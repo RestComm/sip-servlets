@@ -39,6 +39,7 @@ import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
@@ -73,7 +74,7 @@ public class SipFactoryImpl implements SipFactory {
 
 	}
 
-	private static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
+	static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
 			new NamesComparator());
 
 	static {
@@ -282,11 +283,9 @@ public class SipFactoryImpl implements SipFactory {
 		// FIXME: Is this nough?
 		// We need address from which this will be sent, also this one will be
 		// default for contact and via
-		ListeningPoint lp = sipProvider.getListeningPoints()[0];
-		String ip = lp.getIPAddress();
+		ListeningPoint lp = sipProvider.getListeningPoint("udp");
 		String transport = lp.getTransport();
-		int port = lp.getPort();
-
+		
 		// LETS CREATE OUR HEADERS
 
 		try {
@@ -307,30 +306,21 @@ public class SipFactoryImpl implements SipFactory {
 					.createCallIdHeader(((SipApplicationSessionImpl) sipAppSession)
 							.getId());
 			maxForwardsHeader = sipHeaderFactory.createMaxForwardsHeader(70);
-			viaHeader = sipHeaderFactory.createViaHeader(ip, port, transport,
-					"z9hG4bK" + System.currentTimeMillis() + "_"
-							+ Math.random() + "_" + System.currentTimeMillis());
+			
+			
 			// FIXME: ADD ROUTE? HOW?
 			// Address routeAddress = sipAddressFactory.createAddress("sip:"
 			// + peerAddress + ":" + peerPort);
 
 			// routeHeader = sipHeaderFactory.createRouteHeader(routeAddress);
 
-			javax.sip.address.URI requestURI = null;
+			javax.sip.address.SipURI requestURI = null;
 
-			String stringRequestUri = null;
 
-			if (method.compareToIgnoreCase(Request.REGISTER) != 0) {
-				stringRequestUri = to.getURI().toString();
-				contactHeader = sipHeaderFactory.createContactHeader(null);
-			} else {
-				// ITS REGISTER, we have to strip user part
-				String uri = to.getURI().toString();
-				stringRequestUri = uri.substring(0, uri.indexOf(":") + 1)
-						+ uri.substring(uri.indexOf("@") + 1);
-			}
-
-			requestURI = sipAddressFactory.createURI(stringRequestUri);
+			requestURI = (javax.sip.address.SipURI) (((javax.sip.address.URI)to.getURI()).clone());
+			
+		
+		
 
 			// now lets put header params into headers.
 			Iterator<String> keys = to.getParameterNames();
@@ -352,7 +342,9 @@ public class SipFactoryImpl implements SipFactory {
 			}
 
 			requestToWrapp = sipMessageFactory.createRequest(null);
-
+			
+			viaHeader = JainSipUtils.createViaHeader(sipProvider, transport);
+		
 			// Add all headers
 			requestToWrapp.setRequestURI(requestURI);
 			requestToWrapp.addHeader(toHeader);
@@ -365,15 +357,18 @@ public class SipFactoryImpl implements SipFactory {
 				requestToWrapp.addHeader(contactHeader);
 			if (routeHeader != null)
 				requestToWrapp.addHeader(routeHeader);
-
+			
 			ctx = sipProvider.getNewClientTransaction(requestToWrapp);
+			
 			if (dialogCreationMethods.contains(method))
 				dialog = sipProvider.getNewDialog(ctx);
 			
-			dialog.setApplicationData(sipAppSession);
-
-			SipSessionImpl session = new SipSessionImpl(dialog, (SIPTransaction) ctx,
+			
+			SipSessionImpl session = new SipSessionImpl(sipProvider,dialog, (SIPTransaction) ctx,
 					(SipApplicationSessionImpl) sipAppSession);
+			dialog.setApplicationData(session);
+			session.setApplicationSession((SipApplicationSessionImpl)sipAppSession);
+
 
 			SipServletRequest retVal = new SipServletRequestImpl(
 					sipProvider, session, ctx, dialog);
@@ -382,20 +377,10 @@ public class SipFactoryImpl implements SipFactory {
 			// TODO set the routing directive as defined in 15.2.2
 			
 			return retVal;
-		} catch (TransactionUnavailableException e) {
+		} catch (Exception  e) {
 
 			e.printStackTrace();
-
-		} catch (SipException e) {
-
-			e.printStackTrace();
-
-		} catch (ParseException e) {
-
-			e.printStackTrace();
-		} catch (InvalidArgumentException e) {
-
-			e.printStackTrace();
+			logger.error("Error creating sipServletRequest" );
 		}
 
 		return null;

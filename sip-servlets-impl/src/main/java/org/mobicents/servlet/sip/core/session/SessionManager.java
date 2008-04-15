@@ -70,9 +70,9 @@ public class SessionManager {
 					dialog = sp.getNewDialog(transaction);
 				} catch (SipException ex ) {
 					logger.error("Unexpected sip exception" , ex);
-					throw new RuntimeException("Unexpected exception", ex);
+					throw new IllegalStateException("Unexpected exception", ex);
 				}
-				session = new SipSessionImpl(dialog, transaction, null);
+				session = new SipSessionImpl(sp,dialog, transaction, null);
 				
 			} else {
 				session = (SipSessionImpl) transaction.getDialog().getApplicationData();
@@ -85,13 +85,15 @@ public class SessionManager {
 			if ( transaction.getDialog() != null ) {
 				session = (SipSessionImpl) transaction.getDialog().getApplicationData();
 			} else {
-				session = new SipSessionImpl(null, transaction, null);
+				session = new SipSessionImpl(sp,null, transaction, null);
 			}
 			
 		}
 
 		return session;
-		/*try {
+		/*
+		 * Vlad -- you can remove this if no longer relevant.
+		 * try {
 			String initialSessionId = getInitialSessionId(request); // without
 																	// to-tag
 			

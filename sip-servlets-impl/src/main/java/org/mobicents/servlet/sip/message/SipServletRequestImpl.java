@@ -4,6 +4,7 @@ import gov.nist.core.NameValue;
 import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.header.RecordRoute;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.DialogState;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -45,45 +47,40 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest {
+	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
 
+	/* Linked request (for b2bua) */
 	private SipServletRequestImpl nextRequest;
+
+	/*
+	 * Popped route header - when we are the UAS we pop and keep the route
+	 * header
+	 */
 	private RouteHeader popedRouteHeader;
+
+	/* Cache the application routing directive in the record route header */
 	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
-	
+
 	private boolean isInitial = true;
 
-	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
+	private SipServletRequestImpl linkedRequest;
 
 	public SipServletRequestImpl(SipProvider provider, SipSession sipSession,
 			Transaction clientTransaction, Dialog dialog) {
 		super(clientTransaction.getRequest(), provider, clientTransaction,
 				sipSession, dialog);
 
-	}
-	
-	public ContactHeader createContactForProvider(String transport) {
-		try {
-			String ipAddress = provider.getListeningPoint(transport).getIPAddress();
-			int port = provider.getListeningPoint(transport).getPort();
-			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, ipAddress);
-			sipURI.setHost(ipAddress);
-			sipURI.setPort(port);
-			sipURI.setTransportParam(transport);
-			ContactHeader contact = SipFactories.headerFactory.createContactHeader(SipFactories.addressFactory.createAddress(sipURI));
-		
-			return contact;
-		} catch (Exception ex) {
-			logger.fatal ("Unexpected error",ex);
-			throw new RuntimeException ("Unexpected error",ex);
-		}
 	}
 
 	@Override
@@ -163,23 +160,29 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = this.transaction.getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
-			if(statusCode == Response.OK) {
-				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-				if(toHeader.getTag() == null) // If we already have a to tag dont create new
+			if (statusCode == Response.OK) {
+				ToHeader toHeader = (ToHeader) response
+						.getHeader(ToHeader.NAME);
+				if (toHeader.getTag() == null) // If we already have a to tag
+												// dont create new
 				{
 					toHeader.setTag(java.util.UUID.randomUUID().toString());
 					// Add the contact header for the dialog.
-					String transport = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getTransport();
-					ContactHeader contactHeader = this.createContactForProvider(transport);
+					String transport = ((ViaHeader) request
+							.getHeader(ViaHeader.NAME)).getTransport();
+					ContactHeader contactHeader = JainSipUtils
+							.createContactForProvider(provider, transport);
 					response.setHeader(contactHeader);
 				}
-		
-//				response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME, "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
+
+				// response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME,
+				// "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
 			return new SipServletResponseImpl(response, provider,
 					(ServerTransaction) transaction, sipSession, dialog);
 		} catch (ParseException ex) {
-			throw new IllegalArgumentException("Bad status code" + statusCode,ex);
+			throw new IllegalArgumentException("Bad status code" + statusCode,
+					ex);
 		}
 	}
 
@@ -216,26 +219,30 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return ((MaxForwardsHeader) ((Request) message)
 				.getHeader(MaxForwardsHeader.NAME)).getMaxForwards();
 	}
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.sip.SipServletRequest#getPoppedRoute()
 	 */
 	public Address getPoppedRoute() {
 
-		if(this.popedRouteHeader != null) {
+		if (this.popedRouteHeader != null) {
 			return new AddressImpl(this.popedRouteHeader.getAddress());
-		}		
+		}
 		return null;
 	}
 
 	/**
 	 * Set the popped route
-	 * @param routeHeader the popped route header to set
+	 * 
+	 * @param routeHeader
+	 *            the popped route header to set
 	 */
 	public void setPoppedRoute(RouteHeader routeHeader) {
 		this.popedRouteHeader = routeHeader;
 	}
-	
+
 	public Proxy getProxy() throws TooManyHopsException {
 		// TODO Auto-generated method stub
 		return null;
@@ -246,9 +253,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
-	
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.sip.SipServletRequest#getReader()
 	 */
 	public BufferedReader getReader() throws IOException {
@@ -368,26 +375,29 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	public void setRoutingDirective(SipApplicationRoutingDirective directive,
 			SipServletRequest origRequest) throws IllegalStateException {
-			Request request = (Request) message;
+		Request request = (Request) message;
 		javax.sip.address.URI uri = request.getRequestURI();
-		SipServletRequestImpl origRequestImpl  = (SipServletRequestImpl) origRequest;
-		if ( (directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
-				&& ( !origRequestImpl.isInitial || origRequestImpl.isCommitted()) ) {
-			throw new IllegalStateException("Bad state -- cannot set routing directive");
+		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+		if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
+				&& (!origRequestImpl.isInitial || origRequestImpl.isCommitted())) {
+			throw new IllegalStateException(
+					"Bad state -- cannot set routing directive");
 		}
-		
-		RecordRouteHeader rrh   = (RecordRouteHeader) request.getHeader(RecordRouteHeader.NAME);
-		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
-		
+
+		RecordRouteHeader rrh = (RecordRouteHeader) request
+				.getHeader(RecordRouteHeader.NAME);
+		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh
+				.getAddress().getURI();
+
 		try {
-				if (directive == SipApplicationRoutingDirective.NEW) {
-					sipUri.setParameter("rd", "NEW");
-				} else if ( directive == SipApplicationRoutingDirective.REVERSE) {
-					sipUri.setParameter("rd", "REVERSE");					
-				} else if ( directive == SipApplicationRoutingDirective.CONTINUE) {
-					sipUri.setParameter("rd", "CONTINUE");
-				}
-				routingDirective = directive;			
+			if (directive == SipApplicationRoutingDirective.NEW) {
+				sipUri.setParameter("rd", "NEW");
+			} else if (directive == SipApplicationRoutingDirective.REVERSE) {
+				sipUri.setParameter("rd", "REVERSE");
+			} else if (directive == SipApplicationRoutingDirective.CONTINUE) {
+				sipUri.setParameter("rd", "CONTINUE");
+			}
+			routingDirective = directive;
 		} catch (Exception ex) {
 			String s = "error while setting routing directive";
 			logger.error(s, ex);
@@ -399,6 +409,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.ServletRequest#getLocalName()
 	 */
 	public String getLocalName() {
@@ -418,35 +429,40 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
 	 */
 	public String getParameter(String name) {
-		RecordRouteHeader rrh = (RecordRouteHeader) message.getHeader(RecordRouteHeader.NAME);
+		RecordRouteHeader rrh = (RecordRouteHeader) message
+				.getHeader(RecordRouteHeader.NAME);
 		return rrh.getParameter(name);
 	}
 
 	public Map getParameterMap() {
-		RecordRoute rrh = (RecordRoute) message.getHeader(RecordRouteHeader.NAME);
-		HashMap retval  = new HashMap ();
+		RecordRoute rrh = (RecordRoute) message
+				.getHeader(RecordRouteHeader.NAME);
+		HashMap retval = new HashMap();
 		Collection<NameValue> params = rrh.getParameters().values();
-		for ( NameValue nv : params) {
+		for (NameValue nv : params) {
 			retval.put(nv.getName(), nv.getValue());
 		}
-		
+
 		return null;
 	}
 
 	public Enumeration getParameterNames() {
-		RecordRoute rrh = (RecordRoute) message.getHeader(RecordRouteHeader.NAME);
-		Vector<String> retval = new Vector<String> ();
+		RecordRoute rrh = (RecordRoute) message
+				.getHeader(RecordRouteHeader.NAME);
+		Vector<String> retval = new Vector<String>();
 		Set<String> keys = rrh.getParameters().keySet();
 		retval.addAll(keys);
 		return retval.elements();
-	
+
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
 	 */
 	public String[] getParameterValues(String arg0) {
@@ -490,7 +506,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	/**
-	 * @param nextRequest the nextRequest to set
+	 * @param nextRequest
+	 *            the nextRequest to set
 	 */
 	private void setNextRequest(SipServletRequestImpl nextRequest) {
 		this.nextRequest = nextRequest;
@@ -508,6 +525,73 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public SipApplicationRoutingDirective getRoutingDirective() {
 		return routingDirective;
+	}
+
+	@Override
+	public void send() {
+
+		try {
+			Request request = (Request) super.message;
+
+			ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+			String transport = viaHeader.getTransport();
+
+			if ( ((SipURI)request.getRequestURI()).getTransportParam().equalsIgnoreCase("tls")) {
+				transport = "tls";		
+			} else if ( ( viaHeader.getTransport().equalsIgnoreCase("udp")
+					&& request.getContentLength().getContentLength() > 4096 ) ||
+					((SipURI)request.getRequestURI()).getTransportParam().equalsIgnoreCase("tcp")) {
+				transport = "tcp";
+			}
+			
+			if ( ! viaHeader.getTransport().equalsIgnoreCase(transport)) {
+
+				viaHeader = JainSipUtils.createViaHeader(provider, "tcp");
+				request.setHeader(viaHeader);
+			
+
+				ClientTransaction ctx = provider
+						.getNewClientTransaction(request);
+				
+				if ( dialog == null ) {
+					SipApplicationSessionImpl sipAppSession = (SipApplicationSessionImpl) super.transaction
+					.getApplicationData();
+					ctx.setApplicationData(sipAppSession);
+				} else if (SipFactoryImpl.dialogCreationMethods.contains(request
+						.getMethod())
+						&& dialog != null 
+						&& dialog.getState() == null) {
+					SipApplicationSessionImpl sipAppSession = (SipApplicationSessionImpl) super.dialog
+							.getApplicationData();
+
+					dialog = provider.getNewDialog(ctx);
+
+					dialog.setApplicationData(sipAppSession);
+				}
+			
+				super.transaction.terminate();
+				super.transaction = ctx;
+				
+			}
+			// If dialog does not exist or has no state.
+			if ( dialog == null || dialog.getState() == null || dialog.getState() == DialogState.EARLY) {
+				((ClientTransaction) super.transaction).sendRequest();
+			} else {
+				dialog.sendRequest((ClientTransaction) transaction);
+			}
+		} catch (Exception ex) {
+			throw new IllegalStateException("Error sending reuqest");
+		}
+
+	}
+
+	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {
+		this.linkedRequest = linkedRequest;
+		
+	}
+	
+	public SipServletRequestImpl getLinkedRequest() {
+		return this.linkedRequest;
 	}
 
 }

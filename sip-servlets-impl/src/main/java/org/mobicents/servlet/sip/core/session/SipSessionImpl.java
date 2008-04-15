@@ -26,6 +26,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
@@ -42,10 +43,14 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * Implementation of the SipSession interface.
  * 
  *
+ *@author vralev
+ *@author mranga
+ *
  */
 public class SipSessionImpl implements SipSession {
 
 	private SipApplicationSessionImpl sipApplicationSession;
+	
 	
 	private ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners;
 	private ArrayList<SipSessionBindingListener> sipSessionBindingListeners;
@@ -124,8 +129,15 @@ public class SipSessionImpl implements SipSession {
 	private Set<Transaction> ongoingTransactions = new TreeSet<Transaction>();
 	
 	private boolean supervisedMode;
+
+
+	/*
+	 * The almighty provider
+	 */
+	private SipProvider provider;
 	
-	public SipSessionImpl ( Dialog dialog, Transaction transaction, SipApplicationSessionImpl sipApp) {
+	public SipSessionImpl (SipProvider provider, Dialog dialog, Transaction transaction, SipApplicationSessionImpl sipApp) {
+		this.provider = provider;
 		this.sessionCreatingDialog = dialog;
 		this.sessionCreatingTransaction = transaction;
 		this.ongoingTransactions.add(transaction);
@@ -432,4 +444,11 @@ public class SipSessionImpl implements SipSession {
 	public void setSipContext(SipContext sipContext) {
 		this.sipContext = sipContext;
 	}
+
+	public SipProvider getProvider() {
+		
+		return this.provider;
+	}
+
+	
 }

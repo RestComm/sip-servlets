@@ -554,10 +554,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
-	public void send() throws IOException {
-		// TODO Auto-generated method stub
-
-	}
+	public abstract void send() ;
 
 	public void setAcceptLanguage(Locale locale) {
 		// TODO Auto-generated method stub
