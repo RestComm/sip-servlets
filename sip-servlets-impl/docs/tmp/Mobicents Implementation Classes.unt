@@ -210,8 +210,8 @@
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">96</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">924</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">162</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">316</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">313</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">329</XPD:ATTR>
 <XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="7YZYqNID0kO8vtx3nKVrRwAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="yIMz6RTA302HrqDjHxAwBwAA">
@@ -296,9 +296,9 @@
 <XPD:OBJ name="OwnedViews[9]" type="UMLClassView" guid="19s/suTbIESHx+ehVZM8XAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">1008</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">392</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">368</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">588</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">924</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">454</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">225</XPD:ATTR>
 <XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipListenersHolder">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="2C+cweqC/EGSDHYHjDG9NwAA">

@@ -28,8 +28,8 @@ See Note on Section 16.2 of the JSR 289 but it's still present in xsd ..? Check 
 <XPD:OBJ name="OwnedViews[1]" type="UMLNoteView" guid="qRCnp2jlQkivP+mNsjLEuQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">clGreen</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">820</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">904</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">520</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">208</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">413</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">124</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">Global Note :

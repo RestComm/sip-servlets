@@ -20,7 +20,7 @@
 <XPD:REF name="Views[5]">DxKMxWuq9EC9gV9NS6s4QwAA</XPD:REF>
 <XPD:REF name="Views[6]">t3pvUEzKc0K86VF+5VXvCQAA</XPD:REF>
 <XPD:REF name="Views[7]">wqTevedOwEK17FpWn/aE4wAA</XPD:REF>
-<XPD:ATTR name="#Associations" type="integer">10</XPD:ATTR>
+<XPD:ATTR name="#Associations" type="integer">11</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">KpIC0B5IRUuUV9pHn5cFKgAA</XPD:REF>
 <XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sZ6qE80LNkGlAfr/QKCa1AAA</XPD:REF>
 <XPD:REF name="Associations[2]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sUgGEmMjLUya87/NptcVnAAA</XPD:REF>
@@ -31,7 +31,8 @@
 <XPD:REF name="Associations[7]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">9hiBPMEVyESgGr3KzAtdKAAA</XPD:REF>
 <XPD:REF name="Associations[8]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ddeNmAY/j0S61Ka1QsOtlAAA</XPD:REF>
 <XPD:REF name="Associations[9]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">up5X+Pduv02Z8MWDA6wJtwAA</XPD:REF>
-<XPD:ATTR name="#Attributes" type="integer">21</XPD:ATTR>
+<XPD:REF name="Associations[10]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">tqoFFoYnm0icsKQdA44d7QAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">22</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="IWt2oNE7kE+hcZfnjda59wAA">
 <XPD:ATTR name="Name" type="string">applicationName</XPD:ATTR>
 <XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
@@ -140,8 +141,14 @@
 <XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
 <XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Attributes[21]" type="UMLAttribute" guid="dxQWQ+ej/k6t0a0eB4K6swAA">
+<XPD:ATTR name="Name" type="string">sipApplicationSessionAttributeMap</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap&lt;String,Object&gt;</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
 <XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">xludbvJ/vUSOt1CBLxvJeAAA</XPD:REF>
+<XPD:REF name="Instances[1]" pathname="::Sequence actions::chapter 8 - Listeners::CollaborationInstanceSet1::">O2Oh5h30YEC0THTcw6dGdQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="AXJ88RUUGk2bFOlDFaxC3gAA">
 <XPD:ATTR name="Name" type="string">SipServletImpl</XPD:ATTR>

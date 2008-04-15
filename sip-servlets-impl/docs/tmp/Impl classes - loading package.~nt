@@ -31,7 +31,7 @@
 <XPD:REF name="Associations[7]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">9hiBPMEVyESgGr3KzAtdKAAA</XPD:REF>
 <XPD:REF name="Associations[8]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ddeNmAY/j0S61Ka1QsOtlAAA</XPD:REF>
 <XPD:REF name="Associations[9]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">up5X+Pduv02Z8MWDA6wJtwAA</XPD:REF>
-<XPD:ATTR name="#Attributes" type="integer">21</XPD:ATTR>
+<XPD:ATTR name="#Attributes" type="integer">22</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="IWt2oNE7kE+hcZfnjda59wAA">
 <XPD:ATTR name="Name" type="string">applicationName</XPD:ATTR>
 <XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
@@ -69,7 +69,8 @@
 </XPD:OBJ>
 <XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="IQsEhKR1zUedrMW++h82MAAA">
 <XPD:ATTR name="Name" type="string">listeners</XPD:ATTR>
-<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipListenersHolder</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipListenersHolder">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
 <XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="PuQGc8mVp0KE5RObrc/s9AAA">
@@ -137,6 +138,11 @@
 <XPD:OBJ name="Attributes[20]" type="UMLAttribute" guid="pwqT3NqGyUy42WKqwqlUIwAA">
 <XPD:ATTR name="Name" type="string">ejbLocalRefs</XPD:ATTR>
 <XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[21]" type="UMLAttribute" guid="dxQWQ+ej/k6t0a0eB4K6swAA">
+<XPD:ATTR name="Name" type="string">sipApplicationSessionAttributeMap</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap&lt;String,Object&gt;</XPD:ATTR>
 <XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>

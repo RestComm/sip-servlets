@@ -9,11 +9,11 @@
 <XPD:ATTR name="Name" type="string">chapter 8 - Listeners</XPD:ATTR>
 <XPD:ATTR name="#OwnedCollaborationInstanceSets" type="integer">1</XPD:ATTR>
 <XPD:OBJ name="OwnedCollaborationInstanceSets[0]" type="UMLCollaborationInstanceSet" guid="FYOcz1eyd0uTNtim/8c1hwAA">
-<XPD:ATTR name="Name" type="string">CollaborationInstanceSet1</XPD:ATTR>
+<XPD:ATTR name="Name" type="string">chapter 8 - Listeners</XPD:ATTR>
 <XPD:REF name="RepresentedClassifier">oNkHMr4ZXUC3HxRcSE+oZAAA</XPD:REF>
 <XPD:ATTR name="#InteractionInstanceSets" type="integer">1</XPD:ATTR>
 <XPD:OBJ name="InteractionInstanceSets[0]" type="UMLInteractionInstanceSet" guid="T6ThDGdkHkqXsWAXnLxNDgAA">
-<XPD:ATTR name="Name" type="string">LIstener _ 1 </XPD:ATTR>
+<XPD:ATTR name="Name" type="string">SipAppAttribute</XPD:ATTR>
 <XPD:REF name="Context">FYOcz1eyd0uTNtim/8c1hwAA</XPD:REF>
 <XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
 <XPD:OBJ name="OwnedDiagrams[0]" type="UMLSequenceDiagram" guid="cqHv53CRmEu4RbKDxrwfnAAA">
@@ -21,8 +21,56 @@
 <XPD:REF name="DiagramOwner">T6ThDGdkHkqXsWAXnLxNDgAA</XPD:REF>
 <XPD:OBJ name="DiagramView" type="UMLSequenceDiagramView" guid="33HGNEiIAkW/qIZ8zemyrAAA">
 <XPD:REF name="Diagram">cqHv53CRmEu4RbKDxrwfnAAA</XPD:REF>
-<XPD:ATTR name="#OwnedViews" type="integer">2</XPD:ATTR>
-<XPD:OBJ name="OwnedViews[0]" type="UMLNoteView" guid="Rdq3FGVWY0i4j0mYnDvXbwAA">
+<XPD:ATTR name="#OwnedViews" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="OwnedViews[0]" type="UMLSeqObjectView" guid="SI5VPl4uuUGMldbDNvJyXwAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">212</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">192</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">140</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">569</XPD:ATTR>
+<XPD:REF name="Model">O2Oh5h30YEC0THTcw6dGdQAA</XPD:REF>
+<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="QCdrMqmVLECiK58Zmt1grwAA">
+<XPD:OBJ name="NameLabel" type="LabelView" guid="dKlOVekl7U+2jttqFfVHrAAA">
+<XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipServletApplicationImpl</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="hv9Fpw1xC0qBQfyjlwq+gAAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="LabelView" guid="isY0ygxzM0epU8Sfz+2J8gAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="LifeLine" type="UMLLifeLineView" guid="P+hFYHotbEWMoSfAnI7DPgAA">
+<XPD:REF name="Model">O2Oh5h30YEC0THTcw6dGdQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[1]" type="UMLSeqObjectView" guid="UpL+Xmdy1k6nvdNlrpl7SgAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">640</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">205</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">108</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">350</XPD:ATTR>
+<XPD:REF name="Model">7qeSHrwqeUCJtbnqj7i9YgAA</XPD:REF>
+<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="6BDvusF8oEGCXE7fkMwSLQAA">
+<XPD:OBJ name="NameLabel" type="LabelView" guid="DlFmVT07DE6m69gfFaBZUQAA">
+<XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipListenersHolder</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="eV/mFn0sG02cYGQo6sdFXQAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="LabelView" guid="EFHZv1I5KEiBOOluydMjUgAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="LifeLine" type="UMLLifeLineView" guid="WrOJaeYEBU2gJQQqoZjLTQAA">
+<XPD:REF name="Model">7qeSHrwqeUCJtbnqj7i9YgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[2]" type="UMLNoteView" guid="Rdq3FGVWY0i4j0mYnDvXbwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">clLime</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">40</XPD:ATTR>
@@ -35,7 +83,7 @@ some listeners are passed to them so they can
 handle specific invocation - like  javax.servlet.sip.SipSessionActivationListener
 </XPD:ATTR>
 </XPD:OBJ>
-<XPD:OBJ name="OwnedViews[1]" type="UMLNoteView" guid="Cpthp4WqFUixDH3tGNQd+wAA">
+<XPD:OBJ name="OwnedViews[3]" type="UMLNoteView" guid="Cpthp4WqFUixDH3tGNQd+wAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">36</XPD:ATTR>
@@ -45,13 +93,38 @@ handle specific invocation - like  javax.servlet.sip.SipSessionActivationListene
 <XPD:ATTR name="Text" type="string">When sip.xml is parsed, parser fills SipListenersHolder with instances of listeners classes
 </XPD:ATTR>
 </XPD:OBJ>
+<XPD:OBJ name="OwnedViews[4]" type="UMLNoteView" guid="ctROPf07w0u9gOoakJTI+AAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">592</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">68</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">295</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">38</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">Here are lifecycle methods:
+creation, destruction, timeout, activation and passivation
+</XPD:ATTR>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:ATTR name="#ParticipatingInstances" type="integer">1</XPD:ATTR>
+</XPD:OBJ>
+<XPD:ATTR name="#ParticipatingInstances" type="integer">3</XPD:ATTR>
 <XPD:OBJ name="ParticipatingInstances[0]" type="UMLObject" guid="IqLxv6pUu0WoOKJ5wXdFaQAA">
 <XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::SipContexyImpl">8+AAc+nbxk22imhGoS3C+AAA</XPD:REF>
 <XPD:REF name="CollaborationInstanceSet">FYOcz1eyd0uTNtim/8c1hwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="ParticipatingInstances[1]" type="UMLObject" guid="O2Oh5h30YEC0THTcw6dGdQAA">
+<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="CollaborationInstanceSet">FYOcz1eyd0uTNtim/8c1hwAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
+<XPD:REF name="Views[0]">SI5VPl4uuUGMldbDNvJyXwAA</XPD:REF>
+<XPD:REF name="Views[1]">P+hFYHotbEWMoSfAnI7DPgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="ParticipatingInstances[2]" type="UMLObject" guid="7qeSHrwqeUCJtbnqj7i9YgAA">
+<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipListenersHolder">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+<XPD:REF name="CollaborationInstanceSet">FYOcz1eyd0uTNtim/8c1hwAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
+<XPD:REF name="Views[0]">UpL+Xmdy1k6nvdNlrpl7SgAA</XPD:REF>
+<XPD:REF name="Views[1]">WrOJaeYEBU2gJQQqoZjLTQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
