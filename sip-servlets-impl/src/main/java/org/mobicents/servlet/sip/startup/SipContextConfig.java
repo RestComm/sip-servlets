@@ -95,6 +95,7 @@ public class SipContextConfig extends ContextConfig implements
 				sipDigester.setEntityResolver(entityResolver);				
 				//push the context to the digester
 				sipDigester.push(context);
+				sipDigester.setClassLoader(context.getClass().getClassLoader());
 				//parse the sip.xml and populate the context with it
 				try {
 					sipDigester.resolveEntity(null, null);
