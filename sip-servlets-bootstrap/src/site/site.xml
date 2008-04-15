@@ -9,7 +9,7 @@
     <menu>
       <item name="Introduction" href="index.html"/>
       <item name="Install" href="install.html"/>
-      <item name="Examples" href="examples.html"/>
+      <item name="Examples" href="examples/examples.html"/>
       
       <item name="Mailing lists" href="servlets/ProjectMailingListList"/>
       <item name="Source code" href="source/browse/sip-servlets/"/>
