@@ -131,8 +131,31 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		assertTrue(receiver.respondToDisconnect());
 	}
 	
+	// 
+	public void testCallForwardingBothDeployed() throws Exception {
+		deployCallBlocking();
+		deployCallForwarding();
+		setupPhone("sip:forward-sender@sip-servlets.com", "sip:forward-receiver@sip-servlets.com");
+		
+		SipCall sender = sipPhoneSender.createSipCall();
+		SipCall receiver  = sipPhoneReceiver.createSipCall();		
+		
+		receiver.listenForIncomingCall();
+		Thread.sleep(300);
+		sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null);
+				
+		assertTrue(receiver.waitForIncomingCall(TIMEOUT));					
+		assertTrue(receiver.sendIncomingCallResponse(Response.OK, "OK", 0));
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
+		assertTrue(receiver.waitForAck(TIMEOUT));					
+		assertTrue(sender.sendInviteOkAck());		
+		assertTrue(sender.disconnect());
+		assertTrue(receiver.waitForDisconnect(TIMEOUT));
+		assertTrue(receiver.respondToDisconnect());
+	}
+	
 	// Check if we receive a FORBIDDEN response for our invite
-	public void testCallBlockingInviteBothDeployed() throws Exception {
+	public void testCallBlockingBothDeployed() throws Exception {
 		deployCallBlocking();
 		deployCallForwarding();
 		setupPhone("sip:blocked-sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
@@ -140,5 +163,5 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
 		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
 		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));		
-	}
+	}	
 }
