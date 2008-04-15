@@ -21,7 +21,9 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationRoutingDirective;
+import javax.servlet.sip.SipRouteModifier;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -611,16 +613,28 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				getDialog().sendAck(request);
 				return;
 			}
-			//Added for dialog creating requests only not for subsequent requests 
-			if(SipFactoryImpl.dialogCreationMethods.contains(request.getMethod())) {
+			//Added for initial requests only not for subsequent requests 
+			if(isInitial()) {
 				if(getSipSession().getProxyBranch() == null) // If the app is proxying it already does that
 				{
 					//Add a record route header for app composition		
 					addAppCompositionRRHeader();	
 				}
-				//add a route header to direct the request back to the container 
-				//to check if there is any other apps interested in it
-				addInfoForRoutingBackToContainer();				
+				SipApplicationRouterInfo routerInfo = sipFactoryImpl.getNextInterestedApplication(this);
+				if(routerInfo.getNextApplicationName() != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("routing back to the container " +
+								"since the following app is interested " + routerInfo.getNextApplicationName());
+					}
+					//add a route header to direct the request back to the container 
+					//to check if there is any other apps interested in it
+					addInfoForRoutingBackToContainer();
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("routing outside the container " +
+								"since no more apps are is interested.");
+					}
+				}
 			}
 			
 			if (super.getTransaction() == null) {

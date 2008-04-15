@@ -53,7 +53,6 @@ import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -147,7 +146,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = Collections.synchronizedMap(new HashMap<String, SipContext>());
 		sessionManager = new SessionManager();
-		sipFactoryImpl = new SipFactoryImpl(sessionManager);
+		sipFactoryImpl = new SipFactoryImpl(this);
 		hostNames = Collections.synchronizedList(new ArrayList<String>());
 	}
 	
@@ -301,7 +300,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						sipFactoryImpl,
 						null,
 						transaction,
-						null,true);						
+						requestEvent.getDialog(),
+						true);						
 			
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
@@ -323,12 +323,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.info("Routing of Initial Request " + request);
 				routeInitialRequest(sipProvider, sipServletRequest);							
 			} else {
-				logger.info("Routing of Subsequent Request " + request);
-				Dialog dialog = sipServletRequest.getDialog();				
+				logger.info("Routing of Subsequent Request " + request);							
 				if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
-					routeCancel(sipProvider, sipServletRequest, dialog);
+					routeCancel(sipProvider, sipServletRequest);
 				} else {
-					routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
+					routeSubsequentRequest(sipProvider, sipServletRequest);
 				}
 			}
 		} catch (Throwable e) {
@@ -351,10 +350,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @throws SipException
 	 * @throws InvalidArgumentException 
 	 */
-	private void forwardStatefully(SipProvider sipProvider,
-			ServerTransaction serverTransaction,
-			SipServletRequestImpl sipServletRequest,
-			Dialog dialog) throws ParseException,
+	private void forwardStatefully(SipServletRequestImpl sipServletRequest) throws ParseException,
 			TransactionUnavailableException, SipException, InvalidArgumentException {
 				
 		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();		
@@ -390,10 +386,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Routing Back to the container the following request " 
 					+ clonedRequest);
-		}				
+		}	
+		Dialog dialog = sipServletRequest.getDialog();
+		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+				sipFactoryImpl.getSipProviders(), transport);		
 		if(dialog == null) {
+			ServerTransaction serverTransaction = (ServerTransaction) sipServletRequest.getTransaction();
 			Transaction transaction = ((TransactionApplicationData)
-					sipServletRequest.getTransaction().getApplicationData()).getSipServletMessage().getTransaction();
+					serverTransaction.getApplicationData()).getSipServletMessage().getTransaction();
 			if(transaction == null || transaction instanceof ServerTransaction) {
 				ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
 				//keeping the server transaction in the client transaction's application data
@@ -470,10 +470,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @throws ParseException 
 	 * @throws TransactionUnavailableException 
 	 */
-	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest, Dialog dialog) throws TransactionUnavailableException, ParseException, SipException, InvalidArgumentException {
+	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws TransactionUnavailableException, ParseException, SipException, InvalidArgumentException {
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
-
+		Dialog dialog = sipServletRequest.getDialog();
+		
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
 				
 		if(poppedAddress==null){
@@ -583,8 +584,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				return false;
 			} else {		
 				//route header is meant for the container hence we continue
-				forwardStatefully(sipProvider, transaction,
-						sipServletRequest, dialog);
+				forwardStatefully(sipServletRequest);
 				return true;
 			}
 		}		
@@ -597,11 +597,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param request
 	 * @param poppedAddress
 	 */
-	private boolean routeCancel(SipProvider sipProvider, SipServletRequestImpl sipServletRequest, Dialog dialog) {
+	private boolean routeCancel(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
 		
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();		
-						
+		Dialog dialog = sipServletRequest.getDialog();
 		/*
 		 * WARNING: TODO: We need to find a way to route CANCELs through the app path
 		 * of the INVITE. CANCEL does not contain Route headers as other requests related
@@ -667,8 +667,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(inviteRequest.getLinkedRequest() != null) {					
 				SipServletRequestImpl cancelRequest = (SipServletRequestImpl)
 					inviteRequest.getLinkedRequest().createCancel();
-//				cancelRequest.getMessage().removeFirst(RouteHeader.NAME);
-//				cancelRequest.getMessage().removeFirst(RecordRouteHeader.NAME);				
 				cancelRequest.send();
 				return true;
 			} else {
@@ -723,8 +721,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @throws SipException 
 	 * @throws TransactionUnavailableException 
 	 */
-	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws ParseException, TransactionUnavailableException, SipException, InvalidArgumentException {
-		//15.4.1 Routing an Initial request Algorithm
+	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws ParseException, TransactionUnavailableException, SipException, InvalidArgumentException {		
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
 		
@@ -754,7 +751,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
 			logger.info("previous state info : " + stateInfo);
 		}
-					
+		
+		// 15.4.1 Routing an Initial request Algorithm
 		// 15.4.1 Procedure : point 1		
 		SipApplicationRoutingRegion routingRegion = null;
 		if(sipServletRequest.getSipSession() != null) {
@@ -886,7 +884,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// that is not currently deployed we continue routing to see if 
 				// other apps are interested
 				sipServletRequest.addInfoForRoutingBackToContainer();
-				forwardStatefully(sipProvider, transaction, sipServletRequest, null);
+				forwardStatefully(sipServletRequest);
 				return true;
 			}
 			appSession.setSipContext(sipContext);
@@ -942,9 +940,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					// the app that was called didn't do anything with the request
 					// in any case we should route back to container statefully 
 					sipServletRequest.addAppCompositionRRHeader();
-					sipServletRequest.addInfoForRoutingBackToContainer();
-					forwardStatefully(sipProvider, transaction,
-							sipServletRequest, null);
+					SipApplicationRouterInfo routerInfo = getNextInterestedApplication(sipServletRequest);
+					if(routerInfo.getNextApplicationName() != null) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("routing back to the container " +
+									"since the following app is interested " + routerInfo.getNextApplicationName());
+						}
+						//add a route header to direct the request back to the container 
+						//to check if there is any other apps interested in it
+						sipServletRequest.addInfoForRoutingBackToContainer();
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("routing outside the container " +
+									"since no more apps are is interested.");
+						}
+					}
+					forwardStatefully(sipServletRequest);
 					return true;
 				} catch (SipException e) {				
 					logger.error(e);
@@ -1094,23 +1105,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
 		logger.info("Response " + responseEvent.getResponse().toString());
-		Response response = responseEvent.getResponse();
-		// See if this transaction has been here before		
-		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
-		Dialog dialog = responseEvent.getDialog();
-			
-		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
-		ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
-		boolean continueRouting = true;		
-		if(!isViaHeaderExternal(viaHeader)) {
-			continueRouting = routeResponse(response, viaHeader, clientTransaction, dialog);			
-		} 
+					
+		boolean continueRouting = routeResponse(responseEvent);			
 		// if continue routing is to true it means that
 		// a B2BUA got it so we don't have anything to do here 
 		// or an app that didn't do anything with it
 		// or a when handling the request an app had to be called but wasn't deployed
 		// we have to strip the topmost via header and forward it statefully		
 		if (continueRouting) {			
+			Response response = responseEvent.getResponse();			
 			Response newResponse = (Response) response.clone();
 			newResponse.removeFirst(ViaHeader.NAME);
 			ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
@@ -1120,8 +1123,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				if(logger.isDebugEnabled()) {
 					logger.debug("forwarding the response statefully " + newResponse);
 				}
+				TransactionApplicationData applicationData = (TransactionApplicationData)
+					responseEvent.getClientTransaction().getApplicationData();
 				ServerTransaction serverTransaction = (ServerTransaction)
-				((TransactionApplicationData)clientTransaction.getApplicationData()).getTransaction();
+					applicationData.getTransaction();
 				try {
 					serverTransaction.sendResponse(newResponse);
 				} catch (SipException e) {
@@ -1142,73 +1147,80 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	}
 
 	/**
-	 * @param responseEvent
-	 * @param response
-	 * @param address
-	 * @return
+	 * Method for routing responses to apps. This uses via header to know which 
+	 * app has to be called 
+	 * @param responseEvent the jain sip response received
+	 * @return true if we need to continue routing
 	 */
-	private boolean routeResponse(Response response, ViaHeader viaHeader, ClientTransaction clientTransaction, Dialog dialog) {
+	private boolean routeResponse(ResponseEvent responseEvent) {
+		Response response = responseEvent.getResponse();
+		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
+		ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
 		logger.info("viaHeader = " + viaHeader.toString());
-		String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
-		if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
-			return true;
-		}
-		String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
-		String handlerName = viaHeader.getParameter(RR_PARAM_HANDLER_NAME);
-		boolean inverted = false;
-		if(dialog != null && dialog.isServer()) {
-			inverted = true;
-		}
-		SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, inverted);
-		SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl);									
-		// Transate the repsponse to SipServletResponse
-		SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
-				response, 
-				sipFactoryImpl,
-				clientTransaction, 
-				session, 
-				dialog, 
-				null);
-
-		// Update Session state
-		session.updateStateOnResponse(sipServletResponse);
-		
-		try {
-			session.setHandler(handlerName);
-			// See if this is a response to a proxied request
-			ProxyBranchImpl proxyBranch = session.getProxyBranch();
-			if(proxyBranch != null) {
-				// Handle it at the branch
-				proxyBranch.onResponse(sipServletResponse); 
-				
-				// Notfiy the servlet
-				if(proxyBranch.getProxy().getSupervised()) {
+		if(!isViaHeaderExternal(viaHeader)) {
+			ClientTransaction clientTransaction = responseEvent.getClientTransaction();
+			Dialog dialog = responseEvent.getDialog();
+			
+			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
+			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
+				return true;
+			}
+			String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
+			String handlerName = viaHeader.getParameter(RR_PARAM_HANDLER_NAME);
+			boolean inverted = false;
+			if(dialog != null && dialog.isServer()) {
+				inverted = true;
+			}
+			SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, inverted);
+			SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl);									
+			// Transate the repsponse to SipServletResponse
+			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
+					response, 
+					sipFactoryImpl,
+					clientTransaction, 
+					session, 
+					dialog, 
+					null);
+	
+			// Update Session state
+			session.updateStateOnResponse(sipServletResponse);
+			
+			try {
+				session.setHandler(handlerName);
+				// See if this is a response to a proxied request
+				ProxyBranchImpl proxyBranch = session.getProxyBranch();
+				if(proxyBranch != null) {
+					// Handle it at the branch
+					proxyBranch.onResponse(sipServletResponse); 
+					
+					// Notfiy the servlet
+					if(proxyBranch.getProxy().getSupervised()) {
+						callServlet(sipServletResponse, session);
+					}
+					return false;
+				}
+				else {
 					callServlet(sipServletResponse, session);
 				}
+			} catch (ServletException e) {				
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
-			}
-			else {
-				callServlet(sipServletResponse, session);
-			}
-		} catch (ServletException e) {				
-			logger.error(e);
-			// Sends a 500 Internal server error and stops processing.				
-//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-			return false;
-		} catch (IOException e) {				
-			logger.error(e);
-			// Sends a 500 Internal server error and stops processing.				
-//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-			return false;
-		} catch (Throwable e) {
-			e.printStackTrace();
-			logger.error(e);
-			// Sends a 500 Internal server error and stops processing.				
-//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-			return false;
-		}		
-			
-		return true;
+			} catch (IOException e) {				
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+				return false;
+			} catch (Throwable e) {
+				e.printStackTrace();
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+				return false;
+			}		
+		}
+		return true;		
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {
@@ -1384,5 +1396,50 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			logger.debug("Removing hostname "+ hostName);
 		}
 		hostNames.remove(hostName);
+	}
+
+	/**
+	 * @return the sessionManager
+	 */
+	public SessionManager getSessionManager() {
+		return sessionManager;
+	}
+
+	/**
+	 * 
+	 */
+	public SipApplicationRouterInfo getNextInterestedApplication(
+			SipServletRequestImpl sipServletRequest) {
+		SipApplicationRouterInfo applicationRouterInfo = sipApplicationRouter.getNextApplication(
+			sipServletRequest, 
+			sipServletRequest.getSession().getRegion(), 
+			sipServletRequest.getRoutingDirective(), 
+			sipServletRequest.getSipSession().getStateInfo());
+		// 15.4.1 Procedure : point 2
+		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
+		// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
+		// it is up to container to decide whether it is external or internal.
+		if(SipRouteModifier.ROUTE.equals(sipRouteModifier)) {			
+			String route = applicationRouterInfo.getRoute();
+			Address routeAddress = null; 
+			RouteHeader applicationRouterInfoRouteHeader = null;
+			try {
+				routeAddress = SipFactories.addressFactory.createAddress(route);
+				applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
+			} catch (ParseException e) {
+				logger.error("Impossible to parse the route returned by the application router " +
+						"into a compliant address",e);							
+				// the AR returned an empty string route or a bad route
+				// this shouldn't happen if the route modifier is ROUTE, processing is stopped
+				//and a 500 is sent
+//						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+//						return false;
+			}						
+			if(isRouteExternal(applicationRouterInfoRouteHeader)) {
+				// push the route as the top Route header field value and send the request externally
+				sipServletRequest.addHeader(RouteHeader.NAME, route);				
+			}
+		}
+		return applicationRouterInfo;
 	}
 }

@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
@@ -39,6 +40,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
@@ -71,15 +73,14 @@ public class SipFactoryImpl implements SipFactory {
 
 	private Set<SipProvider> sipProviders = null;
 
-	private SessionManager sessionManager = null;
-
+	private SipApplicationDispatcher sipApplicationDispatcher = null;
 	/**
 	 * Dafault constructor
-	 * @param sessionManager 
+	 * @param sipApplicationDispatcher 
 	 */
-	public SipFactoryImpl(SessionManager sessionManager) {
+	public SipFactoryImpl(SipApplicationDispatcher sipApplicationDispatcher) {
 		this.sipProviders = Collections.synchronizedSet(new HashSet<SipProvider>());
-		this.sessionManager = sessionManager;
+		this.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
 
 	/*
@@ -159,7 +160,7 @@ public class SipFactoryImpl implements SipFactory {
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
 				JainSipUtils.findMatchingSipProvider(sipProviders, "udp").getNewCallId().getCallId());		
-		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(
+		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
 				sipApplicationSessionKey, true);
 		sipApplicationSession.setSipContext(sipContext);
 		return sipApplicationSession;
@@ -425,7 +426,7 @@ public class SipFactoryImpl implements SipFactory {
 
 			SipSessionKey key = SessionManager.getSipSessionKey(
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap, false);
-			SipSessionImpl session = sessionManager.getSipSession(key, true, this);
+			SipSessionImpl session = sipApplicationDispatcher.getSessionManager().getSipSession(key, true, this);
 			session.setSipApplicationSession((SipApplicationSessionImpl)sipAppSession);			
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
@@ -482,6 +483,13 @@ public class SipFactoryImpl implements SipFactory {
 	 * @return the sessionManager
 	 */
 	public SessionManager getSessionManager() {
-		return sessionManager;
-	}			
+		return sipApplicationDispatcher.getSessionManager();
+	}	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipApplicationRouterInfo getNextInterestedApplication(SipServletRequestImpl sipServletRequestImpl) {
+		return sipApplicationDispatcher.getNextInterestedApplication(sipServletRequestImpl);
+	}
 }

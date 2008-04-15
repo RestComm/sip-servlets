@@ -19,6 +19,8 @@ import javax.servlet.sip.URI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -30,7 +32,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyImpl implements Proxy {
-	
+	private static Log logger = LogFactory.getLog(ProxyImpl.class);
 	
 	private SipServletRequestImpl originalRequest;
 	private SipServletResponseImpl bestResponse;
@@ -68,9 +70,8 @@ public class ProxyImpl implements Proxy {
 	}
 	
 	public void cancelAllExcept(ProxyBranch except) {
-		for(ProxyBranch pb : proxyBranches.values())
-		{
-			if(pb != except && pb.isStarted()) pb.cancel();
+		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
+			if(!proxyBranch.equals(except) && proxyBranch.isStarted()) proxyBranch.cancel();
 		}
 	}
 
