@@ -7,6 +7,8 @@
 	<classpathentry kind="src" output="applications/call-forwarding-servlet/src/main/sipapp/WEB-INF/classes" path="applications/call-forwarding-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/call-forwarding-b2bua-servlet/src/main/sipapp/WEB-INF/classes" path="applications/call-forwarding-b2bua-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/call-blocking-servlet/src/main/sipapp/WEB-INF/classes" path="applications/call-blocking-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/location-service-servlet/src/main/sipapp/WEB-INF/classes" path="applications/location-service-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/speed-dial-servlet/src/main/sipapp/WEB-INF/classes" path="applications/speed-dial-servlet/src/main/java"/>
 	<classpathentry kind="src" output="testsuite/target/classes" path="testsuite/src/main/java"/>
 	<classpathentry kind="src" path="testsuite/src/test/resources"/>
 	<classpathentry kind="src" path="testsuite/src/test/java"/>

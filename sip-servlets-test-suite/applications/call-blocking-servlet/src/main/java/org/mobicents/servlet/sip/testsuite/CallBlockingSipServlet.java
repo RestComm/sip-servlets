@@ -53,6 +53,12 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		}
 	}
 
+	@Override
+	protected void doBye(SipServletRequest req) throws ServletException,
+			IOException {
+		logger.info("Call Blocking doesn't handle BYE requests");
+	}
+	
 	// SipErrorListener methods
 	/**
 	 * {@inheritDoc}

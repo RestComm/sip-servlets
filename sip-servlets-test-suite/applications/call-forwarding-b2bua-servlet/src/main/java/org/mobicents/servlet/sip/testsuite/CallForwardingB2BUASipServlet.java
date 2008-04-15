@@ -52,16 +52,22 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doAck(SipServletRequest request) throws ServletException,
 			IOException {		
-		logger.info("Got ACK: "
-				+ request.getMethod());
+		logger.info("Got : " + request.toString());
+//		SipSession session = request.getSession();		
+//		SipSession linkedSession = helper.getLinkedSession(session);
+//		SipServletRequest forkedRequest = linkedSession.createRequest("ACK");
+//		forkedRequest.setContentLength(request.getContentLength());
+//		forkedRequest.setContent(request.getContent(), request.getContentType());
+//		logger.info("forkedRequest = " + forkedRequest);
+//		
+//		forkedRequest.send();
 	}
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
-		logger.info("Got INVITE: "
-				+ request.getMethod());
+		logger.info("Got INVITE: " + request.toString());
 		logger.info(request.getFrom().getURI().toString());
 		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
@@ -91,8 +97,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-		logger.info("Got BYE: "
-				+ request.getMethod());
+		logger.info("Got BYE: " + request.toString());
 		//we send the OK directly to the first call leg
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
@@ -108,32 +113,31 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 //		SipURI sipUri = (SipURI) sipFactory.createURI("sip:127.0.0.1:5090");				
 //		forkedRequest.setRequestURI(sipUri);
 		SipSession session = request.getSession();		
-		SipSession linkedSession = helper.getLinkedSession(session);
-		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");
-		
-		logger.info("forkedRequest = " + forkedRequest);
-		
-		forkedRequest.send();
+		SipSession linkedSession = helper.getLinkedSession(session);		
+		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
+		logger.info("forkedRequest = " + forkedRequest);			
+		forkedRequest.send();		
 	}	
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		logger.info("Got : " + sipServletResponse.getStatus() + " "
-				+ sipServletResponse.getMethod());		
+		logger.info("Got : " + sipServletResponse.toString());
 		
+		SipSession originalSession =   
+		    helper.getLinkedSession(sipServletResponse.getSession());
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
 		//if this is a response to an INVITE we ack it and forward the OK 
-		if(cSeqValue.indexOf("INVITE") != -1) {
+		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			logger.info("Sending " +  ackRequest);
 			ackRequest.send();
-			//create and sends OK for the first call leg
-			SipSession originalSession =   
-			    helper.getLinkedSession(sipServletResponse.getSession());					
+			//create and sends OK for the first call leg							
 			SipServletResponse responseToOriginalRequest = 
 				helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
+			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
+			responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();
 		}			
 	}
