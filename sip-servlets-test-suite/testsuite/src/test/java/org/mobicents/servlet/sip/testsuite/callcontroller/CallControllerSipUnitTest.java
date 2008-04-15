@@ -21,8 +21,8 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	private SipStack sipStackReceiver;
 	private SipPhone sipPhoneReceiver;
 
-	private static final int TIMEOUT = 5000;	
-//	private static final int TIMEOUT = 1000000;
+//	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 1000000;
 
 	public CallControllerSipUnitTest(String name) {
 		super(name);
@@ -129,5 +129,16 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		assertTrue(sender.disconnect());
 		assertTrue(receiver.waitForDisconnect(TIMEOUT));
 		assertTrue(receiver.respondToDisconnect());
+	}
+	
+	// Check if we receive a FORBIDDEN response for our invite
+	public void testCallBlockingInviteBothDeployed() throws Exception {
+		deployCallBlocking();
+		deployCallForwarding();
+		setupPhone("sip:blocked-sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
+		SipCall sender = sipPhoneSender.createSipCall();
+		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
+		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));		
 	}
 }

@@ -28,6 +28,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 
 	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);
 	B2buaHelper helper = null;
+	Map<String, String[]> forwardingUris = null;
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */
 	public CallForwardingB2BUASipServlet() {
@@ -37,6 +38,11 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the call forwarding B2BUA sip servlet has been started");
 		super.init(servletConfig);
+		forwardingUris = new HashMap<String, String[]>();
+		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:blocked-sender@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 	}
 	
 	@Override
@@ -53,7 +59,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info("Got INVITE: "
 				+ request.getMethod());
 		logger.info(request.getFrom().getURI().toString());
-		if(request.getFrom().getURI().toString().indexOf("sip:forward-sender@sip-servlets.com") != -1) {
+		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
+		if(forwardingUri != null && forwardingUri.length > 0) {
 			helper = request.getB2buaHelper();
 			
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
@@ -61,12 +68,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			
 			Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
 			Set<String> toHeaderSet = new HashSet<String>();
-			toHeaderSet.add("sip:forward-receiver@sip-servlets.com");
+			toHeaderSet.add(forwardingUri[0]);
 			headers.put("To", toHeaderSet);
 			
 			SipServletRequest forkedRequest = helper.createRequest(request, true,
 					headers);
-			SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
+			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
 			forkedRequest.setRequestURI(sipUri);						
 			
 			logger.info("forkedRequest = " + forkedRequest);
@@ -103,9 +110,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forkedRequest.send();
 	}	
 	
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
@@ -120,11 +125,24 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			SipSession originalSession =   
 			    helper.getLinkedSession(sipServletResponse.getSession());					
 			SipServletResponse responseToOriginalRequest = 
-				helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
+				helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 			responseToOriginalRequest.send();
 		}			
 	}
 	
+	@Override
+	protected void doErrorResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		logger.info("Got : " + sipServletResponse.getStatus() + " "
+				+ sipServletResponse.getReasonPhrase());		
+						
+		//create and sends the error response for the first call leg
+		SipSession originalSession =   
+		    helper.getLinkedSession(sipServletResponse.getSession());					
+		SipServletResponse responseToOriginalRequest = 
+			helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+		responseToOriginalRequest.send();		
+	}
 	
 	// SipErrorListener methods
 	/**

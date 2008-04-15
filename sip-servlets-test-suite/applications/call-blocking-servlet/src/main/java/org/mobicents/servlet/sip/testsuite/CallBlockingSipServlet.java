@@ -1,6 +1,8 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -19,7 +21,7 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		Servlet {
 
 	private static Log logger = LogFactory.getLog(CallBlockingSipServlet.class);
-	
+	List<String> blockedUris = null;
 	
 	/** Creates a new instance of CallBlockingSipServlet */
 	public CallBlockingSipServlet() {}
@@ -28,6 +30,8 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the call blocking sip servlet has been started");
 		super.init(servletConfig);
+		blockedUris = new ArrayList<String>();
+		blockedUris.add("sip:blocked-sender@sip-servlets.com");
 	}
 
 	@Override
@@ -37,10 +41,11 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		logger.info("Got request:\n"
 				+ request.getMethod());
 		logger.info(request.getFrom().getURI().toString());
-		if(request.getFrom().getURI().toString().indexOf("sip:blocked-sender@sip-servlets.com") != -1) {
+		
+		if(blockedUris.contains(request.getFrom().getURI().toString())) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
 			sipServletResponse.send();		
-		}
+		}		
 	}
 
 	// SipErrorListener methods

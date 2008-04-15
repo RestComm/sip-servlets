@@ -46,7 +46,7 @@ public class ProxyTest extends SipServletTestCase{
 				e.printStackTrace();
 			}
 		}
-		firstTime = false;
+		firstTime = true;
 	}
 	
 	@Override

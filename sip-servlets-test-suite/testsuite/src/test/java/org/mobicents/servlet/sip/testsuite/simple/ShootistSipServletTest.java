@@ -32,7 +32,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/simple/simple-sip-servlet-dar.properties";
+				"org/mobicents/servlet/sip/testsuite/simple/shootist-sip-servlet-dar.properties";
 	}
 	
 	@Override
