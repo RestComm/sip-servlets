@@ -11,7 +11,7 @@
 <XPD:OBJ name="OwnedCollaborationInstanceSets[0]" type="UMLCollaborationInstanceSet" guid="019FC/21/EmRPxnN73avCgAA">
 <XPD:ATTR name="Name" type="string">chapter 1 - Proxy</XPD:ATTR>
 <XPD:REF name="RepresentedClassifier">OsSazqX9lkKjcdWzQbR8OwAA</XPD:REF>
-<XPD:ATTR name="#InteractionInstanceSets" type="integer">2</XPD:ATTR>
+<XPD:ATTR name="#InteractionInstanceSets" type="integer">3</XPD:ATTR>
 <XPD:OBJ name="InteractionInstanceSets[0]" type="UMLInteractionInstanceSet" guid="uvkW+4vIpUuGFU0eyv31egAA">
 <XPD:ATTR name="Name" type="string">Proxying - parallel == true, no error</XPD:ATTR>
 <XPD:REF name="Context">019FC/21/EmRPxnN73avCgAA</XPD:REF>
@@ -2204,20 +2204,170 @@ or is it the same invocation?
 <XPD:REF name="Views[3]">ZT7ChdNVD0uSIdr9dLEojQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:OBJ name="InteractionInstanceSets[2]" type="UMLInteractionInstanceSet" guid="0aGCAMYRIkGOtuuDWoKMsgAA">
+<XPD:ATTR name="Name" type="string">Proxying - parallel == false - error and no error</XPD:ATTR>
+<XPD:REF name="Context">019FC/21/EmRPxnN73avCgAA</XPD:REF>
+<XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedDiagrams[0]" type="UMLSequenceDiagram" guid="1Olu9GiSRUO+p/lbFVh8cAAA">
+<XPD:ATTR name="Name" type="string">sequence diagram</XPD:ATTR>
+<XPD:REF name="DiagramOwner">0aGCAMYRIkGOtuuDWoKMsgAA</XPD:REF>
+<XPD:OBJ name="DiagramView" type="UMLSequenceDiagramView" guid="vroi5vHAPE6MH7Xc5seGswAA">
+<XPD:REF name="Diagram">1Olu9GiSRUO+p/lbFVh8cAAA</XPD:REF>
+<XPD:ATTR name="#OwnedViews" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="OwnedViews[0]" type="UMLSeqObjectView" guid="3dgcY9MovUuR5QzYOMOfYAAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">615</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">213</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">70</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">728</XPD:ATTR>
+<XPD:REF name="Model">UvwUGZYYU0O7xUl08azNPAAA</XPD:REF>
+<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="hA2Dwk1uFEq0ULqufL1CNgAA">
+<XPD:OBJ name="NameLabel" type="LabelView" guid="ndDfRwh5s0epXxZT42+pBwAA">
+<XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : Proxy</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="o2GnQxh2lEuOOLAXFg+QiwAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="LabelView" guid="3vrUEqlWCEiEjnWlTjnUwwAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="LifeLine" type="UMLLifeLineView" guid="gE3A1DEbekGOA3z80lZ/ywAA">
+<XPD:REF name="Model">UvwUGZYYU0O7xUl08azNPAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[1]" type="UMLSeqObjectView" guid="FhN1/JOhP0aDS3qNGMqk2AAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">433</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">234</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">70</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">711</XPD:ATTR>
+<XPD:REF name="Model">gtHSrrD+lEaRU6mdZwqZ7AAA</XPD:REF>
+<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="ISjVQxNCo0iqJ+oKv+dQRAAA">
+<XPD:OBJ name="NameLabel" type="LabelView" guid="TqMlH69JGkmMmz4mS269NgAA">
+<XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">Container</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="IoMlUhrGcE6A2/huPgW5TgAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="LabelView" guid="dK/qDPSbnkCrozdqp5LgiwAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="LifeLine" type="UMLLifeLineView" guid="kOGDW+iQ20KRTt6G1kaL7QAA">
+<XPD:REF name="Model">gtHSrrD+lEaRU6mdZwqZ7AAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[2]" type="UMLSeqObjectView" guid="ZYaFRcZJTEm4xl3o5JLIxQAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">164</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">236</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">70</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">709</XPD:ATTR>
+<XPD:REF name="Model">Q/7r6reizE6HAQY3LQsd8QAA</XPD:REF>
+<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="b0axdyQ/LE2nUwrIWowYpwAA">
+<XPD:OBJ name="NameLabel" type="LabelView" guid="6F+RzlozqUCsFX/3ebZWJwAA">
+<XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">Stack</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="yWvAgWUk4EK3UvuqjMpBqwAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="LabelView" guid="Wf5UQBEaG0mE02HQ5kAYUwAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="LifeLine" type="UMLLifeLineView" guid="+XuvSn5TY0Ss0PJQ0zyq5QAA">
+<XPD:REF name="Model">Q/7r6reizE6HAQY3LQsd8QAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[3]" type="UMLNoteView" guid="G1BtQxJ2tE2C4whqB7BIbQAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">80</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">52</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">233</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">38</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">Start is the same as in other diagrams here
+request is received, container does its magic
+</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[4]" type="UMLSeqStimulusView" guid="0YY6owAFr06cuz8XfPZhowAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">468,304;643,304</XPD:ATTR>
+<XPD:REF name="Model">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
+<XPD:REF name="Head">gE3A1DEbekGOA3z80lZ/ywAA</XPD:REF>
+<XPD:REF name="Tail">kOGDW+iQ20KRTt6G1kaL7QAA</XPD:REF>
+<XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="YNY//bIKXUGPfOi/T5wSHgAA">
+<XPD:ATTR name="Alpha" type="real">1,5707963267949</XPD:ATTR>
+<XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">1 : startProxy()</XPD:ATTR>
+<XPD:REF name="Model">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
+<XPD:REF name="HostEdge">0YY6owAFr06cuz8XfPZhowAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="EdgeLabelView" guid="+dFPxpF8ske7iuZFHj/wvAAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+<XPD:ATTR name="Alpha" type="real">1,5707963267949</XPD:ATTR>
+<XPD:ATTR name="Distance" type="real">25</XPD:ATTR>
+<XPD:REF name="Model">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
+<XPD:REF name="HostEdge">0YY6owAFr06cuz8XfPZhowAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="EdgeLabelView" guid="Ug5TrCNTg0O3YKzwwDajPQAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+<XPD:ATTR name="Alpha" type="real">-1,5707963267949</XPD:ATTR>
+<XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
+<XPD:REF name="Model">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
+<XPD:REF name="HostEdge">0YY6owAFr06cuz8XfPZhowAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Activation" type="UMLActivationView" guid="v6p71y1OjECIW7fBvhRBzQAA">
+<XPD:ATTR name="Left" type="integer">643</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">304</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">221</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:ATTR name="#ParticipatingStimuli" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="ParticipatingStimuli[0]" type="UMLStimulus" guid="mZjKg13DiEmyHDZtwX9j4AAA">
+<XPD:REF name="Sender">gtHSrrD+lEaRU6mdZwqZ7AAA</XPD:REF>
+<XPD:REF name="Receiver">UvwUGZYYU0O7xUl08azNPAAA</XPD:REF>
+<XPD:OBJ name="Action" type="UMLCallAction" guid="gYueK1hedE+WM9LJ2/FnywAA">
+<XPD:REF name="Stimulus">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
+<XPD:REF name="Operation" pathname="::Specification Classes::javax::servlet::sip::Proxy::startProxy">gGECM88zcEO+M4c0HnS/sAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:REF name="InteractionInstanceSet">0aGCAMYRIkGOtuuDWoKMsgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">0YY6owAFr06cuz8XfPZhowAA</XPD:REF>
+<XPD:REF name="Views[1]">YNY//bIKXUGPfOi/T5wSHgAA</XPD:REF>
+<XPD:REF name="Views[2]">+dFPxpF8ske7iuZFHj/wvAAA</XPD:REF>
+<XPD:REF name="Views[3]">Ug5TrCNTg0O3YKzwwDajPQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
 <XPD:ATTR name="#ParticipatingInstances" type="integer">9</XPD:ATTR>
 <XPD:OBJ name="ParticipatingInstances[0]" type="UMLObject" guid="gtHSrrD+lEaRU6mdZwqZ7AAA">
 <XPD:ATTR name="Name" type="string">Container</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">019FC/21/EmRPxnN73avCgAA</XPD:REF>
-<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="#Views" type="integer">6</XPD:ATTR>
 <XPD:REF name="Views[0]">plu/ZayMjkaGUOHTbZPRpgAA</XPD:REF>
 <XPD:REF name="Views[1]">UMBLQ0bE2EKzj6+iM4w8YAAA</XPD:REF>
 <XPD:REF name="Views[2]">oiPyGB/GK0im7g06WToYyQAA</XPD:REF>
 <XPD:REF name="Views[3]">Xus0H/Zw70qrma2lBzDp0gAA</XPD:REF>
-<XPD:ATTR name="#SendingStimuli" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[4]">FhN1/JOhP0aDS3qNGMqk2AAA</XPD:REF>
+<XPD:REF name="Views[5]">kOGDW+iQ20KRTt6G1kaL7QAA</XPD:REF>
+<XPD:ATTR name="#SendingStimuli" type="integer">5</XPD:ATTR>
 <XPD:REF name="SendingStimuli[0]">6yQJGT7eXkeBpylkg7LHOgAA</XPD:REF>
 <XPD:REF name="SendingStimuli[1]">Vb+pW8Z1UEOYEqijPa2GKgAA</XPD:REF>
 <XPD:REF name="SendingStimuli[2]">VS/Hgr4R9E2ZeqSGz8of6AAA</XPD:REF>
 <XPD:REF name="SendingStimuli[3]">JcwIClOI8UOIpQxRMRzmZwAA</XPD:REF>
+<XPD:REF name="SendingStimuli[4]">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
 <XPD:ATTR name="#ReceivingStimuli" type="integer">4</XPD:ATTR>
 <XPD:REF name="ReceivingStimuli[0]">bXE/NUqBUkiofXxQTOnAUwAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[1]">6yQJGT7eXkeBpylkg7LHOgAA</XPD:REF>
@@ -2262,11 +2412,13 @@ or is it the same invocation?
 <XPD:OBJ name="ParticipatingInstances[3]" type="UMLObject" guid="Q/7r6reizE6HAQY3LQsd8QAA">
 <XPD:ATTR name="Name" type="string">Stack</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">019FC/21/EmRPxnN73avCgAA</XPD:REF>
-<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="#Views" type="integer">6</XPD:ATTR>
 <XPD:REF name="Views[0]">g4QhJkDvFEeaDuXVbYdinwAA</XPD:REF>
 <XPD:REF name="Views[1]">GJI0yFXlwEKwaOjnRO5knAAA</XPD:REF>
 <XPD:REF name="Views[2]">eja85Ms8OEyPzNHfXttwngAA</XPD:REF>
 <XPD:REF name="Views[3]">JAl4jJFJ+k24kP32txN/rwAA</XPD:REF>
+<XPD:REF name="Views[4]">ZYaFRcZJTEm4xl3o5JLIxQAA</XPD:REF>
+<XPD:REF name="Views[5]">+XuvSn5TY0Ss0PJQ0zyq5QAA</XPD:REF>
 <XPD:ATTR name="#SendingStimuli" type="integer">2</XPD:ATTR>
 <XPD:REF name="SendingStimuli[0]">bXE/NUqBUkiofXxQTOnAUwAA</XPD:REF>
 <XPD:REF name="SendingStimuli[1]">UkyOrh2gF0CgHHh5VFYUwQAA</XPD:REF>
@@ -2274,11 +2426,13 @@ or is it the same invocation?
 <XPD:OBJ name="ParticipatingInstances[4]" type="UMLObject" guid="UvwUGZYYU0O7xUl08azNPAAA">
 <XPD:REF name="Classifier" pathname="::Specification Classes::javax::servlet::sip::Proxy">aAno3Gq1O0+xEokONVJiXwAA</XPD:REF>
 <XPD:REF name="CollaborationInstanceSet">019FC/21/EmRPxnN73avCgAA</XPD:REF>
-<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:ATTR name="#Views" type="integer">6</XPD:ATTR>
 <XPD:REF name="Views[0]">3zrR5x6rxky12TtXgfMU9QAA</XPD:REF>
 <XPD:REF name="Views[1]">eoxB/iiyik2JiSjfGUK/6wAA</XPD:REF>
 <XPD:REF name="Views[2]">40i3Dfw4DUGWliXCVPSF+wAA</XPD:REF>
 <XPD:REF name="Views[3]">Ve46bwKx3k6YmbNqA/sRWQAA</XPD:REF>
+<XPD:REF name="Views[4]">3dgcY9MovUuR5QzYOMOfYAAA</XPD:REF>
+<XPD:REF name="Views[5]">gE3A1DEbekGOA3z80lZ/ywAA</XPD:REF>
 <XPD:ATTR name="#SendingStimuli" type="integer">12</XPD:ATTR>
 <XPD:REF name="SendingStimuli[0]">Lj5bb6LlfU+ZAQwJ2//kGwAA</XPD:REF>
 <XPD:REF name="SendingStimuli[1]">/7J5qs3NsUuF6CX3zc27LwAA</XPD:REF>
@@ -2292,7 +2446,7 @@ or is it the same invocation?
 <XPD:REF name="SendingStimuli[9]">UJfzu3dLXk2rjk5xvIb19wAA</XPD:REF>
 <XPD:REF name="SendingStimuli[10]">OhNW9MHpKUaCY1A6Yu/hwgAA</XPD:REF>
 <XPD:REF name="SendingStimuli[11]">lOsPACXNU0yvrCy3mcawygAA</XPD:REF>
-<XPD:ATTR name="#ReceivingStimuli" type="integer">11</XPD:ATTR>
+<XPD:ATTR name="#ReceivingStimuli" type="integer">12</XPD:ATTR>
 <XPD:REF name="ReceivingStimuli[0]">mgXj7lPxQkCm0CnlfhBYKQAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[1]">BZRQRTadn0Sgjp0QQJNmtQAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[2]">Lj5bb6LlfU+ZAQwJ2//kGwAA</XPD:REF>
@@ -2304,6 +2458,7 @@ or is it the same invocation?
 <XPD:REF name="ReceivingStimuli[8]">UJfzu3dLXk2rjk5xvIb19wAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[9]">OhNW9MHpKUaCY1A6Yu/hwgAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[10]">lOsPACXNU0yvrCy3mcawygAA</XPD:REF>
+<XPD:REF name="ReceivingStimuli[11]">mZjKg13DiEmyHDZtwX9j4AAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[5]" type="UMLObject" guid="nB4SK2rU40mztfBw1xB/3AAA">
 <XPD:REF name="Classifier" pathname="::Specification Classes::javax::servlet::sip::ProxyBranch">L3b1g9jJ6kazk/UwJ4IVFAAA</XPD:REF>
