@@ -175,8 +175,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = this.getTransaction().getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
-			if (statusCode == Response.OK ||
-					statusCode == Response.MOVED_TEMPORARILY) {
+			if (statusCode == Response.OK ) {
 				ToHeader toHeader = (ToHeader) response
 						.getHeader(ToHeader.NAME);
 				if (toHeader.getTag() == null) // If we already have a to tag
@@ -185,7 +184,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 					// Add the contact header for the dialog.
 					String transport = ((ViaHeader) request
-							.getHeader(ViaHeader.NAME)).getTransport();
+							.getHeader(ViaHeader.NAME)).getTransport();					
 					ContactHeader contactHeader = JainSipUtils
 							.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
 					response.setHeader(contactHeader);
@@ -193,6 +192,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 				// response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME,
 				// "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
+			}
+			if(statusCode == Response.MOVED_TEMPORARILY) {
+				ToHeader toHeader = (ToHeader) response
+					.getHeader(ToHeader.NAME);
+				// If we already have a to tag, dont create new
+				if (toHeader.getTag() == null) {
+					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));					
+				}
 			}
 			return new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog());
