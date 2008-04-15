@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.CallForwardingB2BUASipServlet</app-name>
+	<display-name>Call Forwarding B2BUA Sip Servlet</display-name>
+	<description>Call Forwarding B2BUA Sip Servlet</description>
+	
+	<main-servlet>
+		CallForwardingSipServletB2BUA
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>CallForwardingB2BUASipServlet</servlet-name>
+		<display-name>CallForwardingB2BUASipServlet</display-name>
+		<description>Call Forwarding B2BUA Sip Servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.CallForwardingSipServletB2BUA
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.CallForwardingSipServletB2BUA
+		</listener-class>
+	</listener>
+</sip-app>

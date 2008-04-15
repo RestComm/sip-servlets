@@ -1,12 +1,10 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -22,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 public class CallForwardingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(CallForwardingSipServlet.class);
+	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);
 	
 	
 	/** Creates a new instance of CallForwardingSipServlet */

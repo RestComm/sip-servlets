@@ -8,9 +8,9 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
-	<artifactId>simple-sip-servlet</artifactId>
+	<artifactId>call-forwarding-servlet</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>Simple Sip Servlet Example</name>
+	<name>Call Forwarding Sip Servlet Example</name>
 	<url>http://sip-servlets.dev.java.net</url>	
 </project>
