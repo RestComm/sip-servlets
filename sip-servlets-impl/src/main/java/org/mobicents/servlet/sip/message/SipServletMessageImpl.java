@@ -13,13 +13,10 @@
  */
 package org.mobicents.servlet.sip.message;
 
+
 import gov.nist.javax.sip.header.AddressParametersHeader;
-import gov.nist.javax.sip.header.ContentLanguage;
-import gov.nist.javax.sip.header.ContentType;
-import gov.nist.javax.sip.header.Expires;
 import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
-import gov.nist.javax.sip.message.SIPMessage;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -55,10 +52,12 @@ import javax.sip.header.CallInfoHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentDispositionHeader;
 import javax.sip.header.ContentEncodingHeader;
+import javax.sip.header.ContentLanguageHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.ErrorInfoHeader;
 import javax.sip.header.EventHeader;
+import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
@@ -110,9 +109,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
-	protected String _encDefault = "UTF8";
+	protected String defaultEncoding = "UTF8";
 
-	protected HeaderForm _headerForm = HeaderForm.DEFAULT;
+	protected HeaderForm headerForm = HeaderForm.DEFAULT;
 
 	protected InetAddress localAddr = null;
 
@@ -300,7 +299,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if (this.message.getContentEncoding() == null)
 			try {
 				this.message.addHeader(this.headerFactory
-						.createContentEncodingHeader(this._encDefault));
+						.createContentEncodingHeader(this.defaultEncoding));
 			} catch (ParseException e) {
 				logger.debug("Couldnt add deafualt enconding...");
 				e.printStackTrace();
@@ -727,7 +726,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getHeaderForm()
 	 */
 	public HeaderForm getHeaderForm() {
-		return this._headerForm;
+		return this.headerForm;
 	}
 
 	/*
@@ -843,8 +842,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getRawContent()
 	 */
-	public byte[] getRawContent() throws IOException {
-		SIPMessage message = (SIPMessage) this.message;
+	public byte[] getRawContent() throws IOException {		
 		if (message != null)
 			return message.getRawContent();
 		else
@@ -1118,9 +1116,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			throws UnsupportedEncodingException {
 		if(contentType != null && contentType.length() > 0) {
 			String type = contentType.split("/")[0];
-			String subtype = contentType.split("/")[1];
+			String subtype = contentType.split("/")[1];			
 			try {
-				this.message.setContent(content, new ContentType(type, subtype));
+				ContentTypeHeader contentTypeHeader = 
+					SipFactories.headerFactory.createContentTypeHeader(type, subtype);
+				this.message.setContent(content, contentTypeHeader);
 			} catch (Exception e) {
 				throw new RuntimeException("Parse error reading content type", e);
 			}
@@ -1132,9 +1132,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setContentLanguage(java.util.Locale)
 	 */
 	public void setContentLanguage(Locale locale) {
-		this.message.setContentLanguage(new ContentLanguage(locale
-				.getLanguage()));
-
+		ContentLanguageHeader contentLanguageHeader = 
+			SipFactories.headerFactory.createContentLanguageHeader(locale);
+		this.message.setContentLanguage(contentLanguageHeader);
 	}
 	
 	/*
@@ -1180,11 +1180,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setExpires(int seconds) {
 		try {
-			Expires expiresHeader = new Expires();
+			ExpiresHeader expiresHeader = 
+				SipFactories.headerFactory.createExpiresHeader(seconds);			
 			expiresHeader.setExpires(seconds);
 			this.message.setExpires(expiresHeader);
 		} catch (Exception e) {
-			throw new RuntimeException("Error setting expiration!", e);
+			throw new RuntimeException("Error setting expiration header!", e);
 		}
 	}
 
@@ -1318,7 +1319,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		// return name;
 		// break;;
 		// }
-		return this.getCorrectHeaderName(name, this._headerForm);
+		return this.getCorrectHeaderName(name, this.headerForm);
 
 	}
 

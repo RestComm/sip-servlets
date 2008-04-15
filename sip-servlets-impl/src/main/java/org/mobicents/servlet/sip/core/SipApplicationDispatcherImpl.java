@@ -79,7 +79,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;

@@ -35,7 +35,7 @@ import org.mobicents.servlet.sip.SipFactories;
  * @author bartek
  * 
  */
-public class AddressImpl  extends ParameterableImpl implements Address{
+public class AddressImpl  extends ParameterableImpl implements Address {
 
 //	private static Log logger = LogFactory.getLog(AddressImpl.class
 //			.getCanonicalName());

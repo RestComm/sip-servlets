@@ -294,10 +294,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 					.createURI(uri);
 			if (jainUri instanceof javax.sip.address.SipURI) {
 				return new SipURIImpl(
-						(gov.nist.javax.sip.address.SipUri) jainUri);
+						(javax.sip.address.SipURI) jainUri);
 			} else if (jainUri instanceof javax.sip.address.TelURL) {
 				return new TelURLImpl(
-						(gov.nist.javax.sip.address.TelURLImpl) jainUri);
+						(javax.sip.address.TelURL) jainUri);
 
 			}
 		} catch (Exception ex) {

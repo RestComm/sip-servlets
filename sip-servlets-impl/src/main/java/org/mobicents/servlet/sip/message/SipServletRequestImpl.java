@@ -13,20 +13,17 @@
  */
 package org.mobicents.servlet.sip.message;
 
-import gov.nist.core.NameValue;
-import gov.nist.javax.sip.header.RecordRoute;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.RequestDispatcher;
@@ -561,24 +558,34 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return rrh.getParameter(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getParameterMap()
+	 */
 	public Map<String, String> getParameterMap() {
-		RecordRoute rrh = (RecordRoute) message
+		RecordRouteHeader rrh = (RecordRouteHeader) message
 				.getHeader(RecordRouteHeader.NAME);
 		HashMap<String, String> retval = new HashMap<String, String>();
-		Collection<NameValue> params = rrh.getParameters().values();
-		for (NameValue nv : params) {
-			retval.put(nv.getName(), nv.getValue());
+		Iterator<String> parameterNamesIt = rrh.getParameterNames();
+		while (parameterNamesIt.hasNext()) {
+			String parameterName = (String) parameterNamesIt.next();
+			retval.put(parameterName, rrh.getParameter(parameterName));			
 		}
-
 		return retval;
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getParameterNames()
+	 */
 	public Enumeration<String> getParameterNames() {
-		RecordRoute rrh = (RecordRoute) message
+		RecordRouteHeader rrh = (RecordRouteHeader) message
 				.getHeader(RecordRouteHeader.NAME);
 		Vector<String> retval = new Vector<String>();
-		Set<String> keys = rrh.getParameters().keySet();
-		retval.addAll(keys);
+		Iterator<String> parameterNamesIt = rrh.getParameterNames();
+		while (parameterNamesIt.hasNext()) {
+			String parameterName = (String) parameterNamesIt.next();
+			retval.add(parameterName);
+		}		
 		return retval.elements();
 
 	}
