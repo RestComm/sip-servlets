@@ -345,49 +345,62 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		Request request = (Request) sipServletRequest.getMessage();
 		//TODO Extract information from the Record Route Header
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
-		if(poppedAddress == null) {	
+
+		/*
+		 * WARNING: TODO: We need to find a way to route CANCELs through the app path
+		 * of the INVITE. CANCEL does not contain Route headers as other requests related
+		 * to the dialog.
+		 */
+		/* If there is a proxy with the request, let's try to send it directly there.
+		 * This is needed because of CANCEL which is a subsequent request that might
+		 * not have Routes. For example if the callee has'n responded the caller still
+		 * doesn't know the route-record and just sends cancel to the outbound proxy.
+		 */
+		boolean proxyCancel = false;
+		if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
+			Transaction inviteTransaction = ((SIPServerTransaction) transaction ).getCanceledInviteTransaction();
+			Object appData = inviteTransaction.getApplicationData();
+			TransactionApplicationData tad = (TransactionApplicationData) appData;
+			if(tad.getProxy() != null)
+			{
+				try {
+					// First we need to send OK ASAP because of retransmissions.
+					ServerTransaction cancelTransaction = 
+						(ServerTransaction) sipServletRequest.getTransaction();
+					SipServletResponseImpl cancelResponse = (SipServletResponseImpl) 
+					sipServletRequest.createResponse(200, "Canceling");
+					Response cancelJsipResponse = (Response) cancelResponse.getMessage();
+					cancelTransaction.sendResponse(cancelJsipResponse);
+				} catch (SipException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				tad.getProxy().cancel();
+				proxyCancel = true;
+				return false;
+			}
 			
-			/*
-			 * WARNING: TODO: We need to find a way to route CANCELs through the app path
-			 * of the INVITE. CANCEL does not contain Route headers as other requests related
-			 * to the dialog.
-			 */
-			/* If there is a proxy with the request, let's try to send it directly there.
-			 * This is needed because of CANCEL which is a subsequent request that might
-			 * not have Routes. For example if the callee has'n responded the caller still
-			 * doesn't know the route-record and just sends cancel to the outbound proxy.
-			 */
-			boolean proxyCancel = false;
-			if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
-				Transaction inviteTransaction = ((SIPServerTransaction) transaction ).getCanceledInviteTransaction();
-				Object appData = inviteTransaction.getApplicationData();
-				TransactionApplicationData tad = (TransactionApplicationData) appData;
-				if(tad.getProxy() != null)
-				{
-					try {
-						// First we need to send OK ASAP because of retransmissions.
-						ServerTransaction cancelTransaction = 
-							(ServerTransaction) sipServletRequest.getTransaction();
-						SipServletResponseImpl cancelResponse = (SipServletResponseImpl) 
-							sipServletRequest.createResponse(200, "Canceling");
-						Response cancelJsipResponse = (Response) cancelResponse.getMessage();
-						cancelTransaction.sendResponse(cancelJsipResponse);
-					} catch (SipException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InvalidArgumentException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					tad.getProxy().cancel();
-					proxyCancel = true;
-					return false;
+			// TODO: This is a temporary patch. Rewrite when AR uses transactions
+			// This code handles CANCEL requests that got back to the container
+			// after being proxied for example.
+			if(poppedAddress != null)
+			{
+				try {
+					sipProvider.sendRequest((Request)sipServletRequest.getMessage());
+				} catch (SipException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-			if(!proxyCancel){
-				throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
-			}			
+			// End of code to rewrite
 		}
+		if(!proxyCancel && poppedAddress==null){
+			throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
+		}			
+		
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
 		if(applicationName == null || applicationName.length() < 1 || 
