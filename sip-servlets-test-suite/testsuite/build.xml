@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="test-suite" name="sip-servlets-test-suite">
     <property environment="env"/>
-    <property name="M2_REPO" value="C:/Documents and Settings/mranga/.m2/repository"/>
+    <property name="M2_REPO" value="C:/Documents and Settings/dragan/.m2/repository"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.5"/>
     <property name="source" value="1.5"/>
+    <property name="classes" value="target/classes"/>
+    <property name="test-classes" value="target/test-classes"/>
     <path id="sip-servlets-test-suite.classpath">
-        <pathelement location="target/classes"/>
-        <pathelement location="target/test-classes"/>
+        <pathelement location="${classes}"/>
+        <pathelement location="${test-classes}"/>
         <pathelement location="${M2_REPO}/tomcat/tomcat-coyote/5.5.15/tomcat-coyote-5.5.15.jar"/>
         <pathelement location="${M2_REPO}/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
         <pathelement location="${M2_REPO}/directory-naming/naming-resources/0.8/naming-resources-0.8.jar"/>
@@ -30,17 +32,17 @@
         <pathelement location="${M2_REPO}/commons-digester/commons-digester/1.2/commons-digester-1.2.jar"/>
         <pathelement location="${M2_REPO}/directory-naming/naming-core/0.8/naming-core-0.8.jar"/>
         <pathelement location="${M2_REPO}/javax/sip/jain-sip-ri/1.2/jain-sip-ri-1.2.jar"/>
-        <pathelement location="${M2_REPO}/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar"/>
+        <pathelement location="${M2_REPO}/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar"/>        
     </path>
     
     <target name="init">
-        <mkdir dir="target/classes"/>
-        <mkdir dir="target/test-classes"/>        
+        <mkdir dir="${classes}"/>
+        <mkdir dir="${test-classes}"/>        
     </target>
     
     <target name="clean">
-        <delete dir="target/classes"/>
-        <delete dir="target/test-classes"/>
+        <delete dir="${classes}"/>
+        <delete dir="${test-classes}"/>
     </target>
     
     <target depends="clean" name="cleanall"/>
@@ -49,14 +51,19 @@
     
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="target/classes" source="${source}" target="${target}">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${classes}" source="${source}" target="${target}">
             <src path="src/main/java"/>
             <classpath refid="sip-servlets-test-suite.classpath"/>
         </javac>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="target/test-classes" source="${source}" target="${target}">
-            <src path="src/test/java"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${test-classes}" source="${source}" target="${target}">
+            <src path="src/test/java"/>            
             <classpath refid="sip-servlets-test-suite.classpath"/>
         </javac>
+        <copy todir="${test-classes}">
+          <fileset dir="src/test/resources">
+            <include name="**/*.properties"/>
+          </fileset>
+          </copy>
     </target>        
     
     <target name="junitreport">
