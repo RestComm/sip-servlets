@@ -569,12 +569,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return -1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getFrom()
+	 */
 	public Address getFrom() {
 		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl addrs = new AddressImpl(from.getAddress());
-		return null;
+		AddressImpl address = new AddressImpl(from.getAddress());
+		return address;
 	}
 	
 	/*
