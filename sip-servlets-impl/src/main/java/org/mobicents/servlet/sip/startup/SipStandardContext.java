@@ -93,6 +93,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipApplicationDispatcher.getSipFactory());
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+				sipApplicationDispatcher.getOutboundInterfaces());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
 				TimerServiceImpl.getInstance());	
 		logger.info("sip context Initialized");

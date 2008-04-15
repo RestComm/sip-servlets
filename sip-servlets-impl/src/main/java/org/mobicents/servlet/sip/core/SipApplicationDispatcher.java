@@ -1,8 +1,10 @@
 package org.mobicents.servlet.sip.core;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipURI;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
 
@@ -68,4 +70,10 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * @return the sip factory
 	 */
 	public SipFactory getSipFactory();
+	/**
+	 * Returns An immutable instance of the java.util.List interface containing 
+	 * the SipURI representation of IP addresses which are used by the container to send out the messages.
+	 * @return immutable List containing the SipURI representation of IP addresses 
+	 */
+	public List<SipURI> getOutboundInterfaces();
 }

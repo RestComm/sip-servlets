@@ -6,6 +6,8 @@ package org.mobicents.servlet.sip.core;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,11 +24,13 @@ import javax.servlet.sip.SipRouteModifier;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
+import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
@@ -589,6 +593,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void addSipProvider(SipProvider sipProvider) {
 		sipFactoryImpl.addSipProvider(sipProvider);
+		if(started) {
+			resetOutboundInterfaces();
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -596,6 +603,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void removeSipProvider(SipProvider sipProvider) {
 		sipFactoryImpl.removeSipProvider(sipProvider);
+		if(started) {
+			resetOutboundInterfaces();
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -610,5 +620,48 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public SipFactory getSipFactory() {
 		return sipFactoryImpl;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getOutboundInterfaces()
+	 */
+	public List<SipURI> getOutboundInterfaces() {
+		List<SipURI> outboundInterfaces = new ArrayList<SipURI>();
+		Set<SipProvider> sipProviders = sipFactoryImpl.getSipProviders();
+		for (SipProvider sipProvider : sipProviders) {
+			ListeningPoint[] listeningPoints = sipProvider.getListeningPoints();
+			for (int i = 0; i < listeningPoints.length; i++) {
+				javax.sip.address.SipURI jainSipURI;
+				try {
+					jainSipURI = SipFactories.addressFactory.createSipURI(
+							null, listeningPoints[i].getIPAddress());
+					jainSipURI.setPort(listeningPoints[i].getPort());
+					jainSipURI.setTransportParam(listeningPoints[i].getTransport());
+					SipURI sipURI = new SipURIImpl(jainSipURI);
+					outboundInterfaces.add(sipURI);
+				} catch (ParseException e) {
+					logger.error("cannot add the following listening point "+
+							listeningPoints[i].getIPAddress()+":"+
+							listeningPoints[i].getPort()+";transport="+
+							listeningPoints[i].getTransport()+" to the outbound interfaces", e);
+				}				
+			}
+		}
+		
+		return Collections.unmodifiableList(outboundInterfaces);
+	}
+	
+	/**
+	 * Reset the outbound interfaces on all servlet context of applications deployed
+	 */
+	private void resetOutboundInterfaces() {
+		List<SipURI> outboundInterfaces = getOutboundInterfaces();
+		synchronized (applicationDeployed) {
+			for (SipContext sipContext : applicationDeployed.values()) {
+				sipContext.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+						outboundInterfaces);				
+			}
+		}
 	}
 }
