@@ -125,9 +125,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super.start();		
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 		//called implicitly within sipApplicationDispatcher.addSipApplication
-		sipApplicationDispatcher.addSipApplication(applicationName, this);
-								
-		logger.info("sip context started");
+		if(getAvailable()) {
+			sipApplicationDispatcher.addSipApplication(applicationName, this);
+			logger.info("sip context started");
+		} else {
+			logger.info("sip context didn't started due to errors");
+		}
+										
 	}
 
 	@Override
@@ -143,6 +147,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
         // Instantiate the required listeners
         ClassLoader loader = getLoader().getClassLoader();
         ok = listeners.loadListeners(sipApplicationListeners, loader);
+        if(!ok) {
+			return ok;
+		}
         
         List<ServletContextListener> servletContextListeners = listeners.getServletContextListeners();
         if (servletContextListeners != null) {
@@ -239,14 +246,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public synchronized void stop() throws LifecycleException {
 		logger.info("Stopping the sip context");
-		Container container = getParent().getParent();
-		if(container instanceof Engine) {
-			Service service = ((Engine)container).getService();
-			if(service instanceof SipService) {
-				SipApplicationDispatcher sipApplicationDispatcher = 
-					((SipService)service).getSipApplicationDispatcher();				
-				sipApplicationDispatcher.removeSipApplication(applicationName);
-			}
+		if(sipApplicationDispatcher != null) {				
+			sipApplicationDispatcher.removeSipApplication(applicationName);		
 		}	
 		super.stop();
 		logger.info("sip context stopped");

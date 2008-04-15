@@ -193,7 +193,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 			SipApplicationRoutingRegion region,
 			SipApplicationRoutingDirective directive, Serializable stateInfo) {		
 		// Minimalist application router implementation with no processing logic 
-		// besides the declaration of the application order
+		// besides the declaration of the application order as specified in JSR 289 - Appendix C
 		if(initialRequest != null) {						
 			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
 				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());

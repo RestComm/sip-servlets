@@ -67,6 +67,7 @@ public class SessionManager {
 					logger.info("Found initial session " + initialSessionId);
 				} else {
 					session = new SipSessionImpl(sipFactoryImpl, null);
+					session.setSessionCreatingTransaction(transaction);
 					sipSessions.put(initialSessionId, session);
 					logger.info("Created initial session " + initialSessionId);
 				}

@@ -140,7 +140,7 @@ public class SipSessionImpl implements SipSession {
 		this.uuid = UUID.randomUUID();
 		this.state = State.INITIAL;
 		this.valid = true;
-		this.supervisedMode = true;
+		this.supervisedMode = true;		
 		if ( sipApp != null) sipApp.addSipSession(this);
 	}
 	
@@ -511,6 +511,13 @@ public class SipSessionImpl implements SipSession {
 		return sessionCreatingTransaction;
 	}	
 
+	/**
+	 * @param sessionCreatingTransaction the sessionCreatingTransaction to set
+	 */
+	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {
+		this.sessionCreatingTransaction = sessionCreatingTransaction;
+	}
+	
 	public boolean isSupervisedMode() {
 		return supervisedMode;
 	}
@@ -564,5 +571,5 @@ public class SipSessionImpl implements SipSession {
 	
 	public Set<Transaction> getOngoingTransactions() {
 		return this.ongoingTransactions;
-	}
+	}	
 }
