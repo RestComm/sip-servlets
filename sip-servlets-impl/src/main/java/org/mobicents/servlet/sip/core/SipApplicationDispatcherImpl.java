@@ -33,6 +33,7 @@ import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
+import javax.sip.address.URI;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -43,6 +44,8 @@ import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -269,15 +272,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 			} else {
 				// TODO set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
-//				URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI()));
-//				if(subscriberUri instanceof javax.sip.address.SipURI) {
-//					sipServletRequest.setRequestURI(new SipURIImpl((javax.sip.address.SipURI)subscriberUri));
-//				} else (subscriberUri instanceof javax.sip.address.TelURL) {
-////					sipServletRequest.setRequestURI(new TelURIImpl((javax.sip.address.SipURI)subscriberUri));
-//				}
-				
+				try {
+					URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
+					if(subscriberUri instanceof javax.sip.address.SipURI) {
+						sipServletRequest.setRequestURI(new SipURIImpl((javax.sip.address.SipURI)subscriberUri));
+					} else if (subscriberUri instanceof javax.sip.address.TelURL) {
+						sipServletRequest.setRequestURI(new TelURLImpl((javax.sip.address.TelURL)subscriberUri));
+					}
+				} catch (ParseException pe) {					
+					logger.error(pe);
+					//TODO send a 500 server internal error
+				}
 				// follow the procedures of Chapter 16 to select a servlet from the application.			
 				SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
+				//no matching deployed apps
+				if(sipContext == null) {
+					// this should never happen
+					logger.error("No matching deployed application has been found !");
+					//TODO send a 500 server internal error
+					return ;
+				}
 				session.setSipContext(sipContext);
 				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSession()).getHandler();						
 				if(sipSessionHandlerName == null) {
