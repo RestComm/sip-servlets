@@ -11,7 +11,6 @@ import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
@@ -24,18 +23,40 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
+/**
+ * Implementation of the sip servlet response interface
+ *
+ */
 public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
 	private static Log logger =  LogFactory.getLog(SipServletResponseImpl.class);
 	
 	Response response;
-	
+	SipServletRequestImpl originalRequest;
 
-	public SipServletResponseImpl (Response response, SipFactoryImpl sipFactoryImpl, Transaction transaction, SipSession session, Dialog dialog) {
+	/**
+	 * Constructor
+	 * @param response
+	 * @param sipFactoryImpl
+	 * @param transaction
+	 * @param session
+	 * @param dialog
+	 * @param originalRequest
+	 */
+	public SipServletResponseImpl (
+			Response response, 
+			SipFactoryImpl sipFactoryImpl, 
+			Transaction transaction, 
+			SipSession session, 
+			Dialog dialog,
+			SipServletRequestImpl originalRequest) {
+		
 		super(response, sipFactoryImpl, transaction, session, dialog);
 		this.response = (Response) response;
+		this.originalRequest = originalRequest;
 	}
 	
 	
@@ -104,8 +125,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getOutputStream()
+	 */
 	public ServletOutputStream getOutputStream() throws IOException {
-		// TODO Auto-generated method stub
+		// Always return null
 		return null;
 	}
 
@@ -114,21 +139,36 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getReasonPhrase()
+	 */
 	public String getReasonPhrase() {
 		return response.getReasonPhrase();
 	}
 
-	public SipServletRequest getRequest() {
-		// TODO Auto-generated method stub
-		return null;
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getRequest()
+	 */
+	public SipServletRequest getRequest() {		
+		return originalRequest;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getStatus()
+	 */
 	public int getStatus() {
 		return response.getStatusCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getWriter()
+	 */
 	public PrintWriter getWriter() throws IOException {
-		// TODO Auto-generated method stub
+		// Always returns null.
 		return null;
 	}
 
@@ -136,8 +176,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	public void setStatus(int statusCode) {
+		// FIXME
 		try {
 			response.setStatusCode(statusCode);
 		} catch (ParseException e) {
@@ -148,6 +189,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 	public void setStatus(int statusCode, String reasonPhrase) {
+		// FIXME
 		try {
 			response.setStatusCode(statusCode);
 			response.setReasonPhrase(reasonPhrase);
@@ -158,13 +200,19 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#flushBuffer()
+	 */
 	public void flushBuffer() throws IOException {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 
-	public int getBufferSize() {
-		// TODO Auto-generated method stub
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#getBufferSize()
+	 */
+	public int getBufferSize() {		
 		return 0;
 	}
 
@@ -173,19 +221,28 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#reset()
+	 */
 	public void reset() {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#resetBuffer()
+	 */
 	public void resetBuffer() {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#setBufferSize(int)
+	 */
 	public void setBufferSize(int arg0) {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 
 	public void setLocale(Locale arg0) {
@@ -204,7 +261,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			ServerTransaction st = (ServerTransaction) getTransaction();
 			
 			st.sendResponse( (Response)this.message );
-			
+			//specify that a final response has been sent for the request
+			//so that the application dispatcher knows it has to stop
+			//processing the request
+			if(response.getStatusCode() >= Response.OK && 
+					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {
+				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);
+			}
 		} catch (Exception e) {			
 			logger.error(e);
 			throw new IllegalStateException(e);

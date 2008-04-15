@@ -29,6 +29,7 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
@@ -55,12 +56,13 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.core.InitialRequestType;
+import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
-
+	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
+	
 	//request state info
 	private Serializable stateInfo;
 	//request routing region
@@ -68,7 +70,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
-	private SipServletRequestImpl nextRequest;	
 	
 	private boolean createDialog;
 	/*
@@ -80,17 +81,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/* Cache the application routing directive in the record route header */
 	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
 
-	private InitialRequestType isInitial = InitialRequestType.INITIAL;
+	private RoutingState routingState;
+	
 	private B2buaHelper b2buahelper;
-
-	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
-
+	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			SipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
 		super(request, sipFactoryImpl, transaction, sipSession, dialog);
 		this.createDialog = createDialog;
-
+		routingState = RoutingState.INITIAL;
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 			}
 			return new SipServletResponseImpl(response, super.sipFactoryImpl,
-					(ServerTransaction) getTransaction(), session, getDialog());
+					(ServerTransaction) getTransaction(), session, getDialog(), this);
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode,
 					ex);
@@ -234,7 +234,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				this.session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}
-			this.b2buahelper = new B2buaHelperImpl(sipFactoryImpl);
+			this.b2buahelper = new B2buaHelperImpl(this);
 			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			return this.b2buahelper;
 		} catch (SipException ex) {
@@ -328,11 +328,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#isInitial()
 	 */
 	public boolean isInitial() {
-		return this.isInitial.equals(InitialRequestType.INITIAL);
-	}
-
-	public void setInitial(InitialRequestType isInitial) {
-		this.isInitial = isInitial;
+		return this.routingState.equals(RoutingState.INITIAL);
 	}
 
 	public void pushPath(Address uri) {
@@ -428,38 +424,50 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipServletRequest origRequest) throws IllegalStateException {
 		Request request = (Request) message;		
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		//the origRequest can be null
+		//If directive is NEW, origRequest parameter is ignored. 		
 		if(origRequestImpl != null) {
-			if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
-					&& (!origRequestImpl.isInitial() || origRequestImpl.isCommitted())) {
+			//@jean.deruelle Commenting this out, why origRequestImpl.isCommitted() is needed ?
+//			if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
+//					&& (!origRequestImpl.isInitial() || origRequestImpl.isCommitted())) {
+			// If directive is CONTINUE or REVERSE, the parameter origRequest must be an 
+			//initial request dispatched by the container to this application, 
+			//i.e. origRequest.isInitial() must be true
+			if ((directive == SipApplicationRoutingDirective.REVERSE || 
+					directive == SipApplicationRoutingDirective.CONTINUE) &&
+					!origRequestImpl.isInitial()) {
 				throw new IllegalStateException(
 						"Bad state -- cannot set routing directive");
-			}
-			//TODO remove nextRequest... Why do we have a next request, I don't get it ? 
-			origRequestImpl.setNextRequest(this);
+			}			
+		}		
+		//This request must be a request created in a new SipSession 
+		//or from an initial request, and must not have been sent. 
+		//If any one of these preconditions are not met, the method throws an IllegalStateException.
+		if(!State.INITIAL.equals(session.getState()) && session.getOngoingTransactions().size() > 0) {
+			throw new IllegalStateException(
+				"Bad state -- cannot set routing directive");
 		}
-		
-		RecordRouteHeader rrh = (RecordRouteHeader) request
-				.getHeader(RecordRouteHeader.NAME);
-		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh
-				.getAddress().getURI();
-
-		try {
-			if (directive == SipApplicationRoutingDirective.NEW) {
-				sipUri.setParameter("rd", "NEW");
-			} else if (directive == SipApplicationRoutingDirective.REVERSE) {
-				sipUri.setParameter("rd", "REVERSE");
-			} else if (directive == SipApplicationRoutingDirective.CONTINUE) {
-				sipUri.setParameter("rd", "CONTINUE");
-			}
-			routingDirective = directive;
-		} catch (Exception ex) {
-			String s = "error while setting routing directive";
-			logger.error(s, ex);
-			throw new IllegalArgumentException(s, ex);
-		}			
+		routingDirective = directive;
 		linkedRequest = origRequestImpl;
-
+		//@jean.deruelle Commenting this out, is this really needed ?
+//		RecordRouteHeader rrh = (RecordRouteHeader) request
+//				.getHeader(RecordRouteHeader.NAME);
+//		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh
+//				.getAddress().getURI();
+//
+//		try {
+//			if (directive == SipApplicationRoutingDirective.NEW) {
+//				sipUri.setParameter("rd", "NEW");
+//			} else if (directive == SipApplicationRoutingDirective.REVERSE) {
+//				sipUri.setParameter("rd", "REVERSE");
+//			} else if (directive == SipApplicationRoutingDirective.CONTINUE) {
+//				sipUri.setParameter("rd", "CONTINUE");
+//			}
+//			
+//		} catch (Exception ex) {
+//			String s = "error while setting routing directive";
+//			logger.error(s, ex);
+//			throw new IllegalArgumentException(s, ex);
+//		}							
 	}
 
 	/*
@@ -493,19 +501,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return rrh.getParameter(name);
 	}
 
-	public Map getParameterMap() {
+	public Map<String, String> getParameterMap() {
 		RecordRoute rrh = (RecordRoute) message
 				.getHeader(RecordRouteHeader.NAME);
-		HashMap retval = new HashMap();
+		HashMap<String, String> retval = new HashMap<String, String>();
 		Collection<NameValue> params = rrh.getParameters().values();
 		for (NameValue nv : params) {
 			retval.put(nv.getName(), nv.getValue());
 		}
 
-		return null;
+		return retval;
 	}
 
-	public Enumeration getParameterNames() {
+	public Enumeration<String> getParameterNames() {
 		RecordRoute rrh = (RecordRoute) message
 				.getHeader(RecordRouteHeader.NAME);
 		Vector<String> retval = new Vector<String>();
@@ -558,21 +566,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void removeAttribute(String arg0) {
 		// TODO Auto-generated method stub
 
-	}
-
-	/**
-	 * @param nextRequest
-	 *            the nextRequest to set
-	 */
-	private void setNextRequest(SipServletRequestImpl nextRequest) {
-		this.nextRequest = nextRequest;
-	}
-
-	/**
-	 * @return the nextRequest
-	 */
-	private SipServletRequestImpl getNextRequest() {
-		return nextRequest;
 	}
 
 	/**
@@ -660,6 +653,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// This is an in-dialog request.
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}
+			//tells the application dispatcher to stop routing the linked request
+			// (in this case it would be the original request) since it has been relayed
+			if(linkedRequest != null && 
+					!SipApplicationRoutingDirective.NEW.equals(routingDirective)) {
+				linkedRequest.setRoutingState(RoutingState.RELAYED);				
+			}
 			super.session.addOngoingTransaction(getTransaction());
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request",ex);
@@ -702,6 +701,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
 		this.routingRegion = routingRegion;
+	}
+
+	/**
+	 * @return the routingState
+	 */
+	public RoutingState getRoutingState() {
+		return routingState;
+	}
+
+	/**
+	 * @param routingState the routingState to set
+	 */
+	public void setRoutingState(RoutingState routingState) {
+		this.routingState = routingState;
 	}
 
 }

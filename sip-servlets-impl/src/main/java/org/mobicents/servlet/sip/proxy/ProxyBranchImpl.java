@@ -11,9 +11,9 @@ import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
-import javax.sip.SipProvider;
 
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -150,6 +150,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 
 		try {
 			cloned.send();
+			//tells the application dispatcher to stop routing the original request
+			//since it has been proxied
+			originalRequest.setRoutingState(RoutingState.PROXIED);
 			started = true;
 			
 			if(cloned.getMethod().equals("INVITE"))

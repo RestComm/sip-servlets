@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
@@ -173,6 +174,8 @@ public class ProxyUtils {
 					sipFactoryImpl,
 					originalRequest.getSession(),
 					tx, null, false);
+			//JSR 289 Section 15.1.6
+			ret.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 			
 			ret.getTransactionApplicationData().setProxyBranch(proxyBranch);
 			tx.setApplicationData(ret.getTransactionApplicationData());
@@ -207,7 +210,8 @@ public class ProxyUtils {
 				sipFactoryImpl,
 				originalRequest.getTransaction(),
 				originalRequest.getSession(),
-				null);
+				null,
+				originalRequest);
 
 
 	}

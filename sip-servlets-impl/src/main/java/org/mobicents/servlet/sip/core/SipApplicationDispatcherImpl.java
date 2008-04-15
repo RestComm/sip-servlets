@@ -25,6 +25,7 @@ import javax.servlet.sip.SipRouteModifier;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
+import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -286,8 +287,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}			
 			
 			//check if the request is initial
-			InitialRequestType isInitialRequest = isInitialRequest(sipServletRequest, requestEvent.getDialog());		
-			sipServletRequest.setInitial(isInitialRequest);					
+			RoutingState routingState = checkRoutingState(sipServletRequest, requestEvent.getDialog());				
+			sipServletRequest.setRoutingState(routingState);					
 	
 			if(sipServletRequest.isInitial()) {
 				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
@@ -465,8 +466,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// Sends a 503 Service Unavailable error and stops processing.				
 //				JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
 				//FIXME
-//				return true;
-				return false;
+				return true;
+//				return false;
 			}
 			appSession.setSipContext(sipContext);
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
@@ -489,9 +490,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				Servlet servlet = sipServletImpl.allocate();	        
 				servlet.service(sipServletRequest, null);
 				logger.info("Request event dispatched to " + sipContext.getApplicationName());
-				//FIXME
-//				return true;
-				return false;
+				//if a final response has been sent, or if the request has 
+				//been proxied or relayed we stop routing the request
+				RoutingState routingState = sipServletRequest.getRoutingState();
+				if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+						RoutingState.PROXIED.equals(routingState) ||
+						RoutingState.RELAYED.equals(routingState)) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+								"The Container hence stops routing the request.");
+					}
+					return false;
+				} else {
+					return true;
+				}
 			} catch (ServletException e) {				
 				logger.error(e);
 				// Sends a 500 Internal server error and stops processing.				
@@ -535,18 +547,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param dialog the dialog associated with this request
 	 * @return true if the request is initial false otherwise
 	 */
-	private InitialRequestType isInitialRequest(SipServletRequestImpl sipServletRequest, Dialog dialog) {
+	private RoutingState checkRoutingState(SipServletRequestImpl sipServletRequest, Dialog dialog) {
 		// 2. Ongoing Transaction Detection - Employ methods of Section 17.2.3 in RFC 3261 
 		//to see if the request matches an existing transaction. 
 		//If it does, stop. The request is not an initial request.
 		Transaction sipTransaction = sipServletRequest.getTransaction();
 		if(sipTransaction != null && !TransactionState.PROCEEDING.equals(sipTransaction.getState())) {
-			return InitialRequestType.NON_INITIAL;
+			return RoutingState.SUBSEQUENT;
 		}
 		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
 		//The request is not an initial request for which application selection occurs.
 		if(nonInitialSipRequestMethods.contains(sipServletRequest.getMethod())) {
-			return InitialRequestType.NON_INITIAL;
+			return RoutingState.SUBSEQUENT;
 		}
 		// 4. Existing Dialog Detection - If the request has a tag in the To header field, 
 		// the container computes the dialog identifier (as specified in section 12 of RFC 3261) 
@@ -564,7 +576,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		// as a subsequent request and it is inappropriate to route it as an initial request. 
 		// Therefore, the only viable approach is to reject the request.
 		if(dialog != null && !DialogState.EARLY.equals(dialog.getState())) {
-			return InitialRequestType.NON_INITIAL;
+			return RoutingState.SUBSEQUENT;
 		}
 		// 5. Detection of Merged Requests - If the From tag, Call-ID, and CSeq exactly 
 		// match those associated with an ongoing transaction, 
@@ -588,7 +600,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(onGoingCSeqHeader.equals(currentCSeqHeader) &&
 					onGoingCallIdHeader.equals(currentCallIdHeader) &&
 					onGoingFromHeader.equals(currentFromHeader)) {
-				return InitialRequestType.MERGED;
+				return RoutingState.MERGED;
 			}
 		}
 		
@@ -599,7 +611,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		// Refer to section 15.9.2 Simple call with no modifications of requests 
 		// for more information on how a request sent to an encoded URI is handled by the container.
 		
-		return InitialRequestType.INITIAL;		
+		return RoutingState.INITIAL;		
 	}	
 	
 	/**
@@ -630,9 +642,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 //					sipFactoryImpl, response, clientTransaction);
 			
 			// Transate the repsponse to SipServletResponse
-			SipServletResponseImpl sipServletResponse = new
-				SipServletResponseImpl(response, sipFactoryImpl,
-						responseEvent.getClientTransaction(), session, responseEvent.getDialog());
+			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
+					response, 
+					sipFactoryImpl,
+					responseEvent.getClientTransaction(), 
+					session, 
+					responseEvent.getDialog(), 
+					(SipServletRequestImpl) tad.getSipServletMessage());
 
 			// Update Session state
 			session.updateStateOnResponse(sipServletResponse);

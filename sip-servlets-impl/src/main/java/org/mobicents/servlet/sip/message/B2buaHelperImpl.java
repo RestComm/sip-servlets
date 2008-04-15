@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.B2buaHelper;
+import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -50,9 +51,9 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
  */
 
 public class B2buaHelperImpl implements B2buaHelper {
-
+	private static Log logger = LogFactory.getLog(B2buaHelperImpl.class);
+	
 	protected static final HashSet<String> singletonHeadersNames = new HashSet<String>();
-
 	static {
 		singletonHeadersNames.add(FromHeader.NAME);
 		singletonHeadersNames.add(ToHeader.NAME);
@@ -64,18 +65,22 @@ public class B2buaHelperImpl implements B2buaHelper {
 		singletonHeadersNames.add(ContentTypeHeader.NAME);
 		//TODO are there any other singleton headers ?
 	}	
+	
+	//FIXME @jean.deruelle session map is never cleaned up => could lead to memory leak
+	//shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	private ConcurrentHashMap<SipSessionImpl, SipSessionImpl> sessionMap = new ConcurrentHashMap<SipSessionImpl, SipSessionImpl>();
 
 	private SipFactoryImpl sipFactoryImpl;
 
-	private static Log logger = LogFactory.getLog(B2buaHelperImpl.class);
+	private SipServletRequestImpl sipServletRequest;		
 	
 	/**
 	 * 
 	 * @param sipFactoryImpl
 	 */
-	public B2buaHelperImpl(SipFactoryImpl sipFactoryImpl) {		
-		this.sipFactoryImpl = sipFactoryImpl; 
+	public B2buaHelperImpl(SipServletRequestImpl sipServletRequest) {
+		this.sipServletRequest = sipServletRequest;
+		this.sipFactoryImpl = sipServletRequest.sipFactoryImpl; 
 	}
 
 	/*
@@ -143,7 +148,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 					newRequest,
 					sipFactoryImpl,
 					session, null, null, true);
-
+			//JSR 289 Section 15.1.6
+			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
+			
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
@@ -151,11 +158,11 @@ public class B2buaHelperImpl implements B2buaHelper {
 				newSipServletRequest.addHeader(ContactHeader.NAME, contactHeaderValue);
 			}
 			
+			origRequestImpl.setLinkedRequest(newSipServletRequest);
+			newSipServletRequest.setLinkedRequest(origRequestImpl);
 			if (linked) {
 				sessionMap.put(originalSession, session);
-				sessionMap.put(session, originalSession);
-				origRequestImpl.setLinkedRequest(newSipServletRequest);
-				newSipServletRequest.setLinkedRequest(origRequestImpl);
+				sessionMap.put(session, originalSession);				
 			}
 
 			return newSipServletRequest;
@@ -214,24 +221,27 @@ public class B2buaHelperImpl implements B2buaHelper {
 			}
 			
 			//we already have a dialog since it is a subsequent request			
-			SipServletRequest retVal = new SipServletRequestImpl(newRequest,sipFactoryImpl,
+			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(newRequest,sipFactoryImpl,
 					session, sessionImpl.getSessionCreatingTransaction(), dialog, false);
-			
+			//JSR 289 Section 15.1.6
+			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			for (String contactHeaderValue : contactHeaderSet) {
-				retVal.addHeader(ContactHeader.NAME, contactHeaderValue);
+				newSipServletRequest.addHeader(ContactHeader.NAME, contactHeaderValue);
 			}
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("newRequest = " + newRequest);
-			}
+			}			
 			
+			origRequestImpl.setLinkedRequest(newSipServletRequest);
+			newSipServletRequest.setLinkedRequest(origRequestImpl);			
 			sessionMap.put(originalSession, sessionImpl);
 			sessionMap.put(sessionImpl, originalSession);
 
-			return retVal;
+			return newSipServletRequest;
 		} catch (Exception ex) {
 			logger.error("Unexpected exception ", ex);
 			throw new IllegalArgumentException(
@@ -274,7 +284,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			
 			SipServletResponseImpl retval = new SipServletResponseImpl(
 					response, sipFactoryImpl, st, sipSession,
-					sipSession.getSessionCreatingDialog());			
+					sipSession.getSessionCreatingDialog(), sipServletRequest);			
 			return retval;
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("bad input argument", ex);

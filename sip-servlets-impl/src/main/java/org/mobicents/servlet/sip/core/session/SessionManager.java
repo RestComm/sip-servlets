@@ -16,15 +16,18 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 public class SessionManager {
-	private Map<String, SipApplicationSessionImpl> appSessions = new HashMap<String, SipApplicationSessionImpl>();
-
-	private Map<String, SipSessionImpl> sipSessions = new HashMap<String, SipSessionImpl>();
+	private static transient Log logger = LogFactory.getLog(SessionManager.class);
+	//FIXME @jean.deruelle never used 
+	private Map<String, SipApplicationSessionImpl> appSessions = 
+		new HashMap<String, SipApplicationSessionImpl>();
+	//FIXME @jean.deruelle never cleaned up => memory leak will occur
+	//Shall we have a thread scanning for invalid sessions and removing them accordingly ?
+	// could we use ConcurrentHashMap here and remove the lock ?
+	private Map<String, SipSessionImpl> sipSessions = 
+		new HashMap<String, SipSessionImpl>();
 
 	private Object lock = new Object();
-
-	private static transient Log logger = LogFactory
-			.getLog(SessionManager.class);
-
+	
 	public SipSessionImpl getSipSession(String sessionId) {
 		return sipSessions.get(sessionId);
 	}

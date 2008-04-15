@@ -169,7 +169,7 @@ public class SipFactoryImpl implements SipFactory {
 
 		validateCreation(method, sipAppSession);
 
-		return createSipServletRequest(sipAppSession, method, from, to, null);
+		return createSipServletRequest(sipAppSession, method, from, to);
 	}
 
 	/*
@@ -193,7 +193,7 @@ public class SipFactoryImpl implements SipFactory {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA, null);
+		return createSipServletRequest(sipAppSession, method, fromA, toA);
 
 	}
 
@@ -219,7 +219,7 @@ public class SipFactoryImpl implements SipFactory {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA, null);
+		return createSipServletRequest(sipAppSession, method, fromA, toA);
 
 	}
 
@@ -235,9 +235,7 @@ public class SipFactoryImpl implements SipFactory {
 			logger.debug("Creating SipServletRequest from original request["
 					+ origRequest + "] with same call id[" + sameCallId + "]");
 
-		// return createSipServletRequest(sipAppSession, method, from, to,
-		// origRequest);
-		return null;
+	    return origRequest.getB2buaHelper().createRequest(origRequest, true, null);
 	}
 
 	/*
@@ -313,7 +311,7 @@ public class SipFactoryImpl implements SipFactory {
 	 */
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
-			Address to, SipServletRequest originalRequest) {
+			Address to) {
 		
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
@@ -415,13 +413,7 @@ public class SipFactoryImpl implements SipFactory {
 					requestToWrapp, this, session, null, null,
 					dialogCreationMethods.contains(method));
 			// TODO: Do session association?
-
-			// set the routing directive as defined in 15.2.2
-			if (originalRequest != null) {
-				retVal.setRoutingDirective(
-						SipApplicationRoutingDirective.CONTINUE,
-						originalRequest);
-			}
+			
 			return retVal;
 		} catch (Exception e) {
 			logger.error("Error creating sipServletRequest", e);
