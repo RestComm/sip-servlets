@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -17,6 +18,7 @@ import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
@@ -64,10 +66,15 @@ public class SimpleWebServlet extends HttpServlet
 
         if(bye != null) {
         	// Someone wants to end an established call, send byes and clean up
-        	SipServletRequest bye1 = sipFactory.createRequest(appSession, "BYE", from, to);
-        	SipServletRequest bye2 = sipFactory.createRequest(appSession, "BYE", to, from);
-        	bye1.send();
-        	bye2.send();
+        	Iterator iterator = appSession.getSessions("sip");
+        	while(iterator.hasNext()) {
+        		SipSession session = (SipSession) iterator.next();
+        		String addr = session.getRemoteParty().getURI().toString();
+        		if(addr.equals(to.toString())) {
+        			SipServletRequest byeBye = session.createRequest("BYE");
+        			byeBye.send();
+        		}
+        	}
         	calls.removeCall(from.toString(), to.toString());
         	calls.removeCall(to.toString(), from.toString());
         } else {
