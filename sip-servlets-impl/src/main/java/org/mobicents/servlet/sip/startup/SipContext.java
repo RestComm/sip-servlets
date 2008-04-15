@@ -27,6 +27,8 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
  */
 public interface SipContext extends Context {
 
+	public static final String APPLICATION_SIP_XML = "WEB-INF/sip.xml";
+	
 	String getApplicationName();
 
 	void setApplicationName(String applicationName);

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mobicents.servlet.sip.startup;
+package org.mobicents.servlet.sip.startup.jboss;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +27,18 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.Constants;
-import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.DigesterFactory;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
-import org.mobicents.servlet.sip.annotations.ClassFileScanner;
+import org.jboss.web.tomcat.security.config.JBossContextConfig;
+import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipEntityResolver;
+import org.mobicents.servlet.sip.startup.SipRuleSet;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
@@ -42,21 +46,18 @@ import org.xml.sax.SAXException;
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures
  * the properties of that Context, and the associated defined servlets.
- * it extends the regular tomcat context config to be able to load sip
- * servlet applications.
+ * It extends the JbossContextConfig to be able to load sip servlet applications.
  * 
  * @author Jean Deruelle
- * 
+ *
  */
-public class SipContextConfig extends ContextConfig implements
-		LifecycleListener {	
+public class SipJBossContextConfig extends JBossContextConfig 
+	implements LifecycleListener{
 
 	private static transient Log logger = LogFactory
 			.getLog(SipContextConfig.class);
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void lifecycleEvent(LifecycleEvent event) {
 		// logger.info("got lifecycle event : " + event.getType());
 		
@@ -82,7 +83,7 @@ public class SipContextConfig extends ContextConfig implements
 			if(logger.isDebugEnabled()) {
 				logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
 			}
-			context.setWrapperClass(StandardWrapper.class.getName());						
+			context.setWrapperClass(StandardWrapper.class.getName());
 			if (webXmlInputStream != null) {
 				super.start();
 			}				
@@ -94,10 +95,6 @@ public class SipContextConfig extends ContextConfig implements
 					logger.debug(SipContext.APPLICATION_SIP_XML + " has been found !");
 				}
 				context.setWrapperClass(SipServletImpl.class.getName());
-				//annotations scanning
-				SipStandardContext sipctx = (SipStandardContext) context;
-				ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath() + "/WEB-INF/classes/", sipctx);
-				scanner.scan();
 				//
 				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
 	                    xmlNamespaceAware,
@@ -112,32 +109,32 @@ public class SipContextConfig extends ContextConfig implements
 				try {
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
-				} catch (Throwable e) {
+				} catch (IOException e) {
 					logger.error("Impossible to parse the sip deployment descriptor",
 							e);
 					ok = false;
-				}
-				// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
-				if(scanner.isApplicationParsed()) { 
-					ok = true;
-				}
+				} catch (SAXException e) {
+					logger.error("Impossible to parse the sip deployment descriptor",
+							e);
+					ok = false;
+				}						
 			} else {
 				logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
 				ok = false;
-			}			
+			}
 			// Make our application available if no problems were encountered
 			if (ok) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("sipContextConfig started");
-				}
 				context.setConfigured(true);						
 			} else {
 				logger.warn("contextConfig.unavailable");
 				context.setAvailable(false);
-			}			
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("sipContextConfig started");
+			}
 		} else {
 			super.start();
-		}				
+		}
 	}
 
 	@Override
@@ -253,4 +250,5 @@ public class SipContextConfig extends ContextConfig implements
 			super.fixDocBase();
 		}
 	}
+
 }

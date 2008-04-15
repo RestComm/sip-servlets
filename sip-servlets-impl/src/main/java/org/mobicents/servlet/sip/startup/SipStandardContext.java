@@ -25,6 +25,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.NamingContextListener;
@@ -59,17 +60,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime for an 
 	// application session is 3 minutes
 	private static int DEFAULT_LIFETIME = 3;
+	protected boolean initializing = false;
+	protected boolean starting = false;
 	
-	private String applicationName;
-	private String smallIcon;
-	private String largeIcon;
-	private String description;
-	private int proxyTimeout;
-	private int sipApplicationSessionTimeout;
-	private SipListenersHolder listeners;
-	private String mainServlet;	
-	private SipFactoryFacade sipFactoryFacade;	
-	private SipLoginConfig sipLoginConfig;
+	protected String applicationName;
+	protected String smallIcon;
+	protected String largeIcon;
+	protected String description;
+	protected int proxyTimeout;
+	protected int sipApplicationSessionTimeout;
+	protected SipListenersHolder listeners;
+	protected String mainServlet;	
+	protected SipFactoryFacade sipFactoryFacade;	
+	protected SipLoginConfig sipLoginConfig;
 	
     protected String namingContextName;
     
@@ -79,9 +82,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
      */
-    private String sipApplicationListeners[] = new String[0];
+    protected String sipApplicationListeners[] = new String[0];
     
-    private SipApplicationDispatcher sipApplicationDispatcher = null;    
+    protected SipApplicationDispatcher sipApplicationDispatcher = null;    
 	/**
 	 * 
 	 */
@@ -95,6 +98,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public void init() throws Exception {
 		logger.info("Initializing the sip context");
+//		if(initializing) {
+//			return ;
+//		}
+//		initializing = true;
 //		if (this.getParent() != null) {
 //			// Add the main configuration listener for sip applications
 //			LifecycleListener sipConfigurationListener = new SipContextConfig();
@@ -126,13 +133,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 				sipApplicationDispatcher.getOutboundInterfaces());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
-				TimerServiceImpl.getInstance());	
+				TimerServiceImpl.getInstance());
+//		initializing = false;
+//		initialized = true;
 		logger.info("sip context Initialized");
 	}
 
 	@Override
 	public synchronized void start() throws LifecycleException {
 		logger.info("Starting the sip context");
+//		if(starting) {
+//			return ;
+//		}
+//		starting = true;
 		 // Add missing components as necessary
         if (getResources() == null) {   // (1) Required by Loader
             if (logger.isDebugEnabled())
@@ -149,13 +162,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
         if (manager == null) {
             if ((getCluster() != null) && getDistributable()) {
                 try {
-                    setManager(getCluster().createManager(getName()));
+                    manager = getCluster().createManager(getName());
                 } catch (Exception ex) {
                     logger.error("standardContext.clusterFail", ex);
 //                    ok = false;
                 }
             } else {
-                setManager(new SipStandardManager());
+                manager = new SipStandardManager();
             }
         }
         // Reading the "catalina.useNaming" environment variable
@@ -199,8 +212,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
 			}
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
+//			starting = false;
+//			started = true;
 			logger.info("sip context started");
 		} else {
+//			starting = false;
+//			started = false;
 			logger.info("sip context didn't started due to errors");
 		}
 										
@@ -570,6 +587,20 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 		return namingContextName;
+    }
+    
+    @Override
+    public synchronized void setManager(Manager manager) {
+    	if(manager instanceof SipStandardManager && sipApplicationDispatcher != null) {
+			((SipStandardManager)manager).setSipFactoryImpl(
+					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
+		}
+    	super.setManager(manager);
+    }
+    
+    @Override
+    public Manager getManager() {    	
+    	return super.getManager();
     }
 
 	/**

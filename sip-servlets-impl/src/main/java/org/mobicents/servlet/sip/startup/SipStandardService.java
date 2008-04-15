@@ -39,7 +39,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  */
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
-	private static Log log = LogFactory.getLog(SipStandardService.class);
+	private static Log logger = LogFactory.getLog(SipStandardService.class);
 	//the sip application dispatcher class name defined in the server.xml
 	private String sipApplicationDispatcherClassName;
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 
@@ -69,7 +69,7 @@ public class SipStandardService extends StandardService implements SipService {
 				sipProvider.addSipListener(sipApplicationDispatcher);
 				sipApplicationDispatcher.addSipProvider(sipProvider);
 			} catch (TooManyListenersException e) {
-				log.error("Connector.initialize", e);
+				logger.error("Connector.initialize", e);
 			}			
 		}
 		super.addConnector(connector);
@@ -115,6 +115,16 @@ public class SipStandardService extends StandardService implements SipService {
 		super.start();	
 		synchronized (connectors) {
 			for (int i = 0; i < connectors.length; i++) {
+				//Jboss sepcific loading case
+				Boolean isSipConnector = (Boolean)
+					connectors[i].getProtocolHandler().getAttribute("isSipConnector");				
+				if(isSipConnector != null && isSipConnector) {
+					logger.info("Attaching the sip application dispatcher " +
+							"as a sip listener to connector listening on port " + 
+							connectors[i].getPort());
+					connectors[i].getProtocolHandler().setAttribute("SipApplicationDispatcher", sipApplicationDispatcher);						
+				} 
+				//Tomcat specific loading case
 				SipProvider sipProvider = (SipProvider)
 					connectors[i].getProtocolHandler().getAttribute("sipProvider");
 				if(sipProvider != null) {
@@ -131,7 +141,8 @@ public class SipStandardService extends StandardService implements SipService {
 	}
 
 	@Override
-	public void stop() throws LifecycleException {		
+	public void stop() throws LifecycleException {
+		//Tomcat specific unloading case
 		synchronized (connectors) {
 			for (int i = 0; i < connectors.length; i++) {
 				SipProvider sipProvider = (SipProvider)

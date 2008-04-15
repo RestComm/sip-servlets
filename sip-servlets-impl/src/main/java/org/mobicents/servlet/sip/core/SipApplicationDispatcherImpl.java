@@ -189,7 +189,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} catch (ClassCastException e) {
 			throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
 		}		
-		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));		
+		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));
 	}
 	/**
 	 * {@inheritDoc}

@@ -70,12 +70,14 @@ public class SipNamingContextListener extends NamingContextListener {
 	 * @param sipFactory the sip factory to remove
 	 */
 	private void removeSipFactory(SipFactory sipFactory) {
-		try {
-			javax.naming.Context sipContext = (javax.naming.Context)envCtx.lookup(SIP_SUBCONTEXT);
-			sipContext.unbind(SIPFACTORY_JNDI_NAME);
-			envCtx.destroySubcontext(SIP_SUBCONTEXT);
-		} catch (NamingException e) {
-			logger.error(sm.getString("naming.bindFailed", e));
+		if(envCtx != null) {
+			try {
+				javax.naming.Context sipContext = (javax.naming.Context)envCtx.lookup(SIP_SUBCONTEXT);
+				sipContext.unbind(SIPFACTORY_JNDI_NAME);
+				envCtx.destroySubcontext(SIP_SUBCONTEXT);
+			} catch (NamingException e) {
+				logger.error(sm.getString("naming.bindFailed", e));
+			}
 		}
 	}
 
@@ -85,11 +87,13 @@ public class SipNamingContextListener extends NamingContextListener {
 	 * @param sipFactory the sip factory to add
 	 */
 	private void addSipFactory(SipFactory sipFactory) {
-		try {
-			javax.naming.Context sipContext = envCtx.createSubcontext(SIP_SUBCONTEXT);
-			sipContext.bind(SIPFACTORY_JNDI_NAME, sipFactory);
-		} catch (NamingException e) {
-			logger.error(sm.getString("naming.bindFailed", e));
-		}			
+		if(envCtx != null) {
+			try {
+				javax.naming.Context sipContext = envCtx.createSubcontext(SIP_SUBCONTEXT);
+				sipContext.bind(SIPFACTORY_JNDI_NAME, sipFactory);
+			} catch (NamingException e) {
+				logger.error(sm.getString("naming.bindFailed", e));
+			}			
+		}
 	}
 }

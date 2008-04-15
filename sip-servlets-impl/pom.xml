@@ -70,61 +70,143 @@
 			<version>6.0.14</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- JBoss dependencies -->
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>jbossweb-service</artifactId>
+			<version>${jboss.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jbossweb-service.jar</systemPath>
+		</dependency>
 		
-		<!--dependency>
-			<groupId>tomcat</groupId>
-			<artifactId>tomcat-util</artifactId>
-			<version>5.5.15</version>
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>jboss</artifactId>
+			<version>${jboss.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>jboss-system</artifactId>
+			<version>${jboss.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
-			<groupId>directory-naming</groupId>
-			<artifactId>naming-resources</artifactId>
-			<version>0.8</version>
-			<scope>provided</scope>			
-		</dependency-->
+			<groupId>jboss</groupId>
+			<artifactId>jboss-jmx</artifactId>
+			<version>${jboss.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>jboss-common</artifactId>
+			<version>${jboss.version}</version>
+			<scope>provided</scope>
+		</dependency>						
+		
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>jbosssx</artifactId>
+			<version>${jboss.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jbosssx.jar</systemPath>
+		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<tasks>
-								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}\lib"/>
-								<copy verbose="true" file="docs/logging.properties" todir="${tomcat.home}/conf"/>
-								<copy verbose="true" file="docs/log4j.xml" todir="${tomcat.home}/lib"/>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
- 	        	<groupId>org.apache.maven.plugins</groupId>
- 	        	<artifactId>maven-dependency-plugin</artifactId>
- 	        	<executions>
- 	          		<execution>
- 	            			<id>copy-to-lib</id>
- 	            			<phase>package</phase>
- 	            			<goals>
-								<goal> copy-dependencies </goal>
- 	            			</goals>
- 	            			<configuration>
-							<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging</includeArtifactIds>
-			    			<outputDirectory>${tomcat.home}/lib</outputDirectory>
- 	            			</configuration>
- 	          		</execution>
- 	        	</executions>
- 	      	</plugin>
-			
-		</plugins>
+	<build>		
 	</build>
+	<profiles>
+		<profile>			
+			<id>tomcat</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>			
+			<build>			
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<configuration>
+									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}\lib"/>
+										<copy verbose="true" file="docs/logging.properties" todir="${tomcat.home}/conf"/>
+										<copy verbose="true" file="docs/log4j.xml" todir="${tomcat.home}/lib"/>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+		 	        	<groupId>org.apache.maven.plugins</groupId>
+		 	        	<artifactId>maven-dependency-plugin</artifactId>
+		 	        	<executions>
+		 	          		<execution>
+		 	            			<id>copy-to-tomcat-lib</id>
+		 	            			<phase>package</phase>
+		 	            			<goals>
+										<goal> copy-dependencies </goal>
+		 	            			</goals>
+		 	            			<configuration>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging</includeArtifactIds>
+					    			<outputDirectory>${tomcat.home}/lib</outputDirectory>
+		 	            			</configuration>
+		 	          		</execution>
+		 	        	</executions>
+		 	      	</plugin>
+				</plugins>
+			</build>
+		</profile>		
+		<profile>		
+			<id>jboss</id>			
+			<build>			
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<configuration>
+									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jboss.home}/server/default/lib"/>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+		 	        	<groupId>org.apache.maven.plugins</groupId>
+		 	        	<artifactId>maven-dependency-plugin</artifactId>
+		 	        	<executions>		 	          		
+		 	          		<execution>
+		 	            			<id>copy-to-jboss-lib</id>
+		 	            			<phase>package</phase>
+		 	            			<goals>
+										<goal> copy-dependencies </goal>
+		 	            			</goals>
+		 	            			<configuration>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent</includeArtifactIds>
+					    			<outputDirectory>${jboss.home}/server/default/lib</outputDirectory>
+		 	            			</configuration>
+		 	          		</execution>
+		 	        	</executions>
+		 	      	</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

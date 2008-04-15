@@ -55,11 +55,13 @@ public class ClassFileScanner {
 	
     private void _scan(File folder) {
         File[] files = folder.listFiles();
-        for(int j = 0; j < files.length; j++) {
-            if(files[j].isDirectory())
-                _scan(files[j]);
-            else
-            	analyzeClass(files[j].getAbsolutePath());
+        if(files != null) {
+	        for(int j = 0; j < files.length; j++) {
+	            if(files[j].isDirectory())
+	                _scan(files[j]);
+	            else
+	            	analyzeClass(files[j].getAbsolutePath());
+	        }
         }
     }
     

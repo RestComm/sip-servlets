@@ -28,8 +28,9 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class SipHostConfig extends HostConfig {
-	private static final String SIP_CONTEXT_CLASS = "org.mobicents.servlet.sip.startup.SipStandardContext";
-	private static final String SIP_CONTEXT_CONFIG_CLASS = "org.mobicents.servlet.sip.startup.SipContextConfig";
+	public static final String SIP_CONTEXT_CLASS = "org.mobicents.servlet.sip.startup.SipStandardContext";
+	public static final String SIP_CONTEXT_CONFIG_CLASS = "org.mobicents.servlet.sip.startup.SipContextConfig";
+	
 	private static transient Log logger = LogFactory
 		.getLog(SipHostConfig.class);
 	/**
@@ -65,7 +66,7 @@ public class SipHostConfig extends HostConfig {
 		if (deploymentExists(contextPath))
             return;
 		if(logger.isDebugEnabled()) {
-    		logger.debug(SipContextConfig.APPLICATION_SIP_XML + " found in " 
+    		logger.debug(SipContext.APPLICATION_SIP_XML + " found in " 
     				+ sar + ". Enabling sip servlet archive deployment");
     	}
 		String initialHostConfigClass = host.getConfigClass();
@@ -82,7 +83,7 @@ public class SipHostConfig extends HostConfig {
 		boolean isSipServletApplication = isSipServletDirectory(dir);
 		if(isSipServletApplication) {
 			if(logger.isDebugEnabled()) {
-        		logger.debug(SipContextConfig.APPLICATION_SIP_XML + " found in " 
+        		logger.debug(SipContext.APPLICATION_SIP_XML + " found in " 
         				+ dir + ". Enabling sip servlet archive deployment");
         	}
 			String initialConfigClass = configClass;
@@ -157,7 +158,7 @@ public class SipHostConfig extends HostConfig {
 		} else if (file.getName().toLowerCase().endsWith(".war")) {
 			try{
 				JarFile jar = new JarFile(file);			          
-				JarEntry entry = jar.getJarEntry(SipContextConfig.APPLICATION_SIP_XML);
+				JarEntry entry = jar.getJarEntry(SipContext.APPLICATION_SIP_XML);
 				if(entry != null) {
 					return true;
 				}
@@ -178,7 +179,7 @@ public class SipHostConfig extends HostConfig {
 	 */
 	private boolean isSipServletDirectory(File dir) {
 		 if(dir.isDirectory()) {
-			File sipXmlFile = new File(dir.getAbsoluteFile() + SipContextConfig.APPLICATION_SIP_XML);
+			File sipXmlFile = new File(dir.getAbsoluteFile() + SipContext.APPLICATION_SIP_XML);
 			if(sipXmlFile.exists()) {
 				return true;
 			}

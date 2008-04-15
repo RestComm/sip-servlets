@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
  * This is the sip protocol handler that will get called upon creation of the
@@ -112,8 +113,14 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 */
 	public void destroy() throws Exception {
 		logger.info("Stopping the sip stack");
-		//stopping the application dispatcher
-//		ApplicationDispatcher.getInstance().stop();				
+		//Jboss specific unloading case
+		SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
+			getAttribute("SipApplicationDispatcher");
+		if(sipApplicationDispatcher != null) {
+			logger.info("Removing the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
+			sipProvider.removeSipListener(sipApplicationDispatcher);
+			sipApplicationDispatcher.removeSipProvider(sipProvider);
+		}
 		//stopping the sip stack
 		sipStack.deleteSipProvider(sipProvider);
 		sipStack.deleteListeningPoint(listeningPoint);
@@ -144,6 +151,7 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 */
 	public void init() throws Exception {
 		SipFactories.initialize(this.sipPathName);
+		setAttribute("isSipConnector",Boolean.TRUE);
 	}
 
 	public void pause() throws Exception {
@@ -166,17 +174,17 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 */
 	public void setAttribute(String arg0, Object arg1) {
 		attributes.put(arg0, arg1);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
+	}		
+	
 	public void start() throws Exception {
 		try {
 			logger.info("Starting the sip stack");
 
 			
-			String catalinaHome = System.getenv("CATALINA_HOME");
+			String catalinaHome = System.getProperty("catalina.home");
+	        if (catalinaHome == null) {
+	        	catalinaHome = System.getProperty("catalina.base");
+	        }
 			// defining sip stack properties
 			Properties properties = new Properties();
 			
@@ -211,6 +219,15 @@ public class SipProtocolHandler implements ProtocolHandler {
 			//made the sip stack and the sipProvider available to the service implementation
 			setAttribute("sipStack", sipStack);
 			setAttribute("sipProvider", sipProvider);			
+			
+			//Jboss specific loading case
+			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
+				getAttribute("SipApplicationDispatcher");
+			if(sipApplicationDispatcher != null) {
+				logger.info("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
+				sipProvider.addSipListener(sipApplicationDispatcher);
+				sipApplicationDispatcher.addSipProvider(sipProvider);
+			}
 			
 			logger.info("Sip stack started on ip address : " + ipAddress
 					+ " and port " + port);

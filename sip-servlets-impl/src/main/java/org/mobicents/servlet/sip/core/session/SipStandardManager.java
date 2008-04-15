@@ -16,6 +16,7 @@ package org.mobicents.servlet.sip.core.session;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Extension of the Standard implementation of the <b>Manager</b> interface provided by Tomcat
@@ -38,8 +39,13 @@ public class SipStandardManager extends StandardManager {
 	}
 	
 	@Override
-	protected StandardSession getNewSession() {		
-		return new ConvergedSession(this, sipFactoryImpl);
+	protected StandardSession getNewSession() {
+		//return a converged session only if it is managing a sipcontext
+		if(container instanceof SipContext) {
+			return new ConvergedSession(this, sipFactoryImpl);
+		} else {
+			return getNewSession();
+		}
 	}
 
 	/**

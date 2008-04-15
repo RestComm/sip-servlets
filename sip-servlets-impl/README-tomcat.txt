@@ -31,9 +31,11 @@ in tomcat_home/lib directory, there should be a log4j-1.2.14.jar
 in tomcat_home/lib directory, there should be a commons-logging-1.1.jar
 
 make a backup of your tomcat_home/conf/server.xml file
-copy the server.xml located in docs to tomcat_home/conf
+copy the server-tomcat-6.xml located in docs to tomcat_home/conf and rename it to server.xml
 look for the context tag in the server.xml file and 
 modify the docbase attribute to map to your existing simple-sip-servlet application
+look for service tag in the server.xml file and 
+modify the darConfigurationFileLocation attribute to map to your filesystem
 
 make sure to run a mvn clean install at the root of simple-sip-servlet project too
 
