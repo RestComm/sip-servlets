@@ -18,13 +18,48 @@ public class ProxyTest extends SipServletTestCase{
 
 	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
 	
-	private SipStack sipStackA;
-	private SipStack sipStackB;
+	private SipStack sipStackSender;
+	private SipStack[] sipStackReceivers;
 	
-	private SipPhone sipPhoneA;
-	private SipPhone sipPhoneB;
+	private SipPhone sipPhoneSender;
+	private SipPhone[] sipPhoneReceivers;
 	
-	private int timeout = 10000;
+	private static final int timeout = 10000;
+	
+	private static final int receiversCount = 1;
+	
+	// Don't restart the server for this set of tests.
+	private static boolean firstTime = true;
+
+	@Override
+	public void setUp()
+	{
+		if(firstTime)
+		{
+			try {
+				super.setUp();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		firstTime = false;
+	}
+	
+	@Override
+	public void tearDown()
+	{
+		try {
+			sipPhoneSender.dispose();
+			for(SipPhone sp : sipPhoneReceivers) sp.dispose();
+			sipStackSender.dispose();
+			for(SipStack ss : sipStackReceivers) ss.dispose();
+			super.tearDown();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	@Override
 	public void deployApplication() {
@@ -39,46 +74,44 @@ public class ProxyTest extends SipServletTestCase{
 				"org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
 	}
 	
-	@Override
-	protected void setUp() throws Exception {		
-		super.setUp();		
-		init();
+	public SipStack makeStack(String transport, int port)
+	{
+		Properties properties = new Properties();
+		String peerHostPort1 = "127.0.0.1:5070";
+		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
+				+ "udp");
+		properties.setProperty("javax.sip.STACK_NAME", "UAC_"+transport+"_"+port);
+		properties.setProperty("sipunit.BINDADDR", "127.0.0.1");
+		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+		"logs/simplesipservlettest_debug_port"+port+".txt");
+		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+		"logs/simplesipservlettest_log_port"+port+".txt");
+		try {
+			return new SipStack(transport, port, properties);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public void setupPhones() {
+		sipStackReceivers = new SipStack[receiversCount];
+		sipPhoneReceivers = new SipPhone[receiversCount];
 		try {
-			Properties properties1 = new Properties();
-			//properties1.setProperty("javax.sip.IP_ADDRESS", "127.0.0.1");
-			String transport = "udp";
-			String peerHostPort1 = "127.0.0.1:5070";
-			properties1.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
-					+ transport);
-			properties1.setProperty("javax.sip.STACK_NAME", "sender");
-			properties1.setProperty("sipunit.BINDADDR", "127.0.0.1");
-			properties1.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-			"logs/simplesipservlettest_debug.txt");
-			properties1.setProperty("gov.nist.javax.sip.SERVER_LOG",
-			"logs/simplesipservlettest_log.txt");
-
-			Properties properties2 = new Properties();
-			// properties2.setProperty("javax.sip.IP_ADDRESS", "127.0.0.1");
-			String peerHostPort2 = "127.0.0.1:5070";
-			properties2.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort2 + "/"
-					+ transport);
-			properties2.setProperty("javax.sip.STACK_NAME", "receiver");
-			properties2.setProperty("sipunit.BINDADDR", "127.0.0.1");
-			properties2.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-			"logs/simplesipservlettest_debug.txt");
-			properties2.setProperty("gov.nist.javax.sip.SERVER_LOG",
-			"logs/simplesipservlettest_log.txt");
-
-			sipStackA = new SipStack(SipStack.PROTOCOL_UDP , 5058, properties1);
-			ListeningPoint lp = sipStackA.getSipProvider().getListeningPoint("udp");
+			sipStackSender = makeStack(SipStack.PROTOCOL_UDP , 5058);
+			ListeningPoint lp = sipStackSender.getSipProvider().getListeningPoint("udp");
 			String stackIPAddress = lp.getIPAddress();
-			sipPhoneA = sipStackA.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");
+			sipPhoneSender = sipStackSender.createSipPhone("localhost",
+					SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");
 
-			sipStackB = new SipStack(SipStack.PROTOCOL_UDP , 5059, properties2);
-			sipPhoneB = sipStackB.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, "sip:receiver@nist.gov");
+			for(int q=0; q<receiversCount; q++)
+			{
+				int port = 5058 - 1 - q;
+				sipStackReceivers[q] = makeStack(SipStack.PROTOCOL_UDP, port);
+				sipPhoneReceivers[q] = sipStackReceivers[q].createSipPhone(
+						"localhost", SipStack.PROTOCOL_UDP, 5070, "sip:receiver@nist.gov");
+			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -92,65 +125,72 @@ public class ProxyTest extends SipServletTestCase{
 
 	// Tests a complete call.
 	public void testCallProxying() throws InterruptedException {
-		
+		init();
 		try{
-			SipCall callA = sipPhoneA.createSipCall();
-			SipCall callB = sipPhoneB.createSipCall();
+			SipCall sender = sipPhoneSender.createSipCall();
+			SipCall[] receiverCalls = new SipCall[receiversCount];
+			for(int q=0; q<receiversCount; q++)
+				receiverCalls[q] = sipPhoneReceivers[q].createSipCall();
 			
-			callB.listenForIncomingCall();Thread.sleep(300);
-			callA.initiateOutgoingCall("sip:receiver@nist.gov", null);
+			for(SipCall call:receiverCalls)
+				call.listenForIncomingCall();
 			
-			assertTrue(callB.waitForIncomingCall(timeout));
+			sender.initiateOutgoingCall("sip:receiver@nist.gov", null);
 			
-			assertTrue(callB.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
-			assertTrue(callA.waitOutgoingCallResponse(timeout));
+			for(SipCall call:receiverCalls)
+				assertTrue(call.waitForIncomingCall(timeout));
 			
-			assertTrue(callB.sendIncomingCallResponse(Response.OK, "Answer", 0));
-			assertTrue(callA.waitOutgoingCallResponse(timeout));
+			for(SipCall call:receiverCalls)
+				assertTrue(call.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
+			assertTrue(sender.waitOutgoingCallResponse(timeout));
 			
-			assertTrue(callA.sendInviteOkAck());
+			for(SipCall call:receiverCalls)
+				assertTrue(call.sendIncomingCallResponse(Response.OK, "Answer", 0));
+			assertTrue(sender.waitOutgoingCallResponse(timeout));
 			
-			assertTrue(callB.waitForAck(timeout));
+			assertTrue(sender.sendInviteOkAck());
 			
-			assertTrue(callA.disconnect());
-			assertTrue(callB.respondToDisconnect());
+			for(SipCall call:receiverCalls)
+				assertTrue(call.waitForAck(timeout));
 			
-			sipPhoneA.dispose();
-			sipPhoneB.dispose();
-			sipStackA.dispose();
-			sipStackB.dispose();
-
+			assertTrue(sender.disconnect());
+			
+			for(SipCall call:receiverCalls)
+				assertTrue(call.respondToDisconnect());
+			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			fail(e.toString());
 			e.printStackTrace();
 		}
 	}
 	
 	// This just checks if the INVITEs are getting through
 	public void testInviteProxying() throws InterruptedException {
-		
+		init();
 		try{
-			SipCall callA = sipPhoneA.createSipCall();
-			SipCall callB = sipPhoneB.createSipCall();
+			SipCall sender = sipPhoneSender.createSipCall();
+			SipCall[] receiverCalls = new SipCall[receiversCount];
+			for(int q=0; q<receiversCount; q++)
+				receiverCalls[q] = sipPhoneReceivers[q].createSipCall();
 			
-			callB.listenForIncomingCall();Thread.sleep(300);
-			callA.initiateOutgoingCall("sip:receiver@nist.gov", null);
+			for(SipCall call:receiverCalls)
+				call.listenForIncomingCall();
 			
-			assertTrue(callB.waitForIncomingCall(timeout));
+			sender.initiateOutgoingCall("sip:receiver@nist.gov", null);
 			
-			assertTrue(callB.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
-			assertTrue(callA.waitOutgoingCallResponse(timeout));
+			for(SipCall call:receiverCalls)
+				assertTrue(call.waitForIncomingCall(timeout));
 			
-			assertTrue(callB.sendIncomingCallResponse(Response.OK, "Answer", 0));
-			assertTrue(callA.waitOutgoingCallResponse(timeout));
+			for(SipCall call:receiverCalls)
+				assertTrue(call.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
+			assertTrue(sender.waitOutgoingCallResponse(timeout));
 			
-			sipPhoneA.dispose();
-			sipPhoneB.dispose();
-			sipStackA.dispose();
-			sipStackB.dispose();
+			for(SipCall call:receiverCalls)
+				assertTrue(call.sendIncomingCallResponse(Response.OK, "Answer", 0));
+			assertTrue(sender.waitOutgoingCallResponse(timeout));
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			fail(e.toString());
 			e.printStackTrace();
 		}
 	}
