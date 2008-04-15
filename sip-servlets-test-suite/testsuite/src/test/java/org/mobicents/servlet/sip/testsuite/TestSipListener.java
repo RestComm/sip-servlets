@@ -134,13 +134,13 @@ public class TestSipListener implements SipListener {
 			Dialog dialog = st.getDialog();		
 			logger.info("Shootme: dialog = " + dialog);		
 			st.sendResponse(response);
-			if (dialog.getState() != DialogState.CONFIRMED) {
-				response = protocolObjects.messageFactory.createResponse(
-						Response.REQUEST_TERMINATED, inviteRequest);
-				inviteServerTid.sendResponse(response);
-			}
+			
+			response = protocolObjects.messageFactory.createResponse(
+					Response.REQUEST_TERMINATED, inviteRequest);
+			inviteServerTid.sendResponse(response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			logger.error("error sending CANCEL responses", ex);
 		}
 	}
 
@@ -160,11 +160,11 @@ public class TestSipListener implements SipListener {
 					.createAddress("Shootme <sip:127.0.0.1:" + myPort
 							+";transport="+protocolObjects.transport
 							+ ">");
-			ServerTransaction st = requestEvent.getServerTransaction();
-			inviteServerTid = st;
+			ServerTransaction st = requestEvent.getServerTransaction();			
 			if (st == null) {
 				st = sipProvider.getNewServerTransaction(request);
 			}
+			inviteServerTid = st;
 			Dialog dialog = st.getDialog();
 			
 			this.dialogCount ++;
@@ -175,23 +175,30 @@ public class TestSipListener implements SipListener {
 			this.inviteRequest = request;
 			
 			st.sendResponse(response);
-			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
-			
-			Response ringing = protocolObjects.messageFactory
-			.createResponse(Response.RINGING, request);
-			toHeader = (ToHeader) ringing.getHeader(ToHeader.NAME);
-			toHeader.setTag("5432"); // Application is supposed to set.
-			st.sendResponse(ringing);			
-		
-			Response okResponse = protocolObjects.messageFactory
-					.createResponse(Response.OK, request);
-			toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
-			toHeader.setTag("5432"); // Application is supposed to set.
-			okResponse.addHeader(contactHeader);			
-
-			Thread.sleep(1000);
-			st.sendResponse(okResponse);
-
+			if(!cancelReceived) {
+				Response ringing = protocolObjects.messageFactory
+				.createResponse(Response.RINGING, request);
+				toHeader = (ToHeader) ringing.getHeader(ToHeader.NAME);
+				toHeader.setTag("5432"); // Application is supposed to set.
+				st.sendResponse(ringing);			
+			} else {
+				logger.info("CANCEL received, stopping the INVITE processing ");
+				return;
+			}
+			Thread.sleep(2000);
+			if(!cancelReceived) {
+				ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
+				Response okResponse = protocolObjects.messageFactory
+						.createResponse(Response.OK, request);
+				toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
+				toHeader.setTag("5432"); // Application is supposed to set.
+				okResponse.addHeader(contactHeader);			
+					
+				st.sendResponse(okResponse);
+			} else {
+				logger.info("CANCEL received, stopping the INVITE processing ");
+				return ;
+			}
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

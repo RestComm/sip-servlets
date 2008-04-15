@@ -10,6 +10,7 @@ import org.mobicents.servlet.sip.testsuite.callcontroller.CallForwardingB2BUAJun
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallForwardingJunitTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallForwardingSipUnitTest;
 import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJunitTest;
+import org.mobicents.servlet.sip.testsuite.proxy.ProxyTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
 
@@ -27,6 +28,7 @@ public class AllTests {
 		suite.addTestSuite(CallForwardingSipUnitTest.class);
 		suite.addTestSuite(CallForwardingB2BUAJunitTest.class);
 		suite.addTestSuite(CallControllerSipUnitTest.class);
+		suite.addTestSuite(ProxyTest.class);
 		suite.addTestSuite(SpeedDialLocationServiceJunitTest.class);
 		
 		//$JUnit-END$

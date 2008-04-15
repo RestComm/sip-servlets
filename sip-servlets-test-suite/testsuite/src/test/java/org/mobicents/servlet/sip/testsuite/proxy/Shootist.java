@@ -2,6 +2,8 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -408,5 +410,33 @@ public class Shootist implements SipListener {
 			DialogTerminatedEvent dialogTerminatedEvent) {
 		System.out.println("dialogTerminatedEvent");
 
+	}
+	
+	public void destroy() {
+		HashSet hashSet = new HashSet();
+
+		for (Iterator it = sipStack.getSipProviders(); it.hasNext();) {
+
+			SipProvider sipProvider = (SipProvider) it.next();
+			hashSet.add(sipProvider);
+		}
+
+		for (Iterator it = hashSet.iterator(); it.hasNext();) {
+			SipProvider sipProvider = (SipProvider) it.next();
+
+			for (int j = 0; j < 5; j++) {
+				try {
+					sipStack.deleteSipProvider(sipProvider);
+				} catch (ObjectInUseException ex) {
+					try {
+						Thread.sleep(1000);
+					} catch (Exception e) {
+					}
+
+				}
+			}
+		}
+
+		sipStack.stop();
 	}
 }

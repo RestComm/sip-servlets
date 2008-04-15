@@ -1,15 +1,17 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.TooManyListenersException;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.ListeningPoint;
+import javax.sip.ObjectInUseException;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.SipListener;
@@ -25,45 +27,43 @@ import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
-public class ProxyTest extends SipServletTestCase implements SipListener{
+public class ProxyTest extends SipServletTestCase implements SipListener {
 
 	private static Log logger = LogFactory.getLog(ProxyTest.class);
-	
+
 	protected Shootist shootist;
 
 	protected Shootme shootme;
-	
+
 	protected Hashtable providerTable = new Hashtable();
-	
+
 	private static final int timeout = 5000;
-	
+
 	private static final int receiversCount = 1;
-	
 
 	public ProxyTest(String name) {
 		super(name);
 	}
-	
-	@Override
-	public void setUp()
-	{		try {
-		super.setUp();
-		this.shootist = new Shootist();
-		this.shootme = new Shootme();
 
-	} catch (Exception e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
+	@Override
+	public void setUp() {
+		try {
+			super.setUp();
+			this.shootist = new Shootist();
+			this.shootme = new Shootme();
+
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 	}
-		
-	}
-	
+
 	public void testProxy() {
 		this.shootme.init();
 		this.shootist.init();
-		for(int q=0; q<50; q++)
-		{
-			if(shootist.ended == false)
+		for (int q = 0; q < 50; q++) {
+			if (shootist.ended == false)
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
@@ -71,36 +71,36 @@ public class ProxyTest extends SipServletTestCase implements SipListener{
 					e.printStackTrace();
 				}
 		}
-		if(shootist.ended == false) fail("Conversation not complete!");
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
 	}
-	
+
 	@Override
-	public void tearDown()
-	{
-		try {
-			//super.tearDown();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void tearDown() throws Exception {
+		shootist.destroy();
+		shootme.destroy();
+		super.tearDown();
 	}
-	
+
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));		
+		assertTrue(tomcat
+				.deployContext(
+						projectHome
+								+ "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
+						"sip-test-context", "sip-test"));
 	}
 
 	@Override
 	protected String getDarConfigurationFile() {
-		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
+		return "file:///"
+				+ projectHome
+				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
+				+ "org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
 	}
-	
-	public void init()
-	{
-		//setupPhones();
+
+	public void init() {
+		// setupPhones();
 	}
 
 	private SipListener getSipListener(EventObject sipEvent) {

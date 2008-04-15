@@ -7,6 +7,7 @@ import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
+import javax.sip.ObjectInUseException;
 import javax.sip.PeerUnavailableException;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
@@ -347,4 +348,31 @@ public class Shootme implements SipListener {
 
 	}
 
+	public void destroy() {
+		HashSet hashSet = new HashSet();
+
+		for (Iterator it = sipStack.getSipProviders(); it.hasNext();) {
+
+			SipProvider sipProvider = (SipProvider) it.next();
+			hashSet.add(sipProvider);
+		}
+
+		for (Iterator it = hashSet.iterator(); it.hasNext();) {
+			SipProvider sipProvider = (SipProvider) it.next();
+
+			for (int j = 0; j < 5; j++) {
+				try {
+					sipStack.deleteSipProvider(sipProvider);
+				} catch (ObjectInUseException ex) {
+					try {
+						Thread.sleep(1000);
+					} catch (Exception e) {
+					}
+
+				}
+			}
+		}
+
+		sipStack.stop();
+	}
 }
