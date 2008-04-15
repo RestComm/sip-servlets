@@ -21,6 +21,10 @@ public class CallStatusContainer{
 		activeCalls.remove(new Call(from, to));
 	}
 	
+	public void removeCall(Call call) {
+		activeCalls.remove(call);
+	}
+	
 	public Call getCall(String from, String to) {
 		Iterator<Call> it = activeCalls.iterator();
 		while(it.hasNext()) {

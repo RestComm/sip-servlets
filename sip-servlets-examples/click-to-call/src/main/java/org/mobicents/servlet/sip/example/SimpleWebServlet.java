@@ -55,8 +55,8 @@ public class SimpleWebServlet extends HttpServlet
         String fromAddr = request.getParameter("from");
         String bye = request.getParameter("bye");
 
-        URI to = sipFactory.createAddress(toAddr).getURI();
-        URI from = sipFactory.createAddress(fromAddr).getURI();    
+        URI to = toAddr==null? null : sipFactory.createAddress(toAddr).getURI();
+        URI from = fromAddr==null? null : sipFactory.createAddress(fromAddr).getURI();    
 
         CallStatusContainer calls = (CallStatusContainer) getServletContext().getAttribute("activeCalls");
 
@@ -71,12 +71,13 @@ public class SimpleWebServlet extends HttpServlet
         			SipSession session = (SipSession) it.next();
         			Call call = (Call) session.getAttribute("call");
         			call.end();
+        			calls.removeCall(call);
         		}
         	} else {
         		// Someone wants to end an established call, send byes and clean up
         		Call call = calls.getCall(fromAddr, toAddr);
         		call.end();
-        		calls.removeCall(fromAddr, toAddr);
+        		calls.removeCall(call);
         	}
         } else {
         	if(calls == null) {

@@ -194,7 +194,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		char ch;
 		do {
 			ch = address.charAt(end++);
-		} while (";<>,".indexOf(ch)<0);
+		} while (end<address.length() && ";<>,".indexOf(ch)<0);
 		address = address.substring(start, end-1);
 		
 		users.put(req.getFrom().getURI().toString(), address);
