@@ -12,7 +12,8 @@ on the new popup, click on 'New' button
 on the new popup(what a popup mess :-)), 
 enter M2_REPO for the name input field 
 and <your user directory>/.m2/repository for the value.
-on windows <your user directory> shall be replaced by C:/Documents and Settings/Ranga
+on windows <your user directory> 
+shall be replaced by C:/Documents and Settings/Ranga
 Then OK to all and close all remaining popups. This should compile without errors
 if it behaves otherwise mail me to jean.deruelle@gmail.com
 
