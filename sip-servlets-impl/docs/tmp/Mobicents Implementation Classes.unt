@@ -208,11 +208,11 @@
 <XPD:OBJ name="OwnedViews[6]" type="UMLClassView" guid="1SLrOM0b50++RcG3dufy9QAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">96</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">924</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">184</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">928</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">313</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">329</XPD:ATTR>
-<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="7YZYqNID0kO8vtx3nKVrRwAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="yIMz6RTA302HrqDjHxAwBwAA">
 <XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
@@ -226,14 +226,14 @@
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="ggpy7RSHQEaKv26WeJIyLgAA">
-<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="aEAiwKx3tkWOi0En3Hd+4QAA">
-<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="7fnpqtN/D0620e41tak2SgAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLClassView" guid="1AZPB141xEqcwoE5bE2EBwAA">
