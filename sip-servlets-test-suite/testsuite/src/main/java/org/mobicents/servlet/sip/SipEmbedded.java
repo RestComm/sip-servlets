@@ -315,7 +315,8 @@ public class SipEmbedded {
         // Register the server classloader
         ObjectName objectName =
             new ObjectName("Catalina:type=ServerClassLoader,name=" + name);
-        mBeanServer.registerMBean(classLoader, objectName);
+        if(!mBeanServer.isRegistered(objectName))
+        	mBeanServer.registerMBean(classLoader, objectName);
 
         return classLoader;
 
