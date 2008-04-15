@@ -311,7 +311,6 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.cancel();
 		this.timedOut = true;
 		// Just do a timeout response
-		this.lastResponse = (SipServletResponseImpl) this.originalRequest.createResponse(408);
 		proxy.onBranchTimeOut(this);
 	}
 	

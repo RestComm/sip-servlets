@@ -354,8 +354,7 @@ public class ProxyImpl implements Proxy {
 	
 	public void onBranchTimeOut(ProxyBranchImpl branch)
 	{
-		// The branch already generated a timeout response, just handle it normally.
-		onFinalResponse(branch);
+		// Do nothing here since when the branch is timed out it just generated timeout response
 	}
 	
 	// In sequential proxying get some untried branch and start it, then wait for response and repeat
@@ -386,11 +385,11 @@ public class ProxyImpl implements Proxy {
 			// The unstarted branches still haven't got a chance to get response
 			if(!pbi.isStarted()) return false;
 			
-			if(pbi.isStarted())
+			if(pbi.isStarted() && !pbi.isTimedOut())
 			{
-				if(    response == null 
-					|| response.getStatus() < 200)
-				return false;
+				if(    response == null 			// if there is no response yet
+					|| response.getStatus() < 200) 	// or if the response if not final
+					return false;					// then we should wait more
 			}
 		}
 		return true;
@@ -399,6 +398,17 @@ public class ProxyImpl implements Proxy {
 	public void sendBestFinalResponse(SipServletResponseImpl response,
 			ProxyBranchImpl proxyBranch)
 	{
+		// If we didn't get any response and only a timeout just return a timeout
+		if(proxyBranch.isTimedOut()) {
+			try {
+				originalRequest.createResponse(408).send();
+				return;
+			} catch (IOException e1) {
+				throw new IllegalStateException("Faild to send a timeout response");
+			}
+		}
+		
+		//Otherwise proceed with proxying the response
 		SipServletResponse proxiedResponse = 
 			proxyUtils.createProxiedResponse(response, proxyBranch);
 		
