@@ -110,7 +110,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * 
 	 */
 	public SipApplicationDispatcherImpl() {
-		applicationDeployed = new HashMap<String, SipContext>();
+		applicationDeployed = Collections.synchronizedMap(new HashMap<String, SipContext>());
 		sipFactoryImpl = new SipFactoryImpl();		
 	}
 	
@@ -132,7 +132,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} catch (ClassCastException e) {
 			throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
 		}		
-		sipApplicationRouter.init();		
+		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));		
 	}
 	/**
 	 * {@inheritDoc}
@@ -192,9 +192,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {
-		synchronized (applicationDeployed) {
-			applicationDeployed.put(sipApplicationName, sipApplication);	
-		}		
+		applicationDeployed.put(sipApplicationName, sipApplication);
+		List<String> newlyApplicationsDeployed = new ArrayList<String>();
+		newlyApplicationsDeployed.add(sipApplicationName);
+		sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
 		//if the ApplicationDispatcher is started, notification is sent that the servlets are ready for service
 		//otherwise the notification will be delayed until the ApplicationDispatcher has started
 		synchronized (started) {
@@ -209,9 +210,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public SipContext removeSipApplication(String sipApplicationName) {
 		SipContext sipContext;
-		synchronized (applicationDeployed) {
-			sipContext = applicationDeployed.remove(sipApplicationName);
-		}
+		sipContext = applicationDeployed.remove(sipApplicationName);
+		List<String> applicationsUndeployed = new ArrayList<String>();
+		applicationsUndeployed.add(sipApplicationName);
+		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
 		logger.info("the following sip servlet application has been removed : " + sipApplicationName);
 		return sipContext;
 	}
@@ -723,11 +725,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	private void resetOutboundInterfaces() {
 		List<SipURI> outboundInterfaces = getOutboundInterfaces();
-		synchronized (applicationDeployed) {
-			for (SipContext sipContext : applicationDeployed.values()) {
-				sipContext.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-						outboundInterfaces);				
-			}
+		for (SipContext sipContext : applicationDeployed.values()) {
+			sipContext.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+					outboundInterfaces);				
 		}
 	}
 }

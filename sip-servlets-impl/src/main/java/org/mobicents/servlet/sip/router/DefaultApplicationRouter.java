@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.router;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +154,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	 * Default Constructor
 	 */
 	public DefaultApplicationRouter() {
-		containerDeployedApplicationNames = new ArrayList<String>();
+		containerDeployedApplicationNames = Collections.synchronizedList(new ArrayList<String>());
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
 		sipApplicationRouterInfos = new HashMap<String, List<SipApplicationRouterInfo>>();
 	}
@@ -162,29 +163,21 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	 * {@inheritDoc}
 	 */
 	public void applicationDeployed(List<String> newlyDeployedApplicationNames) {		
-		synchronized (containerDeployedApplicationNames) {
-			containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
-		}
+		containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void applicationUndeployed(List<String> undeployedApplicationNames) {
-		synchronized (containerDeployedApplicationNames) {
-			containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
-		}
-
+		containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void destroy() {
-		synchronized (containerDeployedApplicationNames) {
-			containerDeployedApplicationNames.clear();			
-		}
-
+		containerDeployedApplicationNames.clear();			
 	}
 
 	/**
@@ -200,12 +193,11 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 			List<SipApplicationRouterInfo> sipApplicationRouterInfoList = 
 				sipApplicationRouterInfos.get(initialRequest.getMethod());
 			if(sipApplicationRouterInfoList != null && sipApplicationRouterInfoList.size() > 0) {
-//				for (SipApplicationRouterInfo sipApplicationRouterInfo : sipApplicationRouterInfoList) {
-//					if(containerDeployedApplicationNames.contains(sipApplicationRouterInfo.getNextApplicationName())) {
-//						return sipApplicationRouterInfo;
-//					}
-//				}
-				return sipApplicationRouterInfoList.get(0);
+				for (SipApplicationRouterInfo sipApplicationRouterInfo : sipApplicationRouterInfoList) {
+					if(containerDeployedApplicationNames.contains(sipApplicationRouterInfo.getNextApplicationName())) {
+						return sipApplicationRouterInfo;
+					}
+				}
 			}			
 		}
 		return new SipApplicationRouterInfo(null,null,null,null,null);
