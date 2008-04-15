@@ -20,6 +20,10 @@ public class CallBlockingTest extends SipUnitServletTestCase {
 
 	private static final int timeout = 10000;	
 
+	public CallBlockingTest(String name) {
+		super(name);
+	}
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();

@@ -27,6 +27,10 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
 
+	public CallForwardingJunitTest(String name) {
+		super(name);
+	}
+
 	@Override
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
@@ -83,10 +87,11 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 	}
 
 	@Override
-	protected void tearDown() {					
+	protected void tearDown() throws Exception {					
 		senderProtocolObjects.destroy();
 		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");		
+		logger.info("Test completed");
+		super.tearDown();
 	}
 
 

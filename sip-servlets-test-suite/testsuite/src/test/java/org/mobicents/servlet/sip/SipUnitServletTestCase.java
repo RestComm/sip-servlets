@@ -17,6 +17,10 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 	protected SipEmbedded tomcat;
 	protected boolean autoDeployOnStartup = true;
 	
+	public SipUnitServletTestCase(String name) {
+		super(name);
+	}
+	
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();

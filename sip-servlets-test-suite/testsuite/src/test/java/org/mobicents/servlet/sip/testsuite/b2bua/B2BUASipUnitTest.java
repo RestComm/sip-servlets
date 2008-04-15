@@ -20,6 +20,11 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 	
 	SipPhone sipPhoneA;
 	SipPhone sipPhoneB;
+	
+	public B2BUASipUnitTest(String name) {
+		super(name);
+	}
+
 	@Override
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(

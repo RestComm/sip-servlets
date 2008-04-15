@@ -24,6 +24,10 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	private static final int TIMEOUT = 5000;	
 //	private static final int TIMEOUT = 1000000;
 
+	public CallControllerSipUnitTest(String name) {
+		super(name);
+	}
+	
 	@Override
 	public void setUp() throws Exception {
 		autoDeployOnStartup = false;

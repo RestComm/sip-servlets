@@ -30,6 +30,10 @@ public class ProxyTest extends SipServletTestCase{
 	// Don't restart the server for this set of tests.
 	private static boolean firstTime = true;
 
+	public ProxyTest(String name) {
+		super(name);
+	}
+	
 	@Override
 	public void setUp()
 	{

@@ -24,6 +24,10 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 	private static final int TIMEOUT = 5000;	
 //	private static final int TIMEOUT = 1000000;
 
+	public CallForwardingSipUnitTest(String name) {
+		super(name);
+	}
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();

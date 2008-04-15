@@ -6,6 +6,10 @@ public class B2BUATest extends SipServletTestCase {
 	
 	private B2BUATestCase testCase;
 	
+	public B2BUATest(String name) {
+		super(name);
+	}
+	
 	@Override
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(

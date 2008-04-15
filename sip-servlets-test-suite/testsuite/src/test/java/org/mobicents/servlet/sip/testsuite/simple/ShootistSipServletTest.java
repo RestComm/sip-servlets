@@ -18,6 +18,10 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	
 	ProtocolObjects receiverProtocolObjects;
 	
+	public ShootistSipServletTest(String name) {
+		super(name);
+	}
+
 	@Override
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
@@ -57,8 +61,9 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 
 	@Override
-	protected void tearDown() {					
+	protected void tearDown() throws Exception {					
 		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");		
+		logger.info("Test completed");
+		super.tearDown();
 	}
 }

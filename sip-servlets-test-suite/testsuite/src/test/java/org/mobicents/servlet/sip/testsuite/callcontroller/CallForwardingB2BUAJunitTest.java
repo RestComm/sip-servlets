@@ -23,6 +23,10 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
 
+	public CallForwardingB2BUAJunitTest(String name) {
+		super(name);
+	}
+
 	@Override
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
