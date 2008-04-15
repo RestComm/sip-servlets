@@ -899,6 +899,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.attributes.put(name, o);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setCharacterEncoding(java.lang.String)
+	 */
 	public void setCharacterEncoding(String enc) {
 		try {
 			this.message.setContentEncoding(SipFactories.headerFactory
@@ -909,25 +913,38 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		}
 
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setContent(java.lang.Object, java.lang.String)
+	 */
 	public void setContent(Object content, String contentType)
 			throws UnsupportedEncodingException {
-		String type = contentType.split("/")[0];
-		String subtype = contentType.split("/")[1];
-		try {
-			this.message.setContent(content, new ContentType(type, subtype));
-		} catch (Exception e) {
-			throw new RuntimeException("Parse error reading content type", e);
+		if(contentType != null && contentType.length() > 0) {
+			String type = contentType.split("/")[0];
+			String subtype = contentType.split("/")[1];
+			try {
+				this.message.setContent(content, new ContentType(type, subtype));
+			} catch (Exception e) {
+				throw new RuntimeException("Parse error reading content type", e);
+			}
 		}
-
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setContentLanguage(java.util.Locale)
+	 */
 	public void setContentLanguage(Locale locale) {
 		this.message.setContentLanguage(new ContentLanguage(locale
 				.getLanguage()));
 
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setContentLength(int)
+	 */
 	public void setContentLength(int len) {
 
 		// this.message.setContentLength(new ContentLength(len));

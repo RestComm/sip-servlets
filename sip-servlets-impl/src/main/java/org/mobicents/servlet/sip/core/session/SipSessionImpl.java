@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -27,6 +28,7 @@ import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 
@@ -34,6 +36,7 @@ import org.apache.catalina.Container;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -190,7 +193,7 @@ public class SipSessionImpl implements SipSession {
 				||method.equals(Request.CANCEL))
 			throw new IllegalArgumentException(
 					"Can not create ACK or CANCEL requests with this method");				
-		SipServletRequest sipServletRequest = null;
+		SipServletRequestImpl sipServletRequest = null;
 		if(Request.BYE.equalsIgnoreCase(method)) {			
 			try {
 				Request byeRequest = this.sessionCreatingDialog.createRequest(Request.BYE);
@@ -202,11 +205,23 @@ public class SipSessionImpl implements SipSession {
 				throw new IllegalArgumentException("Cannot create the bye request");
 			}			
 		} else {
-			sipServletRequest = sipFactory.createRequest(
+			sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
 				this.sipApplicationSession,
 				method,
 				this.getLocalParty(),
 				this.getRemoteParty());
+		}
+		//Application Routing to avoid going through the same app that created the ack
+		ListIterator<RouteHeader> routeHeaders = sipServletRequest.getMessage().getHeaders(RouteHeader.NAME);
+		sipServletRequest.getMessage().removeHeader(RouteHeader.NAME);
+		while (routeHeaders.hasNext()) {
+			RouteHeader routeHeader = (RouteHeader) routeHeaders
+					.next();
+			String routeAppName = ((javax.sip.address.SipURI)routeHeader .getAddress().getURI()).
+				getParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME);
+			if(routeAppName == null || !routeAppName.equals(getKey().getApplicationName())) {
+				sipServletRequest.getMessage().addHeader(routeHeader);
+			}
 		}
 		return sipServletRequest;
 	}

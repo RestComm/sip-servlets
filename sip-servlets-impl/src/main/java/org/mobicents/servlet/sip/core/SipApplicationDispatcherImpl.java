@@ -490,8 +490,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				sipServletRequest.setPoppedRoute(routeHeader);
 				return true;
 			} else {
-				//FIXME send to the outside world
-				return false;
+				// the Request-URI points to a different domain, or there are one or more Route headers, 
+				// send the request externally according to standard SIP mechanism.
+				try{
+					sipProvider.sendRequest((Request)request.clone());						
+					logger.info("Subsequent Request dispatched outside the container" + request.toString());
+				} catch (Exception ex) {			
+					throw new IllegalStateException("Error sending request",ex);
+				}				
+				return false;				
 			}					
 		}		
 	}

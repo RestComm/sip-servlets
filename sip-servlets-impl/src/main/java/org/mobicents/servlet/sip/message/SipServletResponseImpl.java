@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.message;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -16,9 +17,11 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.Transaction;
+import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -113,6 +116,18 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletRequestImpl sipServletAckRequest = null; 
 		try {
 			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
+			//Application Routing to avoid going through the same app that created the ack
+			ListIterator<RouteHeader> routeHeaders = ackRequest.getHeaders(RouteHeader.NAME);
+			ackRequest.removeHeader(RouteHeader.NAME);
+			while (routeHeaders.hasNext()) {
+				RouteHeader routeHeader = (RouteHeader) routeHeaders
+						.next();
+				String routeAppName = ((SipURI)routeHeader .getAddress().getURI()).
+					getParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME);
+				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
+					ackRequest.addHeader(routeHeader);
+				}
+			}
 			sipServletAckRequest = new SipServletRequestImpl(
 					ackRequest,this.sipFactoryImpl, this.getSipSession(), this.getTransaction(), dialog, false); 
 		} catch (InvalidArgumentException e) {
