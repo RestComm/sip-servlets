@@ -211,16 +211,20 @@ public class SipSessionImpl implements SipSession {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#createRequest(java.lang.String)
 	 */
-	public SipServletRequest createRequest(String method) {
+	public SipServletRequest createRequest(final String method) {
 		if(method.equals(Request.ACK)
 				||method.equals(Request.CANCEL))
 			throw new IllegalArgumentException(
 					"Can not create ACK or CANCEL requests with this method");				
+		if(logger.isDebugEnabled()) {
+			logger.debug("dialog associated with this session to create the new request within that dialog "+
+					sessionCreatingDialog);
+		}
 		SipServletRequestImpl sipServletRequest = null;
-		if(Request.BYE.equalsIgnoreCase(method)) {			
+		if(this.sessionCreatingDialog != null) {			
 			try {
-				Request byeRequest = this.sessionCreatingDialog.createRequest(Request.BYE);
-				String transport = JainSipUtils.findTransport(byeRequest);
+				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
+				final String transport = JainSipUtils.findTransport(methodRequest);
 				
 				ViaHeader viaHeader = JainSipUtils.createViaHeader(sipFactory.getSipProviders(), transport,
 						null);			
@@ -228,10 +232,10 @@ public class SipSessionImpl implements SipSession {
 						key.getApplicationName());
 				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
 						handlerServlet);				
-				byeRequest.setHeader(viaHeader);
+				methodRequest.setHeader(viaHeader);
 				
 				sipServletRequest = new SipServletRequestImpl(
-						byeRequest, this.sipFactory, this, null, null,
+						methodRequest, this.sipFactory, this, null, null,
 						false);
 			} catch (SipException e) {
 				logger.error("Cannot create the bye request form the dialog",e);
@@ -251,7 +255,7 @@ public class SipSessionImpl implements SipSession {
 		//removing the route headers and adding them back again except the one
 		//corresponding to the app that is creating the subsequent request
 		//avoid going through the same app that created the subsequent request
-		ListIterator<RouteHeader> routeHeaders = sipServletRequest.getMessage().getHeaders(RouteHeader.NAME);
+		final ListIterator<RouteHeader> routeHeaders = sipServletRequest.getMessage().getHeaders(RouteHeader.NAME);
 		sipServletRequest.getMessage().removeHeader(RouteHeader.NAME);
 		while (routeHeaders.hasNext()) {
 			RouteHeader routeHeader = (RouteHeader) routeHeaders
@@ -332,13 +336,15 @@ public class SipSessionImpl implements SipSession {
 	public Address getLocalParty() {
 		if(sessionCreatingDialog != null) {
 			return new AddressImpl(sessionCreatingDialog.getLocalParty());
-		} else {
+		} else if (sessionCreatingTransaction != null){
 			try {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
 				return new AddressImpl(fromHeader.getAddress());
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
+		} else {
+			throw new RuntimeException("Error creating Address, no transaction or dialog have been found");
 		}
 	}
 
@@ -380,13 +386,15 @@ public class SipSessionImpl implements SipSession {
 	public Address getRemoteParty() {
 		if(sessionCreatingDialog != null) {
 			return new AddressImpl(sessionCreatingDialog.getRemoteParty());
-		} else {
+		} else if (sessionCreatingTransaction != null){
 			try {
 				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
 				return new AddressImpl(toHeader.getAddress());
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
+		} else {
+			throw new RuntimeException("Error creating Address, no transaction or dialog have been found");
 		}
 	}
 

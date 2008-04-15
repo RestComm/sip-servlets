@@ -80,8 +80,6 @@ import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
-import sun.text.CompactShortArray.Iterator;
-
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
@@ -633,7 +631,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			String transport = JainSipUtils.findTransport(request);
 					
 			if(Request.ACK.equals(request.getMethod())) {
-				getDialog().sendAck(request);
+				super.session.getSessionCreatingDialog().sendAck(request);
 				return;
 			}
 			//Added for initial requests only not for subsequent requests 
@@ -703,8 +701,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(linkedRequest != null) {
 					//keeping the client transaction in the server transaction's application data
 					((TransactionApplicationData)linkedRequest.getTransaction().getApplicationData()).setTransaction(ctx);
+					if(linkedRequest.getDialog() != null && linkedRequest.getDialog().getApplicationData() != null) {
+						((TransactionApplicationData)linkedRequest.getDialog().getApplicationData()).setTransaction(ctx);
+					}
 					//keeping the server transaction in the client transaction's application data
 					this.transactionApplicationData.setTransaction(linkedRequest.getTransaction());
+					if(dialog!= null && dialog.getApplicationData() != null) {
+						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
+					}
 				}
 				
 				// Make the dialog point here so that when the dialog event

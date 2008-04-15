@@ -30,6 +30,7 @@ import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
+import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
@@ -314,18 +315,43 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			session.updateStateOnResponse(this);
 			
 			ServerTransaction st = (ServerTransaction) getTransaction();
-			
+						
 			logger.info("sending response "+ this.message);
+			//if a response is sent for an initial request, it means that the application
+			//acted as an endpoint so a dialog must be created			
+			if(!Request.CANCEL.equals(originalRequest.getMethod())					
+					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
+							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
+					&& getTransaction().getDialog() == null) {					
+				String transport = JainSipUtils.findTransport(st.getRequest());
+				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+						sipFactoryImpl.getSipProviders(), transport);
+				Dialog dialog = sipProvider.getNewDialog(this
+						.getTransaction());				
+				getSipSession().setSessionCreatingDialog(dialog);
+				if(logger.isDebugEnabled()) {
+					logger.debug("created following dialog since the application is acting as an endpoint " + dialog);
+				}
+			}
+			//keeping track of application data and transaction in the dialog
+			if(getTransaction().getDialog() != null) {
+				if(getTransaction().getDialog().getApplicationData() == null) {
+					getTransaction().getDialog().setApplicationData(
+							originalRequest.getTransactionApplicationData());	
+				}				
+				((TransactionApplicationData)getTransaction().getDialog().getApplicationData()).
+					setTransaction(getTransaction());
+			}
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop
 			//processing the request
 			if(response.getStatusCode() >= Response.OK && 
-					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {
-				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);
+					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
+				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
 			}
 			st.sendResponse( (Response)this.message );			
 		} catch (Exception e) {			
-			logger.error(e);
+			logger.error("an exception occured when sending the response", e);
 			throw new IllegalStateException(e);
 		}
 	}

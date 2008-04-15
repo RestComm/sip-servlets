@@ -52,7 +52,8 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		CREATION, DELETION, EXPIRATION;
 	}
 	
-	private static long DEFAULT_LIFETIME = 1000*60*60;
+	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime is 3 minutes
+	private static long DEFAULT_LIFETIME = 3000*60;
 	
 	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey"; 
 	
@@ -98,7 +99,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		this.key = key;
 		this.sipContext = sipContext;
 		lastAccessTime = creationTime = System.currentTimeMillis();
-		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
+		if(sipContext!=null && sipContext.getSessionTimeout() > 0) {
+			expirationTime = lastAccessTime + DEFAULT_LIFETIME;
+		}
 		valid = true;
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
@@ -298,8 +301,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#invalidate()
 	 */
 	public void invalidate() {
-		for(SipSessionImpl session: sipSessions.values())
-		{
+		if(!valid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		for(SipSessionImpl session: sipSessions.values()) {
 			if(session.isValid())
 				throw new IllegalStateException("All SIP " +
 						"and HTTP sessions must be invalidated" +

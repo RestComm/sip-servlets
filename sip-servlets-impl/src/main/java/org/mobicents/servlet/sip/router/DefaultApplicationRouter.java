@@ -215,7 +215,10 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 					previousAppOrder = (Integer) stateInfo;				
 				}
 				for (DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo : defaultSipApplicationRouterInfoList) {
-					if(defaultSipApplicationRouterInfo.getOrder() > previousAppOrder) {
+					if(defaultSipApplicationRouterInfo.getOrder() > previousAppOrder &&
+							(initialRequest.getSession(false) == null || 
+									!defaultSipApplicationRouterInfo.getApplicationName().equals(
+											initialRequest.getSession(false).getApplicationSession().getApplicationName()))) {
 						String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
 						if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
 							String headerName = subscriberIdentity.substring(

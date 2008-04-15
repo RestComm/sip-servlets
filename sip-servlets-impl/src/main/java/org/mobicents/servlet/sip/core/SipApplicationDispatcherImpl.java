@@ -285,8 +285,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
-		tad.getSipServletMessage().getSipSession().onDialogTimeout(dialog);
-		sessionManager.removeSipSession(tad.getSipServletMessage().getSipSession().getKey());
+		SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
+		SipSessionImpl sipSessionImpl = sipServletMessageImpl.getSipSession();
+		sessionManager.removeSipSession(sipSessionImpl.getKey());
 	}
 	/*
 	 * (non-Javadoc)
@@ -319,7 +320,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				} 
 			} 					
 			logger.info("ServerTx ref "  + transaction);
-			logger.info("Dialog ref "  + requestEvent.getDialog());
+			logger.info("Dialog ref "  + requestEvent.getDialog());			
 			
 			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 						request,
@@ -425,7 +426,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				//keeping the server transaction in the client transaction's application data
 				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
 				appData.setTransaction(serverTransaction);
-				ctx.setApplicationData(appData);
+				ctx.setApplicationData(appData);				
 				//keeping the client transaction in the server transaction's application data
 				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);											
 				logger.info("Sending the request " + clonedRequest);
@@ -1167,10 +1168,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	private RoutingState checkRoutingState(SipServletRequestImpl sipServletRequest, Dialog dialog) {
 		// 2. Ongoing Transaction Detection - Employ methods of Section 17.2.3 in RFC 3261 
 		//to see if the request matches an existing transaction. 
-		//If it does, stop. The request is not an initial request.		
+		//If it does, stop. The request is not an initial request.
 		if(dialog != null && DialogState.CONFIRMED.equals(dialog.getState())) {
 			return RoutingState.SUBSEQUENT;
-		}
+		}		
 		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
 		//The request is not an initial request for which application selection occurs.
 		if(nonInitialSipRequestMethods.contains(sipServletRequest.getMethod())) {
@@ -1275,11 +1276,23 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				if(logger.isDebugEnabled()) {
 					logger.debug("forwarding the response statefully " + newResponse);
 				}
-				TransactionApplicationData applicationData = (TransactionApplicationData)
-					responseEvent.getClientTransaction().getApplicationData();
+				TransactionApplicationData applicationData = null; 
+				if(responseEvent.getClientTransaction() != null) {
+					applicationData = (TransactionApplicationData)responseEvent.getClientTransaction().getApplicationData();
+					if(logger.isDebugEnabled()) {
+						logger.debug("ctx application Data " + applicationData);
+					}
+				}
+				//there is no client transaction associated with it, it means that this is a retransmission
+				else if(responseEvent.getDialog() != null){	
+					applicationData = (TransactionApplicationData)responseEvent.getDialog().getApplicationData();
+					if(logger.isDebugEnabled()) {
+						logger.debug("dialog application data " + applicationData);
+					}
+				}								
 				ServerTransaction serverTransaction = (ServerTransaction)
 					applicationData.getTransaction();
-				try {
+				try {					
 					serverTransaction.sendResponse(newResponse);
 				} catch (SipException e) {
 					logger.error("cannot forward the response statefully" , e);
@@ -1344,12 +1357,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// See if this is a response to a proxied request
 				if(clientTransaction != null) {
 					applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
+					((SipServletRequestImpl)applicationData.getSipServletMessage()).setLastFinalResponse(sipServletResponse);
 				}
 				//there is no client transaction associated with it, it means that this is a retransmission
 				else if(dialog != null){	
 					applicationData = (TransactionApplicationData)dialog.getApplicationData();
 				}
-				((SipServletRequestImpl)applicationData.getSipServletMessage()).setLastFinalResponse(sipServletResponse);
+								
 				// We can not use session.getProxyBranch() because all branches belong to the same session
 				// and the session.proxyBranch is overwritten each time there is activity on the branch.
 				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();

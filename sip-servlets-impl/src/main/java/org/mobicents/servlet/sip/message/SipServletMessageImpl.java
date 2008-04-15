@@ -98,6 +98,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	private static Log logger = LogFactory.getLog(SipServletMessageImpl.class
 			.getCanonicalName());
 	
+	private static final String CONTENT_TYPE_TEXT = "text";
+	
 	protected Message message;
 	protected SipFactoryImpl sipFactoryImpl;
 	protected SipSessionImpl session;
@@ -287,6 +289,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.session = (SipSessionImpl) sipSession;
 		this.transactionApplicationData = new TransactionApplicationData(this);
 
+		if(sipSession != null && dialog != null) {
+			session.setSessionCreatingDialog(dialog);
+			if(dialog.getApplicationData() == null) {
+				dialog.setApplicationData(transactionApplicationData);
+			}
+		}
+		
 		// good behaviour, lets make some default
 		if (this.message.getContentEncoding() == null)
 			try {
@@ -603,8 +612,19 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getContent()
+	 */
 	public Object getContent() throws IOException, UnsupportedEncodingException {
-		return this.message.getContent();
+		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
+			this.message.getHeader(ContentTypeHeader.NAME);		
+		if(contentTypeHeader!= null && CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
+			String content = new String(message.getRawContent());
+			return content;
+		} else {
+			return this.message.getContent();
+		}
 	}
 
 	/*
