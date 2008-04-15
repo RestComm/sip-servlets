@@ -74,7 +74,7 @@ public class SipApplicationRouterInfo {
 	}
 
 	public javax.servlet.sip.SipApplicationRoutingRegion getRoutingRegion() {
-		return null; // TODO codavaj!!
+		return null; // TODO ask the EG why it's not in the constructor !!
 	}
 
 	public java.io.Serializable getStateInfo() {
