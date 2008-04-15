@@ -42,7 +42,9 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 
 		logger.info("SimpleProxyServlet: Got request:\n"
 				+ request.getMethod());
-		SipServletResponse sipServletResponse = request.createResponse(200);
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+		sipServletResponse.send();
+		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 		
 		/* This is a proxying sample.
