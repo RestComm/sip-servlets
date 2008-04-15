@@ -1,8 +1,12 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.Properties;
 
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,14 +18,25 @@ import org.apache.commons.logging.LogFactory;
 public class Click2DialSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 	private static Log logger = LogFactory.getLog(Click2DialSipServlet.class);
+	private SipFactory sipFactory;
 	
 	public Click2DialSipServlet() {
 	}
 	
 	@Override
-	public void init(ServletConfig servletConfig) throws ServletException {
-		System.out.println("the simple sip servlet has been started");
+	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
+		logger.info("the click to dial servlet has been started");
+		try { 			
+			// Getting the Sip factory from the JNDI Context
+			Properties jndiProps = new Properties();			
+			Context initCtx = new InitialContext(jndiProps);
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			sipFactory = (SipFactory) envCtx.lookup("sip/SipFactory");
+			logger.info("Sip Factory ref from JNDI : " + sipFactory);
+		} catch (NamingException e) {
+			throw new ServletException("Uh oh -- JNDI problem !", e);
+		}
 	}
 	
 	@Override
@@ -41,8 +56,7 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 	@Override
     protected void doSuccessResponse(SipServletResponse resp)
 			throws ServletException, IOException {
-		logger.info("Got OK");
-		SipFactory sf = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		logger.info("Got OK");		
 		
 		SipSession session = resp.getSession();
 
@@ -56,7 +70,7 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 					.getAttribute("SecondPartyAddress");
 			if (secondPartyAddress != null) {
 
-				SipServletRequest invite = sf.createRequest(resp
+				SipServletRequest invite = sipFactory.createRequest(resp
 						.getApplicationSession(), "INVITE", session
 						.getRemoteParty(), secondPartyAddress);
 
