@@ -11,9 +11,9 @@ import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
-public class CallForwardingTest extends SipServletTestCase {
+public class CallForwardingSipUnitTest extends SipServletTestCase {
 
-	private static Log logger = LogFactory.getLog(CallForwardingTest.class);
+	private static Log logger = LogFactory.getLog(CallForwardingSipUnitTest.class);
 
 	private SipStack sipStackSender;
 	private SipPhone sipPhoneSender;	
@@ -21,11 +21,13 @@ public class CallForwardingTest extends SipServletTestCase {
 	private SipStack sipStackReceiver;
 	private SipPhone sipPhoneReceiver;
 
-	private static final int TIMEOUT = 5000;	
+//	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 1000000;
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+		SipStack.setTraceEnabled(true);
 	}
 
 	@Override
@@ -55,9 +57,9 @@ public class CallForwardingTest extends SipServletTestCase {
 
 	public SipStack makeStack(String transport, int port) throws Exception {
 		Properties properties = new Properties();
-		String peerHostPort1 = "127.0.0.1:5070";
-		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
-				+ "udp");
+//		String peerHostPort1 = "127.0.0.1:5070";
+//		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
+//				+ "udp");
 		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
 				+ port);
 		properties.setProperty("sipunit.BINDADDR", "127.0.0.1");
@@ -79,16 +81,17 @@ public class CallForwardingTest extends SipServletTestCase {
 	}
 
 	public void init() throws Exception {
-		setupPhone();
+		setupPhone();		
 	}
 
 	// Check if we receive a FORBIDDEN response for our invite
 	public void testCallForwarding() throws Exception {
 		init();
-		SipCall sender = sipPhoneSender.createSipCall();
+		
 		SipCall receiver = sipPhoneReceiver.createSipCall();
 		receiver.listenForIncomingCall();
-		assertTrue(sender.initiateOutgoingCall("sip:receiver@nist.gov", null));
+		SipCall sender = sipPhoneSender.makeCall("sip:receiver@nist.gov", null);
+		assertNotNull(sender);		
 		assertTrue(receiver.waitForIncomingCall(TIMEOUT));			
 		assertTrue(receiver.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
 		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));

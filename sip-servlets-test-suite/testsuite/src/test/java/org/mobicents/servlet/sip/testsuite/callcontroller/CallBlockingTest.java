@@ -9,9 +9,9 @@ import org.apache.commons.logging.LogFactory;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
-import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.SipUnitServletTestCase;
 
-public class CallBlockingTest extends SipServletTestCase {
+public class CallBlockingTest extends SipUnitServletTestCase {
 
 	private static Log logger = LogFactory.getLog(CallBlockingTest.class);
 

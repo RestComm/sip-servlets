@@ -12,6 +12,7 @@ import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +34,13 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 		logger.info("the call forwarding sip servlet has been started");
 		super.init(servletConfig);
 	}
+	
+	@Override
+	protected void doAck(SipServletRequest request) throws ServletException,
+			IOException {		
+		logger.info("Got ACK: "
+				+ request.getMethod());
+	}
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
@@ -40,14 +48,22 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 
 		logger.info("Got request: "
 				+ request.getMethod());
-		List<SipURI> outboundInterfaces = (List<SipURI>) getServletContext().getAttribute(OUTBOUND_INTERFACES);
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
-		SipURI sipURI = sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");		
-		Proxy proxy = request.getProxy();
-		proxy.setOutboundInterface(outboundInterfaces.get(0));
-		proxy.setRecordRoute(true);
-		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");		
-		proxy.proxyTo(sipURI);		
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_MOVED_TEMPORARILY);
+		SipURI sipUri= sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");
+//		sipUri.setLrParam(true);
+		sipUri.setTransportParam("udp");
+		
+		sipServletResponse.setHeader("Contact", sipUri.toString());
+		sipServletResponse.send();
+//		List<SipURI> outboundInterfaces = (List<SipURI>) getServletContext().getAttribute(OUTBOUND_INTERFACES);
+		
+//		SipURI sipURI = sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");		
+//		Proxy proxy = request.getProxy();
+//		proxy.setOutboundInterface(outboundInterfaces.get(0));
+//		proxy.setRecordRoute(true);
+//		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");		
+//		proxy.proxyTo(sipURI);		
 	}
 	
 	// SipErrorListener methods
