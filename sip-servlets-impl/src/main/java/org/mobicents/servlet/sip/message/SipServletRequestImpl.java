@@ -1,6 +1,5 @@
 package org.mobicents.servlet.sip.message;
 
-
 import gov.nist.core.NameValue;
 import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.header.RecordRoute;
@@ -70,6 +69,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
 	private SipServletRequestImpl nextRequest;
+
 	/*
 	 * Popped route header - when we are the UAS we pop and keep the route
 	 * header
@@ -78,15 +78,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	/* Cache the application routing directive in the record route header */
 	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
-	
+
 	private boolean isInitial = true;
 
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
 
 	public SipServletRequestImpl(SipProvider provider, SipSession sipSession,
 			Transaction transaction, Dialog dialog) {
-		super(transaction.getRequest(), provider, transaction,
-				sipSession, dialog);
+		super(transaction.getRequest(), provider, transaction, sipSession,
+				dialog);
 
 	}
 
@@ -132,18 +132,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException(
 					"Cannot create CANCEL for non inivte");
 		}
-		if (super.transaction == null
-				|| super.transaction instanceof ServerTransaction)
+		if (super.getTransaction() == null
+				|| super.getTransaction() instanceof ServerTransaction)
 			throw new IllegalStateException("No client transaction found!");
 
 		try {
-			Request cancelRequest = ((ClientTransaction) transaction)
+			Request cancelRequest = ((ClientTransaction) getTransaction())
 					.createCancel();
 			ClientTransaction clientTransaction = super.provider
 					.getNewClientTransaction(cancelRequest);
 			SipServletRequest newRequest = new SipServletRequestImpl(
-					super.provider, super.sipSession, clientTransaction,
-					transaction.getDialog());
+					super.provider, super.session, clientTransaction,
+					getTransaction().getDialog());
 
 			return newRequest;
 		} catch (SipException ex) {
@@ -158,20 +158,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int)
 	 */
 	public SipServletResponse createResponse(int statusCode) {
-		if (super.transaction == null
-				|| super.transaction instanceof ClientTransaction) {
+		if (super.getTransaction() == null
+				|| super.getTransaction() instanceof ClientTransaction) {
 			throw new IllegalStateException(
 					"Cannot create a response - not a server transaction");
 		}
 		try {
-			Request request = this.transaction.getRequest();
+			Request request = this.getTransaction().getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
 			if (statusCode == Response.OK) {
 				ToHeader toHeader = (ToHeader) response
 						.getHeader(ToHeader.NAME);
 				if (toHeader.getTag() == null) // If we already have a to tag
-												// dont create new
+				// dont create new
 				{
 					toHeader.setTag(java.util.UUID.randomUUID().toString());
 					// Add the contact header for the dialog.
@@ -186,7 +186,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
 			return new SipServletResponseImpl(response, provider,
-					(ServerTransaction) transaction, sipSession, dialog);
+					(ServerTransaction) getTransaction(), session, getDialog());
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode,
 					ex);
@@ -194,19 +194,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public SipServletResponse createResponse(int statusCode, String reasonPhrase) {
-		if (super.transaction == null
-				|| super.transaction instanceof ClientTransaction) {
+		if (super.getTransaction() == null
+				|| super.getTransaction() instanceof ClientTransaction) {
 			throw new IllegalStateException(
 					"Cannot create a response - not a server transaction");
 		}
 		try {
-			Request request = this.transaction.getRequest();
+			Request request = this.getTransaction().getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
 			response.setReasonPhrase(reasonPhrase);
 
 			return new SipServletResponseImpl(response, provider,
-					(ServerTransaction) transaction, sipSession, dialog);
+					(ServerTransaction) getTransaction(), session, getDialog());
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode);
 		}
@@ -249,22 +249,21 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void setPoppedRoute(RouteHeader routeHeader) {
 		this.popedRouteHeader = routeHeader;
 	}
-	
+
 	public Proxy getProxy() throws TooManyHopsException {
-		if(proxy == null)
+		if (proxy == null)
 			proxy = new ProxyImpl(this, provider);
-		
+
 		return proxy;
 	}
 
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
-		if(create && proxy == null)
+		if (create && proxy == null)
 			proxy = new ProxyImpl(this, provider);
-		
+
 		return proxy;
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -539,7 +538,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return routingDirective;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mobicents.servlet.sip.message.SipServletMessageImpl#send()
 	 */
 	@Override
@@ -550,51 +551,41 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 			ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
 			String transport = viaHeader.getTransport();
-			
-			String transportParam = ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam();
-			
-			if ( transportParam != null && transportParam.equalsIgnoreCase("tls")) {
-				transport = "tls";		
-			} else if ( ( viaHeader.getTransport().equalsIgnoreCase("udp")
-					&& request.getContentLength().getContentLength() > 4096 ) ||
-					(transportParam != null && transportParam.equalsIgnoreCase("tcp"))) {
+
+			String transportParam = ((javax.sip.address.SipURI) request
+					.getRequestURI()).getTransportParam();
+
+			if (transportParam != null
+					&& transportParam.equalsIgnoreCase("tls")) {
+				transport = "tls";
+			} else if ((viaHeader.getTransport().equalsIgnoreCase("udp") && request
+					.getContentLength().getContentLength() > 4096)
+					|| (transportParam != null && transportParam
+							.equalsIgnoreCase("tcp"))) {
 				transport = "tcp";
 			}
-			
-			if ( ! viaHeader.getTransport().equalsIgnoreCase(transport)) {
+
+			if (super.getTransaction() == null) {
 
 				viaHeader = JainSipUtils.createViaHeader(provider, "tcp");
 				request.setHeader(viaHeader);
-			
 
 				ClientTransaction ctx = provider
 						.getNewClientTransaction(request);
-				
-				if ( dialog == null ) {
-					SipApplicationSessionImpl sipAppSession = (SipApplicationSessionImpl) super.transaction
-					.getApplicationData();
-					ctx.setApplicationData(sipAppSession);
-				} else if (SipFactoryImpl.dialogCreationMethods.contains(request
-						.getMethod())
-						&& dialog != null 
-						&& dialog.getState() == null) {
-					SipApplicationSessionImpl sipAppSession = (SipApplicationSessionImpl) super.dialog
-							.getApplicationData();
 
-					dialog = provider.getNewDialog(ctx);
+				SipApplicationSessionImpl sipAppSession = (SipApplicationSessionImpl) super
+						.getTransaction().getApplicationData();
+				ctx.setApplicationData(sipAppSession);
 
-					dialog.setApplicationData(sipAppSession);
-				}
-			
-				super.transaction.terminate();
-				super.transaction = ctx;
-				
+				super.setTransaction(ctx);
+
 			}
 			// If dialog does not exist or has no state.
-			if ( dialog == null || dialog.getState() == null || dialog.getState() == DialogState.EARLY) {
-				((ClientTransaction) super.transaction).sendRequest();
+			if (getDialog() == null || getDialog().getState() == null
+					|| getDialog().getState() == DialogState.EARLY) {
+				((ClientTransaction) super.getTransaction()).sendRequest();
 			} else {
-				dialog.sendRequest((ClientTransaction) transaction);
+				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}
 		} catch (Exception ex) {
 			throw new IllegalStateException("Error sending reuqest");
@@ -604,11 +595,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {
 		this.linkedRequest = linkedRequest;
-		
+
 	}
-	
+
 	public SipServletRequestImpl getLinkedRequest() {
 		return this.linkedRequest;
 	}
-	
+
 }

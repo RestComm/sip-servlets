@@ -178,7 +178,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			if( this.getStatus()>=100 && this.getStatus()<200 )
 				session.setState(State.EARLY);
 			
-			ServerTransaction st = (ServerTransaction) transaction;
+			ServerTransaction st = (ServerTransaction) getTransaction();
 			
 			st.sendResponse( (Response)this.message );
 			

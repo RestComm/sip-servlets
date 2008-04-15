@@ -91,7 +91,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			Dialog dialog = null;
 			dialog = provider.getNewDialog(ctx);
 
-			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.dialog
+			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
 					.getApplicationData();
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();
@@ -141,7 +141,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			ClientTransaction ctx = provider
 					.getNewClientTransaction(newRequest);
 
-			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.dialog
+			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
 					.getApplicationData();
 
 			SipServletRequest retVal = new SipServletRequestImpl(provider,

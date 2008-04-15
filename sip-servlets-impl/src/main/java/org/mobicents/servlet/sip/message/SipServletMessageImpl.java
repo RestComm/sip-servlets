@@ -87,11 +87,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected Message message;
 	protected SipProvider provider;
-	protected SipSession sipSession;
+	protected SipSession session;
 	protected static SipFactoryImpl sipFactory = SipFactoryImpl.getInstance();
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
-	protected Dialog  dialog;
-	protected Transaction transaction;
+	private Dialog  dialog;
+	private Transaction transaction;
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
@@ -191,11 +191,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	protected SipServletMessageImpl ( Message message, SipProvider provider, Transaction transaction, SipSession sipSession, Dialog dialog) {
-		
+		if ( provider == null )throw new NullPointerException("Null providerr");
+		if ( message == null ) throw new NullPointerException("Null message");
 		this.provider = provider;
 		this.message = message;
 		this.transaction = transaction;
-		this.sipSession = sipSession;
+		this.session = sipSession;
 		
 	}
 	public void addAcceptLanguage(Locale locale) {
@@ -374,11 +375,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public SipApplicationSession getApplicationSession() {
-		return this.sipSession.getApplicationSession();
+		return this.session.getApplicationSession();
 	}
 
 	public SipApplicationSession getApplicationSession(boolean create) {
-		if (this.sipSession.getApplicationSession() == null && create) {
+		if (this.session.getApplicationSession() == null && create) {
 			SipApplicationSessionImpl applSession = new SipApplicationSessionImpl();
 
 		}
@@ -512,7 +513,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public SipSession getSession() {
-		return this.sipSession;
+		return this.session;
 	}
 
 	public SipSession getSession(boolean create) {
@@ -711,12 +712,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return this.transaction;
 	}
 
-	public SipSession getSipSession() {
-		return sipSession;
-	}
+	
 
-	public void setSipSession(SipSession sipSession) {
-		this.sipSession = sipSession;
+	public void setSession(SipSession sipSession) {
+		this.session = sipSession;
 	}
 	
 	@Override
@@ -747,5 +746,17 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	
 	public Dialog getDialog() {
 		return dialog;
+	}
+	/**
+	 * @param dialog the dialog to set
+	 */
+	public void setDialog(Dialog dialog) {
+		this.dialog = dialog;
+	}
+	/**
+	 * @param transaction the transaction to set
+	 */
+	public void setTransaction(Transaction transaction) {
+		this.transaction = transaction;
 	}
 }

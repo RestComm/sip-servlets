@@ -358,20 +358,21 @@ public class SipFactoryImpl implements SipFactory {
 			if (routeHeader != null)
 				requestToWrapp.addHeader(routeHeader);
 			
-			ctx = sipProvider.getNewClientTransaction(requestToWrapp);
+		/*	ctx = sipProvider.getNewClientTransaction(requestToWrapp);
 			
 			if (dialogCreationMethods.contains(method))
 				dialog = sipProvider.getNewDialog(ctx);
 			
 			
-			SipSessionImpl session = new SipSessionImpl(sipProvider, dialog, (SIPTransaction) ctx,
-					(SipApplicationSessionImpl) sipAppSession);
 			dialog.setApplicationData(session);
 			session.setApplicationSession((SipApplicationSessionImpl)sipAppSession);
+*/
 
-
+			SipSessionImpl session = new SipSessionImpl(sipProvider, dialog, (SIPTransaction) ctx,
+					(SipApplicationSessionImpl) sipAppSession);
+		
 			SipServletRequest retVal = new SipServletRequestImpl(
-					sipProvider, session, ctx, dialog);
+					sipProvider, session, null,null);
 
 			// TODO: Do session association?
 			// TODO set the routing directive as defined in 15.2.2
