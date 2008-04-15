@@ -7,6 +7,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -32,7 +33,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 
 		System.out.println("SimpleProxyServlet: Got request:\n"
 				+ request.getMethod());
-		super.doInvite(request);
+		SipServletResponse sipServletResponse = request.createResponse(200);
+		sipServletResponse.send();
 	}
 
 	/**
@@ -42,7 +44,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 			IOException {
 
 		System.out.println("SimpleProxyServlet: Got BYE request:\n" + request);
-		super.doBye(request);
+		SipServletResponse sipServletResponse = request.createResponse(200);
+		sipServletResponse.send();
 	}
 
 	/**

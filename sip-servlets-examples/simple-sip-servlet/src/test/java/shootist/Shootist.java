@@ -42,7 +42,7 @@ public class Shootist implements SipListener {
 
 	private boolean byeTaskRunning;
 	
-	private boolean callerSendsBye;
+	private boolean callerSendsBye = true;
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
