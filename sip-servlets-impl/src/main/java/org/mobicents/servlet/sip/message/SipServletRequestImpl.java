@@ -6,14 +6,10 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -23,11 +19,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.B2buaHelper;
-import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.Proxy;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationRoutingDirective;
-import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -40,11 +33,11 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
-import javax.sip.TransactionState;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -151,11 +144,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = this.transaction.getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
-
+			if(statusCode == Response.OK) {
+				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+				toHeader.setTag("4321");
+//				response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME, "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
+			}
 			return new SipServletResponseImpl(response, provider,
 					(ServerTransaction) transaction, sipSession, dialog);
 		} catch (ParseException ex) {
-			throw new IllegalArgumentException("Bad status code" + statusCode);
+			throw new IllegalArgumentException("Bad status code" + statusCode,ex);
 		}
 	}
 
