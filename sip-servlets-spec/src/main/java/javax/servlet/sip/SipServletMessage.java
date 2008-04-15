@@ -66,7 +66,7 @@ public interface SipServletMessage extends java.lang.Cloneable{
     ListIterator<javax.servlet.sip.Address> getAddressHeaders(java.lang.String name) throws javax.servlet.sip.ServletParseException;
 
     /**
-     * Returns the application session to which this message belongs. If the session doesn't already exist it is created.
+     * Returns the application session to which this message belongs. If the session doesn't already exist it is created. 
      */
     javax.servlet.sip.SipApplicationSession getApplicationSession();
 

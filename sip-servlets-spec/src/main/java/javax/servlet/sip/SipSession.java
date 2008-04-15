@@ -84,7 +84,7 @@ public interface SipSession{
     /**
      * Returns true if this SipSession has one or more ongoing transactions. An ongoing transaction will exist if either of the following is true: if a request has been created and sent with this SipSession but but no final response has been received. if a request has been received on this SipSession but no final response has been sent in response to it. However, the above behavior is overridden if the servlet has operated as an unsupervised proxy. Once the servlet has issues proxy.setSupervised(false) for a request associated with this SipSession, then this method will return false regardless of whether there are in fact any ongoing transactions.
      */
-    boolean isOngoingTransaction();
+    boolean hasOngoingTransaction();
 
     /**
      * Returns true if this SipSession is valid, false otherwise. The SipSession can be invalidated by calling the method

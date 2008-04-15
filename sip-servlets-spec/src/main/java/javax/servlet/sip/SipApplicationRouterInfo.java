@@ -12,6 +12,8 @@ import java.io.Serializable;
 public class SipApplicationRouterInfo {
 	private String nextApplicationName = null;
 
+	private SipApplicationRoutingRegion routingRegion = null;
+	
 	private String subscriberURI = null;
 
 	private String route = null;
@@ -43,11 +45,13 @@ public class SipApplicationRouterInfo {
 	 */
 	public SipApplicationRouterInfo(
 			java.lang.String nextApplicationName,
+			SipApplicationRoutingRegion routingRegion,
 			java.lang.String subscriberURI, 
 			java.lang.String route,
 			javax.servlet.sip.SipRouteModifier mod,
 			java.io.Serializable stateInfo) {
 		this.nextApplicationName = nextApplicationName;
+		this.routingRegion = routingRegion;
 		this.subscriberURI = subscriberURI;
 		this.route = route;
 		this.mod = mod;
@@ -74,7 +78,7 @@ public class SipApplicationRouterInfo {
 	}
 
 	public javax.servlet.sip.SipApplicationRoutingRegion getRoutingRegion() {
-		return null; // TODO ask the EG why it's not in the constructor !!
+		return routingRegion;
 	}
 
 	public java.io.Serializable getStateInfo() {
