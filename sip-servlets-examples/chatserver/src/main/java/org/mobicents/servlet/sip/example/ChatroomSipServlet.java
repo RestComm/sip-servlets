@@ -3,7 +3,11 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
@@ -28,11 +32,23 @@ public class ChatroomSipServlet extends SipServlet {
 
     /** This chatroom server's address, retrieved from the init params. */
     public String serverAddress;
+    
+    public SipFactory factory;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {	
 		super.init(servletConfig);
 		logger.info("The chat room sip servlet has been started ! ");
+		try { 			
+			// Getting the Sip factory from the JNDI Context
+			Properties jndiProps = new Properties();			
+			Context initCtx = new InitialContext(jndiProps);
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			factory = (SipFactory) envCtx.lookup("sip/SipFactory");
+			logger.info("Sip Factory ref from JNDI : " + factory);
+		} catch (NamingException e) {
+			throw new ServletException("Uh oh -- JNDI problem !", e);
+		}
 		getServletContext().setAttribute(USER_LIST,new ArrayList<String>());
         serverAddress = getServletConfig().getInitParameter(CHATROOM_SERVER_NAME);
         logger.info("serverAddress is : " + serverAddress);
@@ -117,9 +133,7 @@ public class ChatroomSipServlet extends SipServlet {
     }
 
     private void sendToAll(String from, String message)  
-    	    throws ServletParseException, IOException {
-        SipFactory factory = (SipFactory)getServletContext().
-        	getAttribute("javax.servlet.sip.SipFactory");
+    	    throws ServletParseException, IOException {        
 
         List<String> list = (List<String>)getServletContext().getAttribute(USER_LIST);
         for (String user : list) {
@@ -135,8 +149,7 @@ public class ChatroomSipServlet extends SipServlet {
 
     private void sendToUser(String to, String message)  
             throws ServletParseException, IOException {
-        SipFactory factory = (SipFactory)getServletContext().
-        	getAttribute("javax.servlet.sip.SipFactory");
+        
         SipApplicationSession session = factory.createApplicationSession();
         SipServletRequest request = factory.createRequest(session, 
                 "MESSAGE", serverAddress, to);
