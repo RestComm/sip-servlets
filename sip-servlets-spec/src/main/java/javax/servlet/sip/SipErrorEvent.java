@@ -13,14 +13,17 @@
  */
 package javax.servlet.sip;
 /**
- * Events of this type are sent to objects implementing the SipErrorListener interface when an error occurs which is related to the applications processing of a SIP transaction.
+ * Events of this type are sent to objects implementing the SipErrorListener 
+ * interface when an error occurs which is related to the applications processing 
+ * of a SIP transaction.
  */
 public class SipErrorEvent extends java.util.EventObject{
 	private SipServletRequest sipServletRequest = null;
 	private SipServletResponse sipServletResponse = null;
     /**
      * Constructs a new SipErrorEvent.
-     * @param request the request the error relates toresponse - the response the error relates to
+     * @param request the request the error relates to
+     * @param response - the response the error relates to
      */
     public SipErrorEvent(javax.servlet.sip.SipServletRequest request, javax.servlet.sip.SipServletResponse response){
     	super(request);
