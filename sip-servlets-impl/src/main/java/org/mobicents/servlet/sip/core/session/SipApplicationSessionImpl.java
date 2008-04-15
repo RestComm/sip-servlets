@@ -82,13 +82,37 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	
 	public void encodeURI(URI uri) {
-		// TODO Auto-generated method stub
-
+		uri.setParameter("org.mobicents.servlet.sip.ApplicationSessionKey", getId());
 	}
 
+	/**
+	 * Adds a get parameter to the URL like this:
+	 * http://hostname/link -> http://hostname/link?org.mobicents.servlet.sip.ApplicationSessionKey=0
+	 * http://hostname/link?something=1 -> http://hostname/link?something=1&org.mobicents.servlet.sip.ApplicationSessionKey=0
+	 */
 	public URL encodeURL(URL url) {
-		// TODO Auto-generated method stub
-		return null;
+		String urlStr = url.toExternalForm();
+		try
+		{
+			URL ret;
+			if(urlStr.contains("?"))
+			{
+				ret = new URL(
+						url + "&org.mobicents.servlet.sip.ApplicationSessionKey="
+							+ getId().toString());
+			}
+			else
+			{
+				ret = new URL(
+						url + "?org.mobicents.servlet.sip.ApplicationSessionKey="
+							+ getId().toString());
+			}
+			return ret;
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException("Failed encoding URL", e);
+		}
 	}
 
 	public Object getAttribute(String name) {
