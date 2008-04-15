@@ -84,7 +84,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 /**
  * Implementation of the SipApplicationDispatcher interface.
  * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine), 
- * translating jain sip SIP messages to sip servlets SIP¨messages, calling the application router 
+ * translating jain sip SIP messages to sip servlets SIPï¿½messages, calling the application router 
  * to know which app is interested in the messages and
  * dispatching them those sip applications interested in the messages. 
  */
@@ -536,7 +536,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					Servlet servlet = servletWrapper.allocate();
 					servlet.service(sipServletRequest, null);
 				}
-				proxyBranch.proxyInDialogRequest(sipServletRequest);
+				proxyBranch.proxySubsequentRequest(sipServletRequest);
 			}
 			// If it's not for a proxy then it's just an AR, so go to the next application
 			else
