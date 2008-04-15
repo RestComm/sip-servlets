@@ -250,6 +250,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				return;				
 			} 
 		}
+		
+		// Check if the request is meant for me. If so, strip the topmost
+		// Route header.
+
+		String myIpAddress = sipProvider.getListeningPoint("udp").getIPAddress();
+		int myPort = sipProvider.getListeningPoint("udp").getPort();
+		RouteHeader routeHeader = (RouteHeader) request
+				.getHeader(RouteHeader.NAME);
+
+		if (routeHeader != null) {
+			String routeIpAddress = ((javax.sip.address.SipURI) routeHeader.getAddress().getURI())
+					.getHost();
+			int routePort = ((javax.sip.address.SipURI) routeHeader.getAddress().getURI()).getPort();
+			if (myIpAddress.equals(routeIpAddress) && myPort == routePort) {
+				request.removeFirst(RouteHeader.NAME);
+			}
+		}
+		
 		SipSessionImpl session = sessionManager.getRequestSession(sipFactoryImpl, requestEvent, transaction);
 		
 		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
@@ -263,6 +281,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		boolean isInitialRequest = isInitialRequest(sipServletRequest, requestEvent.getDialog());		
 		sipServletRequest.setInitial(isInitialRequest);
 		
+		//@mranga
+		sipServletRequest.setPoppedRoute(routeHeader);
+
 		if(isInitialRequest) {
 			//15.4.1 Routing an Initial request Algorithm
 			
@@ -292,7 +313,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					case ROUTE :
 						String route = applicationRouterInfo.getRoute();
 						Address routeAddress = null; 
-						RouteHeader routeHeader = null;
+						//RouteHeader routeHeader = null;
 						try {
 							routeAddress = SipFactories.addressFactory.createAddress(route);
 							routeHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
@@ -311,8 +332,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 							return;
 						} else {
 							// the container MUST make the route available to the applications 
-							// via the SipServletRequest.getPoppedRoute() method.											
-							sipServletRequest.setPoppedRoute(routeHeader);												
+							// via the SipServletRequest.getPoppedRoute() method.
+							
+							// @mranga -- already did this step above.
+							//sipServletRequest.setPoppedRoute(routeHeader);												
 						}
 						break;
 					case CLEAR_ROUTE :

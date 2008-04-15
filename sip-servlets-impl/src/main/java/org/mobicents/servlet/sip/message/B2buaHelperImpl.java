@@ -20,6 +20,7 @@ import javax.sip.Transaction;
 import javax.sip.TransactionState;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -50,7 +51,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 
 	public B2buaHelperImpl(SipServletRequestImpl sipServletRequest) {
 		this.sipServletRequest = sipServletRequest;
-		this.sipFactoryImpl = sipServletRequest.sipFactoryImpl;
+		this.sipFactoryImpl = sipServletRequest.sipFactoryImpl; 
 	}
 
 	public SipServletRequest createRequest(SipServletRequest origRequest,
@@ -74,7 +75,11 @@ public class B2buaHelperImpl implements B2buaHelper {
 					.removeParameter("tag");
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
 					.removeParameter("tag");
-
+			// Remove the route header ( will point to us ).
+			newRequest.removeHeader(RouteHeader.NAME);
+			String tag = Integer.toString((int) (Math.random()*1000));
+			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
+			
 			if(headerMap != null) {
 				for (String headerName : headerMap.keySet()) {
 					for (String value : headerMap.get(headerName)) {
@@ -122,6 +127,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 
 			Request newRequest = dialog.createRequest(((Request) origRequest)
 					.getMethod());
+			
 			// SipSessionImpl ( Dialog dialog, Transaction transaction,
 			// SipApplicationSessionImpl sipApp)
 
@@ -136,6 +142,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
 					.getApplicationData();
 
+			logger.debug("newRequest = " + newRequest);
 			SipServletRequest retVal = new SipServletRequestImpl(newRequest,sipFactoryImpl,
 					session, null, null, true);
 
