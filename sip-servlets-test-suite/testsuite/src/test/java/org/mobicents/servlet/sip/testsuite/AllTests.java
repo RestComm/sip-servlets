@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.testsuite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASipUnitTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallBlockingTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallControllerSipUnitTest;
@@ -42,6 +43,7 @@ public class AllTests {
 		suite.addTestSuite(TimersSipServletTest.class);		
 		suite.addTestSuite(SessionStateUASSipServletTest.class);
 		suite.addTestSuite(SessionStateUACSipServletTest.class);
+		suite.addTestSuite(AnnotationTest.class);
 		//$JUnit-END$
 		return suite;
 	}

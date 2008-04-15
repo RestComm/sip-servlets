@@ -307,7 +307,7 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipSessionEvent se) {
 		logger.info("sip session destroyed " +  se.getSession());
-		SipFactory storedFactory = (SipFactory)se.getSession().getAttribute("sipFactory");
+		SipFactory storedFactory = (SipFactory)se.getSession().getApplicationSession().getAttribute("sipFactory");
 		SipApplicationSession sipApplicationSession = storedFactory.createApplicationSession();
 		try {
 			SipServletRequest sipServletRequest = storedFactory.createRequest(
