@@ -41,7 +41,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class SipFactoryFacade implements SipFactory, Serializable {
-	private static final Log logger = LogFactory.getLog(SipFactoryFacade.class
+	private transient static final Log logger = LogFactory.getLog(SipFactoryFacade.class
 			.getName());
 	
 	private SipFactoryImpl sipFactoryImpl;

@@ -166,7 +166,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //                    ok = false;
                 }
             } else {
-                manager = new SipStandardManager();
+                setManager(new SipStandardManager());
             }
         }
         // Reading the "catalina.useNaming" environment variable

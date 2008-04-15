@@ -373,7 +373,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
 			logger.error("Unexpected exception while processing request",e);
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
@@ -601,12 +600,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				servlet.service(sipServletRequest, null);				
 			}
 		} catch (ServletException e) {				
-			logger.error(e);
+			logger.error("An unexpected servlet exception occured while processing a subsequent request", e);
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
 		} catch (IOException e) {				
-			logger.error(e);
+			logger.error("An unexpected IO exception occured while processing a subsequent request", e);
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
@@ -823,12 +822,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					servlet.service(sipServletRequest, null);
 					return true;
 				} catch (ServletException e) {				
-					logger.error(e);
+					logger.error("An unexpected servlet exception occured while routing the CANCEL", e);
 					// Sends a 500 Internal server error and stops processing.				
 //						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 					return false;
 				} catch (IOException e) {				
-					logger.error(e);
+					logger.error("An unexpected IO exception occured while routing the CANCEL", e);
 					// Sends a 500 Internal server error and stops processing.				
 //						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 					return false;
@@ -1059,7 +1058,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					sipServletRequest.setRequestURI(new TelURLImpl((javax.sip.address.TelURL)subscriberUri));
 				}
 			} catch (ParseException pe) {					
-				logger.error(pe);
+				logger.error("An unexpected parse exception occured ", pe);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;
@@ -1083,7 +1082,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					sipServletRequest.getSipSession().setHandler(sipSessionHandlerName);
 				} catch (ServletException e) {
 					// this should never happen
-					logger.error(e);
+					logger.error("An unexpected servlet exception occured while routing an initial request",e);
 					// Sends a 500 Internal server error and stops processing.				
 					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 					return false;
@@ -1093,12 +1092,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				callServlet(sipServletRequest, sipServletRequest.getSipSession());
 				logger.info("Request event dispatched to " + sipContext.getApplicationName());				
 			} catch (ServletException e) {				
-				logger.error(e);
+				logger.error("An unexpected servlet exception occured while routing an initial request", e);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;
 			} catch (IOException e) {				
-				logger.error(e);
+				logger.error("An unexpected IO exception occured while routing an initial request", e);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;

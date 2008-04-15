@@ -66,7 +66,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 public class SipFactoryImpl implements SipFactory, Serializable {
-	private static final Log logger = LogFactory.getLog(SipFactoryImpl.class
+	private transient static final Log logger = LogFactory.getLog(SipFactoryImpl.class
 			.getCanonicalName());
 
 	public static class NamesComparator implements Comparator<String> {
@@ -82,7 +82,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		forbbidenToHeaderParams.add("tag");
 	}
 
-	private Set<SipProvider> sipProviders = null;
+	private transient Set<SipProvider> sipProviders = null;
 
 	private transient SipApplicationDispatcher sipApplicationDispatcher = null;
 	/**

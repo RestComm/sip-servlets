@@ -28,6 +28,8 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class SipHostConfig extends HostConfig {
+	private static final String WAR_EXTENSION = ".war";
+	private static final String SAR_EXTENSION = ".sar";
 	public static final String SIP_CONTEXT_CLASS = "org.mobicents.servlet.sip.startup.SipStandardContext";
 	public static final String SIP_CONTEXT_CONFIG_CLASS = "org.mobicents.servlet.sip.startup.SipContextConfig";
 	
@@ -50,9 +52,9 @@ public class SipHostConfig extends HostConfig {
 		super.deployApps(name);
 		String docBase = getConfigFile(name);
 		// Deploy SARs, and loop if additional descriptors are found
-        File sar = new File(appBase, docBase + ".sar");
+        File sar = new File(appBase, docBase + SAR_EXTENSION);
         if (sar.exists()) {
-            deploySAR(name, sar, docBase + ".sar");
+            deploySAR(name, sar, docBase + SAR_EXTENSION);
         }
 	}
 	
@@ -153,9 +155,9 @@ public class SipHostConfig extends HostConfig {
 	 * @return true if the file is a sip servlet application, false otherwise
 	 */
 	private boolean isSipServletArchive(File file) {
-		if (file.getName().toLowerCase().endsWith(".sar")) {
+		if (file.getName().toLowerCase().endsWith(SAR_EXTENSION)) {
 			return true;
-		} else if (file.getName().toLowerCase().endsWith(".war")) {
+		} else if (file.getName().toLowerCase().endsWith(WAR_EXTENSION)) {
 			try{
 				JarFile jar = new JarFile(file);			          
 				JarEntry entry = jar.getJarEntry(SipContext.APPLICATION_SIP_XML);

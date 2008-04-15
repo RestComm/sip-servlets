@@ -77,12 +77,12 @@ public class SipContextConfig extends ContextConfig implements
 			// calling start on the parent to initialize web resources of the web
 			// app if any. That mean that this is a converged application.
 			InputStream webXmlInputStream = servletContext
-					.getResourceAsStream(Constants.ApplicationWebXml);
-			if(logger.isDebugEnabled()) {
-				logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
-			}
+					.getResourceAsStream(Constants.ApplicationWebXml);			
 			context.setWrapperClass(StandardWrapper.class.getName());						
 			if (webXmlInputStream != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
+				}
 				super.start();
 			}				
 			InputStream sipXmlInputStream = servletContext
