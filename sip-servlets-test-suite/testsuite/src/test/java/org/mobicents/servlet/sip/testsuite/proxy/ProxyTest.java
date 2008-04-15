@@ -34,6 +34,8 @@ public class ProxyTest extends SipServletTestCase implements SipListener {
 	protected Shootist shootist;
 
 	protected Shootme shootme;
+	
+	protected Cutme cutme;
 
 	protected Hashtable providerTable = new Hashtable();
 
@@ -51,6 +53,7 @@ public class ProxyTest extends SipServletTestCase implements SipListener {
 			super.setUp();
 			this.shootist = new Shootist();
 			this.shootme = new Shootme();
+			this.cutme = new Cutme();
 
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -61,11 +64,12 @@ public class ProxyTest extends SipServletTestCase implements SipListener {
 
 	public void testProxy() {
 		this.shootme.init();
+		this.cutme.init();
 		this.shootist.init();
-		for (int q = 0; q < 50; q++) {
-			if (shootist.ended == false)
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -73,6 +77,8 @@ public class ProxyTest extends SipServletTestCase implements SipListener {
 		}
 		if (shootist.ended == false)
 			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
 	}
 
 	@Override

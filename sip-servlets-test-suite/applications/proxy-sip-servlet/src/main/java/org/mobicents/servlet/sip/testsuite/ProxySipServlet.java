@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -46,12 +47,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		//This is a proxying sample.
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		
-		URI uri = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();
+		URI uri1 = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();
+		URI uri2 = sipFactory.createAddress("sip:cutme@127.0.0.1:5056").getURI();
+		ArrayList uris = new ArrayList();
+		uris.add(uri1);
+		uris.add(uri2);
 		Proxy proxy = request.getProxy();
 		proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
 		proxy.setRecordRoute(true);
 		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
-		proxy.proxyTo(uri);
+		proxy.setParallel(true);
+		proxy.proxyTo(uris);
 	}
 
 	/**
