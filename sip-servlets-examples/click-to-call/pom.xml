@@ -75,19 +75,7 @@
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <webXml>${basedir}/src/main/sipapp/WEB-INF/web.xml</webXml>
                     <warSourceDirectory>${basedir}/src/main/sipapp</warSourceDirectory>
-                    <webResources>
-                        <resource>
-                            <directory>${basedir}/src/main/sipapp/WEB-INF</directory>
-                            <!-- override the destination directory for this resource -->
-                            <targetPath>WEB-INF</targetPath>
-                            <filtering>false</filtering>
-                            <includes>
-                                <exclude>sip.xml</exclude>
-                            </includes>
-                        </resource>
-                    </webResources>
                 </configuration>
             </plugin>
         </plugins>

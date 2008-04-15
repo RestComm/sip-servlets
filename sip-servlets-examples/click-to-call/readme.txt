@@ -2,7 +2,10 @@ To build run:
 mvn clean compile war:war
 
 To deploy:
-Add a context entry in the tomcat's servler.xml like this:
+drop the generated war file in webapps Tomcat directory or Jboss deploy directory.
+
+Alternatively you can add a context entry in the tomcat's server.xml like this 
+(this won't work on Jboss and this is not the recommended way to go) :
 	<Context 
 	className="org.mobicents.servlet.sip.startup.SipStandardContext" 
 	configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
@@ -14,7 +17,7 @@ Add a context entry in the tomcat's servler.xml like this:
 Note that path="/click2call" is important. 
 
 To use:
-You can run Tomcat and naviagate to http://localhost:8080/click2call/.
+You can now run Tomcat or Jboss and navigate to http://localhost:8080/click2call/.
 You will see the index page where you can enter two SIP URIs. Enter the URIs
 of two SIP phones and click "Submit". The SIP phones don't have to be registered.
 I recommend using 3CX Phone and SJ Phone as the two phones in this demo
