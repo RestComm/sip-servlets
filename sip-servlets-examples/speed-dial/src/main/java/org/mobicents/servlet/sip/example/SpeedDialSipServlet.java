@@ -41,7 +41,7 @@ public class SpeedDialSipServlet extends SipServlet {
 		dialNumberToSipUriMapping.put("3", "sip:vlad@sip-servlets.com");
 		dialNumberToSipUriMapping.put("4", "sip:bartek@sip-servlets.com");
 		dialNumberToSipUriMapping.put("5", "sip:jeand@sip-servlets.com");
-		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090"); // special case to be able to rn the app standalone
+		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090"); // special case to be able to run the app standalone
 	}
 
 	@Override
