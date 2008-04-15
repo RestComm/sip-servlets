@@ -39,12 +39,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>concurrent</groupId>
-			<artifactId>concurrent</artifactId>
-			<version>1.3.4</version>
-			<scope>provided</scope>
-		</dependency>
+		
 
 		<!-- j2ee dependencies -->
 		<dependency>

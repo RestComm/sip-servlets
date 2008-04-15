@@ -51,6 +51,7 @@ public class Shootist implements SipListener {
 		}
 		public void run () {
 			try {
+			   System.out.println("Sending BYE!");
 			   Request byeRequest = this.dialog.createRequest(Request.BYE);
 			   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 			   dialog.sendRequest(ct);
@@ -151,11 +152,7 @@ public class Shootist implements SipListener {
 			}			
 			return;
 		}
-		// If the caller is supposed to send the bye
-		if ( callerSendsBye && !byeTaskRunning) {
-			byeTaskRunning = true;
-			new Timer().schedule(new ByeTask(dialog), 4000) ;
-		}
+		
 		System.out.println("transaction state is " + tid.getState());
 		System.out.println("Dialog = " + tid.getDialog());
 		System.out.println("Dialog State is " + tid.getDialog().getState());
@@ -166,9 +163,11 @@ public class Shootist implements SipListener {
 					ackRequest = dialog.createRequest(Request.ACK);
 					System.out.println("Sending ACK");
 					dialog.sendAck(ackRequest);
-					
-					// JvB: test REFER, reported bug in tag handling
-					dialog.sendRequest(  sipProvider.getNewClientTransaction( dialog.createRequest("REFER") )); 
+					// If the caller is supposed to send the bye
+					if ( callerSendsBye && !byeTaskRunning) {
+						byeTaskRunning = true;
+						new Timer().schedule(new ByeTask(dialog), 4000) ;
+					}
 					
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (dialog.getState() == DialogState.CONFIRMED) {
@@ -183,6 +182,9 @@ public class Shootist implements SipListener {
 
 					}
 
+				} else if ( cseq.getMethod().equals(Request.BYE)) {
+					System.out.println("Got OK for the BYE -- tear down the stack");
+					this.sipStack.stop();
 				}
 			}
 		} catch (Exception ex) {
@@ -194,20 +196,11 @@ public class Shootist implements SipListener {
 
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
 
-		System.out.println("Transaction Time out");
+		ClientTransaction ct = timeoutEvent.getClientTransaction();
+		System.out.println("Transaction Time out" + ((ClientTransaction) ct).getRequest().getMethod());
 	}
 
-	public void sendCancel() {
-		try {
-			System.out.println("Sending cancel");
-			Request cancelRequest = inviteTid.createCancel();
-			ClientTransaction cancelTid = sipProvider
-					.getNewClientTransaction(cancelRequest);
-			cancelTid.sendRequest();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
+	
 
 	public void init() {
 		SipFactory sipFactory = null;
@@ -405,6 +398,7 @@ public class Shootist implements SipListener {
 	public void processDialogTerminated(
 			DialogTerminatedEvent dialogTerminatedEvent) {
 		System.out.println("dialogTerminatedEvent");
+		this.sipStack.stop();
 
 	}
 
