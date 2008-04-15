@@ -1,7 +1,6 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import java.text.ParseException;
 import java.util.Properties;
-import java.util.Timer;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -61,7 +60,7 @@ public class ShootistSipServletTest extends SipServletTestCase implements SipLis
 
 	private static final String myAddress = "127.0.0.1";
 
-	private static final int myPort = 5070;
+	private static final int myPort = 5080;
 
 	protected ServerTransaction inviteTid;
 
@@ -301,8 +300,8 @@ public class ShootistSipServletTest extends SipServletTestCase implements SipLis
 			headerFactory = sipFactory.createHeaderFactory();
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
-					5080, "udp");
+			ListeningPoint lp = sipStack.createListeningPoint(myAddress,
+					myPort, "udp");
 	
 			SipListener listener = this;
 	
