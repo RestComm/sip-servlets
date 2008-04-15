@@ -5,6 +5,8 @@ import gov.nist.javax.sip.stack.SIPTransaction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.UUID;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -32,7 +34,18 @@ public class SipSessionImpl implements SipSession {
 	private ArrayList<SipSessionBindingListener> sipSessionBindingListeners;
 	private ArrayList<SipSessionListener> sipSessionListeners;
 
-	private HashMap<String, Object> _sipSessionAttributeMap;
+	private HashMap<String, Object> sipSessionAttributeMap;
+	
+	private UUID uuid;
+	
+	private long creationTime;
+	private long lastAccessTime;
+	
+	private SipApplicationRoutingRegion routingRegion;
+	
+	private State state;
+	
+	private boolean valid;
 	
 	
 	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===
@@ -55,6 +68,10 @@ public class SipSessionImpl implements SipSession {
 		this.dialog = dialog;
 		this.initialTransaction = transaction;
 		this.sipApplicationSession = sipApp;
+		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
+		this.uuid = UUID.randomUUID();
+		this.state = State.INITIAL;
+		this.valid = true;
 	}
 	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
@@ -98,33 +115,28 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public Object getAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return sipSessionAttributeMap.get(name);
 	}
 
 	public Enumeration<String> getAttributeNames() {
-		// TODO Auto-generated method stub
-		return null;
+		Vector<String> names = new Vector<String>(sipSessionAttributeMap.keySet());
+		return names.elements();
 	}
 
 	public String getCallId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.dialog.getCallId().getCallId();
 	}
 
 	public long getCreationTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return creationTime;
 	}
 
 	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return uuid.toString();
 	}
 
 	public long getLastAccessedTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return lastAccessTime;
 	}
 
 	public Address getLocalParty() {
@@ -133,8 +145,7 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public SipApplicationRoutingRegion getRegion() {
-		// TODO Auto-generated method stub
-		return null;
+		return routingRegion;
 	}
 
 	public Address getRemoteParty() {
@@ -143,8 +154,7 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public State getState() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.state;
 	}
 
 	public URI getSubscriberURI() {
@@ -154,6 +164,7 @@ public class SipSessionImpl implements SipSession {
 
 	public void invalidate() {
 		// TODO Auto-generated method stub
+		valid = false;
 
 	}
 
@@ -163,8 +174,7 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.valid;
 	}
 
 	public void removeAttribute(String name) {
@@ -188,7 +198,7 @@ public class SipSessionImpl implements SipSession {
 			l.attributeRemoved(event);
 		}
 
-		this._sipSessionAttributeMap.remove(name);
+		this.sipSessionAttributeMap.remove(name);
 	}
 
 	public void setAttribute(String key, Object attribute) {
@@ -203,7 +213,7 @@ public class SipSessionImpl implements SipSession {
 			throw new NullPointerException("Attribute that is to be bound cant be null!!!");
 		
 		SipSessionBindingEvent event = new SipSessionBindingEvent(this, key);
-		if (this._sipSessionAttributeMap.containsKey(key)) {
+		if (this.sipSessionAttributeMap.containsKey(key)) {
 			// This is initial, we need to send value bound event
 
 			for (SipSessionBindingListener l : this
@@ -226,7 +236,7 @@ public class SipSessionImpl implements SipSession {
 
 		}
 
-		this._sipSessionAttributeMap.put(key, attribute);
+		this.sipSessionAttributeMap.put(key, attribute);
 
 	}
 
