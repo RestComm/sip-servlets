@@ -1,10 +1,5 @@
 package org.mobicents.servlet.sip.message;
 
-import javax.servlet.sip.SipSession;
-import javax.sip.Dialog;
-import javax.sip.Transaction;
-
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
@@ -15,15 +10,12 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  */
 public class TransactionApplicationData {
 	private ProxyImpl proxy;
-	private ProxyBranchImpl proxyBranch;
-	private SipSessionImpl sipSession;
+	private ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 
 	
-	public TransactionApplicationData(SipSessionImpl sipSession, SipServletMessageImpl sipServletMessage ) {
-		this.sipSession = (SipSessionImpl) sipSession;
-		this.sipServletMessage = sipServletMessage;
-		
+	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
+		this.sipServletMessage = sipServletMessage;		
 	}
 	/**
 	 * set proxy
@@ -36,9 +28,6 @@ public class TransactionApplicationData {
 		this.proxyBranch = proxyBranch;
 	}
 	
-	public void setSipSession(SipSessionImpl sipSession) {
-		this.sipSession = sipSession;
-	}
 	/**
 	 * @return the proxy
 	 */
@@ -52,15 +41,8 @@ public class TransactionApplicationData {
 	public ProxyBranchImpl getProxyBranch() {
 		return proxyBranch;
 	}
-	
-	/**
-	 * @return the sipSession
-	 */
-	public SipSessionImpl getSipSession() {
-		return sipSession;
-	}
-	public SipServletMessageImpl getSipServletMessage() {
 		
+	public SipServletMessageImpl getSipServletMessage() {
 		return this.sipServletMessage;
 	}
 	

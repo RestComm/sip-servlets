@@ -89,8 +89,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			Request newRequest = (Request) origRequestImpl.message.clone();
-			newRequest.removeContent();
-
+			newRequest.removeContent();					
 			ViaHeader viaHeader = (ViaHeader) newRequest
 					.getHeader(ViaHeader.NAME);
 			newRequest.removeHeader(ViaHeader.NAME);
@@ -106,7 +105,11 @@ public class B2buaHelperImpl implements B2buaHelper {
 			String tag = Integer.toString((int) (Math.random()*1000));
 			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
 			
-			//If Contact header is present in the headerMap 
+			//For non-REGISTER requests, the Contact header field is not copied 
+			//but is populated by the container as usual
+			newRequest.removeHeader(ContactHeader.NAME);
+
+			//but If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			//They will be added later after the sip servlet request has been created
@@ -127,11 +130,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 						contactHeaderSet = headerMap.get(headerName);
 					}
 				}
-			}
-			TransactionApplicationData transactionApplicationData = 
-				(TransactionApplicationData) origRequestImpl.getDialog().getApplicationData();
-			
-			SipSessionImpl originalSession = transactionApplicationData.getSipSession();
+			}			
+			SipSessionImpl originalSession = origRequestImpl.getSipSession();
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();
 
@@ -181,14 +181,15 @@ public class B2buaHelperImpl implements B2buaHelper {
 			
 			Request newRequest = dialog.createRequest(((SipServletRequest) origRequest)
 					.getMethod());
-						
-			TransactionApplicationData transactionApplicationData = (TransactionApplicationData) origRequestImpl.getDialog()
-					.getApplicationData();
-			SipSessionImpl originalSession = transactionApplicationData.getSipSession();
+									
+			SipSessionImpl originalSession = origRequestImpl.getSipSession();
 
 			logger.info(origRequest.getSession());				
 			logger.info(session);
 			
+			//For non-REGISTER requests, the Contact header field is not copied 
+			//but is populated by the container as usual
+			newRequest.removeHeader(ContactHeader.NAME);
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.

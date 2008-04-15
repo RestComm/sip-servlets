@@ -21,7 +21,6 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;

@@ -174,8 +174,8 @@ public class ProxyUtils {
 					originalRequest.getSession(),
 					tx, null, false);
 			
-			ret.getTrasactionApplicationData().setProxyBranch(proxyBranch);
-			tx.setApplicationData(ret.getTrasactionApplicationData());
+			ret.getTransactionApplicationData().setProxyBranch(proxyBranch);
+			tx.setApplicationData(ret.getTransactionApplicationData());
 
 			return ret;
 		} catch (Exception e) {

@@ -26,7 +26,6 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipURI;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
@@ -92,7 +91,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		nonInitialSipRequestMethods.add("PRACK");
 		nonInitialSipRequestMethods.add("ACK");
 	};
-		
+	
+//	private enum InitialRequestRouting {
+//		CONTINUE, STOP;
+//	}
+	
 	//the sip factory implementation, it is not clear if the sip factory should be the same instance
 	//for all applications
 	private SipFactoryImpl sipFactoryImpl = null;
@@ -228,9 +231,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
 		// TODO FIXME
 		logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
-		Dialog dialog = dialogTerminatedEvent.getDialog();
+		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
-		tad.getSipSession().onDialogTimeout(dialog);		
+		tad.getSipServletMessage().getSipSession().onDialogTimeout(dialog);		
 	}
 	/**
 	 * {@inheritDoc}
@@ -262,7 +265,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				} 
 			}				
 			
-			SipSessionImpl session = sessionManager.getRequestSession(sipFactoryImpl, requestEvent, transaction);
+			SipSessionImpl session = sessionManager.getRequestSession(sipFactoryImpl, request, transaction);
 			
 			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 						request,
@@ -287,12 +290,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipServletRequest.setInitial(isInitialRequest);					
 	
 			if(sipServletRequest.isInitial()) {
-				routeInitialRequest(sipProvider, sipServletRequest);
+				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
+				while(continueRouting) {
+					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
+				}
 			} else {
 				logger.info("Routing of Subsequent Request -- TODO");
 				
 				//TODO implement the application chain routing algorithm			
-				Wrapper servletWrapper = (Wrapper) ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
+				Wrapper servletWrapper = (Wrapper) session.getSipApplicationSession().getSipContext().findChild(session.getHandler());
 				try
 				{
 					Servlet servlet = servletWrapper.allocate();
@@ -310,6 +316,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 			}
 		} catch (Throwable e) {
+			e.printStackTrace();
 			logger.error(e);
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
@@ -325,7 +332,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param session
 	 * @param sipServletRequest
 	 */
-	private void routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
+	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
 		//15.4.1 Routing an Initial request Algorithm
 		SipSessionImpl session = sipServletRequest.getSipSession();
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
@@ -345,9 +352,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				SipApplicationRoutingDirective.REVERSE.equals(sipApplicationRoutingDirective)) {
 			//get the original request's state info
 			stateInfo = ((SipServletRequestImpl)sipServletRequest.getLinkedRequest()).getStateInfo();
-		} 
+		} else {
+			stateInfo = sipServletRequest.getStateInfo();			
+		}
 		
-		logger.info("Dispatching the request event");
+		logger.info("Dispatching the request event");		
 		// 15.4.1 Procedure : point 1
 		//TODO the spec mandates that the sipServletRequest should be 
 		//made read only for the AR to process
@@ -377,13 +386,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						// this shouldn't happen if the route modifier is ROUTE, processing is stopped
 						//and a 500 is sent
 						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-						return;
+						return false;
 					}						
 					if(isRouteExternal(applicationRouterInfoRouteHeader)) {
 						// push the route as the top Route header field value and send the request externally
 						sipServletRequest.addHeader(RouteHeader.NAME, route);
 						sipServletRequest.send();
-						return;
+						return false;
 					} else {
 						// the container MUST make the route available to the applications 
 						// via the SipServletRequest.getPoppedRoute() method.							
@@ -422,13 +431,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// the Request-URI points to a different domain, or there are one or more Route headers, 
 				// send the request externally according to standard SIP mechanism.
 				sipServletRequest.send();
-				return;
+				logger.info("Request event dispatched to another domain");
+				return false;
 			} else {
 				// the Request-URI does not point to another domain, and there is no Route header, 
 				// the container should not send the request as it will cause a loop. 
 				// Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.					 			
 				JainSipUtils.sendErrorResponse(Response.NOT_FOUND, transaction, request, sipProvider);
-				return;
+				return false;
 			}
 		} else {
 			//set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
@@ -445,7 +455,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.error(pe);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-				return;
+				return false;
 			}
 			// follow the procedures of Chapter 16 to select a servlet from the application.			
 			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
@@ -453,8 +463,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(sipContext == null) {
 				logger.error("No matching deployed application has been found !");
 				// Sends a 503 Service Unavailable error and stops processing.				
-				JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
-				return;
+//				JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
+				//FIXME
+//				return true;
+				return false;
 			}
 			appSession.setSipContext(sipContext);
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
@@ -468,32 +480,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					logger.error(e);
 					// Sends a 500 Internal server error and stops processing.				
 					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-					return;
-				} catch (IllegalStateException ise) {
-					logger.error(ise);
-					// Sends a 500 Internal server error and stops processing.				
-					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-					return;
-				}
+					return false;
+				} 
 			}
 			Container container = sipContext.findChild(sipSessionHandlerName);
 			Wrapper sipServletImpl = (Wrapper) container;
 			try {
 				Servlet servlet = sipServletImpl.allocate();	        
 				servlet.service(sipServletRequest, null);
+				logger.info("Request event dispatched to " + sipContext.getApplicationName());
+				//FIXME
+//				return true;
+				return false;
 			} catch (ServletException e) {				
 				logger.error(e);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-				return;
+				return false;
 			} catch (IOException e) {				
 				logger.error(e);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-				return;
-			} 
-		}
-		logger.info("Request event dispatched");
+				return false;
+			} 			
+		}		
 	}
 	/**
 	 * Check if the route is external
@@ -615,7 +625,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			org.mobicents.servlet.sip.message.TransactionApplicationData tad =
 				(org.mobicents.servlet.sip.message.TransactionApplicationData) appData;
 			
-			SipSessionImpl session = tad.getSipSession();
+			SipSessionImpl session = tad.getSipServletMessage().getSipSession();
+//			SipSessionImpl session = sessionManager.getRequestSession(
+//					sipFactoryImpl, response, clientTransaction);
 			
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new
@@ -693,14 +705,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			logger.info("timeout => " + timeoutEvent.getClientTransaction().getRequest().toString());
 		}
 		
-		Transaction tx = null;
+		Transaction transaction = null;
 		if(timeoutEvent.isServerTransaction()) {
-			tx = timeoutEvent.getServerTransaction();
+			transaction = timeoutEvent.getServerTransaction();
 		} else {
-			tx = timeoutEvent.getClientTransaction();
+			transaction = timeoutEvent.getClientTransaction();
 		}
-		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();	
-		tad.getSipSession().removeOngoingTransaction(tx);
+		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
+		tad.getSipServletMessage().getSipSession().removeOngoingTransaction(transaction);
 
 	}
 	/**
@@ -714,9 +726,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} else {
 			transaction = transactionTerminatedEvent.getClientTransaction();
 		}
-		logger.info("transaction terminated => " + transaction.getRequest().toString());
+		logger.info("transaction terminated => " + transaction.getRequest().toString());		
+		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
-		tad.getSipSession().removeOngoingTransaction(transaction);				
+		tad.getSipServletMessage().getSipSession().removeOngoingTransaction(transaction);				
 	}
 
 	/**

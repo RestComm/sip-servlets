@@ -166,6 +166,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int)
 	 */
 	public SipServletResponse createResponse(int statusCode) {
+		return createResponse(statusCode, null);
+	}
+
+	public SipServletResponse createResponse(int statusCode, String reasonPhrase) {
 		if (super.getTransaction() == null
 				|| super.getTransaction() instanceof ClientTransaction) {
 			throw new IllegalStateException(
@@ -175,6 +179,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = this.getTransaction().getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
+			if(reasonPhrase!=null) {
+				response.setReasonPhrase(reasonPhrase);
+			}
 			if (statusCode == Response.OK ) {
 				ToHeader toHeader = (ToHeader) response
 						.getHeader(ToHeader.NAME);
@@ -206,27 +213,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode,
 					ex);
-		}
-	}
-
-	public SipServletResponse createResponse(int statusCode, String reasonPhrase) {
-		if (super.getTransaction() == null
-				|| super.getTransaction() instanceof ClientTransaction) {
-			throw new IllegalStateException(
-					"Cannot create a response - not a server transaction");
-		}
-		try {
-			Request request = this.getTransaction().getRequest();
-			Response response = SipFactories.messageFactory.createResponse(
-					statusCode, request);
-			response.setReasonPhrase(reasonPhrase);
-
-			return new SipServletResponseImpl(response, super.sipFactoryImpl,
-					(ServerTransaction) getTransaction(), session, getDialog());
-		} catch (ParseException ex) {
-			throw new IllegalArgumentException("Bad status code" + statusCode);
-		}
-
+		}		
 	}
 
 	public B2buaHelper getB2buaHelper() {

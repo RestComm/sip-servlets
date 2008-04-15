@@ -25,6 +25,10 @@ public class SessionManager {
 	private static transient Log logger = LogFactory
 			.getLog(SessionManager.class);
 
+	public SipSessionImpl getSipSession(String sessionId) {
+		return sipSessions.get(sessionId);
+	}
+	
 	/**
 	 * Associates requests to sessions. It uses
 	 * (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID) intially as a session id until the
@@ -39,22 +43,17 @@ public class SessionManager {
 	 *            a JAIN SIP request event
 	 * @return
 	 */
-	public SipSessionImpl getRequestSession(SipFactoryImpl sipFactoryImpl, RequestEvent requestEvent,
+	public SipSessionImpl getRequestSession(SipFactoryImpl sipFactoryImpl, Message message,
 			Transaction transaction) {
 		
-		/*
-		 * Vlad -- you can remove this if no longer relevant.
-		 * 
-		 */
-		Request request = requestEvent.getRequest();
 		SipSessionImpl session = null;
 		
 		try {
-			String initialSessionId = getInitialSessionId(request); // without
+			String initialSessionId = getInitialSessionId(message); // without
 																	// to-tag
 			
 			 //with  to-tag  (null if  there is  no  to-tag) 
-			String ackSessionId = getAcknoledgedSessionId(request); 
+			String ackSessionId = getAcknoledgedSessionId(message); 
 		
 		
 			if (ackSessionId == null) // if the we still dont have a dialog
@@ -97,27 +96,27 @@ public class SessionManager {
 	}
 
 	// Gives (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID)
-	public static String getInitialSessionId(Message request) {
-		String sessionId = ((FromHeader) request.getHeader(FromHeader.NAME))
+	public static String getInitialSessionId(Message message) {
+		String sessionId = ((FromHeader) message.getHeader(FromHeader.NAME))
 				.getAddress().getURI().toString()
-				+ ((FromHeader) request.getHeader(FromHeader.NAME))
+				+ ((FromHeader) message.getHeader(FromHeader.NAME))
 						.getParameter("tag")
-				+ ((ToHeader) request.getHeader(ToHeader.NAME)).getAddress()
+				+ ((ToHeader) message.getHeader(ToHeader.NAME)).getAddress()
 						.getURI().toString()
-				+ ((CallIdHeader) request.getHeader(CallIdHeader.NAME))
+				+ ((CallIdHeader) message.getHeader(CallIdHeader.NAME))
 						.getCallId();
 
 		return sessionId;
 	}
 
 	// Gives (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,TO-TAG)
-	public static String getAcknoledgedSessionId(Message request) {
+	public static String getAcknoledgedSessionId(Message message) {
 
-		if (((ToHeader) request.getHeader(ToHeader.NAME)).getTag() == null)
+		if (((ToHeader) message.getHeader(ToHeader.NAME)).getTag() == null)
 			return null;
 
-		String sessionId = getInitialSessionId(request)
-				+ ((ToHeader) request.getHeader(ToHeader.NAME)).getTag();
+		String sessionId = getInitialSessionId(message)
+				+ ((ToHeader) message.getHeader(ToHeader.NAME)).getTag();
 
 		return sessionId;
 	}

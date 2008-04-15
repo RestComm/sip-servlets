@@ -199,10 +199,8 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());
 			if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
 				int previousAppOrder = -1; 
-				if(stateInfo != null) {
-					try{
-						previousAppOrder = Integer.parseInt((String)stateInfo);
-					} catch (NumberFormatException nfe) {}
+				if(stateInfo != null) {					
+					previousAppOrder = (Integer) stateInfo;				
 				}
 				for (DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo : defaultSipApplicationRouterInfoList) {
 					if(defaultSipApplicationRouterInfo.getOrder() > previousAppOrder) {
@@ -213,6 +211,8 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 							subscriberIdentity = initialRequest.getHeader(headerName);
 						}
 						//TODO ask EG : the SipApplicationRoutingRegion is missing from the constructor !!
+						// already asked =>
+						//http://groups.google.com/group/sipservlets/browse_thread/thread/ec708ff63acfd14d/1e7ce3b7e0e29da0?lnk=gst&q=SipApplicationRouterInfo&rnum=4#1e7ce3b7e0e29da0		
 						return new SipApplicationRouterInfo(
 								defaultSipApplicationRouterInfo.getApplicationName(),
 								subscriberIdentity,

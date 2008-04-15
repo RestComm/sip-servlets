@@ -83,9 +83,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
 	private Transaction transaction;
-	protected TransactionApplicationData transactionApplicationData;
-
-	private SipApplicationSessionImpl applicationSession;
+	protected TransactionApplicationData transactionApplicationData;	
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
@@ -265,8 +263,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.message = message;
 		this.transaction = transaction;
 		this.session = (SipSessionImpl) sipSession;
-		this.transactionApplicationData = new TransactionApplicationData(
-				session, this);
+		this.transactionApplicationData = new TransactionApplicationData(this);
 
 		// good behaviour, lets make some default
 		if (this.message.getContentEncoding() == null)
@@ -485,17 +482,21 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession(boolean)
 	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
-		if (this.applicationSession != null)
-			return this.applicationSession;
-		else if (this.session != null
+		if (this.session != null
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
-		} else {
-			SipApplicationSessionImpl applSession = new SipApplicationSessionImpl();
-			this.applicationSession = applSession;
-			this.applicationSession.addSipSession(this.session);
-
-		}
+		} else if (create) {
+			//FIXME this session is never added to the sessionmanager in the 
+			//SipApplicationDispatcher
+			SipApplicationSessionImpl applicationSession = new SipApplicationSessionImpl();
+			if(this.session == null) {
+				this.session = new SipSessionImpl(sipFactoryImpl, applicationSession);
+			} else {
+				applicationSession.addSipSession(this.session);
+				this.session.setApplicationSession(applicationSession);
+			}
+			return this.session.getApplicationSession();			
+		}		
 		return null;
 	}
 
@@ -761,9 +762,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getSession(boolean)
 	 */
 	public SipSession getSession(boolean create) {
-		if (this.session == null && create)
+		if (this.session == null && create) {
+			//FIXME this session is never added to the sessionmanager in the 
+			//SipApplicationDispatcher
 			this.session = new SipSessionImpl(sipFactoryImpl,
 					(SipApplicationSessionImpl) this.getApplicationSession());
+		}
 		return this.session;
 	}
 	
@@ -1107,7 +1111,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.transactionApplicationData = applicationData;
 	}
 
-	public TransactionApplicationData getTrasactionApplicationData() {
+	public TransactionApplicationData getTransactionApplicationData() {
 		return this.transactionApplicationData;
 	}
 

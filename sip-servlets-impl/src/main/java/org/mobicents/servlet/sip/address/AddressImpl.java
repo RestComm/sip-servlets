@@ -2,20 +2,10 @@ package org.mobicents.servlet.sip.address;
 
 import gov.nist.core.NameValue;
 import gov.nist.core.NameValueList;
-import gov.nist.javax.sip.address.AddressFactoryImpl;
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.From;
 
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.URI;
@@ -41,9 +31,7 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 			.getCanonicalName());
 
 	
-	private javax.sip.address.Address address;
-
-	private static AddressFactory addressFactory = SipFactories.addressFactory;
+	private javax.sip.address.Address address;	
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
