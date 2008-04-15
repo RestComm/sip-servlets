@@ -1,0 +1,872 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLModel" guid="bqfEzl+aVEeyGR/J7Vx+RQAA">
+<XPD:ATTR name="Name" type="string">Mobicents Implementation Classes</XPD:ATTR>
+<XPD:ATTR name="StereotypeProfile" type="string">UMLStandard</XPD:ATTR>
+<XPD:ATTR name="StereotypeName" type="string">analysisModel</XPD:ATTR>
+<XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedDiagrams[0]" type="UMLClassDiagram" guid="aiYRGQN1vEKifOegV/HchQAA">
+<XPD:ATTR name="Name" type="string">Overview</XPD:ATTR>
+<XPD:REF name="DiagramOwner">bqfEzl+aVEeyGR/J7Vx+RQAA</XPD:REF>
+<XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="NULmUWrV60GCMsxJquy2fAAA">
+<XPD:REF name="Diagram">aiYRGQN1vEKifOegV/HchQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="NmRyCiGSE0KneKw0TWowWAAA">
+<XPD:ATTR name="Name" type="string">org</XPD:ATTR>
+<XPD:REF name="Namespace">bqfEzl+aVEeyGR/J7Vx+RQAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="hjYk6qynnkmkb3HoPTXzqgAA">
+<XPD:ATTR name="Name" type="string">mobicents</XPD:ATTR>
+<XPD:REF name="Namespace">NmRyCiGSE0KneKw0TWowWAAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="QnLaTaw6w0WRUkZdmKZH7wAA">
+<XPD:ATTR name="Name" type="string">servlet</XPD:ATTR>
+<XPD:REF name="Namespace">hjYk6qynnkmkb3HoPTXzqgAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="jrEh7JqvQE6EpIieRALNigAA">
+<XPD:ATTR name="Name" type="string">sip</XPD:ATTR>
+<XPD:REF name="Namespace">QnLaTaw6w0WRUkZdmKZH7wAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="kZ7e0mFrU0OXVlaCsz6o9gAA">
+<XPD:ATTR name="Name" type="string">SipFactories</XPD:ATTR>
+<XPD:REF name="Namespace">jrEh7JqvQE6EpIieRALNigAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="6kyrH1x89UuBUpLrt1MxEgAA">
+<XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+<XPD:ATTR name="#Parameters" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Parameters[0]" type="UMLParameter" guid="p9bVM5rMMka17fLk6kADfgAA">
+<XPD:ATTR name="Name" type="string">pathName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="BehavioralFeature">6kyrH1x89UuBUpLrt1MxEgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:ATTR name="#Attributes" type="integer">6</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="zDO7tWFm3kSc89upWje2vgAA">
+<XPD:ATTR name="Name" type="string">logger</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">Log</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">LogFactory.getLog(SipFactories.class.getCanonicalName())</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="67VOWFmMf0aEO0PC5jbaoQAA">
+<XPD:ATTR name="Name" type="string">initialized</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="Wv1rTxn8D06vJe3VyhgPoAAA">
+<XPD:ATTR name="Name" type="string">addressFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">AddressFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="6vwf5PB/NUuxEBIP1pGcRgAA">
+<XPD:ATTR name="Name" type="string">headerFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HeaderFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="o/cQ+eYEIk+Va4Bp95ngTgAA">
+<XPD:ATTR name="Name" type="string">sipFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="n7FSYRI/gUCzLuxXrDCDEQAA">
+<XPD:ATTR name="Name" type="string">messageFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">MessageFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="KGBmSnbTlUadIk2096olrgAA">
+<XPD:ATTR name="Name" type="string">startup</XPD:ATTR>
+<XPD:REF name="Namespace">jrEh7JqvQE6EpIieRALNigAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">4</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="RjmF8NG/DkWbuKl98DZJ9wAA">
+<XPD:ATTR name="Name" type="string">SipContextConfig</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="uANpCLsBkUWkN0NhlasntwAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">RjmF8NG/DkWbuKl98DZJ9wAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="Iyc1Y/jV3ki5roQcEvypPAAA">
+<XPD:ATTR name="Name" type="string">SipStandardContext</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="yNQDSIo1/0G3N4XpvxcTAwAA">
+<XPD:ATTR name="Name" type="string">sipServletApplication : SipServletApplication</XPD:ATTR>
+<XPD:REF name="Owner">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLPackage" guid="7Tx/B50IZ0K+zWMZGfpW3AAA">
+<XPD:ATTR name="Name" type="string">loading</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">14</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="N/79IWincU6clojpU/dPwAAA">
+<XPD:ATTR name="Name" type="string">SipServletApplication</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">21</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="IWt2oNE7kE+hcZfnjda59wAA">
+<XPD:ATTR name="Name" type="string">applicationName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="qAU7Vk5wC0SS24xUBDC/+AAA">
+<XPD:ATTR name="Name" type="string">smallIcon</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="kTkYc/FBIkyyVzF43s+6GAAA">
+<XPD:ATTR name="Name" type="string">largeIcon</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="lYPcSz10wEqfoqIzY3rTvQAA">
+<XPD:ATTR name="Name" type="string">displayName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="MxgElD4KB0i3dIlz6Q11qQAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="rBvTSxgW6EqOJdDBBkwwDgAA">
+<XPD:ATTR name="Name" type="string">distributable</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="5G1GZMiwiUSiPsPKvKX1YQAA">
+<XPD:ATTR name="Name" type="string">contextParams</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="IQsEhKR1zUedrMW++h82MAAA">
+<XPD:ATTR name="Name" type="string">listeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="PuQGc8mVp0KE5RObrc/s9AAA">
+<XPD:ATTR name="Name" type="string">mainServlet</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[9]" type="UMLAttribute" guid="U43p6IVUQUanHACP6C9hngAA">
+<XPD:ATTR name="Name" type="string">servlets</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[10]" type="UMLAttribute" guid="9hQXT7M5dUilLobtpBgTYgAA">
+<XPD:ATTR name="Name" type="string">servletMapping</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[11]" type="UMLAttribute" guid="KaYgj1sKpUuZKhxCmrATAQAA">
+<XPD:ATTR name="Name" type="string">proxyTimeout</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">int</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[12]" type="UMLAttribute" guid="N2tvVXn60EyrF4ibawD1VQAA">
+<XPD:ATTR name="Name" type="string">sessionTimeout</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">int</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[13]" type="UMLAttribute" guid="Fo5DLyb8ykGEZQyh4otXHwAA">
+<XPD:ATTR name="Name" type="string">resourceEnvRefs</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[14]" type="UMLAttribute" guid="TLsohHioZkWdKlkJ+3L2fAAA">
+<XPD:ATTR name="Name" type="string">resourcesRef</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[15]" type="UMLAttribute" guid="aoKIiI6eUkKQksqMaPGBLwAA">
+<XPD:ATTR name="Name" type="string">securityConstraints</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[16]" type="UMLAttribute" guid="B2k2zcIy9kypxaqeBXSoswAA">
+<XPD:ATTR name="Name" type="string">loginConfig</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">LoginConfig</XPD:ATTR>
+<XPD:REF name="Type_">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[17]" type="UMLAttribute" guid="/36Gitac7UWNwpZEWJa3fwAA">
+<XPD:ATTR name="Name" type="string">securityRoles</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[18]" type="UMLAttribute" guid="QakdQd6Uv0+rSGEEcvR+oQAA">
+<XPD:ATTR name="Name" type="string">envEntries</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[19]" type="UMLAttribute" guid="X34cOUhx50yXk0SQO7FCpQAA">
+<XPD:ATTR name="Name" type="string">ejbRefs</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[20]" type="UMLAttribute" guid="pwqT3NqGyUy42WKqwqlUIwAA">
+<XPD:ATTR name="Name" type="string">ejbLocalRefs</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="AXJ88RUUGk2bFOlDFaxC3gAA">
+<XPD:ATTR name="Name" type="string">SipServlet</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">9</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="peiT2Zvx6Uu/Wt8WEmh4UQAA">
+<XPD:ATTR name="Name" type="string">icon</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="hW6qrrgmhU+SBbCAaDuNGwAA">
+<XPD:ATTR name="Name" type="string">servletName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="GiOJ8iscg0SCCVdi4w/9FgAA">
+<XPD:ATTR name="Name" type="string">displayName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="Z/uOawdUeUGUIPUeMMLMIwAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="loPgJ3l5L0eUUiu0cfALTwAA">
+<XPD:ATTR name="Name" type="string">servletClass</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="BA2l8V//jUir8qOHvXxgbwAA">
+<XPD:ATTR name="Name" type="string">initParameters</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="Cj5QqTekY06GJkYAf7z8iwAA">
+<XPD:ATTR name="Name" type="string">loadOnStartup</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">int</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="m01OAvzft0+Fw+oL3vrbSAAA">
+<XPD:ATTR name="Name" type="string">runAs</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="iESdw4XFyEm07rABZCce5QAA">
+<XPD:ATTR name="Name" type="string">securityRoleRefs</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="ISBNiGDSvkqPVn7IbgZ/owAA">
+<XPD:ATTR name="Name" type="string">ResourceRef</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">9</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="mJ5GUDDWdUqvKQHU+pXiEwAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="re8bIeAiXkGItUx2E1A55gAA">
+<XPD:ATTR name="Name" type="string">resourceReferenceName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="covW4n6oFUaAv1vFp2G2vgAA">
+<XPD:ATTR name="Name" type="string">resourceType</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="pc4EPkMUEkm86pH6Cq9HMgAA">
+<XPD:ATTR name="Name" type="string">resourceAuth</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="tDlYnZRjmUaZvMEGv2ZkbgAA">
+<XPD:ATTR name="Name" type="string">resourceSharingScope</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="gaketIB/H06SqZt7KOGkSAAA">
+<XPD:ATTR name="Name" type="string">RESOURCE_AUTH_APPLICATION</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">Application</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="r5REQ9BCD06l/tS7BiQp1gAA">
+<XPD:ATTR name="Name" type="string">RESOURCE_AUTH_CONTAINER</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">Container</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="Rokas2Zy9Uq5d9OVmIPqDAAA">
+<XPD:ATTR name="Name" type="string">RESOURCE_SHARING_SCOPE_SHAREABLE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">Shareable</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="mM41LLQVw06tcLnK9d5bSgAA">
+<XPD:ATTR name="Name" type="string">RESOURCE_SHARING_SCOPE_UNSHAREABLE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">Unshareable</XPD:ATTR>
+<XPD:REF name="Owner">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLClass" guid="eR155daBDEWZ89Zj4Mi38gAA">
+<XPD:ATTR name="Name" type="string">SecurityConstraint</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="QIbJhTcLKUukMGspKgYbIQAA">
+<XPD:ATTR name="Name" type="string">displayName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="WGWDzV7Cvk6m+2hnDeDOgQAA">
+<XPD:ATTR name="Name" type="string">resourceCollections</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">Collection</XPD:ATTR>
+<XPD:REF name="Owner">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="adEqR9lCrk6jK8liMeEgJQAA">
+<XPD:ATTR name="Name" type="string">proxyAuthentication</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:REF name="Owner">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="ytoOesn+C0Kyi6REwG1GnQAA">
+<XPD:ATTR name="Name" type="string">authorizationConstraint</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">AuthorizationConstraint</XPD:ATTR>
+<XPD:REF name="Type_">5qg+YmITyU2pEKcXNLmgjQAA</XPD:REF>
+<XPD:REF name="Owner">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="QMK3G4h4k0mELnFlpFJpcAAA">
+<XPD:ATTR name="Name" type="string">userDataConstraint</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">UserDataConstraint</XPD:ATTR>
+<XPD:REF name="Type_">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+<XPD:REF name="Owner">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[4]" type="UMLClass" guid="2fkpRflLrU+YhKCbSCE9EgAA">
+<XPD:ATTR name="Name" type="string">ResourceCollection</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">4</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="6+3r0Zb/CEiPil07UPaTpAAA">
+<XPD:ATTR name="Name" type="string">resourceName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">2fkpRflLrU+YhKCbSCE9EgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="GwXRlJ8SnUeN+estIXi7/gAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">2fkpRflLrU+YhKCbSCE9EgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="59aNb7PRckuthoiN0jfN/gAA">
+<XPD:ATTR name="Name" type="string">servletName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">List</XPD:ATTR>
+<XPD:REF name="Owner">2fkpRflLrU+YhKCbSCE9EgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="/ZpwCCdxzkKVTAm/6xb1MAAA">
+<XPD:ATTR name="Name" type="string">sipMethods</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">List</XPD:ATTR>
+<XPD:REF name="Owner">2fkpRflLrU+YhKCbSCE9EgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[5]" type="UMLClass" guid="+DWposgD9UGs66Y6E4yxxgAA">
+<XPD:ATTR name="Name" type="string">UserDataConstraint</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]">QMK3G4h4k0mELnFlpFJpcAAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="xSP0viWG3Ee+cvlh7Xg65gAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="JEjxem4LVUq/bgEhFthDxgAA">
+<XPD:ATTR name="Name" type="string">transportGuarantee</XPD:ATTR>
+<XPD:REF name="Owner">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="fKsAvE+V4UmGBykhB2q2ZgAA">
+<XPD:ATTR name="Name" type="string">NONE_TRANSPORT_GUARANTEE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">NONE</XPD:ATTR>
+<XPD:REF name="Owner">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="CkSNJY13J0uNna1a/y7dFwAA">
+<XPD:ATTR name="Name" type="string">INTEGRAL_TRANSPORT_GUARANTEE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">INTEGRAL</XPD:ATTR>
+<XPD:REF name="Owner">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="ZpRMRDqw50mxJpdM7GpTkAAA">
+<XPD:ATTR name="Name" type="string">CONFIDENTIAL_TRANSPORT_GUARANTEE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">CONFIDENTIAL</XPD:ATTR>
+<XPD:REF name="Owner">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[6]" type="UMLClass" guid="5qg+YmITyU2pEKcXNLmgjQAA">
+<XPD:ATTR name="Name" type="string">AuthorizationConstraint</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]">ytoOesn+C0Kyi6REwG1GnQAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="EtxlrTLSbkmwxIE+rv6WvQAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">5qg+YmITyU2pEKcXNLmgjQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="Kie+PDMJLEWh0Qq2+EX6FwAA">
+<XPD:ATTR name="Name" type="string">roleNames</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">Collection</XPD:ATTR>
+<XPD:REF name="Owner">5qg+YmITyU2pEKcXNLmgjQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[7]" type="UMLClass" guid="h0N2eaB/UEeY9iZAD3qXnAAA">
+<XPD:ATTR name="Name" type="string">SecurityRole</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="wimYBjIZ4Uym+aOZ+R2HHAAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">h0N2eaB/UEeY9iZAD3qXnAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="G8htaYVny0i6amJ7RtlnGQAA">
+<XPD:ATTR name="Name" type="string">roleName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">h0N2eaB/UEeY9iZAD3qXnAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[8]" type="UMLClass" guid="pttcyUPt4UCVbCx2zJVf1wAA">
+<XPD:ATTR name="Name" type="string">LoginConfig</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]">B2k2zcIy9kypxaqeBXSoswAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="OuBaJowNmEee3Dp97PbA6QAA">
+<XPD:ATTR name="Name" type="string">authenticationMethod</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="JgGHibfKjU6iFrFU3qzUsgAA">
+<XPD:ATTR name="Name" type="string">realName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="R98G9SOmL0GwANmztULF3AAA">
+<XPD:ATTR name="Name" type="string">BASIC_AUTHENTICATION_METHOD</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">BASIC</XPD:ATTR>
+<XPD:REF name="Owner">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="M1Kv85mUikqw/sC2Xz0euwAA">
+<XPD:ATTR name="Name" type="string">DIGEST_AUTHENTICATION_METHOD</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">DIGEST</XPD:ATTR>
+<XPD:REF name="Owner">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="f9gmdg+pckKTYQ69N1/WjAAA">
+<XPD:ATTR name="Name" type="string">CLIENT_CERT_AUTHENTICATION_METHOD</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">CLIENT_CERT</XPD:ATTR>
+<XPD:REF name="Owner">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[9]" type="UMLClass" guid="qtgzPR7To0+8CUvQ+yOtwgAA">
+<XPD:ATTR name="Name" type="string">SecurityRoleRef</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="yvRL9+OvF0KUnvL1C+QJfAAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">qtgzPR7To0+8CUvQ+yOtwgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="Ho5t9NpG+Uaeb/oDR7AwvAAA">
+<XPD:ATTR name="Name" type="string">roleName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">qtgzPR7To0+8CUvQ+yOtwgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="pYxpvNsGwUmqY+FcExWB8wAA">
+<XPD:ATTR name="Name" type="string">roleLink</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">qtgzPR7To0+8CUvQ+yOtwgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[10]" type="UMLClass" guid="kMDgA4MQUEibWnBH1yT2ggAA">
+<XPD:ATTR name="Name" type="string">EnvironmentEntry</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">13</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="PR2PTq6gB0mtkMCHwmRjDwAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="Jdmkqr4WNUOkAXjOKkX3JQAA">
+<XPD:ATTR name="Name" type="string">name</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="cQFqmsHkaUiKOCGaQspRLAAA">
+<XPD:ATTR name="Name" type="string">value</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="QMzcyChVoUWGQwossyM5JAAA">
+<XPD:ATTR name="Name" type="string">type</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="l7c7KNL+N0W4sxM1j80iMAAA">
+<XPD:ATTR name="Name" type="string">BOOLEAN</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Boolean</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="jOhtLQqYbkK7hOl9E8V54AAA">
+<XPD:ATTR name="Name" type="string">BYTE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Byte</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="Wlxzje7K0EeQxfpyyg+OpAAA">
+<XPD:ATTR name="Name" type="string">CHARACTER</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Character</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="TLijbu3/oEK1gzVvzMqLKQAA">
+<XPD:ATTR name="Name" type="string">STRING</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.String</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="+X7BhJo12UuESqEtj5ZC6gAA">
+<XPD:ATTR name="Name" type="string">SHORT</XPD:ATTR>
+<XPD:ATTR name="IsSpecification" type="boolean">True</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Short</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[9]" type="UMLAttribute" guid="66LMp4a5GkyyovmPaJHPGwAA">
+<XPD:ATTR name="Name" type="string">INTEGER</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Integer</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[10]" type="UMLAttribute" guid="hr656nnnekGGqHaMaJWPTQAA">
+<XPD:ATTR name="Name" type="string">LONG</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Long</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[11]" type="UMLAttribute" guid="pGlusx1I2EOooKHjs0nvkAAA">
+<XPD:ATTR name="Name" type="string">DOUBLE</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Double</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[12]" type="UMLAttribute" guid="N9vcEf4qkU+YsU22GfZcVQAA">
+<XPD:ATTR name="Name" type="string">FLOAT</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">java.lang.Float</XPD:ATTR>
+<XPD:REF name="Owner">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[11]" type="UMLClass" guid="Rz7E4G3+e0GC3rnCJwk1rAAA">
+<XPD:ATTR name="Name" type="string">EjbReference</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="002EVhy8PEKqrGawTNiKVAAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="CGOMGCcpTky/+597sErTYQAA">
+<XPD:ATTR name="Name" type="string">name</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="qOQYcg/gp0K9UuL1A8k8CQAA">
+<XPD:ATTR name="Name" type="string">type</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="ShzTVvglWUO9eVAevUfMIwAA">
+<XPD:ATTR name="Name" type="string">home</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="ZARWnj7GS0ezCi0/OCcaMgAA">
+<XPD:ATTR name="Name" type="string">remote</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="3joFZEGEGEy+5TMD+u+OjgAA">
+<XPD:ATTR name="Name" type="string">ejbLink</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="re1UL3LsnE6BS2pnvrbDWgAA">
+<XPD:ATTR name="Name" type="string">SESSION</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">SESSION</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="VtQL6j4GzEGVv1QVPOW9gQAA">
+<XPD:ATTR name="Name" type="string">ENTITY</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">ENTITY</XPD:ATTR>
+<XPD:REF name="Owner">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[12]" type="UMLClass" guid="d3FvRLrz8E+q6AXqLe2HagAA">
+<XPD:ATTR name="Name" type="string">EjbLocalReference</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="pRFe5NMs5U6tLVA8rWsBHAAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="O4BtfUfXj0aVHiIx7hjwKQAA">
+<XPD:ATTR name="Name" type="string">name</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="yV9Hhswiq02OnvorEN7sWgAA">
+<XPD:ATTR name="Name" type="string">type</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="7zSwNC448kybC+CH6t0FKAAA">
+<XPD:ATTR name="Name" type="string">home</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="piGBqJIwL0GTZNnjeiKAtwAA">
+<XPD:ATTR name="Name" type="string">localHome</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="VU+32T4jqUuONr76MOgkegAA">
+<XPD:ATTR name="Name" type="string">ejbLink</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="7ouMq4WtCkG5+sO2QfkmuwAA">
+<XPD:ATTR name="Name" type="string">SESSION</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">SESSION</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="zk39LrvKc06zuTG2HTI2gQAA">
+<XPD:ATTR name="Name" type="string">ENTITY</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="Changeability" type="UMLChangeableKind">ckFrozen</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">ENTITY</XPD:ATTR>
+<XPD:REF name="Owner">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[13]" type="UMLClass" guid="6xQQY3KERE+yJI7lpiHjLQAA">
+<XPD:ATTR name="Name" type="string">RunAs</XPD:ATTR>
+<XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="gABlTEGU/EayItuk6XU8uQAA">
+<XPD:ATTR name="Name" type="string">description</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">6xQQY3KERE+yJI7lpiHjLQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="slT9wUcmnkGuKBwIThPDzgAA">
+<XPD:ATTR name="Name" type="string">roleName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="Owner">6xQQY3KERE+yJI7lpiHjLQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLClass" guid="KO3hjwm8bECLUP35PQLBHAAA">
+<XPD:ATTR name="Name" type="string">SipProtocolHandler</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="a6Ia5t7KAke3TcjVHde+UwAA">
+<XPD:ATTR name="Name" type="string">init</XPD:ATTR>
+<XPD:REF name="Owner">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="r0ZGfuv4FEmerWslyc3FFgAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLPackage" guid="R1wX5fNETUqoXz1hcMS1bwAA">
+<XPD:ATTR name="Name" type="string">core</XPD:ATTR>
+<XPD:REF name="Namespace">jrEh7JqvQE6EpIieRALNigAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="fAfx+fkl/0epcQVWx0Xk0wAA">
+<XPD:ATTR name="Name" type="string">ApplicationDispatcher</XPD:ATTR>
+<XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="Ly/Vq2T3+k6ejzkPFVSdyQAA">
+<XPD:ATTR name="Name" type="string">apache</XPD:ATTR>
+<XPD:REF name="Namespace">NmRyCiGSE0KneKw0TWowWAAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="5YPYv2YH/0CfZ4kH+UnX3wAA">
+<XPD:ATTR name="Name" type="string">catalina</XPD:ATTR>
+<XPD:REF name="Namespace">Ly/Vq2T3+k6ejzkPFVSdyQAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="GR/gf0zphU+qk34vBImYnwAA">
+<XPD:ATTR name="Name" type="string">startup</XPD:ATTR>
+<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="MMEO1kSofUOnM1E8vLX3igAA">
+<XPD:ATTR name="Name" type="string">connector</XPD:ATTR>
+<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="I96g6x0BD0SBAR4XBkeNNAAA">
+<XPD:ATTR name="Name" type="string">Connector</XPD:ATTR>
+<XPD:REF name="Namespace">MMEO1kSofUOnM1E8vLX3igAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLPackage" guid="yTJ78VtcUkixy4po0SZeXAAA">
+<XPD:ATTR name="Name" type="string">core</XPD:ATTR>
+<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="tngXLs1zBE+VK38T+fgSkwAA">
+<XPD:ATTR name="Name" type="string">Catalina</XPD:ATTR>
+<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="CgFyuGIIr0Wu8GAh+39BGwAA">
+<XPD:ATTR name="Name" type="string">StandardServer</XPD:ATTR>
+<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="W6SFsJJjvEaLuDQEz5xs2wAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">CgFyuGIIr0Wu8GAh+39BGwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="D6wXtZ50QEK9SSp4FPWnswAA">
+<XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
+<XPD:REF name="Owner">CgFyuGIIr0Wu8GAh+39BGwAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="Bf0wjZtzQUGrzT8dmXJa7AAA">
+<XPD:ATTR name="Name" type="string">StandardService</XPD:ATTR>
+<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="1VwU1BIc+EuVvasnvAaH2QAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">Bf0wjZtzQUGrzT8dmXJa7AAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="St67EIi7W0SFFA6LWetT7AAA">
+<XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
+<XPD:REF name="Owner">Bf0wjZtzQUGrzT8dmXJa7AAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLClass" guid="xDjciYOEF0mp03FzC7+8ggAA">
+<XPD:ATTR name="Name" type="string">StandardEngine</XPD:ATTR>
+<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[4]" type="UMLClass" guid="P5u0fGItnkiyG/cDHJBSfAAA">
+<XPD:ATTR name="Name" type="string">StandardHost</XPD:ATTR>
+<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="XKCWCnv1qkeV8FAQS04B+wAA">
+<XPD:ATTR name="Name" type="string">coyote</XPD:ATTR>
+<XPD:REF name="Namespace">Ly/Vq2T3+k6ejzkPFVSdyQAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLInterface" guid="453wofIXJEa10uoF6u6lNAAA">
+<XPD:ATTR name="Name" type="string">ProtocolHandler</XPD:ATTR>
+<XPD:REF name="Namespace">XKCWCnv1qkeV8FAQS04B+wAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLPackage" guid="5K7yGueAWEKlHsCxgLgZMwAA">
+<XPD:ATTR name="Name" type="string">tomcat</XPD:ATTR>
+<XPD:REF name="Namespace">Ly/Vq2T3+k6ejzkPFVSdyQAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="fdFMvx/eqUK18I5b5DkddwAA">
+<XPD:ATTR name="Name" type="string">util</XPD:ATTR>
+<XPD:REF name="Namespace">5K7yGueAWEKlHsCxgLgZMwAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="PAtq5WIWaEu2S1cGYh2dtgAA">
+<XPD:ATTR name="Name" type="string">digester</XPD:ATTR>
+<XPD:REF name="Namespace">fdFMvx/eqUK18I5b5DkddwAA</XPD:REF>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="MCdO2KE7qEar7aNaxei0ywAA">
+<XPD:ATTR name="Name" type="string">Digester</XPD:ATTR>
+<XPD:REF name="Namespace">PAtq5WIWaEu2S1cGYh2dtgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>
