@@ -354,6 +354,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		
 		SipSessionKey key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage(), inverted);
 		SipSessionImpl sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl);
+		
+		// Added by Vladimir because the inversion detection on proxied requests doesn't work
+		if(sipSession == null) {
+			key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage(), !inverted);
+			sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl);
+		}
+		
 		if(sipSession == null) {			
 			logger.error("Cannot find the corresponding sip session to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
