@@ -338,6 +338,7 @@ public class ProxyImpl implements Proxy {
 		// Check if we are waiting for more response
 		if(allResponsesHaveArrived())
 		{
+			bestResponse.getSipSession().setProxyBranch(branch);
 			sendBestFinalResponse(bestResponse);
 		}
 

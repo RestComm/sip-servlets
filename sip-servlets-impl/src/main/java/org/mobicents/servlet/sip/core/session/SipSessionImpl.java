@@ -37,6 +37,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -59,6 +60,8 @@ public class SipSessionImpl implements SipSession {
 	private ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners;
 	private ArrayList<SipSessionBindingListener> sipSessionBindingListeners;
 	private ArrayList<SipSessionListener> sipSessionListeners;
+	
+	private ProxyBranchImpl proxyBranch;
 
 	private HashMap<String, Object> sipSessionAttributeMap;
 	
@@ -511,7 +514,7 @@ public class SipSessionImpl implements SipSession {
 	}
 	
 	public boolean isSupervisedMode() {
-		return supervisedMode;
+		return this.supervisedMode;
 	}
 
 	public void setSupervisedMode(boolean supervisedMode) {
@@ -585,5 +588,13 @@ public class SipSessionImpl implements SipSession {
 	 */
 	public void setKey(SipSessionKey key) {
 		this.key = key;
+	}
+
+	public ProxyBranchImpl getProxyBranch() {
+		return proxyBranch;
+	}
+
+	public void setProxyBranch(ProxyBranchImpl proxyBranch) {
+		this.proxyBranch = proxyBranch;
 	}
 }

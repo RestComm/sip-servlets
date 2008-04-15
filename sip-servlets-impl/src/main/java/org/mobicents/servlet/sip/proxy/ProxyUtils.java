@@ -23,6 +23,7 @@ import javax.sip.message.Response;
 
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -38,14 +39,29 @@ public class ProxyUtils {
 		this.proxy = proxy;
 	}
 	
-	public SipServletRequestImpl createProxiedRequest(SipServletRequestImpl originalRequest, ProxyBranchImpl proxyBranch, ProxyParams params)
+	public Request createProxiedRequest(SipServletRequestImpl originalRequest, ProxyBranchImpl proxyBranch, ProxyParams params)
 	{
 		try {
 			Request clonedRequest = (Request) originalRequest.getMessage().clone();
 
-			javax.sip.address.SipURI target = SipFactories.addressFactory.createSipURI(
+			// The target is null when proxying subsequent requests (the Route header is already there)
+			if(params.target != null)
+			{
+				javax.sip.address.SipURI target = SipFactories.addressFactory.createSipURI(
 					params.target.getUser(), params.target.getHost());
-			clonedRequest.setRequestURI(target);
+				clonedRequest.setRequestURI(target);
+				
+				// Add route header
+				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
+						params.target.getUser(), params.target.getHost());
+				routeUri.setPort(params.target.getPort());
+				routeUri.setLrParam();
+				javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.target.getUser(),
+						routeUri);
+				RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
+				
+				clonedRequest.setHeader(rheader);
+			}
 
 			// Decrease max forwards if available
 			MaxForwardsHeader mf = (MaxForwardsHeader) clonedRequest
@@ -57,17 +73,6 @@ public class ProxyUtils {
 				mf.setMaxForwards(mf.getMaxForwards() - 1);
 			}
 
-			// Add route header
-			javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
-					params.target.getUser(), params.target.getHost());
-			routeUri.setPort(params.target.getPort());
-			routeUri.setLrParam();
-			javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.target.getUser(),
-					routeUri);
-			RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
-			
-			clonedRequest.setHeader(rheader);
-			
 			String transport = JainSipUtils.findTransport(clonedRequest);
 			//Add via header
 			ViaHeader viaHeader = null;
@@ -166,21 +171,8 @@ public class ProxyUtils {
 					clonedRequest.addHeader(pathHeader);
 				}
 			}
-			SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-					sipFactoryImpl.getSipProviders(), transport);
-			ClientTransaction tx = sipProvider.getNewClientTransaction(clonedRequest);
-			SipServletRequestImpl ret = new	SipServletRequestImpl(
-					clonedRequest,
-					sipFactoryImpl,
-					originalRequest.getSipSession(),
-					tx, null, false);
-			//JSR 289 Section 15.1.6
-			ret.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 			
-			ret.getTransactionApplicationData().setProxyBranch(proxyBranch);
-			tx.setApplicationData(ret.getTransactionApplicationData());
-
-			return ret;
+			return clonedRequest;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

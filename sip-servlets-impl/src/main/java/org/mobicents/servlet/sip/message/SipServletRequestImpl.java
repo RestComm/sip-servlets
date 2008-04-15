@@ -685,6 +685,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				JainSipUtils.findTransport(request));
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
+		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_ROUTER_ROUTE, "true");
+		
 		sipURI.setLrParam();
 		javax.sip.address.Address recordRouteAddress = 
 			SipFactories.addressFactory.createAddress(sipURI);

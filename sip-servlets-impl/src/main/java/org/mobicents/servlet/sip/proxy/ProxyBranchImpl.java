@@ -8,12 +8,21 @@ import java.util.List;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.sip.ClientTransaction;
+import javax.sip.SipException;
+import javax.sip.SipProvider;
+import javax.sip.TransactionUnavailableException;
+import javax.sip.header.RouteHeader;
+import javax.sip.message.Request;
 
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -142,20 +151,22 @@ public class ProxyBranchImpl implements ProxyBranch {
 		if(proxy.getRecordRoute())
 			recordRoute = getRecordRouteURI();
 		
-		SipServletRequestImpl cloned = (SipServletRequestImpl) 
-			this.proxyUtils.createProxiedRequest(originalRequest,
-					this,
-					new ProxyParams(this.targetURI, this.outboundInterface,
-							recordRoute, this.pathURI));
+		Request cloned = this.proxyUtils.createProxiedRequest(
+				originalRequest,
+				this,
+				new ProxyParams(this.targetURI,
+				this.outboundInterface,
+				recordRoute, 
+				this.pathURI));
 
 		try {
-			cloned.send();
+			forwardRequest(cloned, false);
 			//tells the application dispatcher to stop routing the original request
 			//since it has been proxied
 			originalRequest.setRoutingState(RoutingState.PROXIED);
 			started = true;
 			
-			if(cloned.getMethod().equals("INVITE"))
+			if(cloned.getMethod().equalsIgnoreCase("INVITE"))
 			{
 				// Send provisional TRYING. Chapter 10.2
 				SipServletResponse trying =
@@ -166,6 +177,51 @@ public class ProxyBranchImpl implements ProxyBranch {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void forwardRequestStateless(Request request)
+	{
+		String transport = JainSipUtils.findTransport(request);
+		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+				sipFactoryImpl.getSipProviders(), transport);
+		try {
+			sipProvider.sendRequest(request);
+		} catch (SipException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void forwardRequest(Request request, boolean subsequent) throws TransactionUnavailableException
+	{
+		String transport = JainSipUtils.findTransport(request);
+		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+				sipFactoryImpl.getSipProviders(), transport);
+		ClientTransaction tx = sipProvider.getNewClientTransaction(request);
+		SipServletRequestImpl clonedRequest = new	SipServletRequestImpl(
+				request,
+				sipFactoryImpl,
+				null,
+				tx, null, false);
+		
+		// Initialize the sip session for the new request if initial
+		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
+		SipSessionImpl newSession = (SipSessionImpl) clonedRequest.getSession(true);
+		
+		// Use the original dialog in the new session
+		newSession.setSessionCreatingDialog(originalRequest.getSipSession().getSessionCreatingDialog());
+		
+		// And set a reference to the proxy branch
+		newSession.setProxyBranch(this);
+		
+		
+		//JSR 289 Section 15.1.6
+		if(!subsequent) // Subsequent requests can't have a routing directive?
+			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
+		
+		//ret.getTransactionApplicationData().setProxyBranch(proxyBranch);
+		tx.setApplicationData(clonedRequest.getTransactionApplicationData());
+		
+		clonedRequest.send();
 	}
 	
 	public void onResponse(SipServletResponseImpl response)
@@ -217,6 +273,34 @@ public class ProxyBranchImpl implements ProxyBranch {
 
 	public boolean isTimedOut() {
 		return timedOut;
+	}
+	
+	public void proxyInDialogRequest(SipServletRequestImpl request)
+	{
+		// No proxy params, sine the target is already in the Route headers
+		ProxyParams params = new ProxyParams(null, null, null, null);
+		Request clonedRequest = 
+			proxyUtils.createProxiedRequest(request, this, params);
+
+		clonedRequest.removeFirst(RouteHeader.NAME);
+	
+		String transport = JainSipUtils.findTransport(clonedRequest);
+		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+				sipFactoryImpl.getSipProviders(), transport);
+		
+		try {
+			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK))
+			{
+				sipProvider.sendRequest(clonedRequest);
+			}
+			else
+			{
+				forwardRequest(clonedRequest, true);
+			}
+		} catch (SipException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

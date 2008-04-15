@@ -89,6 +89,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public static final String RR_PARAM_APPLICATION_NAME = "AppName";
 	public static final String RR_PARAM_HANDLER_NAME = "Handler";
 	
+	/* This parameter is to distinguish between the RecordRoute headers
+	 * added by the AR and those added by a proxy.
+	 */
+	public static final String RR_PARAM_APPLICATION_ROUTER_ROUTE = "ARRoute";
+	
 	private static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
@@ -336,6 +341,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		}
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
+		String applicationRouterRoute = poppedAddress.getParameter(RR_PARAM_APPLICATION_ROUTER_ROUTE);
 		if(applicationName == null || applicationName.length() < 1 || 
 				handlerName == null || handlerName.length() < 1) {
 			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
@@ -373,8 +379,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					
 		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
 		try {
-			Servlet servlet = servletWrapper.allocate();
-			servlet.service(sipServletRequest, null);
+			
+			// First check if this node is a Record-Route added by a proxy
+			if(applicationRouterRoute != null && sipServletRequest.getSipSession().getProxyBranch() != null)
+			{
+				ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
+				if(proxyBranch.getProxy().getSupervised())
+				{
+					Servlet servlet = servletWrapper.allocate();
+					servlet.service(sipServletRequest, null);
+				}
+				proxyBranch.proxyInDialogRequest(sipServletRequest);
+			}
+			// If it's not for a proxy then it's just an AR, so go to the next application
+			else
+			{
+				Servlet servlet = servletWrapper.allocate();
+				servlet.service(sipServletRequest, null);
+			}
 		} catch (ServletException e) {				
 			logger.error(e);
 			// Sends a 500 Internal server error and stops processing.				
@@ -760,7 +782,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			
 			try {
 				// See if this is a response to a proxied request
-				ProxyBranchImpl proxyBranch = tad.getProxyBranch();
+				ProxyBranchImpl proxyBranch = session.getProxyBranch();
 				if(proxyBranch != null)
 				{
 					// Handle it at the branch
