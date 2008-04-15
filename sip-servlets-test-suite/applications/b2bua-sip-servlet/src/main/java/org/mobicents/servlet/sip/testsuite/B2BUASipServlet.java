@@ -17,6 +17,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
@@ -26,7 +27,7 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-		logger.info("Got request:\n" + request.getMethod());
+		logger.info("Got request:\n" + request);
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);
 		B2buaHelper helper = request.getB2buaHelper();

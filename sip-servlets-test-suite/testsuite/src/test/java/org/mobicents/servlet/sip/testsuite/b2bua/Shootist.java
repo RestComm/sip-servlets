@@ -201,7 +201,7 @@ public class Shootist implements SipListener {
 			// create Request URI
 			String peerHostPort = peerHost + ":" + peerPort;
 			SipURI requestURI = protocolObjects.addressFactory.createSipURI(
-					toUser, peerHostPort);
+					toUser, toSipAddress);
 
 			// Create ViaHeaders
 
