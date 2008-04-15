@@ -1,0 +1,53 @@
+<!-- Use the  Trace Viewer in src/tools/tracesviewer to view this  trace  
+Here are the stack configuration properties 
+javax.sip.IP_ADDRESS= null
+javax.sip.STACK_NAME= shootist
+javax.sip.ROUTER_PATH= null
+javax.sip.OUTBOUND_PROXY= 127.0.0.1:5070/udp
+-->
+<message
+from="127.0.0.1:5080" 
+to="127.0.0.1:5070" 
+time="1194923872952"
+isSender="true" 
+transactionId="z9hg4bk13e09ae4b46bbb636fd0bf150a52c277" 
+callId="4ba1823384d23f474c3bb77d97c16229@127.0.0.1" 
+firstLine="INVITE sip:LittleGuy@127.0.0.1:5070 SIP/2.0" 
+>
+<![CDATA[INVITE sip:LittleGuy@127.0.0.1:5070 SIP/2.0
+Call-ID: 4ba1823384d23f474c3bb77d97c16229@127.0.0.1
+CSeq: 1 INVITE
+From: "The Master Blaster" <sip:BigGuy@here.com>;tag=12345
+To: "The Little Blister" <sip:LittleGuy@there.com>
+Via: SIP/2.0/UDP 127.0.0.1:5080;branch=z9hG4bK13e09ae4b46bbb636fd0bf150a52c277
+Max-Forwards: 70
+Contact: "BigGuy" <sip:BigGuy@127.0.0.1:5080>
+My-Header: my header value
+Content-Type: application/sdp
+My-Other-Header: my new header value
+Call-Info: <http://www.antd.nist.gov>
+Content-Length: 247
+
+]]>
+</message>
+
+<message
+from="127.0.0.1:5070" 
+to="127.0.0.1:5080" 
+time="1194923873202"
+isSender="false" 
+transactionId="z9hg4bk13e09ae4b46bbb636fd0bf150a52c277" 
+callId="4ba1823384d23f474c3bb77d97c16229@127.0.0.1" 
+firstLine="SIP/2.0 100 Trying" 
+>
+<![CDATA[SIP/2.0 100 Trying
+Call-ID: 4ba1823384d23f474c3bb77d97c16229@127.0.0.1
+CSeq: 1 INVITE
+From: "The Master Blaster" <sip:BigGuy@here.com>;tag=12345
+To: "The Little Blister" <sip:LittleGuy@there.com>
+Via: SIP/2.0/UDP 127.0.0.1:5080;branch=z9hG4bK13e09ae4b46bbb636fd0bf150a52c277
+Content-Length: 0
+
+]]>
+</message>
+

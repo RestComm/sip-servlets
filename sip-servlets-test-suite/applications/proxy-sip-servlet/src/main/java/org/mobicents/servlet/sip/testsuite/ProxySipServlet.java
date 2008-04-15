@@ -37,6 +37,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 

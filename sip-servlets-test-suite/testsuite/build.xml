@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="test-suite" name="sip-servlets-test-suite">
     <property environment="env"/>
-    <property name="M2_REPO" value="C:/Documents and Settings/dragan/.m2/repository"/>
+    <property name="M2_REPO" value="C:/Documents and Settings/mranga/.m2/repository"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.5"/>

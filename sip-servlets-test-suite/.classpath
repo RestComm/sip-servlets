@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" path="applications/b2bua-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/proxy-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/proxy-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="testsuite/target/classes" path="testsuite/src/main/java"/>
 	<classpathentry kind="src" path="testsuite/src/test/resources"/>

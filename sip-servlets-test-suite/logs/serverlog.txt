@@ -1,0 +1,64 @@
+<!-- Use the  Trace Viewer in src/tools/tracesviewer to view this  trace  
+Here are the stack configuration properties 
+javax.sip.IP_ADDRESS= null
+javax.sip.STACK_NAME= SIP-Servlet-Tomcat-Server
+javax.sip.ROUTER_PATH= null
+javax.sip.OUTBOUND_PROXY= null
+-->
+<message
+from="127.0.0.1:5080" 
+to="127.0.0.1:5070" 
+time="1194923872952"
+isSender="false" 
+transactionId="z9hg4bk13e09ae4b46bbb636fd0bf150a52c277" 
+callId="4ba1823384d23f474c3bb77d97c16229@127.0.0.1" 
+firstLine="INVITE sip:LittleGuy@127.0.0.1:5070 SIP/2.0" 
+>
+<![CDATA[INVITE sip:LittleGuy@127.0.0.1:5070 SIP/2.0
+Call-ID: 4ba1823384d23f474c3bb77d97c16229@127.0.0.1
+CSeq: 1 INVITE
+From: "The Master Blaster" <sip:BigGuy@here.com>;tag=12345
+To: "The Little Blister" <sip:LittleGuy@there.com>
+Via: SIP/2.0/UDP 127.0.0.1:5080;branch=z9hG4bK13e09ae4b46bbb636fd0bf150a52c277
+Max-Forwards: 70
+Contact: "BigGuy" <sip:BigGuy@127.0.0.1:5080>
+My-Header: my header value
+Content-Type: application/sdp
+My-Other-Header: my new header value
+Call-Info: <http://www.antd.nist.gov>
+Content-Length: 247
+
+v=0
+o=4855 13760799956958020 13760799956958020 IN IP4  129.6.55.78
+s=mysession session
+p=+46 8 52018010
+c=IN IP4  129.6.55.78
+t=0 0
+m=audio 6022 RTP/AVP 0 4 18
+a=rtpmap:0 PCMU/8000
+a=rtpmap:4 G723/8000
+a=rtpmap:18 G729A/8000
+a=ptime:20
+]]>
+</message>
+
+<message
+from="127.0.0.1:5070" 
+to="127.0.0.1:5080" 
+time="1194923873187"
+isSender="true" 
+transactionId="z9hg4bk13e09ae4b46bbb636fd0bf150a52c277" 
+callId="4ba1823384d23f474c3bb77d97c16229@127.0.0.1" 
+firstLine="SIP/2.0 100 Trying" 
+>
+<![CDATA[SIP/2.0 100 Trying
+Call-ID: 4ba1823384d23f474c3bb77d97c16229@127.0.0.1
+CSeq: 1 INVITE
+From: "The Master Blaster" <sip:BigGuy@here.com>;tag=12345
+To: "The Little Blister" <sip:LittleGuy@there.com>
+Via: SIP/2.0/UDP 127.0.0.1:5080;branch=z9hG4bK13e09ae4b46bbb636fd0bf150a52c277
+Content-Length: 0
+
+]]>
+</message>
+

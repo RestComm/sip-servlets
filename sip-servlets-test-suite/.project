@@ -1,7 +1,10 @@
 <projectDescription>
   <name>sip-servlets-test-suite</name>
   <comment/>
-  <projects/>
+  <projects>
+    <project>sip-servlets-spec</project>
+    <project>sip-servlets-impl</project>
+  </projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
