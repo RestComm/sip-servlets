@@ -18,6 +18,13 @@ Note that path="/click2call" is important.
 
 To use:
 You can now run Tomcat or Jboss and navigate to http://localhost:8080/click2call/.
+If you have no registered SIp clients you will be asked to register at least two.
+Configure your SIP clients to use the sip servlets server as a register and proxy.
+It will accept any password, there is no autherntication. Afte rthat you will see
+a table where each cell will initiate a call between the corresponding clients.
+
+You can also navigate to http://localhost:8080/click2call/simplecall.html, which is
+a simplified version that doesn't require registered clients.
 You will see the index page where you can enter two SIP URIs. Enter the URIs
 of two SIP phones and click "Submit". The SIP phones don't have to be registered.
 I recommend using 3CX Phone and SJ Phone as the two phones in this demo
