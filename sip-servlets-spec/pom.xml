@@ -30,8 +30,8 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<echo message ="${tomcat.home}" />
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}/lib"/>
+										<echo message ="${env.CATALINA_HOME}" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -56,7 +56,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jboss.home}/server/default/lib"/>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/lib"/>
 									</tasks>
 								</configuration>
 								<goals>
