@@ -180,11 +180,11 @@ public class Shootist implements SipListener {
 								.getNewClientTransaction(byeRequest);
 						dialog.sendRequest(ct);
 
-					} else if(cseq.getMethod().equals(Request.BYE)) {
-
-						   ended = true;
 					}
 
+				} else if(cseq.getMethod().equals(Request.BYE)) {
+
+					   ended = true;
 				}
 			}
 		} catch (Exception ex) {
