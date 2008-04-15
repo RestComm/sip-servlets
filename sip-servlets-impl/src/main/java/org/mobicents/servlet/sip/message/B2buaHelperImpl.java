@@ -54,6 +54,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 		this.sipFactoryImpl = sipServletRequest.sipFactoryImpl; 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipServletRequest, boolean, java.util.Map)
+	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest,
 			boolean linked, Map<String, Set<String>> headerMap)
 			throws IllegalArgumentException {
@@ -95,7 +99,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 					.getSipApplicationSession();
 
 			SipSessionImpl session = new SipSessionImpl(sipFactoryImpl, appSession);
-
+			session.setHandler(originalSession.getHandler());
+			session.setSipContext(originalSession.getSipContext());
+			
 			SipServletRequestImpl retVal = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,
@@ -116,6 +122,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipSession, javax.servlet.sip.SipServletRequest, java.util.Map)
+	 */
 	public SipServletRequest createRequest(SipSession session,
 			SipServletRequest origRequest, Map<String, Set<String>> headerMap)
 			throws IllegalArgumentException {
@@ -157,6 +167,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#createResponseToOriginalRequest(javax.servlet.sip.SipSession, int, java.lang.String)
+	 */
 	public SipServletResponse createResponseToOriginalRequest(
 			SipSession session, int status, String reasonPhrase) {
 

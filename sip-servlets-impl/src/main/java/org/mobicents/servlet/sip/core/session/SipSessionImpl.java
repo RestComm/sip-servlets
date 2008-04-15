@@ -2,10 +2,11 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -29,10 +30,10 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.message.SipServletMessageImpl;
-import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -45,7 +46,8 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class SipSessionImpl implements SipSession {
-
+	private static final Log logger = LogFactory.getLog(SipSessionImpl.class);
+	
 	private SipApplicationSessionImpl sipApplicationSession;	
 	
 	private ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners;
@@ -121,8 +123,9 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private Transaction sessionCreatingTransaction;
 	// =============================================================
-	
-	private Set<Transaction> ongoingTransactions = new TreeSet<Transaction>();
+		
+	private Set<Transaction> ongoingTransactions = 
+		Collections.synchronizedSet(new HashSet<Transaction>());
 	
 	private boolean supervisedMode;
 
@@ -438,14 +441,6 @@ public class SipSessionImpl implements SipSession {
 		
 		return sipFactory.getSipProviders();
 	}
-
-	
-	public void onTransactionTimeout(Transaction transaction)
-	{
-		TransactionApplicationData txApplData = (TransactionApplicationData) transaction.getApplicationData();
-		SipServletMessageImpl sipServletMessage = txApplData.getSipServletMessage();
-		this.ongoingTransactions.remove(sipServletMessage);
-	}
 	
 	public void onDialogTimeout(Dialog dialog)
 	{
@@ -467,7 +462,19 @@ public class SipSessionImpl implements SipSession {
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
 		this.ongoingTransactions.add(transaction);
-		
+		if(logger.isDebugEnabled()) {
+			logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
+		}
+	}
+	
+	/**
+	 * Remove an ongoing tx to the session.
+	 */
+	public void removeOngoingTransaction(Transaction transaction) {
+		this.ongoingTransactions.remove(transaction);
+		if(logger.isDebugEnabled()) {
+			logger.debug("transaction "+ transaction +" has been removed from sip session's ongoingTransactions" );
+		}		
 	}
 	
 	public Collection<Transaction>  getOngoingTransactions() {

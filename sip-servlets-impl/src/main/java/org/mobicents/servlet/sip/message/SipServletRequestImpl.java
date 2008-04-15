@@ -636,7 +636,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// Make the dialog point here so that when the dialog event
 				// comes in we can find the session quickly.
 				if (dialog != null)
-					dialog.setApplicationData(super.getSession());
+					dialog.setApplicationData(this.transactionApplicationData);
 
 				// SIP Request is ALWAYS pointed to by the client tx.
 				// Notice that the tx appplication data is cached in the request

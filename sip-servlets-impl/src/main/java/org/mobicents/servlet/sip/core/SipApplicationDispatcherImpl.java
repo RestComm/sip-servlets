@@ -27,6 +27,7 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.SipSession.State;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
@@ -110,8 +111,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = new HashMap<String, SipContext>();
-		sipFactoryImpl = new SipFactoryImpl();
-//		sipProviders = Collections.synchronizedSet(new HashSet<SipProvider>());		
+		sipFactoryImpl = new SipFactoryImpl();		
 	}
 	
 	/**
@@ -218,9 +218,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */	
-	public void processDialogTerminated(DialogTerminatedEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
+		// TODO FIXME
+		Dialog dialog = dialogTerminatedEvent.getDialog();
+		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
+		tad.getSipSession().onDialogTimeout(dialog);		
 	}
 	/**
 	 * {@inheritDoc}
@@ -523,8 +525,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		Response response = responseEvent.getResponse();
 		
 		// See if this transaction has been here before
-		Object appData = responseEvent.getClientTransaction().getApplicationData();
-		if(appData instanceof org.mobicents.servlet.sip.message.TransactionApplicationData)
+		Object appData = null;
+		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
+		Dialog dialog = responseEvent.getDialog();
+		if(clientTransaction != null) {
+			appData = clientTransaction.getApplicationData();
+		} else if(dialog != null){			
+			appData = dialog.getApplicationData();
+		}
+		if(appData != null && appData instanceof org.mobicents.servlet.sip.message.TransactionApplicationData)
 		{
 			org.mobicents.servlet.sip.message.TransactionApplicationData tad =
 				(org.mobicents.servlet.sip.message.TransactionApplicationData) appData;
@@ -559,6 +568,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			{
 				callServlet(sipServletResponse, session);
 			}
+		} else {
+			logger.error("the response doesn't have any clientTx nor dialog associated with it" +
+					" or they contain no TransactionApplicationData !");
 		}
 	}
 	
@@ -597,38 +609,34 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void processTimeout(TimeoutEvent arg0) {
+	public void processTimeout(TimeoutEvent timeoutEvent) {
 		// TODO: FIX ME
 		Transaction tx = null;
-		if(arg0.isServerTransaction())
-		{
-			tx = arg0.getServerTransaction();
-		}
-		else
-		{
-			tx = arg0.getClientTransaction();
+		if(timeoutEvent.isServerTransaction()) {
+			tx = timeoutEvent.getServerTransaction();
+		} else {
+			tx = timeoutEvent.getClientTransaction();
 		}
 		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();
-		tad.getSipSession().onTransactionTimeout(tx);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Removing transaction from sip session's ongoingTransactions " +  tx);
+		}
+		tad.getSipSession().removeOngoingTransaction(tx);
 
 	}
 	/**
 	 * {@inheritDoc}
 	 */
-	public void processTransactionTerminated(TransactionTerminatedEvent arg0) {
+	public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
 		// TODO: FIX ME
 		Transaction tx = null;
-		if(arg0.isServerTransaction())
-		{
-			tx = arg0.getServerTransaction();
+		if(transactionTerminatedEvent.isServerTransaction()) {
+			tx = transactionTerminatedEvent.getServerTransaction();
+		} else {
+			tx = transactionTerminatedEvent.getClientTransaction();
 		}
-		else
-		{
-			tx = arg0.getClientTransaction();
-		}
-		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();
-		tad.getSipSession().onTransactionTimeout(tx);
-		
+		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();		
+		tad.getSipSession().removeOngoingTransaction(tx);				
 	}
 
 	/**
