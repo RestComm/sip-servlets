@@ -6,7 +6,7 @@
 	<description>B2BUA Sip Servlet</description>
 	
 	<main-servlet>
-		ProxySipServlet
+		B2BUASipServlet
 	</main-servlet>
 
 	<servlet>
