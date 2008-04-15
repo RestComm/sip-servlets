@@ -148,10 +148,14 @@ public class ProxyBranchImpl implements ProxyBranch {
 		try {
 			cloned.send();
 			started = true;
-			// Send provisional TRYING
-			SipServletResponse trying =
-				originalRequest.createResponse(100);
-			trying.send();
+			
+			if(cloned.getMethod().equals("INVITE"))
+			{
+				// Send provisional TRYING. Chapter 10.2
+				SipServletResponse trying =
+					originalRequest.createResponse(100);
+				trying.send();
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
