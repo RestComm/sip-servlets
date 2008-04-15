@@ -27,9 +27,9 @@ import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
-public class ProxyTest extends SipServletTestCase implements SipListener {
+public class ParallelProxyWithRecordRouteTest extends SipServletTestCase implements SipListener {
 
-	private static Log logger = LogFactory.getLog(ProxyTest.class);
+	private static Log logger = LogFactory.getLog(ParallelProxyWithRecordRouteTest.class);
 
 	protected Shootist shootist;
 
@@ -43,7 +43,7 @@ public class ProxyTest extends SipServletTestCase implements SipListener {
 
 	private static final int receiversCount = 1;
 
-	public ProxyTest(String name) {
+	public ParallelProxyWithRecordRouteTest(String name) {
 		super(name);
 	}
 
