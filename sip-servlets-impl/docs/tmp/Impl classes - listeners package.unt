@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="qKCTfVQ++0WtXPz8y0979AAA">
+<XPD:ATTR name="Name" type="string">listeners</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="prmh3VudyU+Lts3045fBfwAA">
+<XPD:ATTR name="Name" type="string">SipListenersHolder</XPD:ATTR>
+<XPD:REF name="Namespace">qKCTfVQ++0WtXPz8y0979AAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

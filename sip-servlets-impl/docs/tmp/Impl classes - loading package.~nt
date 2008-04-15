@@ -69,8 +69,7 @@
 </XPD:OBJ>
 <XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="IQsEhKR1zUedrMW++h82MAAA">
 <XPD:ATTR name="Name" type="string">listeners</XPD:ATTR>
-<XPD:ATTR name="TypeExpression" type="string">SipListenersHolder</XPD:ATTR>
-<XPD:REF name="Type_" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipListenersHolder">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+<XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
 <XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="PuQGc8mVp0KE5RObrc/s9AAA">

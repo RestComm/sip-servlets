@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="BvISeKg6PE+1rwPSr3SZgQAA">
+<XPD:ATTR name="Name" type="string">descriptor</XPD:ATTR>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

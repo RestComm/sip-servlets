@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="33nbT1WKG0uiBU7TgHsWUwAA">
+<XPD:ATTR name="Name" type="string">session</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="smzbDV5XNkKJjyjGsU9NgAAA">
+<XPD:ATTR name="Name" type="string">SipApplicationSessionImpl</XPD:ATTR>
+<XPD:REF name="Namespace">33nbT1WKG0uiBU7TgHsWUwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="zcrMBpO/g0+SWqsrta1WHAAA">
+<XPD:ATTR name="Name" type="string">SipSessionImpl</XPD:ATTR>
+<XPD:REF name="Namespace">33nbT1WKG0uiBU7TgHsWUwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="dS63KLOANUi/BdjLrHzmrwAA">
+<XPD:ATTR name="Name" type="string">SipListenersHolder</XPD:ATTR>
+<XPD:REF name="Namespace">33nbT1WKG0uiBU7TgHsWUwAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">19s/suTbIESHx+ehVZM8XAAA</XPD:REF>
+<XPD:REF name="Views[1]">/GFqrn6Xkk2B4r+v6EjcSQAA</XPD:REF>
+<XPD:REF name="Views[2]">O4gOn2wrOEaRnAkLRs2w9wAA</XPD:REF>
+<XPD:REF name="Views[3]">rroPiekhlkG8dLHJaKWgJQAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">7</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="0RUl60VeZU+JGfuwRvQq/AAA">
+<XPD:ATTR name="Name" type="string">getSipApplicationListeners</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="ZH81wddA8k6ri9xyk91fsAAA">
+<XPD:ATTR name="Name" type="string">getSipSessionListeners</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[2]" type="UMLOperation" guid="HaSF3OhblUWe3fxn2q7wBAAA">
+<XPD:ATTR name="Name" type="string">getSipSessionAttributeListeners</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[3]" type="UMLOperation" guid="E9BiRt+tmkS2gdl3G+dozwAA">
+<XPD:ATTR name="Name" type="string">getSipErrorListeners</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[4]" type="UMLOperation" guid="BE25R9PmfE+NNwTl+GR8fwAA">
+<XPD:ATTR name="Name" type="string">getServletContextListeners</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[5]" type="UMLOperation" guid="xLWr6izFdESlSZFvEKSXbQAA">
+<XPD:ATTR name="Name" type="string">getTimerListener</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[6]" type="UMLOperation" guid="0gN0HIx3ske35ztz6v7RCgAA">
+<XPD:ATTR name="Name" type="string">getSipServletsWithListeners</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl::listeners">IQsEhKR1zUedrMW++h82MAAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">7</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="cjhvPvdIf0+zAnAg7kFe9QAA">
+<XPD:ATTR name="Name" type="string">sipApplicationSessionListeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;SipApplicationSessionListener&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="Hc2NLgf2jkKlxOkH82FS2AAA">
+<XPD:ATTR name="Name" type="string">sipSessionListeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;SipSessionListener&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="YjEpc4lUQUy1uvHHZJ6ljAAA">
+<XPD:ATTR name="Name" type="string">sipSessionAttributeListeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;SipSessionAttributeListener&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="H9rsCx5jG0Ohw5LMyG0HvgAA">
+<XPD:ATTR name="Name" type="string">sipErrorListeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;SipErrorListener&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="WvdMh45mBEOuGauHRSjPogAA">
+<XPD:ATTR name="Name" type="string">servletContextListener</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;ServletContextListener&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="89UBeD1rD0K4ug8oKtpKgwAA">
+<XPD:ATTR name="Name" type="string">timerListener</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">TimerListener</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::TimerListener">1ssCH/dKWUKbhhM/0xfAdwAA</XPD:REF>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="2T/aJBbum026drBXm+SS/QAA">
+<XPD:ATTR name="Name" type="string">sipServletsWithListeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;String&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>
