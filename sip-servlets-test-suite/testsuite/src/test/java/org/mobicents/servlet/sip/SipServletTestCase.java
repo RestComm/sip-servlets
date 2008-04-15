@@ -30,7 +30,7 @@ public abstract class SipServletTestCase extends SipTestCase {
 		//starting tomcat
 		tomcat = new SipEmbedded();
 		tomcat.setPath(tomcatBasePath);		
-		tomcat.setLoggingFilePath(projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/logging.properties");
+		tomcat.setLoggingFilePath("file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/");
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
 		tomcat.startTomcat();

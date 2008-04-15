@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.router.DefaultApplicationRouter;
@@ -87,9 +88,10 @@ public class SipEmbedded {
 		System.setProperty("catalina.home", getPath());
 		System.setProperty("catalina.base", getPath());		
 		//logging configuration
-		System.setProperty("java.util.logging.config.file", loggingFilePath);
-		BasicConfigurator.configure();
-		PropertyConfigurator.configure(loggingFilePath);		
+		System.setProperty("java.util.logging.config.file", loggingFilePath + "logging.properties");
+		DOMConfigurator.configure(new URL(loggingFilePath + "log4j.xml"));		
+//		BasicConfigurator.configure();
+//		PropertyConfigurator.configure(loggingFilePath);		
 		//Those are for trying to make it work under mvn test command
 		// don't know why but some jars aren't loaded
 		setSecurityProtection();

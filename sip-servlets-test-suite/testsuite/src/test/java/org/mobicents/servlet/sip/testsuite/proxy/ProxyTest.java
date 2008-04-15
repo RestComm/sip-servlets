@@ -23,7 +23,7 @@ public class ProxyTest extends SipServletTestCase{
 	private SipPhone sipPhoneSender;
 	private SipPhone[] sipPhoneReceivers;
 	
-	private static final int timeout = 10000;
+	private static final int timeout = 5000;
 	
 	private static final int receiversCount = 1;
 	
