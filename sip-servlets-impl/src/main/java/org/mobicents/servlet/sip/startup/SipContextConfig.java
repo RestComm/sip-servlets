@@ -84,7 +84,13 @@ public class SipContextConfig extends ContextConfig implements
 					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
 				}
 				super.start();
-			}				
+			}			
+			
+			//annotations scanning
+			SipStandardContext sipctx = (SipStandardContext) context;
+			ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath() + "/WEB-INF/classes/", sipctx);
+			scanner.scan();
+			
 			InputStream sipXmlInputStream = servletContext
 					.getResourceAsStream(SipContext.APPLICATION_SIP_XML);
 			// processing of the sip.xml file
@@ -93,11 +99,11 @@ public class SipContextConfig extends ContextConfig implements
 					logger.debug(SipContext.APPLICATION_SIP_XML + " has been found !");
 				}
 				context.setWrapperClass(SipServletImpl.class.getName());
-				//annotations scanning
-				SipStandardContext sipctx = (SipStandardContext) context;
-				ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath() + "/WEB-INF/classes/", sipctx);
-				scanner.scan();
-				//
+
+				scanner.loadParsedDataInServlet(); // This method can be called
+													// only after SipServletImpl
+													// wrapper is set.
+				
 				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
 	                    xmlNamespaceAware,
 	                    new SipRuleSet());
@@ -116,14 +122,16 @@ public class SipContextConfig extends ContextConfig implements
 							e);
 					ok = false;
 				}
-				// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
-				if(scanner.isApplicationParsed()) { 
-					ok = true;
-				}
 			} else {
 				logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
 				ok = false;
-			}			
+			}	
+			
+			// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
+			if(scanner.isApplicationParsed()) { 
+				ok = true;
+			}
+			
 			// Make our application available if no problems were encountered
 			if (ok) {
 				if(logger.isDebugEnabled()) {

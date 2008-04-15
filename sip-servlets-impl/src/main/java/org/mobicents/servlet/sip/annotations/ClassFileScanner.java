@@ -42,6 +42,8 @@ public class ClassFileScanner {
 	
 	private URLClassLoader classLoader;
 	
+	SipServletImpl parsedServletData = null;
+	
 	public ClassFileScanner(String docbase, SipStandardContext ctx) {
 		this.docbase = docbase;
 		this.sipContext = ctx;
@@ -116,60 +118,86 @@ public class ClassFileScanner {
     
     
     private void processServletAnnotation(Class<?> clazz) {
-    	SipServlet servlet = (SipServlet) clazz.getAnnotation(SipServlet.class);
-    	if(servlet == null) return;
+		SipServlet servlet = (SipServlet) clazz.getAnnotation(SipServlet.class);
+		if (servlet == null)
+			return;
+		
+		this.parsedServletData = new SipServletImpl();
+
+		String appName = null;
+		if (servlet.applicationName() == null
+				|| servlet.applicationName().equals("")) {
+			// String packageName = clazz.getCanonicalName().substring(0,
+			// clazz.getCanonicalName().lastIndexOf('.'));
+			// Wasted a whole day watching this line...
+			Package pack = clazz.getPackage();
+			String packageName = pack.getName();
+
+			SipApplication appData = getApplicationAnnotation(pack);
+			if (appData != null) {
+				if (this.parsedAnnotatedPackage != null
+						&& !this.parsedAnnotatedPackage.equals(packageName)) {
+					throw new IllegalStateException(
+							"Cant have two different applications in a single context - "
+									+ packageName + " and "
+									+ this.parsedAnnotatedPackage);
+				}
+
+				this.applicationParsed = true;
+				if (this.parsedAnnotatedPackage == null) {
+					this.parsedAnnotatedPackage = packageName;
+					parseSipApplication(sipContext, appData, packageName);
+				}
+				appName = sipContext.getName();
+			}
+		}
+
+		if (appName == null) {
+			appName = servlet.applicationName();
+		}
+
+		String name = null;
+		if (servlet.name() == null || servlet.name().equals("")) {
+			name = clazz.getSimpleName(); // if no name is specified deduce
+											// from the classname
+		} else {
+			name = servlet.name();
+		}
+
+		if (sipContext.getMainServlet() == null
+				|| sipContext.getMainServlet().equals("")) {
+			sipContext.setMainServlet(name);
+		}
+
+		parsedServletData.setName(name);
+		parsedServletData.setServletName(name);
+		parsedServletData.setDisplayName(name);
+		parsedServletData.setDescription(name + "description");
+		parsedServletData.setServletClass(clazz.getCanonicalName());
+		parsedServletData.setLoadOnStartup(1);
+		parsedServletData.setParent(sipContext);
+
+	}
+    
+    public void loadParsedDataInServlet() {
+    	if(this.parsedServletData == null)
+    		return; // If no data has been found in the annotations just return
     	
+    	SipServletImpl from = this.parsedServletData;
     	Wrapper wrapper = sipContext.createWrapper();
-    	if(wrapper instanceof SipServletImpl) {
-    		SipServletImpl sipServletImpl = (SipServletImpl) wrapper;
-
-    		String appName = null;
-    		if(servlet.applicationName() == null || servlet.applicationName().equals("")) {
-    			//String packageName = clazz.getCanonicalName().substring(0, clazz.getCanonicalName().lastIndexOf('.'));
-    			// Wasted a whole day watching this line...
-    			Package pack = clazz.getPackage();
-    			String packageName = pack.getName();
-    			
-    			SipApplication appData = getApplicationAnnotation(pack);
-    			if(appData != null) {
-    				if(this.parsedAnnotatedPackage != null && !this.parsedAnnotatedPackage.equals(packageName)) {
-    						throw new IllegalStateException("Cant have two different applications in a single context - "
-    								+ packageName + " and " + this.parsedAnnotatedPackage);
-    				}
-
-    	    		this.applicationParsed = true;
-    				if(this.parsedAnnotatedPackage == null) {
-    					this.parsedAnnotatedPackage = packageName;
-    					parseSipApplication(sipContext, appData, packageName);
-    				}
-    				appName = sipContext.getName();
-    			}
-    		} 
-    		
-    		if(appName == null) {
-    			appName = servlet.applicationName();
-    		}
-
-    		String name = null;
-    		if(servlet.name() == null || servlet.name().equals("")) {
-    			name = clazz.getSimpleName(); // if no name is specified deduce from the classname
-    		} else {
-    			name = servlet.name();
-    		}
-    		
-    		if(sipContext.getMainServlet() == null || sipContext.getMainServlet().equals("")) {
-    			sipContext.setMainServlet(name);
-    		}
-    		
-			sipServletImpl.setName(name);
-			sipServletImpl.setServletName(name);
-			sipServletImpl.setDisplayName(name);
-			sipServletImpl.setDescription(name + "description");
-    		sipServletImpl.setServletClass(clazz.getCanonicalName());
-    		sipServletImpl.setLoadOnStartup(1);
-    		sipServletImpl.setParent(sipContext);
-    		sipContext.addChild(sipServletImpl);
-    	}
+		if (wrapper instanceof SipServletImpl) {
+			SipServletImpl to = (SipServletImpl) wrapper;
+			to.setName(from.getName());
+			to.setServletName(from.getServletName());
+			to.setDisplayName(from.getDisplayName());
+			to.setDescription(from.getDescription());
+			to.setServletClass(from.getServletClass());
+			to.setLoadOnStartup(from.getLoadOnStartup());
+			to.setParent(sipContext);
+			sipContext.addChild(to);
+		} else {
+			throw new IllegalStateException("Failed loading sip servlet data from annotations.");
+		}
     }
     
     private SipStandardContext parseSipApplication(SipStandardContext context, SipApplication appData, String packageName) {
@@ -202,6 +230,18 @@ public class ClassFileScanner {
     		return sipApp;
     	}
     	return null;
+    }
+    
+    private static void copyParsedProperties(SipStandardContext from, SipStandardContext to) {
+    	to.setMainServlet(from.getMainServlet());
+    	to.setApplicationName(from.getApplicationName());
+    	to.setDisplayName(from.getDisplayName());
+    	to.setDistributable(from.getDistributable());
+    	to.setProxyTimeout(from.getProxyTimeout());
+    	to.setSessionTimeout(from.getSessionTimeout());
+    	to.setSmallIcon(from.getSmallIcon());
+    	to.setLargeIcon(from.getLargeIcon());
+    	to.setDescription(from.getDescription());
     }
 
     /**
