@@ -3,11 +3,6 @@
  */
 package org.mobicents.servlet.sip.core;
 
-import gov.nist.javax.sip.SipProviderImpl;
-import gov.nist.javax.sip.message.SIPRequest;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
-import gov.nist.javax.sip.stack.SIPTransaction;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -46,13 +41,11 @@ import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -164,9 +157,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void processRequest(RequestEvent requestEvent) {
-		
-		
-		SipProviderImpl sp = (SipProviderImpl)requestEvent.getSource();
+		SipProvider sp = (SipProvider)requestEvent.getSource();
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
 		Request request = requestEvent.getRequest();
 		logger.info("Got a request event "  + request.getMethod());
@@ -179,25 +170,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				return;
 			} catch ( TransactionAlreadyExistsException taex ) {
 				// Already processed this request so just return.
-				return;
-				
+				return;				
 			} 
 		}
 		SipSessionImpl session = sessionManager.getRequestSession(requestEvent,transaction);
 		
-		SipServletRequestImpl sipServletRequest = null;
-		
-		try
-		{
-			
+		SipServletRequestImpl sipServletRequest = null;		
+		try {			
 			sipServletRequest = new SipServletRequestImpl(
 					(SipProvider) requestEvent.getSource(),
 					session,
 					transaction,
 					session.getSessionCreatingDialog());
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			throw new RuntimeException("Failure getting the transaction for current request", e);
 		}
 		
@@ -220,6 +206,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(SipApplicationRoutingDirective.CONTINUE.equals(sipApplicationRoutingDirective) || 
 					SipApplicationRoutingDirective.REVERSE.equals(sipApplicationRoutingDirective)) {
 				//TODO get the original request : like directive where should it be retrieved ?
+
 			} 
 			
 			logger.info("Dispatching the request event");
@@ -256,7 +243,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						//returns the same value as before the invocation of application router.
 						break;
 					case NO_ROUTE :
-						// lear the value of popped route header such that SipServletRequest.getPoppedRoute() 
+						// clear the value of popped route header such that SipServletRequest.getPoppedRoute() 
 						//now returns null until another route header belonging to the container is popped.
 						sipServletRequest.setPoppedRoute(null);
 						break;				
@@ -276,7 +263,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 			} else {
 				// TODO set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
-	//			sipServletRequest.setRequestURI(new URIImpl(applicationRouterInfo.getSubscriberURI()));
+//				URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI()));
+//				if(subscriberUri instanceof javax.sip.address.SipURI) {
+//					sipServletRequest.setRequestURI(new SipURIImpl((javax.sip.address.SipURI)subscriberUri));
+//				} else (subscriberUri instanceof javax.sip.address.TelURL) {
+////					sipServletRequest.setRequestURI(new TelURIImpl((javax.sip.address.SipURI)subscriberUri));
+//				}
 				
 				// follow the procedures of Chapter 16 to select a servlet from the application.			
 				SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
@@ -284,7 +276,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSipSession()).getHandler();						
 				if(sipSessionHandlerName == null) {
 					String mainServlet = sipContext.getMainServlet();
-					sipSessionHandlerName = mainServlet;
+					sipSessionHandlerName = mainServlet;					
 					try {
 						sipServletRequest.getSession().setHandler(sipSessionHandlerName);
 					} catch (ServletException e) {
