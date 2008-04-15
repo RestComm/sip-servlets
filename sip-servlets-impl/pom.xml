@@ -76,6 +76,13 @@
 			<version>5.5.15</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>directory-naming</groupId>
+			<artifactId>naming-resources</artifactId>
+			<version>0.8</version>
+			<scope>provided</scope>			
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

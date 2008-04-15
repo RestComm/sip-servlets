@@ -3,10 +3,12 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import java.io.File;
 import java.util.Map;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
@@ -76,6 +78,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public synchronized void start() throws LifecycleException {
 		logger.info("Starting the sip context");
+		 // Add missing components as necessary
+        if (getResources() == null) {   // (1) Required by Loader
+            if (logger.isDebugEnabled())
+                logger.debug("Configuring default Resources");
+            try {
+                if ((getDocBase() != null) && (getDocBase().endsWith(".sar")) && (!(new File(getBasePath())).isDirectory()))
+                    setResources(new SARDirContext());                
+            } catch (IllegalArgumentException e) {
+                logger.error("Error initializing resources: " + e.getMessage());
+//                ok = false;
+            }
+        }
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
@@ -97,6 +111,35 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		logger.info("sip context started");
 	}
 
+	/**
+     * Get base path. Copy pasted from StandardContext Tomcat class
+     */
+    protected String getBasePath() {
+        String docBase = null;
+        Container container = this;
+        while (container != null) {
+            if (container instanceof Host)
+                break;
+            container = container.getParent();
+        }
+        File file = new File(getDocBase());
+        if (!file.isAbsolute()) {
+            if (container == null) {
+                docBase = (new File(engineBase(), getDocBase())).getPath();
+            } else {
+                // Use the "appBase" property of this container
+                String appBase = ((Host) container).getAppBase();
+                file = new File(appBase);
+                if (!file.isAbsolute())
+                    file = new File(engineBase(), appBase);
+                docBase = (new File(file, getDocBase())).getPath();
+            }
+        } else {
+            docBase = file.getPath();
+        }
+        return docBase;
+    }
+	
 	@Override
 	public synchronized void stop() throws LifecycleException {
 		logger.info("Stopping the sip context");

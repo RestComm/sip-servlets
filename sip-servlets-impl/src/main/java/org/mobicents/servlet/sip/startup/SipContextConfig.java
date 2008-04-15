@@ -21,6 +21,7 @@ import org.apache.catalina.startup.DigesterFactory;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
@@ -155,6 +156,7 @@ public class SipContextConfig extends ContextConfig implements
 			docBase = file.getCanonicalPath();
 		}
 		file = new File(docBase);
+		String origDocBase = docBase;
 		if ((docBase.toLowerCase().endsWith(".sar") || docBase.toLowerCase()
 				.endsWith(".war"))
 				&& !file.isDirectory() && unpackWARs) {
@@ -166,6 +168,11 @@ public class SipContextConfig extends ContextConfig implements
 			docBase = ExpandWar.expand(host, war, contextPath);
 			file = new File(docBase);
 			docBase = file.getCanonicalPath();
+			if (context instanceof SipStandardContext) {
+				FileDirContext fileDirContext =new FileDirContext();
+				fileDirContext.setDocBase(docBase);
+                ((SipStandardContext) context).setResources(fileDirContext );
+            }
 		} else {
 			File docDir = new File(docBase);
 			if (!docDir.exists()) {
@@ -187,6 +194,11 @@ public class SipContextConfig extends ContextConfig implements
 						break;
 					}
 				}
+				if (context instanceof SipStandardContext) {
+					FileDirContext fileDirContext =new FileDirContext();
+					fileDirContext.setDocBase(docBase);
+	                ((SipStandardContext) context).setResources(fileDirContext );
+                }
 			}
 		}
 		if (docBase.startsWith(canonicalAppBase.getPath())) {
