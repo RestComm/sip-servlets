@@ -1,5 +1,6 @@
 package org.mobicents.servlet.sip;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -52,7 +53,12 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 		//starting tomcat
 		tomcat = new SipEmbedded();
 		tomcat.setPath(tomcatBasePath);		
-		tomcat.setLoggingFilePath("file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/");
+		tomcat.setLoggingFilePath("file:"+ File.separatorChar + File.separatorChar + File.separatorChar + 
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
 		tomcat.startTomcat();
