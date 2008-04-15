@@ -16,6 +16,10 @@ Goals
   standalone with the Tomcat HTTP server as well as in an application server 
   integrated with JSLEE. Many interesting hacks in progress folks!
 
+Download
+
+	{{{source/browse/*checkout*/sip-servlets/trunk/sip-servlets-bootstrap/release/Sip-Servlet-0.1_Apache-Tomcat-5.5.25.zip?rev=306}Sip-Servlet-0.1_Apache-Tomcat-5.5.25.zip}}
+
 Roadmap and Implementation tasks
 
   Please check out our {{{roadmap.html}roadmap}} to know what's going to happen next.

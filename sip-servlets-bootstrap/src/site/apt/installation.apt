@@ -18,7 +18,7 @@ Installation Instructions
 		
 	* some jars have been added to allow sip servlets to be used
 		
-	** in server/lib directory, there should be a sip-servlets-impl-1.0-SNAPSHOT.jar
+	** in server/lib directory, there should be a sip-servlets-impl-0.1.jar
   	
 	** in common/lib directory, there should be a sip-servlets-spec-1.1-SNAPSHOT.jar
 	  	
@@ -64,7 +64,7 @@ Installation Instructions
 	To run the sip servlet container :
 	check that the following files have been copied during the mvn clean install
 	
-		* in tomcat_home/server/lib directory, there should be a sip-servlets-impl-1.0-SNAPSHOT.jar
+		* in tomcat_home/server/lib directory, there should be a sip-servlets-impl-0.1.jar
 		
 		* in tomcat_home/common/lib directory, there should be a sip-servlets-spec-1.1-SNAPSHOT.jar
 		
