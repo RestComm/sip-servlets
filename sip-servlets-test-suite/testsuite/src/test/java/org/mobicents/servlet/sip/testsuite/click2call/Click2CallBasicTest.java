@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.testsuite.click2call;
 
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -15,8 +16,8 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class Click2CallBasicTest extends SipServletTestCase{
 
-	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
-	
+	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
+	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
 	private static Log logger = LogFactory.getLog(Click2CallBasicTest.class);
 	
 	private SipStack[] sipStackReceivers;
@@ -125,14 +126,21 @@ public class Click2CallBasicTest extends SipServletTestCase{
 			SipCall[] receiverCalls = new SipCall[receiversCount];
 			
 			receiverCalls[0] = sipPhoneReceivers[0].createSipCall();
-			receiverCalls[1] = sipPhoneReceivers[0].createSipCall();
+			receiverCalls[1] = sipPhoneReceivers[1].createSipCall();
 			
 			receiverCalls[0].listenForIncomingCall();
 			receiverCalls[1].listenForIncomingCall();
 			
-			logger.info("Trying to reach url : " + CLICK2DIAL_URL);
-			URL url = new URL(CLICK2DIAL_URL);
-			url.openConnection().connect();
+			logger.info("Trying to reach url : " + CLICK2DIAL_URL + CLICK2DIAL_PARAMS);
+
+			URL url = new URL(CLICK2DIAL_URL + CLICK2DIAL_PARAMS);
+			InputStream in = url.openConnection().getInputStream();
+			
+			byte[] buffer = new byte[10000];
+			int len = in.read(buffer);
+			String httpResponse = "";
+			for(int q=0; q<len; q++) httpResponse += (char) buffer[q];
+			logger.info("Received the follwing HTTP response: " + httpResponse);
 			
 			receiverCalls[0].waitForIncomingCall(timeout);
 			

@@ -14,14 +14,14 @@
 		<display-name>SimpleSipServlet</display-name>
 		<description>Simple SIP servlet</description>
 		<servlet-class>
-			org.mobicents.servlet.sip.testsuite.SimpleSipServlet
+			org.mobicents.servlet.sip.testsuite.Click2DialSipServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<listener>
 		<listener-class>
-			org.mobicents.servlet.sip.testsuite.SimpleSipServlet
+			org.mobicents.servlet.sip.testsuite.Click2DialSipServlet
 		</listener-class>
 	</listener>
 </sip-app>
