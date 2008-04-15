@@ -228,8 +228,7 @@
 
 	<!-- the tomcat location where the generated artifacts will be copied -->
 	<properties>
-		<tomcat.home>E:\servers\apache-tomcat-6.0.14</tomcat.home>
-		<jboss.home>E:\servers\jboss-4.2.2.GA</jboss.home>
+		
 		<jboss.version>4.2.2.GA</jboss.version>
 	</properties>
 </project>
