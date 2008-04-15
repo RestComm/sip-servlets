@@ -364,7 +364,7 @@ public class SipFactoryImpl implements SipFactory {
 				dialog = sipProvider.getNewDialog(ctx);
 			
 			
-			SipSessionImpl session = new SipSessionImpl(sipProvider,dialog, (SIPTransaction) ctx,
+			SipSessionImpl session = new SipSessionImpl(sipProvider, dialog, (SIPTransaction) ctx,
 					(SipApplicationSessionImpl) sipAppSession);
 			dialog.setApplicationData(session);
 			session.setApplicationSession((SipApplicationSessionImpl)sipAppSession);

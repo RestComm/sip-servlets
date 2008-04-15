@@ -10,10 +10,13 @@ import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.Transaction;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
@@ -28,8 +31,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	
 
-	public SipServletResponseImpl (Response response, SipProvider provider, ServerTransaction serverTransaction, SipSession session, Dialog dialog) {
-		super(response, provider, serverTransaction, session, dialog);
+	public SipServletResponseImpl (Response response, SipProvider provider, Transaction transaction, SipSession session, Dialog dialog) {
+		super(response, provider, transaction, session, dialog);
 		
 	}
 	
@@ -169,8 +172,16 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	@Override
 	public void send()  {
 		try {
+			SipSessionImpl session = (SipSessionImpl) this.getSession();
+			if( this.getStatus()>=200 && this.getStatus()<300 )
+				session.setState(State.CONFIRMED);
+			if( this.getStatus()>=100 && this.getStatus()<200 )
+				session.setState(State.EARLY);
+			
 			ServerTransaction st = (ServerTransaction) transaction;
+			
 			st.sendResponse( (Response)this.message );
+			
 		} catch (Exception e) {
 			//TODO logger
 			throw new IllegalStateException(e.getMessage());

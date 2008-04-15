@@ -451,4 +451,21 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	
+	public void onTransactionTimeout(Transaction transaction)
+	{
+		this.ongoingTransactions.remove(transaction);
+	}
+	
+	public void onDialogTimeout(Dialog dialog)
+	{
+		if(this.ongoingTransactions.size()>0)
+		{
+			throw new IllegalStateException("Dialog timed out, but there are active transactions.");
+		}
+		this.state = State.TERMINATED;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
 }

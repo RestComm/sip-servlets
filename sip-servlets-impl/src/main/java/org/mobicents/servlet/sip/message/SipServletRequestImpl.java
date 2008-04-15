@@ -1,17 +1,21 @@
 package org.mobicents.servlet.sip.message;
 
+
 import gov.nist.core.NameValue;
 import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.header.RecordRoute;
 import gov.nist.javax.sip.header.ims.PathHeader;
-import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -32,16 +36,19 @@ import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
+import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.TransactionUnavailableException;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -54,15 +61,15 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
-		SipServletRequest {
-	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
+		SipServletRequest, Cloneable {
 
+	private ProxyImpl proxy = null;
 	/* Linked request (for b2bua) */
+	private SipServletRequestImpl linkedRequest;
 	private SipServletRequestImpl nextRequest;
-
 	/*
 	 * Popped route header - when we are the UAS we pop and keep the route
 	 * header
@@ -71,14 +78,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	/* Cache the application routing directive in the record route header */
 	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
-
+	
 	private boolean isInitial = true;
 
-	private SipServletRequestImpl linkedRequest;
+	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
 
 	public SipServletRequestImpl(SipProvider provider, SipSession sipSession,
-			Transaction clientTransaction, Dialog dialog) {
-		super(clientTransaction.getRequest(), provider, clientTransaction,
+			Transaction transaction, Dialog dialog) {
+		super(transaction.getRequest(), provider, transaction,
 				sipSession, dialog);
 
 	}
@@ -242,17 +249,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void setPoppedRoute(RouteHeader routeHeader) {
 		this.popedRouteHeader = routeHeader;
 	}
-
+	
 	public Proxy getProxy() throws TooManyHopsException {
-		// TODO Auto-generated method stub
-		return null;
+		if(proxy == null)
+			proxy = new ProxyImpl(this, provider);
+		
+		return proxy;
 	}
 
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
-		// TODO Auto-generated method stub
-		return null;
+		if(create && proxy == null)
+			proxy = new ProxyImpl(this, provider);
+		
+		return proxy;
 	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -527,6 +539,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return routingDirective;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.message.SipServletMessageImpl#send()
+	 */
 	@Override
 	public void send() {
 
@@ -535,12 +550,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 			ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
 			String transport = viaHeader.getTransport();
-
-			if ( ((SipURI)request.getRequestURI()).getTransportParam().equalsIgnoreCase("tls")) {
+			
+			String transportParam = ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam();
+			
+			if ( transportParam != null && transportParam.equalsIgnoreCase("tls")) {
 				transport = "tls";		
 			} else if ( ( viaHeader.getTransport().equalsIgnoreCase("udp")
 					&& request.getContentLength().getContentLength() > 4096 ) ||
-					((SipURI)request.getRequestURI()).getTransportParam().equalsIgnoreCase("tcp")) {
+					(transportParam != null && transportParam.equalsIgnoreCase("tcp"))) {
 				transport = "tcp";
 			}
 			
@@ -593,5 +610,5 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public SipServletRequestImpl getLinkedRequest() {
 		return this.linkedRequest;
 	}
-
+	
 }

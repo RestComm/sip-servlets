@@ -719,5 +719,33 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.sipSession = sipSession;
 	}
 	
-
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+	
+	@Override
+	public String toString() {
+		
+		return this.message.toString();
+	}
+	
+	public void setTransactionApplicationData(Object applicationData)
+	{
+		this.transaction.setApplicationData(applicationData);
+	}
+	
+	public Object getTrasactionApplicationData()
+	{
+		return this.transaction.getApplicationData();
+	}
+	
+	public Message getMessage() {
+		return message;
+	}
+	
+	public Dialog getDialog() {
+		return dialog;
+	}
 }

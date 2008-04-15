@@ -34,6 +34,7 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
@@ -45,6 +46,7 @@ import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -380,7 +382,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void processResponse(ResponseEvent arg0) {
 		logger.info("Response " + arg0.getResponse().toString());
-		
+		Response response = arg0.getResponse();
+		SipServletResponseImpl sipServletResponse = new
+			SipServletResponseImpl(response, (SipProvider)arg0.getSource(),
+				arg0.getClientTransaction(), null, arg0.getDialog());
+		Object appData = sipServletResponse.getTrasactionApplicationData();
+		if(appData instanceof org.mobicents.servlet.sip.proxy.ProxyBranchImpl)
+		{
+			org.mobicents.servlet.sip.proxy.ProxyBranchImpl proxyBranch =
+				(org.mobicents.servlet.sip.proxy.ProxyBranchImpl) appData;
+			proxyBranch.onResponse(sipServletResponse);
+		}
 	}
 	/**
 	 * {@inheritDoc}

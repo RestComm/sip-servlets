@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.RequestEvent;
@@ -87,7 +89,6 @@ public class SessionManager {
 			} else {
 				session = new SipSessionImpl(sp,null, transaction, null);
 			}
-			
 		}
 
 		return session;
