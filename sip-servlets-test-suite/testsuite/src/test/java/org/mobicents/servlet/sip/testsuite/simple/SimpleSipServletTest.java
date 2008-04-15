@@ -418,7 +418,7 @@ public class SimpleSipServletTest extends SipServletTestCase implements SipListe
 
 	public void testSimpleSipServlet() throws InterruptedException {
 		init();
-		Thread.sleep(5000000);
+		Thread.sleep(5000);
 	}
 
 	public void processIOException(IOExceptionEvent exceptionEvent) {
