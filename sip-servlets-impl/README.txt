@@ -35,6 +35,8 @@ look for the context tag in the server.xml file and
 modify the docbase attribute to map to your existing simple-sip-servlet application
 
 make sure to run a mvn clean install at the root of simple-sip-servlet project too
+
+Run mvn war:inplace 
 and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
 and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
 (This would be removed automatically through maven when time will permit...)

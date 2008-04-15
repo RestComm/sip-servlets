@@ -166,6 +166,10 @@ public class SipProtocolHandler implements ProtocolHandler {
 			String catalinaHome = System.getenv("CATALINA_HOME");
 			// defining sip stack properties
 			Properties properties = new Properties();
+			
+			
+			logger.info("logLevel = " + this.logLevel);
+			
 		
 			if (this.logLevel != null) {
 				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
@@ -177,6 +181,8 @@ public class SipProtocolHandler implements ProtocolHandler {
 						catalinaHome + "/" + this.debugLog);
 				properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
 						catalinaHome + "/" + this.serverLog);
+				
+				logger.info(properties.toString());
 				
 			}
 			properties.setProperty("javax.sip.STACK_NAME", sipStackName);

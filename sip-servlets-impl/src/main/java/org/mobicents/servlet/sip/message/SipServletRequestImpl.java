@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.core.NameValue;
+import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.header.RecordRoute;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
@@ -38,6 +39,7 @@ import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -65,6 +67,23 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		super(clientTransaction.getRequest(), provider, clientTransaction,
 				sipSession, dialog);
 
+	}
+	
+	public ContactHeader createContactForProvider(String transport) {
+		try {
+			String ipAddress = provider.getListeningPoint(transport).getIPAddress();
+			int port = provider.getListeningPoint(transport).getPort();
+			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, ipAddress);
+			sipURI.setHost(ipAddress);
+			sipURI.setPort(port);
+			sipURI.setTransportParam(transport);
+			ContactHeader contact = SipFactories.headerFactory.createContactHeader(SipFactories.addressFactory.createAddress(sipURI));
+		
+			return contact;
+		} catch (Exception ex) {
+			logger.fatal ("Unexpected error",ex);
+			throw new RuntimeException ("Unexpected error",ex);
+		}
 	}
 
 	@Override
@@ -147,6 +166,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(statusCode == Response.OK) {
 				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
 				toHeader.setTag(java.util.UUID.randomUUID().toString());
+				// Add the contact header for the dialog.
+				String transport = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getTransport();
+				ContactHeader contactHeader = this.createContactForProvider(transport);
+				response.setHeader(contactHeader);
+		
 //				response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME, "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
 			return new SipServletResponseImpl(response, provider,

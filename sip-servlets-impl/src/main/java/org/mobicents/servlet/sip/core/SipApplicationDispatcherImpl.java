@@ -32,10 +32,13 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.Transaction;
+import javax.sip.TransactionAlreadyExistsException;
 import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
+import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.header.RouteHeader;
+import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
@@ -160,20 +163,32 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void processRequest(RequestEvent requestEvent) {
-		logger.info("Got a request event");
 		
 		
 		SipProviderImpl sp = (SipProviderImpl)requestEvent.getSource();
+		ServerTransaction transaction =  requestEvent.getServerTransaction();
+		Request request = requestEvent.getRequest();
+		logger.info("Got a request event "  + request.getMethod());
 		
-		SipSessionImpl session = sessionManager.getRequestSession(requestEvent);
+		if ( transaction == null ) {
+			try {
+				transaction = sp.getNewServerTransaction(request);
+			} catch ( TransactionUnavailableException tae) {
+				//TODO Create a 500 Internal server error and return it here.
+				return;
+			} catch ( TransactionAlreadyExistsException taex ) {
+				// Already processed this request so just return.
+				return;
+				
+			} 
+		}
+		SipSessionImpl session = sessionManager.getRequestSession(requestEvent,transaction);
 		
 		SipServletRequestImpl sipServletRequest = null;
 		
 		try
 		{
-			SIPRequest request = (SIPRequest)requestEvent.getRequest();
 			
-			ServerTransaction transaction = (ServerTransaction) request.getTransaction();
 			sipServletRequest = new SipServletRequestImpl(
 					(SipProvider) requestEvent.getSource(),
 					session,
@@ -289,7 +304,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}
 			logger.info("Request event dispatched");
 		} else {
-			//TODO Routing subsequent requests.
+			logger.info("Routing of Subsequent Request -- TODO");
 		}
 	}
 	

@@ -28,6 +28,8 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.Transaction;
+import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
@@ -105,14 +107,14 @@ public class SipSessionImpl implements SipSession {
 	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info.
 	 * In this case the session only spans a single transaction.
 	 */
-	private SIPTransaction sessionCreatingTransaction;
+	private Transaction sessionCreatingTransaction;
 	// =============================================================
 	
-	private Set<SIPTransaction> ongoingTransactions = new TreeSet<SIPTransaction>();
+	private Set<Transaction> ongoingTransactions = new TreeSet<Transaction>();
 	
 	private boolean supervisedMode;
 	
-	public SipSessionImpl ( Dialog dialog, SIPTransaction transaction, SipApplicationSessionImpl sipApp) {
+	public SipSessionImpl ( Dialog dialog, Transaction transaction, SipApplicationSessionImpl sipApp) {
 		this.sessionCreatingDialog = dialog;
 		this.sessionCreatingTransaction = transaction;
 		this.ongoingTransactions.add(transaction);
@@ -122,6 +124,11 @@ public class SipSessionImpl implements SipSession {
 		this.state = State.INITIAL;
 		this.valid = true;
 		this.supervisedMode = true;
+		if ( dialog != null) {
+			dialog.setApplicationData(this);
+		} else {
+			transaction.setApplicationData(this);
+		}
 	}
 	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
@@ -185,7 +192,7 @@ public class SipSessionImpl implements SipSession {
 		if(this.sessionCreatingDialog != null)
 			return this.sessionCreatingDialog.getCallId().getCallId();
 		else
-			return this.sessionCreatingTransaction.getOriginalRequest().getCallId().getCallId();
+			return ((CallIdHeader)this.sessionCreatingTransaction.getRequest().getHeader(CallIdHeader.NAME)).getCallId();
 	}
 
 	public long getCreationTime() {
@@ -207,8 +214,8 @@ public class SipSessionImpl implements SipSession {
 		{
 			try
 			{
-				From fromHeader = (From)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader);
+				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
+				return new AddressImpl(fromHeader.getAddress());
 			}
 			catch(Exception e)
 			{
@@ -383,7 +390,7 @@ public class SipSessionImpl implements SipSession {
 		this.sipApplicationSession = sipApplicationSession;
 	}
 
-	public SIPTransaction getSessionCreatingTransaction() {
+	public Transaction getSessionCreatingTransaction() {
 		return sessionCreatingTransaction;
 	}
 
