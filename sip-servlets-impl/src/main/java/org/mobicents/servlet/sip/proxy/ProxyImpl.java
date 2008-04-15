@@ -11,20 +11,16 @@ import java.util.Map;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.SipProvider;
 
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author root

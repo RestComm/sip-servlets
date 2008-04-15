@@ -5,7 +5,6 @@ package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -47,8 +46,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	private int proxyTimeout;
 	private SipListenersHolder listeners;
 	private String mainServlet;	
-	private Map securityRoles;
-	private Map<String,Object> sipApplicationSessionAttributeMap;
+//	private Map securityRoles;
+//	private Map<String,Object> sipApplicationSessionAttributeMap;
 	private SipFactoryFacade sipFactoryFacade;
 	
 	/**
@@ -353,33 +352,33 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super.removeConstraint(securityConstraint);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipContext#getSecurityRoles()
-	 */
-	public Map getSecurityRoles() {
-		return securityRoles;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipContext#setSecurityRoles(java.util.HashMap)
-	 */
-	public void setSecurityRoles(Map securityRoles) {
-		this.securityRoles = securityRoles;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionAttributeMap()
-	 */
-	public Map<String, Object> getSipApplicationSessionAttributeMap() {
-		return sipApplicationSessionAttributeMap;
-	}
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipContext#setSipApplicationSessionAttributeMap(java.util.HashMap)
-	 */
-	public void setSipApplicationSessionAttributeMap(
-			Map<String, Object> sipApplicationSessionAttributeMap) {
-		this.sipApplicationSessionAttributeMap = sipApplicationSessionAttributeMap;
-	}
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.SipContext#getSecurityRoles()
+//	 */
+//	public Map getSecurityRoles() {
+//		return securityRoles;
+//	}
+//
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.SipContext#setSecurityRoles(java.util.HashMap)
+//	 */
+//	public void setSecurityRoles(Map securityRoles) {
+//		this.securityRoles = securityRoles;
+//	}
+//	
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionAttributeMap()
+//	 */
+//	public Map<String, Object> getSipApplicationSessionAttributeMap() {
+//		return sipApplicationSessionAttributeMap;
+//	}
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.SipContext#setSipApplicationSessionAttributeMap(java.util.HashMap)
+//	 */
+//	public void setSipApplicationSessionAttributeMap(
+//			Map<String, Object> sipApplicationSessionAttributeMap) {
+//		this.sipApplicationSessionAttributeMap = sipApplicationSessionAttributeMap;
+//	}
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getSmallIcon()
 	 */

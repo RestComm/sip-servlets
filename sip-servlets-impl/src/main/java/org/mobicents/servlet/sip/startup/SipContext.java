@@ -1,7 +1,5 @@
 package org.mobicents.servlet.sip.startup;
 
-import java.util.Map;
-
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 
@@ -71,26 +69,26 @@ public interface SipContext extends Context {
 	
 	void removeConstraint(org.apache.catalina.deploy.SecurityConstraint securityConstraint);
 
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSecurityRoles()
-	 */
-	Map getSecurityRoles();
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSecurityRoles(java.util.HashMap)
-	 */
-	void setSecurityRoles(Map securityRoles);
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSipApplicationSessionAttributeMap()
-	 */
-	Map<String, Object> getSipApplicationSessionAttributeMap();
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSipApplicationSessionAttributeMap(java.util.Map)
-	 */
-	void setSipApplicationSessionAttributeMap(
-			Map<String, Object> sipApplicationSessionAttributeMap);
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSecurityRoles()
+//	 */
+//	Map getSecurityRoles();
+//
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSecurityRoles(java.util.HashMap)
+//	 */
+//	void setSecurityRoles(Map securityRoles);
+//
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSipApplicationSessionAttributeMap()
+//	 */
+//	Map<String, Object> getSipApplicationSessionAttributeMap();
+//
+//	/* (non-Javadoc)
+//	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSipApplicationSessionAttributeMap(java.util.Map)
+//	 */
+//	void setSipApplicationSessionAttributeMap(
+//			Map<String, Object> sipApplicationSessionAttributeMap);
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSmallIcon()
