@@ -113,10 +113,19 @@ public interface SipServletMessage extends java.lang.Cloneable{
     java.lang.String getCharacterEncoding();
 
     /**
-     * Returns the content as a Java object. The actual type of the returned object depends on the MIME type of the content itself (the Content-Type). Containers are required to return a String object for MIME type text/plain as for other text/* MIME types for which the container doesn't have specific knowledge.
-     * It is encouraged that the object returned for "multipart" MIME content is a javax.mail.Multipart object. A byte array is returned for content-types that are unknown to the container.
-     * The message's character encoding is used when the MIME type indicates that the content consists of character data.
-     * Note: This method, together with setContent, is modelled over similar methods in the JavaMail API. Whereas the JavaMail API mandates the use of the Java Activation Framework (JAF) as the underlying data handling system, the SIP servlet API doesn't currently require JAF.
+     * Returns the content as a Java object. The actual type of the returned object 
+     * depends on the MIME type of the content itself (the Content-Type). 
+     * Containers are required to return a String object for MIME type text/plain 
+     * as for other text/* MIME types for which the container doesn't have specific knowledge.
+     * It is encouraged that the object returned for "multipart" MIME content 
+     * is a javax.mail.Multipart object. 
+     * A byte array is returned for content-types that are unknown to the container.
+     * The message's character encoding is used when the MIME type indicates 
+     * that the content consists of character data.
+     * Note: This method, together with setContent, is modelled over similar methods 
+     * in the JavaMail API. Whereas the JavaMail API mandates 
+     * the use of the Java Activation Framework (JAF) as the underlying data handling system, 
+     * the SIP servlet API doesn't currently require JAF.
      */
     java.lang.Object getContent() throws java.io.IOException, java.io.UnsupportedEncodingException;
 
