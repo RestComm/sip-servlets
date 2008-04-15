@@ -47,9 +47,12 @@ public class ShootistSipServlet extends SipServlet implements SipErrorListener, 
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void doResponse(SipServletResponse response)
+	protected void doResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		
+		logger.info("Got : " + sipServletResponse.getStatus() + " "
+				+ sipServletResponse.getMethod());
+		sipServletResponse.createAck();
+		sipServletResponse.send();
 	}
 
 	// SipErrorListener methods
@@ -81,11 +84,13 @@ public class ShootistSipServlet extends SipServlet implements SipErrorListener, 
 		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipFactory.createApplicationSession(), "INVITE", fromURI, toURI);
-//		try {			
-//			sipServletRequest.send();
-//		} catch (IOException e) {
-//			logger.error(e);
-//		}
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+		sipServletRequest.setRequestURI(requestURI);
+		try {			
+			sipServletRequest.send();
+		} catch (IOException e) {
+			logger.error(e);
+		}
 		
 	}
 
