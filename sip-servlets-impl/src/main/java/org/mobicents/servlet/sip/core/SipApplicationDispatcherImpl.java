@@ -287,171 +287,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipServletRequest.setInitial(isInitialRequest);					
 	
 			if(sipServletRequest.isInitial()) {
-				//15.4.1 Routing an Initial request Algorithm
-				
-				// Create new app session for initial requests. 
-				//TODO: later you should check for SipApplicationKey annotated method in the servlet.
-				SipApplicationSessionImpl appSession = new SipApplicationSessionImpl();
-				session.setApplicationSession(appSession);
-				appSession.addSipSession(session);
-				
-				//get the request routing directive
-				SipApplicationRoutingDirective sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
-				//get the state info associated with the request
-				Serializable stateInfo = null;
-				if(SipApplicationRoutingDirective.CONTINUE.equals(sipApplicationRoutingDirective) || 
-						SipApplicationRoutingDirective.REVERSE.equals(sipApplicationRoutingDirective)) {
-					//get the original request's state info
-					stateInfo = ((SipServletRequestImpl)sipServletRequest.getLinkedRequest()).getStateInfo();
-				} 
-				
-				logger.info("Dispatching the request event");
-				// 15.4.1 Procedure : point 1
-				//TODO the spec mandates that the sipServletRequest should be 
-				//made read only for the AR to process
-				SipApplicationRouterInfo applicationRouterInfo = 
-					sipApplicationRouter.getNextApplication(
-							sipServletRequest, 
-							sipServletRequest.getSession().getRegion(), 
-							sipApplicationRoutingDirective, 
-							stateInfo);
-				// 15.4.1 Procedure : point 2
-				SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
-				if(sipRouteModifier != null) {
-					switch(sipRouteModifier) {
-						// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
-						// it is up to container to decide whether it is external or internal.
-						case ROUTE :
-							String route = applicationRouterInfo.getRoute();
-							Address routeAddress = null; 
-							RouteHeader applicationRouterInfoRouteHeader = null;
-							try {
-								routeAddress = SipFactories.addressFactory.createAddress(route);
-								applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
-							} catch (ParseException e) {
-								logger.error("Impossible to parse the route returned by the application router " +
-										"into a compliant address",e);							
-								// the AR returned an empty string route or a bad route
-								// this shouldn't happen if the route modifier is ROUTE, processing is stopped
-								//and a 500 is sent
-								JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-								return;
-							}						
-							if(isRouteExternal(applicationRouterInfoRouteHeader)) {
-								// push the route as the top Route header field value and send the request externally
-								sipServletRequest.addHeader(RouteHeader.NAME, route);
-								sipServletRequest.send();
-								return;
-							} else {
-								// the container MUST make the route available to the applications 
-								// via the SipServletRequest.getPoppedRoute() method.							
-								sipServletRequest.setPoppedRoute(applicationRouterInfoRouteHeader);												
-							}
-							break;
-						// NO_ROUTE indicates that application router is not returning any route 
-						// and the SipApplicationRouterInfo.getRoute() value if any should be disregarded.	
-						case CLEAR_ROUTE :
-							//nothing to do here
-							//disregard the result.getRoute() and proceed. Specifically the SipServletRequest.getPoppedRoute() 
-							//returns the same value as before the invocation of application router.
-							break;
-						// CLEAR_ROUTE modifier indicates to the container to remove the popped top route associated with the request. 
-						// Specifically the subsequent invocation of SipServletRequest.getPoppedRoute() MUST now return null
-						case NO_ROUTE :
-							// clear the value of popped route header such that SipServletRequest.getPoppedRoute() 
-							//now returns null until another route header belonging to the container is popped.
-							sipServletRequest.setPoppedRoute(null);
-							break;				
-					}
-				}
-				// 15.4.1 Procedure : point 3
-				if(applicationRouterInfo.getNextApplicationName() == null) {
-					//check if the request point to another domain
-					boolean isAnotherDomain = false;
-					javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
-					String host = sipRequestUri.getHost();
-					int port = sipRequestUri.getPort();
-					if(!hostNames.contains(host) && 
-							JainSipUtils.findMatchingListeningPoint(sipFactoryImpl.getSipProviders(), host, port) == null) {
-						isAnotherDomain = true;
-					}
-					ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
-					if(isAnotherDomain || routeHeaders.hasNext()) {
-						// the Request-URI points to a different domain, or there are one or more Route headers, 
-						// send the request externally according to standard SIP mechanism.
-						sipServletRequest.send();
-						return;
-					} else {
-						// the Request-URI does not point to another domain, and there is no Route header, 
-						// the container should not send the request as it will cause a loop. 
-						// Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.					 			
-						JainSipUtils.sendErrorResponse(Response.NOT_FOUND, transaction, request, sipProvider);
-						return;
-					}
-				} else {
-					//set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
-					sipServletRequest.setStateInfo(applicationRouterInfo.getStateInfo());
-					sipServletRequest.getSipSession().setRoutingRegion(applicationRouterInfo.getRoutingRegion());
-					try {
-						URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
-						if(subscriberUri instanceof javax.sip.address.SipURI) {
-							sipServletRequest.setRequestURI(new SipURIImpl((javax.sip.address.SipURI)subscriberUri));
-						} else if (subscriberUri instanceof javax.sip.address.TelURL) {
-							sipServletRequest.setRequestURI(new TelURLImpl((javax.sip.address.TelURL)subscriberUri));
-						}
-					} catch (ParseException pe) {					
-						logger.error(pe);
-						// Sends a 500 Internal server error and stops processing.				
-						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-						return;
-					}
-					// follow the procedures of Chapter 16 to select a servlet from the application.			
-					SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
-					//no matching deployed apps
-					if(sipContext == null) {
-						logger.error("No matching deployed application has been found !");
-						// Sends a 503 Service Unavailable error and stops processing.				
-						JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
-						return;
-					}
-					appSession.setSipContext(sipContext);
-					String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
-					if(sipSessionHandlerName == null) {
-						String mainServlet = sipContext.getMainServlet();
-						sipSessionHandlerName = mainServlet;					
-						try {
-							sipServletRequest.getSession().setHandler(sipSessionHandlerName);
-						} catch (ServletException e) {
-							// this should never happen
-							logger.error(e);
-							// Sends a 500 Internal server error and stops processing.				
-							JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-							return;
-						} catch (IllegalStateException ise) {
-							logger.error(ise);
-							// Sends a 500 Internal server error and stops processing.				
-							JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-							return;
-						}
-					}
-					Container container = sipContext.findChild(sipSessionHandlerName);
-					Wrapper sipServletImpl = (Wrapper) container;
-					try {
-						Servlet servlet = sipServletImpl.allocate();	        
-						servlet.service(sipServletRequest, null);
-					} catch (ServletException e) {				
-						logger.error(e);
-						// Sends a 500 Internal server error and stops processing.				
-						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-						return;
-					} catch (IOException e) {				
-						logger.error(e);
-						// Sends a 500 Internal server error and stops processing.				
-						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-						return;
-					} 
-				}
-				logger.info("Request event dispatched");
+				routeInitialRequest(sipProvider, sipServletRequest);
 			} else {
 				logger.info("Routing of Subsequent Request -- TODO");
 				
@@ -479,6 +315,185 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return;
 		}
+	}
+
+	/**
+	 * 
+	 * @param sipProvider
+	 * @param transaction
+	 * @param request
+	 * @param session
+	 * @param sipServletRequest
+	 */
+	private void routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
+		//15.4.1 Routing an Initial request Algorithm
+		SipSessionImpl session = sipServletRequest.getSipSession();
+		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
+		Request request = (Request) sipServletRequest.getMessage();
+		
+		// Create new app session for initial requests. 
+		//TODO: later you should check for SipApplicationKey annotated method in the servlet.
+		SipApplicationSessionImpl appSession = new SipApplicationSessionImpl();
+		session.setApplicationSession(appSession);
+		appSession.addSipSession(session);
+		
+		//get the request routing directive
+		SipApplicationRoutingDirective sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
+		//get the state info associated with the request
+		Serializable stateInfo = null;
+		if(SipApplicationRoutingDirective.CONTINUE.equals(sipApplicationRoutingDirective) || 
+				SipApplicationRoutingDirective.REVERSE.equals(sipApplicationRoutingDirective)) {
+			//get the original request's state info
+			stateInfo = ((SipServletRequestImpl)sipServletRequest.getLinkedRequest()).getStateInfo();
+		} 
+		
+		logger.info("Dispatching the request event");
+		// 15.4.1 Procedure : point 1
+		//TODO the spec mandates that the sipServletRequest should be 
+		//made read only for the AR to process
+		SipApplicationRouterInfo applicationRouterInfo = 
+			sipApplicationRouter.getNextApplication(
+					sipServletRequest, 
+					sipServletRequest.getSession().getRegion(), 
+					sipApplicationRoutingDirective, 
+					stateInfo);
+		// 15.4.1 Procedure : point 2
+		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
+		if(sipRouteModifier != null) {
+			switch(sipRouteModifier) {
+				// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
+				// it is up to container to decide whether it is external or internal.
+				case ROUTE :
+					String route = applicationRouterInfo.getRoute();
+					Address routeAddress = null; 
+					RouteHeader applicationRouterInfoRouteHeader = null;
+					try {
+						routeAddress = SipFactories.addressFactory.createAddress(route);
+						applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
+					} catch (ParseException e) {
+						logger.error("Impossible to parse the route returned by the application router " +
+								"into a compliant address",e);							
+						// the AR returned an empty string route or a bad route
+						// this shouldn't happen if the route modifier is ROUTE, processing is stopped
+						//and a 500 is sent
+						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+						return;
+					}						
+					if(isRouteExternal(applicationRouterInfoRouteHeader)) {
+						// push the route as the top Route header field value and send the request externally
+						sipServletRequest.addHeader(RouteHeader.NAME, route);
+						sipServletRequest.send();
+						return;
+					} else {
+						// the container MUST make the route available to the applications 
+						// via the SipServletRequest.getPoppedRoute() method.							
+						sipServletRequest.setPoppedRoute(applicationRouterInfoRouteHeader);												
+					}
+					break;
+				// NO_ROUTE indicates that application router is not returning any route 
+				// and the SipApplicationRouterInfo.getRoute() value if any should be disregarded.	
+				case CLEAR_ROUTE :
+					//nothing to do here
+					//disregard the result.getRoute() and proceed. Specifically the SipServletRequest.getPoppedRoute() 
+					//returns the same value as before the invocation of application router.
+					break;
+				// CLEAR_ROUTE modifier indicates to the container to remove the popped top route associated with the request. 
+				// Specifically the subsequent invocation of SipServletRequest.getPoppedRoute() MUST now return null
+				case NO_ROUTE :
+					// clear the value of popped route header such that SipServletRequest.getPoppedRoute() 
+					//now returns null until another route header belonging to the container is popped.
+					sipServletRequest.setPoppedRoute(null);
+					break;				
+			}
+		}
+		// 15.4.1 Procedure : point 3
+		if(applicationRouterInfo.getNextApplicationName() == null) {
+			//check if the request point to another domain
+			boolean isAnotherDomain = false;
+			javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+			String host = sipRequestUri.getHost();
+			int port = sipRequestUri.getPort();
+			if(!hostNames.contains(host) && 
+					JainSipUtils.findMatchingListeningPoint(sipFactoryImpl.getSipProviders(), host, port) == null) {
+				isAnotherDomain = true;
+			}
+			ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
+			if(isAnotherDomain || routeHeaders.hasNext()) {
+				// the Request-URI points to a different domain, or there are one or more Route headers, 
+				// send the request externally according to standard SIP mechanism.
+				sipServletRequest.send();
+				return;
+			} else {
+				// the Request-URI does not point to another domain, and there is no Route header, 
+				// the container should not send the request as it will cause a loop. 
+				// Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.					 			
+				JainSipUtils.sendErrorResponse(Response.NOT_FOUND, transaction, request, sipProvider);
+				return;
+			}
+		} else {
+			//set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
+			sipServletRequest.setStateInfo(applicationRouterInfo.getStateInfo());
+			sipServletRequest.getSipSession().setRoutingRegion(applicationRouterInfo.getRoutingRegion());
+			try {
+				URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
+				if(subscriberUri instanceof javax.sip.address.SipURI) {
+					sipServletRequest.setRequestURI(new SipURIImpl((javax.sip.address.SipURI)subscriberUri));
+				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
+					sipServletRequest.setRequestURI(new TelURLImpl((javax.sip.address.TelURL)subscriberUri));
+				}
+			} catch (ParseException pe) {					
+				logger.error(pe);
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return;
+			}
+			// follow the procedures of Chapter 16 to select a servlet from the application.			
+			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
+			//no matching deployed apps
+			if(sipContext == null) {
+				logger.error("No matching deployed application has been found !");
+				// Sends a 503 Service Unavailable error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
+				return;
+			}
+			appSession.setSipContext(sipContext);
+			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
+			if(sipSessionHandlerName == null) {
+				String mainServlet = sipContext.getMainServlet();
+				sipSessionHandlerName = mainServlet;					
+				try {
+					sipServletRequest.getSession().setHandler(sipSessionHandlerName);
+				} catch (ServletException e) {
+					// this should never happen
+					logger.error(e);
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return;
+				} catch (IllegalStateException ise) {
+					logger.error(ise);
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return;
+				}
+			}
+			Container container = sipContext.findChild(sipSessionHandlerName);
+			Wrapper sipServletImpl = (Wrapper) container;
+			try {
+				Servlet servlet = sipServletImpl.allocate();	        
+				servlet.service(sipServletRequest, null);
+			} catch (ServletException e) {				
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return;
+			} catch (IOException e) {				
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return;
+			} 
+		}
+		logger.info("Request event dispatched");
 	}
 	/**
 	 * Check if the route is external
