@@ -2,10 +2,7 @@ package org.mobicents.servlet.sip.testsuite.b2bua;
 
 import java.util.Properties;
 
-import javax.sip.ListeningPoint;
 import javax.sip.message.Response;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,12 +10,11 @@ import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
 public class B2BUASipUnitTest extends SipServletTestCase {
-	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
-//	private static final int TIMEOUT = 10000;
-	private static final int TIMEOUT = 100000000; 
+	private static Log logger = LogFactory.getLog(B2BUASipUnitTest.class);
+	private static final int TIMEOUT = 10000;
+//	private static final int TIMEOUT = 100000000; 
 	SipStack sipStackA;
 	SipStack sipStackB;
 	
@@ -64,13 +60,11 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 			properties2.setProperty("gov.nist.javax.sip.SERVER_LOG",
 			"logs/b2bualog2.txt");
 
-			sipStackA = new SipStack(SipStack.PROTOCOL_UDP , 5058, properties1);
-			ListeningPoint lp = sipStackA.getSipProvider().getListeningPoint("udp");
-			String stackIPAddress = lp.getIPAddress();
+			sipStackA = new SipStack(SipStack.PROTOCOL_UDP , 5058, properties1);					
 			sipPhoneA = sipStackA.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");
 
 			sipStackB = new SipStack(SipStack.PROTOCOL_UDP , 5059, properties2);
-			sipPhoneB = sipStackB.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, "sip:receiver@nist.gov");
+			sipPhoneB = sipStackB.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, "sip:aa@nist.gov");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -84,7 +78,8 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 			SipCall callA = sipPhoneA.createSipCall();
 			SipCall callB = sipPhoneB.createSipCall();
 			
-			callB.listenForIncomingCall();Thread.sleep(300);
+			callB.listenForIncomingCall();
+			Thread.sleep(300);
 			callA.initiateOutgoingCall("sip:receiver@nist.gov", null);
 			
 			assertTrue(callB.waitForIncomingCall(TIMEOUT));
@@ -99,7 +94,8 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 			
 			assertTrue(callB.waitForAck(TIMEOUT));
 			
-			assertTrue(callA.disconnect());
+			assertTrue(callA.disconnect());			
+			assertTrue(callB.waitForDisconnect(TIMEOUT));
 			assertTrue(callB.respondToDisconnect());
 			
 			sipPhoneA.dispose();

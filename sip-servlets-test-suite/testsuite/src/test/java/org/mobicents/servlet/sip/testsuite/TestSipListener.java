@@ -1,4 +1,4 @@
-package org.mobicents.servlet.sip.testsuite.callcontroller;
+package org.mobicents.servlet.sip.testsuite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
  * @author M. Ranganathan
  */
 
-public class CallForwardingTestSipListener implements SipListener {
+public class TestSipListener implements SipListener {
 
 	private SipProvider sipProvider;
 
@@ -73,7 +73,7 @@ public class CallForwardingTestSipListener implements SipListener {
 	
 	private SipURI requestURI;
 	
-	private static Logger logger = Logger.getLogger(CallForwardingTestSipListener.class);
+	private static Logger logger = Logger.getLogger(TestSipListener.class);
 
 	
 
@@ -456,7 +456,7 @@ public class CallForwardingTestSipListener implements SipListener {
 		}
 	}
 	
-	public CallForwardingTestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects) {
+	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects) {
 		this.protocolObjects = protocolObjects;
 		this.myPort = myPort;
 		if(peerPort > 0) {

@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class CallForwardingJunitTest extends SipServletTestCase {
 	
@@ -16,8 +17,8 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 	private static final int TIMEOUT = 5000;	
 //	private static final int TIMEOUT = 100000000;
 	
-	CallForwardingTestSipListener sender;
-	CallForwardingTestSipListener receiver;
+	TestSipListener sender;
+	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
 
@@ -47,10 +48,10 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 			receiverProtocolObjects = new ProtocolObjects(
 					"receiver" , "gov.nist", TRANSPORT, AUTODIALOG);
 						
-			sender = new CallForwardingTestSipListener(5080, 5070, senderProtocolObjects);
+			sender = new TestSipListener(5080, 5070, senderProtocolObjects);
 			SipProvider senderProvider = sender.createProvider();			
 
-			receiver = new CallForwardingTestSipListener(5090, -1, receiverProtocolObjects);
+			receiver = new TestSipListener(5090, -1, receiverProtocolObjects);
 			SipProvider receiverProvider = receiver.createProvider();
 			
 			receiverProvider.addSipListener(receiver);

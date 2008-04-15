@@ -1,6 +1,10 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -13,32 +17,38 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
-import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 
 public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
+	B2buaHelper helper = null;
+	
 	private static Log logger = LogFactory.getLog(B2BUASipServlet.class);
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got request:\n" + request);
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-				SIP_FACTORY);
-		B2buaHelper helper = request.getB2buaHelper();
+		Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
+		Set<String> toHeaderSet = new HashSet<String>();
+		toHeaderSet.add("sip:aa@sip-servlets.com");
+		headers.put("To", toHeaderSet);
+		
+		helper = request.getB2buaHelper();
 		SipServletRequest forkedRequest = helper.createRequest(request, true,
-				null);
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@127.0.0.1:5059");
+				headers);
+		
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);				
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@127.0.0.1:5059");		
+		forkedRequest.setRequestURI(sipUri);
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("forkedRequest = " + forkedRequest);
-
 		}
-		forkedRequest.setRequestURI(sipUri);
 		forkedRequest.send();
 
 	}
@@ -52,8 +62,18 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 				+ sipServletResponse.getMethod());		
 		int status = sipServletResponse.getStatus();
 		if (status == SipServletResponse.SC_OK) {
-			SipServletRequest ackRequest = sipServletResponse.createAck();
-			ackRequest.send();
+			String cSeqValue = sipServletResponse.getHeader("CSeq");
+			//if this is a response to an INVITE we ack it and forward the OK 
+			if(cSeqValue.indexOf("INVITE") != -1) {
+				SipServletRequest ackRequest = sipServletResponse.createAck();
+				ackRequest.send();
+				//create and sends OK for the first call leg
+				SipSession originalSession =   
+				    helper.getLinkedSession(sipServletResponse.getSession());					
+				SipServletResponse responseToOriginalRequest = 
+					helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
+				responseToOriginalRequest.send();
+			}
 		} else {
 			super.doResponse(sipServletResponse);
 		}
@@ -66,14 +86,15 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-
+		logger.info("Got BYE: "
+				+ request.getMethod());
 		SipServletResponse response = request.createResponse(200);
 		response.send();
 
-		SipSession session = request.getSession();
-		B2buaHelper helper = request.getB2buaHelper();
+		SipSession session = request.getSession();		
 		SipSession linkedSession = helper.getLinkedSession(session);
 		SipServletRequest newRequest = linkedSession.createRequest("BYE");
+		logger.info(newRequest);
 		newRequest.send();
 
 	}
