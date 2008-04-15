@@ -293,7 +293,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 		SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 		SipSessionImpl sipSessionImpl = sipServletMessageImpl.getSipSession();
-		sessionManager.removeSipSession(sipSessionImpl.getKey());
+		/*
+ 			TODO: FIXME: Review this. We can't remove sesions that still have transactions.
+			Although the jsip stacktransaction might have ended, the message that ended it
+			is not yet delivered to the container and the servlet at this time.
+        */
+		if(!sipSessionImpl.hasOngoingTransaction())
+			sessionManager.removeSipSession(sipSessionImpl.getKey());
 	}
 	/*
 	 * (non-Javadoc)
