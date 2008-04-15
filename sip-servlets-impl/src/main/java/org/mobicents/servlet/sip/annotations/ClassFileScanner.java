@@ -1,12 +1,11 @@
 package org.mobicents.servlet.sip.annotations;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import javax.servlet.sip.annotation.SipApplication;
 import javax.servlet.sip.annotation.SipApplicationKey;
@@ -41,7 +40,7 @@ public class ClassFileScanner {
 	
 	private Method sipAppKey = null;
 	
-	private ClassLoader classLoader;
+	private URLClassLoader classLoader;
 	
 	public ClassFileScanner(String docbase, SipStandardContext ctx) {
 		this.docbase = docbase;
@@ -51,7 +50,14 @@ public class ClassFileScanner {
 	
 	public void scan() {
 		ClassLoader cl = this.sipContext.getClass().getClassLoader();
-		this.classLoader = new WebInfClassLoader(this.docbase, cl);
+		try {
+			this.classLoader = new URLClassLoader(
+					new URL [] {new URL("file:///" + this.docbase)},
+					cl);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//WebInfClassLoader(this.docbase, cl);
 		_scan(new File(this.docbase));
 	}
 	
@@ -109,18 +115,6 @@ public class ClassFileScanner {
     }
     
     
-    private static void copyParsedProperties(SipStandardContext from, SipStandardContext to) {
-    	to.setMainServlet(from.getMainServlet());
-    	to.setApplicationName(from.getApplicationName());
-    	to.setDisplayName(from.getDisplayName());
-    	to.setDistributable(from.getDistributable());
-    	to.setProxyTimeout(from.getProxyTimeout());
-    	to.setSessionTimeout(from.getSessionTimeout());
-    	to.setSmallIcon(from.getSmallIcon());
-    	to.setLargeIcon(from.getLargeIcon());
-    	to.setDescription(from.getDescription());
-    }
-    
     private void processServletAnnotation(Class<?> clazz) {
     	SipServlet servlet = (SipServlet) clazz.getAnnotation(SipServlet.class);
     	if(servlet == null) return;
@@ -131,8 +125,12 @@ public class ClassFileScanner {
 
     		String appName = null;
     		if(servlet.applicationName() == null || servlet.applicationName().equals("")) {
-    			String packageName = clazz.getPackage().getName();
-    			SipApplication appData = getApplicationAnnotation(packageName);
+    			//String packageName = clazz.getCanonicalName().substring(0, clazz.getCanonicalName().lastIndexOf('.'));
+    			// Wasted a whole day watching this line...
+    			Package pack = clazz.getPackage();
+    			String packageName = pack.getName();
+    			
+    			SipApplication appData = getApplicationAnnotation(pack);
     			if(appData != null) {
     				if(this.parsedAnnotatedPackage != null && !this.parsedAnnotatedPackage.equals(packageName)) {
     						throw new IllegalStateException("Cant have two different applications in a single context - "
@@ -196,20 +194,14 @@ public class ClassFileScanner {
     	return context;
     }
     
-    private static SipApplication getApplicationAnnotation(String packageName) {
-    	Package pack = Package.getPackage(packageName);
+    private static SipApplication getApplicationAnnotation(Package pack) {
     	if(pack == null) return null;
     	
     	SipApplication sipApp = (SipApplication) pack.getAnnotation(SipApplication.class);
     	if(sipApp != null) {
     		return sipApp;
     	}
-    	
-    	int lastDot = packageName.lastIndexOf('.');
-    	if(lastDot <= 0) return null;
-    	
-    	String parentPackage = packageName.substring(0, lastDot);
-    	return getApplicationAnnotation(parentPackage);
+    	return null;
     }
 
     /**
@@ -220,58 +212,5 @@ public class ClassFileScanner {
      */
 	public boolean isApplicationParsed() {
 		return applicationParsed;
-	}
-    
-}
-
-
-class WebInfClassLoader extends ClassLoader {
-
-	private String rootDir;
-
-	private HashMap<String, Class> cache = new HashMap<String, Class>();
-
-	private ClassLoader parent;
-
-	public WebInfClassLoader (String rootDir, ClassLoader parent) {
-		this.parent = parent;
-		this.rootDir = rootDir;
-	}
-
-	protected Class loadClass (String name, boolean resolve) 
-	throws ClassNotFoundException {
-		Class clazz = cache.get(name);
-		if(clazz != null) return clazz;
-		try {
-			clazz = parent.loadClass(name);
-		} catch (ClassNotFoundException e) {
-			// Do nothing
-		}
-		if(clazz != null) return clazz;
-
-		if (clazz == null) {
-			String filename = name.replace ('.', File.separatorChar) + ".class";
-			try {
-				byte data[] = loadClassData(filename);
-				clazz = defineClass (name, data, 0, data.length);
-				if (clazz == null)
-					throw new ClassNotFoundException (name);
-
-			} catch (IOException e) {
-				throw new ClassNotFoundException ("Error reading file: " + filename);
-			}
-		}
-		return clazz;
-	}
-	private byte[] loadClassData (String filename) 
-	throws IOException {
-		File file = new File (rootDir, filename);
-		int size = (int)file.length();
-		byte buff[] = new byte[size];
-		FileInputStream fileStream = new FileInputStream(file);
-		DataInputStream dataStream = new DataInputStream (fileStream);
-		dataStream.readFully (buff);
-		dataStream.close();
-		return buff;
 	}
 }
