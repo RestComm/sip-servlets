@@ -54,9 +54,12 @@ public class SipSecurityUtils {
 	
 	public static boolean authorize(SipStandardContext sipStandardContext, SipServletRequestImpl request)
 	{
-		boolean authorized = false;
+		boolean allConstrainsSatisfied = true;
 		GenericPrincipal principal = (GenericPrincipal) request.getUserPrincipal();
 		SecurityConstraint[] constraints = sipStandardContext.findConstraints();
+		
+		// If we have no constraints, just authorize the request;
+		if(constraints.length == 0) return true;
 		
 		constraints: for(SecurityConstraint constraint:constraints)
 		{
@@ -75,15 +78,18 @@ public class SipSecurityUtils {
 						// If yes, see if the current user is in a role compatible with the
 						// required roles for the resource.
 						if(principal == null) return false;
+						boolean constraintSatisfied = false;
 						for(String assignedRole:constraint.findAuthRoles()) {
 							if(principal.hasRole(assignedRole)) {
-								return true;
+								constraintSatisfied = true;
+								break;
 							}
 						}
+						if(!constraintSatisfied) allConstrainsSatisfied = false;
 					}
 				}
 			}
 		}
-		return false;
+		return allConstrainsSatisfied;
 	}
 }

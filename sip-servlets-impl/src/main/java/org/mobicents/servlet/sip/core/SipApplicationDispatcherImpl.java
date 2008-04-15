@@ -90,7 +90,9 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
+import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -897,6 +899,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					routingRegion, 
 					sipApplicationRoutingDirective, 
 					stateInfo);
+		
 		// 15.4.1 Procedure : point 2
 		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 		if(sipRouteModifier != null) {
@@ -1008,6 +1011,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}
 			// follow the procedures of Chapter 16 to select a servlet from the application.			
 			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
+			
 			//no matching deployed apps
 			if(sipContext == null) {
 				logger.error("No matching deployed application has been found !");
@@ -1018,6 +1022,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				forwardStatefully(sipServletRequest);
 				return true;
 			}
+			
 			appSession.setSipContext(sipContext);
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
 			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
@@ -1033,11 +1038,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					return false;
 				} 
 			}
-			Container container = sipContext.findChild(sipSessionHandlerName);
-			Wrapper sipServletImpl = (Wrapper) container;
 			try {
-				Servlet servlet = sipServletImpl.allocate();	        
-				servlet.service(sipServletRequest, null);
+				callServlet(sipServletRequest, sipServletRequest.getSipSession());
 				logger.info("Request event dispatched to " + sipContext.getApplicationName());				
 			} catch (ServletException e) {				
 				logger.error(e);
@@ -1379,6 +1381,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {
+		if(!securityCheck(request)) return;
 		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 		Wrapper sipServletImpl = (Wrapper) container;
 		Servlet servlet = sipServletImpl.allocate();	        
@@ -1393,6 +1396,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		Wrapper sipServletImpl = (Wrapper) container;		
 		Servlet servlet = sipServletImpl.allocate();	        
 		servlet.service(null, response);		
+	}
+	
+	public static boolean securityCheck(SipServletRequestImpl request)
+	{
+		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
+		SipStandardContext sipStandardContext = (SipStandardContext) appSession.getSipContext();
+		boolean authenticated = SipSecurityUtils.authenticate(sipStandardContext, request);
+		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
+		return authenticated && authorized;
 	}
 	
 	/**
