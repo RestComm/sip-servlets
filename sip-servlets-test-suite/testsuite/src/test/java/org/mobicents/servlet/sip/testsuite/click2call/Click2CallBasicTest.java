@@ -3,8 +3,10 @@ package org.mobicents.servlet.sip.testsuite.click2call;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.Properties;
 
+import javax.sip.InvalidArgumentException;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
@@ -101,18 +103,21 @@ public class Click2CallBasicTest extends SipServletTestCase{
 		sipStackReceivers = new SipStack[receiversCount];
 		sipPhoneReceivers = new SipPhone[receiversCount];
 		try {
-
-			for(int q=0; q<receiversCount; q++)
-			{
-				int port = 5058 - 1 - q;
-				sipStackReceivers[q] = makeStack(SipStack.PROTOCOL_UDP, port);
-				sipPhoneReceivers[q] = sipStackReceivers[q].createSipPhone(
-						"localhost", SipStack.PROTOCOL_UDP, 5070, "sip:receiver@nist.gov");
-			}
-		}
-		catch(Exception e) {
+			sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, 5057);
+			sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone(
+					"127.0.0.1", SipStack.PROTOCOL_UDP, 5070, "sip:to@127.0.0.1");
+			
+			sipStackReceivers[1] = makeStack(SipStack.PROTOCOL_UDP, 5056);
+			sipPhoneReceivers[1] = sipStackReceivers[1].createSipPhone(
+					"127.0.0.1", SipStack.PROTOCOL_UDP, 5070, "sip:from@127.0.0.1");
+		} catch (InvalidArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 		
 	public void init()
