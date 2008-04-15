@@ -65,18 +65,19 @@ public class SimpleWebServlet extends HttpServlet
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
 
         if(bye != null) {
-        	// Someone wants to end an established call, send byes and clean up
-        	Iterator iterator = appSession.getSessions("sip");
-        	while(iterator.hasNext()) {
-        		SipSession session = (SipSession) iterator.next();
-        		String addr = session.getRemoteParty().getURI().toString();
-        		if(addr.equals(to.toString())) {
-        			SipServletRequest byeBye = session.createRequest("BYE");
-        			byeBye.send();
+        	if(bye.equals("all")) {
+        		Iterator it = (Iterator) appSession.getSessions("sip");
+        		while(it.hasNext()) {
+        			SipSession session = (SipSession) it.next();
+        			Call call = (Call) session.getAttribute("call");
+        			call.end();
         		}
+        	} else {
+        		// Someone wants to end an established call, send byes and clean up
+        		Call call = calls.getCall(fromAddr, toAddr);
+        		call.end();
+        		calls.removeCall(fromAddr, toAddr);
         	}
-        	calls.removeCall(from.toString(), to.toString());
-        	calls.removeCall(to.toString(), from.toString());
         } else {
         	if(calls == null) {
         		calls = new CallStatusContainer();
@@ -84,13 +85,17 @@ public class SimpleWebServlet extends HttpServlet
         	}
         	
         	// Add the call in the active calls
-        	calls.addCall(fromAddr, toAddr, "FFFF00");
+        	Call call = calls.addCall(fromAddr, toAddr, "FFFF00");
 
         	SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
 
         	// Set some attribute
         	req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
-
+        	req.getSession().setAttribute("call", call);
+        	
+        	// This session will be used to send BYE
+        	call.addSession(req.getSession());
+        	
         	logger.info("Sending request" + req);
         	// Send the INVITE request            
         	req.send();

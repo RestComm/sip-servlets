@@ -2,48 +2,36 @@ package org.mobicents.servlet.sip.example;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+
+import javax.servlet.sip.SipSession;
 
 public class CallStatusContainer{
-	public class Call
-	{
-		private String from;
-		private String to;
-		
-		public Call(String from, String to) {
-			this.from = from;
-			this.to = to;
-		}
-		
-		public String getFrom() {
-			return from;
-		}
-		
-		public String getTo() {
-			return to;
-		}
-		
-		public boolean equals(Object a) {
-			Call other = (Call) a;
-			if(other.from.equals(from) && other.to.equals(to)) return true;
-			return false;
-		}
-		
-		public int hashCode() {
-			return from.hashCode()^to.hashCode();
-		}
-	}
 	
-	private HashMap<Call,String> activeCalls = new HashMap<Call,String> ();
+	private HashSet<Call> activeCalls = new HashSet<Call> ();
 	
-	public void addCall(String from, String to, String status) {
-		activeCalls.put(new Call(from, to), status);
+	public Call addCall(String from, String to, String status) {
+		Call call = new Call(from, to);
+		call.setStatus(status);
+		activeCalls.add(call);
+		return call;
 	}
 	
 	public void removeCall(String from, String to) {
 		activeCalls.remove(new Call(from, to));
 	}
 	
+	public Call getCall(String from, String to) {
+		Iterator<Call> it = activeCalls.iterator();
+		while(it.hasNext()) {
+			Call call = it.next();
+			if(call.getFrom().equals(from) && call.getTo().equals(to))
+				return call;
+		}
+		return null;
+	}
+	
 	public String getStatus(String from, String to) {
-		return activeCalls.get(new Call(from, to));
+		return getCall(from,to).getStatus();
 	}
 }

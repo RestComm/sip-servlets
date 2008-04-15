@@ -89,7 +89,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 				invite.getSession().setAttribute("FirstPartyAck", ack);
 				invite.getSession().setAttribute("FirstPartyContent", resp.getContent());
 				
-
+				Call call = (Call) session.getAttribute("call");
+				
+				// The call links the two sessions, add the new session to the call
+				call.addSession(invite.getSession());
+				invite.getSession().setAttribute("call", call);
+				
 				invite.send();
 
 				session.setAttribute("InviteSent", Boolean.TRUE);

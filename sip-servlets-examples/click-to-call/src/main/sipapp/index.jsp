@@ -51,9 +51,7 @@ if(users == null) {
 		for(String toAddr:userArray) {
 			if(!toAddr.equals(fromAddr)) {
 				String toAddrV = users.get(toAddr);
-				String status = calls==null? null:calls.getStatus(toAddrV, fromAddrV);
-				String oppositeStatus = calls==null? null:calls.getStatus(fromAddrV, toAddrV);
-				if(status == null) status = oppositeStatus;
+				String status = calls==null? null:calls.getStatus(fromAddrV, toAddrV);
 				if(status == null) status = "FFFFFF"; // This is hex RGB color
 				if(status.equals("FFFFFF"))
 					out.println("<td bgcolor=\"#" + status 
@@ -73,7 +71,9 @@ if(users == null) {
 		out.println("<tr>");
 	}
 	out.println("</table>");
+	out.println("<br/><a href=\"call?bye=all\">Close all calls</a>");
 }
+
 %>
 </body>
 </html>
