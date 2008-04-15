@@ -73,7 +73,8 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 	 * session as expiration timer
 	 */
 	private Serializable _endObject;
-
+	private ServletTimerImpl _expirationTimer;
+	
 	/**
 	 * Lock for this application session
 	 */
@@ -94,7 +95,7 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 	public SipServletApplicationImpl(String name, String icon, String icon2,
 			String name2, String _description, boolean _distributable,
 			HashMap params, SipListenersHolder _listeners, String servlet,
-			HashMap _servlets, HashMap mapping, int timeout, int timeout2,
+			HashMap _servlets, HashMap mapping, int proxyTimeout, int sessionTimeout,
 			HashMap envRefs, HashMap ref, HashMap constraints,
 			LoginConfig config, HashMap roles, HashMap entries, HashMap refs,
 			HashMap localRefs,
@@ -113,8 +114,8 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 		_mainServlet = servlet;
 		this._servlets = _servlets;
 		_servletMapping = mapping;
-		_proxyTimeout = timeout;
-		_sessionTimeout = timeout2;
+		_proxyTimeout = proxyTimeout;
+		_sessionTimeout = sessionTimeout;
 		_resourceEnvRefs = envRefs;
 		_resourcesRef = ref;
 		_securityConstraints = constraints;

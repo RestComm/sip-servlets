@@ -226,7 +226,11 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 
 	}
 
-	
+	public boolean canRun()
+	{
+		return !this._future.isCancelled() && !this._future.isDone();
+		
+	}
 	
 	
 	

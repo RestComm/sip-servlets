@@ -1,6 +1,8 @@
 package org.mobicents.servlet.sip.core.session;
 
 import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.TimerListener;
 
 public class AgregatingListener implements TimerListener {
@@ -21,6 +23,9 @@ public class AgregatingListener implements TimerListener {
 		
 		if(timer.getInfo().equals(this._app.getEndObject()))
 		{
+			SipApplicationSessionEvent ev=new SipApplicationSessionEvent(this._app);
+			for(SipApplicationSessionListener l: this._app.getListeners().getSipApplicationSessionListeners())
+				l.sessionExpired(ev);
 			this._app.expirationTimerFired();
 		}else
 		{
