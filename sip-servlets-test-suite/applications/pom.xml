@@ -18,6 +18,7 @@
 		<module>call-forwarding-b2bua-servlet</module>
 		<module>speed-dial-servlet</module>
 		<module>location-service-servlet</module>
+		<module>click-to-call-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
