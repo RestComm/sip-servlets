@@ -23,6 +23,7 @@ import javax.sip.message.Response;
 
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -110,6 +111,11 @@ public class ProxyUtils {
 							params.routeRecord.getParameter(paramName));
 				}
 				
+				rrURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+						originalRequest.getSipSession().getKey().getApplicationName());
+				rrURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+						originalRequest.getSipSession().getHandler());
+
 				Address rraddress = SipFactories.addressFactory
 				.createAddress(null, rrURI);
 				RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
