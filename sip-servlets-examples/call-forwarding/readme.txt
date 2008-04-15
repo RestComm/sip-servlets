@@ -18,9 +18,7 @@ file:///E:/workspaces/sip-servlets/sip-servlets-examples/call-forwarding/call-fo
 To use:
 You can run Tomcat.
 Start two SIP Phones.
-One should be setup such as the From Header should be one of the following address :
-sip:forward-sender@sip-servlets.com or sip:forward-sender@127.0.0.1
-The other one should be setup as forward-receiver on ip address 127.0.0.1 and port 5090   
+One phone should be setup as forward-receiver on ip address 127.0.0.1 and port 5090   
    
 The SIP phone doesn't have to be registered.
 We recommend using 3CX Phone, SJ Phone or WengoPhone. 

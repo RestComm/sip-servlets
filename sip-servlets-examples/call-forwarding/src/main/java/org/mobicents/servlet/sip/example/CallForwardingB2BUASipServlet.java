@@ -41,13 +41,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 		logger.info("the call forwarding B2BUA sip servlet has been started");
 		super.init(servletConfig);
 		forwardingUris = new HashMap<String, String[]>();
-		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
+		forwardingUris.put("sip:receiver@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:blocked-sender@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:forward-sender@127.0.0.1", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:blocked-sender@127.0.0.1", 
+		forwardingUris.put("sip:receiver@127.0.0.1", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 	}
 	
@@ -63,7 +59,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 
 		logger.info("Got INVITE: " + request.toString());
 		logger.info(request.getFrom().getURI().toString());
-		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
+		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
 			helper = request.getB2buaHelper();						
 			
