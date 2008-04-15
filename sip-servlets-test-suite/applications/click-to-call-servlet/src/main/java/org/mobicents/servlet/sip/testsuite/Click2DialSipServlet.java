@@ -11,11 +11,11 @@ import javax.servlet.sip.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SimpleSipServlet extends SipServlet implements SipErrorListener,
+public class Click2DialSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Log logger = LogFactory.getLog(Click2DialSipServlet.class);
 	
-	public SimpleSipServlet() {
+	public Click2DialSipServlet() {
 	}
 	
 	@Override

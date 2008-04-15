@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/click-to-call-servlet/src/main/sipapp/WEB-INF/classes" path="applications/click-to-call-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/shootist-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/shootist-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/proxy-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/proxy-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/b2bua-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/b2bua-sip-servlet/src/main/java"/>
@@ -31,12 +32,18 @@
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/tomcat/catalina/5.5.15/catalina-5.5.15.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.3/servlet-api-2.3-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-digester/commons-digester/1.2/commons-digester-1.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/directory-naming/naming-core/0.8/naming-core-0.8.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2/jain-sip-ri-1.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar" sourcepath="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2-sources.jar"/>
 	<classpathentry kind="lib" path="testsuite/lib/sipunit.jar"/>
+	<classpathentry kind="var" path="M2_REPO/tomcat/tomcat-http/5.5.15/tomcat-http-5.5.15.jar"/>
+	<classpathentry kind="var" path="M2_REPO/tomcat/jasper-compiler/5.5.15/jasper-compiler-5.5.15.jar"/>
+	<classpathentry kind="var" path="M2_REPO/tomcat/jasper-runtime/5.5.15/jasper-runtime-5.5.15.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/tomcat/servlets-default/5.5.15/servlets-default-5.5.15.jar"/>
+	<classpathentry kind="var" path="M2_REPO/tomcat/servlets-invoker/5.5.15/servlets-invoker-5.5.15.jar"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>

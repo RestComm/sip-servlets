@@ -21,6 +21,7 @@ import org.apache.catalina.security.SecurityConfig;
 import org.apache.catalina.startup.CatalinaProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.coyote.http11.Http11Protocol;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
@@ -143,9 +144,9 @@ public class SipEmbedded {
 		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
 		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 		 */
-		Connector connector = new Connector(
+		Connector sipConnector = new Connector(
 				SipProtocolHandler.class.getName());
-		SipProtocolHandler ph = (SipProtocolHandler) connector
+		SipProtocolHandler ph = (SipProtocolHandler) sipConnector
 				.getProtocolHandler();
 		ph.setPort(5070);
 		ph.setDebugLog("../logs/debuglog.txt");
@@ -156,7 +157,21 @@ public class SipEmbedded {
 		ph.setSipPathName("gov.nist");
 		ph.setSipStackName("SIP-Servlet-Tomcat-Server");
 
-		sipStandardService.addConnector(connector);
+		sipStandardService.addConnector(sipConnector);
+		
+		//HTTP connector
+		Connector httpConnector = new Connector(
+				Http11Protocol.class.getName());
+		Http11Protocol httpProtocolHandler = (Http11Protocol) httpConnector
+				.getProtocolHandler();		
+		httpProtocolHandler.setPort(8080);		
+		httpProtocolHandler.setDisableUploadTimeout(true);
+		httpProtocolHandler.setMaxHttpHeaderSize(8192);
+		httpProtocolHandler.setMaxSpareThreads(75);
+		httpProtocolHandler.setMaxThreads(150);
+		httpProtocolHandler.setMinSpareThreads(75);		
+
+		sipStandardService.addConnector(httpConnector);
 		// Start the embedded server
 		sipStandardService.start();				
 	}

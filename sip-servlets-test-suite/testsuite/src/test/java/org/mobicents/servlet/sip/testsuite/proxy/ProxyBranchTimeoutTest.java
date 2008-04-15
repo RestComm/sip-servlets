@@ -142,7 +142,7 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase{
 			receiverCalls[0].waitForIncomingCall(timeout);
 			
 			receiverCalls[0].sendIncomingCallResponse(Response.RINGING, "Ringing", 0);
-			assertTrue(sender.waitOutgoingCallResponse(5));
+			assertTrue(sender.waitOutgoingCallResponse(30));
 			
 			Thread.sleep(11000); // The built-in response wait doesnt work.
 			receiverCalls[0].waitForDisconnect(15);

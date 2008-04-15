@@ -25,6 +25,21 @@
 			<artifactId>sip-servlets-impl</artifactId>
 			<version>0.1</version>
 		</dependency>
+		
+		<!-- j2ee dependencies -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>			
+		</dependency>
+		
+		<!-- j2ee dependencies -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.0</version>			
+		</dependency>
+		
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -70,6 +85,36 @@
 		<dependency>
 			<groupId>tomcat</groupId>
 			<artifactId>tomcat-util</artifactId>
+			<version>5.5.15</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>tomcat-http</artifactId>
+			<version>5.5.15</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>jasper-compiler</artifactId>
+			<version>5.5.15</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>jasper-runtime</artifactId>
+			<version>5.5.15</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>servlets-default</artifactId>
+			<version>5.5.15</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>servlets-invoker</artifactId>
 			<version>5.5.15</version>
 		</dependency>
 
