@@ -32,22 +32,17 @@ in tomcat_home/lib directory, there should be a commons-logging-1.1.jar
 
 make a backup of your tomcat_home/conf/server.xml file
 copy the server-tomcat-6.xml located in docs to tomcat_home/conf and rename it to server.xml
-look for the context tag in the server.xml file and 
-modify the docbase attribute to map to your existing simple-sip-servlet application
 look for service tag in the server.xml file and 
 modify the darConfigurationFileLocation attribute to map to your filesystem
-
-make sure to run a mvn clean install at the root of simple-sip-servlet project too
-
-Run mvn war:inplace 
-and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
-and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
-(This would be removed automatically through maven when time will permit...)
     	
 go to your tomcat_home/bin directory
 run the following command
 catalina.bat run
-When the server has been started you should see the following logs on the standard output
+
+Run a mvn clean install at the root of simple-sip-servlet project
+and drop in the tomcat_home\webapps directory the war file generated in target dir of simple-sip-servlet, you should see the deployment occuring.
+
+you should see the following logs on the standard output
 18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
 INFO: /WEB-INF/sip.xml has been found !
 18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
@@ -68,3 +63,5 @@ INFO: Server startup in 1984 ms
 
 otherwise this file has not yet been updated with the latest steps or I screwed up somewhere. 
 In any case send me an email or ping me on gmail jean.deruelle@gmail.com if you encounter any problems ;-)
+
+To play with real examples check out the different examples located under trunk/sip-servlets-examples on the svn repo.

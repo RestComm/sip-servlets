@@ -101,9 +101,9 @@
             -->
 
 
-           <Context name="click2-call-context" path="/click2call" docBase="click-to-call" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig">
+           <!--Context name="click2-call-context" path="/click2call" docBase="click-to-call" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig">
 			       <Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
-		   </Context>
+		   </Context-->
 
             <!-- Uncomment to enable request dumper. This Valve "logs interesting 
                  contents from the specified Request (before processing) and the 

@@ -36,10 +36,8 @@ make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/server
 copy the server-jboss.xml located in docs to jboss_home/server/default/deploy/jboss-web.deployer/ and rename it to server.xml
 look for service tag in the server.xml file and 
 modify the darConfigurationFileLocation attribute to map to your filesystem
-look for the context tag in the server.xml file and 
-modify the docbase attribute to map to your existing simple-sip-servlet application
 
-Now you need to modify some extra config files so that jboss can deploy war files 
+Now you need to modify some extra config files so that jboss can deploy sar2/war files 
 containing sip servlet application :
 
 In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml :
@@ -53,21 +51,15 @@ modify the class xml tag of the mbean tag so that it become
 <class>org.mobicents.servlet.sip.startup.jboss.JBossSip</class>
 
 You're all set !
-
-make sure to run a mvn clean install at the root of simple-sip-servlet project too
-
-Run mvn war:inplace 
-and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
-and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
-(This would be removed automatically through maven when time will permit...)
     	
 go to your jboss_home/bin directory
 run the following command
 run.bat
 
-otherwise this file has not yet been updated with the latest steps or I screwed up somewhere.
+Run a mvn clean install at the root of simple-sip-servlet project
+and drop in the jboss_home\server\default\deploy directory the war file generated in target dir of simple-sip-servlet, you should see the deployment occuring.
 
-Alternatively you can comment the context tag in the server.xml you copied earlier and just drop the generated war file
-in the jboss_home\server\default\deploy directory (make sure you remove the web.xml file from the archive prior to that)  
- 
+To play with real examples check out the different examples located under trunk/sip-servlets-examples on the svn repo.
+
+otherwise this file has not yet been updated with the latest steps or I screwed up somewhere.  
 In any case send me an email or ping me on gmail jean.deruelle@gmail.com if you encounter any problems ;-)

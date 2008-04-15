@@ -204,7 +204,7 @@
        -->      
       <Host appBase="E:\servers\apache-tomcat-6.0.14\webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false" hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig">
 
-		<Context name="sip-test-context" path="/simple-sip-servlet" docBase="simple-sip-servlet" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
+		<!--Context name="sip-test-context" path="/simple-sip-servlet" docBase="simple-sip-servlet" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
 			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
 		</Context>
 
@@ -226,7 +226,7 @@
 		
 		<Context name="locationservice" path="/locationservice" docBase="location-service" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
 			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
-		</Context>			 
+		</Context-->			 
 			
         <!-- Defines a cluster for this node,
              By defining this element, means that every manager will be changed.
