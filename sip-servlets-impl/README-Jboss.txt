@@ -46,11 +46,11 @@ In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml :
 Add this attribute to the manager xml tag, className="org.mobicents.servlet.sip.core.session.SipStandardManager"
 
 In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\jboss-service.xml :
-modify the code attribute of the mbean tag so that it become code="org.mobicents.servlet.sip.startup.jboss.JBossConverged"
+modify the code attribute of the mbean tag so that it become code="org.mobicents.servlet.sip.startup.jboss.JBossSip"
 
 In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\webserver-xmbean.xml :
 modify the class xml tag of the mbean tag so that it become 
-<class>org.mobicents.servlet.sip.startup.jboss.JBossConverged</class>
+<class>org.mobicents.servlet.sip.startup.jboss.JBossSip</class>
 
 You're all set !
 

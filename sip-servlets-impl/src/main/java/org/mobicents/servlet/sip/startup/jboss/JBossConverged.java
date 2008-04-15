@@ -19,10 +19,8 @@ import java.net.URL;
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.web.AbstractWebDeployer;
 import org.jboss.web.tomcat.service.JBossWeb;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 /**
  * Extending the JBossWeb implementation of AbstractWebContainer to be able to deploy
@@ -34,24 +32,24 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
  * @author Jean Deruelle
  *
  */
-public class JBossConverged extends JBossWeb {
-	
+public class JBossConverged extends JBossWeb {						
+		
 	@Override
 	public AbstractWebDeployer getDeployer(DeploymentInfo di) throws Exception {
 		if(isSipServletApplication(di)) {
 			String initialContextMBeanCode = getContextMBeanCode();
-			String initialManagerClass = getManagerClass();
+//			String initialManagerClass = getManagerClass();
 			// default to sip standard context and sip specific manager 
 			// if this is a sip servlet application
 			setContextMBeanCode(SipHostConfig.SIP_CONTEXT_CLASS);
-			setManagerClass(SipStandardManager.class.getName());
+//			setManagerClass(SipStandardManager.class.getName());
 			
 			//getting the deployer
 			AbstractWebDeployer deployer = super.getDeployer(di);
 			
 			// setting it back to default value for next potential deployements
 			setContextMBeanCode(initialContextMBeanCode);
-			setManagerClass(initialManagerClass);
+//			setManagerClass(initialManagerClass);
 			
 			return deployer;
 		} else {
@@ -66,7 +64,7 @@ public class JBossConverged extends JBossWeb {
 	 * @param di the service deployment info
 	 * @return true if the service being deployed contains WEB-INF/sip.xml, false otherwise 
 	 */
-	private boolean isSipServletApplication(DeploymentInfo di) {
+	public static boolean isSipServletApplication(DeploymentInfo di) {
 		URL url = di.localCl.findResource(SipContext.APPLICATION_SIP_XML);
 		if(url != null) {
 			try {

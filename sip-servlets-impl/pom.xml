@@ -115,6 +115,12 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jbosssx.jar</systemPath>
 		</dependency>
+		
+		<dependency>
+			<groupId>geronimo-spec</groupId>
+			<artifactId>geronimo-spec-j2ee-jacc</artifactId>
+			<version>1.0-rc4</version>
+		</dependency>
 	</dependencies>
 	<build>		
 	</build>

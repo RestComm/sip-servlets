@@ -130,7 +130,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public static final String APP_NOT_DEPLOYED = "appnotdeployed";
 	
-	private static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
+	public static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
 		nonInitialSipRequestMethods.add("CANCEL");

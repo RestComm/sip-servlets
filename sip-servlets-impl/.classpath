@@ -24,5 +24,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.14/coyote-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1-SNAPSHOT/sip-servlets-spec-1.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jbosssx.jar"/>
+	<classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

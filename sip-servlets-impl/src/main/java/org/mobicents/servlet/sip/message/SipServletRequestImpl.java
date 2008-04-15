@@ -364,12 +364,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		 * 
 		 * TODO: FIXME: MESSAGE requests can be both initial and noninitial
 		 * so they still may be misclassified.
-		 */
-		String method = this.getMethod();
-		if(method.equals(Request.BYE)) return false;
-		if(method.equals(Request.ACK)) return false;
-		if(method.equals(Request.CANCEL)) return false;
-		if(method.equals(Request.PRACK)) return false;
+		 */		
+		if(SipApplicationDispatcherImpl.nonInitialSipRequestMethods.contains(this.getMethod())) { 
+			return false;		
+		}
 		
 		return this.routingState.equals(RoutingState.INITIAL) || 
 			this.routingState.equals(RoutingState.PROXIED) ||
