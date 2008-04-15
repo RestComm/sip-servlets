@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.CallBlockingSipServlet</app-name>
+	<display-name>Call Blocking Sip Servlet</display-name>
+	<description>Call Blocking Sip Servlet</description>
+	
+	<main-servlet>
+		CallBlockingSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>CallBlockingSipServlet</servlet-name>
+		<display-name>CallBlockingSipServlet</display-name>
+		<description>Call Blocking Sip Servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.CallBlockingSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.CallBlockingSipServlet
+		</listener-class>
+	</listener>
+</sip-app>
