@@ -389,7 +389,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
 				this, key);
 		SipListenersHolder listeners = sipContext.getListeners();
-		if (sipApplicationSessionAttributeMap.containsKey(key)) {
+		if (!sipApplicationSessionAttributeMap.containsKey(key)) {
 			// This is initial, we need to send value bound event
 			if(logger.isDebugEnabled()) {
 				logger.debug("notifying SipApplicationSessionBindingListeners of value bound on key "+ key);

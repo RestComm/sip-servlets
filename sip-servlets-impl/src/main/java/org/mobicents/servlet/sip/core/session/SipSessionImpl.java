@@ -424,7 +424,7 @@ public class SipSessionImpl implements SipSession {
 	public void invalidate() {
 		if(state.equals(State.CONFIRMED)
 				|| state.equals(State.EARLY))
-			throw new IllegalStateException("Can not invalidate sessions in" + 
+			throw new IllegalStateException("Can not invalidate session in " + 
 					state.toString() + " state.");
 		if(isSupervisedMode() && ongoingTransactions.size()>0)
 			throw new IllegalStateException("Can not invalidate session with " +
