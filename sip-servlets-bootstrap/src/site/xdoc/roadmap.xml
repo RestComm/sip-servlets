@@ -34,7 +34,7 @@
 			<subsection name="Planned Versions">
 				<subsection name="Version 0.2 - 02/01/2008">
 					<p>
-						<img src="images/orange.jpeg" />
+						<img src="images/green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=12">
 							Listeners
@@ -76,7 +76,7 @@
 							Servlet 2.5 Alignement and Annotations
 						</a>
 						<br />
-						<img src="images/orange.jpeg" />
+						<img src="images/green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=4">
 							Running on top of Tomcat 6
@@ -96,8 +96,11 @@
 						Real world Application Router
 						<br />
 						<img src="images/red.jpeg" />
-						Distributable applications
+						Merge SIP Session Management with HTTP Session Management
 						<br />
+						<img src="images/red.jpeg" />
+						Distributable applications
+						<br />						
 						<img src="images/red.jpeg" />
 						TCK
 						<br />
