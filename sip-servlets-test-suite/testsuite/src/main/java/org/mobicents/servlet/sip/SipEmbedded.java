@@ -167,9 +167,9 @@ public class SipEmbedded {
 		httpProtocolHandler.setPort(8080);		
 		httpProtocolHandler.setDisableUploadTimeout(true);
 		httpProtocolHandler.setMaxHttpHeaderSize(8192);
-		httpProtocolHandler.setMaxSpareThreads(75);
-		httpProtocolHandler.setMaxThreads(150);
-		httpProtocolHandler.setMinSpareThreads(75);		
+//		httpProtocolHandler.setMaxSpareThreads(75);
+//		httpProtocolHandler.setMinSpareThreads(75);
+		httpProtocolHandler.setMaxThreads(150);		
 
 		sipStandardService.addConnector(httpConnector);
 		// Start the embedded server
