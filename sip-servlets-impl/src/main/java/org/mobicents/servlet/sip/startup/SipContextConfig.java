@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
+import org.mobicents.servlet.sip.annotations.ClassFileScanner;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
@@ -71,6 +72,7 @@ public class SipContextConfig extends ContextConfig implements
 	protected synchronized void start() {
 		logger.info("starting sipContextConfig");
 		ServletContext servletContext = context.getServletContext();
+
 		// calling start on the parent to initialize web resources of the web
 		// app if any. That mean that this is a converged application.
 		InputStream webXmlInputStream = servletContext
@@ -81,6 +83,9 @@ public class SipContextConfig extends ContextConfig implements
 			super.start();
 		}		
 		context.setWrapperClass(SipServletImpl.class.getName());
+		SipStandardContext sipctx = (SipStandardContext) context;
+		ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath() + "/WEB-INF/classes/", sipctx);
+		scanner.scan();
 		InputStream sipXmlInputStream = servletContext
 				.getResourceAsStream(APPLICATION_SIP_XML);
 		// processing of the sip.xml file
@@ -113,6 +118,10 @@ public class SipContextConfig extends ContextConfig implements
 			logger.info(APPLICATION_SIP_XML + " has not been found !");
 			ok = false;
 		}
+		
+		// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
+		if(scanner.isApplicationParsed()) ok = true;
+		
 		// Make our application available if no problems were encountered
 		if (ok) {
 			context.setConfigured(true);						
