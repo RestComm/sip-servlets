@@ -3,6 +3,8 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.stack.SIPServerTransaction;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +17,7 @@ import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
+import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
 
@@ -22,6 +25,12 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -40,6 +49,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	private SipApplicationRouter sipApplicationRouter = null;
 	//map of applications deployed
 	private Map<String, SipContext> applicationDeployed = null;
+	
+	private SessionManager sessionManager = new SessionManager();
 	
 	/**
 	 * 
@@ -119,14 +130,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void processRequest(RequestEvent arg0) {
-		logger.info("got a request event");
-//		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
-//				requestEvent.getRequest(), (SipProvider) requestEvent
-//						.getSource(), requestEvent.getDialog(),requestEvent.getServerTransaction());
-		logger.info("dispatching the request event");
+	public void processRequest(RequestEvent requestEvent) {
+		logger.info("Got a request event");
+		
+		SipSessionImpl session = sessionManager.getRequestSession(requestEvent);
+		
+		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
+				(SipProvider) requestEvent.getSource(),
+				session,
+				(SIPServerTransaction) session.getInitialTransaction());
+		
+		logger.info("Dispatching the request event");
+		
 		SipApplicationRouterInfo applicationRouterInfo = 
-			sipApplicationRouter.getNextApplication(null, null, SipApplicationRoutingDirective.NEW, null);
+			sipApplicationRouter.getNextApplication(sipServletRequest, null, SipApplicationRoutingDirective.NEW, null);
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			//TODO sends an error message
 		} else {
@@ -143,7 +160,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.error("Problem during invocation of servlet "+ mainServlet,e);				
 			}
 		}
-		logger.info("request event dispatched");
+		logger.info("Request event dispatched");
 	}
 	/**
 	 * {@inheritDoc}

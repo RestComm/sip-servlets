@@ -3,6 +3,9 @@ package org.mobicents.servlet.sip.message;
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.ContentEncoding;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.stack.SIPClientTransaction;
+import gov.nist.javax.sip.stack.SIPServerTransaction;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -666,5 +669,22 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		return fullName;
 	}
+	 
+	public SIPTransaction getTransaction()
+	{
+		if(clientTransaction != null) 
+			return (SIPClientTransaction) clientTransaction;
+		else 
+			return (SIPServerTransaction) serverTransaction;
+	}
+
+	public SipSession getSipSession() {
+		return sipSession;
+	}
+
+	public void setSipSession(SipSession sipSession) {
+		this.sipSession = sipSession;
+	}
+	
 
 }

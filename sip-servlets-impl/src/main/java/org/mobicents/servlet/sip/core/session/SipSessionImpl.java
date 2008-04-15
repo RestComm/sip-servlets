@@ -1,5 +1,7 @@
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.stack.SIPTransaction;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -32,16 +34,29 @@ public class SipSessionImpl implements SipSession {
 
 	private HashMap<String, Object> _sipSessionAttributeMap;
 	
+	
+	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===
+	// TODO: Refactor this into two Session classes to avoid nulls
+	// and branching on nulls
+	
+	/**
+	 * We use this for dialog-related requests
+	 */
 	private Dialog dialog;
 	
-	private ClientTransaction clientTransaction;
-
-	public SipSessionImpl ( Dialog dialog, ClientTransaction ctx, SipApplicationSessionImpl applicationSession ) {
+	/**
+	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info
+	 */
+	private SIPTransaction initialTransaction;
+	
+	// =============================================================
+	
+	public SipSessionImpl ( Dialog dialog, SIPTransaction transaction, SipApplicationSessionImpl sipApp) {
 		this.dialog = dialog;
-		this.clientTransaction = ctx ;
-		this.sipApplicationSession = applicationSession;
-		
+		this.initialTransaction = transaction;
+		this.sipApplicationSession = sipApp;
 	}
+	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
 		return sipSessionAttributeListeners;
 	}
@@ -244,6 +259,23 @@ public class SipSessionImpl implements SipSession {
 	 */
 	public Dialog getDialog() {
 		return dialog;
+	}
+
+	public SipApplicationSessionImpl getSipApplicationSession() {
+		return sipApplicationSession;
+	}
+
+	public void setSipApplicationSession(
+			SipApplicationSessionImpl sipApplicationSession) {
+		this.sipApplicationSession = sipApplicationSession;
+	}
+
+	public SIPTransaction getInitialTransaction() {
+		return initialTransaction;
+	}
+
+	public void setInitialTransaction(SIPTransaction initialTransaction) {
+		this.initialTransaction = initialTransaction;
 	}
 
 	

@@ -1,5 +1,7 @@
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.stack.SIPTransaction;
+
 import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -9,6 +11,7 @@ import java.util.UUID;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
@@ -369,11 +372,11 @@ public class SipFactoryImpl implements SipFactory {
 			
 			dialog.setApplicationData(sipAppSession);
 
-			SipSessionImpl session = new SipSessionImpl(dialog, ctx,
+			SipSessionImpl session = new SipSessionImpl(dialog, (SIPTransaction) ctx,
 					(SipApplicationSessionImpl) sipAppSession);
 
 			SipServletRequest retVal = new SipServletRequestImpl(
-					sipProvider, session, ctx, this);
+					sipProvider, session, ctx);
 
 			// TODO: Do session association?
 

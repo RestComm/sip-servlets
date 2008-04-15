@@ -180,6 +180,7 @@ public class SipProtocolHandler implements ProtocolHandler {
 				
 			}
 			properties.setProperty("javax.sip.STACK_NAME", sipStackName);
+			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
 
 			// Create SipStack object
 			sipStack = SipFactories.sipFactory.createSipStack(properties);

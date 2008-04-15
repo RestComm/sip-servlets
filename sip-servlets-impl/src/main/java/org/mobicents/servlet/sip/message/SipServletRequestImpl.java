@@ -36,23 +36,21 @@ import javax.sip.message.Request;
 public class SipServletRequestImpl extends SipServletMessageImpl  implements SipServletRequest{
 	
 	
-	public SipServletRequestImpl (SipProvider provider, SipSession sipSession,  ClientTransaction clientTransction, 
-			SipFactoryImpl sipFactory) {
+	public SipServletRequestImpl (SipProvider provider, SipSession sipSession,  ClientTransaction clientTransaction) {
 		
 		super.provider = provider;
 		super.sipSession = sipSession;
 		super.request  = clientTransaction.getRequest();
-		super.sipFactory = sipFactory;
+		super.sipFactory = SipFactoryImpl.getInstance();
 		super.clientTransaction = clientTransaction;
 		
 	}
-	public SipServletRequestImpl (SipProvider provider, SipSession sipSession,  ServerTransaction serverTransction, 
-			SipFactoryImpl sipFactory) {
+	public SipServletRequestImpl (SipProvider provider, SipSession sipSession,  ServerTransaction serverTransaction) {
 		
 		super.provider = provider;
 		super.sipSession = sipSession;
 		super.request  = serverTransaction.getRequest();
-		super.sipFactory = sipFactory;
+		super.sipFactory = SipFactoryImpl.getInstance();
 		super.serverTransaction = serverTransaction;
 	}
 	
@@ -103,7 +101,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl  implements Sip
 		try {	
 			Request cancelRequest = clientTransaction.createCancel();
 			ClientTransaction clientTransaction = super.provider.getNewClientTransaction(cancelRequest);
-			SipServletRequest newRequest = new SipServletRequestImpl(super.provider, super.sipSession,  clientTransaction, super.sipFactory);
+			SipServletRequest newRequest = new SipServletRequestImpl(super.provider, super.sipSession,  clientTransaction);
 			return newRequest;
 		} catch ( SipException ex)	{
 			throw new IllegalStateException("Could not create cancel", ex);
