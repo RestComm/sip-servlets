@@ -1,2 +1,52 @@
 Click To Call
 
+* Service Description
+
+	This simple example shows how SIP Servlets can be used along with HTTP servlets as a converged application 
+	to place calls from a web page. This example consists of the following steps:
+   
+   [[1]]. Alice and Bob each register a SIP Softphone
+   [[2]]. Alice clicks on the "Call" link to place a call to Bob
+   [[3]]. Alice's phone rings
+   [[4]]. When Alice picks up her phone, Bob's phone rings
+   [[5]]. When Bob answers his phone, the call is connected
+   [[6]]. When one of them hangs up, the other one is also disconnected 
+	
+	 
+* How to activate it
+
+** From the binary
+
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the dar file for this service to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.
+	  
+	The darConfigurationFileLocation attribute of the Service tag should be equal to 
+	"conf/dars/dar-click2dial.properties"
+
+	You can now run Tomcat.
+
+** From the source
+
+	Please check out the speed dial example located under this 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/click-to-call}location}} 
+	from the svn repository.
+	Follow the instructions in the README.txt to build and run the example.
+	
+	The DAR file for this example can be found in the sip servlets impl project under the 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs}docs directory}} 
+	Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml):
+	file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties  
+
+* How to play with it
+
+	Starts Two sip phones.
+	
+	Open up a browser to http://localhost:8080/click2call/.
+	You will see the index page where you can enter two SIP URIs. Enter the URIs
+	of the two SIP phones you just started and click "Submit". 
+	
+	The SIP phones don't have to be registered.
+	
+	After you pick up both phones the RTP session starts.
+ 

@@ -1,2 +1,46 @@
 Speed Dial - Location Service : a Composed Application
 
+* Service Description
+
+	This service is a composition of twos other services : 
+	{{{speed_dial.html}Speed Dial}} and {{{location_service.html}Location Service}}
+	
+	The Speed Dial Service will proxy the speed dial number to a sip address, 
+	then the location service will proxies to the actual locations of the callee. 
+	
+	They will be invoked in this order Speed Dial then Location Service. 
+	 
+* How to activate it
+
+** From the binary
+
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the dar file for this service to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.
+	  
+	The darConfigurationFileLocation attribute of the Service tag should be equal to 
+	"conf/dars/speeddial-locationservice-dar.properties"
+
+	You can now run Tomcat.
+
+** From the source
+
+	Please check out the 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/speed-dial}Speed Dial}} and 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/location-service}Location Service}} examples 	
+	from the svn repository and follow their installation instructions in their README.txt.
+	
+	The DAR file for this example can be found in the sip servlets impl project under the 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs}docs directory}} 
+	Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml):
+	file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/speeddial-locationservice-dar.properties  
+
+* How to play with it
+
+	Start two SIP Phones.
+	One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090
+	The other phone can be registered as anything   
+   
+	The SIP phone doesn't have to be registered.
+
+	From the second phone, make a call to sip:1@sip-servlets.com you should have the "receiver" phone ringing.

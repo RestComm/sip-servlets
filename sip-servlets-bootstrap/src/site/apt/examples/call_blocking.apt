@@ -1,2 +1,46 @@
 Call Blocking
 
+* Service Description
+
+	When receiving an INVITE request, Call Blocking checks if the from address 
+	is a blocked contact. If that's the case it sends out a FORBIDDEN in response 
+	otherwise it does nothing.
+	
+	The blocked contacts are for now hard-coded addresses,
+	and should later evolve towards a database.
+	
+	Here is the list of blocked contacts :
+	 
+	 * sip:blocked-sender@sip-servlets.com
+	 		
+	 * sip:blocked-sender@127.0.0.1
+	 
+* How to activate it
+
+** From the binary
+
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the dar file for this service to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.
+	  
+	The darConfigurationFileLocation attribute of the Service tag should be equal to 
+	"conf/dars/call-blocking-servlet-dar.properties"
+
+	You can now run Tomcat.
+
+** From the source
+
+	Please check out the call-blocking example located under this 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-blocking}location}} 
+	from the svn repository.
+	Follow the instructions in the README.txt to build and run the example.  
+
+* How to play with it
+
+	Start a SIP Phone of your choice such as the account name should be blocked-sender.	
+   	The From Header should be one of the following addresses :
+	sip:blocked-sender@sip-servlets.com or sip:blocked-sender@127.0.0.1
+   
+	The SIP phone doesn't have to be registered.
+
+	Make a call to any address, you should receive a Forbidden.

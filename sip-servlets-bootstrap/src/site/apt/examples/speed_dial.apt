@@ -1,2 +1,49 @@
 Speed Dial
 
+* Service Description
+
+	Speed Dial allows a calling party to specify a short speed-dial number (e.g. "1"), 
+	which it translates into a complete address based on prior configuration and 
+	proxies it (without record-routing, and without supervised mode).
+	
+	Speed Dial currently performs a lookup into a hard coded list of addresses 
+	and should later evolve towards a database.
+	
+	Here is the list of hard coded contacts and their locations :
+	 
+	* "1" => "sip:receiver@sip-servlets.com" 
+	* "2" => "sip:mranga@sip-servlets.com" (The Master Blaster)
+	* "3" => "sip:vlad@sip-servlets.com"
+	* "4" => "sip:bartek@sip-servlets.com"
+	* "5" => "sip:jeand@sip-servlets.com"
+	* "9" => "sip:receiver@127.0.0.1:5090" (Special case to be able to run the app standalone)
+	 
+* How to activate it
+
+** From the binary
+
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the dar file for this service to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.
+	  
+	The darConfigurationFileLocation attribute of the Service tag should be equal to 
+	"conf/dars/speed-dial-dar.properties"
+
+	You can now run Tomcat.
+
+** From the source
+
+	Please check out the speed dial example located under this 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/speed-dial}location}} 
+	from the svn repository.
+	Follow the instructions in the README.txt to build and run the example.  
+
+* How to play with it
+
+	Start two SIP Phones.
+	One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090
+	The other phone can be registered as anything   
+   
+	The SIP phone doesn't have to be registered.
+
+	From the second phone, make a call to sip:9@sip-servlets.com you should have the "receiver" phone ringing.

@@ -1,2 +1,50 @@
 Call Forwarding
 
+* Service Description
+
+	When an INVITE receiving a request, the Call Forwarding service checks if 
+	the To address is in the list of hard-coded addresses that needs to be forwarded.
+	
+	If that's the case, then the application acts as a B2BUA and create a new call leg 
+	to the new destination. 
+	When the the response will be received from the new call leg, it will ACK it 
+	and response to the original call leg. 
+	If no Ack is received it should tear down the new call leg with a BYE.
+	When the BYE is received it answers OK directly and 'forwards' the BYE on the new call leg.
+	
+	The contacts to forward are for now hard-coded addresses,
+	and should later evolve towards a database.
+	
+	Here is the list of contacts to forward :
+	 
+	 * sip:receiver@sip-servlets.com
+	 		
+	 * sip:receiver@127.0.0.1
+	 
+* How to activate it
+
+** From the binary
+
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the dar file for this service to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.
+	  
+	The darConfigurationFileLocation attribute of the Service tag should be equal to 
+	"conf/dars/call-forwarding-b2bua-servlet-dar.properties"
+
+	You can now run Tomcat.
+
+** From the source
+
+	Please check out the call-forwarding example located under this 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-forwarding}location}} 
+	from the svn repository.
+	Follow the instructions in the README.txt to build and run the example.  
+
+* How to play with it
+
+	Start two SIP Phones of your choice such as one of the account name should be forward-receiver on ip address 127.0.0.1 and port 5090   
+   
+	The SIP phones don't have to be registered.
+
+	From the first phone, make a call to sip:receiver@sip-servlets.com you should have the phone "forward-receiver" ringing.

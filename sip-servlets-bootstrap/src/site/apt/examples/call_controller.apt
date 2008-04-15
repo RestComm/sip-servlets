@@ -1,2 +1,57 @@
 Call Controller :  a Composed Application
 
+* Service Description
+
+	This service is a composition of twos other services : 
+	{{{call_blocking.html}Call Blocking}} and {{{call_forwarding.html}Call Forwarding}}
+	
+	They will be invoked in this order Call Forwarding then Call Blocking. 
+	 
+* How to activate it
+
+** From the binary
+
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the dar file for this service to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.
+	  
+	The darConfigurationFileLocation attribute of the Service tag should be equal to 
+	"conf/dars/call-controller-servlet-dar.properties"
+
+	You can now run Tomcat.
+
+** From the source
+
+	Please check out the 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-forwarding}Call Forwarding}} and 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-blocking}Call Blocking}} examples 	
+	from the svn repository and follow their installation instructions in their README.txt.
+	
+	The DAR file for this example can be found in the sip servlets impl project under the 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs}docs directory}} 
+	Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml):
+	file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-callblocking-forwarding.properties  
+
+* How to play with it
+
+	We can distinguish two uses cases here : One where the call is blocked and one where the call is forwarded
+	
+** Call Blocked
+
+	Start two SIP Phones of your choice such as one of the account name 
+	should be forward-receiver on ip address 127.0.0.1 and port 5090
+	and the other one should be blocked-sender
+   
+	The SIP phones don't have to be registered.
+
+	From the blocked-sender phone, make a call to sip:receiver@sip-servlets.com you should receive a Forbidden.
+
+** Call Forwarded
+ 
+	Start two SIP Phones of your choice such as one of the account name 
+	should be forward-receiver on ip address 127.0.0.1 and port 5090
+	and the other one should be forward-sender
+   
+	The SIP phones don't have to be registered.
+
+	From the forward-sender phone, make a call to sip:receiver@sip-servlets.com you should have the phone "forward-receiver" ringing.
