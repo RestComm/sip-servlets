@@ -82,8 +82,7 @@
                             <directory>${basedir}/src/main/sipapp/WEB-INF</directory>
                             <!-- override the destination directory for this resource -->
                             <targetPath>WEB-INF</targetPath>
-                            <!-- enable filtering -->
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                             <includes>
                                 <exclude>sip.xml</exclude>
                             </includes>
