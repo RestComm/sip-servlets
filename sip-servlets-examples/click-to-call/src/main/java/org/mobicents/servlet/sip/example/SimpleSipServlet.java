@@ -17,30 +17,25 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	
 	public SimpleSipServlet() {
 	}
-
+	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		System.out.println("the simple sip servlet has been started");
 		super.init(servletConfig);
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void doInvite(SipServletRequest request) throws ServletException,
-			IOException {
-
-		logger.info("SimpleProxyServlet: Got request:\n"
-				+ request.getMethod());
-
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-		
-		URI uri = sipFactory.createAddress("sip:aa@127.0.0.1:5050").getURI();
-		Proxy proxy = request.getProxy();
-		proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
-		proxy.proxyTo(uri);
 	
+	@Override
+	protected void doInvite(SipServletRequest req) throws ServletException,
+			IOException {
+		logger.info("Click2Dial don't handle INVITE. Here's the one we got :  " + req.toString());
+		
+	}
+	
+	@Override
+	protected void doOptions(SipServletRequest req) throws ServletException,
+			IOException {
+		logger.info("Got :  " + req.toString());
+		req.createResponse(SipServletResponse.SC_OK).send();
 	}
 	
 	@Override
@@ -109,16 +104,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got bye");
-
 		SipSession session = request.getSession();
-
 		SipSession linkedSession = (SipSession) session
 				.getAttribute("LinkedSession");
 		if (linkedSession != null) {
 			SipServletRequest bye = linkedSession.createRequest("BYE");
-
 			logger.info("Sending bye to " + linkedSession.getRemoteParty());
-
 			bye.send();
 		}
 
@@ -145,7 +136,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	public void noAckReceived(SipErrorEvent ee) {
 		logger.info("SimpleProxyServlet: Error: noAckReceived.");
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

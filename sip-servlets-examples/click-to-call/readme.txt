@@ -19,6 +19,5 @@ I recommend using 3CX Phone and SJ Phone as the two phones in this demo
 (under Windows), WengoPhone works too. After you pick up both phones the RTP session starts.
  
 If you want to REGISTER use this as a DAR file:
-INVITE: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
 REGISTER: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
 OPTIONS: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
