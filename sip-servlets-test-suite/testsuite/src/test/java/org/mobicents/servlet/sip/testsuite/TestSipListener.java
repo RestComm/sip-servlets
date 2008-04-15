@@ -138,6 +138,12 @@ public class TestSipListener implements SipListener {
 	
 	private void processMessage(Request request,
 			ServerTransaction serverTransactionId) {
+		
+		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
+		request.getHeader(ContentTypeHeader.NAME);		
+		if(CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
+			this.lastMessageContent = new String(request.getRawContent());			
+		}
 		try {
 			Response okResponse = protocolObjects.messageFactory.createResponse(
 					Response.OK, request);			
@@ -150,12 +156,7 @@ public class TestSipListener implements SipListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error("error sending OK response to message", ex);
-		}
-		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
-			request.getHeader(ContentTypeHeader.NAME);		
-		if(CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
-			this.lastMessageContent = new String(request.getRawContent());			
-		}
+		}		
 	}
 
 	private void processCancel(RequestEvent requestEvent,
@@ -680,8 +681,7 @@ public class TestSipListener implements SipListener {
 	 * @throws InvalidArgumentException
 	 * @throws ParseException
 	 */ 
-	public void sendMessageInDialog(String messageToSend) throws SipException, InvalidArgumentException, ParseException {
-		lastMessageContent = null;
+	public void sendMessageInDialog(String messageToSend) throws SipException, InvalidArgumentException, ParseException {		
 		Request message = dialog.createRequest(Request.MESSAGE);
 		ContentLengthHeader contentLengthHeader = 
 			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());
@@ -700,8 +700,7 @@ public class TestSipListener implements SipListener {
 	 * @throws InvalidArgumentException
 	 * @throws ParseException
 	 */ 
-	public void sendMessageNoDialog(String messageToSend) throws SipException, InvalidArgumentException, ParseException {
-		lastMessageContent = null;
+	public void sendMessageNoDialog(String messageToSend) throws SipException, InvalidArgumentException, ParseException {		
 		Request message = dialog.createRequest(Request.MESSAGE);
 		ContentLengthHeader contentLengthHeader = 
 			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());
@@ -717,6 +716,11 @@ public class TestSipListener implements SipListener {
 	 * @return the lastMessageContent
 	 */
 	public String getLastMessageContent() {
-		return lastMessageContent;
+		String content = null;
+		if(lastMessageContent != null) {
+			content = new String(lastMessageContent);
+			lastMessageContent = null;
+		}
+		return content;
 	}	
 }

@@ -2,6 +2,7 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -9,6 +10,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
@@ -23,12 +27,16 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
+import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +47,7 @@ public class ListenersSipServlet
 		implements SipErrorListener, SipServletListener, 
 		SipSessionListener, SipSessionActivationListener, SipSessionBindingListener,
 		SipApplicationSessionListener, SipApplicationSessionActivationListener, SipApplicationSessionBindingListener,
-		SipSessionAttributeListener, SipApplicationSessionAttributeListener {
+		SipSessionAttributeListener, SipApplicationSessionAttributeListener, TimerListener {
 
 	private static Log logger = LogFactory.getLog(ListenersSipServlet.class);
 	
@@ -121,6 +129,11 @@ public class ListenersSipServlet
 		logger.info("Got BYE request: " + request);
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
+		//create a timer to invalidate the sessions
+		request.getSession().setAttribute("sipFactory", sipFactory);
+		request.getSession().getApplicationSession().setAttribute("sipFactory", sipFactory);
+		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
+		timerService.createTimer(request.getApplicationSession(), 5000, false, null);		
 	}	
 
 	@Override
@@ -294,7 +307,24 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipSessionEvent se) {
 		logger.info("sip session destroyed " +  se.getSession());
-		se.getSession().setAttribute(SIP_SESSION_DESTROYED, OK);
+		SipFactory storedFactory = (SipFactory)se.getSession().getAttribute("sipFactory");
+		SipApplicationSession sipApplicationSession = storedFactory.createApplicationSession();
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(SIP_SESSION_DESTROYED.length());
+			sipServletRequest.setContent(SIP_SESSION_DESTROYED, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -385,7 +415,24 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
 		logger.info("sip application session destroyed " +  ev.getApplicationSession());
-		ev.getApplicationSession().setAttribute(SIP_APP_SESSION_DESTROYED, OK);
+		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
+		SipApplicationSession sipApplicationSession = storedFactory .createApplicationSession();
+		try {
+			SipServletRequest sipServletRequest = storedFactory .createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
+			sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -470,5 +517,20 @@ public class ListenersSipServlet
 				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
 			event.getApplicationSession().setAttribute(SIP_APP_SESSION_VALUE_UNBOUND, OK);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.TimerListener#timeout(javax.servlet.sip.ServletTimer)
+	 */
+	public void timeout(ServletTimer timer) {
+		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
+		Iterator<SipSession> sipSessions = (Iterator<SipSession>)
+			sipApplicationSession.getSessions("SIP");
+		while (sipSessions.hasNext()) {
+			SipSession sipSession = (SipSession) sipSessions.next();
+			sipSession.invalidate();
+		}		
+		sipApplicationSession.invalidate();		
 	}
 }

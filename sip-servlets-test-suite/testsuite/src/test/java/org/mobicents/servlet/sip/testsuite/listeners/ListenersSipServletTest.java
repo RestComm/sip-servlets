@@ -35,7 +35,10 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		};		
 	
 	private static final String[] LISTENERS_TO_TEST_AFTER = new String[]{
-		"sipAppSessionExpired", "sipSessionDestroyed", "sipAppSessionDestroyed"
+		//difficult to test, leave it for now 
+//		"sipAppSessionExpired", 
+		//pain to test 
+//		"sipAppSessionDestroyed", "sipSessionDestroyed"
 	};
 	
 	private static final String[] LISTENERS_NOT_TESTED = new String[]{
@@ -105,8 +108,9 @@ public class ListenersSipServletTest extends SipServletTestCase {
 			logger.info("Testing following listener " + LISTENERS_TO_TEST[i]);
 			sender.sendMessageInDialog(LISTENERS_TO_TEST[i]);
 			Thread.sleep(TIMEOUT);
-			assertNotNull(sender.getLastMessageContent());
-			if(!OK.equals(sender.getLastMessageContent())) {
+			String content = sender.getLastMessageContent();
+			assertNotNull(content);
+			if(!OK.equals(content)) {
 				fail("following listener " + LISTENERS_TO_TEST[i] + " was not fired");
 			}
 		}		
@@ -114,15 +118,16 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
-//		for (int i = 0; i < LISTENERS_TO_TEST_AFTER.length; i++) {
-//			logger.info("Testing following listener " + LISTENERS_TO_TEST_AFTER[i]);
-//			sender.sendMessageNoDialog(LISTENERS_TO_TEST_AFTER[i]);
-//			Thread.sleep(TIMEOUT);
-//			assertNotNull(sender.getLastMessageContent());
-//			if(!OK.equals(sender.getLastMessageContent())) {
-//				fail("following listener " + LISTENERS_TO_TEST_AFTER[i] + " was not fired");
-//			}
-//		}
+		Thread.sleep(5000);
+		for (int i = 0; i < LISTENERS_TO_TEST_AFTER.length; i++) {
+			logger.info("Testing following listener " + LISTENERS_TO_TEST_AFTER[i]);						
+			String content = sender.getLastMessageContent();
+			assertNotNull(content);
+			if(!OK.equals(content)) {
+				fail("following listener " + LISTENERS_TO_TEST_AFTER[i] + " was not fired");
+			}
+			Thread.sleep(TIMEOUT);
+		}
 	}
 
 	@Override
