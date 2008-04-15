@@ -393,7 +393,7 @@ public class ProxyImpl implements Proxy {
 		// If we didn't get any response and only a timeout just return a timeout
 		if(proxyBranch.isTimedOut()) {
 			try {
-				response.getTransactionApplicationData().getOriginalProxyRequest().createResponse(408).send();
+				originalRequest.createResponse(408).send();
 				return;
 			} catch (IOException e1) {
 				throw new IllegalStateException("Faild to send a timeout response");

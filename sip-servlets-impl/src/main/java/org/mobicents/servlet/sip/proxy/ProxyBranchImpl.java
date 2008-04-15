@@ -236,8 +236,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 		
 		clonedRequest.send();
-		clonedRequest.getTransactionApplicationData().setOriginalProxyRequest(clonedRequest);
-	}
+		}
 	
 	/**
 	 * A callback. Here we receive all responses from the proxied requests we have sent.

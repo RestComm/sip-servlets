@@ -60,11 +60,5 @@ public class TransactionApplicationData {
 	public void setTransaction(Transaction transaction) {
 		this.transaction = transaction;
 	}
-	public SipServletRequestImpl getOriginalProxyRequest() {
-		return originalProxyRequest;
-	}
-	public void setOriginalProxyRequest(SipServletRequestImpl originalProxyRequest) {
-		this.originalProxyRequest = originalProxyRequest;
-	}
 
 }
