@@ -155,7 +155,9 @@ Copy the server-jboss.xml located in docs to jboss_home/server/default/deploy/jb
 <p>Look for service tag in the server.xml file and modify the darConfigurationFileLocation attribute to map to your filesystem<br />
 Look for the context tag in the server.xml file and modify the docbase attribute to map to your existing simple-sip-servlet application\ Now you need to modify some extra config files so that jboss can deploy war/sar2 files containing sip servlet application :</p>
 <p>In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml <br />
-Add this attribute to the manager xml tag, className=&quot;org.mobicents.servlet.sip.core.session.SipStandardManager&quot;</p>
+Add this attribute to the manager xml tag, <br />
+<tt>className=&quot;org.mobicents.servlet.sip.core.session.SipStandardManager&quot;</tt>
+</p>
 <p>In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\jboss-service.xml :<br />
 Modify the code attribute of the mbean tag so that it become <br />
 <tt>code=&quot;org.mobicents.servlet.sip.startup.jboss.JBossSip&quot;</tt>
