@@ -34,7 +34,10 @@
 				</subsection>
 			</subsection>
 			<subsection name="Planned Versions">
-				<subsection name="Version 0.2 - 02/01/2008">
+				<subsection name="Version 0.2 - 03/01/2008">
+					<p>
+						<i>This version has been rescheduled to a month later than initially planned due to JSR 289 face to face meeting and JBoss World 2008</i>
+					</p>
 					<p>
 						<img src="images/green.jpeg" />
 						<a
@@ -72,6 +75,12 @@
 							Running on top of Jboss AS
 						</a>
 						<br />
+						<img src="images/green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=17">
+							support for MESSAGE sip extension
+						</a>
+						<br />
 						<img src="images/orange.jpeg" />
 						Various Enhancements and Bug fixes :
 						<ul>
@@ -107,7 +116,7 @@
 						<br />
 					</p>
 				</subsection>
-				<subsection name="Version 0.3 - 03/01/2008">
+				<subsection name="Version 0.3 - 04/01/2008">
 					<p>
 						<img src="images/red.jpeg" />
 						Real world Application Router
@@ -141,13 +150,7 @@
 								<a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=10">
 								New Cancel methods on Proxy feature
 								</a>
-							</li>
-							<li>
-								<img src="images/red.jpeg" />
-								<a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=11">
-								Number of call legs in B2BUA
-								</a>
-							</li>
+							</li>							
 						</ul>
 						<br />
 					</p>
