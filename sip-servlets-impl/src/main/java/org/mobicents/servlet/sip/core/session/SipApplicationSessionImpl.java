@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.ServletTimer;
@@ -31,9 +30,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 
 	private Map<SipSessionKey,SipSessionImpl> sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
 	
-	private SipApplicationSessionKey key;
-	
-	private String uuid;
+	private SipApplicationSessionKey key;	
 	
 	private long lastAccessTime;
 	
@@ -60,7 +57,6 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 //	private Serializable endObject;		
 		
 	public SipApplicationSessionImpl(String uuid) {
-		this.uuid = UUID.randomUUID().toString();		
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
 		valid = true;
@@ -152,7 +148,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#getId()
 	 */
 	public String getId() {
-		return uuid;
+		return key.toString();
 	}
 
 	/*

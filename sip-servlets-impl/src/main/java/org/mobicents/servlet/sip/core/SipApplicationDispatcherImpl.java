@@ -300,32 +300,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	
 			if(sipServletRequest.isInitial()) {
 				logger.info("Routing of Initial Request " + request);
-				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
-				while(continueRouting) {
-					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
-					sipServletRequest.addAppCompositionRRHeader();
-				}
+				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);				
+				while(continueRouting) {					
+					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);					
+				}				
 			} else {
 				logger.info("Routing of Subsequent Request " + request);
 				Dialog dialog = sipServletRequest.getDialog();				
-				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
-				while(continueRouting) {					
-					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
-					if(continueRouting) {
-						// Check if the request is meant for me. If so, strip the topmost
-						// Route header.
-						routeHeader = (RouteHeader) request
-								.getHeader(RouteHeader.NAME);
-						//Popping the router header if it's for the container as
-						//specified in JSR 289 - Section 15.8
-						if(! isRouteExternal(routeHeader)) {
-							request.removeFirst(RouteHeader.NAME);
-							sipServletRequest.setPoppedRoute(routeHeader);
-						} else {
-							continueRouting = false;
-						}
-					}
-				}
+				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);				
+				while(continueRouting) {																	
+					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);					
+				}											
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -412,7 +397,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}
 			return false;
 		} else {
-			return true;
+			// Check if the request is meant for me. If so, strip the topmost
+			// Route header.
+			RouteHeader routeHeader = (RouteHeader) request
+					.getHeader(RouteHeader.NAME);
+			//Popping the router header if it's for the container as
+			//specified in JSR 289 - Section 15.8
+			if(! isRouteExternal(routeHeader)) {
+				request.removeFirst(RouteHeader.NAME);
+				sipServletRequest.setPoppedRoute(routeHeader);
+				return true;
+			} else {
+				return false;
+			}					
 		}		
 	}
 
@@ -423,8 +420,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param request
 	 * @param session
 	 * @param sipServletRequest
+	 * @throws ParseException 
 	 */
-	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
+	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws ParseException {
 		//15.4.1 Routing an Initial request Algorithm
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
@@ -570,7 +568,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}
 			appSession.setSipContext(sipContext);
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
-			if(sipSessionHandlerName == null || sipSessionHandlerName.length() > 1) {
+			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 				String mainServlet = sipContext.getMainServlet();
 				sipSessionHandlerName = mainServlet;					
 				try {
@@ -612,6 +610,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 				return false;
 			} else {
+				sipServletRequest.addAppCompositionRRHeader();
 				return true;
 			}
 		}		

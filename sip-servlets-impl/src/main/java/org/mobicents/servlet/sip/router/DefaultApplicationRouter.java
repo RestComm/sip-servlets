@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipApplicationRouter;
 import javax.servlet.sip.SipApplicationRouterInfo;
@@ -159,7 +160,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	public DefaultApplicationRouter() {
 //		containerDeployedApplicationNames = Collections.synchronizedList(new ArrayList<String>());
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
-		defaultSipApplicationRouterInfos = Collections.synchronizedMap(new HashMap<String, List<DefaultSipApplicationRouterInfo>>());
+		defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<DefaultSipApplicationRouterInfo>>();
 	}
 	
 	/**

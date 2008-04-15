@@ -63,10 +63,6 @@ public class SipSessionImpl implements SipSession {
 	private HashMap<String, Object> sipSessionAttributeMap;
 	
 	private SipSessionKey key;
-	/**
-	 * Unique ID for this session.
-	 */
-	private UUID uuid;
 	
 	/**
 	 * Creation time.
@@ -140,8 +136,7 @@ public class SipSessionImpl implements SipSession {
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl) {
 		this.key = key;
 		this.sipFactory = sipFactoryImpl;
-		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
-		this.uuid = UUID.randomUUID();
+		this.creationTime = this.lastAccessTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
 		this.valid = true;
 		this.supervisedMode = true;
@@ -254,7 +249,7 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#getId()
 	 */
 	public String getId() {
-		return uuid.toString();
+		return key.toString();
 	}
 
 	/*
@@ -495,7 +490,7 @@ public class SipSessionImpl implements SipSession {
 			SipApplicationSessionImpl sipApplicationSession) {
 		this.sipApplicationSession = sipApplicationSession;
 		if ( sipApplicationSession != null) {
-			if(sipApplicationSession.getSipSession(uuid.toString())!=null) {
+			if(sipApplicationSession.getSipSession(key.toString())!=null) {
 				sipApplicationSession.addSipSession(this);
 			}
 		}

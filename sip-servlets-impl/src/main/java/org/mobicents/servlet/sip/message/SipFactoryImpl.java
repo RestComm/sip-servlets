@@ -355,9 +355,7 @@ public class SipFactoryImpl implements SipFactory {
 			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
 					+ new Random().nextInt() );
-			callIdHeader = SipFactories.headerFactory
-					.createCallIdHeader(((SipApplicationSessionImpl) sipAppSession)
-							.getId());
+			callIdHeader = JainSipUtils.findMatchingSipProvider(sipProviders, transport).getNewCallId();
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(70);
 
