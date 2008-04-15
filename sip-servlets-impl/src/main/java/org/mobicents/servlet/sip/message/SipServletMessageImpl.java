@@ -564,7 +564,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		ContentTypeHeader cth = (ContentTypeHeader) this.message
 				.getHeader(getCorrectHeaderName(ContentTypeHeader.NAME));
 		if (cth != null)
-			return cth.getContentType();
+		{
+			String contentType = cth.getContentType();
+			String contentSubType = cth.getContentSubType();
+			if(contentSubType != null) 
+				return contentType + "/" + contentSubType;
+			return contentType;
+		}
 		else
 			return null;
 	}
