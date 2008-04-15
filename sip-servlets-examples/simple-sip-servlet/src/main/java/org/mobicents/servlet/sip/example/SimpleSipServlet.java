@@ -2,13 +2,8 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 
-
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -16,13 +11,13 @@ import javax.servlet.sip.SipServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SimpleSipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
-
-	
-	
+/**
+ * This example shows a simple User agent that can any accept call and reply to BYE.
+ * @author Jean Deruelle
+ *
+ */
+public class SimpleSipServlet extends SipServlet {
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
-	
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public SimpleSipServlet() {
@@ -45,17 +40,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
 		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-		sipServletResponse.send();
-		
-		/* This is a proxying sample.
-
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-		
-		URI uri = sipFactory.createAddress("sip:aa@127.0.0.1:5050").getURI();
-		Proxy proxy = request.getProxy();
-		proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
-		proxy.proxyTo(uri);
-		 */
+		sipServletResponse.send();		
 	}
 
 	/**
@@ -78,21 +63,4 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("SimpleProxyServlet: Got response:\n" + response);
 		super.doResponse(response);
 	}
-
-	// SipErrorListener methods
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noAckReceived(SipErrorEvent ee) {
-		logger.info("SimpleProxyServlet: Error: noAckReceived.");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noPrackReceived(SipErrorEvent ee) {
-		logger.info("SimpleProxyServlet: Error: noPrackReceived.");
-	}
-
 }
