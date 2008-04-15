@@ -45,11 +45,11 @@ public class B2BUATestCase extends ScenarioHarness implements
 
 		try {
 			super.setUp();
-			this.shootist = new Shootist(5060, 5070, super.shootistProtocolObjects);
+			this.shootist = new Shootist(5058, 5070, super.shootistProtocolObjects);
 			SipProvider shootistProvider = shootist.createSipProvider();
 			providerTable.put(shootistProvider, shootist);
 
-			this.shootme = new Shootme(5080, shootmeProtocolObjects);
+			this.shootme = new Shootme(5059, shootmeProtocolObjects);
 			SipProvider shootmeProvider = shootme.createProvider();
 			providerTable.put(shootmeProvider, shootme);
 			shootistProvider.addSipListener(this);
