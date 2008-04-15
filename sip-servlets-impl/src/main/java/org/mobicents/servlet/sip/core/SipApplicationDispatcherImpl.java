@@ -44,8 +44,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	}
 	
 	/**
-	 * {@inheritDoc}
-	 * @throws LifecycleException 
+	 * {@inheritDoc} 
 	 */
 	public void init(String sipApplicationRouterClassName) throws LifecycleException {
 		//load the sip application router from the class name specified in the server.xml file
@@ -68,15 +67,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void start() {
-		// TODO Auto-generated method stub
+		// TODO nothing to do here for now
 		
 	}
 	/**
 	 * {@inheritDoc}
 	 */
 	public void stop() {
-		// TODO Auto-generated method stub
-		
+		sipApplicationRouter.destroy();		
 	}
 	
 	/**

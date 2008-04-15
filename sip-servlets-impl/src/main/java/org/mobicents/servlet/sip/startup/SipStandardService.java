@@ -35,6 +35,8 @@ public class SipStandardService extends StandardService implements SipService {
 	private SipApplicationDispatcher sipApplicationDispatcher;
 	//the sip application router class name defined in the server.xml
 	private String sipApplicationRouterClassName;
+	//this should be made available to the application router as a system prop
+	private String darConfigurationFileLocation;
 	/**
 	 * 
 	 */
@@ -86,7 +88,8 @@ public class SipStandardService extends StandardService implements SipService {
 			throw new LifecycleException("Impossible to load the Sip Application Dispatcher",e);
 		} catch (ClassCastException e) {
 			throw new LifecycleException("Sip Application Dispatcher defined does not implement " + SipApplicationDispatcher.class.getName(),e);
-		}		
+		}
+		System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
 		sipApplicationDispatcher.init(sipApplicationRouterClassName);
 		super.initialize();		
 	}
@@ -169,5 +172,19 @@ public class SipStandardService extends StandardService implements SipService {
 	public void setSipApplicationRouterClassName(
 			String sipApplicationRouterClassName) {
 		this.sipApplicationRouterClassName = sipApplicationRouterClassName;
+	}
+
+	/**
+	 * @return the darConfigurationFileLocation
+	 */
+	public String getDarConfigurationFileLocation() {
+		return darConfigurationFileLocation;
+	}
+
+	/**
+	 * @param darConfigurationFileLocation the darConfigurationFileLocation to set
+	 */
+	public void setDarConfigurationFileLocation(String darConfigurationFileLocation) {
+		this.darConfigurationFileLocation = darConfigurationFileLocation;
 	}
 }

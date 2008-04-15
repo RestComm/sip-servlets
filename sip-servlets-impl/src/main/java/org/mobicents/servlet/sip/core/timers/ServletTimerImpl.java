@@ -9,8 +9,7 @@ import javax.servlet.sip.TimerListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.mobicents.servlet.sip.core.session.*;
+import org.mobicents.servlet.sip.core.session.SipServletApplicationImpl;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
 
