@@ -349,7 +349,7 @@ public class ProxyImpl implements Proxy {
 	
 	public void onBranchTimeOut(ProxyBranchImpl branch)
 	{
-		// Do nothing here since when the branch is timed out it just generated timeout response
+		this.onFinalResponse(branch);
 	}
 	
 	// In sequential proxying get some untried branch and start it, then wait for response and repeat
