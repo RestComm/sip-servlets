@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
@@ -34,10 +35,10 @@ public class SimpleWebServlet extends HttpServlet
         URI from = sf.createAddress(fromAddr).getURI();              
 
         // Create app session and request
-//        SipApplicationSession appSession = 
-//        	((ConvergedHttpSession)request.getSession()).getApplicationSession();
         SipApplicationSession appSession = 
-        	sf.createApplicationSession();
+        	((ConvergedHttpSession)request.getSession()).getApplicationSession();
+//        SipApplicationSession appSession = 
+//        	sf.createApplicationSession();
         SipServletRequest req = sf.createRequest(appSession, "INVITE", from, to);
         
         // Set some attribute
