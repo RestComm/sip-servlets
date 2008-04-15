@@ -1,10 +1,7 @@
 package org.mobicents.servlet.sip.example;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-
-import javax.servlet.sip.SipSession;
 
 public class CallStatusContainer{
 	
@@ -36,6 +33,12 @@ public class CallStatusContainer{
 	}
 	
 	public String getStatus(String from, String to) {
-		return getCall(from,to).getStatus();
+		Call call = getCall(from,to);
+		if(call != null) {
+			return call.getStatus();
+		} else {
+			return null;
+		}
+		
 	}
 }
