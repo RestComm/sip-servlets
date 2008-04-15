@@ -30,10 +30,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private SipURI targetURI;
 	private SipURI outboundInterface;
 	private SipURI recordRouteURI;
+	private SipURI pathURI;
 	private boolean started;
 	private SipProvider provider;
-	
 	private ProxyUtils proxyUtils;
+	private boolean timedOut;
 	
 	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipProvider provider, SipURI recordRouteURI)
 	{
@@ -41,11 +42,12 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.proxy = proxy;
 		this.originalRequest = (SipServletRequestImpl) proxy.getOriginalRequest();
 		this.recordRouteURI = proxy.getRecordRouteURI();
+		this.pathURI = proxy.getPathURI();
 		this.outboundInterface = proxy.getOutboundInterface();
 		this.provider = provider;
 		if(recordRouteURI != null)
 			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();
-		this.proxyUtils = new ProxyUtils(provider, this);
+		this.proxyUtils = proxy.getProxyUtils();
 	}
 	
 	/* (non-Javadoc)
@@ -143,7 +145,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			this.proxyUtils.createProxiedRequest(originalRequest,
 					this,
 					new ProxyParams(this.targetURI, this.outboundInterface,
-							recordRoute));
+							recordRoute, this.pathURI));
 
 		try {
 			cloned.send();
@@ -164,29 +166,53 @@ public class ProxyBranchImpl implements ProxyBranch {
 	
 	public void onResponse(SipServletResponseImpl response)
 	{
+		lastResponse = response;
+		
 		// We have already sent TRYING, don't send another one
 		if(response.getStatus() == 100)
 			return;
 		
-		if(response.getStatus() >= 300 && response.getStatus() < 400
-				&& getProxy().getRecurse())
+		// Send informational responses back immediately
+		if(response.getStatus() > 100 && response.getStatus() < 200)
 		{
-			// Recurse
-		}
-		
-		SipServletResponse proxiedResponse = 
-			proxyUtils.createProxiedResponse(response);
-		
-		if(proxiedResponse == null) 
-			return; // this response was addressed to this proxy
 
-		try {
-			proxiedResponse.send();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SipServletResponse proxiedResponse = 
+				proxyUtils.createProxiedResponse(response);
+			
+			if(proxiedResponse == null) 
+				return; // this response was addressed to this proxy
+			
+			try {
+				proxiedResponse.send();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return;
 		}
 		
+		if(response.getStatus() >= 600) // Cancel all 10.2.4
+			this.proxy.cancelAllExcept(this);
+		
+		// Bad final responses should send ACK
+		if(response.getStatus() >= 300)
+		{
+			// TODO: Send ACK to the callee
+			
+		}
+		
+
+		
+		if(response.getStatus() >= 200)
+		{
+			this.proxy.onFinalResponse(this);
+		}
+		
+	}
+
+	public boolean isTimedOut() {
+		return timedOut;
 	}
 
 }

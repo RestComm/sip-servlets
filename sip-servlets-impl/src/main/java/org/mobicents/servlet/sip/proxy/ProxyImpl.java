@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.SipProvider;
@@ -19,6 +20,7 @@ import javax.sip.SipProvider;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -30,6 +32,8 @@ public class ProxyImpl implements Proxy {
 	
 	
 	private SipServletRequestImpl originalRequest;
+	private SipServletResponseImpl bestResponse;
+	private ProxyBranchImpl bestBranch;
 	private boolean recurse;
 	private int proxyTimeout;
 	private int seqSearchTimeout;
@@ -43,6 +47,8 @@ public class ProxyImpl implements Proxy {
 	private SipProvider provider;
 	private int proxyId;
 	
+	private ProxyUtils proxyUtils;
+	
 	private Map<URI, ProxyBranch> proxyBranches;
 	
 	public ProxyImpl(SipServletRequestImpl request, SipProvider provider)
@@ -50,15 +56,20 @@ public class ProxyImpl implements Proxy {
 		this.originalRequest = request;
 		this.provider = provider;
 		proxyBranches = new HashMap<URI, ProxyBranch> ();
+		proxyUtils = new ProxyUtils(provider, this);
 	}
 	
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.Proxy#cancel()
 	 */
 	public void cancel() {
+		cancelAllExcept(null);
+	}
+	
+	public void cancelAllExcept(ProxyBranch except) {
 		for(ProxyBranch pb : proxyBranches.values())
 		{
-			pb.cancel();
+			if(pb != except && pb.isStarted()) pb.cancel();
 		}
 	}
 
@@ -268,9 +279,16 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#startProxy()
 	 */
 	public void startProxy() {
-		for (ProxyBranch pb : this.proxyBranches.values())
+		if(this.parallel)
 		{
-			((ProxyBranchImpl)pb).start();
+			for (ProxyBranch pb : this.proxyBranches.values())
+			{
+				((ProxyBranchImpl)pb).start();
+			}
+		}
+		else
+		{
+			startNextUntriedBranch();
 		}
 
 	}
@@ -278,5 +296,89 @@ public class ProxyImpl implements Proxy {
 	public SipURI getOutboundInterface() {
 		return outboundInterface;
 	}
+	
+	public void onFinalResponse(ProxyBranchImpl branch)
+	{
+		//Get the final response
+		SipServletResponseImpl response = (SipServletResponseImpl) branch.getResponse();
+		
+		// Cancel all others if 2xx or 6xx 10.2.4
+		if( (response.getStatus() >= 200 && response.getStatus() < 300) 
+				|| (response.getStatus() >= 600 && response.getStatus() < 700) ) 
+			cancelAllExcept(branch);
+		
+		// Recurse if allowed
+		if(response.getStatus() >= 300 && response.getStatus() < 400
+				&& getRecurse())
+		{
+			// Recurse
+		}
+		
+		// Sort best do far
+		if(bestResponse.getStatus() > response.getStatus())
+		{
+			bestResponse = response;
+			bestBranch = branch;
+		}
+		
+		// Check if we are waiting for more response
+		if(allResponsesHaveArrived())
+		{
+			sendBestFinalResponse(bestResponse);
+		}
 
+	}
+	
+	public void onBranchTimeOut(ProxyBranchImpl branch)
+	{
+		startNextUntriedBranch();
+	}
+	
+	// In sequential proxying get some untried branch and start it, then wait for response and repeat
+	public void startNextUntriedBranch()
+	{
+		for(ProxyBranch pb: this.proxyBranches.values())
+		{
+			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;
+			SipServletResponse response = pb.getResponse();
+			if(!pbi.isStarted())
+			{
+				pbi.start();
+				return;
+			}
+		}
+	}
+	
+	public boolean allResponsesHaveArrived()
+	{
+		for(ProxyBranch pb: this.proxyBranches.values())
+		{
+			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;
+			SipServletResponse response = pb.getResponse();
+			if(pbi.isStarted() && (response == null || response.getStatus() < 200
+					|| pbi.isTimedOut()))
+				return false;
+		}
+		return true;
+	}
+	
+	public void sendBestFinalResponse(SipServletResponseImpl response)
+	{
+		SipServletResponse proxiedResponse = 
+			proxyUtils.createProxiedResponse(response);
+		
+		if(proxiedResponse == null) 
+			return; // this response was addressed to this proxy
+
+		try {
+			proxiedResponse.send();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	ProxyUtils getProxyUtils() {
+		return proxyUtils;
+	}
 }

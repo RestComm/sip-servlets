@@ -1,5 +1,8 @@
 package org.mobicents.servlet.sip.proxy;
 
+import gov.nist.javax.sip.header.HeaderFactoryImpl;
+import gov.nist.javax.sip.header.ims.PathHeader;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -24,16 +27,16 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 public class ProxyUtils {
 	
 	private SipProvider provider;
-	private ProxyBranchImpl proxyBranch;
+	private ProxyImpl proxy;
 	
-	public ProxyUtils(SipProvider provider, ProxyBranchImpl proxyBranch)
+	public ProxyUtils(SipProvider provider, ProxyImpl proxy)
 	{
 		this.provider = provider;
-		this.proxyBranch = proxyBranch;
+		this.proxy = proxy;
 	}
 	
 	public SipServletRequestImpl createProxiedRequest(SipServletRequestImpl originalRequest, ProxyBranchImpl proxyBranch, ProxyParams params)
-	{// String user, String host, String stackIP, String transport, int port, int stackPort){
+	{
 		try {
 			Request clonedRequest = (Request) originalRequest.getMessage().clone();
 
@@ -52,15 +55,15 @@ public class ProxyUtils {
 			}
 
 			// Add route header
-			javax.sip.address.SipURI recordRouteUri = SipFactories.addressFactory.createSipURI(
+			javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
 					params.target.getUser(), params.target.getHost());
-			recordRouteUri.setPort(params.target.getPort());
-			recordRouteUri.setLrParam();
+			routeUri.setPort(params.target.getPort());
+			routeUri.setLrParam();
 			javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.target.getUser(),
-					recordRouteUri);
+					routeUri);
 			RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
 			
-			clonedRequest.addFirst(rheader);
+			clonedRequest.setHeader(rheader);
 			
 			//Add via header
 			Iterator lps = provider.getSipStack().getListeningPoints();
@@ -95,12 +98,23 @@ public class ProxyUtils {
 				javax.sip.address.SipURI rrURI = SipFactories.addressFactory.createSipURI(null,
 						stackIPAddress);
 				rrURI.setPort(lp.getPort());
-
+				rrURI.setTransportParam(lp.getTransport());
+				
+				Iterator<String> paramNames = params.routeRecord.getParameterNames();
+				
+				// Copy the parameters set by the user
+				while(paramNames.hasNext())
+				{
+					String paramName = paramNames.next();
+					rrURI.setParameter(paramName,
+							params.routeRecord.getParameter(paramName));
+				}
+				
 				Address rraddress = SipFactories.addressFactory
 				.createAddress(null, rrURI);
 				RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
 				.createRecordRouteHeader(rraddress);
-
+				
 				ListIterator recordRouteHeaders = clonedRequest
 				.getHeaders(RecordRouteHeader.NAME);
 				clonedRequest.removeHeader(RecordRouteHeader.NAME);
@@ -118,6 +132,50 @@ public class ProxyUtils {
 					clonedRequest.addHeader(recordRouteHeader);
 				}
 			}
+			
+			// Add path header
+			if(params.path != null)
+			{
+				javax.sip.address.SipURI pathURI = SipFactories.addressFactory.createSipURI(null,
+						stackIPAddress);
+				pathURI.setPort(lp.getPort());
+				pathURI.setTransportParam(lp.getTransport());
+
+				Iterator<String> paramNames = params.path.getParameterNames();
+				
+				// Copy the parameters set by the user
+				while(paramNames.hasNext())
+				{
+					String paramName = paramNames.next();
+					pathURI.setParameter(paramName,
+							params.path.getParameter(paramName));
+				}
+				
+				Address pathAddress = SipFactories.addressFactory
+					.createAddress(null, pathURI);
+				
+				// Here I need to reference the header factory impl class because can't create path header otherwise
+				PathHeader pathHeader = ((HeaderFactoryImpl)SipFactories.headerFactory)
+					.createPathHeader(pathAddress);
+				
+				ListIterator pathHeaders = clonedRequest
+					.getHeaders(PathHeader.NAME);
+				clonedRequest.removeHeader(PathHeader.NAME);
+				Vector v = new Vector();
+				v.addElement(pathHeader);
+				// add the other record route headers.
+				while (pathHeaders != null
+						&& pathHeaders.hasNext()) {
+					pathHeader = (PathHeader) pathHeaders
+					.next();
+					v.addElement(pathHeader);
+				}
+				for (int j = 0; j < v.size(); j++) {
+					pathHeader = (PathHeader) v.elementAt(j);
+					clonedRequest.addHeader(pathHeader);
+				}
+			}
+			
 			ClientTransaction tx = provider.getNewClientTransaction(clonedRequest);
 			SipServletRequestImpl ret = new	SipServletRequestImpl(
 					clonedRequest,
@@ -152,7 +210,7 @@ public class ProxyUtils {
 			return null; // response was meant for this proxy
 		
 		SipServletRequestImpl originalRequest =
-			(SipServletRequestImpl) this.proxyBranch.getProxy().getOriginalRequest();
+			(SipServletRequestImpl) this.proxy.getOriginalRequest();
 		
 		return new SipServletResponseImpl(clonedResponse,
 				this.provider,
