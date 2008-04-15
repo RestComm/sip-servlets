@@ -37,6 +37,7 @@ import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -63,6 +64,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //	private Map securityRoles;
 //	private Map<String,Object> sipApplicationSessionAttributeMap;
 	private SipFactoryFacade sipFactoryFacade;	
+	private SipLoginConfig sipLoginConfig;
 	
     protected String namingContextName;
     
@@ -155,6 +157,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
             setUseNaming(false);
         }
         //activating our custom naming context to be able to set the sip factory in JNDI
+        /*
         if (isUseNaming()) {    
         	if (getNamingContextListener() == null) {
             	NamingContextListener namingContextListener = new SipNamingContextListener();
@@ -163,7 +166,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
                 addLifecycleListener(namingContextListener);
                 addContainerListener(namingContextListener);
             }
-        }                
+        }      */ 
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
@@ -436,6 +439,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return super.getLoginConfig();
 	}
 	
+	public void setSipLoginConfig(SipLoginConfig config) {
+		this.sipLoginConfig = config;
+	}
+	
+	public SipLoginConfig getSipLoginConfig() {
+		return this.sipLoginConfig;
+	}
 	/**
      * Add a new Listener class name to the set of Listeners
      * configured for this application.
