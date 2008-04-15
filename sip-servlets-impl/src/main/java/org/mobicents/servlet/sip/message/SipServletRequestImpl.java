@@ -52,13 +52,16 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -73,6 +76,11 @@ import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
+import org.mobicents.servlet.sip.security.AuthInfoEntry;
+import org.mobicents.servlet.sip.security.AuthInfoImpl;
+import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
+
+import sun.text.CompactShortArray.Iterator;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
@@ -825,7 +833,46 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
 			AuthInfo authInfo) {
-		// TODO Auto-generated method stub
+		AuthInfoImpl authInfoImpl = (AuthInfoImpl) authInfo;
+		
+		SipServletResponseImpl response = 
+			(SipServletResponseImpl) challengeResponse;
+		
+		// First check for WWWAuthentication headers
+		ListIterator authHeaderIterator = 
+			response.getMessage().getHeaders(WWWAuthenticateHeader.NAME);
+		while(authHeaderIterator.hasNext()) {
+			WWWAuthenticateHeader wwwAuthHeader = 
+				(WWWAuthenticateHeader) authHeaderIterator.next();
+			String uri = wwwAuthHeader.getParameter("uri");
+			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
+			
+			if(authInfoEntry == null) throw new SecurityException(
+					"Cannot add authorization header. No credentials for the following realm: " + wwwAuthHeader.getRealm());
+			
+			addChallengeResponse(wwwAuthHeader,
+					authInfoEntry.getUserName(),
+					authInfoEntry.getPassword(),
+					uri);
+		}
+		
+		// Now check for Proxy-Authentication
+		authHeaderIterator = 
+			response.getMessage().getHeaders(ProxyAuthenticateHeader.NAME);
+		while(authHeaderIterator.hasNext()) {
+			ProxyAuthenticateHeader wwwAuthHeader = 
+				(ProxyAuthenticateHeader) authHeaderIterator.next();
+			String uri = wwwAuthHeader.getParameter("uri");
+			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
+			
+			if(authInfoEntry == null) throw new SecurityException(
+					"No credentials for the following realm: " + wwwAuthHeader.getRealm());
+			
+			addChallengeResponse(wwwAuthHeader,
+					authInfoEntry.getUserName(),
+					authInfoEntry.getPassword(),
+					uri);
+		}
 		
 	}
 
@@ -835,8 +882,46 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
 			String username, String password) {
-		// TODO Auto-generated method stub
+		SipServletResponseImpl response = 
+			(SipServletResponseImpl) challengeResponse;
 		
+		ListIterator authHeaderIterator = 
+			response.getMessage().getHeaders(WWWAuthenticateHeader.NAME);
+		
+		// First
+		while(authHeaderIterator.hasNext()) {
+			WWWAuthenticateHeader wwwAuthHeader = 
+				(WWWAuthenticateHeader) authHeaderIterator.next();
+			String uri = wwwAuthHeader.getParameter("uri");
+			addChallengeResponse(wwwAuthHeader, username, password, uri);
+		}
+		
+		
+		authHeaderIterator = 
+			response.getMessage().getHeaders(ProxyAuthenticateHeader.NAME);
+		
+		while(authHeaderIterator.hasNext()) {
+			ProxyAuthenticateHeader wwwAuthHeader = 
+				(ProxyAuthenticateHeader) authHeaderIterator.next();
+			String uri = wwwAuthHeader.getParameter("uri");
+			addChallengeResponse(wwwAuthHeader, username, password, uri);
+		}
+	}
+	
+	private void addChallengeResponse(
+			WWWAuthenticateHeader wwwAuthHeader,
+			String username,
+			String password,
+			String uri) {
+		AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+				getMethod(),
+				uri,
+				"", // TODO: What is this entity-body?
+				wwwAuthHeader,
+				username,
+				password);
+		
+		this.getMessage().addHeader(authorization);
 	}
 
 	/**

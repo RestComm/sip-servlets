@@ -874,16 +874,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getRemoteUser()
 	 */
 	public String getRemoteUser() {
-		if (this.transaction != null
-				&& this.transaction.getDialog() != null
-				&& (javax.sip.address.SipURI) this.transaction.getDialog()
-						.getRemoteParty() != null) {
-
-			javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) (this.transaction
-					.getDialog().getRemoteParty().getURI());
-			return sipUri.getUser();
-		} else
-			return null;
+		// This method returns non-null only if the user is authenticated
+		if(this.userPrincipal != null)
+			return this.userPrincipal.getName();
+		return null;
 	}
 
 	/*

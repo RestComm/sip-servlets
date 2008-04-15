@@ -23,10 +23,15 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
+import javax.sip.header.AuthorizationHeader;
+import javax.sip.header.HeaderFactory;
+import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.WWWAuthenticateHeader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +42,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
@@ -151,31 +157,6 @@ public class DigestAuthenticator
 
             return (true);
         }
-
-        // NOTE: We don't try to reauthenticate using any existing SSO session,
-        // because that will only work if the original authentication was
-        // BASIC or FORM, which are less secure than the DIGEST auth-type
-        // specified for this webapp
-        //
-        // Uncomment below to allow previous FORM or BASIC authentications
-        // to authenticate users for this webapp
-        // TODO make this a configurable attribute (in SingleSignOn??)
-        /*
-        // Is there an SSO session against which we can try to reauthenticate?
-        if (ssoId != null) {
-            if (log.isDebugEnabled())
-                log.debug("SSO Id " + ssoId + " set; attempting " +
-                          "reauthentication");
-            // Try to reauthenticate using data cached by SSO.  If this fails,
-            // either the original SSO logon was of DIGEST or SSL (which
-            // we can't reauthenticate ourselves because there is no
-            // cached username and password), or the realm denied
-            // the user's reauthentication for some reason.
-            // In either case we have to prompt the user for a logon
-            if (reauthenticateFromSSO(ssoId, request))
-                return true;
-        }
-        */
 
         // Validate any credentials already included with this request
         String authorization = request.getHeader("authorization");
@@ -409,7 +390,7 @@ public class DigestAuthenticator
                                          SipServletResponseImpl response,
                                          SipLoginConfig config,
                                          String nOnce) {
-
+    	
         // Get the realm name
         String realmName = config.getRealmName();
         if (realmName == null)
@@ -432,7 +413,108 @@ public class DigestAuthenticator
         } else {
         	response.setHeader("WWW-Authenticate", authenticateHeader);
         }
+    }
+    
+    /**
+     * Generates an authorisation header in response to wwwAuthHeader.
+     *
+     * @param method method of the request being authenticated
+     * @param uri digest-uri
+     * @param requestBody the body of the request.
+     * @param authHeader the challenge that we should respond to
+     * @param username
+     * @param password
+     *
+     * @return an authorisation header in response to authHeader.
+     *
+     * @throws OperationFailedException if auth header was malformated.
+     */
+    public static AuthorizationHeader getAuthorizationHeader(
+                String                method,
+                String                uri,
+                String                requestBody,
+                WWWAuthenticateHeader authHeader,
+                String       		  username,
+                String 				  password)
+    {
+        String response = null;
+        HeaderFactory headerFactory = SipFactories.headerFactory;
+        
+        // JvB: authHeader.getQop() is a quoted _list_ of qop values 
+        // (e.g. "auth,auth-int") Client is supposed to pick one
+        String qopList = authHeader.getQop();
+        String qop = (qopList != null) ? "auth" : null;
+        String nc_value = "00000001";
+        String cnonce = "xyz";
 
+        try
+        {
+            response = MessageDigestResponseAlgorithm.calculateResponse(
+                authHeader.getAlgorithm(),
+                username,
+                authHeader.getRealm(),
+                password,
+                authHeader.getNonce(),
+                nc_value, // JvB added
+                cnonce,   // JvB added
+                method,
+                uri,
+                requestBody,
+                qop);//jvb changed
+        }
+        catch (NullPointerException exc)
+        {
+            throw new IllegalStateException(
+                "The authenticate header was malformatted", exc);
+        }
+
+        AuthorizationHeader authorization = null;
+        try
+        {
+            if (authHeader instanceof ProxyAuthenticateHeader)
+            {
+                authorization = headerFactory.createProxyAuthorizationHeader(
+                    authHeader.getScheme());
+            }
+            else
+            {
+                authorization = headerFactory.createAuthorizationHeader(
+                    authHeader.getScheme());
+            }
+
+            authorization.setUsername(username);
+            authorization.setRealm(authHeader.getRealm());
+            authorization.setNonce(authHeader.getNonce());
+            authorization.setParameter("uri", uri);
+            authorization.setResponse(response);
+            if (authHeader.getAlgorithm() != null)
+            {
+                authorization.setAlgorithm(authHeader.getAlgorithm());
+            }
+
+            if (authHeader.getOpaque() != null)
+            {
+                authorization.setOpaque(authHeader.getOpaque());
+            }
+
+            // jvb added
+            if (qop!=null) 
+            {
+                authorization.setQop(qop);
+                authorization.setCNonce(cnonce);
+                authorization.setNonceCount( Integer.parseInt(nc_value) );
+            }
+
+            authorization.setResponse(response);
+
+        }
+        catch (ParseException ex)
+        {
+            throw new SecurityException(
+                "Failed to create an authorization header!");
+        }
+
+        return authorization;
     }
 
 	public Principal getPrincipal() {
