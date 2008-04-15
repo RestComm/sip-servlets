@@ -90,13 +90,13 @@ Click To Call
            			<<<<module-option name="storeDigestCallback">org.jboss.security.auth.spi.RFC2617Digest</module-option>>>>\
           		<<<</login-module>>>>\
        		<<<</authentication>>>>\
-    	<<<</application-policy>>>>\
+    	<<<</application-policy>>>>
 
 	[[2]] In the file props/sip-servlets-users.properties put this:\
 	# A sample users.properties file, this line creates user "admin" with password "admin" for "sip-servlets-realm"\
 	admin=9640e13fedc736bdafa6b9007d965c56
 
-	The cryptic string here is the A1 value of the digest authentication algorithm and can be generated with the following command:
+	The cryptic string here is the A1 value of the digest authentication algorithm and can be generated with the following command:\
 	<<<java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username "My Realm" password RFC2617 A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea>>>
 
 	[[3]] In the file props/sip-servlets-roles.properties put this:\
@@ -111,7 +111,7 @@ Click To Call
       	need to edit the htmladaptor login configuration to setup the
       	login modules used to authentication users. -->>>>\
       	<<<<security-domain>java:/jaas/sip-servlets</security-domain>>>>\
-	<<<</jboss-web>>>>\
+	<<<</jboss-web>>>>
 
 	[[5]] In sip.xml in your application add some security constraint and authentication type, for example:\
 	<<<<security-constraint>>>>\
@@ -125,12 +125,12 @@ Click To Call
 	     <<<<auth-constraint>>>>\
 	           <<<<role-name>caller</role-name>>>>\
 	     <<<</auth-constraint>>>>\
-	 <<<</security-constraint>>>>\
+	 <<<</security-constraint>>>>
 	 
 	 <<<<login-config>>>>\
          	<<<<auth-method>DIGEST</auth-method>>>>\
          	<<<<realm-name>sip-servlets-realm</realm-name>>>>\
-   	 <<<</login-config>>>>\
+   	 <<<</login-config>>>>
 
 
 ** To enable security in Tomcat
@@ -156,9 +156,9 @@ Click To Call
 	     <<<<auth-constraint>>>>\
 	           <<<<role-name>caller</role-name>>>>\
 	     <<<</auth-constraint>>>>\
-	 <<<</security-constraint>>>>\
+	 <<<</security-constraint>>>>
 	 
 	 <<<<login-config>>>>\ 
          	<<<<auth-method>DIGEST</auth-method>>>>\ 
          	<<<<realm-name>sip-servlets-realm</realm-name>>>>\ 
-   	 <<<</login-config>>>>\
+   	 <<<</login-config>>>>
