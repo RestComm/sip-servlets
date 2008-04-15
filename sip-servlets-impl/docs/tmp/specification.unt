@@ -27,7 +27,7 @@
 <XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="T8p1c4OFK0ST8ub86eWOvQAA">
 <XPD:ATTR name="Name" type="string">servlet</XPD:ATTR>
 <XPD:REF name="Namespace">iNGxFf9cRUWNb84ZWdu+oAAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="g7q943dRSUGhRxMBtlYv1wAA">
 <XPD:ATTR name="Name" type="string">sip</XPD:ATTR>
 <XPD:REF name="Namespace">T8p1c4OFK0ST8ub86eWOvQAA</XPD:REF>
@@ -3636,6 +3636,8 @@
 <XPD:REF name="BehavioralFeature">MB6TRd9MPEaohxz6tpCnLAAA</XPD:REF>
 <XPD:REF name="Type_">AmC3AWMCnka+OF5fis7sYwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipAppSession_Attributes::::">FnDaDZvMf02pCOiOJqMScgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="XmaeCatp2Eq2KbgLOBRF9AAA">
 <XPD:ATTR name="Name" type="string">attributeRemoved</XPD:ATTR>
@@ -3658,7 +3660,11 @@
 <XPD:REF name="BehavioralFeature">t4uGgIRC4Eu5WN9LWBQ81wAA</XPD:REF>
 <XPD:REF name="Type_">AmC3AWMCnka+OF5fis7sYwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipAppSession_Attributes::::">zMxPrS4XgkWhUeOpdV/9gwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">hmkBR/HYEE2Xw+k4Gf9sKgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[11]" type="UMLClass" guid="AmC3AWMCnka+OF5fis7sYwAA">
 <XPD:ATTR name="Name" type="string">SipApplicationSessionBindingEvent</XPD:ATTR>
@@ -3748,6 +3754,8 @@
 <XPD:REF name="BehavioralFeature">mI6bD8HAT0OX0jDjP03bWQAA</XPD:REF>
 <XPD:REF name="Type_">AmC3AWMCnka+OF5fis7sYwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipAppSession_Attributes::::">oZ+6sVoC8ES8q/15B8Cy+gAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="+WkRo6jyVkOYqxN+y0CeSgAA">
 <XPD:ATTR name="Name" type="string">valueUnbound</XPD:ATTR>
@@ -3760,6 +3768,8 @@
 <XPD:REF name="Type_">AmC3AWMCnka+OF5fis7sYwAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">77sdBDEI/EWxnhEOMbgQfAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[13]" type="UMLClass" guid="7cl8ugdjkkOfazsK1E/jJAAA">
 <XPD:ATTR name="Name" type="string">SipApplicationSessionEvent</XPD:ATTR>
@@ -3825,6 +3835,8 @@
 <XPD:REF name="BehavioralFeature">ejZNeTJ8IEmx959G3Dcd+gAA</XPD:REF>
 <XPD:REF name="Type_">7cl8ugdjkkOfazsK1E/jJAAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_LifeCycle::::">4gNPIW7JyU6Sz56oAyBYhQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="zogkMm91SkWMXHBixfO04wAA">
 <XPD:ATTR name="Name" type="string">sessionDestroyed</XPD:ATTR>
@@ -3836,6 +3848,8 @@
 <XPD:REF name="BehavioralFeature">zogkMm91SkWMXHBixfO04wAA</XPD:REF>
 <XPD:REF name="Type_">7cl8ugdjkkOfazsK1E/jJAAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_LifeCycle::::">g5Blb8uVfEKGPZ8HhJJQhwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[2]" type="UMLOperation" guid="yj4mLifa7EaHsA70mXnPlQAA">
 <XPD:ATTR name="Name" type="string">sessionDidActivate</XPD:ATTR>
@@ -3870,6 +3884,8 @@
 <XPD:REF name="Type_">7cl8ugdjkkOfazsK1E/jJAAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">ToKnTKOvg068GT4q4Ho5JgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[15]" type="UMLClass" guid="E+UYDz5dOE2zPQt7p7M5/gAA">
 <XPD:ATTR name="Name" type="string">SipErrorEvent</XPD:ATTR>
@@ -4111,6 +4127,14 @@
 <XPD:REF name="BehavioralFeature">YRWEPTR7IkeTF4G2kJFabgAA</XPD:REF>
 <XPD:REF name="Type_">U5Bj2anufUCAyesMTnbXrQAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">7</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == true, no error::::">7YtzK1VLpk6QJYREzrV8mQAA</XPD:REF>
+<XPD:REF name="CallActions[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying = parallel == true, with error::::">J/Fkdi+UwEWy5YSqctBJ0wAA</XPD:REF>
+<XPD:REF name="CallActions[2]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false - error and no error::::">WZX1EdPfkEasYvfJYtcgjwAA</XPD:REF>
+<XPD:REF name="CallActions[3]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false, 303 response in branch::::">3WOp5qFgH0eTi5zPM0zgBQAA</XPD:REF>
+<XPD:REF name="CallActions[4]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false, 303 response in branch::::">5PXWC3LqhUqrm9EIXDoeMQAA</XPD:REF>
+<XPD:REF name="CallActions[5]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false v2, sequential == true, recurse == true::::">7gnEzCoz40KYFklGT+siOwAA</XPD:REF>
+<XPD:REF name="CallActions[6]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.5 Sendng CANCEL::::">hfT2GDwYAEKV7t7m2sadcQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[6]" type="UMLOperation" guid="C1ECeisSpUC8YG9Udrak4gAA">
 <XPD:ATTR name="Name" type="string">createRequest</XPD:ATTR>
@@ -4253,6 +4277,8 @@
 <XPD:REF name="BehavioralFeature">6um68U3WLkem1dPtOZdkTwAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::">R9DBJUFD+kK6JTqmFLU1bwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[18]" type="UMLClass" guid="tf/ibbHfr0eoakJIHh6/WgAA">
 <XPD:ATTR name="Name" type="string">SipServlet</XPD:ATTR>
@@ -4988,8 +5014,10 @@
 <XPD:ATTR name="TypeExpression" type="string">javax.servlet.sip.Proxy</XPD:ATTR>
 <XPD:REF name="BehavioralFeature">m4jqub4FO0CwemOowXOAdgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::Proxying - parallel == true::::">bPdaTel+wEOI1pTWMuk0EQAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">3</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == true, no error::::">bPdaTel+wEOI1pTWMuk0EQAA</XPD:REF>
+<XPD:REF name="CallActions[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying = parallel == true, with error::::">RwS8jNPifUuBJP0eAo12CwAA</XPD:REF>
+<XPD:REF name="CallActions[2]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false v2, sequential == true, recurse == true::::">xUqPAvKeiE+XlLv9TCWE+QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[8]" type="UMLOperation" guid="2zY0ljWRyUWS6Ut6/CdBHAAA">
 <XPD:ATTR name="Name" type="string">getProxy</XPD:ATTR>
@@ -5105,6 +5133,13 @@
 <XPD:ATTR name="DataValue" type="string">java.io.IOException</XPD:ATTR>
 <XPD:REF name="TaggedModel">cEOQBh6vSEWkR3IGuiuXMwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">6</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == true, no error::::">4A11JFt4CESIrO8kpTHlbQAA</XPD:REF>
+<XPD:REF name="CallActions[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == true, no error::::">vQIFgqtsIkC5iSpRFmE2GgAA</XPD:REF>
+<XPD:REF name="CallActions[2]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying = parallel == true, with error::::">E/fIk/6nuUWb9kNSsavsBwAA</XPD:REF>
+<XPD:REF name="CallActions[3]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false - error and no error::::">NWOkWyoZtESOVVpkGTAd/QAA</XPD:REF>
+<XPD:REF name="CallActions[4]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false, 303 response in branch::::">lUWU4YMIek2QH7LIJBpMWAAA</XPD:REF>
+<XPD:REF name="CallActions[5]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.5 Sendng CANCEL::::">Lru7s2Q5g0mskx1M6calhgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[16]" type="UMLOperation" guid="yFZ1Y5jtZ0+90/4ZES5PyQAA">
 <XPD:ATTR name="Name" type="string">setMaxForwards</XPD:ATTR>
@@ -5152,9 +5187,10 @@
 <XPD:REF name="Type_">U5Bj2anufUCAyesMTnbXrQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:ATTR name="#TypedFeatures" type="integer">2</XPD:ATTR>
+<XPD:ATTR name="#TypedFeatures" type="integer">3</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]">N8J7/FFXUUm6SClLMbEC1wAA</XPD:REF>
-<XPD:REF name="TypedFeatures[1]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::ProxyBranchImpl::request">b42C33ftGkmEiWNqmRGY9AAA</XPD:REF>
+<XPD:REF name="TypedFeatures[1]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::ProxyBranchImpl::requestToBeSent">b42C33ftGkmEiWNqmRGY9AAA</XPD:REF>
+<XPD:REF name="TypedFeatures[2]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::ProxyImpl::originalRequest">XBlS5hmYdkOjG3KKOaUFzQAA</XPD:REF>
 <XPD:ATTR name="#TypedParameters" type="integer">28</XPD:ATTR>
 <XPD:REF name="TypedParameters[0]">tobHRmauxU2E29EO5p4FIQAA</XPD:REF>
 <XPD:REF name="TypedParameters[1]">MsU89vhHfEi52xXYrjiDvwAA</XPD:REF>
@@ -5184,8 +5220,9 @@
 <XPD:REF name="TypedParameters[25]">RS246y/J6U2xER4OqA1KRgAA</XPD:REF>
 <XPD:REF name="TypedParameters[26]">ojPVuoK0YE689EFH0jINlwAA</XPD:REF>
 <XPD:REF name="TypedParameters[27]">OwUBTmTjhEmi22GCxEWF2gAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::">hd47dHx99Eqdu4CUZTMZhQAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::">hd47dHx99Eqdu4CUZTMZhQAA</XPD:REF>
+<XPD:REF name="Instances[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::">2QP0CdTkI0yb1cMoIWPRXAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[22]" type="UMLInterface" guid="6T7+ymclMEmw7DVF/vB5dgAA">
 <XPD:ATTR name="Name" type="string">SipServletResponse</XPD:ATTR>
@@ -5411,7 +5448,11 @@
 <XPD:REF name="BehavioralFeature">EoVJ/+XxkUy6fLsvXyd8agAA</XPD:REF>
 <XPD:REF name="Type_">lfc5xHGT5026tkMUxz2b7wAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_LifeCycle::sessionDeactivated::">zBedcXtjZ0m2OF/7X1wwcgAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">0/vHHfHDqEKphLOThzKO1wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[24]" type="UMLInterface" guid="uNORGVJM7kCZfZZ4ZJMB4QAA">
 <XPD:ATTR name="Name" type="string">SipSessionAttributeListener</XPD:ATTR>
@@ -5434,6 +5475,8 @@
 <XPD:REF name="BehavioralFeature">2sdIyPG3PUaSs6nSbVxXkAAA</XPD:REF>
 <XPD:REF name="Type_">vbSd2hpuKE+suBEiYj91WwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_Attributes::::">6ldAMWK25Em0Go+bgHVzUQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="csLM6lb4E0KFUcRcFwpYgAAA">
 <XPD:ATTR name="Name" type="string">attributeRemoved</XPD:ATTR>
@@ -5445,6 +5488,8 @@
 <XPD:REF name="BehavioralFeature">csLM6lb4E0KFUcRcFwpYgAAA</XPD:REF>
 <XPD:REF name="Type_">vbSd2hpuKE+suBEiYj91WwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_Attributes::::">MOELdzStfUuz5YCqrIXwFQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[2]" type="UMLOperation" guid="gkW/EgsUg0Cmzzu4wUYEvgAA">
 <XPD:ATTR name="Name" type="string">attributeReplaced</XPD:ATTR>
@@ -5457,6 +5502,8 @@
 <XPD:REF name="Type_">vbSd2hpuKE+suBEiYj91WwAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">7qk5+kYA/U2eeEz/KAKbBgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[25]" type="UMLClass" guid="vbSd2hpuKE+suBEiYj91WwAA">
 <XPD:ATTR name="Name" type="string">SipSessionBindingEvent</XPD:ATTR>
@@ -5545,6 +5592,8 @@
 <XPD:REF name="BehavioralFeature">JZedizhhRU28q5Abqqc98wAA</XPD:REF>
 <XPD:REF name="Type_">vbSd2hpuKE+suBEiYj91WwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_Attributes::::">RpiAppjS9UW7kCD50s8PYwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="IL6U2H/2RE6YMHzVnSSA1gAA">
 <XPD:ATTR name="Name" type="string">valueUnbound</XPD:ATTR>
@@ -5556,7 +5605,11 @@
 <XPD:REF name="BehavioralFeature">IL6U2H/2RE6YMHzVnSSA1gAA</XPD:REF>
 <XPD:REF name="Type_">vbSd2hpuKE+suBEiYj91WwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::SipSession_Attributes::::">2rd0En5EukOEvcrSBfTUEwAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">YapM1Mg0+kGuoOVBQxCPQwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[27]" type="UMLClass" guid="lfc5xHGT5026tkMUxz2b7wAA">
 <XPD:ATTR name="Name" type="string">SipSessionEvent</XPD:ATTR>
@@ -5633,6 +5686,8 @@
 <XPD:REF name="Type_">lfc5xHGT5026tkMUxz2b7wAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">dr3uUX8Lik2XRqrCHniAaAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[29]" type="UMLInterface" guid="Be4EHJuSy0OPWKEjHCHEnAAA">
 <XPD:ATTR name="Name" type="string">SipSessionsUtil</XPD:ATTR>
@@ -5763,6 +5818,8 @@
 <XPD:REF name="Type_">hsjX1/bdy0iIju1rUX5euQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipListenersHolder::timerListener">MeYDgmnIN06cyEHEmhAm9QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[32]" type="UMLInterface" guid="m1L/Xk7CGkKqbe9oUFsn0QAA">
 <XPD:ATTR name="Name" type="string">TimerService</XPD:ATTR>
@@ -6484,6 +6541,10 @@
 <XPD:OBJ name="Operations[0]" type="UMLOperation" guid="SlqYxqFPE0CK8thKyElcjAAA">
 <XPD:ATTR name="Name" type="string">cancel</XPD:ATTR>
 <XPD:REF name="Owner">L3b1g9jJ6kazk/UwJ4IVFAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">3</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.5 Sendng CANCEL::::">mJxjZdAJOkSRmY9MKYtHAgAA</XPD:REF>
+<XPD:REF name="CallActions[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.5 Sendng CANCEL::::">x11xF3ilvUe4h2qYdtcPtgAA</XPD:REF>
+<XPD:REF name="CallActions[2]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.6 Receiving CANCEL::::">1cCAG9Wk20q2xcO71wp+4QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[1]" type="UMLOperation" guid="bGySdxzN10qUWRAWEUIo7QAA">
 <XPD:ATTR name="Name" type="string">getProxy</XPD:ATTR>
@@ -6534,7 +6595,7 @@
 <XPD:REF name="Owner">L3b1g9jJ6kazk/UwJ4IVFAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::">nB4SK2rU40mztfBw1xB/3AAA</XPD:REF>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::">nB4SK2rU40mztfBw1xB/3AAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[40]" type="UMLInterface" guid="aAno3Gq1O0+xEokONVJiXwAA">
 <XPD:ATTR name="Name" type="string">Proxy</XPD:ATTR>
@@ -6711,6 +6772,11 @@
 <XPD:ATTR name="TypeExpression" type="string">List&lt;? extends URI&gt;</XPD:ATTR>
 <XPD:REF name="BehavioralFeature">BLaJvg0pW0SzCJjGgtXI/QAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">4</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false - error and no error::::">gYueK1hedE+WM9LJ2/FnywAA</XPD:REF>
+<XPD:REF name="CallActions[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false, 303 response in branch::::">ih4nKmv5Yk6BYhJidM4hcQAA</XPD:REF>
+<XPD:REF name="CallActions[2]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == false v2, sequential == true, recurse == true::::">cb3ZHpC9xEKs3SbxQ6bRcAAA</XPD:REF>
+<XPD:REF name="CallActions[3]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.6 Receiving CANCEL::::">+aV1s3EFL0+S8tfgVyFV9QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[16]" type="UMLOperation" guid="+4IDKeQw0UqXAVV/gJoaBwAA">
 <XPD:ATTR name="Name" type="string">proxyTo</XPD:ATTR>
@@ -6815,15 +6881,17 @@
 <XPD:OBJ name="Operations[26]" type="UMLOperation" guid="gGECM88zcEO+M4c0HnS/sAAA">
 <XPD:ATTR name="Name" type="string">startProxy</XPD:ATTR>
 <XPD:REF name="Owner">aAno3Gq1O0+xEokONVJiXwAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::Proxying - parallel == true::start::">mDGrS/gAjEul/PpkR9c77wAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">3</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying - parallel == true, no error::start::">mDGrS/gAjEul/PpkR9c77wAA</XPD:REF>
+<XPD:REF name="CallActions[1]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::Proxying = parallel == true, with error::::">F9zdWVkFGECChThgdqX0ugAA</XPD:REF>
+<XPD:REF name="CallActions[2]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::10.2.6 Receiving CANCEL::::">kq1V+9HqYUyiFYkRAYquOAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::ProxyBranchImpl::proxy">lRa32+KSs0adD8rxNa93SwAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::proxy::">GBiTM0EgDkyWxjllX7bvBwAA</XPD:REF>
 <XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::">UvwUGZYYU0O7xUl08azNPAAA</XPD:REF>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 10 - Proxy::">UvwUGZYYU0O7xUl08azNPAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[41]" type="UMLInterface" guid="wAUGtcvoxU63fXpdvfr6cgAA">
 <XPD:ATTR name="Name" type="string">SipApplicationRouter</XPD:ATTR>
@@ -6901,6 +6969,10 @@
 <XPD:REF name="BehavioralFeature">Cmnjg9z0skqRH36v4c7GdgAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::SipApplicationDispatcherImpl::sipApplicationRouter">oq+PF7eiEEKwwOcElsE7ugAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::DefaultApplicationRouter">C3ogZho52UmRHBg1q3K2ygAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[42]" type="UMLEnumeration" guid="pO0ij9yZ0EylX9l62hG6TAAA">
 <XPD:ATTR name="Name" type="string">SipApplicationRoutingDirective</XPD:ATTR>
@@ -7687,6 +7759,12 @@
 <XPD:REF name="Views[2]">GMLsCrrERUena753VkopEQAA</XPD:REF>
 <XPD:REF name="Views[3]">gQf/nB2PxUCrQUH6JCx+xAAA</XPD:REF>
 </XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="BkoR8txEF0eaFs323x0iKQAA">
+<XPD:ATTR name="Name" type="string">ServletContext</XPD:ATTR>
+<XPD:REF name="Namespace">T8p1c4OFK0ST8ub86eWOvQAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">ktZ1Hvc0qk6N8wNmGnlC8AAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>

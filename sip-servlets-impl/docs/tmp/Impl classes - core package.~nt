@@ -8,7 +8,7 @@
 <XPD:BODY>
 <XPD:OBJ name="DocumentElement" type="UMLPackage" guid="R1wX5fNETUqoXz1hcMS1bwAA">
 <XPD:ATTR name="Name" type="string">core</XPD:ATTR>
-<XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">7</XPD:ATTR>
 <XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="fAfx+fkl/0epcQVWx0Xk0wAA">
 <XPD:ATTR name="Name" type="string">SipApplicationDispatcherImpl</XPD:ATTR>
 <XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
@@ -54,14 +54,22 @@
 <XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="HV7fJIM/jUOfm0FiG+8uLwAA">
 <XPD:ATTR name="Name" type="string">SipFactoryImpl</XPD:ATTR>
 <XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">DR2odvB2BUGwHzE5BqngkwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="8nkl922hskiR2DWMZJUHMgAA">
 <XPD:ATTR name="Name" type="string">SipStandardWrapper</XPD:ATTR>
 <XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
-<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Operations[0]" type="UMLOperation" guid="i253EzkdL0yhk+1uEgtj7gAA">
 <XPD:ATTR name="Name" type="string">invoke</XPD:ATTR>
 <XPD:REF name="Owner">8nkl922hskiR2DWMZJUHMgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="R8fttydGwUW9xcLmMijYWAAA">
+<XPD:ATTR name="Name" type="string">load</XPD:ATTR>
+<XPD:REF name="Owner">8nkl922hskiR2DWMZJUHMgAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">iswUJOYrqUuiLucwYMZo3wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
 <XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">epLg7bw130qjTEpp7qC8/QAA</XPD:REF>
@@ -102,7 +110,15 @@
 <XPD:ATTR name="Name" type="string">SipContexyImpl</XPD:ATTR>
 <XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
 <XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::CollaborationInstanceSet1::">IqLxv6pUu0WoOKJ5wXdFaQAA</XPD:REF>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">IqLxv6pUu0WoOKJ5wXdFaQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[5]" type="UMLClass" guid="OWyHpFi5wEyE9j8Ia6NuUAAA">
+<XPD:ATTR name="Name" type="string">SipApplicationContext</XPD:ATTR>
+<XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[6]" type="UMLClass" guid="tAUxJY9TfkCcCB4ttp0o7wAA">
+<XPD:ATTR name="Name" type="string">SipApplicationContextFacade</XPD:ATTR>
+<XPD:REF name="Namespace">R1wX5fNETUqoXz1hcMS1bwAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:BODY>

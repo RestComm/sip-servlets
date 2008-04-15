@@ -11,7 +11,7 @@
 <XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="AXJ88RUUGk2bFOlDFaxC3gAA">
 <XPD:ATTR name="Name" type="string">SipServletImpl</XPD:ATTR>
 <XPD:REF name="Namespace">7Tx/B50IZ0K+zWMZGfpW3AAA</XPD:REF>
-<XPD:ATTR name="#Views" type="integer">8</XPD:ATTR>
+<XPD:ATTR name="#Views" type="integer">12</XPD:ATTR>
 <XPD:REF name="Views[0]">JOYrvd+M6k+Xhmi2NWp9ogAA</XPD:REF>
 <XPD:REF name="Views[1]">nKAwkVcyzUaj10eKBEn1RAAA</XPD:REF>
 <XPD:REF name="Views[2]">M2r1CmlRMk+fLcgFJqrMUAAA</XPD:REF>
@@ -20,8 +20,22 @@
 <XPD:REF name="Views[5]">D5SBFXlDB0mn2iCBwrp0dAAA</XPD:REF>
 <XPD:REF name="Views[6]">mSIHmjcxyUiaSN3FUzxGWgAA</XPD:REF>
 <XPD:REF name="Views[7]">q2htbHFHLEC9eJyETExLYwAA</XPD:REF>
-<XPD:ATTR name="#Generalizations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Views[8]">sIsGlzh/g0Ob1j+DYqTjvQAA</XPD:REF>
+<XPD:REF name="Views[9]">7M+Z2MIyf0mm8DsZBE9EgAAA</XPD:REF>
+<XPD:REF name="Views[10]">lltS0k0G3kG5iQGHYt70AgAA</XPD:REF>
+<XPD:REF name="Views[11]">sd2oSX5kp0mxzCO/CG+h0wAA</XPD:REF>
+<XPD:ATTR name="#Generalizations" type="integer">2</XPD:ATTR>
 <XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
+<XPD:REF name="Generalizations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">UgSA8YD6k0exWy2vxoyQSQAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="Xt7inihoEEaOFw/gCbP/zgAA">
+<XPD:ATTR name="Name" type="string">load</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="gC9yFK1En0WAk9DPa408ZgAA">
+<XPD:ATTR name="Name" type="string">invoke</XPD:ATTR>
+<XPD:REF name="Owner">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+</XPD:OBJ>
 <XPD:ATTR name="#Associations" type="integer">3</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">TWfHZ85xGU6sH5BbyucshAAA</XPD:REF>
 <XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sRCEv2M5RkSFmmq47Kdy9AAA</XPD:REF>
