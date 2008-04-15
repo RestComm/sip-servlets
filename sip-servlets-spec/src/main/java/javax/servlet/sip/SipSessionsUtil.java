@@ -14,7 +14,9 @@
 package javax.servlet.sip;
 /**
  * A utility class providing additional support for converged HTTP/SIP applications and converged J2EE/SIP applications.
- * This class can be accessed through the ServletContext parameter named javax.servlet.sip.sessionsutil or it can be injected using the annotation @SipSessionsUtil.
+ * This class can be accessed through the ServletContext parameter named 
+ * javax.servlet.sip.SipSessionsUtil or 
+ * it can be injected using the @Resource annotation.
  * Since: 1.1
  */
 public interface SipSessionsUtil{

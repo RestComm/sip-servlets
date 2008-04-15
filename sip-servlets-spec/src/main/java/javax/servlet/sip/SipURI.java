@@ -95,6 +95,12 @@ public interface SipURI extends javax.servlet.sip.URI{
     boolean isSecure();
 
     /**
+     * Removes the value of the specified header in this SipURI.
+     * @param name header name
+     */
+    void removeHeader(java.lang.String name);
+    
+    /**
      * Sets the value of the specified header in this SipURI.
      */
     void setHeader(java.lang.String name, java.lang.String value);

@@ -30,6 +30,14 @@ public interface ServletTimer{
     javax.servlet.sip.SipApplicationSession getApplicationSession();
 
     /**
+     * Returns a string containing the unique identifier assigned to this timer task. 
+     * The identifier is assigned by the servlet container and is implementation dependent.
+     * @return a string specifying the identifier assigned to this session
+     * @since 1.1
+     */
+    java.lang.String getId();
+    
+    /**
      * Get the information associated with the timer at the time of creation.
      */
     java.io.Serializable getInfo();

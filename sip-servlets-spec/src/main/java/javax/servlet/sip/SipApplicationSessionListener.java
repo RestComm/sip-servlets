@@ -27,19 +27,8 @@ public interface SipApplicationSessionListener extends java.util.EventListener{
     void sessionDestroyed(javax.servlet.sip.SipApplicationSessionEvent ev);
 
     /**
-     * Notification that the application session has just been activated.
-     */
-    void sessionDidActivate(javax.servlet.sip.SipApplicationSessionEvent se);
-
-    /**
      * Notification that an application session has expired. The application may request an extension of the lifetime of the application session by invoking
      * .
      */
     void sessionExpired(javax.servlet.sip.SipApplicationSessionEvent ev);
-
-    /**
-     * Notification that the application session is about to be passivated.
-     */
-    void sessionWillPassivate(javax.servlet.sip.SipApplicationSessionEvent se);
-
 }

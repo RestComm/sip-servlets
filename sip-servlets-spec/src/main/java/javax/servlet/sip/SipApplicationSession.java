@@ -35,6 +35,12 @@ public interface SipApplicationSession{
     java.net.URL encodeURL(java.net.URL url);
 
     /**
+     * Returns the name of the SIP application this SipApplicationSession is associated with.
+     * @return name of the SIP application, this SipApplicationSession is associated with
+     */
+    java.lang.String getApplicationName();
+    
+    /**
      * Returns the object bound with the specified name in this session, or null if no object is bound under the name.
      */
     java.lang.Object getAttribute(java.lang.String name);
@@ -83,6 +89,14 @@ public interface SipApplicationSession{
      */
     javax.servlet.sip.SipSession getSipSession(java.lang.String id);
 
+    /**
+     * Returns the active timer identified by a specific id that is associated with this application session.
+     * @param id 
+     * @return the ServletTimer object identified by the id belonging to this application session
+     * @throws IllegalStateException if this application session is not valid
+     */
+    ServletTimer getTimer(java.lang.String id);
+    
     /**
      * Returns all active timers associated with this application session.
      */

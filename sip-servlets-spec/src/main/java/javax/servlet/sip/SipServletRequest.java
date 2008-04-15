@@ -16,6 +16,26 @@ package javax.servlet.sip;
  * Represents SIP request messages. When receiving an incoming SIP request the container creates a SipServletRequest and passes it to the handling servlet. For outgoing, locally initiated requests, applications call SipFactory.createRequest to obtain a SipServletRequest that can then be modified and sent.
  */
 public interface SipServletRequest extends javax.servlet.sip.SipServletMessage, javax.servlet.ServletRequest{
+	/**
+	 * This method allows the addition of the appropriate authentication header(s) 
+	 * to the request that was challenged with a challenge response.
+	 * @param challengeResponse The challenge response (401/407) receieved from a UAS/Proxy.
+	 * @param authInfo The AuthInfo object that will add the Authentication headers to the request.
+	 */
+	void addAuthHeader(SipServletResponse challengeResponse,
+            AuthInfo authInfo);
+	
+	/**
+	 * This method allows the addition of the appropriate authentication header(s) 
+	 * to the request that was challenged with a challenge response without needing 
+	 * the creation and/or maintenance of the AuthInfo object.
+	 * @param challengeResponse the challenge response (401/407) receieved from a UAS/Proxy.
+	 * @param username
+	 * @param password
+	 */
+	void addAuthHeader(SipServletResponse challengeResponse,
+            java.lang.String username,
+            java.lang.String password);
     /**
      * Returns a CANCEL request object. This method is used by applications to cancel outstanding transactions for which they act as a user agent client (UAC). The CANCEL request is sent when the application invokes
      * on it.
@@ -75,6 +95,13 @@ public interface SipServletRequest extends javax.servlet.sip.SipServletMessage, 
      */
     java.io.BufferedReader getReader() throws java.io.IOException;
 
+    /**
+     * Returns the SipApplicationRoutingDirective associated with this request.
+     * @return SipApplicationRoutingDirective associated with this request.
+     * @throws java.lang.IllegalStateException if called on a request that is not initial
+     */
+    SipApplicationRoutingDirective getRoutingDirective() throws java.lang.IllegalStateException;
+    
     /**
      * Returns the request URI of this request.
      */

@@ -12,11 +12,14 @@
  * limitations under the License.
  */
 package javax.servlet.sip;
+
+import java.io.Serializable;
+
 /**
  * A class that represents the application routing region. It uses the predefined regions in the Enum SipApplicationRoutingRegionType and also allows for implementations to have additional or new regions if it is so required. This could be useful in non telephony domains where the concept of of a caller and callee is not applicable.
  * Since: 1.1
  */
-public final class SipApplicationRoutingRegion{
+public class SipApplicationRoutingRegion implements Serializable {
 	private SipApplicationRoutingRegionType sipApplicationRoutingRegionType = null;
 	private String label = null;
     /**

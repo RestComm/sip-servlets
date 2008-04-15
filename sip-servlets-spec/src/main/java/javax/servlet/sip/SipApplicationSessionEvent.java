@@ -13,7 +13,7 @@
  */
 package javax.servlet.sip;
 /**
- * Notification that a SipApplicationSession has expired.
+ * This is the class representing event notifications for changes to SipApplicationSessions within a SIP servlet application.
  * A SipApplicationSessionListener receiving this notification may attempt to extend the lifetime of the application instance corresponding to the expiring application session by invoking SipApplicationSession.setExpires(int).
  * @since: 1.1 
  */

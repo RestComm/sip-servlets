@@ -16,7 +16,20 @@ package javax.servlet.sip;
 import java.util.List;
 
 /**
- * A ProxyBranch represents a branch which the Proxy sends out the request on. The ProxyBranch object models the branch as used in RFC3261 while describing a stateful proxy. For example, public void doInvite(SipServletRequest req) { ... Proxy p = req.getProxy(); p.setRecordRoute(true); List branches = createProxyBranches(getTargets(req)); branches.get(0).setProxyBranchTimeout(5); branches.get(1).setProxyBranchTimeout(10); p.startProxy(); ... }
+ * A ProxyBranch represents a branch which the Proxy sends out the request on. 
+ * The ProxyBranch object models the branch as used in RFC3261 while describing a stateful proxy. 
+ * For example, 
+ * 
+ * public void doInvite(SipServletRequest req) { 
+ * 		... 
+ * 		Proxy p = req.getProxy(); 
+ * 		p.setRecordRoute(true); 
+ * 		List branches = p.createProxyBranches(getTargets(req)); 
+ * 		branches.get(0).setProxyBranchTimeout(5); 
+ * 		branches.get(1).setProxyBranchTimeout(10); 
+ * 		p.startProxy(); 
+ * 		... 
+ * }
  * @since 1.1
  */
 public interface ProxyBranch{
@@ -26,7 +39,21 @@ public interface ProxyBranch{
      */
     void cancel();
 
-    javax.servlet.sip.Proxy getProxy();
+    /**
+     * This overloaded method of cancel() provides a way to specify the reason 
+     * for cancelling this Proxy by including the appropriate Reason headers [RFC 3326].
+     * @param protocol describes the source of the 'cause' field in the Reason header field.
+     * @param reasonCode corresponds to the 'cause' field. For eg, if protocol is SIP, 
+     * the reasonCode would be the status code of the response which caused the cancel
+     * @param reasonText describes the reason for cancelling the Proxy.
+     * @since 1.1
+     */
+    void cancel(java.lang.String[] protocol,
+            int[] reasonCode,
+            java.lang.String[] reasonText);
+    
+    
+    Proxy getProxy();
 
     /**
      * Returns the current value of the search timeout associated with this ProxyBranch object. If this value is not explicitly set using the

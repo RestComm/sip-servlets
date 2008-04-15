@@ -17,7 +17,42 @@ import java.util.List;
 
 /**
  * Represents the operation of proxying a SIP request.
- * A number of parameters control how proxying is carried out: addToPath: addToPath: Whether the application adds a Path header to the REGISTER request. The default is false. recurse: Whether to autmotically recurse or not. The default is true. recordRoute: Whether to record-route or not. The default is false. parallel: Whether to proxy in parallel or sequentially. The default is true. stateful: Whether to remain transaction stateful for the duration of the proxying operation. The default is true. supervised: Whether the application will be invoked for events (best response received, CANCEL, or ACK received). proxyTimeout: The timeout for the proxy in general. In case the proxy is a sequential proxy then this value behaves like the sequential-search-timeout which is deprecated since v1.1. In case the proxy is a parallel proxy then this timeout acts as the timeout for the entire proxy i.e each of its parallel branches before it starts to send out CANCELs waiting for final responses on all INVITE branches and sends the best final response upstream. sequentialSearchTimeout: The time the container waits for a final response before it CANCELs the branch and proxies to the next destination in the target set. The usage of this explicit sequential timeout setting is deprecated and replaced by a general proxyTimeout parameter. The effect of the various parameters is explained further below.
+ * A number of parameters control how proxying is carried out:
+ * <ul>
+ * <li> 
+ * addToPath: addToPath: Whether the application adds a Path header to the REGISTER request. The default is false.
+ * </li>
+ * <li> 
+ * recurse: Whether to autmotically recurse or not. The default is true.
+ * </li>
+ * <li>
+ * recordRoute: Whether to record-route or not. The default is false. 
+ * </li>
+ * <li>
+ * parallel: Whether to proxy in parallel or sequentially. The default is true. 
+ * </li>
+ * <li>
+ * stateful: Whether to remain transaction stateful for the duration of the proxying operation. The default is true. 
+ * </li>
+ * <li>
+ * supervised: Whether the application will be invoked on incoming responses related to this proxying. 
+ * </li>
+ * <li>
+ * proxyTimeout: The timeout for the proxy in general. In case the proxy is a 
+ * sequential proxy then this value behaves like the sequential-search-timeout 
+ * which is deprecated since v1.1. In case the proxy is a parallel proxy then 
+ * this timeout acts as the timeout for the entire proxy i.e each of its parallel branches 
+ * before it starts to send out CANCELs waiting for final responses on all INVITE branches 
+ * and sends the best final response upstream. 
+ * </li>
+ * <li>
+ * sequentialSearchTimeout: The time the container waits for a final response before 
+ * it CANCELs the branch and proxies to the next destination in the target set. 
+ * The usage of this explicit sequential timeout setting is deprecated and 
+ * replaced by a general proxyTimeout parameter. 
+ * </li>
+ * </ul>
+ * The effect of the various parameters is explained further below.
  */
 public interface Proxy{
     /**
@@ -25,6 +60,18 @@ public interface Proxy{
      */
     void cancel();
 
+    /**
+     * This overloaded method of cancel() provides a way to specify the reason 
+     * for cancelling this Proxy by including the appropriate Reason headers [RFC 3326].
+     * @param protocol describes the source of the 'cause' field in the Reason header field.
+     * @param reasonCode corresponds to the 'cause' field. For eg, if protocol is SIP, 
+     * the reasonCode would be the status code of the response which caused the cancel
+     * @param reasonText describes the reason for cancelling the Proxy.
+     * @since 1.1
+     */
+    void cancel(java.lang.String[] protocol,
+            int[] reasonCode,
+            java.lang.String[] reasonText);
     /**
      * Returns the list of
      * objects given a set of targets. The resulting branches will not have associated client transactions until
@@ -94,13 +141,13 @@ public interface Proxy{
     boolean getRecurse();
 
     /**
-     * Deprecated.
+     * @deprecated
      * Returns the current value of the sequential search timeout parameter. This is measured in seconds.
      */
     int getSequentialSearchTimeout();
 
     /**
-     * Deprecated.
+     * @deprecated
      * Returns true if this proxy operation is transaction stateful (the default), or false if it is stateless.
      */
     boolean getStateful();
@@ -157,14 +204,14 @@ public interface Proxy{
     void setRecurse(boolean recurse);
 
     /**
-     * Deprecated.
+     * @deprecated
      * Sets the sequential search timeout value for this Proxy object. This is the amount of time the container waits for a final response when proxying sequentially. When the timer expires the container CANCELs the current branch and proxies to the next element in the target set.
      * The container is free to ignore this parameter.
      */
     void setSequentialSearchTimeout(int seconds);
 
     /**
-     * Deprecated.
+     * @deprecated
      * Specifies whether the server should proxy statelessly or not, that is whether it should maintain transaction state whilst the proxying operation is in progress.
      * This proxy parameter is a hint only. Implementations may choose to maintain transaction state regardless of the value of this flag, but if so the application will not be invoked again for this transaction.
      */

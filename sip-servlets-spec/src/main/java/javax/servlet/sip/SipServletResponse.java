@@ -12,6 +12,9 @@
  * limitations under the License.
  */
 package javax.servlet.sip;
+
+import java.util.Iterator;
+
 /**
  * Represents SIP responses. Instances of this class are passed to servlets when the container receives incoming SIP responses and also, servlets acting as UA servers or proxies generates SIP responses of their own by creating SipServletResponses.
  * SIP responses has a three-digit status code that indicates the outcome of the corresponding request. Responses with a status code in the range of 100-199 (1xx's) are called provisional or informational and indicate progress in processing of the request. Any response with a status code of 200 or higher is a final response. A UA server may send only one final response per request but this may be preceeded by any number of provisional responses.
@@ -377,8 +380,14 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
     /**
      * Creates a PRACK request object corresponding to this response. This method is used by servlets acting as UACs in order to acknowledge reliable provisional responses to INVITE requests with PRACK (RFC 3262).
      */
-    javax.servlet.sip.SipServletRequest createPrack();
+    javax.servlet.sip.SipServletRequest createPrack() throws Rel100Exception;
 
+    /**
+     * Returns an Iterator over all the realms associated with this challenge response.
+     * @return Iterator over all the realms associated with this challenge response.
+     */
+    Iterator<String> getChallengeRealms();
+    
     /**
      * Always returns null. SIP is not a content transfer protocol and having stream based content accessors is of little utility.
      * Message content can be set using the SipServletMessage.setContent(java.lang.Object, java.lang.String) method.

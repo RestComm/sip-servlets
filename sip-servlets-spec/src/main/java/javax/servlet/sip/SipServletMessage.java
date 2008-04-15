@@ -280,6 +280,15 @@ public interface SipServletMessage extends java.lang.Cloneable{
     boolean isUserInRole(java.lang.String role);
 
     /**
+     * Removes the named attribute from this message. Nothing is done if the message did not already contain the specified attribute. 
+     * 
+     * Attribute names should follow the same conventions as package names. Names beginning with javax.servlet.sip.* are reserved for definition by the SIP Servlet API.
+     * @param name a String specifying the name of the attribute
+     * @throws NullPointerException if name is null.
+     */
+    void removeAttribute(java.lang.String name);
+    
+    /**
      * Removes the specified header. If multiple headers exists with the given name, they're all removed.
      * Either the long or compact name can be used to access the header field, as both are treated as equivalent.
      */

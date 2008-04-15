@@ -21,6 +21,11 @@ import java.util.Iterator;
  * The generic syntax of URIs is defined in RFC 2396.
  */
 public interface URI extends java.lang.Cloneable{
+	/**
+	 * Returns a clone of this URI.
+	 * @return URI a clone of this URI object
+	 */
+	URI clone();
     /**
      * Compares the given URI with this URI. The comparison rules to be followed shall depend upon the underlying URI scheme being used. For general purpose URIs RFC 2396 should be consulted for equality. If the URIs are of scheme for which comparison rules are further specified in their specications, then they must be used for any comparison.
      */
