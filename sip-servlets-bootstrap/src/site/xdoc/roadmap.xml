@@ -1,0 +1,36 @@
+<document>
+
+  <properties>
+    <title>Roadmap</title>
+  </properties>
+
+  <body>
+
+    <section name="Roadmap">
+
+      <subsection name="Version 0.1 - 01/01/2008">
+        <p>
+        <img src="images/green.jpeg"/> Servlet Loading <br/>       
+        <img src="images/green.jpeg"/> Application Routing <br/>
+        <img src="images/green.jpeg"/> Proxying <br/>
+        <img src="images/green.jpeg"/> B2BUA <br/>
+        <img src="images/green.jpeg"/> Http Converged Applications <br/>
+        <img src="images/green.jpeg"/> Sessions <br/>
+        </p>
+      </subsection>
+      <subsection name="Version 0.2 - 02/01/2008">
+        <p>
+        <img src="images/orange.jpeg"/> Listeners and Timers <br/>
+        <img src="images/red.jpeg"/> Security <br/>
+        <img src="images/red.jpeg"/> Servlet 2.5 Alignement <br/>                      
+        <img src="images/red.jpeg"/> Running on Tomcat 6/Jboss AS <br/>
+        </p>
+      </subsection>
+      <subsection name="Version 0.3 - 03/01/2008">
+        <p>
+        <img src="images/red.jpeg"/> Distributable applications <br/>       
+        </p>
+      </subsection>
+    </section>
+  </body>
+</document>

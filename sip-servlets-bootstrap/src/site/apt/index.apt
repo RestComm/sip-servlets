@@ -16,7 +16,9 @@ Goals
   standalone with the Tomcat HTTP server as well as in an application server 
   integrated with JSLEE. Many interesting hacks in progress folks!
 
-Implementation tasks
+Roadmap and Implementation tasks
+
+  Please check out our {{{roadmap.html}roadmap}} to know what's going to happen next.
 
   Here are the {{{http://docs.google.com/Doc?id=dfcjr48z_65gpwxnz}implementation tasks}} needed to implement the JSR 289 spec.
 
@@ -26,4 +28,4 @@ Try it !
 
 	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 5.x to become a sip-servlet converged container.
 	
-	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.
+	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.	 
