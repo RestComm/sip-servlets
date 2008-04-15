@@ -12,6 +12,7 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
@@ -164,5 +165,14 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	@Override
+	public void send() throws IOException {
+		try {
+			super.provider.sendResponse((Response)this.message);
+		} catch (SipException e) {
+			//TODO logger
+			throw new IOException(e.getMessage());
+		}
+	}
 }

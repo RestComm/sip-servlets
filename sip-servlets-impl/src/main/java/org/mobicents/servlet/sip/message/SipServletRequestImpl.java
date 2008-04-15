@@ -61,7 +61,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private SipServletRequestImpl nextRequest;
 	private RouteHeader popedRouteHeader;
-
+	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
+	
 	private boolean isInitial = true;
 
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
@@ -191,12 +192,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return ((MaxForwardsHeader) ((Request) message)
 				.getHeader(MaxForwardsHeader.NAME)).getMaxForwards();
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#getPoppedRoute()
+	 */
 	public Address getPoppedRoute() {
 
-		return new AddressImpl(this.popedRouteHeader.getAddress());
+		if(this.popedRouteHeader != null) {
+			return new AddressImpl(this.popedRouteHeader.getAddress());
+		}		
+		return null;
 	}
 
+	/**
+	 * Set the popped route
+	 * @param routeHeader the popped route header to set
+	 */
+	public void setPoppedRoute(RouteHeader routeHeader) {
+		this.popedRouteHeader = routeHeader;
+	}
+	
 	public Proxy getProxy() throws TooManyHopsException {
 		// TODO Auto-generated method stub
 		return null;
@@ -244,8 +259,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	}
 
-	public void setInitial() {
-		this.isInitial = true;
+	public void setInitial(boolean isInitial) {
+		this.isInitial = isInitial;
 	}
 
 	public void pushPath(Address uri) {
@@ -344,11 +359,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if (directive == SipApplicationRoutingDirective.NEW) {
 					sipUri.setParameter("rd", "NEW");
 				} else if ( directive == SipApplicationRoutingDirective.REVERSE) {
-					sipUri.setParameter("rd", "REVERSE");
+					sipUri.setParameter("rd", "REVERSE");					
 				} else if ( directive == SipApplicationRoutingDirective.CONTINUE) {
 					sipUri.setParameter("rd", "CONTINUE");
 				}
-			
+				routingDirective = directive;			
 		} catch (Exception ex) {
 			String s = "error while setting routing directive";
 			logger.error(s, ex);
@@ -462,6 +477,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	private SipServletRequestImpl getNextRequest() {
 		return nextRequest;
+	}
+
+	/**
+	 * @return the routingDirective
+	 */
+	public SipApplicationRoutingDirective getRoutingDirective() {
+		return routingDirective;
 	}
 
 }

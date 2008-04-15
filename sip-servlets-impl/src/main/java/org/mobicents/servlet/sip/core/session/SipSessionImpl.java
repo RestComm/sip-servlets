@@ -69,7 +69,7 @@ public class SipSessionImpl implements SipSession {
 	private boolean valid;
 	
 	/**
-	 * The name of the servlet withing this same app to handle all subsequent requests.
+	 * The name of the servlet within this same app to handle all subsequent requests.
 	 */
 	private String handlerServlet;
 	
@@ -282,9 +282,25 @@ public class SipSessionImpl implements SipSession {
 
 	}
 
+	/**
+	 * Retrieve which servlet is the current handler for the session
+	 * @return the servlet name corresponding to the handler for the session
+	 */
+	public String getHandler() {
+		return handlerServlet;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#setHandler(java.lang.String)
+	 */
 	public void setHandler(String name) throws ServletException {
-		// TODO Auto-generated method stub
-
+		if(!valid) {
+			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
+		}
+		//TODO throw a ServletException if no servlet with the specified name exists in this application
+		// this implies that the sipsession knows all the servlet of the application, the constructor should refactored for that
+		this.handlerServlet = name;
 	}
 
 	public void setOutboundInterface(SipURI uri) {
@@ -328,7 +344,7 @@ public class SipSessionImpl implements SipSession {
 
 	public void setSessionCreatingTransaction(SIPTransaction initialTransaction) {
 		this.sessionCreatingTransaction = initialTransaction;
-	}
+	}	
 
 	public boolean isSupervisedMode() {
 		return supervisedMode;

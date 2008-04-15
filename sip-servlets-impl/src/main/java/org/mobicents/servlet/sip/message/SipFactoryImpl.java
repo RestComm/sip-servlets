@@ -278,7 +278,7 @@ public class SipFactoryImpl implements SipFactory {
 		CallIdHeader callIdHeader = null;
 		MaxForwardsHeader maxForwardsHeader = null;
 		RouteHeader routeHeader = null;
-
+		
 		// FIXME: Is this nough?
 		// We need address from which this will be sent, also this one will be
 		// default for contact and via
@@ -379,7 +379,8 @@ public class SipFactoryImpl implements SipFactory {
 					sipProvider, session, ctx, dialog);
 
 			// TODO: Do session association?
-
+			// TODO set the routing directive as defined in 15.2.2
+			
 			return retVal;
 		} catch (TransactionUnavailableException e) {
 

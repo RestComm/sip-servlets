@@ -194,13 +194,19 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 			SipServletRequest initialRequest,
 			SipApplicationRoutingRegion region,
 			SipApplicationRoutingDirective directive, Serializable stateInfo) {		
-		// TODO implements the real matching logic for now it's gonna be first app is the one always interested :-)
+		// TODO implements the real matching logic for now it's gonna be first app deployed 
+		// matching	is the one always interested :-)
 		if(initialRequest != null) {			
 			List<SipApplicationRouterInfo> sipApplicationRouterInfoList = 
 				sipApplicationRouterInfos.get(initialRequest.getMethod());
-			if(sipApplicationRouterInfoList != null || sipApplicationRouterInfoList.size() > 0) {
+			if(sipApplicationRouterInfoList != null && sipApplicationRouterInfoList.size() > 0) {
+//				for (SipApplicationRouterInfo sipApplicationRouterInfo : sipApplicationRouterInfoList) {
+//					if(containerDeployedApplicationNames.contains(sipApplicationRouterInfo.getNextApplicationName())) {
+//						return sipApplicationRouterInfo;
+//					}
+//				}
 				return sipApplicationRouterInfoList.get(0);
-			}	
+			}			
 		}
 		return new SipApplicationRouterInfo(null,null,null,null,null);
 	}
