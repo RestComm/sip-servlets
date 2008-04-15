@@ -5,6 +5,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.sip.annotation.SipApplication;
@@ -14,6 +18,7 @@ import javax.servlet.sip.annotation.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.loader.StandardClassLoader;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -43,6 +48,8 @@ public class ClassFileScanner {
 	
 	private Method sipAppKey = null;
 	
+	private ClassLoader classLoader;
+	
 	public ClassFileScanner(String docbase, SipStandardContext ctx) {
 		this.docbase = docbase;
 		this.sipContext = ctx;
@@ -50,6 +57,8 @@ public class ClassFileScanner {
 	
 	
 	public void scan() {
+		ClassLoader cl = this.sipContext.getClass().getClassLoader();
+		this.classLoader = new WebInfClassLoader(this.docbase, cl);
 		_scan(new File(this.docbase));
 	}
 	
@@ -73,7 +82,7 @@ public class ClassFileScanner {
     		if(classpath.startsWith(".")) classpath = classpath.substring(1);
     		String className = classpath;
     		try {
-				Class clazz = Class.forName(className);
+				Class clazz = Class.forName(className, false, this.classLoader);
 				processListenerAnnotation(clazz);
 				processServletAnnotation(clazz);
 				processSipApplicationKeyAnnotation(clazz);
@@ -220,4 +229,56 @@ public class ClassFileScanner {
 		return applicationParsed;
 	}
     
+}
+
+
+class WebInfClassLoader extends ClassLoader {
+
+	private String rootDir;
+
+	private HashMap<String, Class> cache = new HashMap<String, Class>();
+
+	private ClassLoader parent;
+
+	public WebInfClassLoader (String rootDir, ClassLoader parent) {
+		this.parent = parent;
+		this.rootDir = rootDir;
+	}
+
+	protected Class loadClass (String name, boolean resolve) 
+	throws ClassNotFoundException {
+		Class clazz = cache.get(name);
+		if(clazz != null) return clazz;
+		try {
+			clazz = parent.loadClass(name);
+		} catch (ClassNotFoundException e) {
+			// Do nothing
+		}
+		if(clazz != null) return clazz;
+
+		if (clazz == null) {
+			String filename = name.replace ('.', File.separatorChar) + ".class";
+			try {
+				byte data[] = loadClassData(filename);
+				clazz = defineClass (name, data, 0, data.length);
+				if (clazz == null)
+					throw new ClassNotFoundException (name);
+
+			} catch (IOException e) {
+				throw new ClassNotFoundException ("Error reading file: " + filename);
+			}
+		}
+		return clazz;
+	}
+	private byte[] loadClassData (String filename) 
+	throws IOException {
+		File file = new File (rootDir, filename);
+		int size = (int)file.length();
+		byte buff[] = new byte[size];
+		FileInputStream fileStream = new FileInputStream(file);
+		DataInputStream dataStream = new DataInputStream (fileStream);
+		dataStream.readFully (buff);
+		dataStream.close();
+		return buff;
+	}
 }
