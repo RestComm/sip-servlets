@@ -656,11 +656,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	private boolean isRouteExternal(RouteHeader routeHeader) {
 		if (routeHeader != null) {
 			javax.sip.address.SipURI routeUri = (javax.sip.address.SipURI) routeHeader.getAddress().getURI();
-			
-			// Consider proxies external
-			if(routeUri.getParameter(RR_PARAM_APPLICATION_ROUTER_ROUTE) == null)
-				return true;
-			
+
 			String routeTransport = routeUri.getTransportParam();
 			if(routeTransport == null) {
 				routeTransport = ListeningPoint.UDP;
