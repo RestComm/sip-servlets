@@ -103,15 +103,6 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		sipServletResponse.send();
 		
 		//we forward the BYE
-//		SipSession linkedSession = helper.getLinkedSession(request.getSession());		
-//		SipServletRequest forkedRequest = helper.createRequest(
-//				linkedSession,
-//				request, 
-//				null);
-//		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-//				SIP_FACTORY);
-//		SipURI sipUri = (SipURI) sipFactory.createURI("sip:127.0.0.1:5090");				
-//		forkedRequest.setRequestURI(sipUri);
 		SipSession session = request.getSession();		
 		SipSession linkedSession = helper.getLinkedSession(session);		
 		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
