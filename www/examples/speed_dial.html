@@ -188,9 +188,22 @@
 </div>
 <div class="section"><h3>How to activate it</h3>
 <div class="section"><h4>From the binary</h4>
-<p>The binary distribution already contains all the needed dar files to run the examples, you just have to specify the dar file for this service to use in the Service xml tag, darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.</p>
-<p>The darConfigurationFileLocation attribute of the Service tag should be equal to &quot;conf/dars/speed-dial-dar.properties&quot;</p>
-<p>You can now run Tomcat.</p>
+<p>You can find the war file corresponding to this example <a href="http://download.java.net/maven/2/org/mobicents/servlet/sip/example/speed-dial/1.0-SNAPSHOT/speed-dial-1.0-SNAPSHOT.war" class="externalLink">here</a>
+.<br />
+Drop the downloaded war file into your <tt>tomcat_home/webapps</tt>
+ directory or <tt>jboss_home/server/default/deploy</tt>
+ directory </p>
+<p>Get the corresponding <a href="/darfiles/speed-dial-dar.properties">dar configuration file</a>
+.<br />
+Drop it in your <tt>tomcat_home/conf/dars</tt>
+ directory or <tt>jboss_home/server/default/conf/dars</tt>
+ directory.<br />
+To use this dar file for this service, specify in the Service xml tag, darConfigurationFileLocation attribute of the <tt>tomcat_home/conf/server.xml</tt>
+ file or <tt>jboss_home/server/default/deploy/jboss-web.deployer/server.xml</tt>
+, the following :<br />
+<tt>conf/dars/speed-dial-dar.properties.properties</tt>
+</p>
+<p>You can now run your container (Tomcat or Jboss).</p>
 </div>
 <div class="section"><h4>From the source</h4>
 <p>Please check out the speed dial example located under this <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/speed-dial" class="externalLink">location</a>
@@ -218,7 +231,7 @@
 
   
   
-  &nbsp;| Last Published: 02/05/2008
+  &nbsp;| Last Published: 02/08/2008
   &nbsp;| Version: 0.2-SNAPSHOT
 </div>
       <div class="clear">
