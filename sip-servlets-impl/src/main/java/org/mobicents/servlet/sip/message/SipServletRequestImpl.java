@@ -247,7 +247,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				this.session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}
-			this.b2buahelper = new B2buaHelperImpl(this);
+			this.b2buahelper = new B2buaHelperImpl(sipFactoryImpl);
 			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			return this.b2buahelper;
 		} catch (SipException ex) {

@@ -14,6 +14,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.UAMode;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
@@ -45,6 +46,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
  * Implementation of the B2BUA helper class.
  * 
  * @author mranga
+ * @author jean.deruelle
  */
 
 public class B2buaHelperImpl implements B2buaHelper {
@@ -61,20 +63,19 @@ public class B2buaHelperImpl implements B2buaHelper {
 		singletonHeadersNames.add(ContentDispositionHeader.NAME);
 		singletonHeadersNames.add(ContentTypeHeader.NAME);
 		//TODO are there any other singleton headers ?
-	}
-
-	
-	private SipServletRequestImpl sipServletRequest;
-
+	}	
 	private ConcurrentHashMap<SipSessionImpl, SipSessionImpl> sessionMap = new ConcurrentHashMap<SipSessionImpl, SipSessionImpl>();
 
 	private SipFactoryImpl sipFactoryImpl;
 
 	private static Log logger = LogFactory.getLog(B2buaHelperImpl.class);
-
-	public B2buaHelperImpl(SipServletRequestImpl sipServletRequest) {
-		this.sipServletRequest = sipServletRequest;
-		this.sipFactoryImpl = sipServletRequest.sipFactoryImpl; 
+	
+	/**
+	 * 
+	 * @param sipFactoryImpl
+	 */
+	public B2buaHelperImpl(SipFactoryImpl sipFactoryImpl) {		
+		this.sipFactoryImpl = sipFactoryImpl; 
 	}
 
 	/*
@@ -278,16 +279,33 @@ public class B2buaHelperImpl implements B2buaHelper {
 			throw new IllegalArgumentException("bad input argument", ex);
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#getLinkedSession(javax.servlet.sip.SipSession)
+	 */
 	public SipSession getLinkedSession(SipSession session) {
+		if ( session == null )throw new NullPointerException("the argument is null");
+		if(!session.isValid() || 
+				State.TERMINATED.equals(((SipSessionImpl)session).getState())) {
+			throw new IllegalArgumentException("the session is invalid");
+		}
 		return this.sessionMap.get((SipSessionImpl) session );
 		
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#getLinkedSipServletRequest(javax.servlet.sip.SipServletRequest)
+	 */
 	public SipServletRequest getLinkedSipServletRequest(SipServletRequest req) {
 		return ((SipServletRequestImpl)req).getLinkedRequest();
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#getPendingMessages(javax.servlet.sip.SipSession, javax.servlet.sip.UAMode)
+	 */
 	public List<SipServletMessage> getPendingMessages(SipSession session,
 			UAMode mode) {
 		SipSessionImpl sipSessionImpl = (SipSessionImpl) session;
@@ -310,20 +328,45 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 		return retval;
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#linkSipSessions(javax.servlet.sip.SipSession, javax.servlet.sip.SipSession)
+	 */
 	public void linkSipSessions(SipSession session1, SipSession session2) {
+		if ( session1 == null )throw new NullPointerException("First argument is null");
+		if ( session2 == null )throw new NullPointerException("Second argument is null");
+		
+		if(!session1.isValid() || !session2.isValid() || 
+				State.TERMINATED.equals(((SipSessionImpl)session1).getState()) ||
+				State.TERMINATED.equals(((SipSessionImpl)session2).getState()) ||
+				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
+				sessionMap.get(session1) != null ||
+				sessionMap.get(session2) != null) {
+			throw new IllegalArgumentException("either of the specified sessions has been terminated " +
+					"or the sessions do not belong to the same application session or " +
+					"one or both the sessions are already linked with some other session(s)");
+		}
 		this.sessionMap.put((SipSessionImpl)session1, (SipSessionImpl)session2);
 		this.sessionMap.put((SipSessionImpl) session2, (SipSessionImpl) session1);
 
 	}
-
-	public void unlinkSipSessions(SipSession session) {
-		if ( session == null )throw new NullPointerException("Null arg");
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#unlinkSipSessions(javax.servlet.sip.SipSession)
+	 */
+	public void unlinkSipSessions(SipSession session) {		
+		if ( session == null )throw new NullPointerException("the argument is null");
+		if(!session.isValid() || 
+				State.TERMINATED.equals(((SipSessionImpl)session).getState()) ||
+				sessionMap.get(session) == null) {
+			throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
+		}
 		SipSessionImpl key = (SipSessionImpl) session;
 		SipSessionImpl value  = this.sessionMap.get(key);
 		if ( value != null) this.sessionMap.remove(value);
 		this.sessionMap.remove(key);
-
 	}
 
 }
