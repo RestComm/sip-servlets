@@ -6,7 +6,6 @@ import javax.annotation.Resource;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
@@ -16,6 +15,8 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.TimerService;
 import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 
@@ -29,6 +30,10 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 
 	@Resource
 	SipFactory sipFactory;
+	@Resource
+	SipSessionsUtil sipSessionsUtil;
+	@Resource
+	TimerService timerService;
 	
 	private static Log logger = LogFactory.getLog(AnnotatedServlet.class);
 	
@@ -55,6 +60,9 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 		sipServletResponse.send();
 		
 		// End the scenario by sending a message to the Tracker.
+		logger.info("SipFactory injected resource" + sipFactory);
+		logger.info("SipSessionsUtil injected resource" + sipSessionsUtil);
+		logger.info("TimerService injected resource" + timerService);
 		try {
 			SipApplicationSession appSession = 
         	sipFactory.createApplicationSession(); // Injected factory
