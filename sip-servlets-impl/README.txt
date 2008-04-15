@@ -36,9 +36,9 @@ go to your tomcat_home/bin directory
 run the following commande
 catalina.bat run
 When the server has been started you should see the following logs on the standard output
-18 juil. 2007 08:09:46 org.open.servlet.sip.startup.SipContextConfig start
+18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
 INFO: /WEB-INF/sip.xml has been found !
-18 juil. 2007 08:09:46 org.open.servlet.sip.startup.SipContextConfig start
+18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
 INFO: /WEB-INF/sip.xml has been parsed !
 log4j:WARN No appenders could be found for logger (SipContainer).
 log4j:WARN Please initialize the log4j system properly.

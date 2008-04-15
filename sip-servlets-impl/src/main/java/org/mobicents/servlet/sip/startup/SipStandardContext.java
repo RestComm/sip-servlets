@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public class SipStandardContext extends StandardContext {
-	private static final String CONFIG_CLASSNAME = "org.open.servlet.sip.startup.SipContextConfig";
+	private static final String CONFIG_CLASSNAME = "org.mobicents.servlet.sip.startup.SipContextConfig";
 
 	// the logger
 	private static transient Log logger = LogFactory

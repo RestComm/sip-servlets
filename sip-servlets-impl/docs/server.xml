@@ -102,7 +102,7 @@
 	<!-- Define a SIP Connector on port 5070 -->
     <Connector port="5070" 
 	ipAddress = "127.0.0.1"
-	protocol="org.open.servlet.sip.startup.SipProtocolHandler"
+	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	signalingTransport="udp" 
     	logLevel="DEBUG"
 	debugLog = "../logs/debuglog.txt" 
@@ -122,7 +122,7 @@
     <!-- Define the top level container in our container hierarchy -->
     <Engine defaultHost="localhost" name="Catalina">
     
-	  <!--Listener className="org.open.servlet.sip.startup.SipServiceListener"/-->
+	  <!--Listener className="org.mobicents.servlet.sip.startup.SipServiceListener"/-->
       <!-- The request dumper valve dumps useful debugging information about
            the request headers and cookies that were received, and the response
            headers and cookies that were sent, for all requests received by
@@ -189,7 +189,7 @@
        -->
       <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false">
 
-		<Context path="sip-test" docBase="E:\workspaces\sip-servlets\simple-sip-servlet\src\main\sipapp" className="org.open.servlet.sip.startup.SipStandardContext"/>
+		<Context path="sip-test" docBase="E:\workspaces\sip-servlets\simple-sip-servlet\src\main\sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext"/>
 		
         <!-- Defines a cluster for this node,
              By defining this element, means that every manager will be changed.
