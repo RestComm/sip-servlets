@@ -83,21 +83,24 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 
 				session.setAttribute("InviteSent", Boolean.TRUE);
 			} else {
-				logger.info("Got OK from second party -- sending ACK");
-
-				SipServletRequest secondPartyAck = resp.createAck();
-				SipServletRequest firstPartyAck = (SipServletRequest) resp
-						.getSession().getAttribute("FirstPartyAck");
-
-				if (resp.getContentType().equals("application/sdp")) {
-					firstPartyAck.setContent(resp.getContent(),
-							"application/sdp");
-					secondPartyAck.setContent(resp.getContent(),
-							"application/sdp");
+				String cSeqValue = resp.getHeader("CSeq");
+				if(cSeqValue.indexOf("INVITE") != -1) {				
+					logger.info("Got OK from second party -- sending ACK");
+	
+					SipServletRequest secondPartyAck = resp.createAck();
+					SipServletRequest firstPartyAck = (SipServletRequest) resp
+							.getSession().getAttribute("FirstPartyAck");
+	
+					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
+						firstPartyAck.setContent(resp.getContent(),
+								"application/sdp");
+						secondPartyAck.setContent(resp.getContent(),
+								"application/sdp");
+					}
+	
+					firstPartyAck.send();
+					secondPartyAck.send();
 				}
-
-				firstPartyAck.send();
-				secondPartyAck.send();
 			}
 		}
 	}
