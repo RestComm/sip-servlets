@@ -66,7 +66,6 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
 
-	private ProxyImpl proxy = null;
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
 	private SipServletRequestImpl nextRequest;
@@ -218,7 +217,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public B2buaHelper getB2buaHelper() {
-		if (this.proxy != null)
+		if (this.transactionApplicationData.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
 		if (this.b2buahelper != null)
 			return this.b2buahelper;
@@ -232,6 +231,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 			}
 			this.b2buahelper = new B2buaHelperImpl(this);
+			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			return this.b2buahelper;
 		} catch (SipException ex) {
 			throw new IllegalStateException("Cannot get B2BUAHelper");
@@ -270,17 +270,24 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		this.popedRouteHeader = routeHeader;
 	}
 
+	/**
+	 * 
+	 * @TODO -- deal with maxforwards header.
+	 */
 	public Proxy getProxy() throws TooManyHopsException {
-
+		if ( this.b2buahelper != null ) throw new IllegalStateException("Cannot proxy request");
 		return transactionApplicationData.getProxy();
 	}
 
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
-
+		if ( this.b2buahelper != null ) throw new IllegalStateException("Cannot proxy request");
+		
 		if (create && transactionApplicationData.getProxy() == null) {
 			ProxyImpl proxy = new ProxyImpl(this, provider);
 			this.transactionApplicationData.setProxy(proxy);
 		}
+		
+		
 
 		return getProxy();
 	}
