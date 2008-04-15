@@ -30,10 +30,10 @@ public class SipFactoryFacade implements SipFactory {
 	private static final Log logger = LogFactory.getLog(SipFactoryFacade.class
 			.getName());
 	
-	private SipFactory sipFactoryImpl;
+	private SipFactoryImpl sipFactoryImpl;
 	private SipContext sipContext;
 	
-	public SipFactoryFacade(SipFactory sipFactoryImpl, SipContext sipContext) {
+	public SipFactoryFacade(SipFactoryImpl sipFactoryImpl, SipContext sipContext) {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.sipContext = sipContext;
 	}
@@ -64,8 +64,7 @@ public class SipFactoryFacade implements SipFactory {
 	 */
 	public SipApplicationSession createApplicationSession() {
 		SipApplicationSessionImpl sipApplicationSessionImpl = 
-			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession();
-		sipApplicationSessionImpl.setSipContext(sipContext);
+			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession(sipContext);		
 		return sipApplicationSessionImpl;
 	}
 

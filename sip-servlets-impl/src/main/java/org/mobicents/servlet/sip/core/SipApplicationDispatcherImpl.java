@@ -41,7 +41,6 @@ import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.Transaction;
 import javax.sip.TransactionAlreadyExistsException;
-import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
@@ -357,7 +356,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
 		}
-		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationName, request);
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+				applicationName, 
+				((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId());
 		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
 			logger.error("Cannot find the corresponding sip application session to this subsequent request " + request +
@@ -537,8 +538,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipServletRequest.setSipSession(sipSession);
 			//sip appliation session association
 			//TODO: later should check for SipApplicationKey annotated method in the servlet.
-			SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationRouterInfo.getNextApplicationName(), request);
-			SipApplicationSessionImpl appSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, true);
+			SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+					applicationRouterInfo.getNextApplicationName(), 
+					((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId());
+			SipApplicationSessionImpl appSession = sessionManager.getSipApplicationSession(
+					sipApplicationSessionKey, true);
 			sipSession.setSipApplicationSession(appSession);			
 			
 			// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			

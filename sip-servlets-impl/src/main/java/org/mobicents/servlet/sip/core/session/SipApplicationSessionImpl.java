@@ -54,18 +54,15 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * Passed as info object into Servelt timer that ticks for this sip app
 	 * session as expiration timer
 	 */
-//	private Serializable endObject;		
-		
-	public SipApplicationSessionImpl(String uuid) {
+//	private Serializable endObject;					
+	
+	public SipApplicationSessionImpl(SipApplicationSessionKey key ) {		
+		this.key = key;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
 		valid = true;
 		servletTimers = Collections.synchronizedSet(new HashSet<ServletTimer>());
 		//FIXME create and start a timer for session expiration
-	}
-	
-	public SipApplicationSessionImpl(SipApplicationSessionKey key ) {
-		this.key = key;
 	}
 	
 	protected void addSipSession( SipSessionImpl sipSessionImpl) {
@@ -175,6 +172,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		if("SIP".equalsIgnoreCase(protocol))
 			return sipSessions.values().iterator();
 		else 
+			//sipContext.getManager().findSessions()
 			return null;
 	}
 

@@ -158,23 +158,20 @@ public class SessionManager {
 	 * Computes the sip application session key from the input parameters. 
 	 * The sip application session key will be of the form (CALL-ID,APPNAME)
 	 * @param applicationName the name of the application that will be the second component of the key
-	 * @param message the message to get the first component of the key from 
+	 * @param callId the callId composing the first component of the key 
 	 * @return the computed key 
-	 * @throws NullPointerException if application name is null
+	 * @throws NullPointerException if one of the two parameters is null
 	 */
-	public static SipApplicationSessionKey getSipApplicationSessionKey(final String applicationName, final Message message) {
+	public static SipApplicationSessionKey getSipApplicationSessionKey(final String applicationName, final String callId) {
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip application session key creation");
 		}
+		if(callId == null) {
+			throw new NullPointerException("the callId cannot be null for sip application session key creation");
+		}
 		return new SipApplicationSessionKey(
-				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
-				applicationName);
-//		StringBuffer sessionId = new StringBuffer();		
-//		sessionId = sessionId.append(((CallIdHeader) message.getHeader(CallIdHeader.NAME))
-//						.getCallId());
-//		sessionId = sessionId.append(applicationName);
-//
-//		return sessionId.toString();
+				callId,
+				applicationName);		
 	}
 
 //	// Gives (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,TO-TAG)
@@ -247,21 +244,6 @@ public class SessionManager {
 		}
 		return sipApplicationSessionImpl;
 	}	
-	
-	/**
-	 * Sometimes we need to put a session manually, because we don't have the key in advance.
-	 * This is needed when the session key is assigned later with setKey()
-	 * TODO: eliminate the need for this method
-	 * @param key
-	 * @param sipApplicationSessionImpl
-	 */
-	public void putSipApplicationSession(SipApplicationSessionKey key,
-			SipApplicationSessionImpl sipApplicationSessionImpl)
-	{
-		synchronized (sipApplicationSessionLock) {
-			sipApplicationSessions.put(key, sipApplicationSessionImpl);	
-		}	
-	}
 	
 	/**
 	 * Retrieve a sip session from its key. If none exists, one can enforce

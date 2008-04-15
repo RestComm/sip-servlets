@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
@@ -45,6 +44,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 public class SipFactoryImpl implements SipFactory {
 	private static final Log logger = LogFactory.getLog(SipFactoryImpl.class
@@ -151,9 +151,20 @@ public class SipFactoryImpl implements SipFactory {
 	 */
 	public SipApplicationSession createApplicationSession() {
 
-		if (logger.isDebugEnabled())
+		throw new UnsupportedOperationException("use createApplicationSession(SipContext sipContext) instead !");
+	}
+	
+	public SipApplicationSession createApplicationSession(SipContext sipContext) {
+		if (logger.isDebugEnabled()) {
 			logger.debug("Creating new application session");
-		return new SipApplicationSessionImpl(UUID.randomUUID().toString());
+		}
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+				sipContext.getApplicationName(), 
+				JainSipUtils.findMatchingSipProvider(sipProviders, "udp").getNewCallId().getCallId());		
+		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(
+				sipApplicationSessionKey, true);
+		sipApplicationSession.setSipContext(sipContext);
+		return sipApplicationSession;
 	}
 
 	/*
@@ -355,7 +366,8 @@ public class SipFactoryImpl implements SipFactory {
 			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
 					+ new Random().nextInt() );
-			callIdHeader = JainSipUtils.findMatchingSipProvider(sipProviders, transport).getNewCallId();
+			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+					((SipApplicationSessionImpl)sipAppSession).getKey().getCallId());
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(70);
 
@@ -409,22 +421,11 @@ public class SipFactoryImpl implements SipFactory {
 				requestToWrap.addHeader(contactHeader);
 			if (routeHeader != null)
 				requestToWrap.addHeader(routeHeader);
-			
-			if(((SipApplicationSessionImpl)sipAppSession).getKey() == null) {
-				SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
-					((SipApplicationSessionImpl)sipAppSession).getSipContext().getApplicationName(), requestToWrap);
-				((SipApplicationSessionImpl)sipAppSession).setKey(sipApplicationSessionKey);
-				
-				// We have to manually add the app session here. HACK. TODO: Fix it somehow
-				this.sessionManager.putSipApplicationSession(sipApplicationSessionKey, (SipApplicationSessionImpl)sipAppSession);
-			}
+
 			SipSessionKey key = SessionManager.getSipSessionKey(
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap, false);
 			SipSessionImpl session = sessionManager.getSipSession(key, true, this);
-			session.setSipApplicationSession((SipApplicationSessionImpl)sipAppSession);
-//			((SipApplicationSessionImpl)sipAppSession).addSipSession(session);
-//			SipSessionImpl session = new SipSessionImpl(this,
-//					(SipApplicationSessionImpl) sipAppSession);
+			session.setSipApplicationSession((SipApplicationSessionImpl)sipAppSession);			
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,

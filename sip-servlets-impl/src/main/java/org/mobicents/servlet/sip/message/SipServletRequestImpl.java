@@ -650,6 +650,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				super.setTransaction(ctx);
 
 			}
+			logger.info("Sending the request " + request);
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
 					|| getDialog().getState() == DialogState.EARLY) {

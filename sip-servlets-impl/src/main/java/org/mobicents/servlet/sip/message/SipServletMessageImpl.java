@@ -491,7 +491,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
 		} else if (create) {			
-			SipApplicationSessionKey key = SessionManager.getSipApplicationSessionKey(currentApplicationName, message);
+			SipApplicationSessionKey key = SessionManager.getSipApplicationSessionKey(
+					currentApplicationName, 
+					((CallIdHeader)message.getHeader((CallIdHeader.NAME))).getCallId());
 			SipApplicationSessionImpl applicationSession = 
 				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create);
 			if(this.session == null) {
