@@ -2110,8 +2110,8 @@ proper getXListeners method must be called
 <XPD:OBJ name="OwnedViews[2]" type="UMLSeqObjectView" guid="efL7x1HYS0Gj1udnUuowGAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">1028</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">97</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">1048</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">100</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">142</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">1160</XPD:ATTR>
 <XPD:REF name="Model">YapM1Mg0+kGuoOVBQxCPQwAA</XPD:REF>
@@ -2327,7 +2327,7 @@ proper getXListeners method must be called
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">509,444;1092,444</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">509,444;1112,444</XPD:ATTR>
 <XPD:REF name="Model">fuXUkL3dK0eXxUJ3EpsNZQAA</XPD:REF>
 <XPD:REF name="Head">P83MtfyS5kqhGqzqoQRLKAAA</XPD:REF>
 <XPD:REF name="Tail">I1zFHtR2dEKZF6zmXH2xBAAA</XPD:REF>
@@ -2353,7 +2353,7 @@ proper getXListeners method must be called
 <XPD:REF name="HostEdge">hU3Saes7rEqDR1BaAHRAhgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="JvP0b1ZQwEy3pevnCfsnpQAA">
-<XPD:ATTR name="Left" type="integer">1092</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">1112</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">444</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">29</XPD:ATTR>
@@ -2615,7 +2615,7 @@ proper getXListeners method must be called
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">509,1208;1092,1208</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">509,1208;1112,1208</XPD:ATTR>
 <XPD:REF name="Model">mNvhswLQA0OT1bKwSm0BuQAA</XPD:REF>
 <XPD:REF name="Head">P83MtfyS5kqhGqzqoQRLKAAA</XPD:REF>
 <XPD:REF name="Tail">I1zFHtR2dEKZF6zmXH2xBAAA</XPD:REF>
@@ -2641,7 +2641,7 @@ proper getXListeners method must be called
 <XPD:REF name="HostEdge">o9bi4Vr5kkO8STncFP8HyQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="mOR9VhIckEKQJ7DWVbWD0AAA">
-<XPD:ATTR name="Left" type="integer">1092</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">1112</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">1208</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">29</XPD:ATTR>

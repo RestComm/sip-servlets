@@ -45,7 +45,7 @@ with accessors following the JavaBean convention
 <XPD:ATTR name="Top" type="integer">20</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">313</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">329</XPD:ATTR>
-<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="ZNbmcHYxAESlZwj3FhYqhgAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="TMf7+l1l5E+SIeHynlGW0wAA">
 <XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
@@ -59,14 +59,14 @@ with accessors following the JavaBean convention
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="DxKMxWuq9EC9gV9NS6s4QwAA">
-<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="t3pvUEzKc0K86VF+5VXvCQAA">
-<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="wqTevedOwEK17FpWn/aE4wAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[3]" type="UMLClassView" guid="6OpvmfXWlUqNBNBpWZHD8gAA">
@@ -1575,7 +1575,7 @@ with accessors following the JavaBean convention
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">198</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">637</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">368</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">454</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">225</XPD:ATTR>
 <XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipListenersHolder">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="SnX3sV8pK0+XpIA2NK4cdgAA">
@@ -1604,7 +1604,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="OwnedViews[31]" type="UMLAssociationView" guid="4QmANZLEIk+SLoFZQG30NwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">344,637;247,348</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">378,637;259,348</XPD:ATTR>
 <XPD:REF name="Model">bgS2iLNQuEmxpxEe6B73wgAA</XPD:REF>
 <XPD:REF name="Head">B8JuOsnBz0e/vyxlVDAE1AAA</XPD:REF>
 <XPD:REF name="Tail">lShQv3O8PkiXyVmpvVB/XgAA</XPD:REF>
@@ -1693,7 +1693,7 @@ with accessors following the JavaBean convention
 <XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="KpIC0B5IRUuUV9pHn5cFKgAA">
 <XPD:REF name="Association">qgaWToCB4kOojC4bcEGdOgAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="TWfHZ85xGU6sH5BbyucshAAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
@@ -1722,7 +1722,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="sZ6qE80LNkGlAfr/QKCa1AAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">yAyRSbTiY0ahGVjK4y1MxQAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">/q3dPLmg4UimVc7tzlud5gAA</XPD:REF>
 <XPD:REF name="Views[1]">Lzos7d0Y5km5crdH1iLr2AAA</XPD:REF>
@@ -1751,7 +1751,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="sUgGEmMjLUya87/NptcVnAAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">wzv0W2O6aUeM59oHFdxNwQAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">iyQFHtCbakmGcuOW/Pa2zgAA</XPD:REF>
 <XPD:REF name="Views[1]">N6RZLNHzlUuAB1QSSVl22QAA</XPD:REF>
@@ -1780,7 +1780,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="ZNYaXyK610auxCGYp3rTxAAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">DqeVCSQVQkOdU5PuLI+m1wAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">hurdSo7BS0ulfpO1KEN1ygAA</XPD:REF>
 <XPD:REF name="Views[1]">mSh1jGz1uUubeu1SZcv8YgAA</XPD:REF>
@@ -1826,7 +1826,7 @@ with accessors following the JavaBean convention
 <XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="El1QKi+G2kKuTMmEOesxlgAA">
 <XPD:REF name="Association">WWb6OihSx0eIEmIGirKFWQAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">7s5cJjZBREa1VofgAG9yCwAA</XPD:REF>
 <XPD:REF name="Views[1]">dhYzumH/3U6qQvI2GbcKHgAA</XPD:REF>
@@ -1865,7 +1865,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="FmLbBPZrek6JQN7TsbB2YQAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">D8MF2FrTtkqdhMNQi+rkkgAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">M7N7zsYOMEqmDQpKFsuplgAA</XPD:REF>
 <XPD:REF name="Views[1]">DHyBpgZFoEegFeWmGfCJlAAA</XPD:REF>
@@ -1894,7 +1894,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="nBbiZoCqsk+FLMXz8IwM6gAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">k3XDwv6WB0GCIN76nBDGGAAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">injFVfURykm2jWHzhPp97AAA</XPD:REF>
 <XPD:REF name="Views[1]">yibkOfF/0kWa/HvFCJX0GAAA</XPD:REF>
@@ -1923,7 +1923,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="9hiBPMEVyESgGr3KzAtdKAAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">NITI6uTsU02GcDCfiqI0PAAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">IH3z7pJ8VUGE4SU32ArBSwAA</XPD:REF>
 <XPD:REF name="Views[1]">W1HNiwNlr06f400sYS41gQAA</XPD:REF>
@@ -1952,7 +1952,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="ddeNmAY/j0S61Ka1QsOtlAAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">o5iThgTjRkiItv1tX0Y3HAAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">l7Rf4Nbv40+a4+T/sMac1AAA</XPD:REF>
 <XPD:REF name="Views[1]">mkSKMxynFEujYfaIUCTXLAAA</XPD:REF>
@@ -1981,7 +1981,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="up5X+Pduv02Z8MWDA6wJtwAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">YlwOI0nn00Ss5za2wnczFwAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">rDefzyysA0W9SIANjolKmAAA</XPD:REF>
 <XPD:REF name="Views[1]">zZ7Wu88nVEyQQLboX06sdQAA</XPD:REF>
@@ -2105,7 +2105,7 @@ with accessors following the JavaBean convention
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="tqoFFoYnm0icsKQdA44d7QAA">
 <XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
 <XPD:REF name="Association">bgS2iLNQuEmxpxEe6B73wgAA</XPD:REF>
-<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::session::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">YGn+VPvP+USBWu8N9Mw3KwAA</XPD:REF>
 <XPD:REF name="Views[1]">muUc8+dWCEmXSkeu2WX0KwAA</XPD:REF>
