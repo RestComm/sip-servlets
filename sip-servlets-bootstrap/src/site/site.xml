@@ -8,7 +8,10 @@
   <body>
     <menu>
       <item name="Introduction" href="index.html"/>
-      <item name="Installation" href="installation.html"/>
+      <item name="Installation" href="installation.html">
+      	<item name="Tomcat Installation" href="installation-tomcat.html"/>
+      	<item name="Jboss Installation" href="installation-jboss.html"/>
+      </item>
       <item name="Examples" href="examples/examples.html"/>
       <item name="Roadmap" href="roadmap.html"/>
       
