@@ -33,7 +33,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="pDfddIsozku9x85eYN1hXwAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="JOjDq9SRZUqholZkWjNnfQAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">Catalina</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : Catalina</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="O1BQPkSfzEm3jskSzsuA0QAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -57,7 +57,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="nFxkC/KUfkOiDmFHZePZegAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="DYij8xxRR0iVm+okSRp3WgAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">StandardServer</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : StandardServer</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="mZKXSonR/E28lFaZCGWYowAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -81,7 +81,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="tEH0NqKLrUe7Y8eDSf3R4wAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="g0yYobwBZU2HbXKBswFcfQAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">StandardService</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : StandardService</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="75vJSoycS0SAawqqJwrQ+AAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -105,7 +105,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="s1Th4aaxvkCut7kqsQCHWwAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="qx6OBEz830G0UgpKxzdKrQAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">Connector</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : Connector</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="ofFcfeejUEG8n0Zk7Aa5zQAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -129,7 +129,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="7BUsPy8KWEWiHWT7OQTdcAAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="RE4TE8m++keBNbMuz9zWDAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipProtocolHandler</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipProtocolHandler</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="r0lHVcNuHEWmC6X2rYg1nwAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -153,7 +153,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="IaorX91IvU2jx/NuRY35dgAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="IXELjMqSfECmhgmlopOm9QAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipFactories</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipFactories</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="qjSGfX0gF0uuEzE6dy3cIQAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -177,7 +177,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="3hJ6lVHk0U+dvT0n1l7bigAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="+WvFDIGS9EKnXsF1VXOkbAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">StandardEngine</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : StandardEngine</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="PeypoGSz8EClhPoxYsMk5wAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -201,7 +201,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="D54AwEWx+UeoYh+9hpRRCgAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="Zpggy6zN8k6BPVJ2wcGGbAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">StandardHost</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : StandardHost</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="R+HMHSDkWkGEgYYWpXkkAwAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -225,7 +225,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="bAf8rRHwgkOHxU+4sl/DvAAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="Hj3ZJTYj2kqe/te5Ip9BiwAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipStandardContext</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipStandardContext</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="ayA8o40Ymka3h93+cEuUYgAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -249,7 +249,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="M2pDTo5JwEWLgMsLTTNBdQAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="0V8bJ00UEUyHLkAgdoMJ+QAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipContextConfig</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipContextConfig</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="bVCljbu7xkac2/VdxtqPRwAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -273,7 +273,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="Lw1t92vpqkm5+ziT6zbpeQAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="fezKoRUvqkK8ea/Tc0qPgAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">ApplicationDisspatcher</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : ApplicationDispatcher</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="Y3wB/XEyX0GohEcP/E6pugAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -333,7 +333,7 @@
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="Kl59lrMaJUWS2Wv/jUBYPwAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">2</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">2 : initialize()</XPD:ATTR>
 <XPD:REF name="Model">uIG4HRx5r0SK11IGkDBzDAAA</XPD:REF>
 <XPD:REF name="HostEdge">NAEHPnD5oE+XMZBUwVgW4AAA</XPD:REF>
 </XPD:OBJ>
@@ -496,7 +496,7 @@ such as StandardServer and its StandardService which in turn has its Connector a
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="P6Vi3cfmaUCh7xr+Yta8agAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">6</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">6 : initialize()</XPD:ATTR>
 <XPD:REF name="Model">APIeuP0dlkyfb1rLDJ/ASQAA</XPD:REF>
 <XPD:REF name="HostEdge">SpiTf6ZS70KhlE57fCECmQAA</XPD:REF>
 </XPD:OBJ>
@@ -550,7 +550,7 @@ many sip stack will try to be started and does it blow up ?
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="hwck2sNZJUO0WE2rqiIoYwAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">7</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">7 : start()</XPD:ATTR>
 <XPD:REF name="Model">Ni+30r+nwkSU3KLBgEDC9wAA</XPD:REF>
 <XPD:REF name="HostEdge">RpMlJdOqkU2HXWbDz1ZlpQAA</XPD:REF>
 </XPD:OBJ>
@@ -586,7 +586,7 @@ many sip stack will try to be started and does it blow up ?
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="P8rcuwW1bUCnpmGYo6C53wAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">8 *[n]</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">8 *[n] : start()</XPD:ATTR>
 <XPD:REF name="Model">FMpFyn9HQUqw37a/JNl+JAAA</XPD:REF>
 <XPD:REF name="HostEdge">hY5DbSip00qwUMXjonV0eQAA</XPD:REF>
 </XPD:OBJ>
@@ -982,7 +982,7 @@ many sip stack will try to be started and does it blow up ?
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="rJ4ZvCBK2EW9y2D72lkOpwAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">19</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">19 : start()</XPD:ATTR>
 <XPD:REF name="Model">bEUAtdbS90ei8T3CKnVyUAAA</XPD:REF>
 <XPD:REF name="HostEdge">3f47dl8dokeJQXThzqAyugAA</XPD:REF>
 </XPD:OBJ>
@@ -1464,7 +1464,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="IdjA+03FmEaF6q/R4eB9OAAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="Pw/BDuxvnUSz8PlymqOTeAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipContextConfig</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipContextConfig</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="6hxrGSmA6EqwaV/YneOiqAAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -1488,7 +1488,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="nD12HMFEa0ml8oFRKx8HHQAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="XIy9fq6YuUGrY2mo3POktAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">Digester</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : Digester</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="mD7PXfozDkyvET74BeAXlwAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -1512,7 +1512,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="8tGUPKDzWkqekDyvJ7352gAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="NT9DVg5OoEualW5bvavF6gAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipStandardContext</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipStandardContext</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="sd65X4dlvUaOcPJD3xqoiQAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -1536,7 +1536,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="NmzOdz7llEmXMB1B4eSpWAAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">1</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">1 : start()</XPD:ATTR>
 <XPD:REF name="Model">Eul4NFmz00S7W98Oy1mmIAAA</XPD:REF>
 <XPD:REF name="HostEdge">SAkPiEuEiEeqic7V8NMJWgAA</XPD:REF>
 </XPD:OBJ>
@@ -1856,7 +1856,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 </XPD:OBJ>
 <XPD:ATTR name="#ParticipatingInstances" type="integer">15</XPD:ATTR>
 <XPD:OBJ name="ParticipatingInstances[0]" type="UMLObject" guid="QBoSL1yoO0+qWyvi1GZ02QAA">
-<XPD:ATTR name="Name" type="string">Catalina</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">dwZzcmhIV0qLYV7Qe9BfvAAA</XPD:REF>
@@ -1869,7 +1868,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[0]">wPdKOr9I5kCYkl6mkeNBIwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[1]" type="UMLObject" guid="q98GqRy0s029YvFhAuFB3QAA">
-<XPD:ATTR name="Name" type="string">StandardServer</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">1iZj7CTqeUuAXhPBBe6RlgAA</XPD:REF>
@@ -1882,7 +1880,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">Ni+30r+nwkSU3KLBgEDC9wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[2]" type="UMLObject" guid="mjCyNbb00kOL9g8uVC6onQAA">
-<XPD:ATTR name="Name" type="string">StandardService</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">5fcNau9utkewWb/F89UWnQAA</XPD:REF>
@@ -1896,7 +1893,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">FMpFyn9HQUqw37a/JNl+JAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[3]" type="UMLObject" guid="DgbOobxsq0i2+Oa9Jmjn+wAA">
-<XPD:ATTR name="Name" type="string">Connector</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">JQrXCvpdek+9D3jyc0qXlAAA</XPD:REF>
@@ -1909,7 +1905,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">xpiUpf0nW0qlCoRLfS8K8gAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[4]" type="UMLObject" guid="C/FbtI6N3EK7CpXlrp4WYgAA">
-<XPD:ATTR name="Name" type="string">SipProtocolHandler</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">Q4Oj35v4DEaJH8RfgpQRTwAA</XPD:REF>
@@ -1925,7 +1920,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[2]">/vBX0KeR/0ykuI15c5rmiwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[5]" type="UMLObject" guid="JLK7YswhXE2U48KcD3ZIUgAA">
-<XPD:ATTR name="Name" type="string">SipFactories</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">/5xnYaugN0ivnsDtVOX/cgAA</XPD:REF>
@@ -1934,7 +1928,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[0]">APIeuP0dlkyfb1rLDJ/ASQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[6]" type="UMLObject" guid="82Ek8EVbz0mJ3gYwpI1yrQAA">
-<XPD:ATTR name="Name" type="string">StandardEngine</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">nb05ADqKqkyTVVjWk2TNCwAA</XPD:REF>
@@ -1947,7 +1940,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">0PlnrN/ZyUmDf+BbXEjLNwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[7]" type="UMLObject" guid="/MJZOBcdX0GEmnaLeXxbCwAA">
-<XPD:ATTR name="Name" type="string">StandardHost</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">JWp3LTyFGk+6wgk/62b8/wAA</XPD:REF>
@@ -1965,7 +1957,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[9]" type="UMLObject" guid="MTQmK5Atk0OPL7CJHFJqYwAA">
-<XPD:ATTR name="Name" type="string">SipStandardContext</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">WZu6/sr5JUGw1OieTlKgDQAA</XPD:REF>
@@ -1979,7 +1970,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">dwYSzjliykG4mUEoRuKxOQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[10]" type="UMLObject" guid="VpaysvTnmEiVwgeVpuSLygAA">
-<XPD:ATTR name="Name" type="string">SipContextConfig</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">ubsAfF0DdUeqbFSgc/5dVgAA</XPD:REF>
@@ -1989,7 +1979,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">BnpinR55uUOKv7Y2MS+kEwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[11]" type="UMLObject" guid="J+OgYgjvdES6hnJGZOUkbwAA">
-<XPD:ATTR name="Name" type="string">ApplicationDisspatcher</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">KOPtVEZdpUCiRboAaOM51wAA</XPD:REF>
@@ -1999,7 +1988,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">bguBMrkB2k2dqU4+aIa9wQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[12]" type="UMLObject" guid="xFvbhQF1HEew66U0xkpFVAAA">
-<XPD:ATTR name="Name" type="string">SipContextConfig</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">/EuZ5jXYr0O2qfcsBwMC2QAA</XPD:REF>
@@ -2015,7 +2003,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[1]">ZWArnsVQTkSnVqa7s57R+AAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[13]" type="UMLObject" guid="efv5IY5wIU6NFIEx+KvppQAA">
-<XPD:ATTR name="Name" type="string">Digester</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">5JVeKxEeuU2fctl1PPBovgAA</XPD:REF>
@@ -2028,7 +2015,6 @@ as StandardContext is automatically populated by ContextConfig in Tomcat
 <XPD:REF name="ReceivingStimuli[2]">27iMk83DTkKiwya2Gh635wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[14]" type="UMLObject" guid="IPCrfn3iVUe8xLiy34yBrgAA">
-<XPD:ATTR name="Name" type="string">SipStandardContext</XPD:ATTR>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">cEmamHHRckyTZMRZQ0ECEgAA</XPD:REF>
