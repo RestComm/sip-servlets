@@ -1,0 +1,29 @@
+                                    ------
+                                    Sip-Servlets
+                                    ------
+                                    ------
+                                    ------
+
+Goals  
+
+  The purpose of this project is to develop a SIP Servlet v1.1 (JSR 289 Spec) Implementation 
+  on top of Tomcat and to develop interoperability standards between SIP Servlet and JAIN-SLEE 
+  so that applications may exploit the strengths of both. 
+  {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} will be leveraged 
+  as the SIP stack and {{{http://mobicents.dev.java.net}Mobicents}} will be used as the SLEE implementation.
+
+  Flexibility is the goal. We want to develop an implementation that runs 
+  standalone with the Tomcat HTTP server as well as in an application server 
+  integrated with JSLEE. Many interesting hacks in progress folks!
+
+Implementation tasks
+
+  Here are the {{{http://docs.google.com/Doc?id=dfcjr48z_65gpwxnz}implementation tasks}} needed to implement the JSR 289 spec.
+
+  Here is a {{{http://spreadsheets.google.com/pub?key=pl-Xe-Wa5z7INjR4kdhxBEg&gid=1}document}} showing their approximative completion.
+  
+Try it !
+
+	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 5.x to become a sip-servlet converged container.
+	
+	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.

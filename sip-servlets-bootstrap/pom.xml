@@ -8,9 +8,76 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>Sip Servlets Parent Pom</name>
 	<url>http://sip-servlets.dev.java.net</url>
+	<issueManagement>
+		<system>Bugzilla</system>
+		<url>
+			https://sip-servlets.dev.java.net/servlets/ProjectIssues
+		</url>
+	</issueManagement>
+	<developers>
+		<developer>
+		<id>deruelle_jean</id>
+		<email>deruelle_jean@dev.java.net</email>
+		<organization>JBoss/Red Hat</organization>
+		<organizationUrl>http://www.redhat.com/</organizationUrl>
+		<timezone>+1</timezone>			
+		</developer>
+		<developer>
+		<id>vralev</id>
+		<email>vralev@dev.java.net</email>
+		<organization>JBoss/Red Hat</organization>
+		<organizationUrl>http://www.redhat.com/</organizationUrl>
+		<timezone>+1</timezone>			
+		</developer>
+		<developer>
+		<id>baranowb</id>
+		<email>baranowb@dev.java.net</email>
+		<organization>JBoss/Red Hat</organization>
+		<organizationUrl>http://www.redhat.com/</organizationUrl>
+		<timezone>+1</timezone>			
+		</developer>
+		<developer>
+		<id>mranga</id>
+		<email>mranga@dev.java.net</email>		
+		<timezone>-5</timezone>			
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<distributionManagement>
+		<site>
+			<id>sip-servlets-www</id>
+			<url>
+				svn:https://svn.dev.java.net/svn/sip-servlets/trunk/www/
+			</url>
+		</site>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>local-repository</id>
+			<url>
+				svn:https://svn.dev.java.net/svn/maven2-repository/trunk/www/repository/
+			</url>
+		</repository>
+	</distributionManagement>
+	<scm>
+		<connection>
+			scm:svn:https://svn.dev.java.net/svn/sip-servlets/trunk/
+		</connection>
+		<developerConnection>
+			scm:svn:https://svn.dev.java.net/svn/sip-servlets/trunk/
+		</developerConnection>
+		<url>
+			https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/
+		</url>
+	</scm>
 	<modules>
 		<module>../sip-servlets-spec</module>
-		<module>../sip-servlets-impl</module>		
+		<module>../sip-servlets-impl</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
@@ -34,11 +101,21 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
+					<compilerArguments>
+						<g />
+					</compilerArguments>
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.jvnet.wagon-svn</groupId>
+				<artifactId>wagon-svn</artifactId>
+				<version>RELEASE</version>
+			</extension>
+		</extensions>
 	</build>
 	<!-- repositories -->
 	<repositories>
@@ -49,9 +126,9 @@
 			<layout>default</layout>
 		</repository>
 	</repositories>
-	
+
 	<!-- the tomcat location where the generated artifacts will be copied -->
 	<properties>
-		<tomcat.home>E:\servers\apache-tomcat-5.5.20</tomcat.home>
+		<tomcat.home>E:\servers\apache-tomcat-5.5.25</tomcat.home>
 	</properties>
 </project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<project name="Sip-Servlets">
+  <skin>
+    <groupId>org.jvnet.maven-javanet-skin</groupId>
+    <artifactId>maven-javanet-skin</artifactId>
+    <version>1.0</version>
+  </skin>
+  <body>
+    <menu>
+      <item name="Introduction" href="index.html"/>
+      <item name="Install" href="install.html"/>
+      <item name="Examples" href="examples.html"/>
+      
+      <item name="Mailing lists" href="servlets/ProjectMailingListList"/>
+      <item name="Source code" href="source/browse/sip-servlets/"/>
+      <item name="Issues" href="servlets/ProjectIssues"/>
+    </menu>
+
+    ${reports}
+
+  </body>
+</project>
