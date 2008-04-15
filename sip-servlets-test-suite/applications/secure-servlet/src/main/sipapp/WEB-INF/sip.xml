@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.SecureServlet</app-name>
+	<display-name>Secure Servlet</display-name>
+	<description>Secure Servlet</description>
+	
+	<main-servlet>
+		SecureServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>SecureServlet</servlet-name>
+		<display-name>SecureServlet</display-name>
+		<description>SecureServlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.SecureServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.SecureServlet
+		</listener-class>
+	</listener>
+</sip-app>

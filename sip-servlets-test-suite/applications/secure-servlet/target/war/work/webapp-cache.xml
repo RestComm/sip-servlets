@@ -1,0 +1,13 @@
+<webapp-structure>
+  <registeredFiles>
+    <entry>
+      <string>currentBuild</string>
+      <path-set>
+        <pathsSet class="linked-hash-set">
+          <string>WEB-INF/classes/org/mobicents/servlet/sip/testsuite/SecureServlet.class</string>
+          <string>WEB-INF/classes/org/mobicents/servlet/sip/testsuite/SimpleSipServlet.class</string>
+        </pathsSet>
+      </path-set>
+    </entry>
+  </registeredFiles>
+</webapp-structure>
