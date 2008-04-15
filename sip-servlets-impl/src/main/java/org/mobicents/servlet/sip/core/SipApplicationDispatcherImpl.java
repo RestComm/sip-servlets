@@ -180,10 +180,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				Wrapper wrapper = (Wrapper) container;
 				try {
 					Servlet sipServlet = wrapper.allocate();
-					SipServletContextEvent sipServletContextEvent = 
-						new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
-					for (SipServletListener sipServletListener : sipServletListeners) {					
-						sipServletListener.servletInitialized(sipServletContextEvent);					
+					if(sipServlet instanceof SipServlet) {
+						SipServletContextEvent sipServletContextEvent = 
+							new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
+						for (SipServletListener sipServletListener : sipServletListeners) {					
+							sipServletListener.servletInitialized(sipServletContextEvent);					
+						}
 					}
 				} catch (ServletException e) {
 					logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
@@ -297,17 +299,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipServletRequest.setRoutingState(routingState);					
 	
 			if(sipServletRequest.isInitial()) {
+				logger.info("Routing of Initial Request " + request);
 				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
 				while(continueRouting) {
 					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
 					sipServletRequest.addAppCompositionRRHeader();
 				}
 			} else {
-				logger.info("Routing of Subsequent Request");
-				
-				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
+				logger.info("Routing of Subsequent Request " + request);
+				Dialog dialog = sipServletRequest.getDialog();				
+				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
 				while(continueRouting) {					
-					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
+					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
 					if(continueRouting) {
 						// Check if the request is meant for me. If so, strip the topmost
 						// Route header.
@@ -339,7 +342,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param request
 	 * @param sipServletRequest
 	 */
-	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
+	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest, Dialog dialog) {
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
 		//TODO Extract information from the Record Route Header
@@ -354,8 +357,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
+		boolean inverted = false;
+		if(dialog != null && dialog.getFirstTransaction() instanceof ClientTransaction) {
+			inverted = true;
+		}
 		
-		SipSessionKey key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage());
+		SipSessionKey key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage(), inverted);
 		SipSessionImpl sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl);
 		if(sipSession == null) {			
 			logger.error("Cannot find the corresponding sip session to this subsequent request " + request +
@@ -526,7 +533,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} else {
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
 			//sip session association
-			SipSessionKey sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request);
+			SipSessionKey sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
 			SipSessionImpl sipSession = sessionManager.getSipSession(sessionKey, true, sipFactoryImpl);
 			sipSession.setSessionCreatingTransaction(transaction);
 			sipServletRequest.setSipSession(sipSession);

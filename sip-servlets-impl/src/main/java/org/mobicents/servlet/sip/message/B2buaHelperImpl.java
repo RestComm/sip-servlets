@@ -142,7 +142,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();				
 			
-			SipSessionKey key = SessionManager.getSipSessionKey(origRequestImpl.getCurrentApplicationName(), newRequest);
+			SipSessionKey key = SessionManager.getSipSessionKey(origRequestImpl.getCurrentApplicationName(), newRequest, false);
 			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl);			
 			session.setSipApplicationSession(appSession);
 			session.setHandler(originalSession.getHandler());

@@ -116,20 +116,30 @@ public class SessionManager {
 	 * key will be of the form (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,APPNAME)
 	 * @param applicationName the name of the application that will be the fifth component of the key
 	 * @param message the message to get the 4 components of the key from 
+	 * @param inverted TODO
 	 * @return the computed key 
 	 * @throws NullPointerException if application name is null
 	 */
-	public static SipSessionKey getSipSessionKey(final String applicationName, final Message message) {
+	public static SipSessionKey getSipSessionKey(final String applicationName, final Message message, boolean inverted) {
 		//FIXME should be different whether the message is an instance of Request or Response
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
-		return new SipSessionKey(
+		if(inverted) {
+			return new SipSessionKey(
+					((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
+					((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
+					((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
+					((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
+					applicationName);
+		} else {
+			return new SipSessionKey(
 				((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
 				((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 				((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 				applicationName);
+		}
 //		StringBuffer sessionId = new StringBuffer();
 //		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
 //				.getAddress().getURI().toString());

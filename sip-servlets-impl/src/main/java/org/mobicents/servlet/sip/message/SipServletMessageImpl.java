@@ -495,7 +495,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			SipApplicationSessionImpl applicationSession = 
 				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create);
 			if(this.session == null) {
-				SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
+				SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message, false);
 				this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
 						sipFactoryImpl);
 				this.session.setSessionCreatingTransaction(transaction);				
@@ -769,7 +769,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public SipSession getSession(boolean create) {
 		if (this.session == null && create) {
-			SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
+			SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message, false);
 			this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
 					sipFactoryImpl);
 			this.session.setSessionCreatingTransaction(transaction);
