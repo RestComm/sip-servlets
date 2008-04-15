@@ -310,9 +310,8 @@ public class SessionManager {
 	public void dumpSipSessions() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sip sessions present in the session manager");
-		}
-		for (SipSessionKey sipSessionKey : sipSessions.keySet()) {
-			if(logger.isDebugEnabled()) {
+		
+			for (SipSessionKey sipSessionKey : sipSessions.keySet()) {
 				logger.debug(sipSessionKey.toString());
 			}
 		}
@@ -324,9 +323,8 @@ public class SessionManager {
 	public void dumpSipApplicationSessions() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sip application sessions present in the session manager");
-		}
-		for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessions.keySet()) {
-			if(logger.isDebugEnabled()) {
+		
+			for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessions.keySet()) {
 				logger.debug(sipApplicationSessionKey.toString());
 			}
 		}

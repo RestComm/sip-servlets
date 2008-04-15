@@ -668,9 +668,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						.getNewClientTransaction(request);				
 				
 				Dialog dialog = ctx.getDialog();
-				if (dialog == null && this.createDialog) {
+				if (dialog == null && this.createDialog) {					
 					dialog = sipProvider.getNewDialog(ctx);
 					this.session.setSessionCreatingDialog(dialog);
+					if(logger.isDebugEnabled()) {
+						logger.debug("new Dialog for request " + request + ", ref = " + dialog);
+					}
 				}
 
 				//Keeping the transactions mapping in application data for CANCEL handling
@@ -696,6 +699,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 			}
 
+			//tells the application dispatcher to stop routing the linked request
+			// (in this case it would be the original request) since it has been relayed
+			if(linkedRequest != null && 
+					!SipApplicationRoutingDirective.NEW.equals(routingDirective)) {
+				linkedRequest.setRoutingState(RoutingState.RELAYED);						
+			}
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
 					|| getDialog().getState() == DialogState.EARLY) {				
@@ -706,13 +715,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// we don't redirect it to the container for now
 				logger.info("Sending the in dialog request " + request);
 				getDialog().sendRequest((ClientTransaction) getTransaction());
-			}
-			//tells the application dispatcher to stop routing the linked request
-			// (in this case it would be the original request) since it has been relayed
-			if(linkedRequest != null && 
-					!SipApplicationRoutingDirective.NEW.equals(routingDirective)) {
-				linkedRequest.setRoutingState(RoutingState.RELAYED);						
-			}
+			}			
 			super.session.addOngoingTransaction(getTransaction());
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request",ex);
@@ -781,11 +784,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @param routingState the routingState to set
 	 */
 	public void setRoutingState(RoutingState routingState) throws IllegalStateException {
-		//JSR 289 Section 11.2.3
-		if(routingState.equals(RoutingState.CANCELLED) && this.routingState.equals(RoutingState.FINAL_RESPONSE_SENT)) {
+		//JSR 289 Section 11.2.3 && 10.2.6
+		if(routingState.equals(RoutingState.CANCELLED) && 
+				(this.routingState.equals(RoutingState.FINAL_RESPONSE_SENT) || 
+						this.routingState.equals(RoutingState.PROXIED))) {
 			throw new IllegalStateException("Cannot cancel final response already sent!");
 		}
-		if(routingState.equals(RoutingState.FINAL_RESPONSE_SENT) && this.routingState.equals(RoutingState.CANCELLED)) {
+		if((routingState.equals(RoutingState.FINAL_RESPONSE_SENT)|| 
+				routingState.equals(RoutingState.PROXIED)) && this.routingState.equals(RoutingState.CANCELLED)) {
 			throw new IllegalStateException("Cancel received and already replied with a 487!");
 		}
 		this.routingState = routingState;	
