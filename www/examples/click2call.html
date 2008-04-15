@@ -174,8 +174,8 @@
     <div id="bodyColumn">
       <div id="contentBox">
         <p><b>Important Note :</b>
- <i>This example is a modified version of the click to dial example from the <a href="https://sailfin.dev.java.net/" class="externalLink">sailfin project</a>
- and is originally available at <a href="http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2" class="externalLink">http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2</a>
+ <i>This example is a modified version of the click to dial example from the <a class="externalLink" href="https://sailfin.dev.java.net/">sailfin project</a>
+ and is originally available at <a class="externalLink" href="http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2">http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2</a>
 . It is has been modified to fit the new JSR 289 application selection process and slimmed down to its minimum. The purpose here is to demonstrate interoperability between containers and show backward compatibility with JSR 116.</i>
 </p>
 <div class="section"><h2>Click To Call</h2>
@@ -191,7 +191,7 @@
 </div>
 <div class="section"><h3>How to activate it</h3>
 <div class="section"><h4>From the binary</h4>
-<p>You can find the war file corresponding to this example <a href="http://download.java.net/maven/2/org/mobicents/servlet/sip/example/click-to-call-servlet/1.0-SNAPSHOT/click-to-call-servlet-1.0-SNAPSHOT.war" class="externalLink">here</a>
+<p>You can find the war file corresponding to this example <a class="externalLink" href="http://download.java.net/maven/2/org/mobicents/servlet/sip/example/click-to-call-servlet/1.0-SNAPSHOT/click-to-call-servlet-1.0-SNAPSHOT.war">here</a>
 .<br />
 Drop the downloaded war file into your <tt>tomcat_home/webapps</tt>
  directory or <tt>jboss_home/server/default/deploy</tt>
@@ -209,9 +209,9 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 <p>You can now run your container (Tomcat or Jboss).</p>
 </div>
 <div class="section"><h4>From the source</h4>
-<p>Please check out the speed dial example located under this <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/click-to-call" class="externalLink">location</a>
+<p>Please check out the speed dial example located under this <a class="externalLink" href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/click-to-call">location</a>
  from the svn repository. Follow the instructions in the README.txt to build and run the example.</p>
-<p>The DAR file for this example can be found in the sip servlets impl project under the <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs" class="externalLink">docs directory</a>
+<p>The DAR file for this example can be found in the sip servlets impl project under the <a class="externalLink" href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs">docs directory</a>
  Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml): file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties </p>
 </div>
 </div>
@@ -228,42 +228,34 @@ The SIP phones don't have to be registered.</p>
 <p>To enable security for JBoss Application Server, basically you have to create a security domain suitable for digest authentication and then configure your Sip Servlets application to use this security domain.<br />
 Here are the steps to make a simple configuration with static users, passwords and roles:</p>
 <ol type="1"><li>In server/default/conf/login-config.xml add a new security policy with hashed passwords, like this:<br />
-<i>application-policy name = &quot;sip-servlets&quot;</i>
-<br />
-<i>authentication</i>
-<br />
-<i>login-module code=&quot;org.jboss.security.auth.spi.UsersRolesLoginModule&quot; flag = &quot;required&quot;</i>
-<br />
-<i>module-option name=&quot;usersProperties&quot;</i>
-props/sip-servlets-users.properties<i>/module-option</i>
-<br />
-<i>module-option name=&quot;rolesProperties&quot;</i>
-props/sip-servlets-roles.properties<i>/module-option</i>
-<br />
-<i>module-option name=&quot;hashAlgorithm&quot;</i>
-MD5<i>/module-option</i>
-<br />
-<i>module-option name=&quot;hashEncoding&quot;</i>
-rfc2617<i>/module-option</i>
-<br />
-<i>module-option name=&quot;hashUserPassword&quot;</i>
-false<i>/module-option</i>
-<br />
-<i>module-option name=&quot;hashStorePassword&quot;</i>
-true<i>/module-option</i>
-<br />
-<i>module-option name=&quot;passwordIsA1Hash&quot;</i>
-true<i>/module-option</i>
-<br />
-<i>module-option name=&quot;storeDigestCallback&quot;</i>
-org.jboss.security.auth.spi.RFC2617Digest<i>/module-option</i>
-<br />
-<i>/login-module</i>
-<br />
-<i>/authentication</i>
-<br />
-<i>/application-policy</i>
-\</li>
+<tt>&lt;application-policy name = &quot;sip-servlets&quot;</tt>
+&gt;<br />
+<tt>&lt;authentication</tt>
+&gt;<br />
+<tt>&lt;login-module code=&quot;org.jboss.security.auth.spi.UsersRolesLoginModule&quot; flag = &quot;required&quot;</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;usersProperties&quot;&gt;props/sip-servlets-users.properties&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;rolesProperties&quot;&gt;props/sip-servlets-roles.properties&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;hashAlgorithm&quot;&gt;MD5&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;hashEncoding&quot;&gt;rfc2617&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;hashUserPassword&quot;&gt;false&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;hashStorePassword&quot;&gt;true&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;passwordIsA1Hash&quot;&gt;true&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;module-option name=&quot;storeDigestCallback&quot;&gt;org.jboss.security.auth.spi.RFC2617Digest&lt;/module-option</tt>
+&gt;<br />
+<tt>&lt;/login-module</tt>
+&gt;<br />
+<tt>&lt;/authentication</tt>
+&gt;<br />
+<tt>&lt;/application-policy</tt>
+&gt;\</li>
 <li>In the file props/sip-servlets-users.properties put this:<br />
 # A sample users.properties file, this line creates user &quot;admin&quot; with password &quot;admin&quot; for &quot;sip-servlets-realm&quot;<br />
 admin=9640e13fedc736bdafa6b9007d965c56<p>The cryptic string here is the A1 value of the digest authentication algorithm and can be generated with the following command: <tt>java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username &quot;My Realm&quot; password RFC2617 A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea</tt>
@@ -274,106 +266,89 @@ admin=9640e13fedc736bdafa6b9007d965c56<p>The cryptic string here is the A1 value
 admin=caller,role1,role2,..<p>Each line in this file assigns roles to the users defined in sip-servlets-users.properties</p>
 </li>
 <li>In jboss-web.xml in your application put this:<br />
-<i>jboss-web</i>
-<br />
-<i>!-- Uncomment the security-domain to enable security. You will need to edit the htmladaptor login configuration to setup the login modules used to authentication users. --</i>
-<br />
-<i>security-domain</i>
-java:/jaas/sip-servlets<i>/security-domain</i>
-<br />
-<i>/jboss-web</i>
-\</li>
+<tt>&lt;jboss-web</tt>
+&gt;<br />
+<tt>&lt;!-- Uncomment the security-domain to enable security. You will need to edit the htmladaptor login configuration to setup the login modules used to authentication users. --</tt>
+&gt;<br />
+<tt>&lt;security-domain&gt;java:/jaas/sip-servlets&lt;/security-domain</tt>
+&gt;<br />
+<tt>&lt;/jboss-web</tt>
+&gt;\</li>
 <li>In sip.xml in your application add some security constraint and authentication type, for example:<br />
-<i>security-constraint</i>
-<br />
-<i>display-name</i>
-REGISTER Method Security Constraint<i>/display-name</i>
-<br />
-<i>resource-collection</i>
-<br />
-<i>resource-name</i>
-SimpleSipServlet<i>/resource-name</i>
-<br />
-<i>description</i>
-Require authenticated REGSITER requests<i>/description</i>
-<br />
-<i>servlet-name</i>
-SimpleSipServlet<i>/servlet-name</i>
-<br />
-<i>sip-method</i>
-REGISTER<i>/sip-method</i>
-<br />
-<i>/resource-collection</i>
-<br />
-<i>auth-constraint</i>
-<br />
-<i>role-name</i>
-caller<i>/role-name</i>
-<br />
-<i>/auth-constraint</i>
-<br />
-<i>/security-constraint</i>
-\<p><i>login-config</i>
-<br />
-<i>auth-method</i>
-DIGEST<i>/auth-method</i>
-<br />
-<i>realm-name</i>
-sip-servlets-realm<i>/realm-name</i>
-<br />
-<i>/login-config</i>
-\</p>
+<tt>&lt;security-constraint</tt>
+&gt;<br />
+<tt>&lt;display-name&gt;REGISTER Method Security Constraint&lt;/display-name</tt>
+&gt;<br />
+<tt>&lt;resource-collection</tt>
+&gt;<br />
+<tt>&lt;resource-name&gt;SimpleSipServlet&lt;/resource-name</tt>
+&gt;<br />
+<tt>&lt;description&gt;Require authenticated REGSITER requests&lt;/description</tt>
+&gt;<br />
+<tt>&lt;servlet-name&gt;SimpleSipServlet&lt;/servlet-name</tt>
+&gt;<br />
+<tt>&lt;sip-method&gt;REGISTER&lt;/sip-method</tt>
+&gt;<br />
+<tt>&lt;/resource-collection</tt>
+&gt;<br />
+<tt>&lt;auth-constraint</tt>
+&gt;<br />
+<tt>&lt;role-name&gt;caller&lt;/role-name</tt>
+&gt;<br />
+<tt>&lt;/auth-constraint</tt>
+&gt;<br />
+<tt>&lt;/security-constraint</tt>
+&gt;\<p><tt>&lt;login-config</tt>
+&gt;<br />
+<tt>&lt;auth-method&gt;DIGEST&lt;/auth-method</tt>
+&gt;<br />
+<tt>&lt;realm-name&gt;sip-servlets-realm&lt;/realm-name</tt>
+&gt;<br />
+<tt>&lt;/login-config</tt>
+&gt;\</p>
 </li>
 </ol>
 </div>
 <div class="section"><h4>To enable security in Tomcat</h4>
 <p>You have to specify some security realm for the servlet container or it's parents, and add some contraints to the application. There are the steps: \</p>
-<ol type="1"><li>Open <i>tomcat_home</i>
-/conf/server.xml and uncomment the following line:<br />
-<i>Realm className=&quot;org.apache.catalina.realm.MemoryRealm&quot; /</i>
-</li>
-<li>Open <i>tomcat_root</i>
-/conf/tomcat-users.xml and add the following <i>user</i>
+<ol type="1"><li>Open <tt>&lt;tomcat_home&gt;/conf/server.xml</tt>
+ and uncomment the following line:<br />
+<tt>&lt;Realm className=&quot;org.apache.catalina.realm.MemoryRealm&quot; /</tt>
+&gt;</li>
+<li>Open <tt>&lt;tomcat_home&gt;/conf/tomcat-users.xml</tt>
+ and add the following <i>user</i>
  sub-element:<br />
-<i>user name=&quot;user&quot; password=&quot;password&quot; roles=&quot;caller&quot; /</i>
-</li>
+<tt>&lt;user name=&quot;user&quot; password=&quot;password&quot; roles=&quot;caller&quot; /</tt>
+&gt;</li>
 <li>In sip.xml in your application add some security constraint and authentication type, for example:<br />
-<i>security-constraint</i>
-<br />
-<i>display-name</i>
-REGISTER Method Security Constraint<i>/display-name</i>
-<br />
-<i>resource-collection</i>
-<br />
-<i>resource-name</i>
-SimpleSipServlet<i>/resource-name</i>
-<br />
-<i>description</i>
-Require authenticated REGSITER requests<i>/description</i>
-<br />
-<i>servlet-name</i>
-SimpleSipServlet<i>/servlet-name</i>
-<br />
-<i>sip-method</i>
-REGISTER<i>/sip-method</i>
-<br />
-<i>/resource-collection</i>
-<br />
-<i>auth-constraint</i>
-<br />
-<i>role-name</i>
-caller<i>/role-name</i>
-<br />
-<i>/auth-constraint</i>
-<br />
-<i>/security-constraint</i>
-\<p><i>login-config</i>
-&#160; <i>auth-method</i>
-DIGEST<i>/auth-method</i>
-&#160; <i>realm-name</i>
-sip-servlets-realm<i>/realm-name</i>
-&#160; <i>/login-config</i>
-\</p>
+<tt>&lt;security-constraint</tt>
+&gt;<br />
+<tt>&lt;display-name&gt;REGISTER Method Security Constraint&lt;/display-name</tt>
+&gt;<br />
+<tt>&lt;resource-collection</tt>
+&gt;<br />
+<tt>&lt;resource-name&gt;SimpleSipServlet&lt;/resource-name</tt>
+&gt;<br />
+<tt>&lt;description&gt;Require authenticated REGSITER requests&lt;/description</tt>
+&gt;<br />
+<tt>&lt;servlet-name&gt;SimpleSipServlet&lt;/servlet-name</tt>
+&gt;<br />
+<tt>&lt;sip-method&gt;REGISTER&lt;/sip-method</tt>
+&gt;<br />
+<tt>&lt;/resource-collection</tt>
+&gt;<br />
+<tt>&lt;auth-constraint</tt>
+&gt;<br />
+<tt>&lt;role-name&gt;caller&lt;/role-name</tt>
+&gt;<br />
+<tt>&lt;/auth-constraint</tt>
+&gt;<br />
+<tt>&lt;/security-constraint</tt>
+&gt;\<p><tt>&lt;login-config</tt>
+&gt;&#160; <tt>&lt;auth-method&gt;DIGEST&lt;/auth-method</tt>
+&gt;&#160; <tt>&lt;realm-name&gt;sip-servlets-realm&lt;/realm-name</tt>
+&gt;&#160; <tt>&lt;/login-config</tt>
+&gt;\</p>
 </li>
 </ol>
 </div>
