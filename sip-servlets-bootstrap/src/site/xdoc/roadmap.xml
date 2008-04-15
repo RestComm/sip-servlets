@@ -42,7 +42,7 @@
 							Listeners
 						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="images/orange.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=2">
 							Security
@@ -66,7 +66,7 @@
 							Running on top of Tomcat 6
 						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="images/orange.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=5">
 							Running on top of Jboss AS
@@ -156,6 +156,9 @@
 					<p>
 						<img src="images/red.jpeg" />
 						Failover support
+						<br />
+						<img src="images/red.jpeg" />
+						Maven 2 sar/war plugin 
 						<br />
 					</p>
 				</subsection>
