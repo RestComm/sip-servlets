@@ -2088,7 +2088,7 @@ This allows to be able to plug any custom SipApplicationDispatcher
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="mfF7E80XUUWtP01NxC5a7gAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="TjtywCkgi0uwgcHaRah0/gAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string"> : SipStandardWrapper</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipServletImpl</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="KsOy9MgtQE6LabelL3I8ZQAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -4123,7 +4123,7 @@ For section 3.4 still need to define how all the parameters except SipFactory ar
 <XPD:REF name="ReceivingStimuli[1]">uRUGi737sk6Bxq4LbjttIAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[16]" type="UMLObject" guid="epLg7bw130qjTEpp7qC8/QAA">
-<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::SipStandardWrapper">8nkl922hskiR2DWMZJUHMgAA</XPD:REF>
+<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletImpl">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">zfJIBbjAvU2+xEAzcEbytgAA</XPD:REF>

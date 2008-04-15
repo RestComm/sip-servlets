@@ -502,16 +502,16 @@ such as StandardServer and its StandardService which in turn has its Connector a
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">976</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">764</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">409</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">512</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">53</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">TODO : check what happens if many sip connectors are defined in the server.xml
-many sip stack will try to be started and does it blow up ?
+<XPD:ATTR name="Text" type="string">many sip connectors can be defined in the server.xml
+many sip stack can be started in parallel ro the same sip stack instance will be reused if already started
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[20]" type="UMLNoteLinkView" guid="CsxcpvBObkWQLEPmxW6P5AAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">886,777;976,781</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">886,777;976,780</XPD:ATTR>
 <XPD:REF name="Head">ukeN3IhSs06BpuNgTAgbNQAA</XPD:REF>
 <XPD:REF name="Tail">rpxtZzT2XUWQQZzdyKjwwgAA</XPD:REF>
 </XPD:OBJ>
@@ -1264,7 +1264,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="9fMXw5YD50OR8KKVFcdJtQAA">
 <XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
 <XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">25 *[n] : start()</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">25 *[connector] : start()</XPD:ATTR>
 <XPD:REF name="Model">xpiUpf0nW0qlCoRLfS8K8gAA</XPD:REF>
 <XPD:REF name="HostEdge">KZ1L2xFmkEGIObql78frqgAA</XPD:REF>
 </XPD:OBJ>
@@ -1476,15 +1476,15 @@ This allows to be able to plug any custom SipApplicationDispatcher
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">1732</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">592</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">318</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">443</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">44</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">Check on the Next diagram to know how the context is loaded
+<XPD:ATTR name="Text" type="string">Check on the Sip servlet context initialization diagram to know how the context is loaded
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[53]" type="UMLNoteLinkView" guid="sqxzDSF6T0qqbddn2k52agAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">1670,670;1805,635</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1670,671;1846,635</XPD:ATTR>
 <XPD:REF name="Head">sLauKTWGW0OKFTfgVAaqcAAA</XPD:REF>
 <XPD:REF name="Tail">T1fn9+jBUkqH+ULx6sO/MAAA</XPD:REF>
 </XPD:OBJ>
@@ -1885,7 +1885,7 @@ This allows to be able to plug any custom SipApplicationDispatcher
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingStimuli[24]" type="UMLStimulus" guid="xpiUpf0nW0qlCoRLfS8K8gAA">
 <XPD:ATTR name="Name" type="string">start</XPD:ATTR>
-<XPD:ATTR name="Iteration" type="string">n</XPD:ATTR>
+<XPD:ATTR name="Iteration" type="string">connector</XPD:ATTR>
 <XPD:REF name="Sender">mjCyNbb00kOL9g8uVC6onQAA</XPD:REF>
 <XPD:REF name="Receiver">DgbOobxsq0i2+Oa9Jmjn+wAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="U0E5k9HlzUSCLOh7jda6mwAA">
