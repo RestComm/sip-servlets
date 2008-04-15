@@ -648,9 +648,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	private RoutingState checkRoutingState(SipServletRequestImpl sipServletRequest, Dialog dialog) {
 		// 2. Ongoing Transaction Detection - Employ methods of Section 17.2.3 in RFC 3261 
 		//to see if the request matches an existing transaction. 
-		//If it does, stop. The request is not an initial request.
-		Transaction sipTransaction = sipServletRequest.getTransaction();
-		if(sipTransaction != null && !TransactionState.PROCEEDING.equals(sipTransaction.getState())) {
+		//If it does, stop. The request is not an initial request.		
+		if(dialog != null && DialogState.CONFIRMED.equals(dialog.getState())) {
 			return RoutingState.SUBSEQUENT;
 		}
 		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
