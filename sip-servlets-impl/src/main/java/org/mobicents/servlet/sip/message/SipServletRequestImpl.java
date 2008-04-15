@@ -703,7 +703,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// (in this case it would be the original request) since it has been relayed
 			if(linkedRequest != null && 
 					!SipApplicationRoutingDirective.NEW.equals(routingDirective)) {
-				linkedRequest.setRoutingState(RoutingState.RELAYED);						
+				if(!RoutingState.PROXIED.equals(linkedRequest.getRoutingState())) {
+					linkedRequest.setRoutingState(RoutingState.RELAYED);
+				}
 			}
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null

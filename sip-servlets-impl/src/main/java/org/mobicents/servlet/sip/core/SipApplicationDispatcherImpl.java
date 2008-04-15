@@ -708,15 +708,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.debug("proxying the CANCEL " + sipServletRequest);
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("Relaying the CANCEL " + sipServletRequest);
+				logger.debug("CANCEL a proxied request state = " + inviteRequest.getRoutingState());
 			}
-			// Routing State : PROXY - B2BUA case
+			// Routing State : PROXY case
 			SipServletResponseImpl inviteResponse = (SipServletResponseImpl) 
 				inviteRequest.createResponse(Response.REQUEST_TERMINATED);			
-			if(!RoutingState.PROXIED.equals(inviteRequest.getRoutingState())) {
+			if(!RoutingState.PROXIED.equals(inviteRequest.getRoutingState())) {				
 				// 10.2.6 if the original request has not been proxied yet the container 
 				// responds to it with a 487 final response
-				try {
+				try {					
 					inviteRequest.setRoutingState(RoutingState.CANCELLED);
 				} catch (IllegalStateException e) {
 					logger.info("request already proxied, dropping the cancel");

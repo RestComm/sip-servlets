@@ -70,13 +70,17 @@ public class ProxyBranchImpl implements ProxyBranch {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.ProxyBranch#cancel()
 	 */
-	public void cancel() {
+	public void cancel() {		
 		try
-		{
+		{			
 			if(this.isStarted() && !canceled && !timedOut &&
 				outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
 					outgoingRequest.createCancel().send();
-					canceled = true;
+				canceled = true;
+			}
+			if(!this.isStarted() &&
+					outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+				canceled = true;	
 			}
 		}
 		catch(Exception e)
@@ -174,7 +178,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		// will be ignored in the Proxying
 		if(proxy.getRecordRoute())
 			recordRoute = getRecordRouteURI();
-		
+						
 		Request cloned = this.proxyUtils.createProxiedRequest(
 				originalRequest,
 				this,
@@ -182,11 +186,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 				this.outboundInterface,
 				recordRoute, 
 				this.pathURI));
-
-		forwardRequest(cloned, false);			
 		//tells the application dispatcher to stop routing the original request
 		//since it has been proxied
 		originalRequest.setRoutingState(RoutingState.PROXIED);
+		
+		forwardRequest(cloned, false);					
 		started = true;
 		
 		if(cloned.getMethod().equalsIgnoreCase("INVITE"))
@@ -236,7 +240,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 		
 		clonedRequest.send();
-		}
+	}
 	
 	/**
 	 * A callback. Here we receive all responses from the proxied requests we have sent.

@@ -71,7 +71,9 @@ public class ProxyImpl implements Proxy {
 	
 	public void cancelAllExcept(ProxyBranch except) {
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
-			if(!proxyBranch.equals(except) && proxyBranch.isStarted()) proxyBranch.cancel();
+			if(!proxyBranch.equals(except)) {
+				proxyBranch.cancel();
+			}
 		}
 	}
 
