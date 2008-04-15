@@ -17,13 +17,18 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
+import javax.sip.TransactionDoesNotExistException;
 import javax.sip.TransactionTerminatedEvent;
+import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentLengthHeader;
+import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -41,6 +46,8 @@ import org.apache.log4j.Logger;
  */
 
 public class TestSipListener implements SipListener {
+	private static final String CONTENT_TYPE_TEXT = "text";
+	
 	private boolean sendBye;
 	
 	private SipProvider sipProvider;
@@ -75,6 +82,10 @@ public class TestSipListener implements SipListener {
 	
 	private boolean cancelOkReceived;
 	
+	private boolean ackSent;
+	
+	private boolean ackReceived;
+	
 	private boolean requestTerminatedReceived;
 	
 	private boolean byeReceived;
@@ -90,6 +101,8 @@ public class TestSipListener implements SipListener {
 	private boolean cancelSent;
 
 	private boolean waitForCancel;
+	
+	private String lastMessageContent;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 	
@@ -118,8 +131,34 @@ public class TestSipListener implements SipListener {
 		if (request.getMethod().equals(Request.CANCEL)) {
 			processCancel(requestReceivedEvent, serverTransactionId);
 		}
+		
+		if (request.getMethod().equals(Request.MESSAGE)) {
+			processMessage(request, serverTransactionId);
+		}
 	}
 	
+	private void processMessage(Request request,
+			ServerTransaction serverTransactionId) {
+		try {
+			Response okResponse = protocolObjects.messageFactory.createResponse(
+					Response.OK, request);			
+			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
+			if (toHeader.getTag() == null) {
+				toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+			}
+			okResponse.addHeader(contactHeader);
+			serverTransactionId.sendResponse(okResponse);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error("error sending OK response to message", ex);
+		}
+		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
+			request.getHeader(ContentTypeHeader.NAME);		
+		if(CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
+			this.lastMessageContent = new String(request.getRawContent());			
+		}
+	}
+
 	private void processCancel(RequestEvent requestEvent,
 			ServerTransaction serverTransactionId) {
 		try {
@@ -235,6 +274,7 @@ public class TestSipListener implements SipListener {
 		try {
 			logger.info("shootist:  got a " + request);
 			logger.info("shootist:  got an ACK. ServerTxId = " + serverTransactionId);
+			ackReceived = true;
 			if(sendBye) {											
 				Thread.sleep(1000);
 				Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
@@ -271,13 +311,11 @@ public class TestSipListener implements SipListener {
 					Request ackRequest = dialog.createAck(cseq.getSeqNumber());
 					logger.info("Sending ACK");
 					dialog.sendAck(ackRequest);
-					
+					ackSent = true;
 					Thread.sleep(1000);
 					// If the caller is supposed to send the bye
 					if(sendBye) {
-						Request byeRequest = this.dialog.createRequest(Request.BYE);
-						ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
-						dialog.sendRequest(ct);
+						sendBye();
 					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					okToByeReceived = true;
@@ -384,6 +422,18 @@ public class TestSipListener implements SipListener {
 			ex.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * @throws SipException
+	 * @throws TransactionUnavailableException
+	 * @throws TransactionDoesNotExistException
+	 */
+	public void sendBye() throws SipException,
+			TransactionUnavailableException, TransactionDoesNotExistException {
+		Request byeRequest = this.dialog.createRequest(Request.BYE);
+		ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+		dialog.sendRequest(ct);
 	}
 
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
@@ -608,5 +658,39 @@ public class TestSipListener implements SipListener {
 	 */
 	public void setWaitForCancel(boolean waitForCancel) {
 		this.waitForCancel = waitForCancel;
+	}
+
+	/**
+	 * @return the ackSent
+	 */
+	public boolean isAckSent() {
+		return ackSent;
+	}
+
+	/**
+	 * @return the ackReceived
+	 */
+	public boolean isAckReceived() {
+		return ackReceived;
+	}
+
+	// send message 
+	public void sendMessage(String messageToSend) throws SipException, InvalidArgumentException, ParseException {		
+		Request message = dialog.createRequest(Request.MESSAGE);
+		ContentLengthHeader contentLengthHeader = 
+			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());
+		ContentTypeHeader contentTypeHeader = 
+			protocolObjects.headerFactory.createContentTypeHeader("text","plain;charset=UTF-8");
+		message.setContentLength(contentLengthHeader);
+		message.setContent(messageToSend, contentTypeHeader);
+		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
+		dialog.sendRequest(clientTransaction);
+	}
+
+	/**
+	 * @return the lastMessageContent
+	 */
+	public String getLastMessageContent() {
+		return lastMessageContent;
 	}	
 }

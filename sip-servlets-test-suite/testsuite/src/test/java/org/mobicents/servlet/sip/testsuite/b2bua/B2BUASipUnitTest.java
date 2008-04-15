@@ -1,9 +1,7 @@
 package org.mobicents.servlet.sip.testsuite.b2bua;
 
-import java.text.ParseException;
 import java.util.Properties;
 
-import javax.sip.InvalidArgumentException;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.ListenersSipServlet</app-name>
+	<display-name>Listeners Test Sip Servlet</display-name>
+	<description>Listeners Test Sip Servlet</description>
+	
+	<main-servlet>
+		ListenersSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>ListenersSipServlet</servlet-name>
+		<display-name>ListenersSipServlet</display-name>
+		<description>Listeners Test SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.ListenersSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.ListenersSipServlet
+		</listener-class>
+	</listener>
+</sip-app>

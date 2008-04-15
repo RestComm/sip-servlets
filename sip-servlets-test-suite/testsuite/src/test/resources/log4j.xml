@@ -5,7 +5,7 @@
     <!-- Keep one backup file -->
     <param name="MaxBackupIndex" value="10"/>
     <layout class="org.apache.log4j.PatternLayout"> 
-      <param name="ConversionPattern" value="%p %t %c - %m%n"/> 
+      <param name="ConversionPattern" value="%p %t %l - %m%n"/> 
     </layout> 
   </appender>
   

@@ -1,0 +1,101 @@
+package org.mobicents.servlet.sip.testsuite.listeners;
+
+import java.text.ParseException;
+
+import javax.sip.InvalidArgumentException;
+import javax.sip.SipException;
+import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import org.mobicents.servlet.sip.testsuite.TestSipListener;
+
+public class ListenersSipServletTest extends SipServletTestCase {
+	
+	private static Log logger = LogFactory.getLog(ListenersSipServletTest.class);
+
+	private static final String TRANSPORT = "udp";
+	private static final boolean AUTODIALOG = true;
+	private static final int TIMEOUT = 1000;	
+//	private static final int TIMEOUT = 100000000;
+	
+	private static final String OK = "OK";	
+	private static final String SIP_SESSION_CREATED = "sipSessionCreated";
+	
+	TestSipListener sender;
+	
+	ProtocolObjects senderProtocolObjects;	
+
+	
+	public ListenersSipServletTest(String name) {
+		super(name);
+	}
+
+	@Override
+	public void deployApplication() {
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/listeners-sip-servlet/src/main/sipapp",
+				"sip-test-context", "sip-test"));
+	}
+
+	@Override
+	protected String getDarConfigurationFile() {
+		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
+				"org/mobicents/servlet/sip/testsuite/listeners/listeners-sip-servlet-dar.properties";
+	}
+	
+	@Override
+	protected void setUp() {
+		try {
+			super.setUp();						
+			
+			senderProtocolObjects =new ProtocolObjects(
+					"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+						
+			sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+			SipProvider senderProvider = sender.createProvider();			
+			
+			senderProvider.addSipListener(sender);
+			
+			senderProtocolObjects.start();			
+		} catch (Exception ex) {
+			fail("unexpected exception ");
+		}
+	}
+	
+	public void testlisteners() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendInvite(fromAddress, toAddress);	
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		sender.sendMessage("sipSessionCreated");
+		Thread.sleep(TIMEOUT);
+		assertNotNull(sender.getLastMessageContent());
+		assertEquals(OK, sender.getLastMessageContent());
+		Thread.sleep(TIMEOUT);
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());		
+	}
+
+	@Override
+	protected void tearDown() throws Exception {					
+		senderProtocolObjects.destroy();			
+		logger.info("Test completed");
+		super.tearDown();
+	}
+
+
+}

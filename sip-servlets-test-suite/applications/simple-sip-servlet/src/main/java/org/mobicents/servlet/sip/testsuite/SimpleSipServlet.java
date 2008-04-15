@@ -54,17 +54,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("Got BYE request: " + request);
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void doResponse(SipServletResponse response)
-			throws ServletException, IOException {
-
-		logger.info("Got response: " + response);
-		super.doResponse(response);
-	}
+	}	
 
 	// SipErrorListener methods
 
