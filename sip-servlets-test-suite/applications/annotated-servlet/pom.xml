@@ -11,6 +11,6 @@
 	<artifactId>annotated-servlet</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>Simple Sip Servlet Example</name>
+	<name>Annoatated Sip Servlet Example</name>
 	<url>http://sip-servlets.dev.java.net</url>	
 </project>

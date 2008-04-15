@@ -8,7 +8,7 @@
 		<version>0.2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
-	<artifactId>simple-sip-servlet</artifactId>
+	<artifactId>secure-sip-servlet</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>Secure Servlet Example</name>

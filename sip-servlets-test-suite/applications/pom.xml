@@ -23,6 +23,8 @@
 		<module>timers-sip-servlet</module>
 		<module>session-state-uas</module>
 		<module>session-state-uac</module>
+		<module>secure-servlet</module>
+		<module>annotated-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
