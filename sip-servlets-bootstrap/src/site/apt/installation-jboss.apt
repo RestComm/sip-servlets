@@ -43,30 +43,31 @@ Installation Instructions
 		
 		* in jboss_home/lib directory, there should be a commons-logging-1.1.jar
 	
-	Make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/server.xml file\	
-	Copy the server-jboss.xml located in docs to jboss_home/server/default/deploy/jboss-web.deployer/ and rename it to server.xml
+	Make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/server.xml file\
+	Copy the server-jboss.xml located in docs to jboss_home/server/default/deploy/jboss-web.deployer and rename it to server.xml
 	
 	Look for service tag in the server.xml file and modify the darConfigurationFileLocation attribute to map to your filesystem\
 	Look for the context tag in the server.xml file and modify the docbase attribute to map to your existing simple-sip-servlet application\	
 	Now you need to modify some extra config files so that jboss can deploy war/sar2 files containing sip servlet application :
 	
-	In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml \	
+	In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml \
 	Add this attribute to the manager xml tag, className="org.mobicents.servlet.sip.core.session.SipStandardManager"
 	
 	In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\jboss-service.xml :\
-	Modify the code attribute of the mbean tag so that it become code="org.mobicents.servlet.sip.startup.jboss.JBossSip"
+	Modify the code attribute of the mbean tag so that it become \
+	<<<code="org.mobicents.servlet.sip.startup.jboss.JBossSip">>>
 	
-	In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\webserver-xmbean.xml :\	
+	In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\webserver-xmbean.xml :\
 	Modify the class xml tag of the mbean tag so that it become \
-	\<class\>org.mobicents.servlet.sip.startup.jboss.JBossSip\</class\>
+	<<<\<class\>org.mobicents.servlet.sip.startup.jboss.JBossSip\</class\>>>>
 	
 	You're all set !
 	
 	make sure to run a <<<mvn clean install>>> at the root of simple-sip-servlet project too
 	
 	Run <<<mvn war:inplace>>> 
-	and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
-	and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.\
+	and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF 
+	and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF after it.\
 	(This would be removed automatically through maven when time will permit...)
     	
 	go to your jboss_home/bin directory\
