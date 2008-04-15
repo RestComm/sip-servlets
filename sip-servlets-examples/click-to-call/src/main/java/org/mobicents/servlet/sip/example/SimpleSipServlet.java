@@ -1,8 +1,6 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -27,6 +25,8 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static final String CONTACT_HEADER = "Contact";
+	
 	private SipFactory sipFactory;
 	
 	public SimpleSipServlet() {
@@ -185,30 +185,25 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("SimpleProxyServlet: Error: noPrackReceived.");
 	}
 	
-	protected void doRegister(SipServletRequest req) 
-	throws ServletException, IOException 
-	{
+	protected void doRegister(SipServletRequest req) throws ServletException, IOException {
 		logger.info("Received register request: " + req.getTo());
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);
-		HashMap<String, String> users = (HashMap) getServletContext().getAttribute("registeredUsersMap");
+		HashMap<String, String> users = (HashMap<String, String>) getServletContext().getAttribute("registeredUsersMap");
 		if(users == null) users = new HashMap<String, String>();
 		getServletContext().setAttribute("registeredUsersMap", users);
-		String address = req.getHeader("Contact"); 
 		
-		resp.setHeader("Contact", new String(address));
-//		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");		
-//		resp.setHeader("Date", simpleDateFormatter.format(new Date()));
-		// Extract the address from the contact header
-		int start = address.indexOf("sip:");
-		int end = start;
-		char ch;
-		do {
-			ch = address.charAt(end++);
-		} while (end<address.length() && ";<>,".indexOf(ch)<0);
-		address = address.substring(start, end-1);
-		
-		users.put(req.getFrom().getURI().toString(), address);
+		Address address = req.getAddressHeader(CONTACT_HEADER);
+		String fromURI = req.getFrom().getURI().toString();
+		if(address.getExpires() == 0) {
+			users.remove(fromURI);
+			logger.info("User " + fromURI + " unregistered");
+		} else {
+			resp.setAddressHeader(CONTACT_HEADER, address);
+			users.put(fromURI, address.getURI().toString());
+			logger.info("User " + fromURI + 
+					" registered with an Expire time of " + address.getExpires());
+		}				
 						
 		resp.send();
 	}
