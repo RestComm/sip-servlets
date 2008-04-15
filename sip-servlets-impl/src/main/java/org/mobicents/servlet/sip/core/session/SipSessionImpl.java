@@ -140,6 +140,9 @@ public class SipSessionImpl implements SipSession {
 		this.state = State.INITIAL;
 		this.valid = true;
 		this.supervisedMode = true;
+		this.sipSessionAttributeMap = new HashMap<String, Object>();
+		this.sipSessionAttributeListeners = new ArrayList<SipSessionAttributeListener>();
+		this.sipSessionBindingListeners = new ArrayList<SipSessionBindingListener>();
 		//FIXME create and start a timer for session expiration
 	}
 	
