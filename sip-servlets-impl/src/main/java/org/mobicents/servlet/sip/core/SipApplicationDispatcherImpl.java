@@ -3,7 +3,10 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.SipProviderImpl;
+import gov.nist.javax.sip.message.SIPRequest;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,6 +28,7 @@ import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
+import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.Transaction;
@@ -158,13 +162,29 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public void processRequest(RequestEvent requestEvent) {
 		logger.info("Got a request event");
 		
+		
+		SipProviderImpl sp = (SipProviderImpl)requestEvent.getSource();
+		
 		SipSessionImpl session = sessionManager.getRequestSession(requestEvent);
 		
-		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
-				(SipProvider) requestEvent.getSource(),
-				session,
-				(SIPServerTransaction) session.getSessionCreatingTransaction(),
-				session.getSessionCreatingDialog());
+		SipServletRequestImpl sipServletRequest = null;
+		
+		try
+		{
+			SIPRequest request = (SIPRequest)requestEvent.getRequest();
+			
+			ServerTransaction transaction = (ServerTransaction) request.getTransaction();
+			sipServletRequest = new SipServletRequestImpl(
+					(SipProvider) requestEvent.getSource(),
+					session,
+					transaction,
+					session.getSessionCreatingDialog());
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("Failure getting the transaction for current request", e);
+		}
+		
 		//check if the request is initial
 		boolean isInitialRequest = isInitialRequest(sipServletRequest, requestEvent.getDialog());		
 		sipServletRequest.setInitial(isInitialRequest);
@@ -331,7 +351,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void processResponse(ResponseEvent arg0) {
-		// TODO Auto-generated method stub
+		logger.info("Response " + arg0.getResponse().toString());
 		
 	}
 	/**

@@ -146,7 +146,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					statusCode, request);
 			if(statusCode == Response.OK) {
 				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-				toHeader.setTag("4321");
+				toHeader.setTag(java.util.UUID.randomUUID().toString());
 //				response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME, "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
 			return new SipServletResponseImpl(response, provider,
