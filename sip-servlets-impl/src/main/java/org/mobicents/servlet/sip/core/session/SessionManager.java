@@ -249,6 +249,21 @@ public class SessionManager {
 	}	
 	
 	/**
+	 * Sometimes we need to put a session manually, because we don't have the key in advance.
+	 * This is needed when the session key is assigned later with setKey()
+	 * TODO: eliminate the need for this method
+	 * @param key
+	 * @param sipApplicationSessionImpl
+	 */
+	public void putSipApplicationSession(SipApplicationSessionKey key,
+			SipApplicationSessionImpl sipApplicationSessionImpl)
+	{
+		synchronized (sipApplicationSessionLock) {
+			sipApplicationSessions.put(key, sipApplicationSessionImpl);	
+		}	
+	}
+	
+	/**
 	 * Retrieve a sip session from its key. If none exists, one can enforce
 	 * the creation through the create parameter to true. the sip factory cannot be null
 	 * if create is set to true.

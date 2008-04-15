@@ -414,6 +414,9 @@ public class SipFactoryImpl implements SipFactory {
 				SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
 					((SipApplicationSessionImpl)sipAppSession).getSipContext().getApplicationName(), requestToWrap);
 				((SipApplicationSessionImpl)sipAppSession).setKey(sipApplicationSessionKey);
+				
+				// We have to manually add the app session here. HACK. TODO: Fix it somehow
+				this.sessionManager.putSipApplicationSession(sipApplicationSessionKey, (SipApplicationSessionImpl)sipAppSession);
 			}
 			SipSessionKey key = SessionManager.getSipSessionKey(
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap, false);
