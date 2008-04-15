@@ -96,16 +96,16 @@ public class SessionManager {
 		return session;
 	}
 	
-	public void addApplicationSession(String name, SipApplicationSessionImpl appSession)
+	public void addApplicationSession(String id, SipApplicationSessionImpl appSession)
 	{
-		if(appSessions.get(name) != null)
-			throw new IllegalArgumentException("Application session already exists for " + name);
-		appSessions.put(name, appSession);
+		if(appSessions.get(id) != null)
+			throw new IllegalArgumentException("Application session already exists for " + id);
+		appSessions.put(id, appSession);
 	}
 	
-	public SipApplicationSessionImpl getApplicationSession(String appName)
+	public SipApplicationSessionImpl getApplicationSession(String id)
 	{
-		return appSessions.get(appName);
+		return appSessions.get(id);
 	}
 	
 	public static boolean isDialogCreatingRequest(RequestEvent requestEvent)

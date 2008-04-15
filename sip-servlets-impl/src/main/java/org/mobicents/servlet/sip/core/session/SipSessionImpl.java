@@ -1,5 +1,6 @@
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.header.From;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.util.ArrayList;
@@ -27,6 +28,12 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.header.FromHeader;
+import javax.sip.header.ToHeader;
+import javax.sip.message.Request;
+
+import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 public class SipSessionImpl implements SipSession {
 
@@ -69,9 +76,20 @@ public class SipSessionImpl implements SipSession {
 	private boolean valid;
 	
 	/**
-	 * The name of the servlet within this same app to handle all subsequent requests.
+	 * The name of the servlet withing this same app to handle all subsequent requests.
 	 */
 	private String handlerServlet;
+	
+	/**
+	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
+	 */
+	private URI subscriberURI;
+	
+	/**
+	 * Outbound interface is onle of the allowed values in the Servlet COntext attribute
+	 * "javax.servlet.ip.outboundinterfaces"
+	 */
+	private SipURI outboundInterface;
 	
 	
 	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===
@@ -138,8 +156,16 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#createRequest(java.lang.String)
 	 */
 	public SipServletRequest createRequest(String method) {
-		// TODO Auto-generated method stub
-		return null;
+		if(method.equals(Request.ACK)
+				||method.equals(Request.CANCEL))
+			throw new IllegalArgumentException(
+					"Can not create ACK or CANCEL requests with this method");
+		
+		return SipFactoryImpl.getInstance().createRequest(
+				this.sipApplicationSession,
+				method,
+				this.getLocalParty(),
+				this.getRemoteParty());
 	}
 
 	public SipApplicationSession getApplicationSession() {
@@ -175,8 +201,20 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public Address getLocalParty() {
-		// TODO Auto-generated method stub
-		return null;
+		if(sessionCreatingDialog != null)
+			return new AddressImpl(sessionCreatingDialog.getLocalParty());
+		else
+		{
+			try
+			{
+				From fromHeader = (From)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
+				return new AddressImpl(fromHeader);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Error creating Address", e);
+			}
+		}
 	}
 
 	public SipApplicationRoutingRegion getRegion() {
@@ -184,8 +222,20 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public Address getRemoteParty() {
-		// TODO Auto-generated method stub
-		return null;
+		if(sessionCreatingDialog != null)
+			return new AddressImpl(sessionCreatingDialog.getLocalParty());
+		else
+		{
+			try
+			{
+				From toHeader = (From)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
+				return new AddressImpl(toHeader);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Error creating Address", e);
+			}
+		}
 	}
 
 	public State getState() {
@@ -193,8 +243,10 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public URI getSubscriberURI() {
-		// TODO Auto-generated method stub
-		return null;
+		if (this.subscriberURI == null)
+			throw new IllegalStateException("Subscriber URI is only available for outbound sessions.");
+		else 
+			return this.subscriberURI;
 	}
 
 	public void invalidate() {
@@ -282,18 +334,6 @@ public class SipSessionImpl implements SipSession {
 
 	}
 
-	/**
-	 * Retrieve which servlet is the current handler for the session
-	 * @return the servlet name corresponding to the handler for the session
-	 */
-	public String getHandler() {
-		return handlerServlet;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSession#setHandler(java.lang.String)
-	 */
 	public void setHandler(String name) throws ServletException {
 		if(!valid) {
 			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
@@ -302,10 +342,15 @@ public class SipSessionImpl implements SipSession {
 		// this implies that the sipsession knows all the servlet of the application, the constructor should refactored for that
 		this.handlerServlet = name;
 	}
+	
+	public String getHandler()
+	{
+		return handlerServlet;
+	}
 
 	public void setOutboundInterface(SipURI uri) {
-		// TODO Auto-generated method stub
-
+		// TODO: validate from the list in servlet context
+		this.outboundInterface = uri;
 	}
 
 	/**
@@ -344,7 +389,7 @@ public class SipSessionImpl implements SipSession {
 
 	public void setSessionCreatingTransaction(SIPTransaction initialTransaction) {
 		this.sessionCreatingTransaction = initialTransaction;
-	}	
+	}
 
 	public boolean isSupervisedMode() {
 		return supervisedMode;
@@ -352,5 +397,13 @@ public class SipSessionImpl implements SipSession {
 
 	public void setSupervisedMode(boolean supervisedMode) {
 		this.supervisedMode = supervisedMode;
+	}
+
+	public void setSubscriberURI(URI subscriberURI) {
+		this.subscriberURI = subscriberURI;
+	}
+
+	public SipURI getOutboundInterface() {
+		return outboundInterface;
 	}
 }
