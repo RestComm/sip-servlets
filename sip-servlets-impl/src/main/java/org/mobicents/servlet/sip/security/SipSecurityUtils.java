@@ -8,6 +8,7 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.security.authentication.AuthenticatorBase;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -20,7 +21,9 @@ public class SipSecurityUtils {
 	
 	private static Log log = LogFactory.getLog(SipSecurityUtils.class);
 	
-	public static boolean authenticate(SipStandardContext sipStandardContext, SipServletRequestImpl request)
+	public static boolean authenticate(SipStandardContext sipStandardContext,
+			SipServletRequestImpl request,
+			SipSecurityConstraint sipConstraint)
 	{
 		boolean authenticated = false;
 		SipLoginConfig loginConfig = sipStandardContext.getSipLoginConfig();
@@ -33,7 +36,8 @@ public class SipSecurityUtils {
 					if(authMethod.equalsIgnoreCase("DIGEST")) {
 						DigestAuthenticator auth = new DigestAuthenticator();
 						auth.setContext(sipStandardContext);
-						authenticated = auth.authenticate(request, null, loginConfig);
+						SipServletResponseImpl response = createErrorResponse(request, sipConstraint);
+						authenticated = auth.authenticate(request, (SipServletResponseImpl) response, loginConfig);
 						request.setUserPrincipal(auth.getPrincipal());
 					} else if(authMethod.equalsIgnoreCase("BASIC")) {
 						throw new IllegalStateException("Basic authentication not supported in JSR 289");
@@ -52,16 +56,28 @@ public class SipSecurityUtils {
 		return authenticated;
 	}
 	
+	private static SipServletResponseImpl createErrorResponse(SipServletRequestImpl request, SipSecurityConstraint sipConstraint)
+	{
+		SipServletResponse response = null;
+    	if(sipConstraint.isProxyAuthentication()) {
+    		response = (SipServletResponseImpl) 
+    			request.createResponse(SipServletResponseImpl.SC_PROXY_AUTHENTICATION_REQUIRED);
+    	} else {
+    		response = (SipServletResponseImpl) 
+    			request.createResponse(SipServletResponseImpl.SC_UNAUTHORIZED);
+    	}
+    	return (SipServletResponseImpl) response;
+	}
+	
 	public static boolean authorize(SipStandardContext sipStandardContext, SipServletRequestImpl request)
 	{
 		boolean allConstrainsSatisfied = true;
-		GenericPrincipal principal = (GenericPrincipal) request.getUserPrincipal();
 		SecurityConstraint[] constraints = sipStandardContext.findConstraints();
 		
 		// If we have no constraints, just authorize the request;
 		if(constraints.length == 0) return true;
 		
-		constraints: for(SecurityConstraint constraint:constraints)
+		for(SecurityConstraint constraint:constraints)
 		{
 			if(constraint instanceof SipSecurityConstraint)
 			{
@@ -77,15 +93,21 @@ public class SipSecurityUtils {
 						
 						// If yes, see if the current user is in a role compatible with the
 						// required roles for the resource.
-						if(principal == null) return false;
-						boolean constraintSatisfied = false;
-						for(String assignedRole:constraint.findAuthRoles()) {
-							if(principal.hasRole(assignedRole)) {
-								constraintSatisfied = true;
-								break;
+						if(authenticate(sipStandardContext, request, sipConstraint)) {
+							GenericPrincipal principal = (GenericPrincipal) request.getUserPrincipal();
+							if(principal == null) return false;
+							boolean constraintSatisfied = false;
+							for(String assignedRole:constraint.findAuthRoles()) {
+								if(principal.hasRole(assignedRole)) {
+									constraintSatisfied = true;
+									break;
+								}
+							}
+							if(!constraintSatisfied) {
+								allConstrainsSatisfied = false;
+								log.error("Constraint \"" + constraint.getDisplayName() + "\" not satifsied");
 							}
 						}
-						if(!constraintSatisfied) allConstrainsSatisfied = false;
 					}
 				}
 			}

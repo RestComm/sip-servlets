@@ -1409,9 +1409,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	{
 		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
 		SipStandardContext sipStandardContext = (SipStandardContext) appSession.getSipContext();
-		boolean authenticated = SipSecurityUtils.authenticate(sipStandardContext, request);
 		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
-		return authenticated && authorized;
+		return authorized;
 	}
 	
 	/*

@@ -142,8 +142,6 @@ public class DigestAuthenticator
     	
     	principal = null;
     	
-    	if(response == null) 
-    		response = (SipServletResponseImpl) request.createResponse(SipServletResponseImpl.SC_UNAUTHORIZED);
         // Have we already authenticated someone?
         principal = request.getUserPrincipal();
         //String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
@@ -426,7 +424,14 @@ public class DigestAuthenticator
         String authenticateHeader = "Digest realm=\"" + realmName + "\", "
             +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
             + md5Encoder.encode(buffer) + "\"";
-        response.setHeader("WWW-Authenticate", authenticateHeader);
+        
+        // There are different headers for different types of auth
+        if(response.getStatus() == 
+        	SipServletResponseImpl.SC_PROXY_AUTHENTICATION_REQUIRED) {
+        	response.setHeader("Proxy-Authenticate", authenticateHeader);
+        } else {
+        	response.setHeader("WWW-Authenticate", authenticateHeader);
+        }
 
     }
 
