@@ -52,7 +52,7 @@ public class ProtocolObjects {
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG", logFileDirectory
 				+ stackname + "debuglog.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				logFileDirectory + stackname + "log.txt");
+				logFileDirectory + stackname + "log.xml");
 
 		properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT",
 				(autoDialog ? "on" : "off"));

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.InvalidArgumentException;
@@ -31,7 +32,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 
 /**
  * This class is a UAC template. Shootist is the guy that shoots and shootme is
@@ -51,7 +51,9 @@ public class TestSipListener implements SipListener {
 
 	private ListeningPoint listeningPoint;
 
-	private ClientTransaction inviteTid;
+	private ClientTransaction inviteClientTid;
+	
+	private ServerTransaction inviteServerTid;
 
 	private Dialog dialog;
 
@@ -69,6 +71,12 @@ public class TestSipListener implements SipListener {
 
 	private int dialogCount;
 
+	private boolean cancelReceived;
+	
+	private boolean cancelOkReceived;
+	
+	private boolean requestTerminatedReceived;
+	
 	private boolean byeReceived;
 
 	private boolean redirectReceived;
@@ -77,8 +85,11 @@ public class TestSipListener implements SipListener {
 	
 	private SipURI requestURI;
 	
+	private Request inviteRequest;
+	
+	private boolean cancelSent;
+	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
-
 	
 
 	public void processRequest(RequestEvent requestReceivedEvent) {
@@ -102,8 +113,37 @@ public class TestSipListener implements SipListener {
 			processAck(request, serverTransactionId);
 		}
 
+		if (request.getMethod().equals(Request.CANCEL)) {
+			processCancel(requestReceivedEvent, serverTransactionId);
+		}
 	}
 	
+	private void processCancel(RequestEvent requestEvent,
+			ServerTransaction serverTransactionId) {
+		try {
+			cancelReceived = true;
+			SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+			Request request = requestEvent.getRequest();
+			Response response = protocolObjects.messageFactory.createResponse(
+					Response.OK, request);
+			ServerTransaction st = requestEvent.getServerTransaction();
+	
+			if (st == null) {
+				st = sipProvider.getNewServerTransaction(request);
+			}
+			Dialog dialog = st.getDialog();		
+			logger.info("Shootme: dialog = " + dialog);		
+			st.sendResponse(response);
+			if (dialog.getState() != DialogState.CONFIRMED) {
+				response = protocolObjects.messageFactory.createResponse(
+						Response.REQUEST_TERMINATED, inviteRequest);
+				inviteServerTid.sendResponse(response);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	/**
 	 * Process the invite request.
 	 */
@@ -121,7 +161,7 @@ public class TestSipListener implements SipListener {
 							+";transport="+protocolObjects.transport
 							+ ">");
 			ServerTransaction st = requestEvent.getServerTransaction();
-
+			inviteServerTid = st;
 			if (st == null) {
 				st = sipProvider.getNewServerTransaction(request);
 			}
@@ -132,8 +172,10 @@ public class TestSipListener implements SipListener {
 			
 			logger.info("Shootme: dialog = " + dialog);
 			
+			this.inviteRequest = request;
+			
 			st.sendResponse(response);
-			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 			
 			Response ringing = protocolObjects.messageFactory
 			.createResponse(Response.RINGING, request);
@@ -233,6 +275,17 @@ public class TestSipListener implements SipListener {
 					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					okToByeReceived = true;
+				} else if (cseq.getMethod().equals(Request.CANCEL)) {
+					this.cancelOkReceived = true;
+					if (dialog.getState() == DialogState.CONFIRMED) {
+						// oops cancel went in too late. Need to hang up the
+						// dialog.
+						logger.info("Sending BYE -- cancel went in too late !!");
+						Request byeRequest = dialog.createRequest(Request.BYE);
+						ClientTransaction ct = sipProvider
+								.getNewClientTransaction(byeRequest);
+						dialog.sendRequest(ct);
+					} 
 				}
 			} else if  (response.getStatusCode() == Response.MOVED_TEMPORARILY) {
 				// Dialog dies as soon as you get an error response.
@@ -301,17 +354,21 @@ public class TestSipListener implements SipListener {
 					
 					logger.info("Sending INVITE to "
 							+ contHdr.getAddress().getURI().toString());
-					inviteTid = sipProvider.getNewClientTransaction(invRequest);
+					inviteClientTid = sipProvider.getNewClientTransaction(invRequest);
 					this.transactionCount++;
 					
-					logger.info("New TID = " + inviteTid);
-					inviteTid.sendRequest();
-					logger.info("sendReqeust succeeded " + inviteTid);
-					Dialog dialog = inviteTid.getDialog();
+					logger.info("New TID = " + inviteClientTid);
+					inviteClientTid.sendRequest();
+					logger.info("sendReqeust succeeded " + inviteClientTid);
+					Dialog dialog = inviteClientTid.getDialog();
 					this.dialogCount ++;
 					this.dialog = dialog;
 				
 		
+				}
+			} else if (response.getStatusCode() == Response.REQUEST_TERMINATED) {
+				if(cseq.getMethod().equals(Request.INVITE)){
+					this.requestTerminatedReceived = true;
 				}
 			}
 			/**
@@ -447,16 +504,16 @@ public class TestSipListener implements SipListener {
 //			request.addHeader(callInfoHeader);
 
 			// Create the client transaction.
-			inviteTid = sipProvider.getNewClientTransaction(request);
+			inviteClientTid = sipProvider.getNewClientTransaction(request);
 
 			// send the request out.
-			inviteTid.sendRequest();
+			inviteClientTid.sendRequest();
 
 			this.transactionCount ++;
 			
 			
-			logger.info("client tx = " + inviteTid);
-			dialog = inviteTid.getDialog();
+			logger.info("client tx = " + inviteClientTid);
+			dialog = inviteClientTid.getDialog();
 			this.dialogCount++;
 	}
 	
@@ -496,5 +553,40 @@ public class TestSipListener implements SipListener {
 	
 	public boolean getByeReceived() {
 		return byeReceived;
+	}
+
+	public void sendCancel() {
+		try {
+			logger.info("Sending cancel");
+			
+			Request cancelRequest = inviteClientTid.createCancel();
+			ClientTransaction cancelTid = sipProvider
+					.getNewClientTransaction(cancelRequest);
+			cancelTid.sendRequest();
+			cancelSent = true;
+		} catch (Exception ex) {
+			ex.printStackTrace();						
+		}
+	}
+
+	/**
+	 * @return the cancelReceived
+	 */
+	public boolean isCancelReceived() {
+		return cancelReceived;
+	}
+
+	/**
+	 * @return the cancelOkReceived
+	 */
+	public boolean isCancelOkReceived() {
+		return cancelOkReceived;
+	}
+
+	/**
+	 * @return the requestTerminatedReceived
+	 */
+	public boolean isRequestTerminatedReceived() {
+		return requestTerminatedReceived;
 	}	
 }

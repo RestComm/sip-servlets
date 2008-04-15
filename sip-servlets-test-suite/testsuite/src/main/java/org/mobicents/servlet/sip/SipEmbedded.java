@@ -151,7 +151,7 @@ public class SipEmbedded {
 		ph.setDebugLog("../logs/debuglog.txt");
 		ph.setIpAddress("127.0.0.1");
 		ph.setLogLevel("DEBUG");
-		ph.setServerLog("../logs/serverlog.txt");
+		ph.setServerLog("../logs/serverlog.xml");
 		ph.setSignalingTransport("udp");
 		ph.setSipPathName("gov.nist");
 		ph.setSipStackName("SIP-Servlet-Tomcat-Server");

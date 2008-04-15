@@ -135,10 +135,13 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress);		
+		sender.sendInvite(fromAddress, toAddress);
+		Thread.sleep(200);
+		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());		
+		assertTrue(sender.isCancelOkReceived());
+		assertTrue(sender.isRequestTerminatedReceived());
+		assertTrue(receiver.isCancelReceived());
 	}
 	
 	@Override
