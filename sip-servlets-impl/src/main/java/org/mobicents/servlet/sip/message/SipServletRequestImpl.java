@@ -673,11 +673,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					this.session.setSessionCreatingDialog(dialog);
 				}
 
-				// Make the dialog point here so that when the dialog event
-				// comes in we can find the session quickly.
-				if (dialog != null)
-					dialog.setApplicationData(this.transactionApplicationData);
-
 				//Keeping the transactions mapping in application data for CANCEL handling
 				if(linkedRequest != null) {
 					//keeping the client transaction in the server transaction's application data
@@ -685,6 +680,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					//keeping the server transaction in the client transaction's application data
 					this.transactionApplicationData.setTransaction(linkedRequest.getTransaction());
 				}
+				
+				// Make the dialog point here so that when the dialog event
+				// comes in we can find the session quickly.
+				if (dialog != null)
+					dialog.setApplicationData(this.transactionApplicationData);				
 				
 				// SIP Request is ALWAYS pointed to by the client tx.
 				// Notice that the tx appplication data is cached in the request
