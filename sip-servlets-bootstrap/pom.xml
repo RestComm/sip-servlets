@@ -14,32 +14,112 @@
 			https://sip-servlets.dev.java.net/servlets/ProjectIssues
 		</url>
 	</issueManagement>
+	<mailingLists>
+		<mailingList>
+			<name>dev</name>
+			<subscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</subscribe>
+			<unsubscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</unsubscribe>
+			<archive>
+				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=dev
+			</archive>
+			<post>dev@sip-servlets.dev.java.net</post>
+		</mailingList>
+		<mailingList>
+			<name>cvs</name>
+			<subscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</subscribe>
+			<unsubscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</unsubscribe>
+			<archive>
+				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=cvs
+			</archive>
+			<post>cvs@sip-servlets.dev.java.net</post>
+		</mailingList>
+		<mailingList>
+			<name>commits</name>
+			<subscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</subscribe>
+			<unsubscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</unsubscribe>
+			<archive>
+				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=commits
+			</archive>
+			<post>commits@sip-servlets.dev.java.net</post>
+		</mailingList>
+		<mailingList>
+			<name>announce</name>
+			<subscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</subscribe>
+			<unsubscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</unsubscribe>
+			<archive>
+				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=announce
+			</archive>
+			<post>announce@sip-servlets.dev.java.net</post>
+		</mailingList>
+		<mailingList>
+			<name>issues</name>
+			<subscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</subscribe>
+			<unsubscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</unsubscribe>
+			<archive>
+				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=issues
+			</archive>
+			<post>issues@sip-servlets.dev.java.net</post>
+		</mailingList>
+		<mailingList>
+			<name>users</name>
+			<subscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</subscribe>
+			<unsubscribe>
+				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
+			</unsubscribe>
+			<archive>
+				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=users
+			</archive>
+			<post>users@sip-servlets.dev.java.net</post>
+		</mailingList>
+	</mailingLists>
 	<developers>
 		<developer>
-		<id>deruelle_jean</id>
-		<email>deruelle_jean@dev.java.net</email>
-		<organization>JBoss/Red Hat</organization>
-		<organizationUrl>http://www.redhat.com/</organizationUrl>
-		<timezone>+1</timezone>			
+			<id>deruelle_jean</id>
+			<email>deruelle_jean@dev.java.net</email>
+			<organization>JBoss/Red Hat</organization>
+			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<timezone>+1</timezone>
 		</developer>
 		<developer>
-		<id>vralev</id>
-		<email>vralev@dev.java.net</email>
-		<organization>JBoss/Red Hat</organization>
-		<organizationUrl>http://www.redhat.com/</organizationUrl>
-		<timezone>+1</timezone>			
+			<id>vralev</id>
+			<email>vralev@dev.java.net</email>
+			<organization>JBoss/Red Hat</organization>
+			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<timezone>+1</timezone>
 		</developer>
 		<developer>
-		<id>baranowb</id>
-		<email>baranowb@dev.java.net</email>
-		<organization>JBoss/Red Hat</organization>
-		<organizationUrl>http://www.redhat.com/</organizationUrl>
-		<timezone>+1</timezone>			
+			<id>baranowb</id>
+			<email>baranowb@dev.java.net</email>
+			<organization>JBoss/Red Hat</organization>
+			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<timezone>+1</timezone>
 		</developer>
 		<developer>
-		<id>mranga</id>
-		<email>mranga@dev.java.net</email>		
-		<timezone>-5</timezone>			
+			<id>mranga</id>
+			<email>mranga@dev.java.net</email>
+			<timezone>-5</timezone>
 		</developer>
 	</developers>
 	<licenses>
