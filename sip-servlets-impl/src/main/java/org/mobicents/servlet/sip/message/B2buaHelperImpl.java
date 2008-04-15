@@ -93,14 +93,16 @@ public class B2buaHelperImpl implements B2buaHelper {
 					}
 				}
 			}
-			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
-					.getApplicationData();
+			TransactionApplicationData transactionApplicationData = 
+				(TransactionApplicationData) origRequestImpl.getDialog().getApplicationData();
+			
+			SipSessionImpl originalSession = transactionApplicationData.getSipSession();
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();
 
 			SipSessionImpl session = new SipSessionImpl(sipFactoryImpl, appSession);
 			session.setHandler(originalSession.getHandler());
-			session.setSipContext(originalSession.getSipContext());
+			appSession.setSipContext(((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext());
 			
 			SipServletRequestImpl retVal = new SipServletRequestImpl(
 					newRequest,

@@ -22,7 +22,9 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.CallIdHeader;
@@ -34,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -91,10 +94,10 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private String handlerServlet;
 	
-	/**
-	 * The first sip application for subsequent requests.
-	 */
-	private SipContext sipContext;
+//	/**
+//	 * The first sip application for subsequent requests.
+//	 */
+//	private SipContext sipContext;
 	
 	/**
 	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
@@ -183,13 +186,26 @@ public class SipSessionImpl implements SipSession {
 		if(method.equals(Request.ACK)
 				||method.equals(Request.CANCEL))
 			throw new IllegalArgumentException(
-					"Can not create ACK or CANCEL requests with this method");
-		
-		return sipFactory.createRequest(
+					"Can not create ACK or CANCEL requests with this method");				
+		SipServletRequest sipServletRequest = null;
+		if(Request.BYE.equalsIgnoreCase(method)) {			
+			try {
+				Request byeRequest = this.sessionCreatingDialog.createRequest(Request.BYE);
+				sipServletRequest = new SipServletRequestImpl(
+						byeRequest, this.sipFactory, this, null, null,
+						false);
+			} catch (SipException e) {
+				logger.error("Cannot create the bye request form the dialog",e);
+				throw new IllegalArgumentException("Cannot create the bye request");
+			}			
+		} else {
+			sipServletRequest = sipFactory.createRequest(
 				this.sipApplicationSession,
 				method,
 				this.getLocalParty(),
 				this.getRemoteParty());
+		}
+		return sipServletRequest;
 	}
 
 	public SipApplicationSession getApplicationSession() {
@@ -429,13 +445,13 @@ public class SipSessionImpl implements SipSession {
 		return outboundInterface;
 	}
 
-	public SipContext getSipContext() {
-		return sipContext;
-	}
-
-	public void setSipContext(SipContext sipContext) {
-		this.sipContext = sipContext;
-	}
+//	public SipContext getSipContext() {
+//		return sipContext;
+//	}
+//
+//	public void setSipContext(SipContext sipContext) {
+//		this.sipContext = sipContext;
+//	}
 
 	public Set<SipProvider> getProviders() {
 		

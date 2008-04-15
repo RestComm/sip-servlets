@@ -15,6 +15,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -136,7 +137,7 @@ public class SipFactoryFacade implements SipFactory {
 		if(sipSessionImpl.getHandler() == null) {
 			try {
 				sipSessionImpl.setHandler(sipContext.getMainServlet());
-				sipSessionImpl.setSipContext(sipContext);
+				((SipApplicationSessionImpl)sipSessionImpl.getApplicationSession()).setSipContext(sipContext);
 			} catch (ServletException se) {
 				//should never happen
 				logger.error("Impossible to set the default handler on the newly created request "+ request.toString(),se);

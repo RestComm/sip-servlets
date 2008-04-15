@@ -393,7 +393,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
 					return;
 				}
-				session.setSipContext(sipContext);
+				appSession.setSipContext(sipContext);
 				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSession()).getHandler();						
 				if(sipSessionHandlerName == null) {
 					String mainServlet = sipContext.getMainServlet();
@@ -437,7 +437,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			logger.info("Request event dispatched");
 		} else {
 			logger.info("Routing of Subsequent Request -- TODO");
-			Wrapper servletWrapper = (Wrapper) session.getSipContext().findChild(session.getHandler());
+			Wrapper servletWrapper = (Wrapper) ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 			try
 			{
 				Servlet servlet = servletWrapper.allocate();
@@ -523,14 +523,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public void processResponse(ResponseEvent responseEvent) {
 		logger.info("Response " + responseEvent.getResponse().toString());
 		Response response = responseEvent.getResponse();
-		
+		SipProvider sipProvider = (SipProvider)responseEvent.getSource();
 		// See if this transaction has been here before
 		Object appData = null;
 		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
 		Dialog dialog = responseEvent.getDialog();
 		if(clientTransaction != null) {
 			appData = clientTransaction.getApplicationData();
-		} else if(dialog != null){			
+		}
+		//there is no client transaction associated with it, it means that this is a retransmission
+		else if(dialog != null){	
 			appData = dialog.getApplicationData();
 		}
 		if(appData != null && appData instanceof org.mobicents.servlet.sip.message.TransactionApplicationData)
@@ -551,22 +553,40 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if( sipServletResponse.getStatus()>=100 && sipServletResponse.getStatus()<200 )
 				session.setState(State.EARLY);
 			
-			// See if this is a response to a proxied request
-			ProxyBranchImpl proxyBranch = tad.getProxyBranch();
-			if(proxyBranch != null)
-			{
-				// Handle it at the branch
-				proxyBranch.onResponse(sipServletResponse); 
-				
-				// Notfiy the servlet
-				if(proxyBranch.getProxy().getSupervised())
+			try {
+				// See if this is a response to a proxied request
+				ProxyBranchImpl proxyBranch = tad.getProxyBranch();
+				if(proxyBranch != null)
+				{
+					// Handle it at the branch
+					proxyBranch.onResponse(sipServletResponse); 
+					
+					// Notfiy the servlet
+					if(proxyBranch.getProxy().getSupervised())
+					{
+						callServlet(sipServletResponse, session);
+					}
+				}
+				else
 				{
 					callServlet(sipServletResponse, session);
 				}
-			}
-			else
-			{
-				callServlet(sipServletResponse, session);
+			} catch (ServletException e) {				
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+				return;
+			} catch (IOException e) {				
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+				return;
+			} catch (Throwable e) {
+				e.printStackTrace();
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+				return;
 			}
 		} else {
 			logger.error("the response doesn't have any clientTx nor dialog associated with it" +
@@ -574,36 +594,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		}
 	}
 	
-	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session)
+	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException
 	{
-		Container container = session.getSipContext().findChild(session.getHandler());
+		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 		Wrapper sipServletImpl = (Wrapper) container;
-		try {
-			Servlet servlet = sipServletImpl.allocate();	        
-			servlet.service(request, null);
-		} catch (ServletException e) {				
-			logger.error(e);
-			//TODO sends an error message
-		} catch (IOException e) {				
-			logger.error(e);
-			//TODO sends an error message
-		}
+		Servlet servlet = sipServletImpl.allocate();	        
+		servlet.service(request, null);		
 	}
 	
-	public static void callServlet(SipServletResponseImpl response, SipSessionImpl session)
+	public static void callServlet(SipServletResponseImpl response, SipSessionImpl session) throws ServletException, IOException
 	{
-		Container container = session.getSipContext().findChild(session.getHandler());
-		Wrapper sipServletImpl = (Wrapper) container;
-		try {
-			Servlet servlet = sipServletImpl.allocate();	        
-			servlet.service(null, response);
-		} catch (ServletException e) {				
-			logger.error(e);
-			//TODO sends an error message
-		} catch (IOException e) {				
-			logger.error(e);
-			//TODO sends an error message
-		}
+		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
+		Wrapper sipServletImpl = (Wrapper) container;		
+		Servlet servlet = sipServletImpl.allocate();	        
+		servlet.service(null, response);		
 	}
 	
 	/**
@@ -617,10 +621,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} else {
 			tx = timeoutEvent.getClientTransaction();
 		}
-		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();
-		if(logger.isDebugEnabled()) {
-			logger.debug("Removing transaction from sip session's ongoingTransactions " +  tx);
-		}
+		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();	
 		tad.getSipSession().removeOngoingTransaction(tx);
 
 	}

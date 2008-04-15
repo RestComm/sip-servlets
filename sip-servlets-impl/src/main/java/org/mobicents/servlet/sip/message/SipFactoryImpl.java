@@ -1,10 +1,12 @@
 package org.mobicents.servlet.sip.message;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,11 +22,11 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.SipProvider;
-import javax.sip.address.TelURL;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -319,7 +321,7 @@ public class SipFactoryImpl implements SipFactory {
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
 			Address to, SipServletRequest originalRequest) {
-
+		
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
 		Request requestToWrapp = null;
@@ -390,19 +392,24 @@ public class SipFactoryImpl implements SipFactory {
 				toHeader.setParameter(key, from.getParameter(key));
 			}
 
-			requestToWrapp = SipFactories.messageFactory.createRequest(null);
-
 			viaHeader = JainSipUtils.createViaHeader(sipProviders, transport,
 					null);
+			
+			List<Header> viaHeaders = new ArrayList<Header>();
+			viaHeaders.add(viaHeader);
+			
+			requestToWrapp = SipFactories.messageFactory.createRequest(
+					requestURI.getSipURI(), 
+					method, 
+					callIdHeader, 
+					cseqHeader, 
+					fromHeader, 
+					toHeader, 
+					viaHeaders, 
+					maxForwardsHeader);
 
+			
 			// Add all headers
-			requestToWrapp.setRequestURI(requestURI.getSipURI());
-			requestToWrapp.addHeader(toHeader);
-			requestToWrapp.addHeader(fromHeader);
-			requestToWrapp.addHeader(callIdHeader);
-			requestToWrapp.addHeader(cseqHeader);
-			requestToWrapp.addHeader(maxForwardsHeader);
-			requestToWrapp.addHeader(viaHeader);
 			if (contactHeader != null)
 				requestToWrapp.addHeader(contactHeader);
 			if (routeHeader != null)

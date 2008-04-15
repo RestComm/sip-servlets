@@ -20,7 +20,7 @@ public class TimerServiceImpl implements TimerService {
 	private static Log logger = LogFactory.getLog(TimerServiceImpl.class
 			.getName());
 	
-	private ExecutorServiceWrapper eService=ExecutorServiceWrapper.getInstance();
+	private ExecutorServiceWrapper eService = ExecutorServiceWrapper.getInstance();
 	
 	private static TimerServiceImpl instance = new TimerServiceImpl();
 
@@ -28,107 +28,114 @@ public class TimerServiceImpl implements TimerService {
 		return instance;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.TimerService#createTimer(javax.servlet.sip.SipApplicationSession, long, boolean, java.io.Serializable)
+	 */
 	public ServletTimer createTimer(SipApplicationSession appSession,
 			long delay, boolean isPersistent, Serializable info) {			
-		return this.createTimer(appSession, delay, isPersistent, info, false);
+		
+		SipApplicationSessionImpl sipApplicationSessionImpl =(SipApplicationSessionImpl)appSession;
+		
+		if (sipApplicationSessionImpl.isValid() == false) {
+			throw new IllegalStateException("Sip application session has been invalidated!!!");
+		}
+		
+		if (!sipApplicationSessionImpl.hasTimerListener()) {
+			throw new IllegalStateException("No Timer listeners have been configured for this application ");
+		}
+		TimerListener listener = sipApplicationSessionImpl.getSipContext().getListeners().getTimerListener();
+		ServletTimerImpl servletTimer = createTimerLocaly(listener, delay, isPersistent, info, sipApplicationSessionImpl);				
+		
+		return servletTimer;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.TimerService#createTimer(javax.servlet.sip.SipApplicationSession, long, long, boolean, boolean, java.io.Serializable)
+	 */
 	public ServletTimer createTimer(SipApplicationSession appSession,
 			long delay, long period, boolean fixedDelay, boolean isPersistent,
 			Serializable info) {
-		return this.createTimer(appSession, delay, period, fixedDelay, isPersistent, info,false);
-	}
-	
-	
-
-	public ServletTimer createTimer(SipApplicationSession appSession,
-			long delay, long period, boolean fixedDelay, boolean isPersistent,
-			Serializable info, boolean isExpirationTimer) {
 		if (period < 1) {
 			throw new IllegalArgumentException(
 					"Period should be greater than 0");
 		}
-		SipApplicationSessionImpl ap = (SipApplicationSessionImpl) appSession;
+		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl) appSession;
 		
-		if (ap.isValid() == false) {
+		if (sipApplicationSessionImpl.isValid() == false) {
 			throw new IllegalStateException("Sip application session has been invalidated!!!");
 		}
 		
-		if (!isExpirationTimer && !ap.hasTimerListeners()) {
+		if (!sipApplicationSessionImpl.hasTimerListener()) {
 			throw new IllegalStateException("No Timer listeners have been configured for this application ");
 		}
-		TimerListener l=ap.getAgregatingListener();
-		ServletTimerImpl st = createTimerLocaly(l, delay, period, fixedDelay,isPersistent, info,ap);
+		TimerListener timerListener = sipApplicationSessionImpl.getSipContext().getListeners().getTimerListener();
+		ServletTimerImpl servletTimer = createTimerLocaly(timerListener , delay, period, fixedDelay,isPersistent, info,sipApplicationSessionImpl);			
 		
-		// as.addServletTimer(st);
-		return st;
+		return servletTimer;
 	}
-
-	
-	
-
-	public ServletTimer createTimer(SipApplicationSession appSession,
-			long delay, boolean isPersistent, Serializable info, boolean isExpirationTimer) {
 		
-		SipApplicationSessionImpl ap=(SipApplicationSessionImpl)appSession;
-		
-		if (ap.isValid() == false) {
-			throw new IllegalStateException("Sip application session has been invalidated!!!");
-		}
-		
-		if (!isExpirationTimer && !ap.hasTimerListeners()) {
-			throw new IllegalStateException("No Timer listeners have been configured for this application ");
-		}
-		TimerListener l=ap.getAgregatingListener();
-		ServletTimerImpl st = createTimerLocaly(l, delay, isPersistent, info,ap);
-		
-		
-		return st;
-	
-	}
-	
-	
-	
+	/**
+	 * 
+	 * @param listener
+	 * @param delay
+	 * @param isPersistent
+	 * @param info
+	 * @param sipApplicationSession
+	 * @return
+	 */
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
-			boolean isPersistent, Serializable info, SipApplicationSessionImpl ap) {		
-		final TimerListener l = listener;
-		final ServletTimerImpl st = new ServletTimerImpl(info, delay, l,ap);
+			boolean isPersistent, Serializable info, SipApplicationSessionImpl sipApplicationSession) {				
+		ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
 		// logger.log(Level.FINE, "starting timer
 		// at:"+System.currentTimeMillis());
-		ScheduledFuture<?> f = eService.schedule(st, delay,	TimeUnit.MILLISECONDS);
-		st.setFuture(f);
-		ap.timerScheduled(st);
+		ScheduledFuture<?> future = eService.schedule(servletTimer, delay, TimeUnit.MILLISECONDS);
+		servletTimer.setFuture(future);
+//		sipApplicationSession.timerScheduled(st);
+		sipApplicationSession.addServletTimer(servletTimer);
 		if (isPersistent) {
-	
-			persist(st);
+			persist(servletTimer);
 		} 
-		return st;
+		return servletTimer;
 	}
-	
+	/**
+	 * 
+	 * @param listener
+	 * @param delay
+	 * @param period
+	 * @param fixedDelay
+	 * @param isPersistent
+	 * @param info
+	 * @param sipApplicationSession
+	 * @return
+	 */
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
 			long period, boolean fixedDelay, boolean isPersistent,
-			Serializable info, SipApplicationSessionImpl ap) {
-		final TimerListener l = listener;
-		final ServletTimerImpl st = new ServletTimerImpl(info, delay, fixedDelay, period, l,ap);
-		// logger.log(Level.FINE, "starting timer
-		// at:"+System.currentTimeMillis());
-		ScheduledFuture<?> f = null;
+			Serializable info, SipApplicationSessionImpl sipApplicationSession) {		
+		final ServletTimerImpl servletTimer = new ServletTimerImpl(
+				info, delay, fixedDelay, period, listener, sipApplicationSession);
+		ScheduledFuture<?> future = null;
 		if (fixedDelay) {
-			f = eService.scheduleWithFixedDelay(st, delay, period,
+			future = eService.scheduleWithFixedDelay(servletTimer, delay, period,
 					TimeUnit.MILLISECONDS);
 		} else {
-			f = eService.scheduleAtFixedRate(st, delay, period,
+			future = eService.scheduleAtFixedRate(servletTimer, delay, period,
 					TimeUnit.MILLISECONDS);
 		}
-		st.setFuture(f);
-		ap.timerScheduled(st);
-		if (isPersistent) {
-			
-			persist(st);
+		servletTimer.setFuture(future);
+//		sipApplicationSession.timerScheduled(servletTimer);
+		sipApplicationSession.addServletTimer(servletTimer);
+		if (isPersistent) {			
+			persist(servletTimer);
 		} 
-		return st;
+		return servletTimer;
 	}
 
+	/**
+	 * 
+	 * @param st
+	 */
 	private void persist(ServletTimerImpl st) {
 		// TODO - implement persistance
 		

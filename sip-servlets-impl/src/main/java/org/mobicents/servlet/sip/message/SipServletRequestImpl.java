@@ -662,7 +662,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			super.session.addOngoingTransaction(getTransaction());
 		} catch (Exception ex) {			
-			throw new IllegalStateException("Error sending reuqest",ex);
+			throw new IllegalStateException("Error sending request",ex);
 		}
 
 	}

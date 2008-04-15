@@ -208,9 +208,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			
 			st.sendResponse( (Response)this.message );
 			
-		} catch (Exception e) {
-			//TODO logger
-			throw new IllegalStateException(e.getMessage());
+		} catch (Exception e) {			
+			logger.error(e);
+			throw new IllegalStateException(e);
 		}
 	}
 }

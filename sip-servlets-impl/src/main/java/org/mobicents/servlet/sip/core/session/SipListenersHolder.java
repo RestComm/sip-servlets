@@ -41,7 +41,8 @@ public class SipListenersHolder {
 	private List<SipServletListener> sipServletsListeners;
 	private List<SipErrorListener> sipErrorListeners;
 	private List<ServletContextListener> servletContextListeners;
-	private List<TimerListener> timerListeners;	
+	// There may be at most one TimerListener defined.
+	private TimerListener timerListener;	
 
 	/**
 	 * Default Constructor
@@ -56,8 +57,7 @@ public class SipListenersHolder {
 		this.sipSessionListeners = new ArrayList<SipSessionListener>();
 		this.sipServletsListeners = new ArrayList<SipServletListener>();
 		this.sipErrorListeners = new ArrayList<SipErrorListener>();
-		this.servletContextListeners = new ArrayList<ServletContextListener>();
-		this.timerListeners = new ArrayList<TimerListener>();
+		this.servletContextListeners = new ArrayList<ServletContextListener>();		
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public class SipListenersHolder {
 		}
 
 		if (listener instanceof TimerListener) {
-			this.addListener((TimerListener) listener);
+			this.setTimerListener((TimerListener) listener);
 			added = true;
 		}
 
@@ -198,8 +198,13 @@ public class SipListenersHolder {
 		this.servletContextListeners.add(listener);
 	}
 
-	public void addListener(TimerListener listener) {
-		this.timerListeners.add(listener);
+	public void setTimerListener(TimerListener listener) {
+		if(timerListener != null) {
+			throw new IllegalArgumentException(
+					"the time listener has already been set ("+timerListener.getClass().getName() +
+					"), There may be at most one TimerListener defined !");
+		}			 
+		this.timerListener = listener;
 	}
 
 	public List<SipApplicationSessionAttributeListener> getSipApplicationSessionAttributeListeners() {
@@ -242,8 +247,8 @@ public class SipListenersHolder {
 		return servletContextListeners;
 	}
 
-	public List<TimerListener> getTimerListeners() {
-		return timerListeners;
+	public TimerListener getTimerListener() {
+		return timerListener;
 	}
 
 	/**
@@ -263,7 +268,7 @@ public class SipListenersHolder {
 		this.sipServletsListeners.clear();
 		this.sipErrorListeners.clear();
 		this.servletContextListeners.clear();
-		this.timerListeners.clear();
+		this.timerListener = null;
 	}
 
 }

@@ -1,9 +1,9 @@
 package org.mobicents.servlet.sip.core.session;
 
-import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -16,23 +16,20 @@ import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.URI;
 
-import org.mobicents.servlet.sip.core.timers.ServletTimerImpl;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 
 public class SipApplicationSessionImpl implements SipApplicationSession {
 
 	private static long DEFAULT_LIFETIME = 1000*60*60;
 	
-	private SipListenersHolder listeners;
+//	private SipListenersHolder listeners;
 	
 	private Map<String, Object> sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 
 	private Map<String,SipSessionImpl> sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
-	
-	private String applicationName;
 	
 	private String id;
 	
@@ -45,27 +42,23 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	private Set<ServletTimer> servletTimers;
 	
 	private boolean valid;
+
+	/**
+	 * The first sip application for subsequent requests.
+	 */
+	private SipContext sipContext;
 	
-	private TimerListener agregatingListener;
-	private ArrayList<ServletTimer> runningTimers;
+//	private TimerListener agregatingListener;
+//	private ArrayList<ServletTimer> runningTimers;	
 	
 	/**
 	 * Passed as info object into Servelt timer that ticks for this sip app
 	 * session as expiration timer
 	 */
-	private Serializable endObject;
-	private ServletTimerImpl expirationTimer;
-	
-	/**
-	 * Lock for this application session
-	 */
-	private Object _APP_LOCK=new Object();
+//	private Serializable endObject;		
 	
 	public SipApplicationSessionImpl() {
-		this.id = UUID.randomUUID().toString();
-		lastAccessTime = creationTime = System.currentTimeMillis();
-		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
-		valid = true;
+		this(UUID.randomUUID().toString());		
 	}
 	
 	public SipApplicationSessionImpl(String id ) {
@@ -73,6 +66,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
 		valid = true;
+		servletTimers = Collections.synchronizedSet(new HashSet<ServletTimer>());
 	}
 	
 	public void addSipSession( SipSessionImpl sipSessionImpl) {
@@ -80,7 +74,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		sipSessionImpl.setApplicationSession(this);
 	}
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#encodeURI(javax.servlet.sip.URI)
+	 */
 	public void encodeURI(URI uri) {
 		uri.setParameter("org.mobicents.servlet.sip.ApplicationSessionKey", getId());
 	}
@@ -115,49 +112,108 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getAttribute(java.lang.String)
+	 */
 	public Object getAttribute(String name) {
 		return this.sipApplicationSessionAttributeMap.get(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getAttributeNames()
+	 */
 	public Iterator<String> getAttributeNames() {
 		return this.sipApplicationSessionAttributeMap.keySet().iterator();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getCreationTime()
+	 */
 	public long getCreationTime() {
 		return creationTime;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getExpirationTime()
+	 */
 	public long getExpirationTime() {
 		return expirationTime;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getId()
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getLastAccessedTime()
+	 */
 	public long getLastAccessedTime() {
 		return lastAccessTime;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getSessions()
+	 */
 	public Iterator<?> getSessions() {
 		return sipSessions.entrySet().iterator();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getSessions(java.lang.String)
+	 */
 	public Iterator<?> getSessions(String protocol) {
-		if(protocol.equals("SIP"))
+		if("SIP".equalsIgnoreCase(protocol))
 			return sipSessions.values().iterator();
 		else 
 			return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getSipSession(java.lang.String)
+	 */
 	public SipSession getSipSession(String id) {
 		return sipSessions.get(id);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getTimers()
+	 */
 	public Collection<ServletTimer> getTimers() {
 		return servletTimers;
 	}
 
+	/**
+	 * Add a servlet timer to this application session
+	 * @param servletTimer the servlet timer to add
+	 */
+	public void addServletTimer(ServletTimer servletTimer){
+		servletTimers.add(servletTimer);
+	}
+	/**
+	 * Remove a servlet timer from this application session
+	 * @param servletTimer the servlet timer to remove
+	 */
+	public void removeServletTimer(ServletTimer servletTimer){
+		servletTimers.remove(servletTimer);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#invalidate()
+	 */
 	public void invalidate() {
 		for(SipSessionImpl session: sipSessions.values())
 		{
@@ -169,10 +225,18 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		valid = false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#isValid()
+	 */
 	public boolean isValid() {
 		return valid;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#removeAttribute(java.lang.String)
+	 */
 	public void removeAttribute(String name) {
 
 		if (!isValid())
@@ -186,14 +250,13 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 
 		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
 				this, name);
-
-		for (SipApplicationSessionBindingListener l : this.listeners
+		SipListenersHolder listeners = sipContext.getListeners();
+		for (SipApplicationSessionBindingListener l : listeners
 				.getSipApplicationSessionBindingListeners()) {
 			l.valueUnbound(event);
-
 		}
 
-		for (SipApplicationSessionAttributeListener l : this.listeners
+		for (SipApplicationSessionAttributeListener l : listeners
 				.getSipApplicationSessionAttributeListeners()) {
 			l.attributeRemoved(event);
 		}
@@ -201,6 +264,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		this.sipApplicationSessionAttributeMap.remove(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#setAttribute(java.lang.String, java.lang.Object)
+	 */
 	public void setAttribute(String key, Object attribute) {
 
 		if (!isValid())
@@ -216,23 +283,23 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 
 		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
 				this, key);
+		SipListenersHolder listeners = sipContext.getListeners();
 		if (sipApplicationSessionAttributeMap.containsKey(key)) {
-			// This is initial, we need to send value bound event
-
-			for (SipApplicationSessionBindingListener l : this.listeners
+			// This is initial, we need to send value bound event						
+			for (SipApplicationSessionBindingListener l : listeners
 					.getSipApplicationSessionBindingListeners()) {
 				l.valueBound(event);
 
 			}
 
-			for (SipApplicationSessionAttributeListener l : this.listeners
+			for (SipApplicationSessionAttributeListener l : listeners
 					.getSipApplicationSessionAttributeListeners()) {
 				l.attributeAdded(event);
 			}
 
 		} else {
 
-			for (SipApplicationSessionAttributeListener l : this.listeners
+			for (SipApplicationSessionAttributeListener l : listeners
 					.getSipApplicationSessionAttributeListeners()) {
 				l.attributeReplaced(event);
 			}
@@ -242,7 +309,11 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		this.sipApplicationSessionAttributeMap.put(key, attribute);
 
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#setExpires(int)
+	 */
 	public int setExpires(int deltaMinutes) {
 		if(deltaMinutes == 0)
 			this.expirationTime = Long.MAX_VALUE;
@@ -251,46 +322,51 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return 0;
 	}
 
-	public SipListenersHolder getListeners() {
-		return listeners;
+//	public SipListenersHolder getListeners() {
+//		return listeners;
+//	}
+//
+//	public void setListeners(SipListenersHolder listeners) {
+//		this.listeners = listeners;
+//	}
+
+	public boolean hasTimerListener() {
+		return this.sipContext.getListeners().getTimerListener() != null;
+	}	
+
+	public SipContext getSipContext() {
+		return sipContext;
 	}
 
-	public void setListeners(SipListenersHolder listeners) {
-		this.listeners = listeners;
+	public void setSipContext(SipContext sipContext) {
+		this.sipContext = sipContext;
 	}
-
-	public boolean hasTimerListeners() {
-		return this.listeners.getTimerListeners().size() > 0;
-	}
-
-	public void timerCanceled(ServletTimer st) {
-	}
-
-	public TimerListener getAgregatingListener() {
-		return agregatingListener;
-	}
-
-	public void setAgregatingListener(TimerListener agregatingListener) {
-		this.agregatingListener = agregatingListener;
-	}
-
-	Serializable getEndObject() {
-		if (this.endObject == null)
-			this.endObject = new Serializable() {
-			};
-
-		return this.endObject;
-	}
+	
+//	public TimerListener getAgregatingListener() {
+//		return agregatingListener;
+//	}
+//
+//	public void setAgregatingListener(TimerListener agregatingListener) {
+//		this.agregatingListener = agregatingListener;
+//	}
+//
+//	Serializable getEndObject() {
+//		if (this.endObject == null)
+//			this.endObject = new Serializable() {
+//			};
+//
+//		return this.endObject;
+//	}
 	
 	void expirationTimerFired()
 	{
 		
 	}
 	
-	public void timerScheduled(ServletTimerImpl st) {
-		
-		this.runningTimers.add(st);
-
-	}
+//	public void timerScheduled(ServletTimerImpl st) {
+//		
+//		this.runningTimers.add(st);
+//
+//	}
 
 }
