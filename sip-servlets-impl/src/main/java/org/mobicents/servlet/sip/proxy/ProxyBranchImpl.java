@@ -73,6 +73,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	public void cancel() {		
 		try
 		{			
+			cancelTimer();
 			if(this.isStarted() && !canceled && !timedOut &&
 				outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
 					outgoingRequest.createCancel().send();
@@ -223,6 +224,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 				null,
 				null, null, false);
 		
+		if(subsequent) clonedRequest.setRoutingState(RoutingState.SUBSEQUENT);
+		
 		this.outgoingRequest = clonedRequest;
 		
 		// Initialize the sip session for the new request if initial
@@ -238,7 +241,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		//JSR 289 Section 15.1.6
 		if(!subsequent) // Subsequent requests can't have a routing directive?
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
-		
+		clonedRequest.getTransactionApplicationData().setProxyBranch(this);
 		clonedRequest.send();
 	}
 	
@@ -275,6 +278,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 			return;
 		}
 		
+		// Non-provisional responses must also cancel the timer, otherwise it will timeout
+		// and return multiple responses for a single transaction.
+		cancelTimer();
+		
 		if(response.getStatus() >= 600) // Cancel all 10.2.4
 			this.proxy.cancelAllExcept(this);
 		
@@ -282,7 +289,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		if(response.getStatus() >= 200)
 		{
-			if(response.getRequest() != null && response.getRequest().isInitial()) {
+			if(outgoingRequest != null && outgoingRequest.isInitial()) {
 				this.proxy.onFinalResponse(this);
 			} else {
 				this.proxy.sendFinalResponse(response, this);
@@ -376,6 +383,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 			proxyBranchTimer.purge();
 			proxyBranchTimer = null;
 		}
+	}
+
+	public boolean isCanceled() {
+		return canceled;
 	}
 
 }

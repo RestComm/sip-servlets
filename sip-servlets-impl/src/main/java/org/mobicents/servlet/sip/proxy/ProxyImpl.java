@@ -349,7 +349,18 @@ public class ProxyImpl implements Proxy {
 	
 	public void onBranchTimeOut(ProxyBranchImpl branch)
 	{
-		this.onFinalResponse(branch);
+		if(this.bestBranch == null) this.bestBranch = branch;
+		if(allResponsesHaveArrived())
+		{
+			sendFinalResponse(bestResponse, bestBranch);
+		}
+		else
+		{
+			if(!parallel)
+			{
+				startNextUntriedBranch();
+			}
+		}
 	}
 	
 	// In sequential proxying get some untried branch and start it, then wait for response and repeat
@@ -380,7 +391,7 @@ public class ProxyImpl implements Proxy {
 			// The unstarted branches still haven't got a chance to get response
 			if(!pbi.isStarted()) return false;
 			
-			if(pbi.isStarted() && !pbi.isTimedOut())
+			if(pbi.isStarted() && !pbi.isTimedOut() && !pbi.isCanceled())
 			{
 				if(    response == null 			// if there is no response yet
 					|| response.getStatus() < 200) 	// or if the response if not final

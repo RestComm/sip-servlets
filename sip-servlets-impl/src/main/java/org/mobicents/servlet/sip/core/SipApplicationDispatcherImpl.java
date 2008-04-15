@@ -1306,7 +1306,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			try {
 				session.setHandler(handlerName);
 				// See if this is a response to a proxied request
-				ProxyBranchImpl proxyBranch = session.getProxyBranch();
+				TransactionApplicationData applicationData = (TransactionApplicationData)
+					responseEvent.getClientTransaction().getApplicationData();
+				// We can not use session.getProxyBranch() because all branches belong to the same session
+				// and the session.proxyBranch is overwritten each time there is activity on the branch.
+				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
 				if(proxyBranch != null) {
 					// Handle it at the branch
 					proxyBranch.onResponse(sipServletResponse); 
