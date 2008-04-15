@@ -25,9 +25,10 @@ public class SessionManager {
 		.getLog(SessionManager.class);
 	
 	/**
-	 * Tries to extract the session from the application data in the request.
-	 * If not app data is assigned a new session is created and is associated
-	 * with the dialog.
+	 * Tries to extract the session from the application data in the dialog or
+	 * the transaction. If no app data is assigned a new session is created and
+	 * is associated with the dialog or the transaction (depending on the request
+	 * type).
 	 * 
 	 * @param requestEvent a JAIN SIP request event
 	 * @return
