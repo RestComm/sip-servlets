@@ -190,9 +190,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		//and call load on startup which is equivalent to
 		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
 		super.start();	
-						
-		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
-		//called implicitly within sipApplicationDispatcher.addSipApplication
+								
 		if(getAvailable()) {
 			// Replace the default annotation processor. This is needed to handle resource injection
 			// for SipFactory, Session utils and other objects residing in the servlet context space.
@@ -223,6 +221,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				((SipStandardManager)getManager()).setSipFactoryImpl(
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
 			}
+			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
+			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
 			logger.info("sip context started");
 		} else {

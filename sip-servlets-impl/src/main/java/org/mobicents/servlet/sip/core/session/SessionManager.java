@@ -13,6 +13,7 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;

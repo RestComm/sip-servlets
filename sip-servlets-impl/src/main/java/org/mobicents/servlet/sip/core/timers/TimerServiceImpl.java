@@ -27,13 +27,12 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 
 
-
-public class TimerServiceImpl implements TimerService {
+public class TimerServiceImpl implements TimerService, Serializable {
 	
-	private static Log logger = LogFactory.getLog(TimerServiceImpl.class
+	private transient static Log logger = LogFactory.getLog(TimerServiceImpl.class
 			.getName());
 	
-	private ExecutorServiceWrapper eService = ExecutorServiceWrapper.getInstance();
+	private transient ExecutorServiceWrapper eService = ExecutorServiceWrapper.getInstance();
 	
 	private static final TimerServiceImpl instance = new TimerServiceImpl();
 	

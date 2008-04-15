@@ -13,6 +13,7 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.io.Serializable;
 import java.text.ParseException;
 
 import javax.servlet.sip.SipApplicationSession;
@@ -25,10 +26,10 @@ import org.apache.commons.logging.LogFactory;
  * @author Jean Deruelle
  *
  */
-public class SipSessionsUtilImpl implements SipSessionsUtil {
+public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	private static transient Log logger = LogFactory.getLog(SipSessionsUtilImpl.class);
 	
-	private SessionManager sessionManager;
+	private transient SessionManager sessionManager;
 	private String applicationName;
 
 	public SipSessionsUtilImpl(SessionManager sessionManager, String applicationName) {
