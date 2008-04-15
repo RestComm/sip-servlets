@@ -90,23 +90,23 @@ public class SipSecurityUtils {
 					String servletName = request.getSipSession().getHandler();
 					if(sipSecurity.findMethod(request.getMethod())
 							&& sipSecurity.findServletName(servletName)) {
-						
+						boolean constraintSatisfied = false;
 						// If yes, see if the current user is in a role compatible with the
 						// required roles for the resource.
 						if(authenticate(sipStandardContext, request, sipConstraint)) {
 							GenericPrincipal principal = (GenericPrincipal) request.getUserPrincipal();
 							if(principal == null) return false;
-							boolean constraintSatisfied = false;
+							
 							for(String assignedRole:constraint.findAuthRoles()) {
 								if(principal.hasRole(assignedRole)) {
 									constraintSatisfied = true;
 									break;
 								}
 							}
-							if(!constraintSatisfied) {
-								allConstrainsSatisfied = false;
-								log.error("Constraint \"" + constraint.getDisplayName() + "\" not satifsied");
-							}
+						}
+						if(!constraintSatisfied) {
+							allConstrainsSatisfied = false;
+							log.error("Constraint \"" + constraint.getDisplayName() + "\" not satifsied");
 						}
 					}
 				}

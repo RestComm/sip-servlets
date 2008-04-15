@@ -866,7 +866,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			addChallengeResponse(wwwAuthHeader,
 					authInfoEntry.getUserName(),
 					authInfoEntry.getPassword(),
-					uri);
+					this.getRequestURI().toString());
 		}
 		
 		// Now check for Proxy-Authentication
