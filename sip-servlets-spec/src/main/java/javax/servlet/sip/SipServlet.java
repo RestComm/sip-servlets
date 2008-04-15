@@ -101,7 +101,7 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
      */
     protected void doMessage(javax.servlet.sip.SipServletRequest req) throws javax.servlet.ServletException, java.io.IOException{
     	if (req.isInitial())
-			notHandled(req);
+			notImplemented(req);
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
      */
     protected void doNotify(javax.servlet.sip.SipServletRequest req) throws javax.servlet.ServletException, java.io.IOException{
     	if (req.isInitial())
-			notHandled(req);
+			notImplemented(req);
     }
 
     /**
@@ -145,7 +145,7 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
      */
     protected void doPublish(javax.servlet.sip.SipServletRequest req) throws javax.servlet.ServletException, java.io.IOException{
     	if (req.isInitial())
-			notHandled(req);
+			notImplemented(req);
     }
 
     /**
@@ -229,7 +229,7 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
      */
     protected void doSubscribe(javax.servlet.sip.SipServletRequest req) throws javax.servlet.ServletException, java.io.IOException{
     	if (req.isInitial())
-			notHandled(req);
+			notImplemented(req);
     }
 
     /**
@@ -282,6 +282,17 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
     private void notHandled(SipServletRequest req) throws IOException {
 		SipServletResponse resp = req.createResponse(500,
 				"Request not handled by app");
+		resp.send();
+	}
+    
+    /**
+     * 
+     * @param req
+     * @throws IOException
+     */
+    private void notImplemented(SipServletRequest req) throws IOException {
+		SipServletResponse resp = req.createResponse(501,
+				"Request not implemented");
 		resp.send();
 	}
 }
