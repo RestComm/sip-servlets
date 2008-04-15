@@ -75,6 +75,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -87,11 +88,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected Message message;
 	protected SipProvider provider;
-	protected SipSession session;
+	protected SipSessionImpl session;
 	protected static SipFactoryImpl sipFactory = SipFactoryImpl.getInstance();
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
-	private Dialog  dialog;
 	private Transaction transaction;
+	protected TransactionApplicationData transactionApplicationData;
+	
+	private SipApplicationSessionImpl applicationSession;
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
@@ -193,10 +196,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected SipServletMessageImpl ( Message message, SipProvider provider, Transaction transaction, SipSession sipSession, Dialog dialog) {
 		if ( provider == null )throw new NullPointerException("Null providerr");
 		if ( message == null ) throw new NullPointerException("Null message");
+		if ( sipSession == null ) throw new NullPointerException("Null session");
 		this.provider = provider;
 		this.message = message;
 		this.transaction = transaction;
-		this.session = sipSession;
+		this.session = (SipSessionImpl) sipSession;
+		this.transactionApplicationData = new TransactionApplicationData(session);
+		if ( transaction != null ) transaction.setApplicationData(transactionApplicationData);
 		
 	}
 	public void addAcceptLanguage(Locale locale) {
@@ -375,12 +381,17 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public SipApplicationSession getApplicationSession() {
-		return this.session.getApplicationSession();
+		return this.applicationSession;
 	}
 
 	public SipApplicationSession getApplicationSession(boolean create) {
-		if (this.session.getApplicationSession() == null && create) {
+		if ( this.applicationSession != null ) return this.applicationSession;
+		else if (this.session != null && this.session.getApplicationSession() != null ) {
+			return this.session.getApplicationSession();
+		} else {
 			SipApplicationSessionImpl applSession = new SipApplicationSessionImpl();
+			this.applicationSession = applSession;
+			this.applicationSession.addSipSession(this.session);
 
 		}
 		return null;
@@ -508,8 +519,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public String getRemoteUser() {
-		// TODO Auto-generated method stub
-		return null;
+		if ( this.transaction != null && this.transaction.getDialog() != null &&
+			(javax.sip.address.SipURI)this.transaction.getDialog().getRemoteParty() != null ) {
+			
+			 javax.sip.address.SipURI sipUri = 	(javax.sip.address.SipURI)(this.transaction.getDialog().getRemoteParty().getURI());
+			 return sipUri.getUser();
+		} else return null;
 	}
 
 	public SipSession getSession() {
@@ -517,13 +532,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public SipSession getSession(boolean create) {
-		// TODO Auto-generated method stub
-		return null;
+		if ( this.session == null && create)
+			this.session = new SipSessionImpl( provider, (SipApplicationSessionImpl)this.getApplicationSession());
+		return this.session;
 	}
 
 	public Address getTo() {
-		// TODO Auto-generated method stub
-		return null;
+		return new AddressImpl( ((ToHeader) this.message.getHeader(ToHeader.NAME)).getAddress());
 	}
 
 	public String getTransport() {
@@ -714,9 +729,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	
 
-	public void setSession(SipSession sipSession) {
-		this.session = sipSession;
-	}
+	
 	
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
@@ -730,14 +743,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return this.message.toString();
 	}
 	
-	public void setTransactionApplicationData(Object applicationData)
+	protected void setTransactionApplicationData(TransactionApplicationData applicationData)
 	{
-		this.transaction.setApplicationData(applicationData);
+		this.transactionApplicationData  = applicationData;
 	}
 	
-	public Object getTrasactionApplicationData()
+	public TransactionApplicationData getTrasactionApplicationData()
 	{
-		return this.transaction.getApplicationData();
+		return this.transactionApplicationData;
 	}
 	
 	public Message getMessage() {
@@ -745,14 +758,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 	
 	public Dialog getDialog() {
-		return dialog;
+		return this.transaction.getDialog();
 	}
-	/**
-	 * @param dialog the dialog to set
-	 */
-	public void setDialog(Dialog dialog) {
-		this.dialog = dialog;
-	}
+	
 	/**
 	 * @param transaction the transaction to set
 	 */

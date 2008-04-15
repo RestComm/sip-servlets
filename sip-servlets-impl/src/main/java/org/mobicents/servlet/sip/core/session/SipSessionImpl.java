@@ -136,23 +136,18 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private SipProvider provider;
 	
-	public SipSessionImpl (SipProvider provider, Dialog dialog, Transaction transaction, SipApplicationSessionImpl sipApp) {
+	public SipSessionImpl (SipProvider provider,  SipApplicationSessionImpl sipApp) {
 		this.provider = provider;
-		this.sessionCreatingDialog = dialog;
-		this.sessionCreatingTransaction = transaction;
-		this.ongoingTransactions.add(transaction);
 		this.sipApplicationSession = sipApp;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
 		this.uuid = UUID.randomUUID();
 		this.state = State.INITIAL;
 		this.valid = true;
 		this.supervisedMode = true;
-		if ( dialog != null) {
-			dialog.setApplicationData(this);
-		} else {
-			transaction.setApplicationData(this);
-		}
+		if ( sipApp != null) sipApp.addSipSession(this);
 	}
+	
+	
 	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
 		return sipSessionAttributeListeners;
@@ -419,6 +414,7 @@ public class SipSessionImpl implements SipSession {
 
 	public void setSessionCreatingTransaction(Transaction initialTransaction) {
 		this.sessionCreatingTransaction = initialTransaction;
+		this.ongoingTransactions.add(initialTransaction);
 	}
 
 	public boolean isSupervisedMode() {
@@ -468,4 +464,8 @@ public class SipSessionImpl implements SipSession {
 	public void setState(State state) {
 		this.state = state;
 	}
+
+
+
+	
 }

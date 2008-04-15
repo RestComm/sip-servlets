@@ -16,6 +16,8 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.SipProvider;
 
+import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -25,7 +27,8 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  *
  */
 public class ProxyImpl implements Proxy {
-
+	
+	
 	private SipServletRequestImpl originalRequest;
 	private boolean recurse;
 	private int proxyTimeout;
@@ -38,6 +41,7 @@ public class ProxyImpl implements Proxy {
 	private SipURI recordRouteURI;
 	private SipURI outboundInterface;
 	private SipProvider provider;
+	private int proxyId;
 	
 	private Map<URI, ProxyBranch> proxyBranches;
 	
@@ -65,7 +69,7 @@ public class ProxyImpl implements Proxy {
 		ArrayList<ProxyBranch> list = new ArrayList<ProxyBranch>();
 		for(URI target: targets)
 		{
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, provider);
+			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, provider, this.recordRouteURI);
 			list.add(branch);
 		}
 		return list;
@@ -168,7 +172,7 @@ public class ProxyImpl implements Proxy {
 	public void proxyTo(List<? extends URI> uris) {
 		for (URI uri : uris)
 		{
-			ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, provider);
+			ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, provider, this.recordRouteURI);
 			this.proxyBranches.put(uri, pbi);
 			pbi.start();
 		}
@@ -180,7 +184,7 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void proxyTo(URI uri) {
 		
-		ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, provider);
+		ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, provider, this.recordRouteURI);
 		this.proxyBranches.put(uri, pbi);
 		pbi.start();
 
@@ -222,6 +226,8 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#setRecordRoute(boolean)
 	 */
 	public void setRecordRoute(boolean rr) {
+		
+		this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( this.provider));
 		this.recordRoutingEnabled = rr;
 
 	}

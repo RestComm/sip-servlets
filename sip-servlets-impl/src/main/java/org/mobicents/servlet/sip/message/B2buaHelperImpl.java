@@ -86,21 +86,18 @@ public class B2buaHelperImpl implements B2buaHelper {
 					newRequest.addHeader(header);
 				}
 			}
-			ClientTransaction ctx = provider
-					.getNewClientTransaction(newRequest);
-			Dialog dialog = null;
-			dialog = provider.getNewDialog(ctx);
-
+			
 			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
 					.getApplicationData();
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();
 
-			SipSessionImpl session = new SipSessionImpl(provider, dialog,
-					(SIPTransaction) ctx, appSession);
+			SipSessionImpl session = new SipSessionImpl(provider, appSession);
 
-			SipServletRequestImpl retVal = new SipServletRequestImpl(provider,
-					session, ctx, dialog);
+			SipServletRequestImpl retVal = new SipServletRequestImpl(
+					newRequest,
+					provider,
+					session, null, null, true);
 
 			if (linked) {
 				sessionMap.put(originalSession, session);
@@ -138,14 +135,12 @@ public class B2buaHelperImpl implements B2buaHelper {
 					newRequest.addHeader(header);
 				}
 			}
-			ClientTransaction ctx = provider
-					.getNewClientTransaction(newRequest);
-
+			
 			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
 					.getApplicationData();
 
-			SipServletRequest retVal = new SipServletRequestImpl(provider,
-					session, ctx, dialog);
+			SipServletRequest retVal = new SipServletRequestImpl(newRequest,provider,
+					session, null, null, true);
 
 			sessionMap.put(originalSession, sessionImpl);
 			sessionMap.put(sessionImpl, originalSession);

@@ -32,7 +32,7 @@ public class ProxyUtils {
 		this.proxyBranch = proxyBranch;
 	}
 	
-	public SipServletRequestImpl createProxiedRequest(SipServletRequestImpl originalRequest, ProxyParams params)
+	public SipServletRequestImpl createProxiedRequest(SipServletRequestImpl originalRequest, ProxyBranchImpl proxyBranch, ProxyParams params)
 	{// String user, String host, String stackIP, String transport, int port, int stackPort){
 		try {
 			Request clonedRequest = (Request) originalRequest.getMessage().clone();
@@ -81,7 +81,7 @@ public class ProxyUtils {
 			} else {
 
 				viaHeader = SipFactories.headerFactory.createViaHeader(stackIPAddress,
-						lp.getPort(), lp.getTransport(), generateBranchId());
+						lp.getPort(), lp.getTransport(), null);
 			}
 
 			if (viaHeader != null) {
@@ -101,8 +101,6 @@ public class ProxyUtils {
 				RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
 				.createRecordRouteHeader(rraddress);
 
-				// lr parameter to add:
-				recordRouteHeader.setParameter("lr", null);
 				ListIterator recordRouteHeaders = clonedRequest
 				.getHeaders(RecordRouteHeader.NAME);
 				clonedRequest.removeHeader(RecordRouteHeader.NAME);
@@ -121,10 +119,13 @@ public class ProxyUtils {
 				}
 			}
 
-			Transaction clientTransaction = provider.getNewClientTransaction(clonedRequest);
-			SipServletRequestImpl ret = new	SipServletRequestImpl(provider,
+			SipServletRequestImpl ret = new	SipServletRequestImpl(
+					clonedRequest,
+					provider,
 					originalRequest.getSession(),
-					clientTransaction, originalRequest.getDialog());
+					null, null,false);
+			
+			ret.getTrasactionApplicationData().setProxyBranch(proxyBranch);
 
 			return ret;
 		} catch (Exception e) {

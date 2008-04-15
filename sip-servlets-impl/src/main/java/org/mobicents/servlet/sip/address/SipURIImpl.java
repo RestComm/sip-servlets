@@ -212,8 +212,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 
 	@Override
 	public Object clone() {
-		// TODO Auto-generated method stub
-		return null;
+		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone());
 	}
 
 }

@@ -60,7 +60,7 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 
 	}
 	
-	private javax.sip.address.Address getAddress() {
+	public javax.sip.address.Address getAddress() {
 		return address;
 	}
 	

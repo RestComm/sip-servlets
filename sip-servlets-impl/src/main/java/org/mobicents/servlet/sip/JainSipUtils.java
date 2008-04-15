@@ -6,6 +6,7 @@ import java.text.ParseException;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ViaHeader;
 
@@ -54,4 +55,16 @@ public class JainSipUtils {
 				throw new RuntimeException ("Unexpected error",ex);
 			}
 		}
+
+	public static javax.sip.address.SipURI createRecordRouteURI(SipProvider provider) {
+		try {
+			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, provider.getListeningPoint("udp").getIPAddress());
+			// Do we want to add an ID here?
+			return sipUri;
+		} catch ( Exception ex) {
+			logger.fatal("Unexpected error", ex);
+			throw new RuntimeException("Container error", ex);
+		}
+	
+	}
 }

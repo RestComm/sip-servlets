@@ -180,10 +180,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		SipServletRequestImpl sipServletRequest = null;		
 		try {			
 			sipServletRequest = new SipServletRequestImpl(
+					request,
 					(SipProvider) requestEvent.getSource(),
 					session,
 					transaction,
-					session.getSessionCreatingDialog());
+					session.getSessionCreatingDialog(),true);
 		}
 		catch(Exception e) {
 			throw new RuntimeException("Failure getting the transaction for current request", e);
@@ -275,7 +276,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// follow the procedures of Chapter 16 to select a servlet from the application.			
 				SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
 				session.setSipContext(sipContext);
-				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSipSession()).getHandler();						
+				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSession()).getHandler();						
 				if(sipSessionHandlerName == null) {
 					String mainServlet = sipContext.getMainServlet();
 					sipSessionHandlerName = mainServlet;					

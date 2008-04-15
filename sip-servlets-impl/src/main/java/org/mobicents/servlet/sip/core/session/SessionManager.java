@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 
 public class SessionManager {
 	private Map<String, SipApplicationSessionImpl> appSessions = new HashMap<String, SipApplicationSessionImpl>();
@@ -56,49 +57,19 @@ public class SessionManager {
 	 */
 	public SipSessionImpl getRequestSession(RequestEvent requestEvent,
 			Transaction transaction) {
-		SipProvider sp = (SipProvider) requestEvent.getSource();
-		Request request = (Request) requestEvent.getRequest();
-
-		SipSessionImpl session = null;
 		
-		// TODO -- deal with the other Dialog creating requests.
-		
-		
-		if ( request.getMethod().equals(Request.INVITE)) {
-			
-			if ( transaction.getDialog() == null ) {
-				Dialog dialog;
-				try {
-					dialog = sp.getNewDialog(transaction);
-				} catch (SipException ex ) {
-					logger.error("Unexpected sip exception" , ex);
-					throw new IllegalStateException("Unexpected exception", ex);
-				}
-				session = new SipSessionImpl(sp,dialog, transaction, null);
-				
-			} else {
-				session = (SipSessionImpl) transaction.getDialog().getApplicationData();
-				
-			}
-			
-			
-		} else {
-			
-			if ( transaction.getDialog() != null ) {
-				session = (SipSessionImpl) transaction.getDialog().getApplicationData();
-			} else {
-				session = new SipSessionImpl(sp,null, transaction, null);
-			}
-		}
-
-		return session;
 		/*
 		 * Vlad -- you can remove this if no longer relevant.
-		 * try {
+		 * 
+		 */
+		Request request = requestEvent.getRequest();
+		SipSessionImpl session = null;
+		SipProvider provider = (SipProvider) requestEvent.getSource();
+		try {
 			String initialSessionId = getInitialSessionId(request); // without
 																	// to-tag
 			
-			 with  to-tag  (null if  there is  no  to-tag) 
+			 //with  to-tag  (null if  there is  no  to-tag) 
 			String ackSessionId = getAcknoledgedSessionId(request); 
 		
 		
@@ -111,8 +82,7 @@ public class SessionManager {
 					session = sipSessions.get(initialSessionId);
 					logger.info("Found initial session " + initialSessionId);
 				} else {
-					Dialog dialog = sp.getNewDialog(transaction);
-					session = new SipSessionImpl(dialog, transaction, null);
+					session = new SipSessionImpl(provider, null);
 					sipSessions.put(initialSessionId, session);
 					logger.info("Created initial session " + initialSessionId);
 				}
@@ -124,11 +94,7 @@ public class SessionManager {
 					synchronized (lock) {
 						sipSessions.put(ackSessionId, sipSessions
 								.get(initialSessionId));
-						sipSessions.remove(initialSessionId); // @mranga --
-																// this is OK to
-																// remove.
-						// Commented out in case we receive multiple responses,
-						// will leak for now.
+						sipSessions.remove(initialSessionId); 
 					}
 					logger
 							.info("Got rid of the initial session, subsequent requests will have the to tag.");
@@ -140,7 +106,8 @@ public class SessionManager {
 		} catch (Exception ex) {
 			logger.info(ex.getMessage());
 			throw new RuntimeException("Error associating session!", ex);
-		}*/
+		}
+		return session;
 
 	}
 
