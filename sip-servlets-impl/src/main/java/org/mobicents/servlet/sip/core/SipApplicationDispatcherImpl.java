@@ -1508,6 +1508,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
 		SipStandardContext sipStandardContext = (SipStandardContext) appSession.getSipContext();
 		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
+		
+		// This will propagate the identity for the thread and all called components
+		// TODO: FIXME: This would introduce a dependency on JBoss
+		// SecurityAssociation.setPrincipal(request.getUserPrincipal());
+		
 		return authorized;
 	}
 	

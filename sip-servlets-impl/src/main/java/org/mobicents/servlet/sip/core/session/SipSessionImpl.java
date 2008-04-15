@@ -14,6 +14,7 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
+import java.security.Principal;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -92,6 +93,8 @@ public class SipSessionImpl implements SipSession {
 	private Map<String, Object> sipSessionAttributeMap;
 	
 	private SipSessionKey key;
+	
+	private Principal userPrincipal;
 	
 	/**
 	 * Creation time.
@@ -876,5 +879,13 @@ public class SipSessionImpl implements SipSession {
                 }
             }
 		}
-    }	    
+    }
+    
+	public Principal getUserPrincipal() {
+		return userPrincipal;
+	}
+	
+	public void setUserPrincipal(Principal userPrincipal) {
+		this.userPrincipal = userPrincipal;
+	}	    
 }

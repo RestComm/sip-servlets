@@ -966,6 +966,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getUserPrincipal()
 	 */
 	public Principal getUserPrincipal() {
+		if(this.userPrincipal == null) {
+			if(this.getSipSession() != null) {
+				this.userPrincipal = this.getSipSession().getUserPrincipal();
+			}
+		}
 		return this.userPrincipal;
 	}
 	

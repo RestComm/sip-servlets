@@ -16,6 +16,7 @@ import org.mobicents.servlet.sip.startup.loading.ResourceCollection;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityCollection;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
+import org.jboss.security.SecurityAssociation;
 
 public class SipSecurityUtils {
 	
@@ -37,7 +38,7 @@ public class SipSecurityUtils {
 						DigestAuthenticator auth = new DigestAuthenticator();
 						auth.setContext(sipStandardContext);
 						SipServletResponseImpl response = createErrorResponse(request, sipConstraint);
-						authenticated = auth.authenticate(request, (SipServletResponseImpl) response, loginConfig);
+						authenticated = auth.authenticate(request, (SipServletResponseImpl) response, loginConfig);		
 						request.setUserPrincipal(auth.getPrincipal());
 					} else if(authMethod.equalsIgnoreCase("BASIC")) {
 						throw new IllegalStateException("Basic authentication not supported in JSR 289");

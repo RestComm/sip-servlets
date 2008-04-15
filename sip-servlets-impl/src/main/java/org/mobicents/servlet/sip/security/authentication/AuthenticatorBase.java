@@ -53,6 +53,7 @@ import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
@@ -346,28 +347,11 @@ public abstract class AuthenticatorBase
             log.debug("Authenticated '" + name + "' with type '"
                 + authType + "'");
         }
-/*
-        // Cache the authentication information in our request
-        request.setAuthType(authType);
         request.setUserPrincipal(principal);
-
-        SipSession session = request.getSession(false);
-        // Cache the authentication information in our session, if any
-        if (cache) {
-            if (session != null) {
-                session.setAuthType(authType);
-                session.setPrincipal(principal);
-                if (username != null)
-                    session.setNote(Constants.SESS_USERNAME_NOTE, username);
-                else
-                    session.removeNote(Constants.SESS_USERNAME_NOTE);
-                if (password != null)
-                    session.setNote(Constants.SESS_PASSWORD_NOTE, password);
-                else
-                    session.removeNote(Constants.SESS_PASSWORD_NOTE);
-            }
+        SipSessionImpl session = request.getSipSession();
+        if(session != null) {
+        	session.setUserPrincipal(principal);
         }
-*/
     }
 
 
