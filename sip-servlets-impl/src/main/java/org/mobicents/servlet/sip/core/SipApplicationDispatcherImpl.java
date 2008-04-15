@@ -871,56 +871,33 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public void processResponse(ResponseEvent responseEvent) {
 		logger.info("Response " + responseEvent.getResponse().toString());
 		Response response = responseEvent.getResponse();
-//		SipProvider sipProvider = (SipProvider)responseEvent.getSource();
 		// See if this transaction has been here before		
 		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
 		Dialog dialog = responseEvent.getDialog();
-	
-		// FIXME TODO: Note by Vladimir: Responses are routed based on Via headers, not Record Route.
-		// Also, all responses related to a proxy must be sent directly there, it will take care of
-		// the proper routing. Will talk about it tomorow.
-		
-		// FIXME TODO : Note by Jean : remove the loops and send responses back statefully to the stack
-		//(clone response, add route header to route back, and new clientTx) 
-		Response clonedResponse = (Response) response.clone();
-		ListIterator<ViaHeader> viaHeaders = clonedResponse.getHeaders(ViaHeader.NAME);
+			
+		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
+		ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
 		boolean continueRouting = true;
-		while (viaHeaders.hasNext() && continueRouting) {
-			ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
-			if(!isViaHeaderExternal(viaHeader)) {
-				continueRouting = routeResponse(clonedResponse, viaHeader, clientTransaction, dialog);
-				clonedResponse.removeFirst(ViaHeader.NAME);
+		if(!isViaHeaderExternal(viaHeader)) {
+			continueRouting = routeResponse(response, viaHeader, clientTransaction, dialog);			
+		} 
+		// if continue routing is to true it means that
+		// a B2BUA got it so we don't have anything to do here 
+		// or an app that didn't do anything with it
+		// we have to strip the topmost via header and forward it statefully		
+		if (continueRouting) {			
+			Response newResponse = (Response) response.clone();
+			newResponse.removeFirst(ViaHeader.NAME);
+			ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
+			if(viaHeadersLeft.hasNext()) {
+				//TODO forward it statefully
+//				SipProvider sipProvider = (SipProvider)responseEvent.getSource();
 			} else {
-				//TODO forward response statefully
-//				Response newResponse = (Response) response.clone();
-				logger.error("viaHeader is external "+ viaHeader.toString());
-			}
+				//B2BUA case we don't have to do anything here
+				//no more via header B2BUA is the end point
+			}			
 		}
-//		RouteHeader routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
-//		Address address = null;
-//		if(! isRouteExternal(routeHeader)) {
-//			logger.info("routing response by route headers ");
-//			address = routeHeader.getAddress();
-//			response.removeFirst(RouteHeader.NAME);
-//			while(address != null) {
-//				routeResponse(response, address, clientTransaction, dialog);
-//				routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
-//				address = null;
-//				if(! isRouteExternal(routeHeader)) {			
-//					address = routeHeader.getAddress();
-//					response.removeFirst(RouteHeader.NAME);
-//				}
-//			}
-//		} else {
-//			logger.info("routing response by record route headers ");
-//			ListIterator<RecordRouteHeader> recordRouteHeaders = 
-//				response.getHeaders(RecordRouteHeader.NAME);
-//			while (recordRouteHeaders.hasNext()) {
-//				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
-//						.next();
-//				routeResponse(response, recordRouteHeader.getAddress(), clientTransaction, dialog);	
-//			}			
-//		}						
+								
 	}
 
 	/**
@@ -933,7 +910,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		logger.info("viaHeader = " + viaHeader.toString());
 		String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
 		String handlerName = viaHeader.getParameter(RR_PARAM_HANDLER_NAME);
-		SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, false);
+		boolean inverted = false;
+		if(dialog != null && dialog.isServer()) {
+			inverted = true;
+		}
+		SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, inverted);
 		SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl);									
 		// Transate the repsponse to SipServletResponse
 		SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
@@ -982,7 +963,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			return false;
 		}		
 			
-		return false;
+		return true;
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {
