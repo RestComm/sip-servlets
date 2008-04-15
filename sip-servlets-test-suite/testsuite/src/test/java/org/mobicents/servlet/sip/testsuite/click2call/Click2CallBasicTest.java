@@ -4,7 +4,6 @@ package org.mobicents.servlet.sip.testsuite.click2call;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.sip.ListeningPoint;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
@@ -14,10 +13,10 @@ import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
-import sun.net.www.URLConnection;
-
 public class Click2CallBasicTest extends SipServletTestCase{
 
+	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
+	
 	private static Log logger = LogFactory.getLog(Click2CallBasicTest.class);
 	
 	private SipStack[] sipStackReceivers;
@@ -67,7 +66,7 @@ public class Click2CallBasicTest extends SipServletTestCase{
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/click-to-call-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));		
+				"click2call-context", "/click2call"));		
 	}
 
 	@Override
@@ -122,10 +121,7 @@ public class Click2CallBasicTest extends SipServletTestCase{
 
 	public void testClickToCallNoConvergedSession() throws InterruptedException {
 		init();
-		try{
-			URL url = new URL("http://127.0.0.1:8080/sip-test/call?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057");
-			url.openConnection().connect();
-			
+		try{									
 			SipCall[] receiverCalls = new SipCall[receiversCount];
 			
 			receiverCalls[0] = sipPhoneReceivers[0].createSipCall();
@@ -133,6 +129,10 @@ public class Click2CallBasicTest extends SipServletTestCase{
 			
 			receiverCalls[0].listenForIncomingCall();
 			receiverCalls[1].listenForIncomingCall();
+			
+			logger.info("Trying to reach url : " + CLICK2DIAL_URL);
+			URL url = new URL(CLICK2DIAL_URL);
+			url.openConnection().connect();
 			
 			receiverCalls[0].waitForIncomingCall(timeout);
 			
