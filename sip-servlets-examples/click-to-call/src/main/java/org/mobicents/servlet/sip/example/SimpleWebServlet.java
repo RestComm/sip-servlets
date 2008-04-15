@@ -3,16 +3,21 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.sip.*;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SimpleWebServlet extends HttpServlet
 { 	
-
+	private static Log logger = LogFactory.getLog(SimpleWebServlet.class);
     /**
      * Handle the HTTP GET method by building a simple web page.
      */
@@ -38,6 +43,7 @@ public class SimpleWebServlet extends HttpServlet
         // Set some attribute
         req.getSession().setAttribute("SecondPartyAddress", sf.createAddress(fromAddr));
         
+        logger.info("Sending request" + req);
         // Send the INVITE request            
         req.send();
         
