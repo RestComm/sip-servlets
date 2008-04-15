@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.router.DefaultApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
@@ -178,7 +179,8 @@ public class SipEmbedded {
 		context.setName(name);
 		context.setPath(path);
 		context.setParent(host);
-		context.addLifecycleListener(new SipContextConfig());		 
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
 		host.addChild(context);
 		return context.getAvailable();			
 	}
