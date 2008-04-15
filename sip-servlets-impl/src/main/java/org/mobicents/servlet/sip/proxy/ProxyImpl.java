@@ -311,8 +311,8 @@ public class ProxyImpl implements Proxy {
 			// Recurse
 		}
 		
-		// Sort best do far
-		if(bestResponse.getStatus() > response.getStatus())
+		// Sort best do far		
+		if(bestResponse == null || bestResponse.getStatus() > response.getStatus())
 		{
 			bestResponse = response;
 			bestBranch = branch;
