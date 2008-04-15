@@ -15,7 +15,7 @@ import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
-public class B2BUATest extends SipServletTestCase {
+public class B2BUASipUnitTest extends SipServletTestCase {
 	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
 	SipStack sipStackA;
 	SipStack sipStackB;

@@ -19,24 +19,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class B2BUASipServlet extends SipServlet implements SipErrorListener,
-Servlet {
-	
+		Servlet {
+
 	private static Log logger = LogFactory.getLog(B2BUASipServlet.class);
-	
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-		logger.info("Got request:\n"
-				+ request.getMethod());		
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		logger.info("Got request:\n" + request.getMethod());
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);
 		B2buaHelper helper = request.getB2buaHelper();
-		SipServletRequest forkedRequest = helper.createRequest(request, true, null);
-		SipURI sipUri  = (SipURI)sipFactory.createURI("sip:aa@127.0.0.1:5050");
+		SipServletRequest forkedRequest = helper.createRequest(request, true,
+				null);
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@127.0.0.1:5059");
+		if (logger.isDebugEnabled()) {
+			logger.debug("forkedRequest = " + forkedRequest);
+
+		}
 		forkedRequest.setRequestURI(sipUri);
 		forkedRequest.send();
-		
+
 	}
+
 	/**
 	 * 
 	 * {@inheritDoc}
@@ -44,27 +49,26 @@ Servlet {
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-		
+
 		SipServletResponse response = request.createResponse(200);
 		response.send();
-	
+
 		SipSession session = request.getSession();
 		B2buaHelper helper = request.getB2buaHelper();
 		SipSession linkedSession = helper.getLinkedSession(session);
 		SipServletRequest newRequest = linkedSession.createRequest("BYE");
 		newRequest.send();
 
-	
 	}
 
 	public void noAckReceived(SipErrorEvent ee) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void noPrackReceived(SipErrorEvent ee) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
