@@ -37,23 +37,29 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the locationb service sip servlet has been started");
 		super.init(servletConfig);
-		registeredUsers = new HashMap<String, List<URI>>();		
+		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
+		registeredUsers = new HashMap<String, List<URI>>();
+		List<URI> uriList  = new ArrayList<URI>();
+		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:5090"));
+		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:6090"));
+		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
 	}
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
-		logger.info("Got request:\n" + request.getMethod());		
+		logger.info("Got request:\n" + request.toString());		
 		
 		List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
 		if(contactAddresses != null && contactAddresses.size() > 0) {			
 			Proxy proxy = request.getProxy();
 			proxy.setRecordRoute(false);
-			proxy.setParallel(false);
+			proxy.setParallel(true);
 			proxy.setSupervised(false);
 			proxy.proxyTo(contactAddresses);		
 		} else {
+			logger.info(request.getRequestURI().toString() + " is not currently registered");
 			SipServletResponse sipServletResponse = 
 				request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
 			sipServletResponse.send();

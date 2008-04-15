@@ -45,8 +45,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
-		logger.info("Got request:\n"
-				+ request.getMethod());
+		logger.info("Got request:\n" + request.toString());
 		logger.info(request.getRequestURI().toString());
 		
 		String dialNumber = ((SipURI)request.getRequestURI()).getUser();
@@ -57,6 +56,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 			proxy.setRecordRoute(false);
 			proxy.setParallel(false);
 			proxy.setSupervised(false);
+			logger.info("proxying to " + mappedUri);
 			proxy.proxyTo(sipFactory.createURI(mappedUri));				
 		} else {
 			SipServletResponse sipServletResponse = 
