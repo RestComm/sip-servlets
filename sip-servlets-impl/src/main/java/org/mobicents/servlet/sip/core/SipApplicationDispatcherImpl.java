@@ -99,11 +99,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * This parameter is to know which servlet handled the request 
 	 */
 	public static final String RR_PARAM_HANDLER_NAME = "Handler";
-	/* 
-	 * This parameter is to distinguish between the RecordRoute headers
-	 * added by the AR and those added by a proxy.
-	 */
-	public static final String RR_PARAM_APPLICATION_ROUTER_ROUTE = "ARRoute";
 	
 	private static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
@@ -393,7 +388,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		}
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
-		String applicationRouterRoute = poppedAddress.getParameter(RR_PARAM_APPLICATION_ROUTER_ROUTE);
 		if(applicationName == null || applicationName.length() < 1 || 
 				handlerName == null || handlerName.length() < 1) {
 			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
@@ -439,8 +433,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
 		try {
 			
-			// First check if this node is a Record-Route added by a proxy
-			if(applicationRouterRoute != null && sipServletRequest.getSipSession().getProxyBranch() != null)
+			// See if the response should go directly to the proxy
+			if(sipServletRequest.getSipSession().getProxyBranch() != null)
 			{
 				ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
 				if(proxyBranch.getProxy().getSupervised())
@@ -849,7 +843,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
 		Dialog dialog = responseEvent.getDialog();
 	
-		//FIXME 
+		// FIXME TODO: Note by Vladimir: Responses are routed based on Via headers, not Record Route.
+		// Also, all responses related to a proxy must be sent directly there, it will take care of
+		// the proper routing. Will talk about it tomorow.
+		
 		RouteHeader routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
 		Address address = null;
 		if(! isRouteExternal(routeHeader)) {

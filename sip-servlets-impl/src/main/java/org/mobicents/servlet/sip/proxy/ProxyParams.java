@@ -4,15 +4,15 @@ import javax.servlet.sip.SipURI;
 
 public class ProxyParams
 {
-	public ProxyParams(SipURI target, SipURI stack, SipURI routeRecord, SipURI path)
+	public ProxyParams(SipURI destination, SipURI outboundInterface, SipURI routeRecord, SipURI path)
 	{
-		this.target = target;
-		this.stack = stack;
+		this.destination = destination;
+		this.outboundInterface = outboundInterface;
 		this.routeRecord = routeRecord;
 		this.path = path;
 	}
-	public SipURI target;
-	public SipURI stack;
+	public SipURI destination;
+	public SipURI outboundInterface;
 	public SipURI routeRecord;
 	public SipURI path;// for REGISTER path header
 }

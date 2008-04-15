@@ -273,7 +273,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		try {			
 			//if this is a final response
 			if(response.getStatusCode() >= Response.OK && 
-					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {
+					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE && session.getProxyBranch() == null) {
 				javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipProviders(), 
 						JainSipUtils.findTransport((Request)originalRequest.getMessage()));

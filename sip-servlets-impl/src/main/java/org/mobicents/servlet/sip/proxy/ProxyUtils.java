@@ -28,7 +28,11 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
-
+/**
+ * TODO: Use outbound interface from ProxyParams.outboundInterface when adding local
+ * listening point addresses.
+ *
+ */
 public class ProxyUtils {
 	
 	private SipFactoryImpl sipFactoryImpl;
@@ -46,18 +50,18 @@ public class ProxyUtils {
 			Request clonedRequest = (Request) originalRequest.getMessage().clone();
 
 			// The target is null when proxying subsequent requests (the Route header is already there)
-			if(params.target != null)
+			if(params.destination != null)
 			{
 				javax.sip.address.SipURI target = SipFactories.addressFactory.createSipURI(
-					params.target.getUser(), params.target.getHost());
+					params.destination.getUser(), params.destination.getHost());
 				clonedRequest.setRequestURI(target);
 				
 				// Add route header
 				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
-						params.target.getUser(), params.target.getHost());
-				routeUri.setPort(params.target.getPort());
+						params.destination.getUser(), params.destination.getHost());
+				routeUri.setPort(params.destination.getPort());
 				routeUri.setLrParam();
-				javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.target.getUser(),
+				javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.destination.getUser(),
 						routeUri);
 				RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
 				
@@ -72,12 +76,6 @@ public class ProxyUtils {
 				if (clonedRequest.getMethod().equals(Request.CANCEL)) {
 					clonedRequest.removeHeader(ViaHeader.NAME);
 					clonedRequest.removeHeader(RecordRouteHeader.NAME);
-				} else {
-					clonedRequest.removeFirst(RouteHeader.NAME);
-					RouteHeader routeHeader = (RouteHeader) clonedRequest
-						.getHeader(RouteHeader.NAME);
-					if(routeHeader != null)
-						clonedRequest.setRequestURI(routeHeader.getAddress().getURI());
 				}
 			}
 
@@ -132,7 +130,8 @@ public class ProxyUtils {
 						originalRequest.getSipSession().getKey().getApplicationName());
 				rrURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
 						originalRequest.getSipSession().getHandler());
-
+				rrURI.setLrParam();
+				
 				Address rraddress = SipFactories.addressFactory
 				.createAddress(null, rrURI);
 				RecordRouteHeader recordRouteHeader = SipFactories.headerFactory

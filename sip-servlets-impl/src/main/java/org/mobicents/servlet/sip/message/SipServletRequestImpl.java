@@ -597,11 +597,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			//Added for dialog creating requests only not for subsequent requests 
 			if(SipFactoryImpl.dialogCreationMethods.contains(request.getMethod())) {
-				//Add a record route header for app composition		
-				addAppCompositionRRHeader();			
-				//add a route header to direct the request back to the container 
-				//to check if there is any other apps interested in it
-				addInfoForRoutingBackToContainer();
+				if(getSipSession().getProxyBranch() == null) // If the app is proxying it already does that
+				{
+					//Add a record route header for app composition		
+					addAppCompositionRRHeader();			
+					//add a route header to direct the request back to the container 
+					//to check if there is any other apps interested in it
+					addInfoForRoutingBackToContainer();
+				}
 			}
 			
 			if (super.getTransaction() == null) {
@@ -713,7 +716,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				JainSipUtils.findTransport(request));
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
-		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_ROUTER_ROUTE, "true");
 		
 		sipURI.setLrParam();
 		javax.sip.address.Address recordRouteAddress = 
