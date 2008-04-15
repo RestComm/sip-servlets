@@ -3,12 +3,14 @@ mvn clean compile war:war
 
 To deploy:
 Add a context entry in the tomcat's servler.xml like this:
-			<Context 
-			className="org.mobicents.servlet.sip.startup.SipStandardContext" 
-			configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
-			docBase="E:\sip-serv\sip-servlets-examples\click-to-call\target\click-to-call-servlet-1.0-SNAPSHOT" 
-			name="sip-test-context" 
-			path="/click2call"/>
+	<Context 
+	className="org.mobicents.servlet.sip.startup.SipStandardContext" 
+	configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
+	docBase="E:\sip-serv\sip-servlets-examples\click-to-call\target\click-to-call-servlet-1.0-SNAPSHOT" 
+	name="sip-test-context" 
+	path="/click2call">
+		<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+	</Context> 
 Note that path="/click2call" is important. 
 
 To use:
