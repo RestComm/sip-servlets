@@ -8,6 +8,6 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ClickToCall</servlet-name>
-        <url-pattern>/click</url-pattern>
+        <url-pattern>/call</url-pattern>
     </servlet-mapping>
 </web-app>
