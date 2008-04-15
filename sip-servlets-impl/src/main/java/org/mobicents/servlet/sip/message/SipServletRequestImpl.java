@@ -23,7 +23,6 @@ import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationRoutingDirective;
-import javax.servlet.sip.SipRouteModifier;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
