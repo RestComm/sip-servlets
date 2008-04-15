@@ -355,9 +355,25 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#isInitial()
 	 */
 	public boolean isInitial() {
+		
+		/** When initiating requests from a servlet (c2d for example)
+		 * the following requests would be recognized as initial since
+		 * there is no previous information in them and the session is
+		 * not available yet. This may be fixed is a cleaner way if the
+		 * decision initial/noninitial is made after the session mapping.
+		 * 
+		 * TODO: FIXME: MESSAGE requests can be both initial and noninitial
+		 * so they still may be misclassified.
+		 */
+		String method = this.getMethod();
+		if(method.equals(Request.BYE)) return false;
+		if(method.equals(Request.ACK)) return false;
+		if(method.equals(Request.CANCEL)) return false;
+		if(method.equals(Request.PRACK)) return false;
+		
 		return this.routingState.equals(RoutingState.INITIAL) || 
 			this.routingState.equals(RoutingState.PROXIED) ||
-			this.routingState.equals(RoutingState.RELAYED);
+			this.routingState.equals(RoutingState.RELAYED); 
 	}
 
 	public void pushPath(Address uri) {
