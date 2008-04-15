@@ -73,9 +73,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 	public void cancel() {
 		try
 		{
-			if(this.isStarted() && !canceled && !timedOut) {
-				outgoingRequest.createCancel().send();
-				canceled = true;
+			if(this.isStarted() && !canceled && !timedOut &&
+				outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+					outgoingRequest.createCancel().send();
+					canceled = true;
 			}
 		}
 		catch(Exception e)
@@ -151,8 +152,19 @@ public class ProxyBranchImpl implements ProxyBranch {
 
 	}
 	
+	/**
+	 * After the branch is initialized, this method proxies the initial request to the
+	 * specified destination. Subsequent requests are proxied through proxySubsequentRequest
+	 */
 	public void start()
 	{
+		if(started)
+			throw new IllegalStateException("Proxy branch alredy started!");
+		if(canceled)
+			throw new IllegalStateException("Proxy branch was cancelled, you must create a new branch!");
+		if(timedOut)
+			throw new IllegalStateException("Proxy brnach has timed out!");
+		
 		// Initialize these here for efficiency.
 		updateTimer();
 		
@@ -190,12 +202,14 @@ public class ProxyBranchImpl implements ProxyBranch {
 		}
 	}
 	
-	public void forwardRequest(Request request, boolean subsequent) 
+	/**
+	 * Forward the request to the specified destination. The method is used internally.
+	 * @param request
+	 * @param subsequent Set to false if the the method is initial
+	 */
+	private void forwardRequest(Request request, boolean subsequent) 
 	{
-//		String transport = JainSipUtils.findTransport(request);
-//		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-//				sipFactoryImpl.getSipProviders(), transport);
-//		ClientTransaction tx = sipProvider.getNewClientTransaction(request);
+
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating cloned Request for proxybranch " + request);
 		}
@@ -221,12 +235,15 @@ public class ProxyBranchImpl implements ProxyBranch {
 		if(!subsequent) // Subsequent requests can't have a routing directive?
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 		
-		//ret.getTransactionApplicationData().setProxyBranch(proxyBranch);
-//		tx.setApplicationData(clonedRequest.getTransactionApplicationData());
-		
 		clonedRequest.send();
+		clonedRequest.getTransactionApplicationData().setOriginalProxyRequest(clonedRequest);
 	}
 	
+	/**
+	 * A callback. Here we receive all responses from the proxied requests we have sent.
+	 * 
+	 * @param response
+	 */
 	public void onResponse(SipServletResponseImpl response)
 	{
 		lastResponse = response;
@@ -258,31 +275,34 @@ public class ProxyBranchImpl implements ProxyBranch {
 		if(response.getStatus() >= 600) // Cancel all 10.2.4
 			this.proxy.cancelAllExcept(this);
 		
-		// Bad final responses should send ACK
-		if(response.getStatus() >= 300)
-		{
-			// TODO: Send ACK to the callee
-			// ACTUALLY: This ACK is sent by the stack
-		}
-		
-
+		// FYI: ACK is sent automatically by jsip when needed
 		
 		if(response.getStatus() >= 200)
 		{
 			if(response.getRequest() != null && response.getRequest().isInitial()) {
 				this.proxy.onFinalResponse(this);
 			} else {
-				this.proxy.sendBestFinalResponse(response, this);
+				this.proxy.sendFinalResponse(response, this);
 			}
 		}
 		
 	}
 
+	/**
+	 * Has the branch timed out?
+	 * 
+	 * @return
+	 */
 	public boolean isTimedOut() {
 		return timedOut;
 	}
 	
-	public void proxyInDialogRequest(SipServletRequestImpl request)
+	/**
+	 * Call this method when a subsequent request must be proxied through the branch.
+	 * 
+	 * @param request
+	 */
+	public void proxySubsequentRequest(SipServletRequestImpl request)
 	{
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
@@ -312,6 +332,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 		}
 	}
 	
+	/**
+	 * This callback is called when the remote side has been idle too long while
+	 * establishing the dialog.
+	 *
+	 */
 	public void onTimeout()
 	{
 		this.cancel();
@@ -320,7 +345,12 @@ public class ProxyBranchImpl implements ProxyBranch {
 		proxy.onBranchTimeOut(this);
 	}
 	
-	public void updateTimer()
+	/**
+	 * Restart the timer. Call this method when some activity shows the remote
+	 * party is still online.
+	 *
+	 */
+	void updateTimer()
 	{
 		if(proxyBranchTimer != null) {
 			proxyBranchTimer.cancel();

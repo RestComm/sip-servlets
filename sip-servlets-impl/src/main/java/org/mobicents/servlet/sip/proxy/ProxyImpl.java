@@ -332,7 +332,7 @@ public class ProxyImpl implements Proxy {
 		if(allResponsesHaveArrived())
 		{
 			bestResponse.getSipSession().setProxyBranch(branch);
-			sendBestFinalResponse(bestResponse, bestBranch);
+			sendFinalResponse(bestResponse, bestBranch);
 		}
 		else
 		{
@@ -387,13 +387,13 @@ public class ProxyImpl implements Proxy {
 		return true;
 	}
 	
-	public void sendBestFinalResponse(SipServletResponseImpl response,
+	public void sendFinalResponse(SipServletResponseImpl response,
 			ProxyBranchImpl proxyBranch)
 	{
 		// If we didn't get any response and only a timeout just return a timeout
 		if(proxyBranch.isTimedOut()) {
 			try {
-				originalRequest.createResponse(408).send();
+				response.getTransactionApplicationData().getOriginalProxyRequest().createResponse(408).send();
 				return;
 			} catch (IOException e1) {
 				throw new IllegalStateException("Faild to send a timeout response");
