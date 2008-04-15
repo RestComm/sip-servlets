@@ -44,7 +44,7 @@ public class EmbeddedTomcatLoaderTest extends SipServletTestCase implements SipL
 	@Override
 	public void deployApplication() {
 		tomcat.deployContext(
-				"E:\\workspaces\\sip-servlets\\simple-sip-servlet\\src\\main\\sipapp",
+				projectHome + "/simple-sip-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test");
 	}
 
