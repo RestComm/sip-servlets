@@ -100,6 +100,11 @@ public class DigestAuthenticator
      * Private key.
      */
     protected String key = "Catalina";
+    
+    /*
+     * Principal
+     */
+    private Principal principal;
 
 
     // ------------------------------------------------------------- Properties
@@ -113,7 +118,6 @@ public class DigestAuthenticator
         return (info);
 
     }
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -136,10 +140,12 @@ public class DigestAuthenticator
                                 SipLoginConfig config)
         throws IOException {
     	
+    	principal = null;
+    	
     	if(response == null) 
     		response = (SipServletResponseImpl) request.createResponse(SipServletResponseImpl.SC_UNAUTHORIZED);
         // Have we already authenticated someone?
-        Principal principal = request.getUserPrincipal();
+        principal = request.getUserPrincipal();
         //String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
         if (principal != null) {
             if (log.isDebugEnabled())
@@ -423,6 +429,10 @@ public class DigestAuthenticator
         response.setHeader("WWW-Authenticate", authenticateHeader);
 
     }
+
+	public Principal getPrincipal() {
+		return principal;
+	}
 
 
 }

@@ -74,6 +74,7 @@ import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
@@ -125,6 +126,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected String transport = null;
 
 	protected String currentApplicationName = null;
+	
+	protected Principal userPrincipal;
 
 	/**
 	 * List of headers that ARE system at all times
@@ -942,8 +945,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getUserPrincipal()
 	 */
 	public Principal getUserPrincipal() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.userPrincipal;
+	}
+	
+	public void setUserPrincipal(Principal principal) {
+		this.userPrincipal = principal;
 	}
 
 	/*
@@ -968,7 +974,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#isUserInRole(java.lang.String)
 	 */
 	public boolean isUserInRole(String role) {
-		// TODO Auto-generated method stub
+		if(this.userPrincipal != null) {
+			return ((GenericPrincipal)this.userPrincipal).hasRole(role);
+		}
 		return false;
 	}
 

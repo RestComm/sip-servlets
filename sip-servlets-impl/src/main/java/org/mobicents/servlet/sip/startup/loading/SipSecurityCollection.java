@@ -68,6 +68,20 @@ public class SipSecurityCollection extends SecurityCollection {
 		servletNames.remove(servletName);
 	}
 	
+	public boolean findServletName(String servletName) {
+		for(String servletNameFromList:servletNames) {
+			if(servletNameFromList.equals(servletName))
+				return true;
+		}
+		return false;
+	}
+	
+	public String[] findServletNames() {
+		String[] ret = null;
+		servletNames.toArray(ret);
+		return ret;
+	}
+	
 	/**
 	 * 
 	 * @param sipMethod
