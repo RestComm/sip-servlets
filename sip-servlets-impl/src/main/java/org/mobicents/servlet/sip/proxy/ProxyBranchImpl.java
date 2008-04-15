@@ -216,10 +216,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		// And set a reference to the proxy branch
 		newSession.setProxyBranch(this);
-		
-		//set AR State Info from previous request
-		newSession.setStateInfo(originalRequest.getSipSession().getStateInfo());
-		
+				
 		//JSR 289 Section 15.1.6
 		if(!subsequent) // Subsequent requests can't have a routing directive?
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
