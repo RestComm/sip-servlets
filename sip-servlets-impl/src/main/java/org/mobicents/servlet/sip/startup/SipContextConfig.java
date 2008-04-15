@@ -37,7 +37,6 @@ import org.apache.tomcat.util.digester.Digester;
 import org.mobicents.servlet.sip.annotations.ClassFileScanner;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.xml.sax.EntityResolver;
-import org.xml.sax.SAXException;
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures

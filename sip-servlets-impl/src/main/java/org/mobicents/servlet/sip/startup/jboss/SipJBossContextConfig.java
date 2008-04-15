@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
 import org.jboss.web.tomcat.security.config.JBossContextConfig;
+import org.mobicents.servlet.sip.annotations.ClassFileScanner;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipEntityResolver;
@@ -41,7 +42,6 @@ import org.mobicents.servlet.sip.startup.SipRuleSet;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.xml.sax.EntityResolver;
-import org.xml.sax.SAXException;
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures
@@ -83,7 +83,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 			if(logger.isDebugEnabled()) {
 				logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
 			}
-			context.setWrapperClass(StandardWrapper.class.getName());
+			context.setWrapperClass(StandardWrapper.class.getName());						
 			if (webXmlInputStream != null) {
 				super.start();
 			}				
@@ -95,6 +95,10 @@ public class SipJBossContextConfig extends JBossContextConfig
 					logger.debug(SipContext.APPLICATION_SIP_XML + " has been found !");
 				}
 				context.setWrapperClass(SipServletImpl.class.getName());
+				//annotations scanning
+				SipStandardContext sipctx = (SipStandardContext) context;
+				ClassFileScanner scanner = new ClassFileScanner(sipctx.getJbossBasePath() + "/WEB-INF/classes/", sipctx);
+				scanner.scan();
 				//
 				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
 	                    xmlNamespaceAware,
@@ -109,32 +113,32 @@ public class SipJBossContextConfig extends JBossContextConfig
 				try {
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
-				} catch (IOException e) {
+				} catch (Throwable e) {
 					logger.error("Impossible to parse the sip deployment descriptor",
 							e);
 					ok = false;
-				} catch (SAXException e) {
-					logger.error("Impossible to parse the sip deployment descriptor",
-							e);
-					ok = false;
-				}						
+				}
+				// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
+				if(scanner.isApplicationParsed()) { 
+					ok = true;
+				}
 			} else {
 				logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
 				ok = false;
-			}
+			}			
 			// Make our application available if no problems were encountered
 			if (ok) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("sipContextConfig started");
+				}
 				context.setConfigured(true);						
 			} else {
 				logger.warn("contextConfig.unavailable");
 				context.setAvailable(false);
-			}
-			if(logger.isDebugEnabled()) {
-				logger.debug("sipContextConfig started");
-			}
+			}			
 		} else {
 			super.start();
-		}
+		}				
 	}
 
 	@Override
