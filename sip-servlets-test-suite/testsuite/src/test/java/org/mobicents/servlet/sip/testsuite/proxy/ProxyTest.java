@@ -52,6 +52,7 @@ public class ProxyTest extends SipServletTestCase{
 			properties1.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 					+ transport);
 			properties1.setProperty("javax.sip.STACK_NAME", "sender");
+			properties1.setProperty("sipunit.BINDADDR", "127.0.0.1");
 			properties1.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 			"logs/simplesipservlettest_debug.txt");
 			properties1.setProperty("gov.nist.javax.sip.SERVER_LOG",
@@ -63,6 +64,7 @@ public class ProxyTest extends SipServletTestCase{
 			properties2.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort2 + "/"
 					+ transport);
 			properties2.setProperty("javax.sip.STACK_NAME", "receiver");
+			properties2.setProperty("sipunit.BINDADDR", "127.0.0.1");
 			properties2.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 			"logs/simplesipservlettest_debug.txt");
 			properties2.setProperty("gov.nist.javax.sip.SERVER_LOG",
