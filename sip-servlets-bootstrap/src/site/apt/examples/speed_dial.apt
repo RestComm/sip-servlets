@@ -11,11 +11,16 @@ Speed Dial
 	
 	Here is the list of hard coded contacts and their locations :
 	 
-	* "1" => "sip:receiver@sip-servlets.com" 
+	* "1" => "sip:receiver@sip-servlets.com"
+	 
 	* "2" => "sip:mranga@sip-servlets.com" (The Master Blaster)
+	
 	* "3" => "sip:vlad@sip-servlets.com"
+	
 	* "4" => "sip:bartek@sip-servlets.com"
+	
 	* "5" => "sip:jeand@sip-servlets.com"
+	
 	* "9" => "sip:receiver@127.0.0.1:5090" (Special case to be able to run the app standalone)
 	 
 * How to activate it

@@ -6,10 +6,15 @@ Click To Call
 	to place calls from a web page. This example consists of the following steps:
    
    [[1]]. Alice and Bob each register a SIP Softphone
+   
    [[2]]. Alice clicks on the "Call" link to place a call to Bob
+   
    [[3]]. Alice's phone rings
+   
    [[4]]. When Alice picks up her phone, Bob's phone rings
+   
    [[5]]. When Bob answers his phone, the call is connected
+   
    [[6]]. When one of them hangs up, the other one is also disconnected 
 	
 	 

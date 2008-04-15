@@ -9,9 +9,13 @@ Location Service
 	The steps performed by the application and container are as follows:
 
     * Alice makes a call to sip:receiver@sip-servlets.com. The INVITE is received by the servlet container which invokes the location service.
+    
     * The location service determines, using non-SIP means, that the callee (receiver) is registered with two locations, identified by, say, two SIP URIs (sip:receiver@127.0.0.1:5090 and sip:receiver@127.0.0.1:6090).
-    * The service proxies to those two destinations in parallel, without record-routing, and without the supervised mode. 
+    
+    * The service proxies to those two destinations in parallel, without record-routing, and without the supervised mode.
+     
     * One of the destinations return 200 (OK) and the other branch is cancelled by the container.
+    
     * The 200 is forwarded upstream to Alice and the call setup is completed as per usual.
 
 	Location service currently performs a lookup into a hard coded list of addresses 
@@ -19,9 +23,9 @@ Location Service
 	
 	Here is the list of hard coded contacts and their locations :
 	 
-	 * sip:receiver@sip-servlets.com :
+	* sip:receiver@sip-servlets.com :
 	 		
-	 	* sip:receiver@127.0.0.1:5090
+		* sip:receiver@127.0.0.1:5090
 	 	
 	 	* sip:receiver@127.0.0.1:6090
 	 
