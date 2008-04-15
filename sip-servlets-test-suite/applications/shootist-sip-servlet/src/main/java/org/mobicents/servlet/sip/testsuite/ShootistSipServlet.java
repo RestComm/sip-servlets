@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -19,8 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class ShootistSipServlet extends SipServlet implements SipErrorListener, SipServletListener,
-		Servlet {
+public class ShootistSipServlet 
+		extends SipServlet 
+		implements SipErrorListener, SipServletListener, Servlet {
 
 	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);
 	
@@ -33,35 +35,28 @@ public class ShootistSipServlet extends SipServlet implements SipErrorListener, 
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the shootist has been started");
 		super.init(servletConfig);
-	}
+	}		
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
-		sipServletResponse.createAck();
-		sipServletResponse.send();		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void doResponse(SipServletResponse sipServletResponse)
-			throws ServletException, IOException {
-		logger.info("Got : " + sipServletResponse.getStatus() + " "
-				+ sipServletResponse.getMethod());
 		int status = sipServletResponse.getStatus();
-		if (status == SipServletResponse.SC_OK) {
+		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			ackRequest.send();
-		} else {
-			super.doResponse(sipServletResponse);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {				
+				logger.error(e);
+			}
+			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
+			sipServletRequest.send();
 		}
 	}
-
-	// SipErrorListener methods
 	
+	// SipErrorListener methods	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipErrorListener#noAckReceived(javax.servlet.sip.SipErrorEvent)
@@ -84,19 +79,18 @@ public class ShootistSipServlet extends SipServlet implements SipErrorListener, 
 	 * @see javax.servlet.sip.SipServletListener#servletInitialized(javax.servlet.sip.SipServletContextEvent)
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
-		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);		
+		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
+		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
 		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		SipServletRequest sipServletRequest = 
-			sipFactory.createRequest(sipFactory.createApplicationSession(), "INVITE", fromURI, toURI);
+			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
 		sipServletRequest.setRequestURI(requestURI);
 		try {			
 			sipServletRequest.send();
 		} catch (IOException e) {
 			logger.error(e);
-		}
-		
+		}		
 	}
-
 }
