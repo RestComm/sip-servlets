@@ -1,17 +1,25 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.sip.*;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
+import javax.servlet.sip.SipErrorEvent;
+import javax.servlet.sip.SipErrorListener;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -186,8 +194,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		HashMap<String, String> users = (HashMap) getServletContext().getAttribute("registeredUsersMap");
 		if(users == null) users = new HashMap<String, String>();
 		getServletContext().setAttribute("registeredUsersMap", users);
-		String address = req.getHeader("Contact");
+		String address = req.getHeader("Contact"); 
 		
+		resp.setHeader("Contact", new String(address));
+//		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");		
+//		resp.setHeader("Date", simpleDateFormatter.format(new Date()));
 		// Extract the address from the contact header
 		int start = address.indexOf("sip:");
 		int end = start;
@@ -198,6 +209,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		address = address.substring(start, end-1);
 		
 		users.put(req.getFrom().getURI().toString(), address);
+						
 		resp.send();
 	}
 
