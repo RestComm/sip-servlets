@@ -1,5 +1,15 @@
-/**
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.mobicents.servlet.sip.core;
 
@@ -49,6 +59,7 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.Header;
@@ -85,7 +96,8 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine), 
  * translating jain sip SIP messages to sip servlets SIP messages, calling the application router 
  * to know which app is interested in the messages and
- * dispatching them to those sip applications interested in the messages. 
+ * dispatching them to those sip applications interested in the messages.
+ * @author Jean Deruelle 
  */
 public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	//the logger
@@ -1223,15 +1235,29 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
 		logger.info("Response " + responseEvent.getResponse().toString());
-					
-		boolean continueRouting = routeResponse(responseEvent);			
+		Response response = responseEvent.getResponse();
+		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
+		//if this is a response to a cancel, the response is dropped
+		if(Request.CANCEL.equalsIgnoreCase(cSeqHeader.getMethod())) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("the response is dropped accordingly to JSR 289 " +
+						"since this a response to a CANCEL");
+			}
+		}
+		//if this is a trying response, the response is dropped
+		if(Response.TRYING == response.getStatusCode()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("the response is dropped accordingly to JSR 289 " +
+						"since this a 100");
+			}
+		}
+		boolean continueRouting = routeResponse(responseEvent);		
 		// if continue routing is to true it means that
 		// a B2BUA got it so we don't have anything to do here 
 		// or an app that didn't do anything with it
 		// or a when handling the request an app had to be called but wasn't deployed
 		// we have to strip the topmost via header and forward it statefully		
 		if (continueRouting) {			
-			Response response = responseEvent.getResponse();			
 			Response newResponse = (Response) response.clone();
 			newResponse.removeFirst(ViaHeader.NAME);
 			ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
