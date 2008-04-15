@@ -559,7 +559,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			return false;
 		}		
 		sipServletRequest.setSipSession(sipSession);
-					
+		
+		sipSession.updateStateOnSubsequentRequest(sipServletRequest);
+		
 		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
 		try {
 			

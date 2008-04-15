@@ -43,6 +43,7 @@ import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.RouteHeader;
@@ -426,14 +427,25 @@ public class SipSessionImpl implements SipSession {
 				|| state.equals(State.EARLY))
 			throw new IllegalStateException("Can not invalidate session in " + 
 					state.toString() + " state.");
-		if(isSupervisedMode() && ongoingTransactions.size()>0)
+		if(isSupervisedMode() && ongoingTransactions.size()>0) {
+			dumpOngoingTransactions();
 			throw new IllegalStateException("Can not invalidate session with " +
-					"ongoing transactions in supervised mode.");		
+					ongoingTransactions.size() + " ongoing transactions in supervised mode.");
+		}
 		valid = false;		
 		notifySipSessionListeners(SipSessionEventType.DELETION);
 		sipFactory.getSessionManager().removeSipSession(key);
 	}
 
+	private void dumpOngoingTransactions() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("ongoing transactions in sip the session " + key);
+		
+			for (Transaction transaction : ongoingTransactions) {
+				logger.debug("Transaction " + transaction + " : state = " + transaction.getState());
+			}
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#isOngoingTransaction()
@@ -678,12 +690,42 @@ public class SipSessionImpl implements SipSession {
 		return this.ongoingTransactions;
 	}	
 	
-	public void updateStateOnResponse(SipServletResponseImpl response)
-	{
-		if( response.getStatus()>=200 && response.getStatus()<300 )
+	/**
+	 * 
+	 * @param response
+	 */
+	public void updateStateOnResponse(SipServletResponseImpl response) {
+		CSeqHeader cSeqHeader = (CSeqHeader)response.getMessage().getHeader(CSeqHeader.NAME);
+		if( response.getStatus()>=200 && response.getStatus()<300 && 
+				!Request.BYE.equals(cSeqHeader.getMethod()) &&
+				!Request.CANCEL.equals(cSeqHeader.getMethod())) {
 			this.setState(State.CONFIRMED);
-		if( response.getStatus()>=100 && response.getStatus()<200 )
+			if(logger.isDebugEnabled()) {
+				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+			}
+		}
+		if( response.getStatus()>=100 && response.getStatus()<200 ) {
 			this.setState(State.EARLY);
+			if(logger.isDebugEnabled()) {
+				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+			}
+		}
+	}
+	
+	/**
+     * 
+     * @param sipServletRequest
+     */
+    public void updateStateOnSubsequentRequest(
+			SipServletRequestImpl sipServletRequest) {
+		if(Request.BYE.equals(sipServletRequest.getMethod()) ||
+				Request.CANCEL.equals(sipServletRequest.getMethod())) {			
+			this.setState(State.TERMINATED);
+			if(logger.isDebugEnabled()) {
+				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+			}
+		}
+		
 	}
 
 	/**
@@ -752,5 +794,5 @@ public class SipSessionImpl implements SipSession {
                 }
             }
 		}
-    }
+    }	    
 }
