@@ -51,7 +51,8 @@ Installation Instructions
 	Now you need to modify some extra config files so that jboss can deploy war/sar2 files containing sip servlet application :
 	
 	In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml \
-	Add this attribute to the manager xml tag, className="org.mobicents.servlet.sip.core.session.SipStandardManager"
+	Add this attribute to the manager xml tag, \
+	<<<className="org.mobicents.servlet.sip.core.session.SipStandardManager">>>
 	
 	In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\jboss-service.xml :\
 	Modify the code attribute of the mbean tag so that it become \
