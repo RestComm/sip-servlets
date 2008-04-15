@@ -2,7 +2,13 @@ package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.ContentEncoding;
+import gov.nist.javax.sip.header.ContentLanguage;
+import gov.nist.javax.sip.header.ContentLength;
+import gov.nist.javax.sip.header.ContentType;
+import gov.nist.javax.sip.header.Expires;
+import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
@@ -21,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
@@ -33,6 +40,7 @@ import javax.sip.Dialog;
 import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
+import javax.sip.SipFactory;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.AcceptLanguageHeader;
@@ -384,8 +392,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Enumeration<String> getAttributeNames() {
-		// TODO Auto-generated method stub
-		return null;
+		Vector<String> names = new Vector<String>(this.attributes.keySet());
+		return names.elements();
 	}
 
 	public String getCallId() {
@@ -393,13 +401,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public String getCharacterEncoding() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message.getContentEncoding().getEncoding();
 	}
 
 	public Object getContent() throws IOException, UnsupportedEncodingException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message.getContent();
 	}
 
 	public Object getContent(Class[] classes) throws IOException,
@@ -409,23 +415,20 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Locale getContentLanguage() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message.getContentLanguage().getContentLanguage();
 	}
 
 	public int getContentLength() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.message.getContentLength().getContentLength();
 	}
 
 	public String getContentType() {
-		// TODO Auto-generated method stub
-		return null;
+		ContentTypeHeader cth = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);
+		return cth.getContentType();
 	}
 
 	public int getExpires() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.message.getExpires().getExpires();
 	}
 
 	public Address getFrom() {
@@ -434,8 +437,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public String getHeader(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((SIPHeader) this.message.getHeader(name)).getHeaderValue();
 	}
 
 	public HeaderForm getHeaderForm() {
@@ -444,8 +446,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Iterator<String> getHeaderNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message.getHeaderNames();
 	}
 
 	public ListIterator<String> getHeaders(String name) {
@@ -491,8 +492,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public byte[] getRawContent() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		SIPMessage message = (SIPMessage) this.message;
+		return message.getRawContent();
 	}
 
 	public String getRemoteAddr() {
@@ -511,8 +512,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public SipSession getSession() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.sipSession;
 	}
 
 	public SipSession getSession(boolean create) {
@@ -588,17 +588,26 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	public void setContent(Object content, String contentType)
 			throws UnsupportedEncodingException {
-		// TODO Auto-generated method stub
+		String type = contentType.split("/")[0];
+		String subtype = contentType.split("/")[1];
+		try
+		{
+			this.message.setContent(content, new ContentType(type, subtype));
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("Parse error reading content type", e);
+		}
 
 	}
 
 	public void setContentLanguage(Locale locale) {
-		// TODO Auto-generated method stub
+		this.message.setContentLanguage(new ContentLanguage(locale.getLanguage()));
 
 	}
 
 	public void setContentLength(int len) {
-		// TODO Auto-generated method stub
+		this.message.setContentLength(new ContentLength(len));
 
 	}
 
@@ -608,12 +617,30 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public void setExpires(int seconds) {
-		// TODO Auto-generated method stub
+		try
+		{
+			Expires expiresHeader = new Expires();
+			expiresHeader.setExpires(seconds);
+			this.message.setExpires(expiresHeader);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("Error setting expiration!", e);
+		}
 
 	}
 
 	public void setHeader(String name, String value) {
-		// TODO Auto-generated method stub
+		try
+		{
+			Header header = 
+				SipFactory.getInstance().createHeaderFactory().createHeader(name, value);
+			this.message.setHeader(header);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("Error creating header!", e);
+		}
 
 	}
 
