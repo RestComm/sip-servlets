@@ -40,7 +40,7 @@ Installation Instructions
 	  
 	Install {{{http://maven.apache.org}maven 2}}
 	
-	Check out the sip-servlets project at {{{https://sip-servlets.dev.java.net/svn/sip-servlets/tags/release-0.1}}} 
+	Check out the sip-servlets project at {{{https://sip-servlets.dev.java.net/svn/sip-servlets/tags/release-0.1/}https://sip-servlets.dev.java.net/svn/sip-servlets/tags/release-0.1/}} 
 	
 	Open up the pom.xml from sip-servlets-bootstrap project and change the following property tomcat.home at the end of the file
 	Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-5.5.25 
@@ -125,7 +125,7 @@ Installation Instructions
 	18 juil. 2007 08:09:48 org.apache.catalina.startup.Catalina start
 	INFO: Server startup in 1984 ms
 			
-	In any case send an email on the issues mailing list at {{{https://sip-servlets.dev.java.net/servlets/ProjectMailingListList}}} if you encounter any problems.
+	In any case send an email on the {{{dev@sip-servlets.dev.java.net}issues mailing list}} or {{{servlets/ProjectIssues}file a bug}} on the bugtracker if you encounter any problems.
 
 * From the source (From the trunk, on Tomcat 6.x) 
 	
@@ -133,7 +133,7 @@ Installation Instructions
 	  
 	Install {{{http://maven.apache.org}maven 2}}
 	
-	Check out the sip-servlets project at {{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/}}} 
+	Check out the sip-servlets project at {{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/}https://sip-servlets.dev.java.net/source/browse/sip-servlets/}} 
 	
 	Open up the pom.xml from sip-servlets-bootstrap project and change the following property tomcat.home at the end of the file
 	Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-6.0.14 
@@ -220,5 +220,5 @@ Installation Instructions
 	18 juil. 2007 08:09:48 org.apache.catalina.startup.Catalina start
 	INFO: Server startup in 1984 ms
 			
-	In any case send an email on the issues mailing list at {{{https://sip-servlets.dev.java.net/servlets/ProjectMailingListList}}} if you encounter any problems.
+	In any case send an email on the {{{dev@sip-servlets.dev.java.net}issues mailing list}} or {{{servlets/ProjectIssues}file a bug}} on the bugtracker if you encounter any problems.
 	

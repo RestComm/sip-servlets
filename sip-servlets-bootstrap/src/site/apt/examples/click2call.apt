@@ -1,5 +1,10 @@
 Click To Call
 
+<<Important Note :>> <This example has been taken mostly from the {{{https://sailfin.dev.java.net/}sailfin project}} 
+and is originally available at {{{http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}}.
+It is has been modified to fit the new JSR 289 application selection process and slimmed down to its minimum. 
+The purpose here is to demonstrate interoperability between containers and show backward compatibility with JSR 116.>
+
 * Service Description
 
 	This simple example shows how SIP Servlets can be used along with HTTP servlets as a converged application 
@@ -15,8 +20,7 @@ Click To Call
    
    [[5]]When Bob answers his phone, the call is connected
    
-   [[6]]When one of them hangs up, the other one is also disconnected 
-	
+   [[6]]When one of them hangs up, the other one is also disconnected 	
 	 
 * How to activate it
 

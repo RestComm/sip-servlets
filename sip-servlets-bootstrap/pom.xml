@@ -100,6 +100,9 @@
 			<email>deruelle_jean@dev.java.net</email>
 			<organization>JBoss/Red Hat</organization>
 			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
 			<timezone>+1</timezone>
 		</developer>
 		<developer>

@@ -2,11 +2,9 @@
                                     Sip-Servlets
                                     ------                                    
                                     ------
-                                    ------                                    
-
-	<<Project Lead>> : {{{mailto:deruelle_jean@dev.java.net}Jean Deruelle}}
+                                    ------                                    	
 	
-	<<Team>> : check out the {{{team-list.html}team members}}
+	<<Team>> : check out the {{{team-list.html}team members}} making this possible
 
 Goals  
 
@@ -26,7 +24,10 @@ Download
 
 Roadmap and Implementation tasks
 
-  Please check out our {{{roadmap.html}roadmap}} to know what's going to happen next.
+  As the JSR 289 spec is not yet finalized and as we are in the process of implementing it,
+  Please consider that this is still a work in progress and as such is still unstable
+
+  Please check out our {{{roadmap.html}roadmap}} to follow project progress and to know what will happen next.
 
   Here are the {{{http://docs.google.com/Doc?id=dfcjr48z_65gpwxnz}implementation tasks}} needed to implement the JSR 289 spec.
 
