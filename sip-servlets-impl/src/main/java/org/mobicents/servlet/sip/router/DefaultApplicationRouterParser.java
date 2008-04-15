@@ -1,8 +1,8 @@
 package org.mobicents.servlet.sip.router;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,7 +54,8 @@ public class DefaultApplicationRouterParser {
 			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" is not valid ! ",e);
 		}				
 		try {
-			properties.load(new FileReader(darConfigurationFile));
+			FileInputStream fis = new FileInputStream(darConfigurationFile);
+			properties.load(fis);
 		} catch (FileNotFoundException e) {
 			log.fatal("Cannot find the default application router file ! ",e);
 			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" is not valid ! ",e);
