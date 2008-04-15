@@ -24,17 +24,23 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
 public class ProxyTest extends SipServletTestCase{
+
 	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
-	SipStack sipStackA;
-	SipStack sipStackB;
 	
-	SipPhone sipPhoneA;
-	SipPhone sipPhoneB;
+	private SipStack sipStackA;
+	private SipStack sipStackB;
+	
+	private SipPhone sipPhoneA;
+	private SipPhone sipPhoneB;
+	
+	private int timeout = 10000;
+	
 	@Override
 	public void deployApplication() {
 		tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test");
+		init();
 	}
 
 	@Override
@@ -86,6 +92,11 @@ public class ProxyTest extends SipServletTestCase{
 	public void init()
 	{
 		setupPhones();
+	}
+
+	// Tests a complete call.
+	public void testCallProxying() throws InterruptedException {
+		
 		try{
 			SipCall callA = sipPhoneA.createSipCall();
 			SipCall callB = sipPhoneB.createSipCall();
@@ -93,17 +104,17 @@ public class ProxyTest extends SipServletTestCase{
 			callB.listenForIncomingCall();Thread.sleep(300);
 			callA.initiateOutgoingCall("sip:receiver@nist.gov", null);
 			
-			assertTrue(callB.waitForIncomingCall(10000));
+			assertTrue(callB.waitForIncomingCall(timeout));
 			
 			assertTrue(callB.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
-			assertTrue(callA.waitOutgoingCallResponse(10000));
+			assertTrue(callA.waitOutgoingCallResponse(timeout));
 			
 			assertTrue(callB.sendIncomingCallResponse(Response.OK, "Answer", 0));
-			assertTrue(callA.waitOutgoingCallResponse(10000));
+			assertTrue(callA.waitOutgoingCallResponse(timeout));
 			
 			assertTrue(callA.sendInviteOkAck());
 			
-			assertTrue(callB.waitForAck(10000));
+			assertTrue(callB.waitForAck(timeout));
 			
 			assertTrue(callA.disconnect());
 			assertTrue(callB.respondToDisconnect());
@@ -118,9 +129,33 @@ public class ProxyTest extends SipServletTestCase{
 			e.printStackTrace();
 		}
 	}
+	
+	// This just checks if the INVITEs are getting through
+	public void testInviteProxying() throws InterruptedException {
+		
+		try{
+			SipCall callA = sipPhoneA.createSipCall();
+			SipCall callB = sipPhoneB.createSipCall();
+			
+			callB.listenForIncomingCall();Thread.sleep(300);
+			callA.initiateOutgoingCall("sip:receiver@nist.gov", null);
+			
+			assertTrue(callB.waitForIncomingCall(timeout));
+			
+			assertTrue(callB.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
+			assertTrue(callA.waitOutgoingCallResponse(timeout));
+			
+			assertTrue(callB.sendIncomingCallResponse(Response.OK, "Answer", 0));
+			assertTrue(callA.waitOutgoingCallResponse(timeout));
+			
+			sipPhoneA.dispose();
+			sipPhoneB.dispose();
+			sipStackA.dispose();
+			sipStackB.dispose();
 
-	public void testSimpleSipServlet() throws InterruptedException {
-		init();
-		Thread.sleep(5000);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

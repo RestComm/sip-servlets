@@ -49,6 +49,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		URI uri = sipFactory.createAddress("sip:receiver@127.0.0.1:5059").getURI();
 		Proxy proxy = request.getProxy();
 		proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
+		proxy.setRecordRoute(true);
+		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
 		proxy.proxyTo(uri);
 	}
 
