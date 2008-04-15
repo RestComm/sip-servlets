@@ -185,9 +185,9 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private void notifySipSessionListeners(SipSessionEventType sipSessionEventType) {
 		SipContext sipContext = 
-			sipFactory.getSipApplicationDispatcher().findSipApplication(key.getApplicationName());		
+			getSipApplicationSession().getSipContext();		
 		if(logger.isDebugEnabled()) {
-			logger.debug("notifying sip session listeners of context " + key.getApplicationName() + " of following event " +
+			logger.debug("notifying sip session listeners of context " + sipContext.getApplicationName() + " of following event " +
 					sipSessionEventType);
 		}
 		List<SipSessionListener> sipSessionListeners = 

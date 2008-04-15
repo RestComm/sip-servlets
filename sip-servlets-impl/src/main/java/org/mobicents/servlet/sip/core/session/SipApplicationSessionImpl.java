@@ -343,6 +343,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
 				this, name);
 		SipListenersHolder listeners = sipContext.getListeners();
+		if(logger.isDebugEnabled()) {
+			logger.debug("notifying SipApplicationSessionBindingListeners of value unbound on key "+ key);
+		}
 		for (SipApplicationSessionBindingListener listener : listeners
 				.getSipApplicationSessionBindingListeners()) {
 			try {
@@ -350,6 +353,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			} catch (Throwable t) {
 				logger.error("SipApplicationSessionBindingListener threw exception", t);
 			}
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("notifying SipApplicationSessionAttributeListener of attribute removed on key "+ key);
 		}
 		for (SipApplicationSessionAttributeListener listener : listeners
 				.getSipApplicationSessionAttributeListeners()) {
@@ -384,14 +390,20 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				this, key);
 		SipListenersHolder listeners = sipContext.getListeners();
 		if (sipApplicationSessionAttributeMap.containsKey(key)) {
-			// This is initial, we need to send value bound event						
+			// This is initial, we need to send value bound event
+			if(logger.isDebugEnabled()) {
+				logger.debug("notifying SipApplicationSessionBindingListeners of value bound on key "+ key);
+			}
 			for (SipApplicationSessionBindingListener listener : listeners
 					.getSipApplicationSessionBindingListeners()) {
-				try { 
+				try {					
 					listener.valueBound(event);
 				} catch (Throwable t) {
 					logger.error("SipApplicationSessionBindingListener threw exception", t);
 				}				
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("notifying SipApplicationSessionAttributeListener of attribute added on key "+ key);
 			}
 			for (SipApplicationSessionAttributeListener listener : listeners
 					.getSipApplicationSessionAttributeListeners()) {
@@ -402,6 +414,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				}
 			}
 		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("notifying SipApplicationSessionAttributeListener of attribute replaced on key "+ key);
+			}
 			for (SipApplicationSessionAttributeListener listener : listeners
 					.getSipApplicationSessionAttributeListeners()) {
 				try {
