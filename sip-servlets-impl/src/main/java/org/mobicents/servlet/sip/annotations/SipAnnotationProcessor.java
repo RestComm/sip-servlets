@@ -65,8 +65,10 @@ public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 	
 	protected boolean lookupResourceInServletContext(Object instance, Field field, String annotationName) {
 		String typeName = field.getType().getCanonicalName();
+		if(annotationName == null || annotationName.equals("")) annotationName = typeName;
 		Object objectToInject = sipContext.getServletContext().getAttribute(typeName);
-		if(objectToInject != null && field.getType().isAssignableFrom(objectToInject.getClass())) {
+		if(objectToInject != null &&
+				field.getType().isAssignableFrom(objectToInject.getClass())) {
 			boolean accessibility = false;
 			accessibility = field.isAccessible();
 			field.setAccessible(true);
