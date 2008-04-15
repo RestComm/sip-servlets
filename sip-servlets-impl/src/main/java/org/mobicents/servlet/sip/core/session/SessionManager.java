@@ -70,7 +70,7 @@ public class SessionManager {
 		{
 			logger.info("Dialog session associated!");
 		}
-		else // If it's not in the dialog, we MUST create a new session
+		else // If it's not in the dialog or the transaction, we MUST create a new session
 		{
 			try
 			{
