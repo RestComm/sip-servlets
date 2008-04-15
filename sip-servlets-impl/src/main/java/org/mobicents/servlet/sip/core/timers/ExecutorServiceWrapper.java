@@ -19,24 +19,20 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-public class ExecutorServiceWrapper {
-
-	
+public class ExecutorServiceWrapper {	
 	private static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
 
 	//TODO need to rename this class in ScheduledExecutorServiceWrapper
-	private static ExecutorServiceWrapper singletonInstance;
+	//
+	private static final ExecutorServiceWrapper singletonInstance = new ExecutorServiceWrapper();
 
 	private ScheduledThreadPoolExecutor myThreadPool = null;
 
-//	private static transient Log log = LogFactory
-//			.getLog(SipContainerThreadPool.class.getName());
-
-	public static synchronized ExecutorServiceWrapper getInstance() {
-		if(singletonInstance == null) {
-			singletonInstance = new ExecutorServiceWrapper();
-		}
-		singletonInstance.initialize();
+	private ExecutorServiceWrapper() {
+		initialize();
+	}
+	
+	public static ExecutorServiceWrapper getInstance() {		
 		return singletonInstance;
 	}
 

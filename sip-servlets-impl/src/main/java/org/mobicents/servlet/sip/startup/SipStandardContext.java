@@ -190,34 +190,33 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		//and call load on startup which is equivalent to
 		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
 		super.start();	
-		
-		// Replace the default annotation processor. This is needed to handle resource injection
-		// for SipFactory, Session utils and other objects residing in the servlet context space.
-		// Of course if the variable is not found in in the servet context it defaults to the
-		// normal lookup method - in the default naming context.
-		if(isUseNaming()) {
-			//tomcat naming 
-			this.setAnnotationProcessor(
-					new SipAnnotationProcessor(
-							getNamingContextListener().getEnvContext(),
-							this));
-		} else {
-			try {
-				InitialContext iniCtx = new InitialContext();
-				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-				// jboss or other kind of naming
-				this.setAnnotationProcessor(
-						new SipAnnotationProcessor(
-								envCtx,
-								this));
-			} catch (NamingException e) {
-				logger.error("Impossible to get the naming context ", e);
-			}						
-		}
-		
+						
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 		//called implicitly within sipApplicationDispatcher.addSipApplication
 		if(getAvailable()) {
+			// Replace the default annotation processor. This is needed to handle resource injection
+			// for SipFactory, Session utils and other objects residing in the servlet context space.
+			// Of course if the variable is not found in in the servet context it defaults to the
+			// normal lookup method - in the default naming context.
+			if(isUseNaming()) {
+				//tomcat naming 
+				this.setAnnotationProcessor(
+						new SipAnnotationProcessor(
+								getNamingContextListener().getEnvContext(),
+								this));
+			} else {
+				try {
+					InitialContext iniCtx = new InitialContext();
+					Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+					// jboss or other kind of naming
+					this.setAnnotationProcessor(
+							new SipAnnotationProcessor(
+									envCtx,
+									this));
+				} catch (NamingException e) {
+					logger.error("Impossible to get the naming context ", e);
+				}						
+			}
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
 			//FIXME the session manager should be refactored and made part of the sipstandardmanager
 			if(getManager() instanceof SipStandardManager) {
