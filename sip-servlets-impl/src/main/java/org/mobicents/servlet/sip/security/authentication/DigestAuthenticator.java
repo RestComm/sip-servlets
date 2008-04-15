@@ -211,7 +211,9 @@ public class DigestAuthenticator
         authorization = authorization.substring(7).trim();
 
         // Bugzilla 37132: http://issues.apache.org/bugzilla/show_bug.cgi?id=37132
-        String[] tokens = authorization.split(",(?=(?:[^\"]*\"[^\"]*\")+$)");
+        // The solution of 37132 doesn't work with : response="2d05f1206becab904c1f311f205b405b",cnonce="5644k1k670",username="admin",nc=00000001,qop=auth,nonce="b6c73ab509830b8c0897984f6b0526e8",realm="sip-servlets-realm",opaque="9ed6d115d11f505f9ee20f6a68654cc2",uri="sip:192.168.1.142",algorithm=MD5
+        // That's why I am going back to simple comma (Vladimir). TODO: Review this.
+        String[] tokens = authorization.split(",");//(?=(?:[^\"]*\"[^\"]*\")+$)");
 
         String userName = null;
         String realmName = null;

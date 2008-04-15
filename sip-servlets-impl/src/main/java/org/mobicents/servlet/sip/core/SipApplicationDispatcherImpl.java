@@ -1471,10 +1471,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {
-		if(!securityCheck(request)) return;
 		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 		Wrapper sipServletImpl = (Wrapper) container;
-		Servlet servlet = sipServletImpl.allocate();	        
+		Servlet servlet = sipServletImpl.allocate();
+		
+		// JBoss-specific CL issue:
+		// This is needed because usually the classloader here is some UnifiedClassLoader3,
+		// which has no idea where the servlet ENC is. We will use the classloader of the
+		// servlet class, which is the WebAppClassLoader, and has ENC fully loaded with
+		// with java:comp/env/security (manager, context etc)
+		ClassLoader cl = servlet.getClass().getClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+		
+		if(!securityCheck(request)) return;
+	        
 		servlet.service(request, null);		
 	}
 	
