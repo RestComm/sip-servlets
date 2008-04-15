@@ -23,22 +23,6 @@ Examples
 	From the binary or right from the source like a true hacker :-)
 	
 	For testing against the examples you'll need to use some SIP softphones.
-	We tested most of the examples with WengoPhone, 3CX VoIP Client and SJ Phone 1.65.
-	Most of the examples uses the 5090 port for one the SIP softphone 
+	We tested most of the examples with WengoPhone, 3CX VoIP Client and SJ Phone 1.65, Ekiga and XLite.
+	Most of the examples uses the 5090 port for one of the SIP softphone 
 	to be contacted so please make sure, it is configured that way.
-	
-* From the binary 
-
-	The examples are already installed in the binary distribution that you should 
-	have already installed as described in the {{{../installation.html}installation page}}. 
-	However, in order to use them you'll need to change the default application router properties file 
-	(also know as DAR properties file, check Appendix C of JSR 289 for more information).
-	
-	The binary distribution already contains all the needed dar files to run the examples, you just have
-	to specify the new dar file to use in the Service xml tag, 
-	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.  
-
-* From the source
-
-	Please check out the sip-servlets examples you want to play with located under this 
-	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/}location}} from the svn repository. 
