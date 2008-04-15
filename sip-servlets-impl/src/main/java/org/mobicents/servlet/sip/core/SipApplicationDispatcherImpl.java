@@ -141,8 +141,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 				(SipProvider) requestEvent.getSource(),
 				session,
-				(SIPServerTransaction) session.getInitialTransaction(),
-				session.getDialog());
+				(SIPServerTransaction) session.getSessionCreatingTransaction(),
+				session.getSessionCreatingDialog());
 		
 		logger.info("Dispatching the request event");
 		

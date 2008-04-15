@@ -55,18 +55,18 @@ public class SipSessionImpl implements SipSession {
 	/**
 	 * We use this for dialog-related requests
 	 */
-	private Dialog dialog;
+	private Dialog sessionCreatingDialog;
 	
 	/**
 	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info
 	 */
-	private SIPTransaction initialTransaction;
+	private SIPTransaction sessionCreatingTransaction;
 	
 	// =============================================================
 	
 	public SipSessionImpl ( Dialog dialog, SIPTransaction transaction, SipApplicationSessionImpl sipApp) {
-		this.dialog = dialog;
-		this.initialTransaction = transaction;
+		this.sessionCreatingDialog = dialog;
+		this.sessionCreatingTransaction = transaction;
 		this.sipApplicationSession = sipApp;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
 		this.uuid = UUID.randomUUID();
@@ -124,7 +124,10 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public String getCallId() {
-		return this.dialog.getCallId().getCallId();
+		if(this.sessionCreatingDialog != null)
+			return this.sessionCreatingDialog.getCallId().getCallId();
+		else
+			return this.sessionCreatingTransaction.getOriginalRequest().getCallId().getCallId();
 	}
 
 	public long getCreationTime() {
@@ -260,15 +263,15 @@ public class SipSessionImpl implements SipSession {
 	/**
 	 * @param dialog the dialog to set
 	 */
-	public void setDialog(Dialog dialog) {
-		this.dialog = dialog;
+	public void setSessionCreatingDialog(Dialog dialog) {
+		this.sessionCreatingDialog = dialog;
 	}
 
 	/**
 	 * @return the dialog
 	 */
-	public Dialog getDialog() {
-		return dialog;
+	public Dialog getSessionCreatingDialog() {
+		return sessionCreatingDialog;
 	}
 
 	public SipApplicationSessionImpl getSipApplicationSession() {
@@ -280,12 +283,12 @@ public class SipSessionImpl implements SipSession {
 		this.sipApplicationSession = sipApplicationSession;
 	}
 
-	public SIPTransaction getInitialTransaction() {
-		return initialTransaction;
+	public SIPTransaction getSessionCreatingTransaction() {
+		return sessionCreatingTransaction;
 	}
 
-	public void setInitialTransaction(SIPTransaction initialTransaction) {
-		this.initialTransaction = initialTransaction;
+	public void setSessionCreatingTransaction(SIPTransaction initialTransaction) {
+		this.sessionCreatingTransaction = initialTransaction;
 	}
 
 	
