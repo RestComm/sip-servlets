@@ -331,11 +331,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						
 			logger.info("sending response "+ this.message);
 			//if a response is sent for an initial request, it means that the application
-			//acted as an endpoint so a dialog must be created			
+			//acted as an endpoint so a dialog must be created but only for dialog creating method
+			CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 			if(!Request.CANCEL.equals(originalRequest.getMethod())					
 					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
 							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
-					&& getTransaction().getDialog() == null) {					
+					&& getTransaction().getDialog() == null 
+					&& JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod())) {					
 				String transport = JainSipUtils.findTransport(st.getRequest());
 				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
 						sipFactoryImpl.getSipProviders(), transport);

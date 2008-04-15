@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 public class SipContextConfig extends ContextConfig implements
 		LifecycleListener {
 
-	private static final String APPLICATION_SIP_XML = "/WEB-INF/sip.xml";
+	public static final String APPLICATION_SIP_XML = "WEB-INF/sip.xml";
 
 	private static transient Log logger = LogFactory
 			.getLog(SipContextConfig.class);
