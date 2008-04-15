@@ -1,8 +1,12 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.util.Properties;
 
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,14 +18,25 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private SipFactory sipFactory;
 	
 	public SimpleSipServlet() {
 	}
 	
 	@Override
-	public void init(ServletConfig servletConfig) throws ServletException {
-		System.out.println("the simple sip servlet has been started");
+	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
+		logger.info("the simple sip servlet has been started");
+		try { 			
+			// Getting the Sip factory from the JNDI Context
+			Properties jndiProps = new Properties();			
+			Context initCtx = new InitialContext(jndiProps);
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			sipFactory = (SipFactory) envCtx.lookup("sip/SipFactory");
+			logger.info("Sip Factory ref from JNDI : " + sipFactory);
+		} catch (NamingException e) {
+			throw new ServletException("Uh oh -- JNDI problem !", e);
+		}
 	}
 	
 	@Override
@@ -41,8 +56,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	@Override
     protected void doSuccessResponse(SipServletResponse resp)
 			throws ServletException, IOException {
-		logger.info("Got OK");
-		SipFactory sf = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		logger.info("Got " + resp.toString());
+//		SipFactory sf = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		
 		SipSession session = resp.getSession();
 
@@ -56,7 +71,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 					.getAttribute("SecondPartyAddress");
 			if (secondPartyAddress != null) {
 
-				SipServletRequest invite = sf.createRequest(resp
+				SipServletRequest invite = sipFactory.createRequest(resp
 						.getApplicationSession(), "INVITE", session
 						.getRemoteParty(), secondPartyAddress);
 
@@ -72,8 +87,13 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 				invite.getSession().setAttribute("LinkedSession", session);
 
 				SipServletRequest ack = resp.createAck();
+//				contentType = resp.getContentType();
+//				if (contentType.trim().equals("application/sdp")) {
+//					ack.setContent(resp.getContent(), "application/sdp");
+//				}
 				invite.getSession().setAttribute("FirstPartyAck", ack);
-
+				invite.getSession().setAttribute("FirstPartyContent", resp.getContent());
+				
 				invite.send();
 
 				session.setAttribute("InviteSent", Boolean.TRUE);
@@ -86,14 +106,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 					SipServletRequest firstPartyAck = (SipServletRequest) resp
 							.getSession().getAttribute("FirstPartyAck");
 	
-					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
+//					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
 						firstPartyAck.setContent(resp.getContent(),
 								"application/sdp");
-						secondPartyAck.setContent(resp.getContent(),
+						secondPartyAck.setContent(resp.getSession().getAttribute("FirstPartyContent"),
 								"application/sdp");
-					}
-	
+//					}
+					logger.info("First ACK "+ firstPartyAck.toString());
 					firstPartyAck.send();
+					logger.info("Second ACK "+ secondPartyAck.toString());
 					secondPartyAck.send();
 				}
 			}
