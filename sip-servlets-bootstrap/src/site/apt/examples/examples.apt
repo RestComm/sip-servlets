@@ -16,6 +16,8 @@ Examples
 	with two {{{speeddial_locationservice.html}chained proxy applications}}
 	
 	* {{{click2call.html}Click to Call}} : Converged application
+	
+	* {{{chatserver.html}Chat Server}} : support for sip extension MESSAGE
 
 	You can play with our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)
