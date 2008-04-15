@@ -1,16 +1,17 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Properties;
 
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.*;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +25,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	}
 	
 	@Override
-	public void init(ServletConfig servletConfig) throws ServletException {		
+	public void init(ServletConfig servletConfig) throws ServletException {
 		super.init(servletConfig);
 		logger.info("the simple sip servlet has been started");
 		try { 			
@@ -56,9 +57,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	@Override
     protected void doSuccessResponse(SipServletResponse resp)
 			throws ServletException, IOException {
-		logger.info("Got " + resp.toString());
-//		SipFactory sf = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-		
+		logger.info("Got OK");
 		SipSession session = resp.getSession();
 
 		if (resp.getStatus() == SipServletResponse.SC_OK) {
@@ -87,13 +86,10 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 				invite.getSession().setAttribute("LinkedSession", session);
 
 				SipServletRequest ack = resp.createAck();
-//				contentType = resp.getContentType();
-//				if (contentType.trim().equals("application/sdp")) {
-//					ack.setContent(resp.getContent(), "application/sdp");
-//				}
 				invite.getSession().setAttribute("FirstPartyAck", ack);
 				invite.getSession().setAttribute("FirstPartyContent", resp.getContent());
 				
+
 				invite.send();
 
 				session.setAttribute("InviteSent", Boolean.TRUE);
@@ -112,13 +108,22 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 						secondPartyAck.setContent(resp.getSession().getAttribute("FirstPartyContent"),
 								"application/sdp");
 //					}
-					logger.info("First ACK "+ firstPartyAck.toString());
+	
 					firstPartyAck.send();
-					logger.info("Second ACK "+ secondPartyAck.toString());
 					secondPartyAck.send();
 				}
 			}
 		}
+	}
+	
+	@Override
+	protected void doErrorResponse(SipServletResponse resp) throws ServletException,
+			IOException {
+		// If someone rejects it remove the call from the table
+		CallStatusContainer calls = (CallStatusContainer) getServletContext().getAttribute("activeCalls");
+		calls.removeCall(resp.getFrom().getURI().toString(), resp.getTo().getURI().toString());
+		calls.removeCall(resp.getTo().getURI().toString(), resp.getFrom().getURI().toString());
+
 	}
 
 	@Override
@@ -133,7 +138,9 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 			logger.info("Sending bye to " + linkedSession.getRemoteParty());
 			bye.send();
 		}
-
+		CallStatusContainer calls = (CallStatusContainer) getServletContext().getAttribute("activeCalls");
+		calls.removeCall(request.getFrom().getURI().toString(), request.getTo().getURI().toString());
+		calls.removeCall(request.getTo().getURI().toString(), request.getFrom().getURI().toString());
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
@@ -171,6 +178,21 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("Received register request: " + req.getTo());
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);
+		HashMap<String, String> users = (HashMap) getServletContext().getAttribute("registeredUsersMap");
+		if(users == null) users = new HashMap<String, String>();
+		getServletContext().setAttribute("registeredUsersMap", users);
+		String address = req.getHeader("Contact");
+		
+		// Extract the address from the contact header
+		int start = address.indexOf("sip:");
+		int end = start;
+		char ch;
+		do {
+			ch = address.charAt(end++);
+		} while (";<>,".indexOf(ch)<0);
+		address = address.substring(start, end-1);
+		
+		users.put(req.getFrom().getURI().toString(), address);
 		resp.send();
 	}
 

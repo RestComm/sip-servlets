@@ -2,6 +2,7 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -47,39 +48,54 @@ public class SimpleWebServlet extends HttpServlet
     public void doGet (HttpServletRequest request,
             	   HttpServletResponse response)
     throws ServletException, IOException
-    {       	        
+    {
         String toAddr = request.getParameter("to");
         String fromAddr = request.getParameter("from");
+        String bye = request.getParameter("bye");
+
         URI to = sipFactory.createAddress(toAddr).getURI();
-        URI from = sipFactory.createAddress(fromAddr).getURI();              
+        URI from = sipFactory.createAddress(fromAddr).getURI();    
+
+        CallStatusContainer calls = (CallStatusContainer) getServletContext().getAttribute("activeCalls");
 
         // Create app session and request
         SipApplicationSession appSession = 
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
-//        SipApplicationSession appSession = 
-//        	sipFactory.createApplicationSession();
-        SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
+
+        if(bye != null) {
+        	// Someone wants to end an established call, send byes and clean up
+        	SipServletRequest bye1 = sipFactory.createRequest(appSession, "BYE", from, to);
+        	SipServletRequest bye2 = sipFactory.createRequest(appSession, "BYE", to, from);
+        	bye1.send();
+        	bye2.send();
+        	calls.removeCall(from.toString(), to.toString());
+        	calls.removeCall(to.toString(), from.toString());
+        } else {
+        	if(calls == null) {
+        		calls = new CallStatusContainer();
+        		getServletContext().setAttribute("activeCalls", calls);
+        	}
+        	
+        	// Add the call in the active calls
+        	calls.addCall(fromAddr, toAddr, "FFFF00");
+
+        	SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
+
+        	// Set some attribute
+        	req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
+
+        	logger.info("Sending request" + req);
+        	// Send the INVITE request            
+        	req.send();
+        }
         
-        // Set some attribute
-        req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
-        
-        logger.info("Sending request" + req);
-        // Send the INVITE request            
-        req.send();
-        
-        // This hsould be at the end otherwise the response will have been committed and 
-        // the session can't be accessed anymore 
-        // Write some web page content
+        // Write the output html
     	PrintWriter	out;
         response.setContentType("text/html");
         out = response.getWriter();
-        out.println("<HTML><HEAD><TITLE>");
-        out.println("Click to call - converger sip servlet");
-        out.println("</TITLE></HEAD><BODY>");
-        out.println("<H1>Click To Call Converged Demo Sip Servlet</H1>");
-        out.println("<P>Calling from <b>" + fromAddr + "</b> to <b>" + toAddr + "</b>...");
-        if(sipFactory == null) out.println("</BR>Error: SipFactory is null");
-        out.println("</BODY></HTML>");
+        
+        // Just redirect to the index
+        out.println("<HTML><META HTTP-EQUIV=\"Refresh\"CONTENT=\"0; URL=index.jsp\"><HEAD><TITLE></HTML>");
         out.close();
     }
 }
