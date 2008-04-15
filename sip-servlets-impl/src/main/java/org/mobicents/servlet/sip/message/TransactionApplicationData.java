@@ -1,5 +1,7 @@
 package org.mobicents.servlet.sip.message;
 
+import javax.sip.Transaction;
+
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
@@ -12,6 +14,7 @@ public class TransactionApplicationData {
 	private ProxyImpl proxy;
 	private ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
+	private Transaction transaction;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;		
@@ -43,6 +46,18 @@ public class TransactionApplicationData {
 		
 	public SipServletMessageImpl getSipServletMessage() {
 		return this.sipServletMessage;
+	}
+	/**
+	 * @return the transaction
+	 */
+	public Transaction getTransaction() {
+		return transaction;
+	}
+	/**
+	 * @param transaction the transaction to set
+	 */
+	public void setTransaction(Transaction transaction) {
+		this.transaction = transaction;
 	}
 
 }

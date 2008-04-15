@@ -49,6 +49,7 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -99,6 +100,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * This parameter is to know which servlet handled the request 
 	 */
 	public static final String RR_PARAM_HANDLER_NAME = "handler";
+	/* 
+	 * This parameter is to know when an app was not deployed and couldn't handle the request
+	 * used so that the response doesn't try to call the app not deployed
+	 */
+	public static final String APP_NOT_DEPLOYED = "appnotdeployed";
 	
 	private static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
@@ -308,22 +314,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			RoutingState routingState = checkRoutingState(sipServletRequest, requestEvent.getDialog());				
 			sipServletRequest.setRoutingState(routingState);					
 			logger.info("Routing State " + routingState);			
-			
-			// FIXME TODO Note By Jean : remove the loops and send requests back statefully to the stack
-			// (clone request, add route header to route back, and new clientTx)						
+										
 			if(sipServletRequest.isInitial()) {
 				logger.info("Routing of Initial Request " + request);
-				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);				
-				while(continueRouting) {					
-					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);					
+				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
+				// if continueRouting is true it means two things :
+				// A) the app returned by the Application Router returned an app
+				// that is not currently deployed
+				// B) the app that was called didn't do anything with the request
+				// in any case we should route back to container statefully 
+				if(continueRouting) {
+					forwardStatefully(sipProvider, transaction,
+							sipServletRequest);
 				}				
 			} else {
 				logger.info("Routing of Subsequent Request " + request);
 				Dialog dialog = sipServletRequest.getDialog();				
-				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);				
-				while(continueRouting) {																	
-					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);					
-				}											
+				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
+				// if continueRouting is true it means the app that was called 
+				// didn't do anything with the request
+				// in any case we should route back to container statefully 
+				if(continueRouting) {
+					forwardStatefully(sipProvider, transaction,
+							sipServletRequest);
+				}										
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -332,6 +346,61 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return;
 		}
+	}
+
+	/**
+	 * Forward statefully a request whether it is initial or subsequent
+	 * and keep track of the transactions used in application data of each transaction
+	 * @param sipProvider the sip provider used to get a new client Transaction
+	 * @param transaction the server transaction on which we received the request
+	 * @param sipServletRequest the sip servlet request to forward statefully
+	 * @throws ParseException 
+	 * @throws TransactionUnavailableException
+	 * @throws SipException
+	 * @throws InvalidArgumentException 
+	 */
+	private void forwardStatefully(SipProvider sipProvider,
+			ServerTransaction transaction,
+			SipServletRequestImpl sipServletRequest) throws ParseException,
+			TransactionUnavailableException, SipException, InvalidArgumentException {
+		sipServletRequest.addInfoForRoutingBackToContainer();
+		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();
+		if(logger.isDebugEnabled()) {
+			logger.debug("Routing Back to the container the following initial request " 
+					+ clonedRequest);
+		}												
+		//Add via header
+		String transport = JainSipUtils.findTransport(clonedRequest);
+		String handlerName = sipServletRequest.getSipSession().getHandler();
+		ViaHeader viaHeader = JainSipUtils.createViaHeader(
+				sipFactoryImpl.getSipProviders(), transport, null);
+		if(handlerName != null) { 
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+					sipServletRequest.getSipSession().getKey().getApplicationName());
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+					sipServletRequest.getSipSession().getHandler());
+		} else {
+			viaHeader.setParameter(SipApplicationDispatcherImpl.APP_NOT_DEPLOYED,
+					sipServletRequest.getSipSession().getKey().getApplicationName());						
+		}					
+		clonedRequest.addHeader(viaHeader);
+		//decrease the Max Forward Header
+		MaxForwardsHeader mf = (MaxForwardsHeader) clonedRequest
+			.getHeader(MaxForwardsHeader.NAME);
+		if (mf == null) {
+			mf = SipFactories.headerFactory.createMaxForwardsHeader(70);
+			clonedRequest.addHeader(mf);
+		} else {
+			mf.setMaxForwards(mf.getMaxForwards() - 1);
+		}
+		ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
+		//keeping the server transaction in the client transaction's application data
+		TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
+		appData.setTransaction(transaction);
+		ctx.setApplicationData(appData);
+		//keeping the client transaction in the server transaction's application data
+		((TransactionApplicationData)transaction.getApplicationData()).setTransaction(ctx);
+		ctx.sendRequest();
 	}
 
 	/**
@@ -619,14 +688,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			logger.info("Dispatching the request event outside the container");
 			//check if the request point to another domain
-			boolean isAnotherDomain = false;
+			
 			javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
 			String host = sipRequestUri.getHost();
 			int port = sipRequestUri.getPort();
-			if(!hostNames.contains(host) && 
-					JainSipUtils.findMatchingListeningPoint(sipFactoryImpl.getSipProviders(), host, port) == null) {
-				isAnotherDomain = true;
-			}
+			String transport = JainSipUtils.findTransport(request);
+			boolean isAnotherDomain = isExternal(host, port, transport);			
 			ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
 			if(isAnotherDomain || routeHeaders.hasNext()) {
 				// the Request-URI points to a different domain, or there are one or more Route headers, 
@@ -759,13 +826,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			String routeTransport = routeUri.getTransportParam();
 			if(routeTransport == null) {
 				routeTransport = ListeningPoint.UDP;
-			}
-			ListeningPoint listeningPoint = JainSipUtils.findMatchingListeningPoint(
-					sipFactoryImpl.getSipProviders(), routeUri.getHost(), routeUri.getPort(), routeTransport);
-			if(listeningPoint != null) {
-				return false;
-			}
-		}
+			}					
+			return isExternal(routeUri.getHost(), routeUri.getPort(), routeTransport);						
+		}		
 		return true;
 	}
 	
@@ -775,14 +838,34 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @return true if the via header is external, false otherwise
 	 */
 	private boolean isViaHeaderExternal(ViaHeader viaHeader) {
-		if (viaHeader != null) {						
-			ListeningPoint listeningPoint = JainSipUtils.findMatchingListeningPoint(
-					sipFactoryImpl.getSipProviders(), viaHeader.getHost(), viaHeader.getPort(), viaHeader.getTransport());
-			if(listeningPoint != null) {
-				return false;
-			}
+		if (viaHeader != null) {			
+			return isExternal(viaHeader.getHost(), viaHeader.getPort(), viaHeader.getTransport());
 		}
 		return true;
+	}
+	
+	/**
+	 * Check whether or not the triplet host, port and transport are corresponding to an interface
+	 * @param host canbe hostname or ipaddress
+	 * @param port port number
+	 * @param transport transport used
+	 * @return true if the triplet host, port and transport are corresponding to an interface
+	 * false otherwise
+	 */
+	private boolean isExternal(String host, int port, String transport) {
+		boolean isExternal = true;
+		ListeningPoint listeningPoint = JainSipUtils.findMatchingListeningPoint(
+				sipFactoryImpl.getSipProviders(), host, port, transport);
+		if(hostNames.contains(host) || listeningPoint != null) {
+			isExternal = false;
+		}		
+		if(logger.isDebugEnabled()) {
+			logger.debug("the triplet host/port/transport : " + 
+					host + "/" +
+					port + "/" +
+					transport + " is external : " + isExternal);
+		}
+		return isExternal;
 	}
 	
 	/**
@@ -877,24 +960,41 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			
 		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
 		ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
-		boolean continueRouting = true;
+		boolean continueRouting = true;		
 		if(!isViaHeaderExternal(viaHeader)) {
 			continueRouting = routeResponse(response, viaHeader, clientTransaction, dialog);			
 		} 
 		// if continue routing is to true it means that
 		// a B2BUA got it so we don't have anything to do here 
 		// or an app that didn't do anything with it
+		// or a when handling the request an app had to be called but wasn't deployed
 		// we have to strip the topmost via header and forward it statefully		
 		if (continueRouting) {			
 			Response newResponse = (Response) response.clone();
 			newResponse.removeFirst(ViaHeader.NAME);
 			ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
 			if(viaHeadersLeft.hasNext()) {
-				//TODO forward it statefully
-//				SipProvider sipProvider = (SipProvider)responseEvent.getSource();
+				//forward it statefully
+				//TODO should decrease the max forward header to avoid infinite loop
+				if(logger.isDebugEnabled()) {
+					logger.debug("forwarding the response statefully " + newResponse);
+				}
+				ServerTransaction serverTransaction = (ServerTransaction)
+				((TransactionApplicationData)clientTransaction.getApplicationData()).getTransaction();
+				try {
+					serverTransaction.sendResponse(newResponse);
+				} catch (SipException e) {
+					logger.error("cannot forward the response statefully" , e);
+				} catch (InvalidArgumentException e) {
+					logger.error("cannot forward the response statefully" , e);
+				}				
 			} else {
 				//B2BUA case we don't have to do anything here
 				//no more via header B2BUA is the end point
+				if(logger.isDebugEnabled()) {
+					logger.debug("Not forwarding the response statefully. " +
+							"It was either an endpoint or a B2BUA, ie an endpoint too " + newResponse);
+				}
 			}			
 		}
 								
@@ -908,6 +1008,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	private boolean routeResponse(Response response, ViaHeader viaHeader, ClientTransaction clientTransaction, Dialog dialog) {
 		logger.info("viaHeader = " + viaHeader.toString());
+		String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
+		if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
+			return true;
+		}
 		String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
 		String handlerName = viaHeader.getParameter(RR_PARAM_HANDLER_NAME);
 		boolean inverted = false;
@@ -1115,6 +1219,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#addHostName(java.lang.String)
 	 */
 	public void addHostName(String hostName) {
+		if(logger.isDebugEnabled()) {
+			logger.debug(this);
+			logger.debug("Adding hostname "+ hostName);
+		}
 		hostNames.add(hostName);
 	}
 
@@ -1131,6 +1239,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#removeHostName(java.lang.String)
 	 */
 	public void removeHostName(String hostName) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Removing hostname "+ hostName);
+		}
 		hostNames.remove(hostName);
 	}
 }

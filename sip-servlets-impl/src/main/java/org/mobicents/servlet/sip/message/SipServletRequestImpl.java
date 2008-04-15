@@ -692,7 +692,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	}
 
-	private void addInfoForRoutingBackToContainer() throws ParseException {		
+	public void addInfoForRoutingBackToContainer() throws ParseException {		
 		Request request = (Request) super.message;
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipProviders(), 
