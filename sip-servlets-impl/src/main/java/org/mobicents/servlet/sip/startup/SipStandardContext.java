@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -63,8 +64,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime for an 
 	// application session is 3 minutes
 	private static int DEFAULT_LIFETIME = 3;
-	protected boolean initializing = false;
-	protected boolean starting = false;
 	
 	protected String applicationName;
 	protected String smallIcon;
@@ -75,6 +74,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected SipListenersHolder listeners;
 	protected String mainServlet;	
 	protected SipFactoryFacade sipFactoryFacade;	
+	protected SipSessionsUtilImpl sipSessionsUtil;
 	protected SipLoginConfig sipLoginConfig;
 	
     protected String namingContextName;
@@ -101,10 +101,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public void init() throws Exception {
 		logger.info("Initializing the sip context");
-//		if(initializing) {
-//			return ;
-//		}
-//		initializing = true;
 //		if (this.getParent() != null) {
 //			// Add the main configuration listener for sip applications
 //			LifecycleListener sipConfigurationListener = new SipContextConfig();
@@ -131,24 +127,23 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 		
 		sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
+		sipSessionsUtil = new SipSessionsUtilImpl(((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()).getSessionManager(), applicationName);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipFactoryFacade);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 				sipApplicationDispatcher.getOutboundInterfaces());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
 				TimerServiceImpl.getInstance());
-//		initializing = false;
-//		initialized = true;
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
+				SipApplicationDispatcher.EXTENSIONS_SUPPORTED);
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
+				sipSessionsUtil);
 		logger.info("sip context Initialized");
 	}
 
 	@Override
 	public synchronized void start() throws LifecycleException {
 		logger.info("Starting the sip context");
-//		if(starting) {
-//			return ;
-//		}
-//		starting = true;
 		 // Add missing components as necessary
         if (getResources() == null) {   // (1) Required by Loader
             if (logger.isDebugEnabled())
@@ -230,12 +225,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
 			}
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
-//			starting = false;
-//			started = true;
 			logger.info("sip context started");
 		} else {
-//			starting = false;
-//			started = false;
 			logger.info("sip context didn't started due to errors");
 		}
 										
@@ -357,13 +348,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			sipApplicationDispatcher.removeSipApplication(applicationName);		
 		}	
 		if(isUseNaming()) {
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIPFACTORY_REMOVED_EVENT, sipFactoryFacade);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_REMOVED_EVENT, sipSessionsUtil);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_REMOVED_EVENT, TimerServiceImpl.getInstance());
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_REMOVED_EVENT, null);
 		}  else {
         	try {
 				InitialContext iniCtx = new InitialContext();
 				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
 				// jboss or other kind of naming
 				SipNamingContextListener.removeSipFactory(envCtx, sipFactoryFacade);
+				SipNamingContextListener.removeSipSessionsUtil(envCtx, sipSessionsUtil);
+				SipNamingContextListener.removeTimerService(envCtx, TimerServiceImpl.getInstance());
+				SipNamingContextListener.removeSipSubcontext(envCtx);
 			} catch (NamingException e) {
 				//It is possible that the context has already been removed so no problem,
 				//we are stopping anyway
@@ -377,13 +374,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public void loadOnStartup(Container[] containers) {
 		if(isUseNaming()) {
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT, sipFactoryFacade);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_ADDED_EVENT, null);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT, sipFactoryFacade);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_ADDED_EVENT, sipSessionsUtil);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());
 		} else {
         	try {
 				InitialContext iniCtx = new InitialContext();
 				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
 				// jboss or other kind of naming
+				SipNamingContextListener.addSipSubcontext(envCtx);
 				SipNamingContextListener.addSipFactory(envCtx, sipFactoryFacade);
+				SipNamingContextListener.addSipSessionsUtil(envCtx, sipSessionsUtil);
+				SipNamingContextListener.addTimerService(envCtx, TimerServiceImpl.getInstance());
 			} catch (NamingException e) {
 				logger.error("Impossible to get the naming context ", e);
 				throw new IllegalStateException(e);

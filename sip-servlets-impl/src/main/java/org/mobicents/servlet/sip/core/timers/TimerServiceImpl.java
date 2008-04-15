@@ -35,9 +35,10 @@ public class TimerServiceImpl implements TimerService {
 	
 	private ExecutorServiceWrapper eService = ExecutorServiceWrapper.getInstance();
 	
-	private static TimerServiceImpl instance = new TimerServiceImpl();
-
-	public static synchronized TimerServiceImpl getInstance() {
+	private static final TimerServiceImpl instance = new TimerServiceImpl();
+	
+	// using Threadsafe static lazy initialization from joshua block
+	public static TimerServiceImpl getInstance() {
 		return instance;
 	}
 	
