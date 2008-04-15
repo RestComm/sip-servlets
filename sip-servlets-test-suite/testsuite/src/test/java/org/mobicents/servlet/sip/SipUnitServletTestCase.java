@@ -3,6 +3,8 @@ package org.mobicents.servlet.sip;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cafesip.sipunit.SipTestCase;
 
 /**
@@ -12,6 +14,7 @@ import org.cafesip.sipunit.SipTestCase;
  * since it should map to the test case.
  */
 public abstract class SipUnitServletTestCase extends SipTestCase {
+	private static Log logger = LogFactory.getLog(SipUnitServletTestCase.class);
 	protected String tomcatBasePath;
 	protected String projectHome;
 	protected SipEmbedded tomcat;
@@ -35,8 +38,17 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
 			properties.load(inputStream);
 		}	
-		tomcatBasePath = properties.getProperty("tomcat.home");		
-		projectHome = properties.getProperty("project.home");
+		// First try to use the env variables - useful for shell scripting
+		tomcatBasePath = System.getenv("CATALINA_HOME");	
+		projectHome = System.getenv("SIP_SERVLETS_HOME");
+		
+		// Otherwise use the properties
+		if(this.tomcatBasePath == null || this.tomcatBasePath.length() <= 0) 
+			this.tomcatBasePath = properties.getProperty("tomcat.home");
+		if(this.projectHome == null || this.projectHome.length() <= 0)
+			this.projectHome = properties.getProperty("project.home");
+		logger.info("Tomcat base Path is : " + tomcatBasePath);
+		logger.info("Project Home is : " + projectHome);
 		//starting tomcat
 		tomcat = new SipEmbedded();
 		tomcat.setPath(tomcatBasePath);		

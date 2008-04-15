@@ -164,7 +164,7 @@ public class Shootist implements SipListener {
 				if (cseq.getMethod().equals(Request.INVITE)) {
 					System.out.println("Dialog after 200 OK  " + dialog);
 					System.out.println("Dialog State after 200 OK  " + dialog.getState());
-					ackRequest = dialog.createRequest(Request.ACK);
+					ackRequest = dialog.createAck(cseq.getSeqNumber());
 					System.out.println("Sending ACK");
 					dialog.sendAck(ackRequest);
 					
