@@ -32,6 +32,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
@@ -177,7 +178,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
 		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
-		super.start();		
+		super.start();	
+		
+		// Replace the default annotation processor. This is needed to handle resource injection
+		// for SipFactory, Session utils and other objects residing in the servlet context space.
+		// Of course if the variable is not found in in the servet context it defaults to the
+		// normal lookup method - in the default naming context.
+		this.setAnnotationProcessor(
+				new SipAnnotationProcessor(
+						getNamingContextListener().getEnvContext(),
+						this));
+		
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 		//called implicitly within sipApplicationDispatcher.addSipApplication
 		if(getAvailable()) {
