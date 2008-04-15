@@ -154,6 +154,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 					session, null, null, true);			
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
+			//set AR State Info from previous request
+			newSipServletRequest.getSipSession().setStateInfo(origRequestImpl.getSipSession().getStateInfo());
 			//needed for application composition
 			newSipServletRequest.setCurrentApplicationName(origRequestImpl.getCurrentApplicationName());
 			//If Contact header is present in the headerMap 

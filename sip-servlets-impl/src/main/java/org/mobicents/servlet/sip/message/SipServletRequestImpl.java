@@ -6,12 +6,11 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,6 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipApplicationRoutingDirective;
-import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -64,12 +62,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
-	
-	//request state info
-	private Serializable stateInfo;
-	//request routing region
-	private SipApplicationRoutingRegion routingRegion;
-	
+		
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
 	
@@ -210,7 +203,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));					
 				}
 			}			
-				
+			//Adding the recorded route headers as route headers
+			ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
+			while (recordRouteHeaders.hasNext()) {
+				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+						.next();
+				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
+				response.addHeader(routeHeader);
+			}
+			
 			return new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog(), this);
 		} catch (ParseException ex) {
@@ -425,7 +426,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void setRoutingDirective(SipApplicationRoutingDirective directive,
 			SipServletRequest origRequest) throws IllegalStateException {
-		Request request = (Request) message;		
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 		//If directive is NEW, origRequest parameter is ignored. 		
 		if(origRequestImpl != null) {
@@ -590,12 +590,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = (Request) super.message;
 
 			String transport = JainSipUtils.findTransport(request);
-			//Add a record route header for app composition		
-			addAppCompositionRRHeader();
-			
+					
 			if(Request.ACK.equals(request.getMethod())) {
 				getDialog().sendAck(request);
 				return;
+			}
+			//Added for dialog creating requests only not for subsequent requests 
+			if(SipFactoryImpl.dialogCreationMethods.contains(request.getMethod())) {
+				//Add a record route header for app composition		
+				addAppCompositionRRHeader();			
+				//add a route header to direct the request back to the container 
+				//to check if there is any other apps interested in it
+				addInfoForRoutingBackToContainer();
 			}
 			
 			if (super.getTransaction() == null) {
@@ -625,7 +631,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);
 					request.addHeader(contactHeader);
-				}
+				}				
 				
 				ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
@@ -650,13 +656,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				super.setTransaction(ctx);
 
 			}
-			logger.info("Sending the request " + request);
+
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
-					|| getDialog().getState() == DialogState.EARLY) {
+					|| getDialog().getState() == DialogState.EARLY) {				
+				logger.info("Sending the request " + request);
 				((ClientTransaction) super.getTransaction()).sendRequest();
 			} else {
-				// This is an in-dialog request.
+				// This is a subsequent (an in-dialog) request. 
+				// we don't redirect it to the container for now
+				logger.info("Sending the in dialog request " + request);
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}
 			//tells the application dispatcher to stop routing the linked request
@@ -672,9 +681,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	}
 
+	private void addInfoForRoutingBackToContainer() throws ParseException {		
+		Request request = (Request) super.message;
+		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
+				sipFactoryImpl.getSipProviders(), 
+				JainSipUtils.findTransport(request));
+		sipURI.setLrParam();
+		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_DIRECTIVE, 
+				routingDirective.toString());
+		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_PREV_APPLICATION_NAME, 
+				session.getKey().getApplicationName());
+		javax.sip.address.Address routeAddress = 
+			SipFactories.addressFactory.createAddress(sipURI);
+		RouteHeader routeHeader = 
+			SipFactories.headerFactory.createRouteHeader(routeAddress);
+		request.addHeader(routeHeader);						
+	}
+
 	/**
 	 * Add a record route header for app composition
-	 * @throws ParseException if anything goes wrong while createing the record route header
+	 * @throws ParseException if anything goes wrong while creating the record route header
 	 */
 	public void addAppCompositionRRHeader()
 			throws ParseException {
@@ -702,35 +728,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	public SipServletRequestImpl getLinkedRequest() {
 		return this.linkedRequest;
-	}
-
-	/**
-	 * @return the stateInfo
-	 */
-	public Serializable getStateInfo() {
-		return stateInfo;
-	}
-
-	/**
-	 * @param stateInfo the stateInfo to set
-	 */
-	public void setStateInfo(Serializable stateInfo) {
-		this.stateInfo = stateInfo;
-	}
-
-	/**
-	 * @return the routingRegion
-	 */
-	public SipApplicationRoutingRegion getRoutingRegion() {
-		return routingRegion;
-	}
-
-	/**
-	 * @param routingRegion the routingRegion to set
-	 */
-	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
-		this.routingRegion = routingRegion;
-	}
+	}	
 
 	/**
 	 * @return the routingState

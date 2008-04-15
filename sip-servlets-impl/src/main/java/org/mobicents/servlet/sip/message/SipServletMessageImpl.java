@@ -786,6 +786,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return this.session;
 	}
 	
+	/**
+	 * Retrieve the sip session implementation
+	 * @return the sip session implementation
+	 */
 	public SipSessionImpl getSipSession() {
 		return session;
 	}

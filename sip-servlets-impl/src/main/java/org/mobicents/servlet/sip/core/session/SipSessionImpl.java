@@ -1,12 +1,12 @@
 package org.mobicents.servlet.sip.core.session;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -81,6 +81,11 @@ public class SipSessionImpl implements SipSession {
 	 * Routing region per session/dialog.
 	 */
 	private SipApplicationRoutingRegion routingRegion;
+	
+	/**
+	 * AR state info
+	 */
+	private Serializable stateInfo;
 	
 	/**
 	 * Current state of the session, one of INTITIAL, EARLY, ESTABLISHED and TERMINATED.
@@ -291,8 +296,27 @@ public class SipSessionImpl implements SipSession {
 		return routingRegion;
 	}
 
+	/**
+	 * This method allows the application to set the region that the application 
+	 * is in with respect to this SipSession
+	 * @param routingRegion the region that the application is in  
+	 */
 	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
 		this.routingRegion = routingRegion;
+	}
+	
+	/**
+	 * @return the stateInfo
+	 */
+	public Serializable getStateInfo() {
+		return stateInfo;
+	}
+
+	/**
+	 * @param stateInfo the stateInfo to set
+	 */
+	public void setStateInfo(Serializable stateInfo) {
+		this.stateInfo = stateInfo;
 	}
 	
 	/*

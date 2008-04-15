@@ -30,12 +30,12 @@ public class SipNamingContextListener extends NamingContextListener {
         ContextAccessController.setWritable(getName(), container);
         
         String type = event.getType();
-		if (type.equals("addSipFactory")) {
+		if (type.equals(NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT)) {
 			SipFactory sipFactory = (SipFactory) event.getData();
             if (sipFactory != null) {                
                 addSipFactory(sipFactory);
             }
-        } else if (type.equals("removeSipFactory")) {
+        } else if (type.equals(NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT)) {
         	SipFactory sipFactory = (SipFactory) event.getData();
             if (sipFactory != null) {                
                 removeSipFactory(sipFactory);

@@ -59,7 +59,7 @@ public class SipFactoryImpl implements SipFactory {
 	private static final TreeSet<String> forbbidenToHeaderParams = new TreeSet<String>(
 			new NamesComparator());
 
-	private static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
+	protected static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
 			new NamesComparator());
 
 	static {
