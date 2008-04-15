@@ -39,7 +39,9 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 
 		logger.info("Got request:\n"
 				+ request.getMethod());
-		SipServletResponse sipServletResponse = request.createResponse(200);
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+		sipServletResponse.send();
+		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 	}
 
@@ -50,7 +52,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 			IOException {
 
 		logger.info("Got BYE request:\n" + request);
-		SipServletResponse sipServletResponse = request.createResponse(200);
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 	}
 

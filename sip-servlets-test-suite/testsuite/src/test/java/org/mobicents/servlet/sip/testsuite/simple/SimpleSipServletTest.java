@@ -175,7 +175,7 @@ public class SimpleSipServletTest extends SipServletTestCase implements SipListe
 		
 			
 		if (tid == null) {
-			
+			dialog = responseReceivedEvent.getDialog();
 			// RFC3261: MUST respond to every 2xx
 			if (ackRequest!=null && dialog!=null) {
 			   logger.info("re-sending ACK");
@@ -195,6 +195,7 @@ public class SimpleSipServletTest extends SipServletTestCase implements SipListe
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
+					dialog = responseReceivedEvent.getDialog();
 					ackRequest = dialog.createRequest(Request.ACK);
 					logger.info("Sending ACK");
 					dialog.sendAck(ackRequest);
