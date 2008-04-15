@@ -44,7 +44,7 @@ public class SipStandardManager extends StandardManager {
 		if(container instanceof SipContext) {
 			return new ConvergedSession(this, sipFactoryImpl);
 		} else {
-			return getNewSession();
+			return super.getNewSession();
 		}
 	}
 
