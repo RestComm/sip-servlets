@@ -319,6 +319,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if (create && transactionApplicationData.getProxy() == null) {
 			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
 			this.transactionApplicationData.setProxy(proxy);
+			getSipSession().setSupervisedMode(proxy.getSupervised());
 		}
 		return this.transactionApplicationData.getProxy();
 	}

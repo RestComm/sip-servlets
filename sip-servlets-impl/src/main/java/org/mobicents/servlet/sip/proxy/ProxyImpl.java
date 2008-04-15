@@ -303,7 +303,7 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void setSupervised(boolean supervised) {
 		this.supervised = supervised;
-
+		originalRequest.getSipSession().setSupervisedMode(supervised);
 	}
 
 	/* (non-Javadoc)

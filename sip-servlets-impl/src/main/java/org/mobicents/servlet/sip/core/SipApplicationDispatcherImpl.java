@@ -30,6 +30,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -165,7 +166,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * 
 	 */
 	public SipApplicationDispatcherImpl() {
-		applicationDeployed = Collections.synchronizedMap(new HashMap<String, SipContext>());
+		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		sessionManager = new SessionManager();
 		sipFactoryImpl = new SipFactoryImpl(this);
 		hostNames = Collections.synchronizedList(new ArrayList<String>());
@@ -1433,17 +1434,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					callServlet(sipServletResponse, session);
 				}
 			} catch (ServletException e) {				
-				logger.error(e);
+				logger.error("Unexpected servlet exception while processing the response", e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
 			} catch (IOException e) {				
-				logger.error(e);
+				logger.error("Unexpected io exception while processing the response",e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
-			} catch (Throwable e) {
-				e.printStackTrace();
+			} catch (Throwable e) {				
 				logger.error("Unexpected exception while processing response",e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
@@ -1466,9 +1466,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
 		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
-		Wrapper sipServletImpl = (Wrapper) container;		
-		Servlet servlet = sipServletImpl.allocate();	        
-		servlet.service(null, response);		
+		Wrapper sipServletImpl = (Wrapper) container;	
+		if(sipServletImpl.isUnavailable()) {
+			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
+		} else {
+			Servlet servlet = sipServletImpl.allocate();	        
+			servlet.service(null, response);
+		}
+				
 	}
 	
 	public static boolean securityCheck(SipServletRequestImpl request)

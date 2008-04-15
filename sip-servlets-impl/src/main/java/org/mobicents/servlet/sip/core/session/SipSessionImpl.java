@@ -24,6 +24,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -43,6 +44,7 @@ import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
@@ -173,7 +175,7 @@ public class SipSessionImpl implements SipSession {
 		this.state = State.INITIAL;
 		this.valid = true;
 		this.supervisedMode = true;
-		this.sipSessionAttributeMap = new HashMap<String, Object>();
+		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipApplicationSessionImpl.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -427,18 +429,29 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#invalidate()
 	 */
 	public void invalidate() {
-		if(state.equals(State.CONFIRMED)
-				|| state.equals(State.EARLY))
-			throw new IllegalStateException("Can not invalidate session in " + 
-					state.toString() + " state.");
-		if(isSupervisedMode() && ongoingTransactions.size()>0) {
-			dumpOngoingTransactions();
-			throw new IllegalStateException("Can not invalidate session with " +
-					ongoingTransactions.size() + " ongoing transactions in supervised mode.");
+		checkInvalidation();
+		
+		for (String key : sipSessionAttributeMap.keySet()) {
+			removeAttribute(key);
 		}
-		valid = false;		
+		valid = false;				
 		notifySipSessionListeners(SipSessionEventType.DELETION);
 		sipFactory.getSessionManager().removeSipSession(key);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void checkInvalidation() {
+		if(state.equals(State.CONFIRMED)
+				|| state.equals(State.EARLY))
+			throw new IllegalStateException("Can not invalidate sip session in " + 
+					state.toString() + " state.");
+		if(isSupervisedMode() && hasOngoingTransaction()) {
+			dumpOngoingTransactions();
+			throw new IllegalStateException("Can not invalidate sip session with " +
+					ongoingTransactions.size() + " ongoing transactions in supervised mode.");
+		}
 	}
 
 	private void dumpOngoingTransactions() {
@@ -455,10 +468,18 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#isOngoingTransaction()
 	 */
 	public boolean hasOngoingTransaction() {
-		if(!isSupervisedMode())
+		if(!isSupervisedMode()) {
 			return false;
-		else
-			return ongoingTransactions.size()>0;
+		} else {
+			for (Transaction transaction : ongoingTransactions) {
+				if(TransactionState.CALLING.equals(transaction.getState()) ||
+					TransactionState.TRYING.equals(transaction.getState()) ||
+					TransactionState.PROCEEDING.equals(transaction.getState())) {
+						return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	/*
@@ -660,7 +681,7 @@ public class SipSessionImpl implements SipSession {
 	}
 	
 	public void onDialogTimeout(Dialog dialog) {
-		if(this.ongoingTransactions.size()>0) {
+		if(hasOngoingTransaction()) {
 			throw new IllegalStateException("Dialog timed out, but there are active transactions.");
 		}
 		this.state = State.TERMINATED;
@@ -709,7 +730,7 @@ public class SipSessionImpl implements SipSession {
 		// The exception to the general rule is that it does not apply to requests (e.g. BYE, CANCEL) 
 		// that are dialog terminating according to the appropriate RFC rules relating to the kind of dialog.		
 		if(!JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod()) &&
-				JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
+				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
 			return;
 		}
 		// Mapping to the sip session state machine (proxy is covered here too)

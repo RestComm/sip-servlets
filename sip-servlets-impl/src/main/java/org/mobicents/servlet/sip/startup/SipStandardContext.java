@@ -342,31 +342,34 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	@Override
 	public synchronized void stop() throws LifecycleException {
-		logger.info("Stopping the sip context");
+		logger.info("Stopping the sip context");		
+		super.stop();
+		// this should happen after so that applications can still do some processing
+		// in destroy methods to notify that context is getting destroyed and app removed
 		if(sipApplicationDispatcher != null) {				
 			sipApplicationDispatcher.removeSipApplication(applicationName);		
 		}	
-		if(isUseNaming()) {
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_REMOVED_EVENT, sipSessionsUtil);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_REMOVED_EVENT, TimerServiceImpl.getInstance());
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_REMOVED_EVENT, null);
-		}  else {
-        	try {
-				InitialContext iniCtx = new InitialContext();
-				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-				// jboss or other kind of naming
-				SipNamingContextListener.removeSipFactory(envCtx, sipFactoryFacade);
-				SipNamingContextListener.removeSipSessionsUtil(envCtx, sipSessionsUtil);
-				SipNamingContextListener.removeTimerService(envCtx, TimerServiceImpl.getInstance());
-				SipNamingContextListener.removeSipSubcontext(envCtx);
-			} catch (NamingException e) {
-				//It is possible that the context has already been removed so no problem,
-				//we are stopping anyway
-//				logger.error("Impossible to get the naming context ", e);				
-			}	        	
-        }
-		super.stop();		
+		// not needed since the JNDI will be destroyed automatically
+//		if(isUseNaming()) {
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_REMOVED_EVENT, sipSessionsUtil);
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_REMOVED_EVENT, TimerServiceImpl.getInstance());
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_REMOVED_EVENT, null);
+//		}  else {
+//        	try {
+//				InitialContext iniCtx = new InitialContext();
+//				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+//				// jboss or other kind of naming
+//				SipNamingContextListener.removeSipFactory(envCtx, sipFactoryFacade);
+//				SipNamingContextListener.removeSipSessionsUtil(envCtx, sipSessionsUtil);
+//				SipNamingContextListener.removeTimerService(envCtx, TimerServiceImpl.getInstance());
+//				SipNamingContextListener.removeSipSubcontext(envCtx);
+//			} catch (NamingException e) {
+//				//It is possible that the context has already been removed so no problem,
+//				//we are stopping anyway
+////				logger.error("Impossible to get the naming context ", e);				
+//			}	        	
+//        }
 		logger.info("sip context stopped");
 	}
 

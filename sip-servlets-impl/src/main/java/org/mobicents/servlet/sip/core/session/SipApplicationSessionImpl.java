@@ -347,13 +347,38 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		if(!valid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
+		//JSR 289 Section 6.1.2.2.1
+		//When the IllegalStateException is thrown, the application is guaranteed 
+		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
+		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
+		
+		//need to check before doing the real invalidation if they are eligible 
+		//for invalidation
 		for(SipSessionImpl session: sipSessions.values()) {
-			if(session.isValid())
-				throw new IllegalStateException("All SIP " +
+			if(session.isValid()) {
+				try {
+					session.checkInvalidation();
+				} catch (IllegalStateException e) {
+					throw new IllegalStateException("All SIP " +
 						"and HTTP sessions must be invalidated" +
-						" before invalidating the application session.");
+						" before invalidating the application session.", e);
+				}
+			}					
 		}
-		valid = false;		
+		//doing the invalidation
+		for(SipSessionImpl session: sipSessions.values()) {
+			if(session.isValid()) {
+				session.invalidate();
+			}
+		}
+		for(HttpSession session: httpSessions.values()) {
+			session.invalidate();
+		}
+		valid = false;	
+		//cancelling the timers
+		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
+			servletTimerEntry.getValue().cancel();
+		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		// FIXME get rid of the reference in the session manager (refactor session manager
 		// to map to tomcat session management)
