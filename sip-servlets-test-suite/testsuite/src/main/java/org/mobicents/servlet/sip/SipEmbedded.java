@@ -14,7 +14,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.loader.StandardClassLoader;
 import org.apache.catalina.security.SecurityClassLoad;
@@ -31,6 +30,7 @@ import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.SipStandardEngine;
 import org.mobicents.servlet.sip.startup.SipStandardService;
 
 /**
@@ -106,20 +106,21 @@ public class SipEmbedded {
 		 * name="Catalina"
 		 * sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
 		 * sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">
-		 */
-		SipApplicationDispatcherImpl sipApplicationDispatcher = new SipApplicationDispatcherImpl();
+		 */		
 		// Create an embedded server		
 		sipStandardService = new SipStandardService();
-		sipStandardService.setName("Catalina");
-		sipStandardService.setSipApplicationDispatcher(sipApplicationDispatcher);
+		sipStandardService.setName("Catalina");		
 		sipStandardService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
 		sipStandardService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
 		sipStandardService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		// Create an engine		
-		Engine engine = new StandardEngine();
+		Engine engine = new SipStandardEngine();
 		engine.setName("Catalina");
 		engine.setDefaultHost("localhost");
-		engine.setService(sipStandardService);		
+		engine.setService(sipStandardService);
+		// Install the assembled container hierarchy
+		sipStandardService.setContainer(engine);
+		sipStandardService.init();
 		// Create a default virtual host
 //		host = (StandardHost) embedded.createHost("localhost", getPath() + "/webapps");
 		host = new StandardHost();
@@ -130,10 +131,7 @@ public class SipEmbedded {
 		host.addLifecycleListener(new SipHostConfig());
 		host.setAutoDeploy(false);
 		host.setDeployOnStartup(false);
-		engine.addChild(host);
-
-		// Install the assembled container hierarchy
-		sipStandardService.setContainer(engine);
+		engine.addChild(host);		
 
 		/*
 		 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
