@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. -->
 <project basedir="." default="test-suite" name="sip-servlets-test-suite">
     <property environment="env"/>
     <property name="M2_REPO" value="C:/Documents and Settings/DRAGAN/.m2/repository"/>
-    <property name="ECLIPSE_HOME" value="../../../java/eclipse-3.3"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.5"/>
@@ -41,13 +35,7 @@
     
     <target name="init">
         <mkdir dir="target/classes"/>
-        <mkdir dir="target/test-classes"/>
-        <copy includeemptydirs="false" todir="target/classes">
-            <fileset dir="src/main/java" excludes="**/*.uad, **/*.ucd, **/*.uld, **/*.upd, **/*.udd, **/*.uod, **/*.usd, **/*.utd, **/*.uud, **/*.odd, **/*.ead, **/*.ecd, **/*.eld, **/*.epd, **/*.edd, **/*.eod, **/*.esd, **/*.etd, **/*.eud, **/*.urd*.uml, **/*.ecore, **/*.launch, **/*.java"/>
-        </copy>
-        <copy includeemptydirs="false" todir="target/test-classes">
-            <fileset dir="src/test/java" excludes="**/*.uad, **/*.ucd, **/*.uld, **/*.upd, **/*.udd, **/*.uod, **/*.usd, **/*.utd, **/*.uud, **/*.odd, **/*.ead, **/*.ecd, **/*.eld, **/*.epd, **/*.edd, **/*.eod, **/*.esd, **/*.etd, **/*.eud, **/*.urd*.uml, **/*.ecore, **/*.launch, **/*.java"/>
-        </copy>
+        <mkdir dir="target/test-classes"/>        
     </target>
     
     <target name="clean">
@@ -57,9 +45,7 @@
     
     <target depends="clean" name="cleanall"/>
     
-    <target depends="build-subprojects,build-project" name="build"/>
-    
-    <target name="build-subprojects"/>
+    <target depends="build-project" name="build"/>
     
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
@@ -71,22 +57,6 @@
             <src path="src/test/java"/>
             <classpath refid="sip-servlets-test-suite.classpath"/>
         </javac>
-    </target>
-    
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
-    </target>
-    
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
     </target>        
     
     <target name="junitreport">
