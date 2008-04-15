@@ -2,7 +2,6 @@ package org.mobicents.servlet.sip.router;
 
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -143,41 +142,47 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultApplicationRouter implements SipApplicationRouter {	
 	//	the logger
 	private static Log log = LogFactory.getLog(DefaultApplicationRouter.class);
+	//the prefix used in the dar configuration file to specify the subscriber URI to use
+	//when reusing the information from one header
+	private static final String DAR_SUSCRIBER_PREFIX = "DAR:";
+	private static final int DAR_SUSCRIBER_PREFIX_LENGTH = DAR_SUSCRIBER_PREFIX.length();
 	//the parser for the properties file
 	private DefaultApplicationRouterParser defaultApplicationRouterParser;
 	//Applications deployed within the container
-	List<String> containerDeployedApplicationNames = null;
+//	List<String> containerDeployedApplicationNames = null;
 	//List of applications defined in the defautl application router properties file
-	Map<String, List<SipApplicationRouterInfo>> sipApplicationRouterInfos;
+	Map<String, List<DefaultSipApplicationRouterInfo>> defaultSipApplicationRouterInfos;
 	
 	/**
 	 * Default Constructor
 	 */
 	public DefaultApplicationRouter() {
-		containerDeployedApplicationNames = Collections.synchronizedList(new ArrayList<String>());
+//		containerDeployedApplicationNames = Collections.synchronizedList(new ArrayList<String>());
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
-		sipApplicationRouterInfos = new HashMap<String, List<SipApplicationRouterInfo>>();
+		defaultSipApplicationRouterInfos = Collections.synchronizedMap(new HashMap<String, List<DefaultSipApplicationRouterInfo>>());
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public void applicationDeployed(List<String> newlyDeployedApplicationNames) {		
-		containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
+	public void applicationDeployed(List<String> newlyDeployedApplicationNames) {
+		init();
+//		containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void applicationUndeployed(List<String> undeployedApplicationNames) {
-		containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
+		init();
+//		containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void destroy() {
-		containerDeployedApplicationNames.clear();			
+//		containerDeployedApplicationNames.clear();			
 	}
 
 	/**
@@ -187,18 +192,36 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 			SipServletRequest initialRequest,
 			SipApplicationRoutingRegion region,
 			SipApplicationRoutingDirective directive, Serializable stateInfo) {		
-		// TODO implements the real matching logic for now it's gonna be first app deployed 
-		// matching	is the one always interested :-)
-		if(initialRequest != null) {			
-			List<SipApplicationRouterInfo> sipApplicationRouterInfoList = 
-				sipApplicationRouterInfos.get(initialRequest.getMethod());
-			if(sipApplicationRouterInfoList != null && sipApplicationRouterInfoList.size() > 0) {
-				for (SipApplicationRouterInfo sipApplicationRouterInfo : sipApplicationRouterInfoList) {
-					if(containerDeployedApplicationNames.contains(sipApplicationRouterInfo.getNextApplicationName())) {
-						return sipApplicationRouterInfo;
+		// Minimalist application router implementation with no processing logic 
+		// besides the declaration of the application order
+		if(initialRequest != null) {						
+			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
+				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());
+			if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
+				int previousAppOrder = -1; 
+				if(stateInfo != null) {
+					try{
+						previousAppOrder = Integer.parseInt((String)stateInfo);
+					} catch (NumberFormatException nfe) {}
+				}
+				for (DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo : defaultSipApplicationRouterInfoList) {
+					if(defaultSipApplicationRouterInfo.getOrder() > previousAppOrder) {
+						String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
+						if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
+							String headerName = subscriberIdentity.substring(
+									DAR_SUSCRIBER_PREFIX_LENGTH);
+							subscriberIdentity = initialRequest.getHeader(headerName);
+						}
+						//TODO ask EG : the SipApplicationRoutingRegion is missing from the constructor !!
+						return new SipApplicationRouterInfo(
+								defaultSipApplicationRouterInfo.getApplicationName(),
+								subscriberIdentity,
+								defaultSipApplicationRouterInfo.getRoute(),
+								defaultSipApplicationRouterInfo.getRouteModifier(),
+								defaultSipApplicationRouterInfo.getOrder());					
 					}
 				}
-			}			
+			}
 		}
 		return new SipApplicationRouterInfo(null,null,null,null,null);
 	}
@@ -209,7 +232,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	public void init() {		
 		defaultApplicationRouterParser.init();		
 		try {
-			sipApplicationRouterInfos = defaultApplicationRouterParser.parse();
+			defaultSipApplicationRouterInfos = defaultApplicationRouterParser.parse();
 		} catch (ParseException e) {
 			log.fatal("Impossible to parse the default application router configuration file",e);
 			throw new IllegalArgumentException("Impossible to parse the default application router configuration file",e);
@@ -221,7 +244,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	 */
 	public void init(List<String> deployedApplicationNames) {
 		init();
-		this.containerDeployedApplicationNames.addAll(deployedApplicationNames);
+//		this.containerDeployedApplicationNames.addAll(deployedApplicationNames);
 	}
 
 }

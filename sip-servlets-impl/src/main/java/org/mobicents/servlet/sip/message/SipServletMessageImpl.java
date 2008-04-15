@@ -576,7 +576,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		AddressImpl addrs = new AddressImpl(from.getAddress());
 		return null;
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getHeader(java.lang.String)
+	 */
 	public String getHeader(String name) {
 
 		String nameToSearch = getCorrectHeaderName(name);

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import javax.servlet.sip.SipApplicationRouterInfo;
+import javax.servlet.sip.SipApplicationRoutingRegionType;
 import javax.servlet.sip.SipRouteModifier;
 
 import org.apache.commons.logging.Log;
@@ -70,9 +70,9 @@ public class DefaultApplicationRouterParser {
 	 * @return a Map of key as sip method and value as a list of SipApplicationRouterInfo
 	 * @throws ParseException if anything goes wrong during the parsing
 	 */
-	public Map<String, List<SipApplicationRouterInfo>> parse() throws ParseException {
-		Map<String, List<SipApplicationRouterInfo>> sipApplicationRoutingInfo = 
-			new HashMap<String, List<SipApplicationRouterInfo>>();
+	public Map<String, List<DefaultSipApplicationRouterInfo>> parse() throws ParseException {
+		Map<String, List<DefaultSipApplicationRouterInfo>> sipApplicationRoutingInfo = 
+			new HashMap<String, List<DefaultSipApplicationRouterInfo>>();
 		
 		Iterator darEntriesIterator = properties.entrySet().iterator();
 		while(darEntriesIterator.hasNext()) {
@@ -81,7 +81,7 @@ public class DefaultApplicationRouterParser {
 			String sipMethod = darEntry.getKey();
 			String sipApplicationRouterInfosStringified = darEntry.getValue();
 			//parse the corresponding value  
-			List<SipApplicationRouterInfo> sipApplicationRouterInfoList = 
+			List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfoList = 
 				parseSipApplicationRouterInfos(sipApplicationRouterInfosStringified);			
 			sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
 		}
@@ -96,8 +96,8 @@ public class DefaultApplicationRouterParser {
 	 * @return a list of SipApplicationRouterInfo
 	 * @throws ParseException if anything goes wrong during the parsing
 	 */
-	private List<SipApplicationRouterInfo> parseSipApplicationRouterInfos(String sipApplicationRouterInfosStringified) throws ParseException {
-		List<SipApplicationRouterInfo> sipApplicationRouterInfos = new ArrayList<SipApplicationRouterInfo>();
+	private List<DefaultSipApplicationRouterInfo> parseSipApplicationRouterInfos(String sipApplicationRouterInfosStringified) throws ParseException {
+		List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfos = new ArrayList<DefaultSipApplicationRouterInfo>();
 		while(sipApplicationRouterInfosStringified.indexOf("(") != -1) {
 			int indexOfLeftParenthesis = sipApplicationRouterInfosStringified.indexOf("(");
 			int indexOfRightParenthesis = sipApplicationRouterInfosStringified.indexOf(")");
@@ -107,9 +107,9 @@ public class DefaultApplicationRouterParser {
 				
 			String sipApplicationRouterInfoStringified = 
 				sipApplicationRouterInfosStringified.substring(indexOfLeftParenthesis, indexOfRightParenthesis +1);
-			SipApplicationRouterInfo sipApplicationRouterInfo = parseSipApplicationRouterInfo(sipApplicationRouterInfoStringified);
-			//TODO don't add them in list order but get the index order from the default application router properties file
-			sipApplicationRouterInfos.add(sipApplicationRouterInfo);
+			DefaultSipApplicationRouterInfo sipApplicationRouterInfo = parseSipApplicationRouterInfo(sipApplicationRouterInfoStringified);
+			//get the index order from the default application router properties file			
+			sipApplicationRouterInfos.add(sipApplicationRouterInfo.getOrder(),sipApplicationRouterInfo);
 			sipApplicationRouterInfosStringified = sipApplicationRouterInfosStringified.substring(indexOfRightParenthesis + 1);
 		}
 		return sipApplicationRouterInfos;
@@ -122,7 +122,7 @@ public class DefaultApplicationRouterParser {
 	 * @return the corresponding SipApplicationRouterInfo
 	 * @throws ParseException if anything goes wrong during the parsing
 	 */
-	private SipApplicationRouterInfo parseSipApplicationRouterInfo(String sipApplicationRouterInfoStringified) throws ParseException {
+	private DefaultSipApplicationRouterInfo parseSipApplicationRouterInfo(String sipApplicationRouterInfoStringified) throws ParseException {
 		//there will always have 6 parameters in a SipApplicationRouterInfo for the default applicationRouterInfo
 		String[] sipApplicationRouterInfoParameters = new String[SIP_APPLICATION_ROUTER_INFO_PARAM_NB];
 		
@@ -133,25 +133,32 @@ public class DefaultApplicationRouterParser {
 			}
 			int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
 			if(indexOfRightQuote == -1) {				
-				throw new ParseException("Cannot parse the following string from the default application router file" + sipApplicationRouterInfoStringified,0);
+				throw new ParseException("Cannot parse the following string from the default application router file " + sipApplicationRouterInfoStringified,0);
 			}				
 			indexOfRightQuote += indexOfLeftQuote;
 			String sipApplicationRouterInfoParameter = 
 				sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1, indexOfRightQuote + 1);
 			sipApplicationRouterInfoParameters[i] = sipApplicationRouterInfoParameter;
 			sipApplicationRouterInfoStringified = sipApplicationRouterInfoStringified.substring(indexOfRightQuote + 2);
-		}	
-		//TODO ask EG : the SipApplicationRoutingRegion is missing from the constructor !!
-		return new SipApplicationRouterInfo(
+		}		
+		int order = -1;
+		try{
+			order = Integer.parseInt(sipApplicationRouterInfoParameters[5]);
+		} catch (NumberFormatException nfe) {
+			throw new ParseException("Impossible to parse the state info into an integer for this line " + sipApplicationRouterInfoStringified, 0);
+		}
+		return new DefaultSipApplicationRouterInfo(
 				//application name
 				sipApplicationRouterInfoParameters[0],
 				//subsriberURI
 				sipApplicationRouterInfoParameters[1],
+				//routing region
+				SipApplicationRoutingRegionType.valueOf(SipApplicationRoutingRegionType.class,sipApplicationRouterInfoParameters[2]),
 				//route
 				sipApplicationRouterInfoParameters[3],
 				//sip route modifier
 				SipRouteModifier.valueOf(SipRouteModifier.class,sipApplicationRouterInfoParameters[4]),
 				//stateinfo
-				sipApplicationRouterInfoParameters[5]);		
+				order);		
 	}
 }
