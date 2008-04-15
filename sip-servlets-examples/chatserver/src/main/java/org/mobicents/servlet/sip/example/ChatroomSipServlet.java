@@ -158,4 +158,13 @@ public class ChatroomSipServlet extends SipServlet {
         List<String> list = (List<String>)getServletContext().getAttribute(USER_LIST);
         list.remove(from);
     }
+    
+    @Override
+    protected void doRegister(SipServletRequest req) throws ServletException, IOException 
+	{
+		logger.info("Received register request: " + req.getTo());
+		int response = SipServletResponse.SC_OK;
+		SipServletResponse resp = req.createResponse(response);
+		resp.send();
+	}
 }
