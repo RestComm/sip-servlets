@@ -18,6 +18,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Stack;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -184,9 +187,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
                 namingContextListener.setName(getNamingContextName());
                 setNamingContextListener(namingContextListener);
                 addLifecycleListener(namingContextListener);
-                addContainerListener(namingContextListener);
+                addContainerListener(namingContextListener);                
             }
-        }
+        }   
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
@@ -204,11 +207,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 							getNamingContextListener().getEnvContext(),
 							this));
 		} else {
-			// jboss or other kind of naming
-			this.setAnnotationProcessor(
-					new SipAnnotationProcessor(
-							null,
-							this));
+			try {
+				InitialContext iniCtx = new InitialContext();
+				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+				// jboss or other kind of naming
+				this.setAnnotationProcessor(
+						new SipAnnotationProcessor(
+								envCtx,
+								this));
+			} catch (NamingException e) {
+				logger.error("Impossible to get the naming context ", e);
+			}						
 		}
 		
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
@@ -349,17 +358,37 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}	
 		if(isUseNaming()) {
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIPFACTORY_REMOVED_EVENT, sipFactoryFacade);
-		}
+		}  else {
+        	try {
+				InitialContext iniCtx = new InitialContext();
+				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+				// jboss or other kind of naming
+				SipNamingContextListener.removeSipFactory(envCtx, sipFactoryFacade);
+			} catch (NamingException e) {
+				//It is possible that the context has already been removed so no problem,
+				//we are stopping anyway
+//				logger.error("Impossible to get the naming context ", e);				
+			}	        	
+        }
 		super.stop();		
 		logger.info("sip context stopped");
 	}
 
 	@Override
 	public void loadOnStartup(Container[] containers) {
-		// Adding Sip Factory to JNDI Context
-		if (isUseNaming()) {			
+		if(isUseNaming()) {
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT, sipFactoryFacade);
-		}
+		} else {
+        	try {
+				InitialContext iniCtx = new InitialContext();
+				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+				// jboss or other kind of naming
+				SipNamingContextListener.addSipFactory(envCtx, sipFactoryFacade);
+			} catch (NamingException e) {
+				logger.error("Impossible to get the naming context ", e);
+				throw new IllegalStateException(e);
+			}	        	
+        }   
 		super.loadOnStartup(containers);	
 	}
 

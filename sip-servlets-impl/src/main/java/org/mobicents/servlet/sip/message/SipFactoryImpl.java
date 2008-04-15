@@ -13,6 +13,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +65,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
-public class SipFactoryImpl implements SipFactory {
+public class SipFactoryImpl implements SipFactory, Serializable {
 	private static final Log logger = LogFactory.getLog(SipFactoryImpl.class
 			.getCanonicalName());
 
@@ -83,7 +84,7 @@ public class SipFactoryImpl implements SipFactory {
 
 	private Set<SipProvider> sipProviders = null;
 
-	private SipApplicationDispatcher sipApplicationDispatcher = null;
+	private transient SipApplicationDispatcher sipApplicationDispatcher = null;
 	/**
 	 * Dafault constructor
 	 * @param sipApplicationDispatcher 

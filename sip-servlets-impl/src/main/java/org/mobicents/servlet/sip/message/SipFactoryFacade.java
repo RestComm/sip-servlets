@@ -13,6 +13,8 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import java.io.Serializable;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.Address;
@@ -38,13 +40,13 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author Jean Deruelle
  *
  */
-public class SipFactoryFacade implements SipFactory {
+public class SipFactoryFacade implements SipFactory, Serializable {
 	private static final Log logger = LogFactory.getLog(SipFactoryFacade.class
 			.getName());
 	
 	private SipFactoryImpl sipFactoryImpl;
-	private SipContext sipContext;
-	private ThreadLocal<HttpSession> threadLocalHttpSession;
+	private transient SipContext sipContext;
+	private transient ThreadLocal<HttpSession> threadLocalHttpSession;
 	
 	public SipFactoryFacade(SipFactoryImpl sipFactoryImpl, SipContext sipContext) {
 		this.sipFactoryImpl = sipFactoryImpl;
@@ -78,7 +80,7 @@ public class SipFactoryFacade implements SipFactory {
 	 */
 	public SipApplicationSession createApplicationSession() {
 		SipApplicationSessionImpl sipApplicationSessionImpl = 
-			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession(sipContext);
+			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSessionByAppName(sipContext.getApplicationName());
 		associateHttpSession(sipApplicationSessionImpl);
 		return sipApplicationSessionImpl;
 	}

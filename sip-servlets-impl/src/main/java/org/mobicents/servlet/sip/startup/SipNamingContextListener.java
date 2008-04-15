@@ -13,6 +13,7 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.servlet.sip.SipFactory;
 
@@ -47,7 +48,7 @@ public class SipNamingContextListener extends NamingContextListener {
 		if (type.equals(NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT)) {
 			SipFactory sipFactory = (SipFactory) event.getData();
             if (sipFactory != null) {                
-                addSipFactory(sipFactory);
+                addSipFactory(envCtx, sipFactory);
                 if(logger.isDebugEnabled()) {
                 	logger.debug("Sip Factory added to the JNDI context for container " + event.getContainer());
                 }
@@ -55,7 +56,7 @@ public class SipNamingContextListener extends NamingContextListener {
         } else if (type.equals(NAMING_CONTEXT_SIPFACTORY_REMOVED_EVENT)) {
         	SipFactory sipFactory = (SipFactory) event.getData();
             if (sipFactory != null) {                
-                removeSipFactory(sipFactory);
+                removeSipFactory(envCtx, sipFactory);
                 if(logger.isDebugEnabled()) {
                 	logger.debug("Sip Factory removed from the JNDI context for container " + event.getContainer());
                 }
@@ -69,7 +70,7 @@ public class SipNamingContextListener extends NamingContextListener {
 	 * Removes the sip factory binding from the jndi mapping along with the sip subcontext
 	 * @param sipFactory the sip factory to remove
 	 */
-	private void removeSipFactory(SipFactory sipFactory) {
+	public static void removeSipFactory(Context envCtx, SipFactory sipFactory) {
 		if(envCtx != null) {
 			try {
 				javax.naming.Context sipContext = (javax.naming.Context)envCtx.lookup(SIP_SUBCONTEXT);
@@ -86,7 +87,7 @@ public class SipNamingContextListener extends NamingContextListener {
 	 * and bind the sip factory in paramter to it
 	 * @param sipFactory the sip factory to add
 	 */
-	private void addSipFactory(SipFactory sipFactory) {
+	public static void addSipFactory(Context envCtx, SipFactory sipFactory) {
 		if(envCtx != null) {
 			try {
 				javax.naming.Context sipContext = envCtx.createSubcontext(SIP_SUBCONTEXT);

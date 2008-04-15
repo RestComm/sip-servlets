@@ -1,26 +1,19 @@
 package org.mobicents.servlet.sip.annotations;
 
-import java.io.*;
-import java.lang.annotation.Annotation;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.sip.annotation.SipApplication;
 import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
-import javax.servlet.sip.SipServletRequest;
 
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.loader.StandardClassLoader;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
