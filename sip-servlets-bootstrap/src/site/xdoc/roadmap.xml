@@ -28,6 +28,8 @@
 						<img src="images/green.jpeg" />
 						Sessions
 						<br />
+						<img src="images/green.jpeg" />						
+						Timers					
 					</p>
 				</subsection>
 			</subsection>
@@ -40,10 +42,10 @@
 							Listeners
 						</a>
 						<br />
-						<img src="images/orange.jpeg" />
+						<img src="images/green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=14">
-							Timers
+							Application Session Expiration
 						</a>
 						<br />
 						<img src="images/orange.jpeg" />
