@@ -376,7 +376,7 @@ public class SipFactoryImpl implements SipFactory {
 					(SipApplicationSessionImpl) sipAppSession);
 
 			SipServletRequest retVal = new SipServletRequestImpl(
-					sipProvider, session, ctx);
+					sipProvider, session, ctx, dialog);
 
 			// TODO: Do session association?
 
