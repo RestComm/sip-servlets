@@ -41,9 +41,9 @@ public abstract class SipServletTestCase extends TestCase {
 		projectHome = System.getProperty("SIP_SERVLETS_HOME");
 		
 		// Otherwise use the properties
-		if(this.tomcatBasePath == null || this.tomcatBasePath.isEmpty()) 
+		if(this.tomcatBasePath == null || this.tomcatBasePath.length() <= 0) 
 			this.tomcatBasePath = properties.getProperty("tomcat.home");
-		if(this.projectHome == null || this.projectHome.isEmpty())
+		if(this.projectHome == null || this.projectHome.length() <= 0)
 			this.projectHome = properties.getProperty("project.home");
 		
 		//starting tomcat
