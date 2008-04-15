@@ -29,6 +29,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipURI;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
@@ -489,6 +490,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				sipServletRequest.setPoppedRoute(routeHeader);
 				return true;
 			} else {
+				//FIXME send to the outside world
 				return false;
 			}					
 		}		
@@ -534,8 +536,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
 			logger.info("previous state info : " + stateInfo);
 		}
-		
-		logger.info("Dispatching the request event");		
+					
 		// 15.4.1 Procedure : point 1		
 		SipApplicationRoutingRegion routingRegion = null;
 		if(sipServletRequest.getSipSession() != null) {
@@ -600,6 +601,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		}
 		// 15.4.1 Procedure : point 3
 		if(applicationRouterInfo.getNextApplicationName() == null) {
+			logger.info("Dispatching the request event outside the container");
 			//check if the request point to another domain
 			boolean isAnotherDomain = false;
 			javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
@@ -614,9 +616,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// the Request-URI points to a different domain, or there are one or more Route headers, 
 				// send the request externally according to standard SIP mechanism.
 				try{
-					sipProvider.sendRequest((Request)request.clone());
-						
-					logger.info("Request event dispatched to another domain");
+					sipProvider.sendRequest((Request)request.clone());						
+					logger.info("Request event dispatched to another domain" + request.toString());
 				} catch (Exception ex) {			
 					throw new IllegalStateException("Error sending request",ex);
 				}				
@@ -629,6 +630,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				return false;
 			}
 		} else {
+			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
 			//sip session association
 			SipSessionKey sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
@@ -713,8 +715,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 				return false;
 			} else {
-				sipServletRequest.addAppCompositionRRHeader();
-				return true;
+				try {
+					sipServletRequest.addAppCompositionRRHeader();
+					return true;
+				} catch (SipException e) {				
+					logger.error(e);
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return false;
+				}
 			}
 		}		
 	}
@@ -830,73 +839,97 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		Response response = responseEvent.getResponse();
 //		SipProvider sipProvider = (SipProvider)responseEvent.getSource();
 		// See if this transaction has been here before		
-//		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
-//		Dialog dialog = responseEvent.getDialog();
+		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
+		Dialog dialog = responseEvent.getDialog();
 	
 		//FIXME 
 		RouteHeader routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
 		Address address = null;
-		if(routeHeader != null) {
+		if(! isRouteExternal(routeHeader)) {
+			logger.info("routing response by route headers ");
 			address = routeHeader.getAddress();
-		}
-		RecordRouteHeader recordRouteHeader = (RecordRouteHeader) response.getHeader(RecordRouteHeader.NAME);
-		if(address == null && recordRouteHeader != null) {			
-			address = recordRouteHeader.getAddress();			
-		}
-		if(address != null) {
-			javax.sip.address.SipURI routeURI = (javax.sip.address.SipURI)address.getURI();
-			String appName = routeURI.getParameter(RR_PARAM_APPLICATION_NAME); 
-			String handlerName = routeURI.getParameter(RR_PARAM_HANDLER_NAME);
-			SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, false);
-			SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl);									
-			// Transate the repsponse to SipServletResponse
-			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
-					response, 
-					sipFactoryImpl,
-					responseEvent.getClientTransaction(), 
-					session, 
-					responseEvent.getDialog(), 
-					null);
-	
-			// Update Session state
-			session.updateStateOnResponse(sipServletResponse);
-			
-			try {
-				session.setHandler(handlerName);
-				// See if this is a response to a proxied request
-				ProxyBranchImpl proxyBranch = session.getProxyBranch();
-				if(proxyBranch != null) {
-					// Handle it at the branch
-					proxyBranch.onResponse(sipServletResponse); 
-					
-					// Notfiy the servlet
-					if(proxyBranch.getProxy().getSupervised()) {
-						callServlet(sipServletResponse, session);
-					}
+			response.removeFirst(RouteHeader.NAME);
+			while(address != null) {
+				routeResponse(response, address, clientTransaction, dialog);
+				routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
+				address = null;
+				if(! isRouteExternal(routeHeader)) {			
+					address = routeHeader.getAddress();
+					response.removeFirst(RouteHeader.NAME);
 				}
-				else {
+			}
+		} else {
+			logger.info("routing response by record route headers ");
+			ListIterator<RecordRouteHeader> recordRouteHeaders = 
+				response.getHeaders(RecordRouteHeader.NAME);
+			while (recordRouteHeaders.hasNext()) {
+				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+						.next();
+				routeResponse(response, recordRouteHeader.getAddress(), clientTransaction, dialog);	
+			}			
+		}						
+	}
+
+	/**
+	 * @param responseEvent
+	 * @param response
+	 * @param address
+	 * @return
+	 */
+	private boolean routeResponse(Response response, Address address, ClientTransaction clientTransaction, Dialog dialog) {		
+		
+		javax.sip.address.SipURI routeURI = (javax.sip.address.SipURI)address.getURI();
+		String appName = routeURI.getParameter(RR_PARAM_APPLICATION_NAME); 
+		String handlerName = routeURI.getParameter(RR_PARAM_HANDLER_NAME);
+		SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, false);
+		SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl);									
+		// Transate the repsponse to SipServletResponse
+		SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
+				response, 
+				sipFactoryImpl,
+				clientTransaction, 
+				session, 
+				dialog, 
+				null);
+
+		// Update Session state
+		session.updateStateOnResponse(sipServletResponse);
+		
+		try {
+			session.setHandler(handlerName);
+			// See if this is a response to a proxied request
+			ProxyBranchImpl proxyBranch = session.getProxyBranch();
+			if(proxyBranch != null) {
+				// Handle it at the branch
+				proxyBranch.onResponse(sipServletResponse); 
+				
+				// Notfiy the servlet
+				if(proxyBranch.getProxy().getSupervised()) {
 					callServlet(sipServletResponse, session);
 				}
-			} catch (ServletException e) {				
-				logger.error(e);
-				// Sends a 500 Internal server error and stops processing.				
-	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				return;
-			} catch (IOException e) {				
-				logger.error(e);
-				// Sends a 500 Internal server error and stops processing.				
-	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				return;
-			} catch (Throwable e) {
-				e.printStackTrace();
-				logger.error(e);
-				// Sends a 500 Internal server error and stops processing.				
-	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				return;
-			}		
-		} else {
-			logger.error("No Route Header on the response, dropping it !");
-		}
+			}
+			else {
+				callServlet(sipServletResponse, session);
+			}
+		} catch (ServletException e) {				
+			logger.error(e);
+			// Sends a 500 Internal server error and stops processing.				
+//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+			return false;
+		} catch (IOException e) {				
+			logger.error(e);
+			// Sends a 500 Internal server error and stops processing.				
+//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+			return false;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			logger.error(e);
+			// Sends a 500 Internal server error and stops processing.				
+//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+			return false;
+		}		
+			
+		return true;
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {

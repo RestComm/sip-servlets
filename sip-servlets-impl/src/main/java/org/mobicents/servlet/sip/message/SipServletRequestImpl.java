@@ -701,9 +701,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/**
 	 * Add a record route header for app composition
 	 * @throws ParseException if anything goes wrong while creating the record route header
+	 * @throws SipException 
+	 * @throws NullPointerException 
 	 */
 	public void addAppCompositionRRHeader()
-			throws ParseException {
+			throws ParseException, SipException {
 		Request request = (Request) super.message;
 		
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
@@ -718,7 +720,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipFactories.addressFactory.createAddress(sipURI);
 		RecordRouteHeader recordRouteHeader = 
 			SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
-		request.addHeader(recordRouteHeader);
+		request.addLast(recordRouteHeader);
 	}
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {

@@ -269,13 +269,14 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					SipFactories.addressFactory.createAddress(sipURI);
 				RecordRouteHeader recordRouteHeader = 
 					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
-				response.addHeader(recordRouteHeader);
+				response.addLast(recordRouteHeader);
 			}
 			// Update Session state
 			session.updateStateOnResponse(this);
 			
 			ServerTransaction st = (ServerTransaction) getTransaction();
 			
+			logger.info("sending response "+ this.message);
 			st.sendResponse( (Response)this.message );
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop

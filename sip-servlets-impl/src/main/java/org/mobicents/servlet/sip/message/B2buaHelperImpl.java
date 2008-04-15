@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +31,7 @@ import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -111,6 +113,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 			newRequest.removeHeader(RouteHeader.NAME);
 			String tag = Integer.toString((int) (Math.random()*1000));
 			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
+			
+			// Remove the record route headers. This is a new call leg.
+			newRequest.removeHeader(RecordRouteHeader.NAME);
 			
 			//For non-REGISTER requests, the Contact header field is not copied 
 			//but is populated by the container as usual
@@ -278,12 +283,21 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 		ServerTransaction st = (ServerTransaction) trans;
 
-		Request request = st.getRequest();
+		Request request = st.getRequest();				
 		try {
 			Response response = SipFactories.messageFactory.createResponse(
 					status, request);
 			if (reasonPhrase != null)
 				response.setReasonPhrase(reasonPhrase);
+						
+			ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);			
+			while (recordRouteHeaders.hasNext()) {
+				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+						.next();				
+				response.addHeader(recordRouteHeader);
+//				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
+//				response.addHeader(routeHeader);
+			}			
 			
 			if(status ==  Response.OK) {
 				ContactHeader contactHeader = 
