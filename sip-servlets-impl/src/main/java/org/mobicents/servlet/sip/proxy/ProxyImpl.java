@@ -3,8 +3,6 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
-import gov.nist.javax.sip.header.SIPHeader;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +46,6 @@ public class ProxyImpl implements Proxy {
 	private SipURI recordRouteURI;
 	private SipURI outboundInterface;
 	private SipFactoryImpl sipFactoryImpl;
-	private int proxyId;
 	
 	private ProxyUtils proxyUtils;
 	
@@ -282,18 +279,13 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#startProxy()
 	 */
 	public void startProxy() {
-		if(this.parallel)
-		{
-			for (ProxyBranch pb : this.proxyBranches.values())
-			{
+		if(this.parallel) {
+			for (ProxyBranch pb : this.proxyBranches.values()) {
 				((ProxyBranchImpl)pb).start();
 			}
-		}
-		else
-		{
+		} else {
 			startNextUntriedBranch();
-		}
-
+		}		
 	}
 	
 	public SipURI getOutboundInterface() {

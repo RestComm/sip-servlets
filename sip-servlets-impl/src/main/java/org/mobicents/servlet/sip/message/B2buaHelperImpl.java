@@ -147,7 +147,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();				
 			
-			SipSessionKey key = SessionManager.getSipSessionKey(origRequestImpl.getCurrentApplicationName(), newRequest, false);
+			SipSessionKey key = SessionManager.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
 			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl);			
 			session.setSipApplicationSession(appSession);
 			session.setHandler(originalSession.getHandler());
@@ -238,7 +238,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
 			//needed for application composition
-			newSipServletRequest.setCurrentApplicationName(origRequestImpl.getCurrentApplicationName());
+			newSipServletRequest.setCurrentApplicationName(originalSession.getKey().getApplicationName());
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.

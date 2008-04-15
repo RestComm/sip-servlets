@@ -9,22 +9,19 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.servlet.sip.SipApplicationRoutingDirective;
-import javax.sip.ClientTransaction;
-import javax.sip.ListeningPoint;
-import javax.sip.SipProvider;
 import javax.sip.address.Address;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -34,7 +31,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyUtils {
-	
+	private static Log logger = LogFactory.getLog(ProxyUtils.class);
 	private SipFactoryImpl sipFactoryImpl;
 	private ProxyImpl proxy;
 	
@@ -51,21 +48,23 @@ public class ProxyUtils {
 
 			// The target is null when proxying subsequent requests (the Route header is already there)
 			if(params.destination != null)
-			{
-				javax.sip.address.SipURI target = SipFactories.addressFactory.createSipURI(
-					params.destination.getUser(), params.destination.getHost());
-				clonedRequest.setRequestURI(target);
+			{				
+				if(logger.isDebugEnabled()){
+					logger.debug("request URI on the request to proxy : " + params.destination);
+				}
+				//this way everything is copied even the port but might not work for TelURI...
+				clonedRequest.setRequestURI(((SipURIImpl)params.destination).getURI());
 				
-				// Add route header
-				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
-						params.destination.getUser(), params.destination.getHost());
-				routeUri.setPort(params.destination.getPort());
-				routeUri.setLrParam();
-				javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.destination.getUser(),
-						routeUri);
-				RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
-				
-				clonedRequest.setHeader(rheader);
+//				// Add route header
+//				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
+//						params.destination.getUser(), params.destination.getHost());
+//				routeUri.setPort(params.destination.getPort());
+//				routeUri.setLrParam();
+//				javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.destination.getUser(),
+//						routeUri);
+//				RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
+//				
+//				clonedRequest.setHeader(rheader);
 			}
 			else
 			{

@@ -332,7 +332,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#isInitial()
 	 */
 	public boolean isInitial() {
-		return this.routingState.equals(RoutingState.INITIAL);
+		return this.routingState.equals(RoutingState.INITIAL) || 
+			this.routingState.equals(RoutingState.PROXIED) ||
+			this.routingState.equals(RoutingState.RELAYED);
 	}
 
 	public void pushPath(Address uri) {
@@ -427,27 +429,35 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void setRoutingDirective(SipApplicationRoutingDirective directive,
 			SipServletRequest origRequest) throws IllegalStateException {
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		//If directive is NEW, origRequest parameter is ignored. 		
-		if(origRequestImpl != null) {
-			//@jean.deruelle Commenting this out, why origRequestImpl.isCommitted() is needed ?
+		//@jean.deruelle Commenting this out, why origRequestImpl.isCommitted() is needed ?
 //			if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
 //					&& (!origRequestImpl.isInitial() || origRequestImpl.isCommitted())) {
-			// If directive is CONTINUE or REVERSE, the parameter origRequest must be an 
-			//initial request dispatched by the container to this application, 
-			//i.e. origRequest.isInitial() must be true
-			if ((directive == SipApplicationRoutingDirective.REVERSE || 
-					directive == SipApplicationRoutingDirective.CONTINUE) &&
-					!origRequestImpl.isInitial()) {
+		// If directive is CONTINUE or REVERSE, the parameter origRequest must be an 
+		//initial request dispatched by the container to this application, 
+		//i.e. origRequest.isInitial() must be true
+		if ((directive == SipApplicationRoutingDirective.REVERSE || 
+				directive == SipApplicationRoutingDirective.CONTINUE)){ 
+			if(origRequestImpl == null ||
+				!origRequestImpl.isInitial()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("directive to set : " + directive);
+					logger.debug("Original Request Routing State : " + origRequestImpl.getRoutingState());
+				}
 				throw new IllegalStateException(
 						"Bad state -- cannot set routing directive");
-			}			
-		}		
-		//This request must be a request created in a new SipSession 
-		//or from an initial request, and must not have been sent. 
-		//If any one of these preconditions are not met, the method throws an IllegalStateException.
-		if(!State.INITIAL.equals(session.getState()) && session.getOngoingTransactions().size() > 0) {
-			throw new IllegalStateException(
-				"Bad state -- cannot set routing directive");
+			}
+		} else {				
+			//This request must be a request created in a new SipSession 
+			//or from an initial request, and must not have been sent. 
+			//If any one of these preconditions are not met, the method throws an IllegalStateException.
+			if(!State.INITIAL.equals(session.getState()) && session.getOngoingTransactions().size() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("session state : " + session.getState());
+					logger.debug("numbers of ongoing transactions : " + session.getOngoingTransactions().size());
+				}
+				throw new IllegalStateException(
+					"Bad state -- cannot set routing directive");
+			}
 		}
 		routingDirective = directive;
 		linkedRequest = origRequestImpl;
@@ -600,11 +610,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(getSipSession().getProxyBranch() == null) // If the app is proxying it already does that
 				{
 					//Add a record route header for app composition		
-					addAppCompositionRRHeader();			
-					//add a route header to direct the request back to the container 
-					//to check if there is any other apps interested in it
-					addInfoForRoutingBackToContainer();
+					addAppCompositionRRHeader();	
 				}
+				//add a route header to direct the request back to the container 
+				//to check if there is any other apps interested in it
+				addInfoForRoutingBackToContainer();				
 			}
 			
 			if (super.getTransaction() == null) {
@@ -635,7 +645,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);
 					request.addHeader(contactHeader);
 				}				
-				
+				if(logger.isDebugEnabled()) {
+					logger.debug("Getting new Client Tx for request " + request);
+				}
 				ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
 				

@@ -309,6 +309,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			sipServletRequest.setRoutingState(routingState);					
 			logger.info("Routing State " + routingState);			
 			
+			// FIXME TODO Note By Jean : remove the loops and send requests back statefully to the stack
+			// (clone request, add route header to route back, and new clientTx)						
 			if(sipServletRequest.isInitial()) {
 				logger.info("Routing of Initial Request " + request);
 				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);				
@@ -706,7 +708,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			} 			
 			//if a final response has been sent, or if the request has 
 			//been proxied or relayed we stop routing the request
-			RoutingState routingState = sipServletRequest.getRoutingState();
+			RoutingState routingState = sipServletRequest.getRoutingState();			
 			if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
 					RoutingState.PROXIED.equals(routingState) ||
 					RoutingState.RELAYED.equals(routingState)) {
@@ -716,6 +718,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				}
 				return false;
 			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+							"The Container hence continue routing the initial request.");
+				}
 				try {
 					sipServletRequest.addAppCompositionRRHeader();
 					return true;
@@ -846,6 +852,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		// FIXME TODO: Note by Vladimir: Responses are routed based on Via headers, not Record Route.
 		// Also, all responses related to a proxy must be sent directly there, it will take care of
 		// the proper routing. Will talk about it tomorow.
+		
+		// FIXME TODO : Note by Jean : remove the loops and send responses back statefully to the stack
+		//(clone response, add route header to route back, and new clientTx) 
 		
 		RouteHeader routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
 		Address address = null;

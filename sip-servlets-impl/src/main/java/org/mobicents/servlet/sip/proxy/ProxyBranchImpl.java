@@ -6,7 +6,6 @@ package org.mobicents.servlet.sip.proxy;
 import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
@@ -14,13 +13,13 @@ import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
-import javax.sip.ClientTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -34,7 +33,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyBranchImpl implements ProxyBranch {
-
+	private static Log logger = LogFactory.getLog(ProxyBranchImpl.class);
 	private ProxyImpl proxy;
 	private SipServletRequestImpl originalRequest;
 	private SipServletRequestImpl outgoingRequest;
@@ -172,37 +171,39 @@ public class ProxyBranchImpl implements ProxyBranch {
 				recordRoute, 
 				this.pathURI));
 
-		try {
-			forwardRequest(cloned, false);
-			//tells the application dispatcher to stop routing the original request
-			//since it has been proxied
-			originalRequest.setRoutingState(RoutingState.PROXIED);
-			started = true;
-			
-			if(cloned.getMethod().equalsIgnoreCase("INVITE"))
-			{
-				// Send provisional TRYING. Chapter 10.2
-				SipServletResponse trying =
-					originalRequest.createResponse(100);
+		forwardRequest(cloned, false);			
+		//tells the application dispatcher to stop routing the original request
+		//since it has been proxied
+		originalRequest.setRoutingState(RoutingState.PROXIED);
+		started = true;
+		
+		if(cloned.getMethod().equalsIgnoreCase("INVITE"))
+		{
+			// Send provisional TRYING. Chapter 10.2
+			SipServletResponse trying =
+				originalRequest.createResponse(100);
+			try {
 				trying.send();
+			} catch (IOException e) { 
+				logger.error("Cannot send the 100 Trying",e);
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
-	public void forwardRequest(Request request, boolean subsequent) throws TransactionUnavailableException
+	public void forwardRequest(Request request, boolean subsequent) 
 	{
-		String transport = JainSipUtils.findTransport(request);
-		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-				sipFactoryImpl.getSipProviders(), transport);
-		ClientTransaction tx = sipProvider.getNewClientTransaction(request);
+//		String transport = JainSipUtils.findTransport(request);
+//		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+//				sipFactoryImpl.getSipProviders(), transport);
+//		ClientTransaction tx = sipProvider.getNewClientTransaction(request);
+		if(logger.isDebugEnabled()) {
+			logger.debug("creating cloned Request for proxybranch " + request);
+		}
 		SipServletRequestImpl clonedRequest = new	SipServletRequestImpl(
 				request,
 				sipFactoryImpl,
 				null,
-				tx, null, false);
+				null, null, false);
 		
 		this.outgoingRequest = clonedRequest;
 		
@@ -224,7 +225,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 		
 		//ret.getTransactionApplicationData().setProxyBranch(proxyBranch);
-		tx.setApplicationData(clonedRequest.getTransactionApplicationData());
+//		tx.setApplicationData(clonedRequest.getTransactionApplicationData());
 		
 		clonedRequest.send();
 	}
