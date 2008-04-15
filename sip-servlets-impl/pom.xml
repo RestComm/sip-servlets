@@ -141,9 +141,9 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}\lib"/>
-										<copy verbose="true" file="docs/logging.properties" todir="${tomcat.home}/conf"/>
-										<copy verbose="true" file="docs/log4j.xml" todir="${tomcat.home}/lib"/>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}\lib"/>
+										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf"/>
+										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -164,7 +164,7 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging</includeArtifactIds>
-					    			<outputDirectory>${tomcat.home}/lib</outputDirectory>
+					    			<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
 		 	        	</executions>
@@ -185,7 +185,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jboss.home}/server/default/lib"/>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/lib"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -206,7 +206,7 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent</includeArtifactIds>
-					    			<outputDirectory>${jboss.home}/server/default/lib</outputDirectory>
+					    			<outputDirectory>${env.JBOSS_HOME}/server/default/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
 		 	        	</executions>
