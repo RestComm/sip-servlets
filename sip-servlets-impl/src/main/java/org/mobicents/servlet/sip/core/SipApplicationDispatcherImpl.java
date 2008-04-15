@@ -349,6 +349,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
 		if(poppedAddress == null) {	
 			
+			/*
+			 * WARNING: TODO: We need to find a way to route CANCELs through the app path
+			 * of the INVITE. CANCEL does not contain Route headers as other requests related
+			 * to the dialog.
+			 */
 			/* If there is a proxy with the request, let's try to send it directly there.
 			 * This is needed because of CANCEL which is a subsequent request that might
 			 * not have Routes. For example if the callee has'n responded the caller still
