@@ -98,6 +98,7 @@
 							<tasks>
 								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}\lib"/>
 								<copy verbose="true" file="docs/logging.properties" todir="${tomcat.home}/conf"/>
+								<copy verbose="true" file="docs/log4j.xml" todir="${tomcat.home}/lib"/>
 							</tasks>
 						</configuration>
 						<goals>
