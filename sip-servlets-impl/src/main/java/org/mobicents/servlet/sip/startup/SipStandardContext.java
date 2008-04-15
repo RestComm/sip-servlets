@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -66,6 +67,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		// standardcontextconfig
 		// is correctly initialized too
 		super.init();
+		
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
+				SipFactoryImpl.getInstance());
 		logger.info("sip context Initialized");
 	}
 
