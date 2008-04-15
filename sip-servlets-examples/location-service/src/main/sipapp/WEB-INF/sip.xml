@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.LocationServiceSipServlet</app-name>
+	<display-name>Location Service Sip Servlet</display-name>
+	<description>Location Service Sip Servlet</description>
+	
+	<main-servlet>
+		LocationServiceSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>LocationServiceSipServlet</servlet-name>
+		<display-name>LocationServiceSipServlet</display-name>
+		<description>Location Service SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.LocationServiceSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>
