@@ -11,6 +11,7 @@
     <path id="sip-servlets-test-suite.classpath">
         <pathelement location="${classes}"/>
         <pathelement location="${test-classes}"/>
+    	<pathelement location="lib/sipunit.jar"/>
         <pathelement location="${M2_REPO}/tomcat/tomcat-coyote/5.5.15/tomcat-coyote-5.5.15.jar"/>
         <pathelement location="${M2_REPO}/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
         <pathelement location="${M2_REPO}/directory-naming/naming-resources/0.8/naming-resources-0.8.jar"/>
