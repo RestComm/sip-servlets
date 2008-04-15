@@ -29,10 +29,12 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.ClientTransaction;
+import javax.sip.Dialog;
 import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.Transaction;
 import javax.sip.header.AcceptLanguageHeader;
 import javax.sip.header.AlertInfoHeader;
 import javax.sip.header.AllowEventsHeader;
@@ -75,13 +77,13 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public abstract class SipServletMessageImpl implements SipServletMessage {
 
-	protected Request request;
+	protected Message message;
 	protected SipProvider provider;
 	protected SipSession sipSession;
-	protected ClientTransaction clientTransaction;
-	protected ServerTransaction serverTransaction;
-	protected SipFactoryImpl sipFactory;
+	protected static SipFactoryImpl sipFactory = SipFactoryImpl.getInstance();
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
+	protected Dialog  dialog;
+	protected Transaction transaction;
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
@@ -180,10 +182,18 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		headerCompactNamesMappings.put("k", SupportedHeader.NAME);
 	}
 
+	protected SipServletMessageImpl ( Message message, SipProvider provider, Transaction transaction, SipSession sipSession, Dialog dialog) {
+		
+		this.provider = provider;
+		this.message = message;
+		this.transaction = transaction;
+		this.sipSession = sipSession;
+		
+	}
 	public void addAcceptLanguage(Locale locale) {
 		AcceptLanguageHeader ach = headerFactory
 				.createAcceptLanguageHeader(locale);
-		request.addHeader(ach);
+		message.addHeader(ach);
 
 	}
 
@@ -215,19 +225,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		try {
 			Header h = headerFactory.createHeader(hName, addr.toString());
 			if (first) {
-				this.request.addFirst(h);
+				this.message.addFirst(h);
 			} else {
-				this.request.addLast(h);
+				this.message.addLast(h);
 			}
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SipException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Error adding header", e);
 		}
 
 	}
@@ -250,7 +253,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		try {
 			Header header = SipFactories.headerFactory.createHeader(hName,
 					value);
-			this.request.addLast(header);
+			this.message.addLast(header);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
 		}
@@ -270,9 +273,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			Header header = SipFactories.headerFactory
 					.createHeader(hName, body);
 			if (first)
-				this.request.addFirst(header);
+				this.message.addFirst(header);
 			else
-				this.request.addLast(header);
+				this.message.addLast(header);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied");
 		}
@@ -280,7 +283,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Locale getAcceptLanguage() {
-		AcceptLanguageHeader alh = (AcceptLanguageHeader) this.request
+		AcceptLanguageHeader alh = (AcceptLanguageHeader) this.message
 				.getHeader(AcceptLanguageHeader.NAME);
 		if (alh == null)
 			return null;
@@ -291,7 +294,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	public Iterator<Locale> getAcceptLanguages() {
 		LinkedList<Locale> ll = new LinkedList<Locale>();
-		Iterator<Header> it = (Iterator<Header>) this.request.getHeaders(AcceptLanguageHeader.NAME);
+		Iterator<Header> it = (Iterator<Header>) this.message
+				.getHeaders(AcceptLanguageHeader.NAME);
 		while (it.hasNext()) {
 			AcceptLanguageHeader alh = (AcceptLanguageHeader) it.next();
 			ll.add(alh.getAcceptLanguage());
@@ -316,7 +320,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					+ "] cant be parsed to address, wrong content type!!!");
 		}
 
-		ListIterator<Header> headers = (ListIterator<Header>) this.request
+		ListIterator<Header> headers = (ListIterator<Header>) this.message
 				.getHeaders(hName);
 		ListIterator<Header> lit = headers;
 
@@ -344,7 +348,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					"Header is not address type header");
 		}
 		LinkedList<Address> retval = new LinkedList<Address>();
-		for (Iterator<Header> it = this.request.getHeaders(name); it.hasNext();) {
+		for (Iterator<Header> it = this.message.getHeaders(name); it.hasNext();) {
 			Header header = (Header) it.next();
 			if (header instanceof AddressParametersHeader) {
 				AddressParametersHeader aph = (AddressParametersHeader) header;
@@ -366,9 +370,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public SipApplicationSession getApplicationSession(boolean create) {
-		if ( this.sipSession.getApplicationSession() == null && create) {
+		if (this.sipSession.getApplicationSession() == null && create) {
 			SipApplicationSessionImpl applSession = new SipApplicationSessionImpl();
-			
+
 		}
 		return null;
 	}
@@ -385,8 +389,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public String getCallId() {
-		// TODO Auto-generated method stub
-		return null;
+		return ((CallIdHeader)  this.message.getHeader(CallIdHeader.NAME)).getCallId();
 	}
 
 	public String getCharacterEncoding() {
@@ -465,7 +468,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getMethod()
 	 */
 	public String getMethod() {
-		return request.getMethod();
+	
+		return message instanceof Request ? ((Request) message).getMethod():
+			((CSeqHeader) message.getHeader(CSeqHeader.NAME)).getMethod();
 	}
 
 	public Parameterable getParameterableHeader(String name)
@@ -531,8 +536,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public boolean isCommitted() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.transaction.getState() != null;
 	}
 
 	public boolean isSecure() {
@@ -571,9 +575,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.attributes.put(name, o);
 	}
 
-	public void setCharacterEncoding(String enc)
-			throws UnsupportedEncodingException {
-		this.request.setContentEncoding(new ContentEncoding(enc));
+	public void setCharacterEncoding(String enc) {
+		try {
+			this.message.setContentEncoding(SipFactories.headerFactory
+					.createContentEncodingHeader(ContentEncodingHeader.NAME
+							+ ":" + enc));
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Unsupported encoding", ex);
+		}
 
 	}
 
@@ -673,12 +682,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return fullName;
 	}
 	 
-	public SIPTransaction getTransaction()
+	public Transaction getTransaction()
 	{
-		if(clientTransaction != null) 
-			return (SIPClientTransaction) clientTransaction;
-		else 
-			return (SIPServerTransaction) serverTransaction;
+		return this.transaction;
 	}
 
 	public SipSession getSipSession() {

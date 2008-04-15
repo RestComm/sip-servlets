@@ -25,7 +25,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		super(sipUri);
 	}
 
-	private javax.sip.address.SipURI getSipURI() {
+	public javax.sip.address.SipURI getSipURI() {
 		return (javax.sip.address.SipURI) super.uri;
 
 	}
