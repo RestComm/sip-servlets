@@ -16,10 +16,12 @@ You can run Tomcat and naviagate to http://localhost:8080/click2call/.
 You will see the index page where you can enter two SIP URIs. Enter the URIs
 of two SIP phones and click "Submit". The SIP phones don't have to be registered.
 I recommend using 3CX Phone and SJ Phone as the two phones in this demo
-(under Windows). After you pick up both phones the RTP session starts.
+(under Windows), WengoPhone works too. After you pick up both phones the RTP session starts.
  
 If you want to REGISTER use this as a DAR file:
 INVITE: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), \
 ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:To", "TERMINATING", "", "NO_ROUTE", "1")
 REGISTER: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), \
+("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:To", "TERMINATING", "", "NO_ROUTE", "1")
+OPTIONS: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), \
 ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:To", "TERMINATING", "", "NO_ROUTE", "1")
