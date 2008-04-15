@@ -158,7 +158,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		}
 	}
 	
-	public void onResponse(SipServletResponse response)
+	public void onResponse(SipServletResponseImpl response)
 	{
 		// We have already sent TRYING, don't send another one
 		if(response.getStatus() == 100)
@@ -169,12 +169,15 @@ public class ProxyBranchImpl implements ProxyBranch {
 		{
 			// Recurse
 		}
-		SipServletResponse responseToOriginal = originalRequest.createResponse(
-				response.getStatus(),
-				response.getReasonPhrase());
+		
+		SipServletResponse proxiedResponse = 
+			proxyUtils.createProxiedResponse(response);
+		
+		if(proxiedResponse == null) 
+			return; // this response was addressed to this proxy
 
 		try {
-			responseToOriginal.send();
+			proxiedResponse.send();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

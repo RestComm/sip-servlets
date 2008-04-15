@@ -202,7 +202,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.transaction = transaction;
 		this.session = (SipSessionImpl) sipSession;
 		this.transactionApplicationData = new TransactionApplicationData(session, this);
-		if ( transaction != null ) transaction.setApplicationData(transactionApplicationData);
+		
+		if ( transaction != null && transaction.getApplicationData() == null) 
+			transaction.setApplicationData(transactionApplicationData);
 		
 	}
 	public void addAcceptLanguage(Locale locale) {

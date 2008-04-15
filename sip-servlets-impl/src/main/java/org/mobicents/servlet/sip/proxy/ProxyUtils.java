@@ -6,20 +6,20 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipURI;
+import javax.sip.ClientTransaction;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
-import javax.sip.Transaction;
 import javax.sip.address.Address;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
 public class ProxyUtils {
 	
@@ -81,7 +81,7 @@ public class ProxyUtils {
 			} else {
 
 				viaHeader = SipFactories.headerFactory.createViaHeader(stackIPAddress,
-						lp.getPort(), lp.getTransport(), null);
+						lp.getPort(), lp.getTransport(), generateBranchId());
 			}
 
 			if (viaHeader != null) {
@@ -118,14 +118,15 @@ public class ProxyUtils {
 					clonedRequest.addHeader(recordRouteHeader);
 				}
 			}
-
+			ClientTransaction tx = provider.getNewClientTransaction(clonedRequest);
 			SipServletRequestImpl ret = new	SipServletRequestImpl(
 					clonedRequest,
 					provider,
 					originalRequest.getSession(),
-					null, null,false);
+					tx, null, false);
 			
 			ret.getTrasactionApplicationData().setProxyBranch(proxyBranch);
+			tx.setApplicationData(ret.getTrasactionApplicationData());
 
 			return ret;
 		} catch (Exception e) {
@@ -134,6 +135,33 @@ public class ProxyUtils {
 		}
 	}
 	
+	public SipServletResponseImpl createProxiedResponse(SipServletResponseImpl sipServetResponse)
+	{
+		Response response = (Response)sipServetResponse.getMessage();
+		Response clonedResponse = (Response)  response.clone();
+
+		// 1. TODO: Update timer C for provisional responses
+
+
+			
+		// 2. Remove topmost via
+		Iterator viaHeaderIt = clonedResponse.getHeaders(ViaHeader.NAME);
+		viaHeaderIt.next();
+		viaHeaderIt.remove();
+		if (!viaHeaderIt.hasNext())
+			return null; // response was meant for this proxy
+		
+		SipServletRequestImpl originalRequest =
+			(SipServletRequestImpl) this.proxyBranch.getProxy().getOriginalRequest();
+		
+		return new SipServletResponseImpl(clonedResponse,
+				this.provider,
+				originalRequest.getTransaction(),
+				originalRequest.getSession(),
+				null);
+
+
+	}
 	public static synchronized String generateBranchId() throws Exception {
 		StringBuffer ret = new StringBuffer();
 		StringBuffer b = new StringBuffer();
