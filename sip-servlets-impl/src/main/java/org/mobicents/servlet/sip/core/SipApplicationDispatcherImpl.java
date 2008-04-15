@@ -228,6 +228,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */	
 	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
 		// TODO FIXME
+		logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
 		Dialog dialog = dialogTerminatedEvent.getDialog();
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 		tad.getSipSession().onDialogTimeout(dialog);		
@@ -657,6 +658,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void processTimeout(TimeoutEvent timeoutEvent) {
 		// TODO: FIX ME
+		if(timeoutEvent.isServerTransaction()) {
+			logger.info("timeout => " + timeoutEvent.getServerTransaction().getRequest().toString());
+		} else {
+			logger.info("timeout => " + timeoutEvent.getClientTransaction().getRequest().toString());
+		}
+		
 		Transaction tx = null;
 		if(timeoutEvent.isServerTransaction()) {
 			tx = timeoutEvent.getServerTransaction();
@@ -671,15 +678,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
-		// TODO: FIX ME
-		Transaction tx = null;
+		// TODO: FIX ME		
+		Transaction transaction = null;
 		if(transactionTerminatedEvent.isServerTransaction()) {
-			tx = transactionTerminatedEvent.getServerTransaction();
+			transaction = transactionTerminatedEvent.getServerTransaction();
 		} else {
-			tx = transactionTerminatedEvent.getClientTransaction();
+			transaction = transactionTerminatedEvent.getClientTransaction();
 		}
-		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();		
-		tad.getSipSession().removeOngoingTransaction(tx);				
+		logger.info("transaction terminated => " + transaction.getRequest().toString());
+		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
+		tad.getSipSession().removeOngoingTransaction(transaction);				
 	}
 
 	/**

@@ -175,13 +175,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = this.getTransaction().getRequest();
 			Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
-			if (statusCode == Response.OK) {
+			if (statusCode == Response.OK ||
+					statusCode == Response.MOVED_TEMPORARILY) {
 				ToHeader toHeader = (ToHeader) response
 						.getHeader(ToHeader.NAME);
 				if (toHeader.getTag() == null) // If we already have a to tag
 				// dont create new
 				{
-					toHeader.setTag(java.util.UUID.randomUUID().toString());
+					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 					// Add the contact header for the dialog.
 					String transport = ((ViaHeader) request
 							.getHeader(ViaHeader.NAME)).getTransport();
