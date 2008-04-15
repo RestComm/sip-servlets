@@ -29,7 +29,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="g20tbKZ25kitx9DRG0VM5AAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="sHgMkoNe+E6+axX4UkK81gAA">
 <XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">ApplicationDispatcher</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">SipApplicationDispatcher</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="WHsNiSPMMkKVJzyPOGEKBAAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -549,6 +549,8 @@
 <XPD:ATTR name="TypeExpression" type="string">HashMap</XPD:ATTR>
 <XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">xludbvJ/vUSOt1CBLxvJeAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="AXJ88RUUGk2bFOlDFaxC3gAA">
 <XPD:ATTR name="Name" type="string">SipServletImpl</XPD:ATTR>
@@ -1240,6 +1242,8 @@
 <XPD:ATTR name="Name" type="string">invoke</XPD:ATTR>
 <XPD:REF name="Owner">8nkl922hskiR2DWMZJUHMgAA</XPD:REF>
 </XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">epLg7bw130qjTEpp7qC8/QAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[3]" type="UMLPackage" guid="xBGhNa/elUW2QC8NhJWHVgAA">
@@ -1336,13 +1340,15 @@
 <XPD:REF name="Views[3]">b83aw/jKfkKs+VGtc+qySwAA</XPD:REF>
 <XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
 <XPD:REF name="ClientDependencies[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">f/lNycNPnkeIwEdFJECBhQAA</XPD:REF>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]">g+H69D/y8EmIPpZBP4cMXQAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">5</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::proxy::">Jg22D8mUUkeO+PWix9P/BQAA</XPD:REF>
 <XPD:REF name="Associations[1]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">hbNaWGlyH0mLsFR8NNPGLgAA</XPD:REF>
 <XPD:REF name="Associations[2]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">+dcppItV+USYrTgnbaZZVAAA</XPD:REF>
 <XPD:REF name="Associations[3]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">w+E1DpKHskuRzU+E3qO9egAA</XPD:REF>
 <XPD:REF name="Associations[4]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">h+aXsdJNZECDNxd5PhZeJAAA</XPD:REF>
-<XPD:ATTR name="#Attributes" type="integer">7</XPD:ATTR>
+<XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="lRa32+KSs0adD8rxNa93SwAA">
 <XPD:ATTR name="Name" type="string">proxy</XPD:ATTR>
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPackage</XPD:ATTR>
@@ -1388,6 +1394,13 @@
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
 <XPD:ATTR name="TypeExpression" type="string">BranchState</XPD:ATTR>
 <XPD:REF name="Type_">tF8XAfZ2Z0Oh6/nRy9ad+AAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="g+H69D/y8EmIPpZBP4cMXQAA">
+<XPD:ATTR name="Name" type="string">parentBranch</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ProxyBranchImpl</XPD:ATTR>
+<XPD:REF name="Type_">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
 <XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>

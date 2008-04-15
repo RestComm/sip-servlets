@@ -1446,6 +1446,15 @@
 <XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="+yBcVu/UbEeSFidInewxtAAA">
 <XPD:ATTR name="Name" type="string">DefaultApplicationRouter</XPD:ATTR>
 <XPD:REF name="Namespace">go3VU3ITyEW8FGNCpKMN+gAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="GER/DaBCaU6PndtYfUpgywAA">
+<XPD:ATTR name="Name" type="string">init</XPD:ATTR>
+<XPD:REF name="Owner">+yBcVu/UbEeSFidInewxtAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">P/tl5/IABkOdRy+cIPTyaQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">C3ogZho52UmRHBg1q3K2ygAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
