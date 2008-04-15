@@ -631,6 +631,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// This is an in-dialog request.
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}
+			super.session.addOngoingTransaction(getTransaction());
 		} catch (Exception ex) {
 			throw new IllegalStateException("Error sending reuqest");
 		}

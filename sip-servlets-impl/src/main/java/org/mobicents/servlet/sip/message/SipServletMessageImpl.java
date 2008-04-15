@@ -201,7 +201,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.message = message;
 		this.transaction = transaction;
 		this.session = (SipSessionImpl) sipSession;
-		this.transactionApplicationData = new TransactionApplicationData(session);
+		this.transactionApplicationData = new TransactionApplicationData(session, this);
 		if ( transaction != null ) transaction.setApplicationData(transactionApplicationData);
 		
 	}

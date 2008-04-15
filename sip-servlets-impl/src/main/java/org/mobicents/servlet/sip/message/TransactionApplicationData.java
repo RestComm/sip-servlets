@@ -17,10 +17,12 @@ public class TransactionApplicationData {
 	private ProxyImpl proxy;
 	private ProxyBranchImpl proxyBranch;
 	private SipSessionImpl sipSession;
+	private SipServletMessageImpl sipServletMessage;
 
 	
-	public TransactionApplicationData(SipSessionImpl sipSession ) {
+	public TransactionApplicationData(SipSessionImpl sipSession, SipServletMessageImpl sipServletMessage ) {
 		this.sipSession = (SipSessionImpl) sipSession;
+		this.sipServletMessage = sipServletMessage;
 		
 	}
 	/**
@@ -57,5 +59,10 @@ public class TransactionApplicationData {
 	public SipSessionImpl getSipSession() {
 		return sipSession;
 	}
+	public SipServletMessageImpl getSipServletMessage() {
+		
+		return this.sipServletMessage;
+	}
+	
 
 }

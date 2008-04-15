@@ -5,6 +5,7 @@ import gov.nist.javax.sip.header.Via;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.ToHeader;
@@ -196,17 +198,39 @@ public class B2buaHelperImpl implements B2buaHelper {
 
 	public List<SipServletMessage> getPendingMessages(SipSession session,
 			UAMode mode) {
-		// TODO Auto-generated method stub
-		return null;
+		SipSessionImpl sipSessionImpl = (SipSessionImpl) session;
+		List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
+		if ( mode.equals(UAMode.UAC)) {
+			for ( Transaction transaction: sipSessionImpl.getOngoingTransactions()) {
+				if ( transaction instanceof ClientTransaction && transaction.getState() != TransactionState.TERMINATED) {
+					TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+					retval.add(tad.getSipServletMessage());
+				}
+			}
+			
+		} else {
+			for ( Transaction transaction: sipSessionImpl.getOngoingTransactions()) {
+				if ( transaction instanceof ServerTransaction && transaction.getState() != TransactionState.TERMINATED) {
+					TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+					retval.add(tad.getSipServletMessage());
+				}
+			}
+		}
+		return retval;
 	}
 
 	public void linkSipSessions(SipSession session1, SipSession session2) {
-		// TODO Auto-generated method stub
+		this.sessionMap.put((SipSessionImpl)session1, (SipSessionImpl)session2);
+		this.sessionMap.put((SipSessionImpl) session2, (SipSessionImpl) session1);
 
 	}
 
 	public void unlinkSipSessions(SipSession session) {
-		// TODO Auto-generated method stub
+		if ( session == null )throw new NullPointerException("Null arg");
+		SipSessionImpl key = (SipSessionImpl) session;
+		SipSessionImpl value  = this.sessionMap.get(key);
+		if ( value != null) this.sessionMap.remove(value);
+		this.sessionMap.remove(key);
 
 	}
 
