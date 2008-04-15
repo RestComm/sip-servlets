@@ -17,6 +17,8 @@ import gov.nist.javax.sip.stack.SIPServerTransaction;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -540,9 +542,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			inverted = true;
 		}
 		
-		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
-				applicationName, 
-				((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId());
+		SipStandardContext sipContext = (SipStandardContext) this.applicationDeployed.get(applicationName);
+		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
+				sipContext, sipServletRequest, applicationName);
 		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, false, null);
 		if(sipApplicationSession == null) {
 			logger.error("Cannot find the corresponding sip application session to this subsequent request " + request +
@@ -867,6 +869,34 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			throw new IllegalStateException("Initial request for CANCEL is in "+ sipServletRequest.getRoutingState() +" Routing state");
 		}
 	}
+	
+	private SipApplicationSessionKey makeAppSessionKey(SipStandardContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) {
+		String callId = null;
+		Request request = (Request) sipServletRequestImpl.getMessage();
+		Method appKeyMethod = null;
+		if(sipContext != null) appKeyMethod = sipContext.getSipApplicationKeyMethod();
+		if(appKeyMethod != null) {
+			try {
+				callId = (String) appKeyMethod.invoke(null, new Object[] {sipServletRequestImpl});
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(callId == null) throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");
+		} else {
+			callId = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
+		}
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+				applicationName, 
+				callId);
+		return sipApplicationSessionKey;
+	}
 
 	/**
 	 * 
@@ -1005,12 +1035,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} else {
 			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
-			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());			
+			SipStandardContext sipContext = (SipStandardContext) applicationDeployed.get(applicationRouterInfo.getNextApplicationName());			
 			//sip appliation session association
-			//TODO: later should check for SipApplicationKey annotated method in the servlet.
-			SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
-					applicationRouterInfo.getNextApplicationName(), 
-					((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId());
+			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
+					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
 			SipApplicationSessionImpl appSession = sessionManager.getSipApplicationSession(
 					sipApplicationSessionKey, true, sipContext);
 			//sip session association

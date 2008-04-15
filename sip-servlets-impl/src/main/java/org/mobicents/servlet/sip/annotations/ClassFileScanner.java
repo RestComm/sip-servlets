@@ -2,11 +2,16 @@ package org.mobicents.servlet.sip.annotations;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import javax.servlet.sip.annotation.SipApplication;
+import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
+import javax.servlet.sip.SipServletRequest;
 
 import org.apache.catalina.Wrapper;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -21,6 +26,8 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  * party libs in WEB-INF/jar, and system libs. Parsing all these would be slow, so for
  * now we will only look in WEB-INF/classes since it works.
  * 
+ * General TODO: Validation
+ * 
  * @author Vladimir Ralev
  *
  */
@@ -33,6 +40,8 @@ public class ClassFileScanner {
 	private String parsedAnnotatedPackage = null;
 	
 	private boolean applicationParsed = false;
+	
+	private Method sipAppKey = null;
 	
 	public ClassFileScanner(String docbase, SipStandardContext ctx) {
 		this.docbase = docbase;
@@ -65,6 +74,7 @@ public class ClassFileScanner {
 				Class clazz = Class.forName(className);
 				processListenerAnnotation(clazz);
 				processServletAnnotation(clazz);
+				processSipApplicationKeyAnnotation(clazz);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -77,6 +87,23 @@ public class ClassFileScanner {
     	if(listener != null)
     		sipContext.addSipApplicationListener(clazz.getCanonicalName());
     }
+    
+    private void processSipApplicationKeyAnnotation(Class<?> clazz) {
+    	Method[] methods = clazz.getMethods();
+    	for(Method method:methods) {
+    		if(method.getAnnotation(SipApplicationKey.class)!=null &&
+    				Modifier.isStatic(method.getModifiers())) {
+    			//if(!method.getGenericReturnType().equals(String.class.)) continue;
+    			//Type[] types = method.getGenericParameterTypes();
+    			//if(!types[0].equals(SipServletRequest.class)) continue;
+    			if(this.sipAppKey != null) throw new IllegalStateException(
+    					"More than one SipApplicationKey annotated method is not allowed.");
+    			this.sipAppKey = method;
+    			sipContext.setSipApplicationKeyMethod(method);
+    		}
+    	}
+    }
+    
     
     private static void copyParsedProperties(SipStandardContext from, SipStandardContext to) {
     	to.setMainServlet(from.getMainServlet());

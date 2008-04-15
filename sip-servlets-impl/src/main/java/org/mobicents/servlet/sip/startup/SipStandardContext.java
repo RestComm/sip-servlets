@@ -14,6 +14,7 @@
 package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Stack;
 
@@ -70,6 +71,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	private SipLoginConfig sipLoginConfig;
 	
     protected String namingContextName;
+    
+    protected Method sipApplicationKeyMethod;
     
 	/**
      * The set of sip application listener class names configured for this
@@ -570,5 +573,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public void setSipApplicationSessionTimeout(int sipApplicationSessionTimeout) {
 		this.sipApplicationSessionTimeout = sipApplicationSessionTimeout;		
+	}
+
+	public Method getSipApplicationKeyMethod() {
+		return sipApplicationKeyMethod;
+	}
+
+	public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
+		this.sipApplicationKeyMethod = sipApplicationKeyMethod;
 	}
 }
