@@ -16,6 +16,8 @@
 		<module>call-blocking-servlet</module>
 		<module>call-forwarding-servlet</module>
 		<module>call-forwarding-b2bua-servlet</module>
+		<module>speed-dial-servlet</module>
+		<module>location-service-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
