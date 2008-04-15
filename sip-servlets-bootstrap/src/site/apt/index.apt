@@ -39,6 +39,11 @@ Try it !
 	
 	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.
 	
+License
+
+	We have chosen the business-friendly LGPL as our main license to ensure that you can safely use them to develop and deploy applications whilst keeping your source code private.\ 
+	You may even keep changes made to the project source code private as long as you do not distribute the resulting binaries.
+	
 Feedback
 
 	To provide any kind of feedback (bad or good), please feel free to post a mail on the {{{dev@sip-servlets.dev.java.net}dev list}}, {{{servlets/ProjectIssues}post an issue}} in the bugtracker, mail one of the {{{team-list.html}team members}} or join the project.	 
