@@ -48,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -207,6 +208,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		if(isInitialRequest) {
 			//15.4.1 Routing an Initial request Algorithm
 			
+			// Create new app session for initial requests. TODO: later you should check for SipApplicationKey annotated method in the servlet.
+			SipApplicationSessionImpl appSession = new SipApplicationSessionImpl();
+			session.setApplicationSession(appSession);
+			appSession.addSipSession(session);
+			
 			//get the request routing directive
 			SipApplicationRoutingDirective sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
 			//get the state info associated with the request
@@ -274,6 +280,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				
 				// follow the procedures of Chapter 16 to select a servlet from the application.			
 				SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
+				session.setSipContext(sipContext);
 				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSipSession()).getHandler();						
 				if(sipSessionHandlerName == null) {
 					String mainServlet = sipContext.getMainServlet();
@@ -305,8 +312,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			logger.info("Request event dispatched");
 		} else {
 			logger.info("Routing of Subsequent Request -- TODO");
+			Wrapper servletWrapper = (Wrapper) session.getSipContext().findChild(session.getHandler());
+			try
+			{
+				Servlet servlet = servletWrapper.allocate();
+				servlet.service(sipServletRequest, null);
+			} catch (ServletException e) {				
+				logger.error(e);
+				//TODO sends an error message
+			} catch (IOException e) {				
+				logger.error(e);
+				//TODO sends an error message
+			}
 		}
 	}
+	
+	
 	
 	/**
 	 * Method checking whether or not the sip servlet request in parameter is initial

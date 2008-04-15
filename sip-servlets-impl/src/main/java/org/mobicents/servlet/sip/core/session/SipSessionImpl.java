@@ -36,6 +36,7 @@ import javax.sip.message.Request;
 
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 public class SipSessionImpl implements SipSession {
 
@@ -81,6 +82,11 @@ public class SipSessionImpl implements SipSession {
 	 * The name of the servlet withing this same app to handle all subsequent requests.
 	 */
 	private String handlerServlet;
+	
+	/**
+	 * The first sip application for subsequent requests.
+	 */
+	private SipContext sipContext;
 	
 	/**
 	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
@@ -412,5 +418,13 @@ public class SipSessionImpl implements SipSession {
 
 	public SipURI getOutboundInterface() {
 		return outboundInterface;
+	}
+
+	public SipContext getSipContext() {
+		return sipContext;
+	}
+
+	public void setSipContext(SipContext sipContext) {
+		this.sipContext = sipContext;
 	}
 }

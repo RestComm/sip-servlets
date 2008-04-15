@@ -165,11 +165,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					statusCode, request);
 			if(statusCode == Response.OK) {
 				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-				toHeader.setTag(java.util.UUID.randomUUID().toString());
-				// Add the contact header for the dialog.
-				String transport = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getTransport();
-				ContactHeader contactHeader = this.createContactForProvider(transport);
-				response.setHeader(contactHeader);
+				if(toHeader.getTag() == null) // If we already have a to tag dont create new
+				{
+					toHeader.setTag(java.util.UUID.randomUUID().toString());
+					// Add the contact header for the dialog.
+					String transport = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getTransport();
+					ContactHeader contactHeader = this.createContactForProvider(transport);
+					response.setHeader(contactHeader);
+				}
 		
 //				response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME, "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
