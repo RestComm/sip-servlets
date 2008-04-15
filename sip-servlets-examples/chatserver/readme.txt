@@ -9,9 +9,9 @@ Alternatively you can add a context entry in the tomcat's server.xml like this
 	<Context 
 	className="org.mobicents.servlet.sip.startup.SipStandardContext" 
 	configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
-	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\chatserver\target\speed-dial-1.0-SNAPSHOT" 
-	name="speed-dial-context" 
-	path="/speed-dial">
+	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\chatserver\target\chatserver-1.0-SNAPSHOT" 
+	name="chatserver-context" 
+	path="/chatserver">
 		<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
 	</Context> 
 
@@ -20,3 +20,10 @@ file:///E:/workspaces/sip-servlets/sip-servlets-examples/chatserver/dar-chatserv
 
 To use:
 You can now run Tomcat or Jboss.
+
+Starts Two SIP chat clients. Point them to sip:just4fun@127.0.0.1:5070
+Type your message and then click on the send button 
+	
+You should see the messages in both clients once they are both in the chat server 
+(that is when they sent at least one message to it).
+ 
