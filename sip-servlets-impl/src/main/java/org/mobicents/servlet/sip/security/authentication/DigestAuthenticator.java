@@ -1,23 +1,20 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-
 package org.mobicents.servlet.sip.security.authentication;
-
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -26,28 +23,20 @@ import java.security.Principal;
 import java.text.ParseException;
 import java.util.StringTokenizer;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.Constants;
-import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
-
-
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST
