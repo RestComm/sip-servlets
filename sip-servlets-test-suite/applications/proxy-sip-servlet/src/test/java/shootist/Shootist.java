@@ -222,9 +222,9 @@ public class Shootist implements SipListener {
 		// You can set a max message size for tcp transport to
 		// guard against denial of service attack.
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"shootistdebug.txt");
+				"logs/shootistdebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"shootistlog.txt");
+				"logs/shootistlog.txt");
 
 		// Drop the client connection after we are done with the transaction.
 		properties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS",

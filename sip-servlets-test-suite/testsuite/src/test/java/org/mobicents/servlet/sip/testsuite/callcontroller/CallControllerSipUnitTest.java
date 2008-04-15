@@ -21,7 +21,8 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	private SipStack sipStackReceiver;
 	private SipPhone sipPhoneReceiver;
 
-	private static final int TIMEOUT = 15000;	
+	private static final int TIMEOUT = 3000;
+	private static final int TIMEOUT_FORBIDDEN = 15000;	
 //	private static final int TIMEOUT = 1000000;
 
 	public CallControllerSipUnitTest(String name) {
@@ -30,16 +31,15 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	
 	@Override
 	public void setUp() throws Exception {
-		autoDeployOnStartup = false;
-		SipStack.setTraceEnabled(true);
+		autoDeployOnStartup = false;		
 		super.setUp();		
 	}
 
 	@Override
 	public void tearDown() throws Exception {		
 		sipPhoneSender.dispose();		
-		sipStackSender.dispose();		
 		sipPhoneReceiver.dispose();		
+		sipStackSender.dispose();				
 		sipStackReceiver.dispose();
 		super.tearDown();
 	}
@@ -85,15 +85,15 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 				"logs/callforwarding_debug_" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
 				"logs/callforwarding_server_" + port + ".txt");
-		
+		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		return new SipStack(transport, port, properties);		
 	}
 
-	public void setupPhone(String fromAddress, String toAddress) throws Exception {
-			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);					
+	public void setupPhone(String fromAddress, String toAddress) throws Exception {			
+			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);			
 			sipPhoneSender = sipStackSender.createSipPhone("localhost",
 					SipStack.PROTOCOL_UDP, 5070, fromAddress);		
-			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, 5090);					
+			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, 5090);			
 			sipPhoneReceiver = sipStackReceiver.createSipPhone("localhost",
 					SipStack.PROTOCOL_UDP, 5070, toAddress);
 	}
@@ -105,8 +105,8 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		setupPhone("sip:blocked-sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
 		SipCall sender = sipPhoneSender.createSipCall();
 		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
-		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));	
-		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT_FORBIDDEN));	
+		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));		
 	}
 	
 	// 
@@ -161,7 +161,7 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		setupPhone("sip:blocked-sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
 		SipCall sender = sipPhoneSender.createSipCall();
 		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
-		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT_FORBIDDEN));
 		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));		
 	}	
 }

@@ -27,8 +27,14 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 		//Reading properties
 		Properties properties = new Properties();
 		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
+		"org/mobicents/servlet/sip/testsuite/testsuite.properties");		
+		try{
+			properties.load(inputStream);
+		} catch (NullPointerException e) {
+			inputStream = getClass().getResourceAsStream(
 				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
-		properties.load(inputStream);		
+			properties.load(inputStream);
+		}	
 		tomcatBasePath = properties.getProperty("tomcat.home");		
 		projectHome = properties.getProperty("project.home");
 		//starting tomcat

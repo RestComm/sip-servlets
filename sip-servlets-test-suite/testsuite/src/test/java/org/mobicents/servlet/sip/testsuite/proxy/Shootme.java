@@ -280,9 +280,9 @@ public class Shootme implements SipListener {
 		// Your code will limp at 32 but it is best for debugging.
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"shootmedebug.txt");
+				"logs/shootmedebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"shootmelog.txt");
+				"logs/shootmelog.txt");
 
 		try {
 			// Create SipStack object

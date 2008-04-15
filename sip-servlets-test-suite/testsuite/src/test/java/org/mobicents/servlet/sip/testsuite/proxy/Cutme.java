@@ -248,9 +248,9 @@ public class Cutme implements SipListener {
 		// Your code will limp at 32 but it is best for debugging.
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"cutmedebug.txt");
+				"logs/cutmedebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"cutmelog.txt");
+				"logs/cutmelog.txt");
 
 		try {
 			// Create SipStack object

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="test-suite" name="sip-servlets-test-suite">
     <property environment="env"/>
-    <property name="M2_REPO" value="C:/Documents and Settings/mranga/.m2/repository"/>
+    <property name="M2_REPO" value="C:/Documents and Settings/DRAGAN/.m2/repository"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.5"/>
@@ -10,30 +10,31 @@
     <property name="test-classes" value="target/test-classes"/>
     <path id="sip-servlets-test-suite.classpath">
         <pathelement location="${classes}"/>
-        <pathelement location="${test-classes}"/>
-    	<pathelement location="lib/sipunit.jar"/>
+        <pathelement location="${test-classes}"/>    	  
         <pathelement location="${M2_REPO}/tomcat/tomcat-coyote/5.5.15/tomcat-coyote-5.5.15.jar"/>
-        <pathelement location="${M2_REPO}/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
-        <pathelement location="${M2_REPO}/directory-naming/naming-resources/0.8/naming-resources-0.8.jar"/>
-        <pathelement location="${M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/1.1-SNAPSHOT/sip-servlets-spec-1.1-SNAPSHOT.jar"/>
-        <pathelement location="${M2_REPO}/avalon-framework/avalon-framework/4.1.3/avalon-framework-4.1.3.jar"/>
-        <pathelement location="${M2_REPO}/logkit/logkit/1.0.1/logkit-1.0.1.jar"/>
-        <pathelement location="${M2_REPO}/tomcat/tomcat-apr/5.5.15/tomcat-apr-5.5.15.jar"/>
-        <pathelement location="${M2_REPO}/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
-        <pathelement location="${M2_REPO}/tomcat/tomcat-util/5.5.15/tomcat-util-5.5.15.jar"/>
-        <pathelement location="${M2_REPO}/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
-        <pathelement location="${M2_REPO}/commons-modeler/commons-modeler/1.1/commons-modeler-1.1.jar"/>
-        <pathelement location="${M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/1.0-SNAPSHOT/sip-servlets-impl-1.0-SNAPSHOT.jar"/>
-        <pathelement location="${M2_REPO}/mx4j/mx4j-jmx/1.1/mx4j-jmx-1.1.jar"/>
-        <pathelement location="${M2_REPO}/junit/junit/3.8.1/junit-3.8.1.jar"/>
-        <pathelement location="${M2_REPO}/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
-        <pathelement location="${M2_REPO}/tomcat/catalina/5.5.15/catalina-5.5.15.jar"/>
-        <pathelement location="${M2_REPO}/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar"/>
         <pathelement location="${M2_REPO}/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
-        <pathelement location="${M2_REPO}/commons-digester/commons-digester/1.2/commons-digester-1.2.jar"/>
-        <pathelement location="${M2_REPO}/directory-naming/naming-core/0.8/naming-core-0.8.jar"/>
+        <pathelement location="${M2_REPO}/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+        <pathelement location="${M2_REPO}/logkit/logkit/1.0.1/logkit-1.0.1.jar"/>
+        <pathelement location="${M2_REPO}/avalon-framework/avalon-framework/4.1.3/avalon-framework-4.1.3.jar"/>
+        <pathelement location="${M2_REPO}/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
+        <pathelement location="lib/sipunit.jar"/>                
+        <pathelement location="${M2_REPO}/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
+        <pathelement location="${M2_REPO}/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1.jar"/>
+        <pathelement location="${M2_REPO}/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
         <pathelement location="${M2_REPO}/javax/sip/jain-sip-ri/1.2/jain-sip-ri-1.2.jar"/>
-        <pathelement location="${M2_REPO}/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar"/>        
+        <pathelement location="${M2_REPO}/junit/junit/3.8.1/junit-3.8.1.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/servlet-api/6.0.14/servlet-api-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/coyote/6.0.14/coyote-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/jasper/6.0.14/jasper-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/jsp-api/6.0.14/jsp-api-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/el-api/6.0.14/el-api-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/jasper-jdt/6.0.14/jasper-jdt-6.0.14.jar"/>
+        <pathelement location="${M2_REPO}/org/apache/tomcat/jasper-el/6.0.14/jasper-el-6.0.14.jar"/>        
+        <pathelement location="${M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/1.1-SNAPSHOT/sip-servlets-spec-1.1-SNAPSHOT.jar"/>                        
+        <pathelement location="${M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/0.2-SNAPSHOT/sip-servlets-impl-0.2-SNAPSHOT.jar"/>                
     </path>
     
     <target name="init">
@@ -44,13 +45,10 @@
     <target name="clean">
         <delete dir="${classes}"/>
         <delete dir="${test-classes}"/>
-    </target>
+        <delete dir="logs"/>
+    </target>        
     
-    <target depends="clean" name="cleanall"/>
-    
-    <target depends="build-project" name="build"/>
-    
-    <target depends="init" name="build-project">
+    <target name="build" depends="clean,init">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${classes}" source="${source}" target="${target}">
             <src path="src/main/java"/>
@@ -78,15 +76,25 @@
     
     <target name="test-suite" depends="build">
         <mkdir dir="${junit.output.dir}"/>
-        <junit fork="yes" printsummary="withOutAndErr">            
+        <junit fork="yes" printsummary="yes">            
             <classpath refid="sip-servlets-test-suite.classpath"/>
             <formatter type="xml" />
 
 						<batchtest fork="yes" todir="${junit.output.dir}" >
-							<fileset dir="src/test/java">								
-								<include name="**/*Test.java" />
+							<fileset dir="src/test/java">							
+                <include name="**/*Test.java"/>
+                <exclude name="**/B2BUATest.java"/>	
+								<exclude name="**/Click2CallBasicTest.java"/>																
 							</fileset>
 						</batchtest>
         </junit>
-    </target>
+        <!--mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes">          
+          <classpath refid="sip-servlets-test-suite.classpath"/>          
+  
+          <test name="org.mobicents.servlet.sip.testsuite.AllTests">
+            <formatter type="plain"/>
+          </test>  
+        </junit-->
+    </target>    
 </project>
