@@ -2,7 +2,7 @@ Installation Instructions
 
 * From the binary
 	
-	Download our JSR 289 sip-servlet-ized 0.1 version of Tomcat 5.5.25 {{{}here}}
+	Download our JSR 289 sip-servlet-ized 0.1 version of Tomcat 5.5.25 {{{source/browse/*checkout*/sip-servlets/trunk/sip-servlets-bootstrap/release/apache-tomcat-5.5.25.zip?rev=306}here}}
 	
 	Unzip it and run it from bin directory with ./catalina.bat run or ./catalina.sh run command. 
 	
@@ -13,14 +13,23 @@ Installation Instructions
 ** What is different from Tomcat standard version
 
 	* a sipapps directory containing all sip servlets applications shipping with this release has been addded.
+		
 	* the server.xml has been modified to provide extended classes to common container classes to allow for sip applications to be loaded and sip stack to be started
+		
 	* some jars have been added to allow sip servlets to be used
+		
 	** in server/lib directory, there should be a sip-servlets-impl-1.0-SNAPSHOT.jar
+  	
 	** in common/lib directory, there should be a sip-servlets-spec-1.1-SNAPSHOT.jar
+	  	
 	** in common/lib directory, there should be a jain-sip-api-1.2.jar
+	
 	** in common/lib directory, there should be a jain-sip-ri-1.2.jar
+	
 	** in common/lib directory, there should be a concurrent-1.3.4.jar
+	
 	** in common/lib directory, there should be a log4j-1.2.14.jar
+	
 	* a dars directory containing all the default applications router properties 
 	files for using the sip servlets applications bundled with the release, 
 	has been added to the conf directory	
@@ -55,44 +64,64 @@ Installation Instructions
 	To run the sip servlet container :
 	check that the following files have been copied during the mvn clean install
 	
-	* in tomcat_home/server/lib directory, there should be a sip-servlets-impl-1.0-SNAPSHOT.jar
-	* in tomcat_home/common/lib directory, there should be a sip-servlets-spec-1.1-SNAPSHOT.jar
-	* in tomcat_home/common/lib directory, there should be a jain-sip-api-1.2.jar
-	* in tomcat_home/common/lib directory, there should be a jain-sip-ri-1.2.jar
-	* in tomcat_home/common/lib directory, there should be a concurrent.jar
-	* in tomcat_home/common/lib directory, there should be a log4j.jar
+		* in tomcat_home/server/lib directory, there should be a sip-servlets-impl-1.0-SNAPSHOT.jar
+		
+		* in tomcat_home/common/lib directory, there should be a sip-servlets-spec-1.1-SNAPSHOT.jar
+		
+		* in tomcat_home/common/lib directory, there should be a jain-sip-api-1.2.jar
+		
+		* in tomcat_home/common/lib directory, there should be a jain-sip-ri-1.2.jar
+		
+		* in tomcat_home/common/lib directory, there should be a concurrent.jar
+		
+		* in tomcat_home/common/lib directory, there should be a log4j.jar
 	
 	make a backup of your tomcat_home/conf/server.xml file
+	
 	copy the server.xml located in docs to tomcat_home/conf
+	
 	look for the context tag in the server.xml file and 
 	modify the docbase attribute to map to your existing simple-sip-servlet application
 	
 	make sure to run a mvn clean install at the root of simple-sip-servlet project too
 	
 	Run mvn war:inplace 
+	
 	and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
 	and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
+	
 	(This would be removed automatically through maven when time will permit...)
 	    	
 	go to your tomcat_home/bin directory
-	run the following commande
-	catalina.bat run
+	
+	run the following command : ./catalina.bat run or ./catalina.sh run  
+	
 	When the server has been started you should see the following logs on the standard output
+	
 	18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
 	INFO: /WEB-INF/sip.xml has been found !
+	
 	18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
 	INFO: /WEB-INF/sip.xml has been parsed !
+	
 	log4j:WARN No appenders could be found for logger (SipContainer).
+	
 	log4j:WARN Please initialize the log4j system properly.
+	
 	the simple sip servlet has been started
+	
 	18 juil. 2007 08:09:48 org.apache.coyote.http11.Http11BaseProtocol start
 	INFO: DÚmarrage de Coyote HTTP/1.1 sur http-8080
+	
 	18 juil. 2007 08:09:48 org.apache.jk.common.ChannelSocket init
 	INFO: JK: ajp13 listening on /0.0.0.0:8009
+	
 	18 juil. 2007 08:09:48 org.apache.jk.server.JkMain start
 	INFO: Jk running ID=0 time=0/15  config=null
+	
 	18 juil. 2007 08:09:48 org.apache.catalina.storeconfig.StoreLoader load
 	INFO: Find registry server-registry.xml at classpath resource
+	
 	18 juil. 2007 08:09:48 org.apache.catalina.startup.Catalina start
 	INFO: Server startup in 1984 ms
 			
