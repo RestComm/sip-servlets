@@ -29,9 +29,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private Map<String, Object> sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 
-	private Map<String,SipSessionImpl> sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
+	private Map<SipSessionKey,SipSessionImpl> sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
 	
-	private String key;
+	private SipApplicationSessionKey key;
 	
 	private String uuid;
 	
@@ -59,14 +59,17 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 //	private Serializable endObject;		
 		
-	public SipApplicationSessionImpl(String key ) {
-		this.uuid = UUID.randomUUID().toString();
-		this.key = key;
+	public SipApplicationSessionImpl(String uuid) {
+		this.uuid = UUID.randomUUID().toString();		
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
 		valid = true;
 		servletTimers = Collections.synchronizedSet(new HashSet<ServletTimer>());
-		//FIXME create and start a timer for session expiration 
+		//FIXME create and start a timer for session expiration
+	}
+	
+	public SipApplicationSessionImpl(SipApplicationSessionKey key ) {
+		this.key = key;
 	}
 	
 	protected void addSipSession( SipSessionImpl sipSessionImpl) {
@@ -366,14 +369,14 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	/**
 	 * @return the key
 	 */
-	public String getKey() {
+	public SipApplicationSessionKey getKey() {
 		return key;
 	}
 
 	/**
 	 * @param key the key to set
 	 */
-	public void setKey(String key) {
+	public void setKey(SipApplicationSessionKey key) {
 		this.key = key;
 	}
 	

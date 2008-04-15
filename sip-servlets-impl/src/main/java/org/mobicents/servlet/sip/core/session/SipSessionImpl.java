@@ -62,7 +62,7 @@ public class SipSessionImpl implements SipSession {
 
 	private HashMap<String, Object> sipSessionAttributeMap;
 	
-	private String key;
+	private SipSessionKey key;
 	/**
 	 * Unique ID for this session.
 	 */
@@ -137,7 +137,7 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private SipFactoryImpl sipFactory;
 	
-	protected SipSessionImpl (String key, SipFactoryImpl sipFactoryImpl) {
+	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl) {
 		this.key = key;
 		this.sipFactory = sipFactoryImpl;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
@@ -495,7 +495,7 @@ public class SipSessionImpl implements SipSession {
 			SipApplicationSessionImpl sipApplicationSession) {
 		this.sipApplicationSession = sipApplicationSession;
 		if ( sipApplicationSession != null) {
-			if(sipApplicationSession.getSipSession(key)!=null) {
+			if(sipApplicationSession.getSipSession(uuid.toString())!=null) {
 				sipApplicationSession.addSipSession(this);
 			}
 		}
@@ -578,14 +578,14 @@ public class SipSessionImpl implements SipSession {
 	/**
 	 * @return the key
 	 */
-	public String getKey() {
+	public SipSessionKey getKey() {
 		return key;
 	}
 
 	/**
 	 * @param key the key to set
 	 */
-	public void setKey(String key) {
+	public void setKey(SipSessionKey key) {
 		this.key = key;
 	}
 }

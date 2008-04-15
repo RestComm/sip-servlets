@@ -33,13 +33,13 @@ public class SessionManager {
 	
 	public final static String TAG_PARAMETER_NAME = "tag";
 	
-	private Map<String, SipApplicationSessionImpl> sipApplicationSessions = 
-		new HashMap<String, SipApplicationSessionImpl>();
+	private Map<SipApplicationSessionKey, SipApplicationSessionImpl> sipApplicationSessions = 
+		new HashMap<SipApplicationSessionKey, SipApplicationSessionImpl>();
 	//FIXME if it's never cleaned up a memory leak will occur
 	//Shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	//=> after a chat with ranga the better way to go for now is removing on processDialogTerminated
-	private Map<String, SipSessionImpl> sipSessions = 
-		new HashMap<String, SipSessionImpl>();
+	private Map<SipSessionKey, SipSessionImpl> sipSessions = 
+		new HashMap<SipSessionKey, SipSessionImpl>();
 
 	private Object sipSessionLock = new Object();
 	
@@ -119,23 +119,29 @@ public class SessionManager {
 	 * @return the computed key 
 	 * @throws NullPointerException if application name is null
 	 */
-	public static String getSipSessionKey(final String applicationName, final Message message) {
+	public static SipSessionKey getSipSessionKey(final String applicationName, final Message message) {
 		//FIXME should be different whether the message is an instance of Request or Response
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
-		StringBuffer sessionId = new StringBuffer();
-		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
-				.getAddress().getURI().toString());
-		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
-						.getParameter(TAG_PARAMETER_NAME));
-		sessionId = sessionId.append(((ToHeader) message.getHeader(ToHeader.NAME)).getAddress()
-						.getURI().toString());
-		sessionId = sessionId.append(((CallIdHeader) message.getHeader(CallIdHeader.NAME))
-						.getCallId());
-		sessionId = sessionId.append(applicationName);
-
-		return sessionId.toString();
+		return new SipSessionKey(
+				((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
+				((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
+				((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
+				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
+				applicationName);
+//		StringBuffer sessionId = new StringBuffer();
+//		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
+//				.getAddress().getURI().toString());
+//		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
+//						.getParameter(TAG_PARAMETER_NAME));
+//		sessionId = sessionId.append(((ToHeader) message.getHeader(ToHeader.NAME)).getAddress()
+//						.getURI().toString());
+//		sessionId = sessionId.append(((CallIdHeader) message.getHeader(CallIdHeader.NAME))
+//						.getCallId());
+//		sessionId = sessionId.append(applicationName);
+//
+//		return sessionId.toString();
 	}
 	
 	/**
@@ -146,16 +152,19 @@ public class SessionManager {
 	 * @return the computed key 
 	 * @throws NullPointerException if application name is null
 	 */
-	public static String getSipApplicationSessionKey(final String applicationName, final Message message) {
+	public static SipApplicationSessionKey getSipApplicationSessionKey(final String applicationName, final Message message) {
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip application session key creation");
 		}
-		StringBuffer sessionId = new StringBuffer();		
-		sessionId = sessionId.append(((CallIdHeader) message.getHeader(CallIdHeader.NAME))
-						.getCallId());
-		sessionId = sessionId.append(applicationName);
-
-		return sessionId.toString();
+		return new SipApplicationSessionKey(
+				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
+				applicationName);
+//		StringBuffer sessionId = new StringBuffer();		
+//		sessionId = sessionId.append(((CallIdHeader) message.getHeader(CallIdHeader.NAME))
+//						.getCallId());
+//		sessionId = sessionId.append(applicationName);
+//
+//		return sessionId.toString();
 	}
 
 //	// Gives (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,TO-TAG)
@@ -185,7 +194,7 @@ public class SessionManager {
 	 * @param key the identifier for this session
 	 * @return the sip session that had just been removed, null otherwise
 	 */
-	public SipSessionImpl removeSipSession(final String key) {
+	public SipSessionImpl removeSipSession(final SipSessionKey key) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip session with the key : " + key);
 		}
@@ -199,7 +208,7 @@ public class SessionManager {
 	 * @param key the identifier for this session
 	 * @return the sip application session that had just been removed, null otherwise
 	 */
-	public SipApplicationSessionImpl removeSipApplicationSession(final String key) {
+	public SipApplicationSessionImpl removeSipApplicationSession(final SipApplicationSessionKey key) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip application session with the key : " + key);
 		}
@@ -215,7 +224,7 @@ public class SessionManager {
 	 * @param create if set to true, if no session has been found one will be created
 	 * @return the sip application session matching the key
 	 */
-	public SipApplicationSessionImpl getSipApplicationSession(final String key, final boolean create) {
+	public SipApplicationSessionImpl getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
 		SipApplicationSessionImpl sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		if(sipApplicationSessionImpl ==null && create) {
 			sipApplicationSessionImpl = new SipApplicationSessionImpl(key);
@@ -239,7 +248,7 @@ public class SessionManager {
 	 * @return the sip session matching the key
 	 * @throws IllegalArgumentException if create is set to true and sip Factory is null
 	 */
-	public SipSessionImpl getSipSession(final String key, final boolean create, final SipFactoryImpl sipFactoryImpl) {
+	public SipSessionImpl getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl) {
 		if(create && sipFactoryImpl == null) {
 			throw new IllegalArgumentException("the sip factory should not be null");
 		}
@@ -270,5 +279,33 @@ public class SessionManager {
 	 */
 	public Iterator<SipApplicationSessionImpl> getAllSipApplicationSessions() {
 		return sipApplicationSessions.values().iterator();
+	}
+
+	/**
+	 * 
+	 */
+	public void dumpSipSessions() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("sip sessions present in the session manager");
+		}
+		for (SipSessionKey sipSessionKey : sipSessions.keySet()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug(sipSessionKey.toString());
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void dumpSipApplicationSessions() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("sip application sessions present in the session manager");
+		}
+		for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessions.keySet()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug(sipApplicationSessionKey.toString());
+			}
+		}
 	}
 }

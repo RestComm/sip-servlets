@@ -68,7 +68,9 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * Implementation of SipServletMessage
@@ -489,11 +491,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
 		} else if (create) {			
-			String key = SessionManager.getSipApplicationSessionKey(currentApplicationName, message);
+			SipApplicationSessionKey key = SessionManager.getSipApplicationSessionKey(currentApplicationName, message);
 			SipApplicationSessionImpl applicationSession = 
 				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create);
 			if(this.session == null) {
-				String sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
+				SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
 				this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
 						sipFactoryImpl);
 				this.session.setSessionCreatingTransaction(transaction);				
@@ -767,7 +769,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public SipSession getSession(boolean create) {
 		if (this.session == null && create) {
-			String sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
+			SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
 			this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
 					sipFactoryImpl);
 			this.session.setSessionCreatingTransaction(transaction);

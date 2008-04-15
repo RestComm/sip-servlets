@@ -42,7 +42,9 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 public class SipFactoryImpl implements SipFactory {
 	private static final Log logger = LogFactory.getLog(SipFactoryImpl.class
@@ -319,7 +321,7 @@ public class SipFactoryImpl implements SipFactory {
 		
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
-		Request requestToWrapp = null;
+		Request requestToWrap = null;
 
 		ContactHeader contactHeader = null;
 		ToHeader toHeader = null;
@@ -393,7 +395,7 @@ public class SipFactoryImpl implements SipFactory {
 			List<Header> viaHeaders = new ArrayList<Header>();
 			viaHeaders.add(viaHeader);
 			
-			requestToWrapp = SipFactories.messageFactory.createRequest(
+			requestToWrap = SipFactories.messageFactory.createRequest(
 					requestURI.getSipURI(), 
 					method, 
 					callIdHeader, 
@@ -406,12 +408,17 @@ public class SipFactoryImpl implements SipFactory {
 			
 			// Add all headers
 			if (contactHeader != null)
-				requestToWrapp.addHeader(contactHeader);
+				requestToWrap.addHeader(contactHeader);
 			if (routeHeader != null)
-				requestToWrapp.addHeader(routeHeader);
+				requestToWrap.addHeader(routeHeader);
 			
-			String key = SessionManager.getSipSessionKey(
-					((SipApplicationSessionImpl)sipAppSession).getKey(), requestToWrapp);
+			if(((SipApplicationSessionImpl)sipAppSession).getKey() == null) {
+				SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+					((SipApplicationSessionImpl)sipAppSession).getSipContext().getApplicationName(), requestToWrap);
+				((SipApplicationSessionImpl)sipAppSession).setKey(sipApplicationSessionKey);
+			}
+			SipSessionKey key = SessionManager.getSipSessionKey(
+					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap);
 			SipSessionImpl session = sessionManager.getSipSession(key, true, this);
 			session.setSipApplicationSession((SipApplicationSessionImpl)sipAppSession);
 //			((SipApplicationSessionImpl)sipAppSession).addSipSession(session);
@@ -419,7 +426,7 @@ public class SipFactoryImpl implements SipFactory {
 //					(SipApplicationSessionImpl) sipAppSession);
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
-					requestToWrapp, this, session, null, null,
+					requestToWrap, this, session, null, null,
 					dialogCreationMethods.contains(method));						
 			
 			return retVal;

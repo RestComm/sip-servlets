@@ -682,7 +682,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipProviders(), 
 				JainSipUtils.findTransport(request));
-		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, currentApplicationName);
+		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
 		sipURI.setLrParam();
 		javax.sip.address.Address recordRouteAddress = 

@@ -43,6 +43,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * Implementation of the B2BUA helper class.
@@ -141,7 +142,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();				
 			
-			String key = SessionManager.getSipSessionKey(origRequestImpl.getCurrentApplicationName(), newRequest);
+			SipSessionKey key = SessionManager.getSipSessionKey(origRequestImpl.getCurrentApplicationName(), newRequest);
 			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl);			
 			session.setSipApplicationSession(appSession);
 			session.setHandler(originalSession.getHandler());
@@ -153,7 +154,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 					session, null, null, true);			
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
-			
+			//needed for application composition
+			newSipServletRequest.setCurrentApplicationName(origRequestImpl.getCurrentApplicationName());
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
@@ -228,6 +230,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 					session, sessionImpl.getSessionCreatingTransaction(), dialog, false);
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
+			//needed for application composition
+			newSipServletRequest.setCurrentApplicationName(origRequestImpl.getCurrentApplicationName());
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
@@ -285,10 +289,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 				response.addHeader(contactHeader);
 			}
 			
-			SipServletResponseImpl retval = new SipServletResponseImpl(
+			SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(
 					response, sipFactoryImpl, st, sipSession,
 					sipSession.getSessionCreatingDialog(), sipServletRequest);			
-			return retval;
+			return newSipServletResponse;
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("bad input argument", ex);
 		}

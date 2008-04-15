@@ -64,8 +64,10 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -297,16 +299,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(sipServletRequest.isInitial()) {
 				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
 				while(continueRouting) {
-					sipServletRequest.addAppCompositionRRHeader();
 					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
+					sipServletRequest.addAppCompositionRRHeader();
 				}
 			} else {
 				logger.info("Routing of Subsequent Request");
 				
 				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
-//				while(continueRouting) {
-//					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
-//				}
+				while(continueRouting) {					
+					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
+					if(continueRouting) {
+						// Check if the request is meant for me. If so, strip the topmost
+						// Route header.
+						routeHeader = (RouteHeader) request
+								.getHeader(RouteHeader.NAME);
+						//Popping the router header if it's for the container as
+						//specified in JSR 289 - Section 15.8
+						if(! isRouteExternal(routeHeader)) {
+							request.removeFirst(RouteHeader.NAME);
+							sipServletRequest.setPoppedRoute(routeHeader);
+						} else {
+							continueRouting = false;
+						}
+					}
+				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -333,15 +349,32 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		}
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
-		if(applicationName == null || handlerName == null) {
+		if(applicationName == null || applicationName.length() < 1 || 
+				handlerName == null || handlerName.length() < 1) {
 			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
 		
-		String key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage());
+		SipSessionKey key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage());
 		SipSessionImpl sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl);
-		String sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationName, request);
+		if(sipSession == null) {			
+			logger.error("Cannot find the corresponding sip session to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			sessionManager.dumpSipSessions();
+			// Sends a 500 Internal server error and stops processing.				
+			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			return false;
+		}
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationName, request);
 		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, false);
+		if(sipApplicationSession == null) {
+			logger.error("Cannot find the corresponding sip application session to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			sessionManager.dumpSipApplicationSessions();
+			// Sends a 500 Internal server error and stops processing.				
+			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			return false;
+		}
 		sipSession.setSipApplicationSession(sipApplicationSession);
 		sipServletRequest.setSipSession(sipSession);
 					
@@ -493,13 +526,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} else {
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
 			//sip session association
-			String sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request);
+			SipSessionKey sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request);
 			SipSessionImpl sipSession = sessionManager.getSipSession(sessionKey, true, sipFactoryImpl);
 			sipSession.setSessionCreatingTransaction(transaction);
 			sipServletRequest.setSipSession(sipSession);
 			//sip appliation session association
 			//TODO: later should check for SipApplicationKey annotated method in the servlet.
-			String sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationRouterInfo.getNextApplicationName(), request);
+			SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationRouterInfo.getNextApplicationName(), request);
 			SipApplicationSessionImpl appSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, true);
 			sipSession.setSipApplicationSession(appSession);			
 			
@@ -530,7 +563,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}
 			appSession.setSipContext(sipContext);
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
-			if(sipSessionHandlerName == null) {
+			if(sipSessionHandlerName == null || sipSessionHandlerName.length() > 1) {
 				String mainServlet = sipContext.getMainServlet();
 				sipSessionHandlerName = mainServlet;					
 				try {
