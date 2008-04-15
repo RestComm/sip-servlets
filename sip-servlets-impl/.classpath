@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/commons-digester/commons-digester/1.2/commons-digester-1.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/tomcat/tomcat-coyote/5.5.15/tomcat-coyote-5.5.15.jar"/>
