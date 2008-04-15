@@ -21,12 +21,13 @@
       <subsection name="Version 0.2 - 02/01/2008">
         <p>        
         <img src="images/orange.jpeg"/> Listeners and Timers <br/>
-        <img src="images/orange.jpeg"/> More sip phones interoperability <br/>
-        <img src="images/red.jpeg"/> Security <br/>
-        <img src="images/red.jpeg"/> JSR 289 Public Review API Alignement <br/>        
-        <img src="images/red.jpeg"/> J2EE integration/J2EE converged applications<br/>
-        <img src="images/red.jpeg"/> Servlet 2.5 Alignement and Annotations<br/>                      
-        <img src="images/red.jpeg"/> Running on Tomcat 6/Jboss AS <br/>        
+        <img src="images/orange.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=8}More sip phones interoperability}} <br/>
+        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=2}Security}} <br/>
+        <img src="images/green.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=3}JSR 289 Public Review API Alignement}} <br/>        
+        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7}J2EE integration/J2EE converged applications}}<br/>
+        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=6}Servlet 2.5 Alignement and Annotations}}<br/>                      
+        <img src="images/orange.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=4}Running on top of Tomcat 6}} <br/>        
+        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=5}Running on top of Jboss AS}} <br/>
         </p>
       </subsection>
       <subsection name="Version 0.3 - 03/01/2008">
