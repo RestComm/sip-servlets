@@ -5,6 +5,7 @@ package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
 import java.util.List;
+import java.util.Stack;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -15,6 +16,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.commons.logging.Log;
@@ -51,7 +53,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //	private Map securityRoles;
 //	private Map<String,Object> sipApplicationSessionAttributeMap;
 	private SipFactoryFacade sipFactoryFacade;
-	
+	protected String namingContextName;
 	/**
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
@@ -121,6 +123,34 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //                ok = false;
             }
         }
+        // Configure default manager if none was specified
+        if (manager == null) {
+            if ((getCluster() != null) && getDistributable()) {
+                try {
+                    setManager(getCluster().createManager(getName()));
+                } catch (Exception ex) {
+                    logger.error("standardContext.clusterFail", ex);
+//                    ok = false;
+                }
+            } else {
+                setManager(new SipStandardManager());
+            }
+        }
+        // Reading the "catalina.useNaming" environment variable
+        //FIXME uncomment this when we will have moved to Tomcat 6
+//        String useNamingProperty = System.getProperty("catalina.useNaming");
+//        if ((useNamingProperty != null)
+//            && (useNamingProperty.equals("false"))) {
+//            setUseNaming(false);
+//        }
+//        if (isUseNaming()) {
+//            if (getNamingContextListener() == null) {
+//            	NamingContextListener namingContextListener = new SipNamingContextListener();
+//                namingContextListener.setName(getNamingContextName());
+//                setNamingContextListener(namingContextListener);
+//                addLifecycleListener(namingContextListener);
+//            }
+//        }
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
@@ -128,7 +158,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super.start();		
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 		//called implicitly within sipApplicationDispatcher.addSipApplication
-		if(getAvailable()) {
+		if(getAvailable()) {			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
 			//FIXME the session manager should be refactored and made part of the sipstandardmanager
 			if(getManager() instanceof SipStandardManager) {
@@ -468,5 +498,30 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public SipFactoryFacade getSipFactoryFacade() {
 		return sipFactoryFacade;
-	}
+	}		
+	
+	/**
+     * Get naming context full name.
+     */
+    private String getNamingContextName() {    	
+	    if (namingContextName == null) {
+			Container parent = getParent();
+			if (parent == null) {
+				namingContextName = getName();
+			} else {
+				Stack<String> stk = new Stack<String>();
+				StringBuffer buff = new StringBuffer();
+				while (parent != null) {
+					stk.push(parent.getName());
+					parent = parent.getParent();
+				}
+				while (!stk.empty()) {
+					buff.append("/" + stk.pop());
+				}
+				buff.append(getName());
+				namingContextName = buff.toString();
+			}
+		}
+		return namingContextName;
+    }
 }
