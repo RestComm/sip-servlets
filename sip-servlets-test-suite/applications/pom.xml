@@ -10,6 +10,7 @@
 	<url>http://sip-servlets.dev.java.net</url>
 	<modules>
 		<module>simple-sip-servlet</module>
+		<module>shootist-sip-servlet</module>
 		<module>proxy-sip-servlet</module>		
 		<module>b2bua-sip-servlet</module>		
 	</modules>
