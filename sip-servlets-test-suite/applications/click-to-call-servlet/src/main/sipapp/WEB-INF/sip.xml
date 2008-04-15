@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sip-app>
-	<app-name>org.mobicents.servlet.sip.example.SimpleSipServlet</app-name>
-	<display-name>Simple Sip Servlet</display-name>
-	<description>Simple Sip Servlet</description>
+	<app-name>org.mobicents.servlet.sip.testsuite.Click2DialSipServlet</app-name>
+	<display-name>Click2Dial Sip Servlet</display-name>
+	<description>Click2Dial Sip Servlet</description>
 	
 	<main-servlet>
-		SimpleSipServlet
+		Click2DialSipServlet
 	</main-servlet>
 
 	<servlet>
-		<servlet-name>SimpleSipServlet</servlet-name>
-		<display-name>SimpleSipServlet</display-name>
-		<description>Simple SIP servlet</description>
+		<servlet-name>Click2DialSipServlet</servlet-name>
+		<display-name>Click2DialSipServlet</display-name>
+		<description>Click2Dial SIP servlet</description>
 		<servlet-class>
 			org.mobicents.servlet.sip.testsuite.Click2DialSipServlet
 		</servlet-class>
