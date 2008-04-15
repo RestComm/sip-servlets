@@ -107,16 +107,11 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
         }
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void doResponse(SipServletResponse response)
+	@Override
+	protected void doSuccessResponse(SipServletResponse response)
 			throws ServletException, IOException {
-		
-		response.createAck().send();
-		
 		logger.info("Got response: " + response);
-		super.doResponse(response);
+		response.createAck().send();				
 	}
 	
 	@SipApplicationKey

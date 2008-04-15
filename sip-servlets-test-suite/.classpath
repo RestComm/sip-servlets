@@ -15,6 +15,7 @@
 	<classpathentry kind="src" output="applications/secure-servlet/src/main/sipapp/WEB-INF/classes" path="applications/secure-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/session-state-uas/src/main/sipapp/WEB-INF/classes" path="applications/session-state-uas/src/main/java"/>
 	<classpathentry kind="src" output="applications/session-state-uac/src/main/sipapp/WEB-INF/classes" path="applications/session-state-uac/src/main/java"/>
+	<classpathentry kind="src" output="applications/annotated-servlet/src/main/sipapp/WEB-INF/classes" path="applications/annotated-servlet/src/main/java"/>
 	<classpathentry kind="src" output="testsuite/target/classes" path="testsuite/src/main/java"/>
 	<classpathentry kind="src" path="testsuite/src/test/resources"/>
 	<classpathentry kind="src" path="testsuite/src/test/java"/>
@@ -40,5 +41,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jsp-api/6.0.14/jsp-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper/6.0.14/jasper-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.14/servlet-api-6.0.14.jar"/>
+	<classpathentry kind="src" path=".apt_generated">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>
