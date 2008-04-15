@@ -114,8 +114,8 @@ public class ListenersSipServlet
 
 		logger.info("Got request: "
 				+ request.getMethod());
-//		SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
-//		ringingResponse.send();
+		SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
+		ringingResponse.send();
 		SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
 		okResponse.send();
 	}
@@ -527,6 +527,15 @@ public class ListenersSipServlet
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
 		Iterator<SipSession> sipSessions = (Iterator<SipSession>)
 			sipApplicationSession.getSessions("SIP");
+		int nbSipSessions = 0;
+		while (sipSessions.hasNext()) {
+			sipSessions.next();
+			nbSipSessions++;
+		}
+		logger.info("Number of sip sessions contained in the sip application " +
+				"session to invalidate " + nbSipSessions);
+		sipSessions = (Iterator<SipSession>)
+			sipApplicationSession.getSessions("SIP");		
 		while (sipSessions.hasNext()) {
 			SipSession sipSession = (SipSession) sipSessions.next();
 			sipSession.invalidate();

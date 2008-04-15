@@ -14,6 +14,8 @@ import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJ
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
+import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
+import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
 import org.mobicents.servlet.sip.testsuite.timers.TimersSipServletTest;
@@ -38,6 +40,8 @@ public class AllTests {
 		suite.addTestSuite(Click2CallBasicTest.class);
 		suite.addTestSuite(ListenersSipServletTest.class);
 		suite.addTestSuite(TimersSipServletTest.class);		
+		suite.addTestSuite(SessionStateUASSipServletTest.class);
+		suite.addTestSuite(SessionStateUACSipServletTest.class);
 		//$JUnit-END$
 		return suite;
 	}

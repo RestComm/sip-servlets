@@ -1,0 +1,103 @@
+package org.mobicents.servlet.sip.testsuite;
+
+import java.io.IOException;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+
+public class SessionStateUACSipServlet
+		extends SipServlet 
+		implements SipServletListener {
+
+	private static Log logger = LogFactory.getLog(SessionStateUACSipServlet.class);
+	
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";		
+	private static final String SEND_1XX_2XX = "send1xx_2xx";
+	private static final String SEND_1XX_4XX = "send1xx_4xx";
+	private static final String SEND_4XX = "send4xx";
+	private static final String SEND_2XX = "send2xx";
+	
+	private SipFactory sipFactory;	
+	
+	/** Creates a new instance of SessionStateUACSipServlet */
+	public SessionStateUACSipServlet() {
+	}
+
+	@Override
+	public void init(ServletConfig servletConfig) throws ServletException {		
+		super.init(servletConfig);
+		logger.info("the session state UAC test sip servlet has been started");		
+	}		
+	
+	@Override
+	protected void doResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		logger.info("Got : " + sipServletResponse);
+		if ("INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			sendMessage(sipFactory, sipServletResponse.getSession().getState().toString());		
+		}
+	}	
+
+	// SipServletListener methods
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletListener#servletInitialized(javax.servlet.sip.SipServletContextEvent)
+	 */
+	public void servletInitialized(SipServletContextEvent ce) {
+		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
+		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+		SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
+		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+		SipServletRequest sipServletRequest = 
+			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+		sipServletRequest.setRequestURI(requestURI);
+		sipServletRequest.setContentLength(SEND_1XX_4XX.length());
+		try {
+			sipServletRequest.setContent(SEND_1XX_4XX, CONTENT_TYPE);
+			sipServletRequest.send();			
+		} catch (IOException e) {
+			logger.error("An Io exception occured while trying to set the content or send the request", e);
+		}		
+		sendMessage(sipFactory, sipServletRequest.getSession().getState().toString());
+	}
+	
+	/**
+	 * Utility method to send a message out of dialog
+	 * @param messageContent messageContent
+	 */
+	public void sendMessage(SipFactory sipFactory, String messageContent) {
+		try {
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri = sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(messageContent.length());
+			sipServletRequest.setContent(messageContent, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
+
+}

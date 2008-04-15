@@ -45,7 +45,13 @@ import org.apache.log4j.Logger;
  */
 
 public class TestSipListener implements SipListener {
-	private static final String CONTENT_TYPE_TEXT = "text";
+	private static final String TO_TAG = "5432";
+
+	private static final String PLAIN_UTF8_CONTENT_SUBTYPE = "plain;charset=UTF-8";
+
+	private static final String TEXT_CONTENT_TYPE = "text";
+
+	private static final String CONTENT_TYPE_TEXT = TEXT_CONTENT_TYPE;
 	
 	private boolean sendBye;
 	
@@ -104,6 +110,12 @@ public class TestSipListener implements SipListener {
 	private String lastMessageContent;
 	
 	private List<String> allMessagesContent;
+
+	private boolean finalResponseReceived;
+	
+	private int finalResponseToSend;
+	
+	private List<Integer> provisionalResponsesToSend;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 	
@@ -161,7 +173,7 @@ public class TestSipListener implements SipListener {
 		request.getHeader(ContentTypeHeader.NAME);		
 		if(CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
 			this.lastMessageContent = new String(request.getRawContent());
-			allMessagesContent.add(lastMessageContent);
+			allMessagesContent.add(new String(lastMessageContent));
 		}
 		try {
 			Response okResponse = protocolObjects.messageFactory.createResponse(
@@ -170,7 +182,7 @@ public class TestSipListener implements SipListener {
 			if (toHeader.getTag() == null) {
 				toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 			}
-			okResponse.addHeader(contactHeader);
+//			okResponse.addHeader(contactHeader);
 			serverTransaction.sendResponse(okResponse);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -211,15 +223,8 @@ public class TestSipListener implements SipListener {
 			ServerTransaction serverTransaction) {
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
+		logger.info("shootme: got an Invite " + request);	
 		try {
-			logger.info("shootme: got an Invite " + request); 
-			Response response = protocolObjects.messageFactory.createResponse(
-					Response.TRYING, request);
-			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-			Address address = protocolObjects.addressFactory
-					.createAddress("Shootme <sip:127.0.0.1:" + myPort
-							+";transport="+protocolObjects.transport
-							+ ">");
 			ServerTransaction st = requestEvent.getServerTransaction();			
 			if (st == null) {
 				st = sipProvider.getNewServerTransaction(request);
@@ -233,25 +238,33 @@ public class TestSipListener implements SipListener {
 			logger.info("Shootme: dialog = " + dialog);
 			
 			this.inviteRequest = request;
-			
-			st.sendResponse(response);			
 				
-			Response ringing = protocolObjects.messageFactory
-				.createResponse(Response.RINGING, request);
-				toHeader = (ToHeader) ringing.getHeader(ToHeader.NAME);
-				toHeader.setTag("5432"); // Application is supposed to set.
-				st.sendResponse(ringing);			
-			
-			Thread.sleep(1000);
+			for (int provisionalResponseToSend : provisionalResponsesToSend) {
+				Response response = protocolObjects.messageFactory.createResponse(
+						provisionalResponseToSend, request);
+				if(provisionalResponseToSend >= Response.TRYING && provisionalResponseToSend < Response.OK) {
+					ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+					if(provisionalResponseToSend != Response.TRYING) {
+						toHeader.setTag(TO_TAG); // Application is supposed to set.
+					}
+					st.sendResponse(response);
+					Thread.sleep(1000);
+				}
+			}								
+						
 			if(!waitForCancel) {
+				Address address = protocolObjects.addressFactory
+				.createAddress("Shootme <sip:127.0.0.1:" + myPort
+						+";transport="+protocolObjects.transport
+						+ ">");
 				ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
-				Response okResponse = protocolObjects.messageFactory
-						.createResponse(Response.OK, request);
-				toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
-				toHeader.setTag("5432"); // Application is supposed to set.
-				okResponse.addHeader(contactHeader);			
+				Response finalResponse = protocolObjects.messageFactory
+						.createResponse(finalResponseToSend, request);
+				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
+				toHeader.setTag(TO_TAG); // Application is supposed to set.
+				finalResponse.addHeader(contactHeader);			
 					
-				st.sendResponse(okResponse);
+				st.sendResponse(finalResponse);
 			} else {
 				logger.info("Waiting for CANCEL, stopping the INVITE processing ");
 				return ;
@@ -324,6 +337,9 @@ public class TestSipListener implements SipListener {
 		logger.info("Dialog State is " + tid.getDialog().getState());
 
 		try {
+			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
+				finalResponseReceived = true;
+			}
 			if (response.getStatusCode() == Response.OK) {
 				logger.info("response = " + response);
 				if (cseq.getMethod().equals(Request.INVITE)) {
@@ -438,7 +454,7 @@ public class TestSipListener implements SipListener {
 			 * end of modified code
 			 */
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("An unexpected exception occured while processing the response" , ex);
 		}
 
 	}
@@ -472,7 +488,7 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendInvite(SipURI fromURI, SipURI toURI) throws SipException, ParseException, InvalidArgumentException {
+	public void sendInvite(SipURI fromURI, SipURI toURI, String messageContent) throws SipException, ParseException, InvalidArgumentException {
 			// create >From Header
 			Address fromNameAddress = protocolObjects.addressFactory
 					.createAddress(fromURI);			
@@ -578,14 +594,22 @@ public class TestSipListener implements SipListener {
 //					"Call-Info", "<http://www.antd.nist.gov>");
 //			request.addHeader(callInfoHeader);
 
+			// set the message content
+			if(messageContent != null) {
+				ContentLengthHeader contentLengthHeader = 
+					protocolObjects.headerFactory.createContentLengthHeader(messageContent.length());
+				ContentTypeHeader contentTypeHeader = 
+					protocolObjects.headerFactory.createContentTypeHeader(TEXT_CONTENT_TYPE,PLAIN_UTF8_CONTENT_SUBTYPE);
+				byte[] contents = messageContent.getBytes();
+				request.setContent(contents, contentTypeHeader);
+				request.setContentLength(contentLengthHeader);
+			}
 			// Create the client transaction.
 			inviteClientTid = sipProvider.getNewClientTransaction(request);
-
 			// send the request out.
 			inviteClientTid.sendRequest();
 
 			this.transactionCount ++;
-			
 			
 			logger.info("client tx = " + inviteClientTid);
 			dialog = inviteClientTid.getDialog();
@@ -601,6 +625,10 @@ public class TestSipListener implements SipListener {
 		}
 		this.sendBye = callerSendBye;
 		allMessagesContent = new ArrayList<String>();
+		finalResponseToSend = Response.OK;
+		provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.RINGING);
 	}
 
 	public void processIOException(IOExceptionEvent exceptionEvent) {
@@ -706,7 +734,7 @@ public class TestSipListener implements SipListener {
 		ContentLengthHeader contentLengthHeader = 
 			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());
 		ContentTypeHeader contentTypeHeader = 
-			protocolObjects.headerFactory.createContentTypeHeader("text","plain;charset=UTF-8");
+			protocolObjects.headerFactory.createContentTypeHeader(TEXT_CONTENT_TYPE,PLAIN_UTF8_CONTENT_SUBTYPE);
 		message.setContentLength(contentLengthHeader);
 		message.setContent(messageToSend, contentTypeHeader);
 		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
@@ -725,7 +753,7 @@ public class TestSipListener implements SipListener {
 		ContentLengthHeader contentLengthHeader = 
 			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());
 		ContentTypeHeader contentTypeHeader = 
-			protocolObjects.headerFactory.createContentTypeHeader("text","plain;charset=UTF-8");
+			protocolObjects.headerFactory.createContentTypeHeader(TEXT_CONTENT_TYPE,PLAIN_UTF8_CONTENT_SUBTYPE);
 		message.setContentLength(contentLengthHeader);
 		message.setContent(messageToSend, contentTypeHeader);
 		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
@@ -749,5 +777,41 @@ public class TestSipListener implements SipListener {
 	 */
 	public List<String> getAllMessagesContent() {
 		return allMessagesContent;
+	}
+
+	/**
+	 * @return the finalResponseReceived
+	 */
+	public boolean isFinalResponseReceived() {
+		return finalResponseReceived;
+	}
+
+	/**
+	 * @return the finalResponseToSend
+	 */
+	public int getFinalResponseToSend() {
+		return finalResponseToSend;
+	}
+
+	/**
+	 * @param finalResponseToSend the finalResponseToSend to set
+	 */
+	public void setFinalResponseToSend(int finalResponseToSend) {
+		this.finalResponseToSend = finalResponseToSend;
+	}
+
+	/**
+	 * @return the provisionalResponsesToSend
+	 */
+	public List<Integer> getProvisionalResponsesToSend() {
+		return provisionalResponsesToSend;
+	}
+
+	/**
+	 * @param provisionalResponsesToSend the provisionalResponsesToSend to set
+	 */
+	public void setProvisionalResponsesToSend(
+			List<Integer> provisionalResponsesToSend) {
+		this.provisionalResponsesToSend = provisionalResponsesToSend;
 	}	
 }

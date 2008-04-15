@@ -20,7 +20,8 @@ public class ListenersSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 1000;	
+	private static final int TIMEOUT = 1000;
+	private static final int TIMEOUT_TIMER = 6000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	private static final String OK = "OK";
@@ -34,12 +35,11 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		"sipSessionValueBound", "sipSessionValueUnbound",  
 		"sipSessionAttributeReplaced", "sipSessionAttributeRemoved", "sipSessionAttributeAdded"
 		};		
-	
+		
 	private static final String[] LISTENERS_TO_TEST_AFTER = new String[]{
 		//tested in TimersSipServletTest 
-//		"sipAppSessionExpired", 
-		//pain to test 
-//		"sipAppSessionDestroyed", "sipSessionDestroyed"
+//		"sipAppSessionExpired", 	
+		"sipAppSessionDestroyed", "sipSessionDestroyed"
 	};
 	
 	private static final String[] LISTENERS_NOT_TESTED = new String[]{
@@ -102,7 +102,7 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress);	
+		sender.sendInvite(fromAddress, toAddress, null);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		for (int i = 0; i < LISTENERS_TO_TEST.length; i++) {
@@ -119,8 +119,9 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(TIMEOUT_TIMER);
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		logger.info("all messages received : ");
 		while (allMessagesIterator.hasNext()) {
 			String message = (String) allMessagesIterator.next();
 			logger.info(message);

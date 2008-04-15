@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.SessionStateUASSipServlet</app-name>
+	<display-name>Session State UAS Test Sip Servlet</display-name>
+	<description>Session State UAS Test Sip Servlet</description>
+	
+	<main-servlet>
+		SessionStateUASSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>SessionStateUASSipServlet</servlet-name>
+		<display-name>SessionStateUASSipServlet</display-name>
+		<description>Session State UAS Test SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.SessionStateUASSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>

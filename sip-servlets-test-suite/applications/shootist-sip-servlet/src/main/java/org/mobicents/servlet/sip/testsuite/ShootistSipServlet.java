@@ -2,12 +2,9 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
@@ -19,10 +16,9 @@ import javax.servlet.sip.SipURI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class ShootistSipServlet 
 		extends SipServlet 
-		implements SipErrorListener, SipServletListener, Servlet {
+		implements SipServletListener {
 
 	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);
 	
@@ -54,23 +50,6 @@ public class ShootistSipServlet
 			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
 			sipServletRequest.send();
 		}
-	}
-	
-	// SipErrorListener methods	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipErrorListener#noAckReceived(javax.servlet.sip.SipErrorEvent)
-	 */
-	public void noAckReceived(SipErrorEvent ee) {
-		logger.error("noAckReceived.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipErrorListener#noPrackReceived(javax.servlet.sip.SipErrorEvent)
-	 */
-	public void noPrackReceived(SipErrorEvent ee) {
-		logger.error("noPrackReceived.");
 	}
 
 	// SipServletListener methods

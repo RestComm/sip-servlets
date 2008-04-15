@@ -36,22 +36,18 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() {
-		try {
-			super.setUp();						
-			
-			receiverProtocolObjects =new ProtocolObjects(
-					"sender", "gov.nist", TRANSPORT, AUTODIALOG);
-						
-			receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-			SipProvider senderProvider = receiver.createProvider();			
-			
-			senderProvider.addSipListener(receiver);
-			
-			receiverProtocolObjects.start();			
-		} catch (Exception ex) {
-			fail("unexpected exception ");
-		}
+	protected void setUp() throws Exception {
+		super.setUp();						
+		
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();			
 	}
 	
 	public void testShootist() throws InterruptedException {

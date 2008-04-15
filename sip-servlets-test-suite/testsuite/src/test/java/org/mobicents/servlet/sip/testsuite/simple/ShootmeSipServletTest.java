@@ -74,7 +74,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress);		
+		sender.sendInvite(fromAddress, toAddress, null);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());		
 	}

@@ -21,6 +21,8 @@
 		<module>click-to-call-servlet</module>
 		<module>listeners-sip-servlet</module>
 		<module>timers-sip-servlet</module>
+		<module>session-state-uas</module>
+		<module>session-state-uac</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
