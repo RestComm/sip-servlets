@@ -111,7 +111,7 @@
     </div>
     <div id="bodyColumn">
       <div id="contentBox">
-        <div class="section"><h2>Speed Dial - Location Service : a Composed Application</h2></div>
+        <div class="section"><h2>Speed Dial - Location Service : a Composed Application</h2><div class="section"><h3>Service Description</h3><p>This service is a composition of twos other services : <a href="speed_dial.html">Speed Dial</a> and <a href="location_service.html">Location Service</a></p><p>The Speed Dial Service will proxy the speed dial number to a sip address, then the location service will proxies to the actual locations of the callee. </p><p>They will be invoked in this order Speed Dial then Location Service. </p></div><div class="section"><h3>How to activate it</h3><div class="section"><h4>From the binary</h4><p>The binary distribution already contains all the needed dar files to run the examples, you just have to specify the dar file for this service to use in the Service xml tag, darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.</p><p>The darConfigurationFileLocation attribute of the Service tag should be equal to &quot;conf/dars/speeddial-locationservice-dar.properties&quot;</p><p>You can now run Tomcat.</p></div><div class="section"><h4>From the source</h4><p>Please check out the <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/speed-dial">Speed Dial</a> and <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/location-service">Location Service</a> examples from the svn repository and follow their installation instructions in their README.txt.</p><p>The DAR file for this example can be found in the sip servlets impl project under the <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs">docs directory</a> Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml): file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/speeddial-locationservice-dar.properties </p></div></div><div class="section"><h3>How to play with it</h3><p>Start two SIP Phones. One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090 The other phone can be registered as anything </p><p>The SIP phone doesn't have to be registered.</p><p>From the second phone, make a call to sip:1@sip-servlets.com you should have the &quot;receiver&quot; phone ringing.</p></div></div>
       </div>
     </div>
     <div class="clear">
@@ -126,7 +126,7 @@
 
   
   
-  &nbsp;| Last Published: 12/30/2007
+  &nbsp;| Last Published: 12/31/2007
   &nbsp;| Version: 0.1
 </div>
       <div class="clear">

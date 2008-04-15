@@ -111,7 +111,7 @@
     </div>
     <div id="bodyColumn">
       <div id="contentBox">
-        <div class="section"><h2>Call Controller : a Composed Application</h2></div>
+        <div class="section"><h2>Call Controller : a Composed Application</h2><div class="section"><h3>Service Description</h3><p>This service is a composition of twos other services : <a href="call_blocking.html">Call Blocking</a> and <a href="call_forwarding.html">Call Forwarding</a></p><p>They will be invoked in this order Call Forwarding then Call Blocking. </p></div><div class="section"><h3>How to activate it</h3><div class="section"><h4>From the binary</h4><p>The binary distribution already contains all the needed dar files to run the examples, you just have to specify the dar file for this service to use in the Service xml tag, darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.</p><p>The darConfigurationFileLocation attribute of the Service tag should be equal to &quot;conf/dars/call-controller-servlet-dar.properties&quot;</p><p>You can now run Tomcat.</p></div><div class="section"><h4>From the source</h4><p>Please check out the <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-forwarding">Call Forwarding</a> and <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-blocking">Call Blocking</a> examples from the svn repository and follow their installation instructions in their README.txt.</p><p>The DAR file for this example can be found in the sip servlets impl project under the <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs">docs directory</a> Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml): file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-callblocking-forwarding.properties </p></div></div><div class="section"><h3>How to play with it</h3><p>We can distinguish two uses cases here : One where the call is blocked and one where the call is forwarded</p><div class="section"><h4>Call Blocked</h4><p>Start two SIP Phones of your choice such as one of the account name should be forward-receiver on ip address 127.0.0.1 and port 5090 and the other one should be blocked-sender</p><p>The SIP phones don't have to be registered.</p><p>From the blocked-sender phone, make a call to sip:receiver@sip-servlets.com you should receive a Forbidden.</p></div><div class="section"><h4>Call Forwarded</h4><p>Start two SIP Phones of your choice such as one of the account name should be forward-receiver on ip address 127.0.0.1 and port 5090 and the other one should be forward-sender</p><p>The SIP phones don't have to be registered.</p><p>From the forward-sender phone, make a call to sip:receiver@sip-servlets.com you should have the phone &quot;forward-receiver&quot; ringing.</p></div></div></div>
       </div>
     </div>
     <div class="clear">
@@ -126,7 +126,7 @@
 
   
   
-  &nbsp;| Last Published: 12/30/2007
+  &nbsp;| Last Published: 12/31/2007
   &nbsp;| Version: 0.1
 </div>
       <div class="clear">

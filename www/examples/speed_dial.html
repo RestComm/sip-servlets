@@ -111,7 +111,7 @@
     </div>
     <div id="bodyColumn">
       <div id="contentBox">
-        <div class="section"><h2>Speed Dial</h2></div>
+        <div class="section"><h2>Speed Dial</h2><div class="section"><h3>Service Description</h3><p>Speed Dial allows a calling party to specify a short speed-dial number (e.g. &quot;1&quot;), which it translates into a complete address based on prior configuration and proxies it (without record-routing, and without supervised mode).</p><p>Speed Dial currently performs a lookup into a hard coded list of addresses and should later evolve towards a database.</p><p>Here is the list of hard coded contacts and their locations :</p><ul><li>&quot;1&quot; =&gt; &quot;sip:receiver@sip-servlets.com&quot; * &quot;2&quot; =&gt; &quot;sip:mranga@sip-servlets.com&quot; (The Master Blaster) * &quot;3&quot; =&gt; &quot;sip:vlad@sip-servlets.com&quot; * &quot;4&quot; =&gt; &quot;sip:bartek@sip-servlets.com&quot; * &quot;5&quot; =&gt; &quot;sip:jeand@sip-servlets.com&quot; * &quot;9&quot; =&gt; &quot;sip:receiver@127.0.0.1:5090&quot; (Special case to be able to run the app standalone)</li></ul></div><div class="section"><h3>How to activate it</h3><div class="section"><h4>From the binary</h4><p>The binary distribution already contains all the needed dar files to run the examples, you just have to specify the dar file for this service to use in the Service xml tag, darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.</p><p>The darConfigurationFileLocation attribute of the Service tag should be equal to &quot;conf/dars/speed-dial-dar.properties&quot;</p><p>You can now run Tomcat.</p></div><div class="section"><h4>From the source</h4><p>Please check out the speed dial example located under this <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/speed-dial">location</a> from the svn repository. Follow the instructions in the README.txt to build and run the example. </p></div></div><div class="section"><h3>How to play with it</h3><p>Start two SIP Phones. One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090 The other phone can be registered as anything </p><p>The SIP phone doesn't have to be registered.</p><p>From the second phone, make a call to sip:9@sip-servlets.com you should have the &quot;receiver&quot; phone ringing.</p></div></div>
       </div>
     </div>
     <div class="clear">
@@ -126,7 +126,7 @@
 
   
   
-  &nbsp;| Last Published: 12/30/2007
+  &nbsp;| Last Published: 12/31/2007
   &nbsp;| Version: 0.1
 </div>
       <div class="clear">
