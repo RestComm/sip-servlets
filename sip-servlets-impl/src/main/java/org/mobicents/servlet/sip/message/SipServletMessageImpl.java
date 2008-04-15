@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.AddressParametersHeader;
+import gov.nist.javax.sip.header.ContentEncoding;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -76,6 +78,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected ClientTransaction clientTransaction;
 	protected ServerTransaction serverTransaction;
 	protected SipFactoryImpl sipFactory;
+	protected Map<String, Object> attributes = new HashMap<String, Object>();
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
@@ -235,7 +238,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		if (isSystemHeader(hName)) {
 
-			logger.error("Cant add system ehader [" + hName + "]");
+			logger.error("Cant add system header [" + hName + "]");
 
 			throw new IllegalArgumentException("Header[" + hName
 					+ "] is system header, cant add, modify it!!!");
@@ -368,8 +371,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Object getAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		if (name == null)
+			throw new NullPointerException("Attribute name can not be null.");
+		return this.attributes.get(name);
 	}
 
 	public Enumeration<String> getAttributeNames() {
@@ -556,13 +560,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public void setAttribute(String name, Object o) {
-		// TODO Auto-generated method stub
-
+		if (name == null)
+			throw new NullPointerException("Attribute name can not be null.");
+		this.attributes.put(name, o);
 	}
 
 	public void setCharacterEncoding(String enc)
 			throws UnsupportedEncodingException {
-		// TODO Auto-generated method stub
+		this.request.setContentEncoding(new ContentEncoding(enc));
 
 	}
 
