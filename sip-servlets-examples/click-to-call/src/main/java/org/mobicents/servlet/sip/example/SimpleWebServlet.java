@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.sip.SipFactory;
 
 public class SimpleWebServlet extends HttpServlet
-{ 
+{ 	
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		System.out.println("the simple web servlet has been started");
+	}
     /**
      * Handle the HTTP GET method by building a simple web page.
      */

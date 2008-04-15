@@ -21,6 +21,7 @@
             <groupId>tomcat</groupId>
             <artifactId>catalina</artifactId>
             <version>5.5.15</version>
+            <scope>provided</scope>
         </dependency>
         <!-- logging dependency -->
         <dependency>
