@@ -330,6 +330,9 @@ public class SipSessionImpl implements SipSession {
 		return lastAccessTime;
 	}
 
+	public void setLastAccessedTime(long lastAccessTime) {
+		this.lastAccessTime= lastAccessTime;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#getLocalParty()

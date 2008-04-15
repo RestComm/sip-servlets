@@ -54,15 +54,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	private static transient Log logger = LogFactory
 			.getLog(SipStandardContext.class);
 
+	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime for an 
+	// application session is 3 minutes
+	private static int DEFAULT_LIFETIME = 3000*60;
+	
 	private String applicationName;
 	private String smallIcon;
 	private String largeIcon;
 	private String description;
 	private int proxyTimeout;
+	private int sipApplicationSessionTimeout;
 	private SipListenersHolder listeners;
 	private String mainServlet;	
-//	private Map securityRoles;
-//	private Map<String,Object> sipApplicationSessionAttributeMap;
 	private SipFactoryFacade sipFactoryFacade;	
 	private SipLoginConfig sipLoginConfig;
 	
@@ -80,6 +83,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public SipStandardContext() {
 		super();
+		sipApplicationSessionTimeout = DEFAULT_LIFETIME;
 		pipeline.setBasic(new SipStandardContextValve());
 		listeners = new SipListenersHolder();
 	}
@@ -553,4 +557,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		return namingContextName;
     }
+
+	/**
+	 * @return the sipApplicationSessionTimeout in minutes
+	 */
+	public int getSipApplicationSessionTimeout() {
+		return sipApplicationSessionTimeout;
+	}
+
+	/**
+	 * @param sipApplicationSessionTimeout the sipApplicationSessionTimeout to set in minutes
+	 */
+	public void setSipApplicationSessionTimeout(int sipApplicationSessionTimeout) {
+		this.sipApplicationSessionTimeout = sipApplicationSessionTimeout;		
+	}
 }

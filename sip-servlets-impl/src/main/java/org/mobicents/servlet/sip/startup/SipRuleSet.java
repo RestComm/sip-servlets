@@ -27,11 +27,10 @@ import org.xml.sax.Attributes;
 
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a sip application
+ * <p><strong>SipRuleSet</strong> for processing the contents of a sip application
  * deployment descriptor (<code>/WEB-INF/sip.xml</code>) resource.</p>
  *
  */
-
 public class SipRuleSet extends RuleSetBase {
 
 
@@ -186,7 +185,7 @@ public class SipRuleSet extends RuleSetBase {
         digester.addRule(prefix + "sip-app/session-config",
                          sessionConfig);        
         digester.addCallMethod(prefix + "sip-app/session-config/session-timeout",
-                               "setSessionTimeout", 1,
+                               "setSipApplicationSessionTimeout", 1,
                                new Class[] { Integer.TYPE });
         digester.addCallParam(prefix + "sip-app/session-config/session-timeout", 0);       
         //Handles Resource Env Ref

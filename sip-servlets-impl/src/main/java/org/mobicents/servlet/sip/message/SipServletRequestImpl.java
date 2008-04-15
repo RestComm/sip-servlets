@@ -746,6 +746,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}			
 			super.session.addOngoingTransaction(getTransaction());
+			//updating the last accessed times 
+			getSipSession().setLastAccessedTime(System.currentTimeMillis());
+			getSipSession().getSipApplicationSession().setLastAccessedTime(System.currentTimeMillis());
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request",ex);
 		}

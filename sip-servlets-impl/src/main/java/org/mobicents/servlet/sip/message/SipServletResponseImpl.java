@@ -349,7 +349,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
 			}
-			st.sendResponse( (Response)this.message );			
+			st.sendResponse( (Response)this.message );
+			//updating the last accessed times 
+			getSipSession().setLastAccessedTime(System.currentTimeMillis());
+			getSipSession().getSipApplicationSession().setLastAccessedTime(System.currentTimeMillis());
 		} catch (Exception e) {			
 			logger.error("an exception occured when sending the response", e);
 			throw new IllegalStateException(e);

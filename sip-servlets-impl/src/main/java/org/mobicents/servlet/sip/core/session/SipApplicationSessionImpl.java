@@ -15,10 +15,13 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
@@ -51,13 +54,30 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	private enum SipApplicationSessionEventType {
 		CREATION, DELETION, EXPIRATION;
 	}
-	
-	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime is 3 minutes
-	private static long DEFAULT_LIFETIME = 3000*60;
+	/**
+	 * Timer task that will notify the listeners that the sip application session has expired 
+	 * @author Jean Deruelle
+	 */
+	private class SipApplicationSessionTimerTask extends TimerTask {		
+		private SipApplicationSessionImpl sipApplicationSessionImpl;
+		
+		/**
+		 * Default Constructor
+		 * @param sipApplicationSessionImpl the sip application session that will expires
+		 */
+		public SipApplicationSessionTimerTask(SipApplicationSessionImpl sipApplicationSessionImpl) {
+			this.sipApplicationSessionImpl = sipApplicationSessionImpl;
+		}
+		
+		@Override
+		public void run() {
+			sipApplicationSessionImpl.notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
+			sipApplicationSessionImpl.expired = true;
+		}
+		
+	}
 	
 	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey"; 
-	
-//	private SipListenersHolder listeners;
 	
 	private Map<String, Object> sipApplicationSessionAttributeMap;
 
@@ -73,6 +93,12 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private long expirationTime;
 	
+	private boolean expired;
+	
+	private Timer expirationTimer;
+	
+	private TimerTask expirationTimerTask;
+	
 	private Map<String, ServletTimer> servletTimers;
 	
 	private boolean valid;
@@ -82,14 +108,6 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 	private SipContext sipContext;
 	
-//	private TimerListener agregatingListener;
-//	private ArrayList<ServletTimer> runningTimers;	
-	
-	/**
-	 * Passed as info object into Servelt timer that ticks for this sip app
-	 * session as expiration timer
-	 */
-//	private Serializable endObject;					
 	
 	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
@@ -99,12 +117,28 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		this.key = key;
 		this.sipContext = sipContext;
 		lastAccessTime = creationTime = System.currentTimeMillis();
-		if(sipContext!=null && sipContext.getSessionTimeout() > 0) {
-			expirationTime = lastAccessTime + DEFAULT_LIFETIME;
-		}
+		expired = false;
+		expirationTimer =  new Timer();
 		valid = true;
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
+			//scheduling the timer for session expiration
+			if(sipContext.getSipApplicationSessionTimeout() > 0) {
+				expirationTime = lastAccessTime + sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
+				expirationTimerTask = new SipApplicationSessionTimerTask(this);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Scheduling sip application session "+ key +" to expire " + new Date(expirationTime));
+				}
+				expirationTimer.schedule(expirationTimerTask, new Date(expirationTime));
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("The sip application session "+ key +" will never expire ");
+				}
+				// If the session timeout value is 0 or less, then an application session timer 
+				// never starts for the SipApplicationSession object and the container does 
+				// not consider the object to ever have expired
+				expirationTime = -1;
+			}
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
 		}
 		//FIXME create and start a timer for session expiration
@@ -226,6 +260,12 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#getExpirationTime()
 	 */
 	public long getExpirationTime() {
+		if(expirationTime <= 0) {
+			return 0;
+		}
+		if(expired) {
+			return Long.MIN_VALUE;
+		}
 		return expirationTime;
 	}
 
@@ -245,6 +285,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return lastAccessTime;
 	}
 
+	public void setLastAccessedTime(long lastAccessTime) {
+		this.lastAccessTime= lastAccessTime;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions()
@@ -434,20 +478,40 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#setExpires(int)
 	 */
 	public int setExpires(int deltaMinutes) {
-		if(deltaMinutes == 0)
-			this.expirationTime = Long.MAX_VALUE;
-		else
-			this.expirationTime = System.currentTimeMillis() + deltaMinutes*1000*60;
-		return 0;
+		if(!isValid()) {
+			throw new IllegalStateException("Impossible to change the sip application " +
+					"session timeout when it has been invalidated !");
+		}
+		expired = false;
+		if(logger.isDebugEnabled()) {
+			logger.debug("Postponing the expiratin of the sip application session " 
+					+ key +" to expire in " + deltaMinutes + " minutes.");
+		}
+		if(deltaMinutes <= 0) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("The sip application session "+ key +" won't expire anymore ");
+			}
+			// If the session timeout value is 0 or less, then an application session timer 
+			// never starts for the SipApplicationSession object and the container 
+			// does not consider the object to ever have expired
+			this.expirationTime = -1;
+			if(expirationTimerTask != null) {
+				expirationTimerTask.cancel();								
+			}		
+			return Integer.MAX_VALUE;
+		} else {
+			this.expirationTime = expirationTime + deltaMinutes * 1000 * 60;
+			if(expirationTimerTask != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Re-Scheduling sip application session "+ key +" to expire " + new Date(expirationTime));
+				}
+				expirationTimerTask.cancel();
+				expirationTimerTask = new SipApplicationSessionTimerTask(this);
+				expirationTimer.schedule(expirationTimerTask, new Date(expirationTime));
+			}
+			return deltaMinutes;
+		}				
 	}
-
-//	public SipListenersHolder getListeners() {
-//		return listeners;
-//	}
-//
-//	public void setListeners(SipListenersHolder listeners) {
-//		this.listeners = listeners;
-//	}
 
 	public boolean hasTimerListener() {
 		return this.sipContext.getListeners().getTimerListener() != null;
@@ -456,26 +520,6 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	public SipContext getSipContext() {
 		return sipContext;
 	}
-
-//	public void setSipContext(SipContext sipContext) {
-//		this.sipContext = sipContext;
-//	}
-//	
-//	public TimerListener getAgregatingListener() {
-//		return agregatingListener;
-//	}
-//
-//	public void setAgregatingListener(TimerListener agregatingListener) {
-//		this.agregatingListener = agregatingListener;
-//	}
-//
-//	Serializable getEndObject() {
-//		if (this.endObject == null)
-//			this.endObject = new Serializable() {
-//			};
-//
-//		return this.endObject;
-//	}
 	
 	void expirationTimerFired() {
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
@@ -510,12 +554,6 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	public ServletTimer getTimer(String id) {
 		return servletTimers.get(id);
 	}
-	
-//	public void timerScheduled(ServletTimerImpl st) {
-//		
-//		this.runningTimers.add(st);
-//
-//	}
 	
 	/**
      * Perform the internal processing required to passivate
