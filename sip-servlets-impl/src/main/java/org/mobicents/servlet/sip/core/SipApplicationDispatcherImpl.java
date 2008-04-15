@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -20,12 +21,12 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationRouter;
 import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationRoutingDirective;
+import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipRouteModifier;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
-import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -84,6 +85,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	private static transient Log logger = LogFactory
 			.getLog(SipApplicationDispatcherImpl.class);
 	
+	public static final String RR_PARAM_APPLICATION_NAME = "AppName";
+	public static final String RR_PARAM_HANDLER_NAME = "Handler";
+	
 	private static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
@@ -111,7 +115,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	//application chains
 //	private Map<String, SipContext> applicationChains = null;
 	
-	private SessionManager sessionManager = new SessionManager();
+	private SessionManager sessionManager = null;
 	
 	private Boolean started = false;
 	
@@ -120,7 +124,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = Collections.synchronizedMap(new HashMap<String, SipContext>());
-		sipFactoryImpl = new SipFactoryImpl();
+		sessionManager = new SessionManager();
+		sipFactoryImpl = new SipFactoryImpl(sessionManager);
 		hostNames = Collections.synchronizedList(new ArrayList<String>());
 	}
 	
@@ -234,7 +239,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
-		tad.getSipServletMessage().getSipSession().onDialogTimeout(dialog);		
+		tad.getSipServletMessage().getSipSession().onDialogTimeout(dialog);
+		sessionManager.removeSipSession(tad.getSipServletMessage().getSipSession().getKey());
 	}
 	/**
 	 * {@inheritDoc}
@@ -264,16 +270,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					// Already processed this request so just return.
 					return;				
 				} 
-			}				
-			
-			SipSessionImpl session = sessionManager.getRequestSession(sipFactoryImpl, request, transaction);
+			}									
 			
 			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 						request,
 						sipFactoryImpl,
-						session,
+						null,
 						transaction,
-						session.getSessionCreatingDialog(),true);						
+						null,true);						
 			
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
@@ -293,28 +297,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(sipServletRequest.isInitial()) {
 				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
 				while(continueRouting) {
+					sipServletRequest.addAppCompositionRRHeader();
 					continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
 				}
 			} else {
-				logger.info("Routing of Subsequent Request -- TODO");
+				logger.info("Routing of Subsequent Request");
 				
-				//TODO implement the application chain routing algorithm			
-				Wrapper servletWrapper = (Wrapper) session.getSipApplicationSession().getSipContext().findChild(session.getHandler());
-				try
-				{
-					Servlet servlet = servletWrapper.allocate();
-					servlet.service(sipServletRequest, null);
-				} catch (ServletException e) {				
-					logger.error(e);
-					// Sends a 500 Internal server error and stops processing.				
-					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-					return;
-				} catch (IOException e) {				
-					logger.error(e);
-					// Sends a 500 Internal server error and stops processing.				
-					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-					return;
-				}
+				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
+//				while(continueRouting) {
+//					continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest);
+//				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -323,6 +315,65 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return;
 		}
+	}
+
+	/**
+	 * @param sipProvider
+	 * @param transaction
+	 * @param request
+	 * @param sipServletRequest
+	 */
+	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
+		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
+		Request request = (Request) sipServletRequest.getMessage();
+		//TODO Extract information from the Record Route Header
+		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
+		if(poppedAddress == null) {			
+			throw new IllegalArgumentException("the popped route shouldn't be null");			
+		}
+		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
+		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
+		if(applicationName == null || handlerName == null) {
+			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
+					"in this popped routed header " + poppedAddress);
+		}
+		
+		String key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage());
+		SipSessionImpl sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl);
+		String sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationName, request);
+		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, false);
+		sipSession.setSipApplicationSession(sipApplicationSession);
+		sipServletRequest.setSipSession(sipSession);
+					
+		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
+		try {
+			Servlet servlet = servletWrapper.allocate();
+			servlet.service(sipServletRequest, null);
+		} catch (ServletException e) {				
+			logger.error(e);
+			// Sends a 500 Internal server error and stops processing.				
+			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			return false;
+		} catch (IOException e) {				
+			logger.error(e);
+			// Sends a 500 Internal server error and stops processing.				
+			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			return false;
+		}
+		//if a final response has been sent, or if the request has 
+		//been proxied or relayed we stop routing the request
+		RoutingState routingState = sipServletRequest.getRoutingState();
+		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+				RoutingState.PROXIED.equals(routingState) ||
+				RoutingState.RELAYED.equals(routingState)) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+						"The Container hence stops routing the initial request.");
+			}
+			return false;
+		} else {
+			return true;
+		}		
 	}
 
 	/**
@@ -335,16 +386,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
 		//15.4.1 Routing an Initial request Algorithm
-		SipSessionImpl session = sipServletRequest.getSipSession();
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
-		
-		// Create new app session for initial requests. 
-		//TODO: later you should check for SipApplicationKey annotated method in the servlet.
-		SipApplicationSessionImpl appSession = new SipApplicationSessionImpl();
-		session.setApplicationSession(appSession);
-		appSession.addSipSession(session);
-		
+				
 		//get the request routing directive
 		SipApplicationRoutingDirective sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
 		//get the state info associated with the request
@@ -361,10 +405,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		// 15.4.1 Procedure : point 1
 		//TODO the spec mandates that the sipServletRequest should be 
 		//made read only for the AR to process
+		SipApplicationRoutingRegion routingRegion = null;
+		if(sipServletRequest.getSipSession() != null) {
+			routingRegion = sipServletRequest.getSipSession().getRegion();
+		}
+			
 		SipApplicationRouterInfo applicationRouterInfo = 
 			sipApplicationRouter.getNextApplication(
 					sipServletRequest, 
-					sipServletRequest.getSession().getRegion(), 
+					routingRegion, 
 					sipApplicationRoutingDirective, 
 					stateInfo);
 		// 15.4.1 Procedure : point 2
@@ -442,7 +491,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				return false;
 			}
 		} else {
-			//set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
+			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
+			//sip session association
+			String sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request);
+			SipSessionImpl sipSession = sessionManager.getSipSession(sessionKey, true, sipFactoryImpl);
+			sipSession.setSessionCreatingTransaction(transaction);
+			sipServletRequest.setSipSession(sipSession);
+			//sip appliation session association
+			//TODO: later should check for SipApplicationKey annotated method in the servlet.
+			String sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(applicationRouterInfo.getNextApplicationName(), request);
+			SipApplicationSessionImpl appSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, true);
+			sipSession.setSipApplicationSession(appSession);			
+			
+			// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
 			sipServletRequest.setStateInfo(applicationRouterInfo.getStateInfo());
 			sipServletRequest.getSipSession().setRoutingRegion(applicationRouterInfo.getRoutingRegion());
 			try {
@@ -465,9 +526,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.error("No matching deployed application has been found !");
 				// Sends a 503 Service Unavailable error and stops processing.				
 //				JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
-				//FIXME
 				return true;
-//				return false;
 			}
 			appSession.setSipContext(sipContext);
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
@@ -475,7 +534,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				String mainServlet = sipContext.getMainServlet();
 				sipSessionHandlerName = mainServlet;					
 				try {
-					sipServletRequest.getSession().setHandler(sipSessionHandlerName);
+					sipServletRequest.getSipSession().setHandler(sipSessionHandlerName);
 				} catch (ServletException e) {
 					// this should never happen
 					logger.error(e);
@@ -489,21 +548,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			try {
 				Servlet servlet = sipServletImpl.allocate();	        
 				servlet.service(sipServletRequest, null);
-				logger.info("Request event dispatched to " + sipContext.getApplicationName());
-				//if a final response has been sent, or if the request has 
-				//been proxied or relayed we stop routing the request
-				RoutingState routingState = sipServletRequest.getRoutingState();
-				if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
-						RoutingState.PROXIED.equals(routingState) ||
-						RoutingState.RELAYED.equals(routingState)) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-								"The Container hence stops routing the request.");
-					}
-					return false;
-				} else {
-					return true;
-				}
+				logger.info("Request event dispatched to " + sipContext.getApplicationName());				
 			} catch (ServletException e) {				
 				logger.error(e);
 				// Sends a 500 Internal server error and stops processing.				
@@ -515,6 +560,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;
 			} 			
+			//if a final response has been sent, or if the request has 
+			//been proxied or relayed we stop routing the request
+			RoutingState routingState = sipServletRequest.getRoutingState();
+			if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+					RoutingState.PROXIED.equals(routingState) ||
+					RoutingState.RELAYED.equals(routingState)) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+							"The Container hence stops routing the initial request.");
+				}
+				return false;
+			} else {
+				return true;
+			}
 		}		
 	}
 	/**
@@ -583,24 +642,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		// the request has arrived more than once across different paths, most likely due to forking. 
 		// Such requests represent merged requests and MUST NOT be treated as initial requests. 
 		// Refer to section 11.3 for more information on container treatment of merged requests.
-		Set<Transaction> transactions = 
-			((SipSessionImpl)sipServletRequest.getSession()).getOngoingTransactions();		
-		for (Transaction transaction : transactions) {
-			Request onGoingRequest = transaction.getRequest();
-			Request currentRequest = (Request) sipServletRequest.getMessage();
-			//Get the from headers
-			FromHeader onGoingFromHeader = (FromHeader) onGoingRequest.getHeader(FromHeader.NAME);
-			FromHeader currentFromHeader = (FromHeader) currentRequest.getHeader(FromHeader.NAME);
-			//Get the CallId headers
-			CallIdHeader onGoingCallIdHeader = (CallIdHeader) onGoingRequest.getHeader(CallIdHeader.NAME);
-			CallIdHeader currentCallIdHeader = (CallIdHeader) currentRequest.getHeader(CallIdHeader.NAME);
-			//Get the CSeq headers
-			CSeqHeader onGoingCSeqHeader = (CSeqHeader) onGoingRequest.getHeader(CSeqHeader.NAME);
-			CSeqHeader currentCSeqHeader = (CSeqHeader) currentRequest.getHeader(CSeqHeader.NAME);
-			if(onGoingCSeqHeader.equals(currentCSeqHeader) &&
-					onGoingCallIdHeader.equals(currentCallIdHeader) &&
-					onGoingFromHeader.equals(currentFromHeader)) {
-				return RoutingState.MERGED;
+		Iterator<SipSessionImpl> sipSessionIterator = sessionManager.getAllSipSessions();
+		while (sipSessionIterator.hasNext()) {
+			SipSessionImpl sipSessionImpl = (SipSessionImpl) sipSessionIterator
+					.next();				
+			Set<Transaction> transactions = sipSessionImpl.getOngoingTransactions();		
+			for (Transaction transaction : transactions) {
+				Request onGoingRequest = transaction.getRequest();
+				Request currentRequest = (Request) sipServletRequest.getMessage();
+				//Get the from headers
+				FromHeader onGoingFromHeader = (FromHeader) onGoingRequest.getHeader(FromHeader.NAME);
+				FromHeader currentFromHeader = (FromHeader) currentRequest.getHeader(FromHeader.NAME);
+				//Get the CallId headers
+				CallIdHeader onGoingCallIdHeader = (CallIdHeader) onGoingRequest.getHeader(CallIdHeader.NAME);
+				CallIdHeader currentCallIdHeader = (CallIdHeader) currentRequest.getHeader(CallIdHeader.NAME);
+				//Get the CSeq headers
+				CSeqHeader onGoingCSeqHeader = (CSeqHeader) onGoingRequest.getHeader(CSeqHeader.NAME);
+				CSeqHeader currentCSeqHeader = (CSeqHeader) currentRequest.getHeader(CSeqHeader.NAME);
+				if(onGoingCSeqHeader.equals(currentCSeqHeader) &&
+						onGoingCallIdHeader.equals(currentCallIdHeader) &&
+						onGoingFromHeader.equals(currentFromHeader)) {
+					return RoutingState.MERGED;
+				}
 			}
 		}
 		

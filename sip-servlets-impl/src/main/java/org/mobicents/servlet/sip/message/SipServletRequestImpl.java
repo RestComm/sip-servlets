@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +58,7 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
@@ -207,7 +209,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if (toHeader.getTag() == null) {
 					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));					
 				}
-			}
+			}			
+				
 			return new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog(), this);
 		} catch (ParseException ex) {
@@ -257,11 +260,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#getPoppedRoute()
 	 */
 	public Address getPoppedRoute() {
-
+		AddressImpl addressImpl = null;
 		if (this.popedRouteHeader != null) {
-			return new AddressImpl(this.popedRouteHeader.getAddress());
+			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress());			
 		}
-		return null;
+		return addressImpl;
 	}
 
 	/**
@@ -587,6 +590,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = (Request) super.message;
 
 			String transport = JainSipUtils.findTransport(request);
+			//Add a record route header for app composition		
+			addAppCompositionRRHeader();
 			
 			if(Request.ACK.equals(request.getMethod())) {
 				getDialog().sendAck(request);
@@ -623,8 +628,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				
 				ClientTransaction ctx = sipProvider
-						.getNewClientTransaction(request);
-
+						.getNewClientTransaction(request);				
+				
 				Dialog dialog = ctx.getDialog();
 				if (dialog == null && this.createDialog) {
 					dialog = sipProvider.getNewDialog(ctx);
@@ -657,13 +662,34 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// (in this case it would be the original request) since it has been relayed
 			if(linkedRequest != null && 
 					!SipApplicationRoutingDirective.NEW.equals(routingDirective)) {
-				linkedRequest.setRoutingState(RoutingState.RELAYED);				
+				linkedRequest.setRoutingState(RoutingState.RELAYED);						
 			}
 			super.session.addOngoingTransaction(getTransaction());
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request",ex);
 		}
 
+	}
+
+	/**
+	 * Add a record route header for app composition
+	 * @throws ParseException if anything goes wrong while createing the record route header
+	 */
+	public void addAppCompositionRRHeader()
+			throws ParseException {
+		Request request = (Request) super.message;
+		
+		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
+				sipFactoryImpl.getSipProviders(), 
+				JainSipUtils.findTransport(request));
+		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, currentApplicationName);
+		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
+		sipURI.setLrParam();
+		javax.sip.address.Address recordRouteAddress = 
+			SipFactories.addressFactory.createAddress(sipURI);
+		RecordRouteHeader recordRouteHeader = 
+			SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
+		request.addHeader(recordRouteHeader);
 	}
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {
@@ -715,6 +741,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void setRoutingState(RoutingState routingState) {
 		this.routingState = routingState;
-	}
+	}	
 
 }

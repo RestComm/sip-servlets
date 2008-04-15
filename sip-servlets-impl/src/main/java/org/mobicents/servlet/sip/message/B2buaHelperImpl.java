@@ -40,6 +40,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
@@ -138,16 +139,18 @@ public class B2buaHelperImpl implements B2buaHelper {
 			}			
 			SipSessionImpl originalSession = origRequestImpl.getSipSession();
 			SipApplicationSessionImpl appSession = originalSession
-					.getSipApplicationSession();
-
-			SipSessionImpl session = new SipSessionImpl(sipFactoryImpl, appSession);
+					.getSipApplicationSession();				
+			
+			String key = SessionManager.getSipSessionKey(origRequestImpl.getCurrentApplicationName(), newRequest);
+			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl);			
+			session.setSipApplicationSession(appSession);
 			session.setHandler(originalSession.getHandler());
-			appSession.setSipContext(((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext());
+			appSession.setSipContext(session.getSipApplicationSession().getSipContext());
 			
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,
-					session, null, null, true);
+					session, null, null, true);			
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
 			

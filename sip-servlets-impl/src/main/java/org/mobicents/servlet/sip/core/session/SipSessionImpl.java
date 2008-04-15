@@ -43,7 +43,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 /**
  * 
  * Implementation of the SipSession interface.
- * 
+ * An instance of this sip session can only be retrieved through the Session Manager
+ * to constrain the creation of sip session and to make sure that all session created
+ * can be retrieved through the session manager 
  *
  *@author vralev
  *@author mranga
@@ -60,6 +62,7 @@ public class SipSessionImpl implements SipSession {
 
 	private HashMap<String, Object> sipSessionAttributeMap;
 	
+	private String key;
 	/**
 	 * Unique ID for this session.
 	 */
@@ -134,15 +137,15 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private SipFactoryImpl sipFactory;
 	
-	public SipSessionImpl (SipFactoryImpl sipFactoryImpl,  SipApplicationSessionImpl sipApp) {
+	protected SipSessionImpl (String key, SipFactoryImpl sipFactoryImpl) {
+		this.key = key;
 		this.sipFactory = sipFactoryImpl;
-		this.sipApplicationSession = sipApp;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
 		this.uuid = UUID.randomUUID();
 		this.state = State.INITIAL;
 		this.valid = true;
-		this.supervisedMode = true;		
-		if ( sipApp != null) sipApp.addSipSession(this);
+		this.supervisedMode = true;
+		//FIXME create and start a timer for session expiration
 	}
 	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
@@ -468,14 +471,7 @@ public class SipSessionImpl implements SipSession {
 	public void setOutboundInterface(SipURI uri) {
 		// TODO: validate from the list in servlet context
 		this.outboundInterface = uri;
-	}
-
-	/**
-	 * @param sipApplicationSession the sipApplicationSession to set
-	 */
-	public void setApplicationSession(SipApplicationSessionImpl sipApplicationSession) {
-		this.sipApplicationSession = sipApplicationSession;
-	}
+	}	
 
 	/**
 	 * @param dialog the dialog to set
@@ -498,6 +494,11 @@ public class SipSessionImpl implements SipSession {
 	public void setSipApplicationSession(
 			SipApplicationSessionImpl sipApplicationSession) {
 		this.sipApplicationSession = sipApplicationSession;
+		if ( sipApplicationSession != null) {
+			if(sipApplicationSession.getSipSession(key)!=null) {
+				sipApplicationSession.addSipSession(this);
+			}
+		}
 	}
 
 	public Transaction getSessionCreatingTransaction() {
@@ -572,5 +573,19 @@ public class SipSessionImpl implements SipSession {
 			this.setState(State.CONFIRMED);
 		if( response.getStatus()>=100 && response.getStatus()<200 )
 			this.setState(State.EARLY);
+	}
+
+	/**
+	 * @return the key
+	 */
+	public String getKey() {
+		return key;
+	}
+
+	/**
+	 * @param key the key to set
+	 */
+	public void setKey(String key) {
+		this.key = key;
 	}
 }

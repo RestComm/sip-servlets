@@ -66,6 +66,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
+import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
@@ -77,6 +78,9 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
  */
 public abstract class SipServletMessageImpl implements SipServletMessage {
 
+	private static Log logger = LogFactory.getLog(SipServletMessageImpl.class
+			.getCanonicalName());
+	
 	protected Message message;
 	protected SipFactoryImpl sipFactoryImpl;
 	protected SipSessionImpl session;
@@ -105,8 +109,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected String transport = null;
 
-	private static Log logger = LogFactory.getLog(SipServletMessageImpl.class
-			.getCanonicalName());
+	protected String currentApplicationName = null;
 
 	/**
 	 * List of headers that ARE system at all times
@@ -257,8 +260,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			throw new NullPointerException("Null factory");
 		if (message == null)
 			throw new NullPointerException("Null message");
-		if (sipSession == null)
-			throw new NullPointerException("Null session");
+//		if (sipSession == null)
+//			throw new NullPointerException("Null session");
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.message = message;
 		this.transaction = transaction;
@@ -485,16 +488,17 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if (this.session != null
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
-		} else if (create) {
-			//FIXME this session is never added to the sessionmanager in the 
-			//SipApplicationDispatcher
-			SipApplicationSessionImpl applicationSession = new SipApplicationSessionImpl();
+		} else if (create) {			
+			String key = SessionManager.getSipApplicationSessionKey(currentApplicationName, message);
+			SipApplicationSessionImpl applicationSession = 
+				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create);
 			if(this.session == null) {
-				this.session = new SipSessionImpl(sipFactoryImpl, applicationSession);
-			} else {
-				applicationSession.addSipSession(this.session);
-				this.session.setApplicationSession(applicationSession);
-			}
+				String sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
+				this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
+						sipFactoryImpl);
+				this.session.setSessionCreatingTransaction(transaction);				
+			} 
+			this.session.setSipApplicationSession(applicationSession);
 			return this.session.getApplicationSession();			
 		}		
 		return null;
@@ -763,16 +767,24 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public SipSession getSession(boolean create) {
 		if (this.session == null && create) {
-			//FIXME this session is never added to the sessionmanager in the 
-			//SipApplicationDispatcher
-			this.session = new SipSessionImpl(sipFactoryImpl,
-					(SipApplicationSessionImpl) this.getApplicationSession());
+			String sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message);
+			this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
+					sipFactoryImpl);
+			this.session.setSessionCreatingTransaction(transaction);
+			session.setSipApplicationSession((SipApplicationSessionImpl)getApplicationSession(create));
 		}
 		return this.session;
 	}
 	
 	public SipSessionImpl getSipSession() {
 		return session;
+	}
+
+	/**
+	 * @param session the session to set
+	 */
+	public void setSipSession(SipSessionImpl session) {
+		this.session = session;
 	}
 
 	public Address getTo() {
@@ -1206,5 +1218,19 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		// FIXME: Add cehck?
 		return true;
 
+	}
+
+	/**
+	 * @return the currentApplicationName
+	 */
+	public String getCurrentApplicationName() {
+		return currentApplicationName;
+	}
+
+	/**
+	 * @param currentApplicationName the currentApplicationName to set
+	 */
+	public void setCurrentApplicationName(String currentApplicationName) {
+		this.currentApplicationName = currentApplicationName;
 	}
 }

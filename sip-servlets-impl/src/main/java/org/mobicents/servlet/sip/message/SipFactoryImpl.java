@@ -15,7 +15,6 @@ import java.util.UUID;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
-import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
@@ -41,6 +40,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
@@ -71,11 +71,15 @@ public class SipFactoryImpl implements SipFactory {
 
 	private Set<SipProvider> sipProviders = null;
 
+	private SessionManager sessionManager = null;
+	
 	/**
 	 * Dafault constructor
+	 * @param sessionManager 
 	 */
-	public SipFactoryImpl() {
+	public SipFactoryImpl(SessionManager sessionManager) {
 		this.sipProviders = Collections.synchronizedSet(new HashSet<SipProvider>());
+		this.sessionManager = sessionManager;
 	}
 
 	/*
@@ -405,14 +409,18 @@ public class SipFactoryImpl implements SipFactory {
 				requestToWrapp.addHeader(contactHeader);
 			if (routeHeader != null)
 				requestToWrapp.addHeader(routeHeader);
-
-			SipSessionImpl session = new SipSessionImpl(this,
-					(SipApplicationSessionImpl) sipAppSession);
-
+			
+			String key = SessionManager.getSipSessionKey(
+					((SipApplicationSessionImpl)sipAppSession).getKey(), requestToWrapp);
+			SipSessionImpl session = sessionManager.getSipSession(key, true, this);
+			session.setSipApplicationSession((SipApplicationSessionImpl)sipAppSession);
+//			((SipApplicationSessionImpl)sipAppSession).addSipSession(session);
+//			SipSessionImpl session = new SipSessionImpl(this,
+//					(SipApplicationSessionImpl) sipAppSession);
+			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrapp, this, session, null, null,
-					dialogCreationMethods.contains(method));
-			// TODO: Do session association?
+					dialogCreationMethods.contains(method));						
 			
 			return retVal;
 		} catch (Exception e) {
@@ -458,6 +466,13 @@ public class SipFactoryImpl implements SipFactory {
 	 */
 	public Set<SipProvider> getSipProviders() {
 		return Collections.unmodifiableSet(sipProviders);
+	}
+
+	/**
+	 * @return the sessionManager
+	 */
+	public SessionManager getSessionManager() {
+		return sessionManager;
 	}
 
 }

@@ -18,12 +18,16 @@ import javax.sip.SipException;
 import javax.sip.Transaction;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
 /**
@@ -111,7 +115,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		try {
 			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
 			sipServletAckRequest = new SipServletRequestImpl(
-					ackRequest,this.sipFactoryImpl, this.getSession(), this.getTransaction(), dialog, false); 
+					ackRequest,this.sipFactoryImpl, this.getSipSession(), this.getTransaction(), dialog, false); 
 		} catch (InvalidArgumentException e) {
 			logger.error("Impossible to create the ACK",e);
 		} catch (SipException e) {
@@ -252,9 +256,22 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	@Override
 	public void send()  {
-		try {
-			SipSessionImpl session = (SipSessionImpl) this.getSession();
-			
+		try {			
+			//if this is a final response
+			if(response.getStatusCode() >= Response.OK && 
+					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {
+				javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
+						sipFactoryImpl.getSipProviders(), 
+						JainSipUtils.findTransport((Request)originalRequest.getMessage()));
+				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, originalRequest.getCurrentApplicationName());
+				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
+				sipURI.setLrParam();
+				javax.sip.address.Address recordRouteAddress = 
+					SipFactories.addressFactory.createAddress(sipURI);
+				RecordRouteHeader recordRouteHeader = 
+					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
+				response.addHeader(recordRouteHeader);
+			}
 			// Update Session state
 			session.updateStateOnResponse(this);
 			

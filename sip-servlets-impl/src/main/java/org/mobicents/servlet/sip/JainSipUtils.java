@@ -138,7 +138,7 @@ public class JainSipUtils {
 	}
 
 	public static javax.sip.address.SipURI createRecordRouteURI(Set<SipProvider> sipProviders, String transport) {
-		//FIXME defaulting to udp but an exceptions should be thrown instead 
+		//FIXME defaulting to udp but an exception should be thrown instead 
 		if(transport == null) {
 			transport = ListeningPoint.UDP;
 		}

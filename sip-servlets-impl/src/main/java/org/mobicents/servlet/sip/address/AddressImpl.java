@@ -1,15 +1,14 @@
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.core.NameValue;
 import gov.nist.core.NameValueList;
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.From;
 
 import java.text.ParseException;
+import java.util.Iterator;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.URI;
-import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
 import javax.sip.header.FromHeader;
 import javax.sip.header.HeaderFactory;
@@ -29,38 +28,33 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 
 	private static Log logger = LogFactory.getLog(AddressImpl.class
 			.getCanonicalName());
-
 	
 	private javax.sip.address.Address address;	
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
-	
-
 	private SipURI getUriAsSipUri() {
-
 		if (this.address.getURI() instanceof SipURI) {
-			return (SipURI) this.address.getURI();
-			
+			return (SipURI) this.address.getURI();	
 		} else {
 			throw new UnsupportedOperationException("Cannot return as SipURI");
 		}
-
 	}
 	
 	public javax.sip.address.Address getAddress() {
 		return address;
 	}
 	
-	
-	public AddressImpl() {
-		
-		
-	}
+	public AddressImpl() {}
 	
 	public AddressImpl (javax.sip.address.Address address) {
-		this.address = address;
-		
+		this.address = address;				
+		SipURI sipURI = getUriAsSipUri();
+		Iterator<String> parameterNames = sipURI.getParameterNames();
+		while (parameterNames.hasNext()) {
+			String parameterName = (String) parameterNames.next();
+			parameters.set(parameterName, sipURI.getParameter(parameterName));		
+		}
 	}
 
 	/**
@@ -88,21 +82,23 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 	 *            </b>
 	 * @throws ParseException
 	 */
-	
-
 	public AddressImpl(AddressParametersHeader header) throws ParseException {
 		this.address = header.getAddress();
 		super.parameters = header.getParameters();
 
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#getDisplayName()
+	 */
 	public String getDisplayName() {
-
 		return address.getDisplayName();
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#getExpires()
+	 */
 	public int getExpires() {
-
 		javax.sip.address.URI uri = this.address.getURI();
 		if (uri instanceof SipURI) {
 			SipURI sipUri = (SipURI) uri;
@@ -110,15 +106,20 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 					.parseInt(sipUri.getParameter("expires"));
 		} else
 			throw new UnsupportedOperationException("Illegal operation");
-
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#getQ()
+	 */
 	public float getQ() {
 		SipURI sipUri = this.getUriAsSipUri();
 		return sipUri.getParameter("q") == null ? (float) -1.0 : Float
 				.parseFloat(sipUri.getParameter("q"));
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#getURI()
+	 */
 	public URI getURI() {
 		if (getAddress().getURI() instanceof javax.sip.address.SipURI)
 			return new SipURIImpl((javax.sip.address.SipURI) getAddress().getURI());
@@ -127,12 +128,18 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 		else
 			throw new RuntimeException("unsupported operation - unknown scheme");
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#isWildcard()
+	 */
 	public boolean isWildcard() {
-
 		return getAddress().isWildcard();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#setDisplayName(java.lang.String)
+	 */
 	public void setDisplayName(String name) {
 		try {
 			getAddress().setDisplayName(name);
@@ -141,7 +148,11 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 		}
 
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#setExpires(int)
+	 */
 	public void setExpires(int seconds) throws IllegalArgumentException {
 		javax.sip.address.URI uri = this.getAddress().getURI();
 
@@ -157,7 +168,10 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 			throw new IllegalArgumentException(
 					"Can only set parameter for Sip URI");
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#setQ(float)
+	 */
 	public void setQ(float q) {
 		try {
 			SipURI sipUri = getUriAsSipUri();
@@ -166,18 +180,18 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 			throw new IllegalArgumentException("Bad parameter", ex);
 		}
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Address#setURI(javax.servlet.sip.URI)
+	 */
 	public void setURI(URI uri) {
 		this.getAddress().setURI(((URIImpl) uri).uri);
-
 	}
-
+	
 	public Object clone() {
-
 		AddressImpl retval = new AddressImpl();
 		retval.parameters = (NameValueList) this.parameters.clone();
 		return retval;
-		
 	}
 
 	public String toString() {
@@ -188,28 +202,22 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 		retval.append(address.toString());
 		if ( parameters.size() != 0 ) retval.append(";").append(parameters.toString());
 		return retval.toString();
-
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Parameterable#getValue()
+	 */
 	public String getValue() {
 		return toString();
 	}
 
-	public void removeParameter(String name) {
-		this.parameters.remove(name);
-
-	}
-
-	public void setParameter(String name, String value) {
-		this.parameters.put(name, new NameValue(name,value));
-
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Parameterable#setValue(java.lang.String)
+	 */
 	public void setValue(String value) {
-
 		try {
-
 			FromHeader fromHeader = (FromHeader) headerFactory.createHeader(
 					FromHeader.NAME, value);
 			this.address = fromHeader.getAddress();
@@ -222,5 +230,4 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 	public void setAddress(javax.sip.address.Address address) {
 		this.address = address;
 	}
-
 }

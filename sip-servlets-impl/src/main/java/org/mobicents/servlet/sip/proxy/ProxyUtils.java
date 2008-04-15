@@ -172,7 +172,7 @@ public class ProxyUtils {
 			SipServletRequestImpl ret = new	SipServletRequestImpl(
 					clonedRequest,
 					sipFactoryImpl,
-					originalRequest.getSession(),
+					originalRequest.getSipSession(),
 					tx, null, false);
 			//JSR 289 Section 15.1.6
 			ret.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
@@ -209,7 +209,7 @@ public class ProxyUtils {
 		return new SipServletResponseImpl(clonedResponse,
 				sipFactoryImpl,
 				originalRequest.getTransaction(),
-				originalRequest.getSession(),
+				originalRequest.getSipSession(),
 				null,
 				originalRequest);
 
