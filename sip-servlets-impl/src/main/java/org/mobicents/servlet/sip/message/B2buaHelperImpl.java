@@ -2,6 +2,7 @@ package org.mobicents.servlet.sip.message;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,8 +19,15 @@ import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
+import javax.sip.header.CSeqHeader;
+import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentDispositionHeader;
+import javax.sip.header.ContentLengthHeader;
+import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
+import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -41,6 +49,21 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
 public class B2buaHelperImpl implements B2buaHelper {
 
+	protected static final HashSet<String> singletonHeadersNames = new HashSet<String>();
+
+	static {
+		singletonHeadersNames.add(FromHeader.NAME);
+		singletonHeadersNames.add(ToHeader.NAME);
+		singletonHeadersNames.add(CSeqHeader.NAME);
+		singletonHeadersNames.add(CallIdHeader.NAME);
+		singletonHeadersNames.add(MaxForwardsHeader.NAME);
+		singletonHeadersNames.add(ContentLengthHeader.NAME);		
+		singletonHeadersNames.add(ContentDispositionHeader.NAME);
+		singletonHeadersNames.add(ContentTypeHeader.NAME);
+		//TODO are there any other singleton headers ?
+	}
+
+	
 	private SipServletRequestImpl sipServletRequest;
 
 	private ConcurrentHashMap<SipSessionImpl, SipSessionImpl> sessionMap = new ConcurrentHashMap<SipSessionImpl, SipSessionImpl>();
@@ -66,8 +89,6 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			Request newRequest = (Request) origRequestImpl.message.clone();
 			newRequest.removeContent();
-			// SipSessionImpl ( Dialog dialog, Transaction transaction,
-			// SipApplicationSessionImpl sipApp)
 
 			ViaHeader viaHeader = (ViaHeader) newRequest
 					.getHeader(ViaHeader.NAME);
@@ -84,12 +105,25 @@ public class B2buaHelperImpl implements B2buaHelper {
 			String tag = Integer.toString((int) (Math.random()*1000));
 			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
 			
+			//If Contact header is present in the headerMap 
+			//then relevant portions of Contact header is to be used in the request created, 
+			//in accordance with section 4.1.3 of the specification.
+			//They will be added later after the sip servlet request has been created
+			Set<String> contactHeaderSet = new HashSet<String>();
 			if(headerMap != null) {
 				for (String headerName : headerMap.keySet()) {
-					for (String value : headerMap.get(headerName)) {
-						Header header = SipFactories.headerFactory.createHeader(
-								headerName, value);
-						newRequest.addHeader(header);
+					if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
+						for (String value : headerMap.get(headerName)) {							
+							Header header = SipFactories.headerFactory.createHeader(
+									headerName, value);
+							if(! singletonHeadersNames.contains(header.getName())) {
+								newRequest.addHeader(header);
+							} else {
+								newRequest.setHeader(header);
+							}
+						}
+					} else {
+						contactHeaderSet = headerMap.get(headerName);
 					}
 				}
 			}
@@ -109,6 +143,13 @@ public class B2buaHelperImpl implements B2buaHelper {
 					sipFactoryImpl,
 					session, null, null, true);
 
+			//If Contact header is present in the headerMap 
+			//then relevant portions of Contact header is to be used in the request created, 
+			//in accordance with section 4.1.3 of the specification.
+			for (String contactHeaderValue : contactHeaderSet) {
+				newSipServletRequest.addHeader(ContactHeader.NAME, contactHeaderValue);
+			}
+			
 			if (linked) {
 				sessionMap.put(originalSession, session);
 				sessionMap.put(session, originalSession);
@@ -136,28 +177,55 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipSessionImpl sessionImpl = (SipSessionImpl) session;
 
 			Dialog dialog = sessionImpl.getSessionCreatingDialog();
-
-			Request newRequest = dialog.createRequest(((Request) origRequest)
-					.getMethod());
 			
-			// SipSessionImpl ( Dialog dialog, Transaction transaction,
-			// SipApplicationSessionImpl sipApp)
+			Request newRequest = dialog.createRequest(((SipServletRequest) origRequest)
+					.getMethod());
+						
+			TransactionApplicationData transactionApplicationData = (TransactionApplicationData) origRequestImpl.getDialog()
+					.getApplicationData();
+			SipSessionImpl originalSession = transactionApplicationData.getSipSession();
 
-			for (String headerName : headerMap.keySet()) {
-				for (String value : headerMap.get(headerName)) {
-					Header header = SipFactories.headerFactory.createHeader(
-							headerName, value);
-					newRequest.addHeader(header);
+			logger.info(origRequest.getSession());				
+			logger.info(session);
+			
+			//If Contact header is present in the headerMap 
+			//then relevant portions of Contact header is to be used in the request created, 
+			//in accordance with section 4.1.3 of the specification.
+			//They will be added later after the sip servlet request has been created
+			Set<String> contactHeaderSet = new HashSet<String>();
+			if(headerMap != null) {
+				for (String headerName : headerMap.keySet()) {
+					if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
+						for (String value : headerMap.get(headerName)) {							
+							Header header = SipFactories.headerFactory.createHeader(
+									headerName, value);
+							if(! singletonHeadersNames.contains(header.getName())) {
+								newRequest.addHeader(header);
+							} else {
+								newRequest.setHeader(header);
+							}
+						}
+					} else {
+						contactHeaderSet = headerMap.get(headerName);
+					}
 				}
 			}
 			
-			SipSessionImpl originalSession = (SipSessionImpl) origRequestImpl.getDialog()
-					.getApplicationData();
-
-			logger.debug("newRequest = " + newRequest);
+			//we already have a dialog since it is a subsequent request			
 			SipServletRequest retVal = new SipServletRequestImpl(newRequest,sipFactoryImpl,
-					session, null, null, true);
-
+					session, sessionImpl.getSessionCreatingTransaction(), dialog, false);
+			
+			//If Contact header is present in the headerMap 
+			//then relevant portions of Contact header is to be used in the request created, 
+			//in accordance with section 4.1.3 of the specification.
+			for (String contactHeaderValue : contactHeaderSet) {
+				retVal.addHeader(ContactHeader.NAME, contactHeaderValue);
+			}
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("newRequest = " + newRequest);
+			}
+			
 			sessionMap.put(originalSession, sessionImpl);
 			sessionMap.put(sessionImpl, originalSession);
 
@@ -195,10 +263,16 @@ public class B2buaHelperImpl implements B2buaHelper {
 					status, request);
 			if (reasonPhrase != null)
 				response.setReasonPhrase(reasonPhrase);
-
+			
+			if(status ==  Response.OK) {
+				ContactHeader contactHeader = 
+					JainSipUtils.createContactForProvider(sipFactoryImpl.getSipProviders(), JainSipUtils.findTransport(request));
+				response.addHeader(contactHeader);
+			}
+			
 			SipServletResponseImpl retval = new SipServletResponseImpl(
 					response, sipFactoryImpl, st, sipSession,
-					sipSession.getSessionCreatingDialog());
+					sipSession.getSessionCreatingDialog());			
 			return retval;
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("bad input argument", ex);

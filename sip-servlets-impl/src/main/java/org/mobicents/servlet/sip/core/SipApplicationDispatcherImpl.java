@@ -215,8 +215,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public SipContext removeSipApplication(String sipApplicationName) {
-		SipContext sipContext;
-		sipContext = applicationDeployed.remove(sipApplicationName);
+		SipContext sipContext = applicationDeployed.remove(sipApplicationName);
 		List<String> applicationsUndeployed = new ArrayList<String>();
 		applicationsUndeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
@@ -272,6 +271,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						transaction,
 						session.getSessionCreatingDialog(),true);						
 			
+			// Check if the request is meant for me. If so, strip the topmost
+			// Route header.
+			RouteHeader routeHeader = (RouteHeader) request
+					.getHeader(RouteHeader.NAME);
+			//Popping the router header if it's for the container as
+			//specified in JSR 289 - Section 15.8
+			if(! isRouteExternal(routeHeader)) {
+				request.removeFirst(RouteHeader.NAME);
+				sipServletRequest.setPoppedRoute(routeHeader);
+			}			
+			
 			//check if the request is initial
 			InitialRequestType isInitialRequest = isInitialRequest(sipServletRequest, requestEvent.getDialog());		
 			sipServletRequest.setInitial(isInitialRequest);					
@@ -297,27 +307,37 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				
 				logger.info("Dispatching the request event");
 				// 15.4.1 Procedure : point 1
+				//TODO the spec mandates that the sipServletRequest should be 
+				//made read only for the AR to process
 				SipApplicationRouterInfo applicationRouterInfo = 
-					sipApplicationRouter.getNextApplication(sipServletRequest, null, sipApplicationRoutingDirective, stateInfo);
+					sipApplicationRouter.getNextApplication(
+							sipServletRequest, 
+							sipServletRequest.getSession().getRegion(), 
+							sipApplicationRoutingDirective, 
+							stateInfo);
 				// 15.4.1 Procedure : point 2
 				SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 				if(sipRouteModifier != null) {
-					//TODO check this out once DAR has been implemented
 					switch(sipRouteModifier) {
+						// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
+						// it is up to container to decide whether it is external or internal.
 						case ROUTE :
 							String route = applicationRouterInfo.getRoute();
 							Address routeAddress = null; 
-							RouteHeader routeHeader = null;
+							RouteHeader applicationRouterInfoRouteHeader = null;
 							try {
 								routeAddress = SipFactories.addressFactory.createAddress(route);
-								routeHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
+								applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
 							} catch (ParseException e) {
-								logger.error("Impossible to parse the route into a compliant address",e);							
-								// Sends a 500 Internal server error and stops processing.				
+								logger.error("Impossible to parse the route returned by the application router " +
+										"into a compliant address",e);							
+								// the AR returned an empty string route or a bad route
+								// this shouldn't happen if the route modifier is ROUTE, processing is stopped
+								//and a 500 is sent
 								JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 								return;
 							}						
-							if(isRouteExternal(routeHeader)) {
+							if(isRouteExternal(applicationRouterInfoRouteHeader)) {
 								// push the route as the top Route header field value and send the request externally
 								sipServletRequest.addHeader(RouteHeader.NAME, route);
 								sipServletRequest.send();
@@ -325,14 +345,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 							} else {
 								// the container MUST make the route available to the applications 
 								// via the SipServletRequest.getPoppedRoute() method.							
-								sipServletRequest.setPoppedRoute(routeHeader);												
+								sipServletRequest.setPoppedRoute(applicationRouterInfoRouteHeader);												
 							}
 							break;
+						// NO_ROUTE indicates that application router is not returning any route 
+						// and the SipApplicationRouterInfo.getRoute() value if any should be disregarded.	
 						case CLEAR_ROUTE :
 							//nothing to do here
 							//disregard the result.getRoute() and proceed. Specifically the SipServletRequest.getPoppedRoute() 
 							//returns the same value as before the invocation of application router.
 							break;
+						// CLEAR_ROUTE modifier indicates to the container to remove the popped top route associated with the request. 
+						// Specifically the subsequent invocation of SipServletRequest.getPoppedRoute() MUST now return null
 						case NO_ROUTE :
 							// clear the value of popped route header such that SipServletRequest.getPoppedRoute() 
 							//now returns null until another route header belonging to the container is popped.
@@ -391,7 +415,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						return;
 					}
 					appSession.setSipContext(sipContext);
-					String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSession()).getHandler();						
+					String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
 					if(sipSessionHandlerName == null) {
 						String mainServlet = sipContext.getMainServlet();
 						sipSessionHandlerName = mainServlet;					
@@ -430,14 +454,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.info("Request event dispatched");
 			} else {
 				logger.info("Routing of Subsequent Request -- TODO");
-				// Check if the request is meant for me. If so, strip the topmost
-				// Route header.
-				RouteHeader routeHeader = (RouteHeader) request
-						.getHeader(RouteHeader.NAME);
-				if(isRouteExternal(routeHeader)) {
-					request.removeFirst(RouteHeader.NAME);
-				}
-				sipServletRequest.setPoppedRoute(routeHeader);
+				
 				//TODO implement the application chain routing algorithm			
 				Wrapper servletWrapper = (Wrapper) ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 				try

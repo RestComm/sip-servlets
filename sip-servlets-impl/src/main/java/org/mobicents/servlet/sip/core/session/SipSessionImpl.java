@@ -268,17 +268,13 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#getLocalParty()
 	 */
 	public Address getLocalParty() {
-		if(sessionCreatingDialog != null)
+		if(sessionCreatingDialog != null) {
 			return new AddressImpl(sessionCreatingDialog.getLocalParty());
-		else
-		{
-			try
-			{
+		} else {
+			try {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
 				return new AddressImpl(fromHeader.getAddress());
-			}
-			catch(Exception e)
-			{
+			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
 		}
@@ -301,17 +297,13 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#getRemoteParty()
 	 */
 	public Address getRemoteParty() {
-		if(sessionCreatingDialog != null)
-			return new AddressImpl(sessionCreatingDialog.getLocalParty());
-		else
-		{
-			try
-			{
+		if(sessionCreatingDialog != null) {
+			return new AddressImpl(sessionCreatingDialog.getRemoteParty());
+		} else {
+			try {
 				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
 				return new AddressImpl(toHeader.getAddress());
-			}
-			catch(Exception e)
-			{
+			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
 		}
