@@ -1,0 +1,16 @@
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender"> 
+    <param name="file" value="logs/simplesipservlet.log"/>
+    <param name="MaxFileSize" value="200KB"/>
+    <!-- Keep one backup file -->
+    <param name="MaxBackupIndex" value="1"/>
+    <layout class="org.apache.log4j.PatternLayout"> 
+      <param name="ConversionPattern" value="%p %t %c - %m%n"/> 
+    </layout> 
+  </appender> 
+  <root> 
+    <priority value ="debug" />     
+    <appender-ref ref="rolling-file" /> 
+  </root>
+</log4j:configuration>
