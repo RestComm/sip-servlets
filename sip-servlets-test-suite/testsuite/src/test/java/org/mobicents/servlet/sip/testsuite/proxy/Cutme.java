@@ -1,12 +1,18 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.TimerTask;
+
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
+import javax.sip.ObjectInUseException;
 import javax.sip.PeerUnavailableException;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
@@ -16,24 +22,14 @@ import javax.sip.SipFactory;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
-import javax.sip.TimeoutEvent;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
-
-import java.text.ParseException;
-import java.util.*;
-
-import javax.sip.*;
-import javax.sip.message.*;
-import javax.sip.address.*;
-import javax.sip.header.*;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import javax.sip.address.AddressFactory;
+import javax.sip.header.HeaderFactory;
+import javax.sip.message.MessageFactory;
+import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 public class Cutme implements SipListener {
 
@@ -315,4 +311,31 @@ public class Cutme implements SipListener {
 
 	}
 
+	public void destroy() {
+		HashSet hashSet = new HashSet();
+
+		for (Iterator it = sipStack.getSipProviders(); it.hasNext();) {
+
+			SipProvider sipProvider = (SipProvider) it.next();
+			hashSet.add(sipProvider);
+		}
+
+		for (Iterator it = hashSet.iterator(); it.hasNext();) {
+			SipProvider sipProvider = (SipProvider) it.next();
+
+			for (int j = 0; j < 5; j++) {
+				try {
+					sipStack.deleteSipProvider(sipProvider);
+				} catch (ObjectInUseException ex) {
+					try {
+						Thread.sleep(1000);
+					} catch (Exception e) {
+					}
+
+				}
+			}
+		}
+
+		sipStack.stop();
+	}
 }

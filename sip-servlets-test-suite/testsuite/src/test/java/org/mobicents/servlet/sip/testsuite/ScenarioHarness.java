@@ -1,10 +1,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
-import javax.sip.SipListener;
-
-import junit.framework.TestCase;
 import java.util.EventObject;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -15,6 +12,8 @@ import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
 
+import junit.framework.TestCase;
+
 
 
 public abstract class ScenarioHarness extends TestCase implements SipListener {
@@ -24,7 +23,7 @@ public abstract class ScenarioHarness extends TestCase implements SipListener {
 
 	protected static String transport = "udp";
 
-	protected Hashtable providerTable;
+	protected java.util.Map<SipProvider, SipListener> providerTable;
 
 	// this flag determines whether the tested SIP Stack is shootist or shootme
 	protected boolean testedImplFlag;
@@ -92,7 +91,7 @@ public abstract class ScenarioHarness extends TestCase implements SipListener {
 	protected ScenarioHarness(String name, boolean autoDialog) {
 
 		super(name);
-		this.providerTable = new Hashtable();
+		this.providerTable = new HashMap<SipProvider, SipListener>();
 
 	}
 	

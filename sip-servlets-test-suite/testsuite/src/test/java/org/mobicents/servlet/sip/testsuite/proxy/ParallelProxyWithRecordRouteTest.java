@@ -48,18 +48,11 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 	}
 
 	@Override
-	public void setUp() {
-		try {
-			super.setUp();
-			this.shootist = new Shootist();
-			this.shootme = new Shootme();
-			this.cutme = new Cutme();
-
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
+	public void setUp() throws Exception {
+		super.setUp();
+		this.shootist = new Shootist();
+		this.shootme = new Shootme();
+		this.cutme = new Cutme();
 	}
 
 	public void testProxy() {
@@ -85,6 +78,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 	public void tearDown() throws Exception {
 		shootist.destroy();
 		shootme.destroy();
+		cutme.destroy();
 		super.tearDown();
 	}
 
