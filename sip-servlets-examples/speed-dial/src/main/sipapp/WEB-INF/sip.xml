@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.SpeedDialSipServlet</app-name>
+	<display-name>Speed Dial Sip Servlet</display-name>
+	<description>Speed Dial Sip Servlet</description>
+	
+	<main-servlet>
+		SpeedDialSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>SpeedDialSipServlet</servlet-name>
+		<display-name>SpeedDialSipServlet</display-name>
+		<description>Speed Dial SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.SpeedDialSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>
