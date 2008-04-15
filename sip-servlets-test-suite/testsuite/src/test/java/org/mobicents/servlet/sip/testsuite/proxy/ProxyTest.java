@@ -12,11 +12,10 @@ import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
 public class ProxyTest extends SipServletTestCase{
 
-	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
+	private static Log logger = LogFactory.getLog(ProxyTest.class);
 	
 	private SipStack sipStackSender;
 	private SipStack[] sipStackReceivers;

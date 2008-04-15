@@ -78,6 +78,14 @@
 			<artifactId>naming-resources</artifactId>
 			<version>0.8</version>			
 		</dependency>
+		
+		<dependency>
+			<groupId>comp.java.cafesip</groupId>
+			<artifactId>sipunit</artifactId>
+			<version>0.0.6-BETA</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/sipunit.jar</systemPath>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Log logger = LogFactory.getLog(CallForwardingSipServlet.class);
 	
 	
 	/** Creates a new instance of SimpleProxyServlet */
@@ -37,7 +37,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
-		logger.info("Got request:\n"
+		logger.info("Got request: "
 				+ request.getMethod());
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
@@ -51,7 +51,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 
-		logger.info("Got BYE request:\n" + request);
+		logger.info("Got BYE request: " + request);
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 	}
@@ -62,7 +62,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	protected void doResponse(SipServletResponse response)
 			throws ServletException, IOException {
 
-		logger.info("Got response:\n" + response);
+		logger.info("Got response: " + response);
 		super.doResponse(response);
 	}
 
