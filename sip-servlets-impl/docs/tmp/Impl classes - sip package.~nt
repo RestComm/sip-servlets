@@ -2,314 +2,11 @@
 <XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
 <XPD:HEADER>
 <XPD:SUBUNITS>
-<XPD:UNIT owner="NSOHPG0n+kmg/wUTiaaKwAAA" index="0">proxy overview diagrams.unt</XPD:UNIT>
-<XPD:UNIT owner="NSOHPG0n+kmg/wUTiaaKwAAA" index="1">Sip Servlets Loading Class Diagram.unt</XPD:UNIT>
 </XPD:SUBUNITS>
 </XPD:HEADER>
 <XPD:BODY>
-<XPD:OBJ name="DocumentElement" type="UMLModel" guid="bqfEzl+aVEeyGR/J7Vx+RQAA">
-<XPD:ATTR name="Name" type="string">Mobicents Implementation Classes</XPD:ATTR>
-<XPD:ATTR name="StereotypeProfile" type="string">UMLStandard</XPD:ATTR>
-<XPD:ATTR name="StereotypeName" type="string">analysisModel</XPD:ATTR>
-<XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedDiagrams[0]" type="UMLClassDiagram" guid="aiYRGQN1vEKifOegV/HchQAA">
-<XPD:ATTR name="Name" type="string">Overview</XPD:ATTR>
-<XPD:REF name="DiagramOwner">bqfEzl+aVEeyGR/J7Vx+RQAA</XPD:REF>
-<XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="NULmUWrV60GCMsxJquy2fAAA">
-<XPD:REF name="Diagram">aiYRGQN1vEKifOegV/HchQAA</XPD:REF>
-<XPD:ATTR name="#OwnedViews" type="integer">9</XPD:ATTR>
-<XPD:OBJ name="OwnedViews[0]" type="UMLClassView" guid="f/Fx7R1kPkiMlTWnpbatiwAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">795</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">391</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">134</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">43</XPD:ATTR>
-<XPD:REF name="Model">fAfx+fkl/0epcQVWx0Xk0wAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="g20tbKZ25kitx9DRG0VM5AAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="sHgMkoNe+E6+axX4UkK81gAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipApplicationDispatcherImpl</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="WHsNiSPMMkKVJzyPOGEKBAAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="JlPIC/kSykCCAE2jsl/0vgAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="wGX0JLpmik+2ZXI+DrpwtgAA">
-<XPD:REF name="Model">fAfx+fkl/0epcQVWx0Xk0wAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="M2qKPEymPEGI8gOSkg8RpQAA">
-<XPD:REF name="Model">fAfx+fkl/0epcQVWx0Xk0wAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="PPIZ2Re4K0qbnwAcXiqAfwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">fAfx+fkl/0epcQVWx0Xk0wAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[1]" type="UMLClassView" guid="Bk5GHD4UeUCz44GhALgMswAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">612</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">475</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">367</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">134</XPD:ATTR>
-<XPD:REF name="Model">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="0uUhgoAxGkmbIel1sFQQAgAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="ZDJ8K4c8NEKzZOxSJXd06AAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipFactories</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="VMqCjrYhGEu0mkFT5ANrtQAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="J9haVu+hEkiKVMdhCwJJCAAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="6IFsCnwL00mr8K9ef34ObQAA">
-<XPD:REF name="Model">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="O6tBopASNUikycqey11saQAA">
-<XPD:REF name="Model">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="lqM8JXW9OkWIRld1HP/zegAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[2]" type="UMLClassView" guid="bo5YdaCtlUa7ESN4m5T/sQAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">598</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">254</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">107</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">56</XPD:ATTR>
-<XPD:REF name="Model">RjmF8NG/DkWbuKl98DZJ9wAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="5GVSHpNNAEGIGhPsZK1VsgAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="QpCbjxDQAk+Zrgny2t8j5wAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipContextConfig</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="SSXBQsLtZUKO8QkTHEAC9gAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="znM0qPmDp0uqeU2DxIjj+QAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="UF8A7U1KjECq5h+YxVnYugAA">
-<XPD:REF name="Model">RjmF8NG/DkWbuKl98DZJ9wAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="elH0n+4GyUWPTE2nHWgNvwAA">
-<XPD:REF name="Model">RjmF8NG/DkWbuKl98DZJ9wAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="wpcDfPIN1UOCEhrsYQRwDAAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">RjmF8NG/DkWbuKl98DZJ9wAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[3]" type="UMLClassView" guid="OaaoZh/kU0SLdUePhc/1xQAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">661</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">160</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">227</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">56</XPD:ATTR>
-<XPD:REF name="Model">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="fljoW4HVikWK5IGBWNrdhQAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="OS8JETKDYUGltu6BzGHAmQAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipStandardContext</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="r4FBFX09FUGHy9nk2anPywAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="Zk3aVFsezkeb11Z7JbiGowAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="ng0KHdweFE+AMe2n5AiE5AAA">
-<XPD:REF name="Model">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="SYaI97Ck2ESUVBfHPUoO9gAA">
-<XPD:REF name="Model">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="CCtSY4Kp9k2rnanrE9j0fQAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[4]" type="UMLClassView" guid="PhGQCFRHIkC5lf7Cl7IXwAAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">684</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">75</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">118</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">69</XPD:ATTR>
-<XPD:REF name="Model">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="jviRCnJHBUeAP9ra4McwXQAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="0e7QACmaRECzqeG4xEHY4gAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipProtocolHandler</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="anJZ2eNZp02jqxjiClX1KQAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="EgxTQaaoqEaaJCdi1wHF1gAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="OlRKrGkrhUiDLGWu00QcpQAA">
-<XPD:REF name="Model">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="bFceMY8L3UClyZnICUfyxQAA">
-<XPD:REF name="Model">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="rYd7VSlg+EWMmxg6a82ptwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[5]" type="UMLClassView" guid="JOYrvd+M6k+Xhmi2NWp9ogAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">136</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">548</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">150</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">160</XPD:ATTR>
-<XPD:REF name="Model">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="8FyUYYIi/ESG844CiRQRIwAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="JAyY4/hm8kqwfhER/Xut5wAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipServletImpl</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="/hKNVp7NjEWaB/udrqZLKwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="az9a0rMUQkyPfWanIRZtkgAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="nKAwkVcyzUaj10eKBEn1RAAA">
-<XPD:REF name="Model">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="M2r1CmlRMk+fLcgFJqrMUAAA">
-<XPD:REF name="Model">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="jJ0HfaH2LUmFpdQ86MRwywAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[6]" type="UMLClassView" guid="1SLrOM0b50++RcG3dufy9QAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">96</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">924</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">162</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">316</XPD:ATTR>
-<XPD:REF name="Model">N/79IWincU6clojpU/dPwAAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="7YZYqNID0kO8vtx3nKVrRwAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="yIMz6RTA302HrqDjHxAwBwAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipServletApplicationImpl</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="s961HF0bNUSlPaEvql+d5AAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="Uift8f5OHkiVXfiHPv93ywAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="ggpy7RSHQEaKv26WeJIyLgAA">
-<XPD:REF name="Model">N/79IWincU6clojpU/dPwAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="aEAiwKx3tkWOi0En3Hd+4QAA">
-<XPD:REF name="Model">N/79IWincU6clojpU/dPwAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="7fnpqtN/D0620e41tak2SgAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model">N/79IWincU6clojpU/dPwAAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[7]" type="UMLClassView" guid="1AZPB141xEqcwoE5bE2EBwAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">36</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">429</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">433</XPD:ATTR>
-<XPD:REF name="Model" pathname="::Specification Classes::javax::servlet::sip::SipServlet">tf/ibbHfr0eoakJIHh6/WgAA</XPD:REF>
-<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="r+QaQL9wWEmaZOFNHtCi9wAA">
-<XPD:OBJ name="NameLabel" type="LabelView" guid="on//R47f0E2KtyxKyqxw0gAA">
-<XPD:ATTR name="FontStyle" type="integer">3</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">SipServlet</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="8sgEVt0bTUq3y5eisd539gAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="LabelView" guid="NfHV/pkSRkSs3edd2LDuWQAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="i1nIxdKHfUyubUPxCqOllgAA">
-<XPD:REF name="Model" pathname="::Specification Classes::javax::servlet::sip::SipServlet">tf/ibbHfr0eoakJIHh6/WgAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="Gr3/XjnKfEmaUnEiBjPVZAAA">
-<XPD:REF name="Model" pathname="::Specification Classes::javax::servlet::sip::SipServlet">tf/ibbHfr0eoakJIHh6/WgAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="oqFoMv6jAked8n2bX8bJbQAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:REF name="Model" pathname="::Specification Classes::javax::servlet::sip::SipServlet">tf/ibbHfr0eoakJIHh6/WgAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[8]" type="UMLGeneralizationView" guid="jdrF8Yga70+cqiVRTujd3gAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">218,548;229,436</XPD:ATTR>
-<XPD:REF name="Model">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
-<XPD:REF name="Head">1AZPB141xEqcwoE5bE2EBwAA</XPD:REF>
-<XPD:REF name="Tail">JOYrvd+M6k+Xhmi2NWp9ogAA</XPD:REF>
-<XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="1DauT9nA8UG54Ynw7rBNfwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
-<XPD:ATTR name="Distance" type="real">15</XPD:ATTR>
-<XPD:REF name="Model">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="EdgeLabelView" guid="0JPbH2zxXEqLgAt6Xr0LrwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
-<XPD:ATTR name="Distance" type="real">30</XPD:ATTR>
-<XPD:REF name="Model">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="EdgeLabelView" guid="QtX62vJdPEuX78efAaseCwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Alpha" type="real">-1.5707963267949</XPD:ATTR>
-<XPD:ATTR name="Distance" type="real">15</XPD:ATTR>
-<XPD:REF name="Model">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="NmRyCiGSE0KneKw0TWowWAAA">
-<XPD:ATTR name="Name" type="string">org</XPD:ATTR>
-<XPD:REF name="Namespace">bqfEzl+aVEeyGR/J7Vx+RQAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">2</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="hjYk6qynnkmkb3HoPTXzqgAA">
-<XPD:ATTR name="Name" type="string">mobicents</XPD:ATTR>
-<XPD:REF name="Namespace">NmRyCiGSE0KneKw0TWowWAAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="QnLaTaw6w0WRUkZdmKZH7wAA">
-<XPD:ATTR name="Name" type="string">servlet</XPD:ATTR>
-<XPD:REF name="Namespace">hjYk6qynnkmkb3HoPTXzqgAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="jrEh7JqvQE6EpIieRALNigAA">
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="jrEh7JqvQE6EpIieRALNigAA">
 <XPD:ATTR name="Name" type="string">sip</XPD:ATTR>
-<XPD:REF name="Namespace">QnLaTaw6w0WRUkZdmKZH7wAA</XPD:REF>
 <XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
 <XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="kZ7e0mFrU0OXVlaCsz6o9gAA">
 <XPD:ATTR name="Name" type="string">SipFactories</XPD:ATTR>
@@ -450,16 +147,16 @@
 <XPD:REF name="Views[6]">t3pvUEzKc0K86VF+5VXvCQAA</XPD:REF>
 <XPD:REF name="Views[7]">wqTevedOwEK17FpWn/aE4wAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">10</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">KpIC0B5IRUuUV9pHn5cFKgAA</XPD:REF>
-<XPD:REF name="Associations[1]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sZ6qE80LNkGlAfr/QKCa1AAA</XPD:REF>
-<XPD:REF name="Associations[2]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sUgGEmMjLUya87/NptcVnAAA</XPD:REF>
-<XPD:REF name="Associations[3]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ZNYaXyK610auxCGYp3rTxAAA</XPD:REF>
-<XPD:REF name="Associations[4]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">El1QKi+G2kKuTMmEOesxlgAA</XPD:REF>
-<XPD:REF name="Associations[5]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">FmLbBPZrek6JQN7TsbB2YQAA</XPD:REF>
-<XPD:REF name="Associations[6]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">nBbiZoCqsk+FLMXz8IwM6gAA</XPD:REF>
-<XPD:REF name="Associations[7]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">9hiBPMEVyESgGr3KzAtdKAAA</XPD:REF>
-<XPD:REF name="Associations[8]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ddeNmAY/j0S61Ka1QsOtlAAA</XPD:REF>
-<XPD:REF name="Associations[9]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">up5X+Pduv02Z8MWDA6wJtwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">KpIC0B5IRUuUV9pHn5cFKgAA</XPD:REF>
+<XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sZ6qE80LNkGlAfr/QKCa1AAA</XPD:REF>
+<XPD:REF name="Associations[2]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sUgGEmMjLUya87/NptcVnAAA</XPD:REF>
+<XPD:REF name="Associations[3]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ZNYaXyK610auxCGYp3rTxAAA</XPD:REF>
+<XPD:REF name="Associations[4]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">El1QKi+G2kKuTMmEOesxlgAA</XPD:REF>
+<XPD:REF name="Associations[5]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">FmLbBPZrek6JQN7TsbB2YQAA</XPD:REF>
+<XPD:REF name="Associations[6]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">nBbiZoCqsk+FLMXz8IwM6gAA</XPD:REF>
+<XPD:REF name="Associations[7]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">9hiBPMEVyESgGr3KzAtdKAAA</XPD:REF>
+<XPD:REF name="Associations[8]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ddeNmAY/j0S61Ka1QsOtlAAA</XPD:REF>
+<XPD:REF name="Associations[9]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">up5X+Pduv02Z8MWDA6wJtwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">21</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="IWt2oNE7kE+hcZfnjda59wAA">
 <XPD:ATTR name="Name" type="string">applicationName</XPD:ATTR>
@@ -584,11 +281,11 @@
 <XPD:REF name="Views[6]">mSIHmjcxyUiaSN3FUzxGWgAA</XPD:REF>
 <XPD:REF name="Views[7]">q2htbHFHLEC9eJyETExLYwAA</XPD:REF>
 <XPD:ATTR name="#Generalizations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Generalizations[0]">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
+<XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::">Et23O6mCb0Oypn3HEneANQAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">3</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">TWfHZ85xGU6sH5BbyucshAAA</XPD:REF>
-<XPD:REF name="Associations[1]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sRCEv2M5RkSFmmq47Kdy9AAA</XPD:REF>
-<XPD:REF name="Associations[2]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">4VrQlt5IU0e7HSeJ8yPmWwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">TWfHZ85xGU6sH5BbyucshAAA</XPD:REF>
+<XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">sRCEv2M5RkSFmmq47Kdy9AAA</XPD:REF>
+<XPD:REF name="Associations[2]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">4VrQlt5IU0e7HSeJ8yPmWwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">9</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="peiT2Zvx6Uu/Wt8WEmh4UQAA">
 <XPD:ATTR name="Name" type="string">icon</XPD:ATTR>
@@ -645,7 +342,7 @@
 <XPD:REF name="Views[2]">19ovJzEEEEWiWc0d0PdgRAAA</XPD:REF>
 <XPD:REF name="Views[3]">nQAkTIkjzEGS9kSApxEBewAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">HraMrq9/V0KAaj3P6pLhNwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">HraMrq9/V0KAaj3P6pLhNwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">9</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="mJ5GUDDWdUqvKQHU+pXiEwAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -714,11 +411,11 @@
 <XPD:REF name="Views[2]">3ME8FBzLsUSDZ4z/zZRPHwAA</XPD:REF>
 <XPD:REF name="Views[3]">xwMRth4BLkaee/iwCvPi5AAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">5</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">CCHftaOIjkqrKEeJzhGnPgAA</XPD:REF>
-<XPD:REF name="Associations[1]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">/qBh5dzEikKwItdlhbtQoQAA</XPD:REF>
-<XPD:REF name="Associations[2]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">5yNrGDWcGUSaCK00cFh1BAAA</XPD:REF>
-<XPD:REF name="Associations[3]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ik2nRjAmtUSGecGa8QWUNgAA</XPD:REF>
-<XPD:REF name="Associations[4]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">R0JD2iKBJ0K/D/4SBJhcJgAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">CCHftaOIjkqrKEeJzhGnPgAA</XPD:REF>
+<XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">/qBh5dzEikKwItdlhbtQoQAA</XPD:REF>
+<XPD:REF name="Associations[2]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">5yNrGDWcGUSaCK00cFh1BAAA</XPD:REF>
+<XPD:REF name="Associations[3]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">ik2nRjAmtUSGecGa8QWUNgAA</XPD:REF>
+<XPD:REF name="Associations[4]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">R0JD2iKBJ0K/D/4SBJhcJgAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">5</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="QIbJhTcLKUukMGspKgYbIQAA">
 <XPD:ATTR name="Name" type="string">displayName</XPD:ATTR>
@@ -757,8 +454,8 @@
 <XPD:REF name="Views[2]">lJwpvVVFBEmgxjvX6t5VWwAA</XPD:REF>
 <XPD:REF name="Views[3]">ns1tEi1o7kuhrq7wpvsp8wAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">2</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">Vge8Bpf/e0257ieg4dXTeQAA</XPD:REF>
-<XPD:REF name="Associations[1]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">8Eg6LHVGgkuw5T7O0QCU+AAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">Vge8Bpf/e0257ieg4dXTeQAA</XPD:REF>
+<XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">8Eg6LHVGgkuw5T7O0QCU+AAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">4</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="6+3r0Zb/CEiPil07UPaTpAAA">
 <XPD:ATTR name="Name" type="string">resourceName</XPD:ATTR>
@@ -792,7 +489,7 @@
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]">QMK3G4h4k0mELnFlpFJpcAAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">11vMMXyksEuDc12NEObbJQAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">11vMMXyksEuDc12NEObbJQAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">5</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="xSP0viWG3Ee+cvlh7Xg65gAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -839,7 +536,7 @@
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]">ytoOesn+C0Kyi6REwG1GnQAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">0NlyoLbcJ0K2GgbVnHoRSwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">0NlyoLbcJ0K2GgbVnHoRSwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="EtxlrTLSbkmwxIE+rv6WvQAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -861,7 +558,7 @@
 <XPD:REF name="Views[2]">yB45RySgvk+w+4v+UN6K6wAA</XPD:REF>
 <XPD:REF name="Views[3]">ETBgsiQ+iEGGGgIp2N9VcQAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">Cv1CDl8epEi6T/ymj4fLlAAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">Cv1CDl8epEi6T/ymj4fLlAAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="wimYBjIZ4Uym+aOZ+R2HHAAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -885,7 +582,7 @@
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]">B2k2zcIy9kypxaqeBXSoswAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">lFEULR22DEuR2E08MYTfJQAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">lFEULR22DEuR2E08MYTfJQAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">5</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="OuBaJowNmEee3Dp97PbA6QAA">
 <XPD:ATTR name="Name" type="string">authenticationMethod</XPD:ATTR>
@@ -931,7 +628,7 @@
 <XPD:REF name="Views[2]">s7NoaEPnPU2YuF7EgN+SdwAA</XPD:REF>
 <XPD:REF name="Views[3]">oJ6W+wCIKU2+0MzSRTDUBgAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">8lK9cagja0urqymwDPH8wwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">8lK9cagja0urqymwDPH8wwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">3</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="yvRL9+OvF0KUnvL1C+QJfAAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -958,7 +655,7 @@
 <XPD:REF name="Views[2]">cAXZJC8C+06iG0wfKdaUGwAA</XPD:REF>
 <XPD:REF name="Views[3]">KgpO2EppIEmINGer6XaqFwAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">u+53t6NxCU6jlGKZtMcyuwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">u+53t6NxCU6jlGKZtMcyuwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">13</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="PR2PTq6gB0mtkMCHwmRjDwAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -1063,7 +760,7 @@
 <XPD:REF name="Views[2]">mRhj41OAHU2UWIXdcoQPHwAA</XPD:REF>
 <XPD:REF name="Views[3]">MpBR4bpR1UqnIcRi099/wgAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">FawXV4Aop0S8ewrJiftlqAAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">FawXV4Aop0S8ewrJiftlqAAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="002EVhy8PEKqrGawTNiKVAAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -1121,7 +818,7 @@
 <XPD:REF name="Views[2]">o2WsvbPvTUG0u5ikHLzYSgAA</XPD:REF>
 <XPD:REF name="Views[3]">Cdz/NCrAFUek1oyl32gDxwAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">b89yWPe56UKZIdFKn0ZqnwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">b89yWPe56UKZIdFKn0ZqnwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="pRFe5NMs5U6tLVA8rWsBHAAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -1179,7 +876,7 @@
 <XPD:REF name="Views[2]">UowhKOiWhUuQowPZ/J8xYAAA</XPD:REF>
 <XPD:REF name="Views[3]">OAcjR0MJ50qMoyFM49mjvgAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">EYepoet3nkm2Y/eJKcFDawAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">EYepoet3nkm2Y/eJKcFDawAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="gABlTEGU/EayItuk6XU8uQAA">
 <XPD:ATTR name="Name" type="string">description</XPD:ATTR>
@@ -1351,9 +1048,9 @@
 <XPD:REF name="Views[2]">LSduTRrO9ECXOaf503hZlwAA</XPD:REF>
 <XPD:REF name="Views[3]">Mr98cJf4jkSROSZkivn2HgAA</XPD:REF>
 <XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
-<XPD:REF name="ClientDependencies[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">gju+kYaGoUCaEOzQX3QYEgAA</XPD:REF>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">gju+kYaGoUCaEOzQX3QYEgAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">yasfhgT1fk+hYqX2BY+3eQAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">yasfhgT1fk+hYqX2BY+3eQAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">10</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="6yJHeHBg+UG/gWFPP1xldgAA">
 <XPD:ATTR name="Name" type="string">started</XPD:ATTR>
@@ -1431,15 +1128,15 @@
 <XPD:REF name="Views[2]">TKOM/reeCEmuDc/2mHNUOgAA</XPD:REF>
 <XPD:REF name="Views[3]">b83aw/jKfkKs+VGtc+qySwAA</XPD:REF>
 <XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
-<XPD:REF name="ClientDependencies[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">f/lNycNPnkeIwEdFJECBhQAA</XPD:REF>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">f/lNycNPnkeIwEdFJECBhQAA</XPD:REF>
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]">g+H69D/y8EmIPpZBP4cMXQAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">5</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::proxy::">Jg22D8mUUkeO+PWix9P/BQAA</XPD:REF>
-<XPD:REF name="Associations[1]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">hbNaWGlyH0mLsFR8NNPGLgAA</XPD:REF>
-<XPD:REF name="Associations[2]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">+dcppItV+USYrTgnbaZZVAAA</XPD:REF>
-<XPD:REF name="Associations[3]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">w+E1DpKHskuRzU+E3qO9egAA</XPD:REF>
-<XPD:REF name="Associations[4]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">h+aXsdJNZECDNxd5PhZeJAAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::proxy::">Jg22D8mUUkeO+PWix9P/BQAA</XPD:REF>
+<XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">hbNaWGlyH0mLsFR8NNPGLgAA</XPD:REF>
+<XPD:REF name="Associations[2]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">+dcppItV+USYrTgnbaZZVAAA</XPD:REF>
+<XPD:REF name="Associations[3]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">w+E1DpKHskuRzU+E3qO9egAA</XPD:REF>
+<XPD:REF name="Associations[4]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">h+aXsdJNZECDNxd5PhZeJAAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="lRa32+KSs0adD8rxNa93SwAA">
 <XPD:ATTR name="Name" type="string">proxy</XPD:ATTR>
@@ -1505,7 +1202,7 @@
 <XPD:REF name="Views[2]">h8Fy6bbwpkuGXOq6SW21LQAA</XPD:REF>
 <XPD:REF name="Views[3]">uMuAmDRBEE6jsKPTe5CSRAAA</XPD:REF>
 <XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
-<XPD:REF name="ClientDependencies[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">GjlWBBC3j0qiFQRU8wL5PwAA</XPD:REF>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">GjlWBBC3j0qiFQRU8wL5PwAA</XPD:REF>
 <XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="bckiMb6ZDka/7uzsSg8QyQAA">
 <XPD:ATTR name="Name" type="string">linkedSessions</XPD:ATTR>
@@ -1528,7 +1225,7 @@
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]">yoUluWwU6kOI1XPo/XJd/wAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
-<XPD:REF name="Associations[0]" pathname="Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">K0k3Vd+Q5kaZHnsa9kq9jwAA</XPD:REF>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">K0k3Vd+Q5kaZHnsa9kq9jwAA</XPD:REF>
 <XPD:ATTR name="#Literals" type="integer">3</XPD:ATTR>
 <XPD:OBJ name="Literals[0]" type="UMLEnumerationLiteral" guid="JPYL6tgHSU+cov4fMk4ZiQAA">
 <XPD:ATTR name="Name" type="string">NotSent</XPD:ATTR>
@@ -1565,155 +1262,6 @@
 <XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">QYrMtFm/B0mZw2LT1QnaIQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="Ly/Vq2T3+k6ejzkPFVSdyQAA">
-<XPD:ATTR name="Name" type="string">apache</XPD:ATTR>
-<XPD:REF name="Namespace">NmRyCiGSE0KneKw0TWowWAAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="5YPYv2YH/0CfZ4kH+UnX3wAA">
-<XPD:ATTR name="Name" type="string">catalina</XPD:ATTR>
-<XPD:REF name="Namespace">Ly/Vq2T3+k6ejzkPFVSdyQAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="GR/gf0zphU+qk34vBImYnwAA">
-<XPD:ATTR name="Name" type="string">startup</XPD:ATTR>
-<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="MMEO1kSofUOnM1E8vLX3igAA">
-<XPD:ATTR name="Name" type="string">connector</XPD:ATTR>
-<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="I96g6x0BD0SBAR4XBkeNNAAA">
-<XPD:ATTR name="Name" type="string">Connector</XPD:ATTR>
-<XPD:REF name="Namespace">MMEO1kSofUOnM1E8vLX3igAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">DgbOobxsq0i2+Oa9Jmjn+wAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[2]" type="UMLPackage" guid="yTJ78VtcUkixy4po0SZeXAAA">
-<XPD:ATTR name="Name" type="string">core</XPD:ATTR>
-<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="tngXLs1zBE+VK38T+fgSkwAA">
-<XPD:ATTR name="Name" type="string">Catalina</XPD:ATTR>
-<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">QBoSL1yoO0+qWyvi1GZ02QAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="CgFyuGIIr0Wu8GAh+39BGwAA">
-<XPD:ATTR name="Name" type="string">StandardServer</XPD:ATTR>
-<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
-<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
-<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="W6SFsJJjvEaLuDQEz5xs2wAA">
-<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
-<XPD:REF name="Owner">CgFyuGIIr0Wu8GAh+39BGwAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">ptysi0ZE5EaHtxSAdd3LCAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="D6wXtZ50QEK9SSp4FPWnswAA">
-<XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
-<XPD:REF name="Owner">CgFyuGIIr0Wu8GAh+39BGwAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">VuMvdjBQ2EO1dD3I2OT3rAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">q98GqRy0s029YvFhAuFB3QAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="Bf0wjZtzQUGrzT8dmXJa7AAA">
-<XPD:ATTR name="Name" type="string">StandardService</XPD:ATTR>
-<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
-<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
-<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="1VwU1BIc+EuVvasnvAaH2QAA">
-<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
-<XPD:REF name="Owner">Bf0wjZtzQUGrzT8dmXJa7AAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">i6GeYyKuKEm8jHKBiZjzEgAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="St67EIi7W0SFFA6LWetT7AAA">
-<XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
-<XPD:REF name="Owner">Bf0wjZtzQUGrzT8dmXJa7AAA</XPD:REF>
-</XPD:OBJ>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">mjCyNbb00kOL9g8uVC6onQAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[3]" type="UMLClass" guid="xDjciYOEF0mp03FzC7+8ggAA">
-<XPD:ATTR name="Name" type="string">StandardEngine</XPD:ATTR>
-<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">82Ek8EVbz0mJ3gYwpI1yrQAA</XPD:REF>
-<XPD:REF name="Instances[1]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">0539LXULQ0CKIFx5MWwxRAAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[4]" type="UMLClass" guid="P5u0fGItnkiyG/cDHJBSfAAA">
-<XPD:ATTR name="Name" type="string">StandardHost</XPD:ATTR>
-<XPD:REF name="Namespace">yTJ78VtcUkixy4po0SZeXAAA</XPD:REF>
-<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="hrQLCTp0vEKVcPJ8VnSaMQAA">
-<XPD:ATTR name="Name" type="string">getParent</XPD:ATTR>
-<XPD:REF name="Owner">P5u0fGItnkiyG/cDHJBSfAAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">e1n+qRT5BkSur5VZIuoYzQAA</XPD:REF>
-</XPD:OBJ>
-<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">/MJZOBcdX0GEmnaLeXxbCwAA</XPD:REF>
-<XPD:REF name="Instances[1]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">LqIP4s0RtkqebNC1N4SMugAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[3]" type="UMLInterface" guid="ABtID/lbS0iLr3vtzN2A3QAA">
-<XPD:ATTR name="Name" type="string">Wrapper</XPD:ATTR>
-<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[4]" type="UMLInterface" guid="a88MEoqN+USodt4eUasO+gAA">
-<XPD:ATTR name="Name" type="string">LifecycleListener</XPD:ATTR>
-<XPD:REF name="Namespace">5YPYv2YH/0CfZ4kH+UnX3wAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[1]" type="UMLPackage" guid="XKCWCnv1qkeV8FAQS04B+wAA">
-<XPD:ATTR name="Name" type="string">coyote</XPD:ATTR>
-<XPD:REF name="Namespace">Ly/Vq2T3+k6ejzkPFVSdyQAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLInterface" guid="453wofIXJEa10uoF6u6lNAAA">
-<XPD:ATTR name="Name" type="string">ProtocolHandler</XPD:ATTR>
-<XPD:REF name="Namespace">XKCWCnv1qkeV8FAQS04B+wAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[2]" type="UMLPackage" guid="5K7yGueAWEKlHsCxgLgZMwAA">
-<XPD:ATTR name="Name" type="string">tomcat</XPD:ATTR>
-<XPD:REF name="Namespace">Ly/Vq2T3+k6ejzkPFVSdyQAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="fdFMvx/eqUK18I5b5DkddwAA">
-<XPD:ATTR name="Name" type="string">util</XPD:ATTR>
-<XPD:REF name="Namespace">5K7yGueAWEKlHsCxgLgZMwAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLPackage" guid="PAtq5WIWaEu2S1cGYh2dtgAA">
-<XPD:ATTR name="Name" type="string">digester</XPD:ATTR>
-<XPD:REF name="Namespace">fdFMvx/eqUK18I5b5DkddwAA</XPD:REF>
-<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
-<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="MCdO2KE7qEar7aNaxei0ywAA">
-<XPD:ATTR name="Name" type="string">Digester</XPD:ATTR>
-<XPD:REF name="Namespace">PAtq5WIWaEu2S1cGYh2dtgAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">efv5IY5wIU6NFIEx+KvppQAA</XPD:REF>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[1]" type="UMLGeneralization" guid="Et23O6mCb0Oypn3HEneANQAA">
-<XPD:REF name="Namespace">bqfEzl+aVEeyGR/J7Vx+RQAA</XPD:REF>
-<XPD:REF name="Child">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
-<XPD:REF name="Parent" pathname="::Specification Classes::javax::servlet::sip::SipServlet">tf/ibbHfr0eoakJIHh6/WgAA</XPD:REF>
-<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
-<XPD:REF name="Views[0]">jdrF8Yga70+cqiVRTujd3gAA</XPD:REF>
-<XPD:REF name="Views[1]">1DauT9nA8UG54Ynw7rBNfwAA</XPD:REF>
-<XPD:REF name="Views[2]">0JPbH2zxXEqLgAt6Xr0LrwAA</XPD:REF>
-<XPD:REF name="Views[3]">QtX62vJdPEuX78efAaseCwAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedElements[2]" type="UMLModel" guid="NSOHPG0n+kmg/wUTiaaKwAAA">
-<XPD:ATTR name="Name" type="string">specfic diagrams</XPD:ATTR>
-<XPD:REF name="Namespace">bqfEzl+aVEeyGR/J7Vx+RQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:BODY>
