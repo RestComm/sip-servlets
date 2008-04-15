@@ -179,8 +179,11 @@ public class B2buaHelperImpl implements B2buaHelper {
 			
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
-					sipFactoryImpl,
-					session, null, null, true);			
+					sipFactoryImpl,					
+					session, 
+					null, 
+					null, 
+					JainSipUtils.dialogCreatingMethods.contains(newRequest.getMethod()));			
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			//If Contact header is present in the headerMap 
@@ -251,8 +254,13 @@ public class B2buaHelperImpl implements B2buaHelper {
 			}
 			
 			//we already have a dialog since it is a subsequent request			
-			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(newRequest,sipFactoryImpl,
-					session, sessionImpl.getSessionCreatingTransaction(), dialog, false);
+			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
+					newRequest,
+					sipFactoryImpl,
+					session, 
+					sessionImpl.getSessionCreatingTransaction(), 
+					dialog, 
+					JainSipUtils.dialogCreatingMethods.contains(newRequest.getMethod()));
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			//If Contact header is present in the headerMap 
@@ -332,8 +340,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 */
 	public SipSession getLinkedSession(SipSession session) {
 		if ( session == null )throw new NullPointerException("the argument is null");
-		if(!session.isValid() || 
-				State.TERMINATED.equals(((SipSessionImpl)session).getState())) {
+		if(!session.isValid()) {
 			throw new IllegalArgumentException("the session is invalid");
 		}
 		return this.sessionMap.get((SipSessionImpl) session );

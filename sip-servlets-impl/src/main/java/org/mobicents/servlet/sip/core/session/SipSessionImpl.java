@@ -235,6 +235,7 @@ public class SipSessionImpl implements SipSession {
 						handlerServlet);				
 				methodRequest.setHeader(viaHeader);
 				
+				//FIXME can it be dialog creating if a SUBSCRIBE is sent for exemple ?
 				sipServletRequest = new SipServletRequestImpl(
 						methodRequest, this.sipFactory, this, null, null,
 						false);
@@ -694,35 +695,89 @@ public class SipSessionImpl implements SipSession {
 	}	
 	
 	/**
-	 * 
-	 * @param response
+	 * Update the sip session state upon sending/receiving a response
+	 * Covers JSR 289 Section 6.2.1 along with updateStateOnRequest method
+	 * @param response the response received/to send
+	 * @param receive true if the response has been received, false if it is to be sent.
 	 */
-	public void updateStateOnResponse(SipServletResponseImpl response) {
+	public void updateStateOnResponse(SipServletResponseImpl response, boolean receive) {
 		CSeqHeader cSeqHeader = (CSeqHeader)response.getMessage().getHeader(CSeqHeader.NAME);
-		if( response.getStatus()>=200 && response.getStatus()<300 && 
-				!Request.BYE.equals(cSeqHeader.getMethod()) &&
-				!Request.CANCEL.equals(cSeqHeader.getMethod())) {
+		// JSR 289 Section 6.2.1 Point 2 of rules governing the state of SipSession
+		// In general, whenever a non-dialog creating request is sent or received, 
+		// the SipSession state remains unchanged. Similarly, a response received 
+		// for a non-dialog creating request also leaves the SipSession state unchanged. 
+		// The exception to the general rule is that it does not apply to requests (e.g. BYE, CANCEL) 
+		// that are dialog terminating according to the appropriate RFC rules relating to the kind of dialog.		
+		if(!JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod()) &&
+				JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
+			return;
+		}
+		// Mapping to the sip session state machine (proxy is covered here too)
+		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
+				response.getStatus() >= 200 && response.getStatus() < 300 && 
+				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
 			this.setState(State.CONFIRMED);
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
 			}
 		}
-		if( response.getStatus()>=100 && response.getStatus()<200 ) {
+		// Mapping to the sip session state machine
+		if( State.INITIAL.equals(state) && response.getStatus() >= 100 && response.getStatus() < 200 ) {
 			this.setState(State.EARLY);
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
 			}
-		}
+		}		
+		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
+				response.getStatus() >= 300 && response.getStatus() < 700 &&
+				JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod()) && 
+				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
+			// If the servlet acts as a UAC and sends a dialog creating request, 
+			// then the SipSession state tracks directly the SIP dialog state except 
+			// that non-2XX final responses received in the EARLY or INITIAL states 
+			// cause the SipSession state to return to the INITIAL state rather than going to TERMINATED.
+			// +
+			// If the servlet acts as a proxy for a dialog creating request then 
+			// the SipSession state tracks the SIP dialog state except that non-2XX 
+			// final responses received from downstream in the EARLY or INITIAL states 
+			// cause the SipSession state to return to INITIAL rather than going to TERMINATED.
+			if(receive) {
+				setState(State.INITIAL);
+				if(logger.isDebugEnabled()) {
+					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+				}
+			} 
+			// If the servlet acts as a UAS and receives a dialog creating request, 
+			// then the SipSession state directly tracks the SIP dialog state. 
+			// Unlike a UAC, a non-2XX final response sent by the UAS in the EARLY or INITIAL 
+			// states causes the SipSession state to go directly to the TERMINATED state.
+			// +
+			// This enables proxy servlets to proxy requests to additional destinations 
+			// when called by the container in the doResponse() method for a tentative 
+			// non-2XX best response. 
+			// After all such additional proxy branches have been responded to and after 
+			// considering any servlet created responses, the container eventually arrives at 
+			// the overall best response and forwards this response upstream. 
+			// If this best response is a non-2XX final response, then when the forwarding takes place, 
+			// the state of the SipSession object becomes TERMINATED.
+			else {
+				setState(State.TERMINATED);
+				if(logger.isDebugEnabled()) {
+					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+				}
+			}						
+		}								 				
 	}
 	
 	/**
-     * 
-     * @param sipServletRequest
-     */
+	 * Update the sip session state upon sending/receiving a subsequent request
+	 * Covers JSR 289 Section 6.2.1 along with updateStateOnResponse method
+	 * @param request the subsequent request received/to send
+	 * @param receive true if the subsequent request has been received, false if it is to be sent.
+	 */
     public void updateStateOnSubsequentRequest(
-			SipServletRequestImpl sipServletRequest) {
-		if(Request.BYE.equals(sipServletRequest.getMethod()) ||
-				Request.CANCEL.equals(sipServletRequest.getMethod())) {			
+			SipServletRequestImpl request, boolean receive) {
+		if(JainSipUtils.dialogTerminatingMethods.contains(request.getMethod())) {			
 			this.setState(State.TERMINATED);
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());

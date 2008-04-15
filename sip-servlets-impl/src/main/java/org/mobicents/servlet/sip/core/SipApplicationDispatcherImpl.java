@@ -212,7 +212,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		boolean ok = true;
 		SipListenersHolder sipListenersHolder = sipContext.getListeners();
 		List<SipServletListener> sipServletListeners = sipListenersHolder.getSipServletsListeners();
-		Container[] children = sipContext.findChildren();	
+		if(logger.isDebugEnabled()) {
+			logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+		}
+		Container[] children = sipContext.findChildren();
+		if(logger.isDebugEnabled()) {
+			logger.debug(children.length + " container to notify of servlet initialization");
+		}
 		for (Container container : children) {
 			if(container instanceof Wrapper) {			
 				Wrapper wrapper = (Wrapper) container;
@@ -328,7 +334,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						null,
 						transaction,
 						requestEvent.getDialog(),
-						true);						
+						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));						
 			
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
@@ -559,6 +565,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			return false;
 		}		
 		sipServletRequest.setSipSession(sipSession);			
+		// JSR 289 Section 6.2.1 :
+		// any state transition caused by the reception of a SIP message, 
+		// the state change must be accomplished by the container before calling 
+		// the service() method of any SipServlet to handle the incoming message.
+		sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
 		
 		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
 		try {
@@ -590,9 +601,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
-		} finally {
-			sipSession.updateStateOnSubsequentRequest(sipServletRequest);
-		}
+		} 
 		//if a final response has been sent, or if the request has 
 		//been proxied or relayed we stop routing the request
 		RoutingState routingState = sipServletRequest.getRoutingState();
@@ -1254,6 +1263,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.debug("the response is dropped accordingly to JSR 289 " +
 						"since this a response to a CANCEL");
 			}
+			return;
 		}
 		//if this is a trying response, the response is dropped
 		if(Response.TRYING == response.getStatusCode()) {
@@ -1261,6 +1271,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				logger.debug("the response is dropped accordingly to JSR 289 " +
 						"since this a 100");
 			}
+			return;
 		}
 		boolean continueRouting = routeResponse(responseEvent);		
 		// if continue routing is to true it means that
@@ -1348,10 +1359,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					clientTransaction, 
 					session, 
 					dialog, 
-					null);
-	
-			// Update Session state
-			session.updateStateOnResponse(sipServletResponse);
+					null);				
 			
 			try {
 				session.setHandler(handlerName);
@@ -1359,7 +1367,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// See if this is a response to a proxied request
 				if(clientTransaction != null) {
 					applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
-					((SipServletRequestImpl)applicationData.getSipServletMessage()).setLastFinalResponse(sipServletResponse);
+					if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
+						((SipServletRequestImpl)applicationData.getSipServletMessage()).setLastFinalResponse(sipServletResponse);
+					}
 				}
 				//there is no client transaction associated with it, it means that this is a retransmission
 				else if(dialog != null){	
@@ -1370,6 +1380,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				// and the session.proxyBranch is overwritten each time there is activity on the branch.
 				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
 				if(proxyBranch != null) {
+					sipServletResponse.setProxyBranch(proxyBranch);
+					// Update Session state
+					session.updateStateOnResponse(sipServletResponse, true);
 					// Handle it at the branch
 					proxyBranch.onResponse(sipServletResponse); 
 					
@@ -1380,6 +1393,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					return false;
 				}
 				else {
+					// Update Session state
+					session.updateStateOnResponse(sipServletResponse, true);
+					
 					callServlet(sipServletResponse, session);
 				}
 			} catch (ServletException e) {				

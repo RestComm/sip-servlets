@@ -56,7 +56,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime for an 
 	// application session is 3 minutes
-	private static int DEFAULT_LIFETIME = 3000*60;
+	private static int DEFAULT_LIFETIME = 3;
 	
 	private String applicationName;
 	private String smallIcon;

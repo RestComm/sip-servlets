@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -57,7 +58,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	Response response;
 	SipServletRequestImpl originalRequest;
-
+	ProxyBranch proxyBranch;
 	/**
 	 * Constructor
 	 * @param response
@@ -146,7 +147,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				}
 			}
 			sipServletAckRequest = new SipServletRequestImpl(
-					ackRequest,this.sipFactoryImpl, this.getSipSession(), this.getTransaction(), dialog, false); 
+					ackRequest,
+					this.sipFactoryImpl, 
+					this.getSipSession(), 
+					this.getTransaction(), 
+					dialog, 
+					false); 
 		} catch (InvalidArgumentException e) {
 			logger.error("Impossible to create the ACK",e);
 		} catch (SipException e) {
@@ -169,9 +175,16 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getProxy()
+	 */
 	public Proxy getProxy() {
-		// TODO Auto-generated method stub
-		return null;
+		if(proxyBranch != null) {
+			return proxyBranch.getProxy();
+		} else {
+			return null;
+		}
 	}
 
 	/*
@@ -312,7 +325,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				response.addLast(recordRouteHeader);
 			}
 			// Update Session state
-			session.updateStateOnResponse(this);
+			session.updateStateOnResponse(this, false);
 			
 			ServerTransaction st = (ServerTransaction) getTransaction();
 						
@@ -367,4 +380,20 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+	/**
+	 * @return the proxyBranch
+	 */
+	public ProxyBranch getProxyBranch() {
+		return proxyBranch;
+	}
+
+
+	/**
+	 * @param proxyBranch the proxyBranch to set
+	 */
+	public void setProxyBranch(ProxyBranch proxyBranch) {
+		this.proxyBranch = proxyBranch;
+	}	
 }

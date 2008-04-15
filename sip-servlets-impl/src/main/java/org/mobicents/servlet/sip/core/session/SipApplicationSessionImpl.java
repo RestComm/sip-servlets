@@ -15,7 +15,6 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -124,12 +123,12 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		if(sipContext != null) {
 			//scheduling the timer for session expiration
 			if(sipContext.getSipApplicationSessionTimeout() > 0) {
-				expirationTime = lastAccessTime + sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
+				expirationTime = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
 				if(logger.isDebugEnabled()) {
-					logger.debug("Scheduling sip application session "+ key +" to expire " + new Date(expirationTime));
+					logger.debug("Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
 				}
-				expirationTimer.schedule(expirationTimerTask, new Date(expirationTime));
+				expirationTimer.schedule(expirationTimerTask, expirationTime);
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
@@ -500,14 +499,14 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			}		
 			return Integer.MAX_VALUE;
 		} else {
-			this.expirationTime = expirationTime + deltaMinutes * 1000 * 60;
+			this.expirationTime = (expirationTimerTask.scheduledExecutionTime() - expirationTime) + deltaMinutes * 1000 * 60;
 			if(expirationTimerTask != null) {
 				if(logger.isDebugEnabled()) {
-					logger.debug("Re-Scheduling sip application session "+ key +" to expire " + new Date(expirationTime));
+					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60)+ " minutes");
 				}
 				expirationTimerTask.cancel();
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
-				expirationTimer.schedule(expirationTimerTask, new Date(expirationTime));
+				expirationTimer.schedule(expirationTimerTask, expirationTime);
 			}
 			return deltaMinutes;
 		}				

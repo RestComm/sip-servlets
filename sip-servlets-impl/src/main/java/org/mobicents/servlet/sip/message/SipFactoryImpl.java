@@ -77,13 +77,8 @@ public class SipFactoryImpl implements SipFactory {
 	private static final TreeSet<String> forbbidenToHeaderParams = new TreeSet<String>(
 			new NamesComparator());
 
-	protected static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
-			new NamesComparator());
-
 	static {
 		forbbidenToHeaderParams.add("tag");
-		dialogCreationMethods.add(Request.INVITE);
-		dialogCreationMethods.add(Request.SUBSCRIBE);
 	}
 
 	private Set<SipProvider> sipProviders = null;
@@ -448,7 +443,7 @@ public class SipFactoryImpl implements SipFactory {
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,
-					dialogCreationMethods.contains(method));						
+					JainSipUtils.dialogCreatingMethods.contains(method));						
 			
 			return retVal;
 		} catch (Exception e) {

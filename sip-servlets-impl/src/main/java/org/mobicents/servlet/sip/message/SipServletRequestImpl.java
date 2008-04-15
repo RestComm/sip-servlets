@@ -200,32 +200,35 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(reasonPhrase!=null) {
 				response.setReasonPhrase(reasonPhrase);
 			}
-			if (statusCode == Response.OK ) {
-				ToHeader toHeader = (ToHeader) response
-						.getHeader(ToHeader.NAME);
-				if (toHeader.getTag() == null) // If we already have a to tag
-				// dont create new
-				{
-					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
-					// Add the contact header for the dialog.
-					String transport = ((ViaHeader) request
-							.getHeader(ViaHeader.NAME)).getTransport();					
-					ContactHeader contactHeader = JainSipUtils
-							.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
-					response.setHeader(contactHeader);
-				}
-
-				// response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME,
-				// "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
-			}
-			if(statusCode > Response.OK ) {
+			//add a To tag for all responses except Trying
+			if(statusCode > Response.TRYING && statusCode <= Response.SESSION_NOT_ACCEPTABLE) {
 				ToHeader toHeader = (ToHeader) response
 					.getHeader(ToHeader.NAME);
 				// If we already have a to tag, dont create new
 				if (toHeader.getTag() == null) {
-					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));					
+					String localTag = null;					
+					if(getTransaction().getDialog() != null) {
+						localTag = getTransaction().getDialog().getLocalTag();
+						// if a dialog has already been created
+						// reuse local tag
+						if(localTag != null && localTag.length() > 0) {
+							toHeader.setTag(localTag);
+						} else {
+							toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+						}
+					} else {
+						toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+					}
+					if (statusCode == Response.OK ) {
+						// Add the contact header for the dialog.
+						String transport = ((ViaHeader) request
+								.getHeader(ViaHeader.NAME)).getTransport();					
+						ContactHeader contactHeader = JainSipUtils
+								.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
+						response.setHeader(contactHeader);
+					}
 				}
-			}			
+			}
 			//Application Routing : Adding the recorded route headers as route headers, should it be Via Headers ?
 			ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
 			while (recordRouteHeaders.hasNext()) {
@@ -734,6 +737,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					linkedRequest.setRoutingState(RoutingState.RELAYED);
 				}
 			}
+			// Update Session state
+			super.session.updateStateOnSubsequentRequest(this, false);
+			
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
 					|| getDialog().getState() == DialogState.EARLY) {				

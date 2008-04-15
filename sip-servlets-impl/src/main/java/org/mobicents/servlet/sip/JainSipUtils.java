@@ -17,6 +17,7 @@ package org.mobicents.servlet.sip;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
@@ -31,6 +32,7 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 
 /**
  * 
@@ -41,6 +43,20 @@ import org.apache.commons.logging.LogFactory;
 public class JainSipUtils {
 	
 	private static Log logger = LogFactory.getLog(JainSipUtils.class);
+
+	public static final TreeSet<String> dialogCreatingMethods = new TreeSet<String>(
+			new NamesComparator());
+	
+	public static final TreeSet<String> dialogTerminatingMethods = new TreeSet<String>(
+			new NamesComparator());
+
+	static {		
+		dialogCreatingMethods.add(Request.INVITE);
+		dialogCreatingMethods.add(Request.SUBSCRIBE);
+		dialogTerminatingMethods.add(Request.CANCEL);
+		dialogTerminatingMethods.add(Request.BYE);
+	}
+
 	
 	public static ViaHeader createViaHeader(Set<SipProvider> sipProviders, String transport, String branch) {
 		Iterator<SipProvider> it = sipProviders.iterator();
