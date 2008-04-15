@@ -26,22 +26,35 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
+import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.TransactionState;
 import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 
 public class SipServletRequestImpl extends SipServletMessageImpl  implements SipServletRequest{
 	
 	
-	public SipServletRequestImpl (SipProvider provider, SipSession sipSession, Request request, SipFactoryImpl sipFactory) {
+	public SipServletRequestImpl (SipProvider provider, SipSession sipSession,  ClientTransaction clientTransction, 
+			SipFactoryImpl sipFactory) {
 		
 		super.provider = provider;
 		super.sipSession = sipSession;
-		super.message  = request;
+		super.request  = clientTransaction.getRequest();
 		super.sipFactory = sipFactory;
+		super.clientTransaction = clientTransaction;
 		
 	}
-
+	public SipServletRequestImpl (SipProvider provider, SipSession sipSession,  ServerTransaction serverTransction, 
+			SipFactoryImpl sipFactory) {
+		
+		super.provider = provider;
+		super.sipSession = sipSession;
+		super.request  = serverTransaction.getRequest();
+		super.sipFactory = sipFactory;
+		super.serverTransaction = serverTransaction;
+	}
 	
 	@Override
 	public boolean isSystemHeader(String headerName) {
@@ -61,7 +74,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl  implements Sip
 			return isSystemHeader;
 
 		boolean isContactSystem = false;
-		Request request = (Request) this.message;
+		Request request = (Request) this.request;
 
 		String method = request.getMethod();
 		if (method.equals(Request.REGISTER)) {
@@ -82,10 +95,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl  implements Sip
 
 	public SipServletRequest createCancel() {
 		
-		Request request = (Request) super.message;
 		if ( !request.getMethod().equals(Request.INVITE)) {
 			throw new IllegalStateException ("Cannot create CANCEL for non inivte");
 		}
+		if ( super.clientTransaction == null ) throw new IllegalStateException("No client transaction found!");
+		
+		try {	
+			Request cancelRequest = clientTransaction.createCancel();
+			ClientTransaction clientTransaction = super.provider.getNewClientTransaction(cancelRequest);
+			SipServletRequest newRequest = new SipServletRequestImpl(super.provider, super.sipSession,  clientTransaction, super.sipFactory);
+			return newRequest;
+		} catch ( SipException ex)	{
+			throw new IllegalStateException("Could not create cancel", ex);
+		}
+			
+			
+		
 		
 		
 		

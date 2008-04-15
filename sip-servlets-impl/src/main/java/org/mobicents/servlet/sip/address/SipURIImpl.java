@@ -122,6 +122,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 			getSipURI().setMethodParam(method);
 		} catch (ParseException e) {
 			logger.error("parse exception occured", e);
+			throw new IllegalArgumentException("Bad arg " + method, e);
 		}
 
 	}
@@ -207,6 +208,12 @@ public class SipURIImpl extends URIImpl implements SipURI {
 
 	public String getValue() {
 		return this.uri.toString();
+	}
+
+	@Override
+	public Object clone() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

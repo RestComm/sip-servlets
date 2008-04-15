@@ -40,8 +40,7 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 	private static Log logger = LogFactory.getLog(AddressImpl.class
 			.getCanonicalName());
 
-	private AddressParametersHeader addressParametersHeader;
-
+	
 	private javax.sip.address.Address address;
 
 	private static AddressFactory addressFactory = SipFactories.addressFactory;
@@ -52,9 +51,9 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 
 	private SipURI getUriAsSipUri() {
 
-		if (this.addressParametersHeader.getAddress().getURI() instanceof SipURI) {
-			SipURI sipUri = (SipURI) this.addressParametersHeader.getAddress().getURI();
-			return sipUri;
+		if (this.address.getURI() instanceof SipURI) {
+			return (SipURI) this.address.getURI();
+			
 		} else {
 			throw new UnsupportedOperationException("Cannot return as SipURI");
 		}
@@ -62,12 +61,17 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 	}
 	
 	private javax.sip.address.Address getAddress() {
-		return this.addressParametersHeader.getAddress();
+		return address;
 	}
 	
 	
 	public AddressImpl() {
 		
+		
+	}
+	
+	public AddressImpl (javax.sip.address.Address address) {
+		this.address = address;
 		
 	}
 
@@ -106,12 +110,12 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 
 	public String getDisplayName() {
 
-		return addressParametersHeader.getAddress().getDisplayName();
+		return address.getDisplayName();
 	}
 
 	public int getExpires() {
 
-		javax.sip.address.URI uri = this.addressParametersHeader.getAddress().getURI();
+		javax.sip.address.URI uri = this.address.getURI();
 		if (uri instanceof SipURI) {
 			SipURI sipUri = (SipURI) uri;
 			return sipUri.getParameter("expires") == null ? -1 : Integer

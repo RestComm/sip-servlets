@@ -9,11 +9,11 @@ import javax.servlet.sip.TimerListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.SipServletApplicationImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
 
-	private SipServletApplicationImpl _appSession;
+	private SipApplicationSessionImpl _appSession;
 	/**
 	 * Logger for this class
 	 */
@@ -101,7 +101,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	    * @param listener
 	    *            Listener that will get timeout events.
 	    */
-	   public ServletTimerImpl(Serializable info, long delay, TimerListener listener,SipServletApplicationImpl appSession)
+	   public ServletTimerImpl(Serializable info, long delay, TimerListener listener,SipApplicationSessionImpl appSession)
 	   {
 	      this(info, delay, false, 0, listener, appSession);
 	      _isRepeatingTimer = false;
@@ -124,7 +124,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	    *            Listener that will get timeout events.
 	    */
 	   public ServletTimerImpl(Serializable info, long delay, boolean fixedDelay,
-	         long period, TimerListener listener,SipServletApplicationImpl appSession)
+	         long period, TimerListener listener,SipApplicationSessionImpl appSession)
 	   {
 	      _info = info;
 	      _delay = delay;
@@ -152,7 +152,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	    */
 	   public void cancel(boolean mayInterruptIfRunning)
 	   {
-		   SipServletApplicationImpl appSessionToCancelThisTimersFrom = null;
+		   SipApplicationSessionImpl appSessionToCancelThisTimersFrom = null;
 	      synchronized (_TIMER_LOCK)
 	      {
 	         if (_future != null)

@@ -11,7 +11,7 @@ import javax.servlet.sip.TimerService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.SipServletApplicationImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 
 
 
@@ -50,7 +50,7 @@ public class TimerServiceImpl implements TimerService {
 			throw new IllegalArgumentException(
 					"Period should be greater than 0");
 		}
-		SipServletApplicationImpl ap = (SipServletApplicationImpl) appSession;
+		SipApplicationSessionImpl ap = (SipApplicationSessionImpl) appSession;
 		
 		if (ap.isValid() == false) {
 			throw new IllegalStateException("Sip application session has been invalidated!!!");
@@ -72,7 +72,7 @@ public class TimerServiceImpl implements TimerService {
 	public ServletTimer createTimer(SipApplicationSession appSession,
 			long delay, boolean isPersistent, Serializable info, boolean isExpirationTimer) {
 		
-		SipServletApplicationImpl ap=(SipServletApplicationImpl)appSession;
+		SipApplicationSessionImpl ap=(SipApplicationSessionImpl)appSession;
 		
 		if (ap.isValid() == false) {
 			throw new IllegalStateException("Sip application session has been invalidated!!!");
@@ -92,7 +92,7 @@ public class TimerServiceImpl implements TimerService {
 	
 	
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
-			boolean isPersistent, Serializable info, SipServletApplicationImpl ap) {		
+			boolean isPersistent, Serializable info, SipApplicationSessionImpl ap) {		
 		final TimerListener l = listener;
 		final ServletTimerImpl st = new ServletTimerImpl(info, delay, l,ap);
 		// logger.log(Level.FINE, "starting timer
@@ -109,7 +109,7 @@ public class TimerServiceImpl implements TimerService {
 	
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
 			long period, boolean fixedDelay, boolean isPersistent,
-			Serializable info, SipServletApplicationImpl ap) {
+			Serializable info, SipApplicationSessionImpl ap) {
 		final TimerListener l = listener;
 		final ServletTimerImpl st = new ServletTimerImpl(info, delay, fixedDelay, period, l,ap);
 		// logger.log(Level.FINE, "starting timer

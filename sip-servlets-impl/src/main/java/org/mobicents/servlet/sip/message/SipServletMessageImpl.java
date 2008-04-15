@@ -54,10 +54,12 @@ import javax.sip.header.SupportedHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
+import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -68,13 +70,12 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public abstract class SipServletMessageImpl implements SipServletMessage {
 
-	private Message message;
+	protected Request request;
 	protected SipProvider provider;
 	protected SipSession sipSession;
 	protected ClientTransaction clientTransaction;
-	private ServerTransaction serverTransaction;
-	private SipApplicationSession sipApplicationSession;
-	
+	protected ServerTransaction serverTransaction;
+	protected SipFactoryImpl sipFactory;
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 
@@ -176,7 +177,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	public void addAcceptLanguage(Locale locale) {
 		AcceptLanguageHeader ach = headerFactory
 				.createAcceptLanguageHeader(locale);
-		message.addHeader(ach);
+		request.addHeader(ach);
 
 	}
 
@@ -208,9 +209,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		try {
 			Header h = headerFactory.createHeader(hName, addr.toString());
 			if (first) {
-				this.message.addFirst(h);
+				this.request.addFirst(h);
 			} else {
-				this.message.addLast(h);
+				this.request.addLast(h);
 			}
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -243,7 +244,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		try {
 			Header header = SipFactories.headerFactory.createHeader(hName,
 					value);
-			this.message.addLast(header);
+			this.request.addLast(header);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
 		}
@@ -263,9 +264,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			Header header = SipFactories.headerFactory
 					.createHeader(hName, body);
 			if (first)
-				this.message.addFirst(header);
+				this.request.addFirst(header);
 			else
-				this.message.addLast(header);
+				this.request.addLast(header);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied");
 		}
@@ -273,7 +274,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Locale getAcceptLanguage() {
-		AcceptLanguageHeader alh = (AcceptLanguageHeader) this.message
+		AcceptLanguageHeader alh = (AcceptLanguageHeader) this.request
 				.getHeader(AcceptLanguageHeader.NAME);
 		if (alh == null)
 			return null;
@@ -284,9 +285,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	public Iterator<Locale> getAcceptLanguages() {
 		LinkedList<Locale> ll = new LinkedList<Locale>();
-		Iterator it = this.message.getHeaders(AcceptLanguageHeader.NAME);
-		while ( it.hasNext()) {
-			AcceptLanguageHeader alh = ( AcceptLanguageHeader ) it.next();
+		Iterator<Header> it = (Iterator<Header>) this.request.getHeaders(AcceptLanguageHeader.NAME);
+		while (it.hasNext()) {
+			AcceptLanguageHeader alh = (AcceptLanguageHeader) it.next();
 			ll.add(alh.getAcceptLanguage());
 		}
 		return ll.iterator();
@@ -309,45 +310,60 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					+ "] cant be parsed to address, wrong content type!!!");
 		}
 
-		ListIterator<Header> headers = (ListIterator<Header>) this.message.getHeaders(hName);
+		ListIterator<Header> headers = (ListIterator<Header>) this.request
+				.getHeaders(hName);
 		ListIterator<Header> lit = headers;
 
 		if (lit != null) {
 			Header first = lit.next();
-			try {
+			if (first instanceof AddressParametersHeader) {
+				try {
 
-				return new AddressImpl(first);
-			} catch (ParseException e) {
-				throw new ServletParseException("Bad address " + first);
+					return new AddressImpl((AddressParametersHeader) first);
+				} catch (ParseException e) {
+					throw new ServletParseException("Bad address " + first);
+				}
 			}
 		}
 		return null;
-		
+
 	}
 
+	@SuppressWarnings("unchecked")
 	public ListIterator<Address> getAddressHeaders(String name)
 			throws ServletParseException {
-		
-		if ( ! this.isAddressTypeHeader(name)) {
-			throw new IllegalArgumentException("Header is not address type header");
+
+		if (isAddressTypeHeader(name)) {
+			throw new IllegalArgumentException(
+					"Header is not address type header");
 		}
-		for ( Iterator it = this.message.getHeaders(name);  it.hasNext(); ) {
+		LinkedList<Address> retval = new LinkedList<Address>();
+		for (Iterator<Header> it = this.request.getHeaders(name); it.hasNext();) {
 			Header header = (Header) it.next();
-			if ( header instanceof AddressParametersHeader ) {
+			if (header instanceof AddressParametersHeader) {
 				AddressParametersHeader aph = (AddressParametersHeader) header;
-				AddressImpl addressImpl  = new AddressImpl(aph);
-				
-				
+				try {
+					AddressImpl addressImpl = new AddressImpl(
+							(AddressParametersHeader) aph);
+					retval.add(addressImpl);
+				} catch (ParseException ex) {
+					throw new ServletParseException("Bad header", ex);
+				}
+
 			}
 		}
+		return retval.listIterator();
 	}
 
 	public SipApplicationSession getApplicationSession() {
-		return this.sipApplicationSession;
+		return this.sipSession.getApplicationSession();
 	}
 
 	public SipApplicationSession getApplicationSession(boolean create) {
-		// TODO Auto-generated method stub
+		if ( this.sipSession.getApplicationSession() == null && create) {
+			SipApplicationSessionImpl applSession = new SipApplicationSessionImpl();
+			
+		}
 		return null;
 	}
 

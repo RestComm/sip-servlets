@@ -27,6 +27,9 @@ public abstract class URIImpl  extends ParameterableImpl implements URI {
 		super();
 	}
 	
+	public javax.sip.address.URI getURI() {
+		return this.uri;
+	}
 	
 	public URIImpl ( javax.sip.address.TelURL telUrl) {
 		this.uri = telUrl;

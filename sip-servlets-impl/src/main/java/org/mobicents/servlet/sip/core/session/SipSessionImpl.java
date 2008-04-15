@@ -19,15 +19,29 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.ClientTransaction;
+import javax.sip.Dialog;
 
 public class SipSessionImpl implements SipSession {
 
+	private SipApplicationSessionImpl sipApplicationSession;
+	
 	private ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners;
 	private ArrayList<SipSessionBindingListener> sipSessionBindingListeners;
 	private ArrayList<SipSessionListener> sipSessionListeners;
 
 	private HashMap<String, Object> _sipSessionAttributeMap;
+	
+	private Dialog dialog;
+	
+	private ClientTransaction clientTransaction;
 
+	public SipSessionImpl ( Dialog dialog, ClientTransaction ctx, SipApplicationSessionImpl applicationSession ) {
+		this.dialog = dialog;
+		this.clientTransaction = ctx ;
+		this.sipApplicationSession = applicationSession;
+		
+	}
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
 		return sipSessionAttributeListeners;
 	}
@@ -55,14 +69,17 @@ public class SipSessionImpl implements SipSession {
 		this.sipSessionListeners = sipSessionListeners;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#createRequest(java.lang.String)
+	 */
 	public SipServletRequest createRequest(String method) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public SipApplicationSession getApplicationSession() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.sipApplicationSession;
 	}
 
 	public Object getAttribute(String name) {
@@ -207,5 +224,28 @@ public class SipSessionImpl implements SipSession {
 		// TODO Auto-generated method stub
 
 	}
+
+	/**
+	 * @param sipApplicationSession the sipApplicationSession to set
+	 */
+	public void setApplicationSession(SipApplicationSessionImpl sipApplicationSession) {
+		this.sipApplicationSession = sipApplicationSession;
+	}
+
+	/**
+	 * @param dialog the dialog to set
+	 */
+	public void setDialog(Dialog dialog) {
+		this.dialog = dialog;
+	}
+
+	/**
+	 * @return the dialog
+	 */
+	public Dialog getDialog() {
+		return dialog;
+	}
+
+	
 
 }

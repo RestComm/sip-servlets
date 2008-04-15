@@ -8,11 +8,11 @@ import javax.servlet.sip.TimerListener;
 public class AgregatingListener implements TimerListener {
 
 	
-	SipServletApplicationImpl _app=null;
+	SipApplicationSessionImpl _app=null;
 	
 	
 	
-	public AgregatingListener(SipServletApplicationImpl _app) {
+	public AgregatingListener(SipApplicationSessionImpl _app) {
 		super();
 		this._app = _app;
 	}

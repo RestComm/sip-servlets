@@ -6,12 +6,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
+import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.URI;
@@ -30,7 +34,7 @@ import org.mobicents.servlet.sip.core.timers.ServletTimerImpl;
 //
 //
 
-public class SipServletApplicationImpl implements SipApplicationSession {
+public class SipApplicationSessionImpl implements SipApplicationSession {
 
 	// ----- GENERATED FROM STAR UML
 	private String _applicationName;
@@ -47,7 +51,7 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 	 */
 	private SipListenersHolder _listeners;
 	private String _mainServlet;
-	private HashMap _servlets;
+	private HashMap <String, SipServlet>_servlets  = new HashMap<String,SipServlet> ();;
 	private HashMap _servletMapping;
 	private int _proxyTimeout;
 	private int _sessionTimeout;
@@ -59,14 +63,16 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 	private HashMap _envEntries;
 	private HashMap _ejbRefs;
 	private HashMap _ejbLocalRefs;
-	private HashMap<String, Object> _sipApplicationSessionAttributeMap;
+	private Map<String, Object> _sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
+	
 
 	// ------ END GENERATED
 
 	private TimerListener _agregatingListener;
 	private ArrayList<ServletTimer> _runningTimers;
 
-	private HashMap<String, SipSession> id2SipSession;
+	private Map<String,SipSessionImpl> sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
+	private String id;
 
 	/**
 	 * Passed as info object into Servelt timer that ticks for this sip app
@@ -85,14 +91,18 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 	
 	
 	
+	public SipApplicationSessionImpl(String id ) {
+		this.id = id;
+	}
+	
+	
+	public SipApplicationSessionImpl() {
+		
+	}
 	
 	
 	
-	
-	
-	
-	
-	public SipServletApplicationImpl(String name, String icon, String icon2,
+	public SipApplicationSessionImpl(String name, String icon, String icon2,
 			String name2, String _description, boolean _distributable,
 			HashMap params, SipListenersHolder _listeners, String servlet,
 			HashMap _servlets, HashMap mapping, int proxyTimeout, int sessionTimeout,
@@ -100,8 +110,7 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 			LoginConfig config, HashMap roles, HashMap entries, HashMap refs,
 			HashMap localRefs,
 			HashMap<String, Object> applicationSessionAttributeMap,
-			TimerListener listener, ArrayList<ServletTimer> timers,
-			HashMap<String, SipSession> id2SipSession) {
+			TimerListener listener, ArrayList<ServletTimer> timers) {
 		super();
 		_applicationName = name;
 		_smallIcon = icon;
@@ -127,11 +136,18 @@ public class SipServletApplicationImpl implements SipApplicationSession {
 		_sipApplicationSessionAttributeMap = applicationSessionAttributeMap;
 		_agregatingListener = listener;
 		_runningTimers = timers;
-		this.id2SipSession = id2SipSession;
 		
 		this._agregatingListener=new AgregatingListener(this);
 	}
 
+	
+	
+	public void addSipSession( SipSessionImpl sipSessionImpl) {
+		this.sipSessions.put(sipSessionImpl.getId(), sipSessionImpl);
+		sipSessionImpl.setApplicationSession(this);
+	}
+	
+	
 	public void encodeURI(URI uri) {
 		// TODO Auto-generated method stub
 
