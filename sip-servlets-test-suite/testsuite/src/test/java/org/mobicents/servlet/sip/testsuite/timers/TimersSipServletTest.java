@@ -1,4 +1,4 @@
-package org.mobicents.servlet.sip.testsuite.listeners;
+package org.mobicents.servlet.sip.testsuite.timers;
 
 import java.text.ParseException;
 import java.util.Iterator;
@@ -11,65 +11,57 @@ import javax.sip.address.SipURI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class ListenersSipServletTest extends SipServletTestCase {
+public class TimersSipServletTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(ListenersSipServletTest.class);
+	private static Log logger = LogFactory.getLog(TimersSipServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 1000;	
+	//1 sec
+	private static final int TIMEOUT = 1000;
+	//1 minute and 10 sec
+	private static final int APP_SESSION_TIMEOUT = 1000 * 60 + 10000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	private static final String OK = "OK";
 	// the order is important here 
-	private static final String[] LISTENERS_TO_TEST = new String[]{
-		"sipServletInitialized",
-		"sipAppSessionCreated",		
-		"sipAppSessionValueBound", "sipAppSessionValueUnbound", 
-		"sipAppSessionAttributeReplaced","sipAppSessionAttributeRemoved", "sipAppSessionAttributeAdded", 
-		"sipSessionCreated", 
-		"sipSessionValueBound", "sipSessionValueUnbound",  
-		"sipSessionAttributeReplaced", "sipSessionAttributeRemoved", "sipSessionAttributeAdded"
-		};		
-	
-	private static final String[] LISTENERS_TO_TEST_AFTER = new String[]{
-		//tested in TimersSipServletTest 
-//		"sipAppSessionExpired", 
-		//pain to test 
-//		"sipAppSessionDestroyed", "sipSessionDestroyed"
-	};
-	
-	private static final String[] LISTENERS_NOT_TESTED = new String[]{
-		//difficult to test, leave it for now 
-		"noAckReceived", 
-		//require the container to support Prack, it currently doesn't
-		"noPrackReceived",  
-		//require the container to session persistence or distribution, it currently doesn't
-		"sipAppSessionPassivated", "sipAppSessionActivated", "sipSessionPassivated", "sipSessionActivated"};
+	private static final String[] TIMERS_TO_TEST = new String[]{
+		"timerExpired",
+		"sipAppSessionExpired"				
+		};				
 	
 	TestSipListener sender;
 	
 	ProtocolObjects senderProtocolObjects;	
 
 	
-	public ListenersSipServletTest(String name) {
+	public TimersSipServletTest(String name) {
 		super(name);
 	}
 
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/listeners-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/timers-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		//setting the sip application timeout to 1 minutes instead of the regular 3 minutes
+		context.setSipApplicationSessionTimeout(1);
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());		
+		assertTrue(tomcat.deployContext(context));		
 	}
 
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/listeners/listeners-sip-servlet-dar.properties";
+				"org/mobicents/servlet/sip/testsuite/timers/timers-sip-servlet-dar.properties";
 	}
 	
 	@Override
@@ -91,7 +83,7 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		}
 	}
 	
-	public void testListeners() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testTimers() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -104,30 +96,19 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		
 		sender.sendInvite(fromAddress, toAddress);	
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isAckSent());
-		for (int i = 0; i < LISTENERS_TO_TEST.length; i++) {
-			logger.info("Testing following listener " + LISTENERS_TO_TEST[i]);
-			sender.sendMessageInDialog(LISTENERS_TO_TEST[i]);
-			Thread.sleep(TIMEOUT);
-			String content = sender.getLastMessageContent();
-			assertNotNull(content);
-			if(!OK.equals(content)) {
-				fail("following listener " + LISTENERS_TO_TEST[i] + " was not fired");
-			}
-		}		
-		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());			
+		Thread.sleep(APP_SESSION_TIMEOUT);
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
-		Thread.sleep(TIMEOUT);
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
 		while (allMessagesIterator.hasNext()) {
 			String message = (String) allMessagesIterator.next();
 			logger.info(message);
 		}
-		for (int i = 0; i < LISTENERS_TO_TEST_AFTER.length; i++) {
-			assertTrue(sender.getAllMessagesContent().contains(LISTENERS_TO_TEST_AFTER[i]));
-		}
+		for (int i = 0; i < TIMERS_TO_TEST.length; i++) {
+			assertTrue(sender.getAllMessagesContent().contains(TIMERS_TO_TEST[i]));
+		}	
 	}
 
 	@Override

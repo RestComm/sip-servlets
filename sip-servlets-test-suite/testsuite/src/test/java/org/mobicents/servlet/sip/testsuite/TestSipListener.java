@@ -103,6 +103,8 @@ public class TestSipListener implements SipListener {
 	
 	private String lastMessageContent;
 	
+	private List<String> allMessagesContent;
+	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 	
 
@@ -139,10 +141,27 @@ public class TestSipListener implements SipListener {
 	private void processMessage(Request request,
 			ServerTransaction serverTransactionId) {
 		
+		ServerTransaction serverTransaction = null;
+
+        try {
+
+            serverTransaction = 
+            	(serverTransactionId == null? 
+            			sipProvider.getNewServerTransaction(request): 
+            				serverTransactionId);
+        } catch (javax.sip.TransactionAlreadyExistsException ex) {
+            ex.printStackTrace();
+            return;
+        } catch (javax.sip.TransactionUnavailableException ex1) {
+            ex1.printStackTrace();
+            return;
+        }
+		
 		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
 		request.getHeader(ContentTypeHeader.NAME);		
 		if(CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
-			this.lastMessageContent = new String(request.getRawContent());			
+			this.lastMessageContent = new String(request.getRawContent());
+			allMessagesContent.add(lastMessageContent);
 		}
 		try {
 			Response okResponse = protocolObjects.messageFactory.createResponse(
@@ -152,7 +171,7 @@ public class TestSipListener implements SipListener {
 				toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 			}
 			okResponse.addHeader(contactHeader);
-			serverTransactionId.sendResponse(okResponse);
+			serverTransaction.sendResponse(okResponse);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error("error sending OK response to message", ex);
@@ -581,6 +600,7 @@ public class TestSipListener implements SipListener {
 			this.peerHostPort = "127.0.0.1:"+ peerPort;
 		}
 		this.sendBye = callerSendBye;
+		allMessagesContent = new ArrayList<String>();
 	}
 
 	public void processIOException(IOExceptionEvent exceptionEvent) {
@@ -722,5 +742,12 @@ public class TestSipListener implements SipListener {
 			lastMessageContent = null;
 		}
 		return content;
+	}
+
+	/**
+	 * @return the allMessagesContent
+	 */
+	public List<String> getAllMessagesContent() {
+		return allMessagesContent;
 	}	
 }

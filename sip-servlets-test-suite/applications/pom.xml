@@ -20,6 +20,7 @@
 		<module>location-service-servlet</module>
 		<module>click-to-call-servlet</module>
 		<module>listeners-sip-servlet</module>
+		<module>timers-sip-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->

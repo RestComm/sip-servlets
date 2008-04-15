@@ -16,6 +16,7 @@ import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
+import org.mobicents.servlet.sip.testsuite.timers.TimersSipServletTest;
 
 public class AllTests {
 
@@ -36,7 +37,7 @@ public class AllTests {
 		suite.addTestSuite(SpeedDialLocationServiceJunitTest.class);
 		suite.addTestSuite(Click2CallBasicTest.class);
 		suite.addTestSuite(ListenersSipServletTest.class);
-		
+		suite.addTestSuite(TimersSipServletTest.class);		
 		//$JUnit-END$
 		return suite;
 	}
