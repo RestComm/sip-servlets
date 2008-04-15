@@ -558,9 +558,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
 		}		
-		sipServletRequest.setSipSession(sipSession);
-		
-		sipSession.updateStateOnSubsequentRequest(sipServletRequest);
+		sipServletRequest.setSipSession(sipSession);			
 		
 		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
 		try {
@@ -580,7 +578,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			else
 			{
 				Servlet servlet = servletWrapper.allocate();
-				servlet.service(sipServletRequest, null);
+				servlet.service(sipServletRequest, null);				
 			}
 		} catch (ServletException e) {				
 			logger.error(e);
@@ -592,6 +590,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
+		} finally {
+			sipSession.updateStateOnSubsequentRequest(sipServletRequest);
 		}
 		//if a final response has been sent, or if the request has 
 		//been proxied or relayed we stop routing the request

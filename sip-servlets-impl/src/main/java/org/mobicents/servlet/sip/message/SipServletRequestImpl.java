@@ -218,7 +218,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME,
 				// "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
-			if(statusCode == Response.MOVED_TEMPORARILY) {
+			if(statusCode > Response.OK ) {
 				ToHeader toHeader = (ToHeader) response
 					.getHeader(ToHeader.NAME);
 				// If we already have a to tag, dont create new

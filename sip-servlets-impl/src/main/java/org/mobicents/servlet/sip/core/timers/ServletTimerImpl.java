@@ -21,10 +21,13 @@ import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
-
+	private transient static final Log logger = LogFactory.getLog(ServletTimerImpl.class);
+	
 	private SipApplicationSessionImpl appSession;
 	/**
 	 * Logger for this class
@@ -257,6 +260,8 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 
 		try {
 			listener.timeout(this);
+		} catch(Throwable t) {
+			logger.error("An unexpected exception happened in the timer callback!",t);
 		} finally {
 			if (isRepeatingTimer) {
 				estimateNextExecution();
