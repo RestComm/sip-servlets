@@ -8,11 +8,11 @@
   <body>
     <menu>
       <item name="Introduction" href="index.html"/>
-      <item name="Installation" href="installation.html">
+      <item name="Installation" href="installation.html" collapse="true">
       	<item name="Tomcat Installation" href="installation-tomcat.html"/>
       	<item name="Jboss Installation" href="installation-jboss.html"/>
       </item>
-      <item name="Examples" href="examples/examples.html">
+      <item name="Examples" href="examples/examples.html" collapse="true">
       	<item name="Call Blocking" href="examples/call_blocking.html"/>
       	<item name="Call Forwarding" href="examples/call_forwarding.html"/>
       	<item name="Call Controller" href="examples/call_controller.html"/>

@@ -1,4 +1,4 @@
-	<<Important Note :>> <This example has been taken from the {{{http://dev2dev.bea.com/pub/a/2006/02/sip-servlet.html} BEA dev2dev}}.
+	<<Important Note :>> <This example has been taken from the {{{http://dev2dev.bea.com/pub/a/2006/02/sip-servlet.html}BEA dev2dev}}.\
 	It is has been modified to fit the new JSR 289 specification. 
 	The purpose here is to demonstrate MESSAGE sip extension support.>
 
