@@ -4,6 +4,7 @@
 package org.mobicents.servlet.sip.startup;
 
 
+import java.io.File;
 import java.util.TooManyListenersException;
 
 import javax.sip.SipProvider;
@@ -91,6 +92,9 @@ public class SipStandardService extends StandardService implements SipService {
 		} catch (ClassCastException e) {
 			throw new LifecycleException("Sip Application Dispatcher defined does not implement " + SipApplicationDispatcher.class.getName(),e);
 		}
+		if(darConfigurationFileLocation != null && !darConfigurationFileLocation.startsWith("file:///")) {
+			darConfigurationFileLocation = "file:///" + System.getProperty("catalina.base").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
+ 		}
 		System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
 		sipApplicationDispatcher.init(sipApplicationRouterClassName);
 		super.initialize();		
