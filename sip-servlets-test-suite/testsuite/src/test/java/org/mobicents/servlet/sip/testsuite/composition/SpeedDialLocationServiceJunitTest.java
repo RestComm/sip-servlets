@@ -128,6 +128,7 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		receiver.setWaitForCancel(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);

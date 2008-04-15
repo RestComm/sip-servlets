@@ -88,6 +88,8 @@ public class TestSipListener implements SipListener {
 	private Request inviteRequest;
 	
 	private boolean cancelSent;
+
+	private boolean waitForCancel;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 	
@@ -174,19 +176,16 @@ public class TestSipListener implements SipListener {
 			
 			this.inviteRequest = request;
 			
-			st.sendResponse(response);
-			if(!cancelReceived) {
-				Response ringing = protocolObjects.messageFactory
+			st.sendResponse(response);			
+				
+			Response ringing = protocolObjects.messageFactory
 				.createResponse(Response.RINGING, request);
 				toHeader = (ToHeader) ringing.getHeader(ToHeader.NAME);
 				toHeader.setTag("5432"); // Application is supposed to set.
 				st.sendResponse(ringing);			
-			} else {
-				logger.info("CANCEL received, stopping the INVITE processing ");
-				return;
-			}
-			Thread.sleep(2000);
-			if(!cancelReceived) {
+			
+			Thread.sleep(1000);
+			if(!waitForCancel) {
 				ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 				Response okResponse = protocolObjects.messageFactory
 						.createResponse(Response.OK, request);
@@ -196,7 +195,7 @@ public class TestSipListener implements SipListener {
 					
 				st.sendResponse(okResponse);
 			} else {
-				logger.info("CANCEL received, stopping the INVITE processing ");
+				logger.info("Waiting for CANCEL, stopping the INVITE processing ");
 				return ;
 			}
 			
@@ -595,5 +594,19 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isRequestTerminatedReceived() {
 		return requestTerminatedReceived;
+	}
+
+	/**
+	 * @return the waitForCancel
+	 */
+	public boolean isWaitForCancel() {
+		return waitForCancel;
+	}
+
+	/**
+	 * @param waitForCancel the waitForCancel to set
+	 */
+	public void setWaitForCancel(boolean waitForCancel) {
+		this.waitForCancel = waitForCancel;
 	}	
 }
