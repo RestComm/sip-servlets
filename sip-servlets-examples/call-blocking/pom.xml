@@ -75,29 +75,9 @@
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<webXml>${basedir}/src/main/sipapp/WEB-INF/sip.xml</webXml>
 					<warSourceDirectory>${basedir}/src/main/sipapp</warSourceDirectory>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<delete
-									file="${project.build.directory}/${project.build.finalName}/WEB-INF/web.xml" />
-								<delete
-									file="${basedir}/src/main/sipapp/WEB-INF/web.xml" />
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+			</plugin>			
 		</plugins>
 	</build>
 	<!-- repositories -->
