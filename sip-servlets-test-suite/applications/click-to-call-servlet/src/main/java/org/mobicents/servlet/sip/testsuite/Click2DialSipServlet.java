@@ -64,7 +64,7 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 						+ secondPartyAddress);
 
 				String contentType = resp.getContentType();
-				if (contentType.trim().equals("application/sdp")) {
+				if (contentType != null && contentType.trim().equals("application/sdp")) {
 					invite.setContent(resp.getContent(), "application/sdp");
 				}
 
