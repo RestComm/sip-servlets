@@ -28,10 +28,6 @@ public class ChatroomSipServlet extends SipServlet {
 
     /** This chatroom server's address, retrieved from the init params. */
     public String serverAddress;
-    
-	/** Creates a new instance of ChatroomSipServlet */
-	public ChatroomSipServlet() {
-	}
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {	
@@ -104,7 +100,6 @@ public class ChatroomSipServlet extends SipServlet {
      */
     protected void doErrorResponse(SipServletResponse response)
             throws ServletException, IOException {
-        super.doErrorResponse(response);
         //The receiver of the message probably dropped off. Remove 
         //him from the list.
         String receiver = response.getTo().toString();
@@ -117,9 +112,8 @@ public class ChatroomSipServlet extends SipServlet {
      */
     protected void doSuccessResponse(SipServletResponse response)
             throws ServletException, IOException {
-        super.doSuccessResponse(response);
-        //FIXME We created the app session, we have to destroy it too.
-//        response.getApplicationSession().invalidate();  
+        //We created the app session, we have to destroy it too.
+        response.getApplicationSession().invalidate();  
     }
 
     private void sendToAll(String from, String message)  
