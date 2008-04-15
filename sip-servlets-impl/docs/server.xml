@@ -41,7 +41,9 @@
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar.properties">
+  		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
+  		<!--darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-callblocking-forwarding.properties"-->
+  		<!--darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">-->
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned.  Each Connector passes requests on to the
@@ -194,6 +196,14 @@
       <Host appBase="E:\servers\apache-tomcat-5.5.20\webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false" hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig">
 
 		<Context name="sip-test-context" path="/click2call" docBase="E:\workspaces\sip-servlets\click-to-call\src\main\sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
+			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+		</Context>
+
+		<Context name="callforwarding" path="/callforwarding" docBase="E:\workspaces\sip-servlets\sip-servlets-test-suite\applications\call-forwarding-b2bua-servlet\src\main\sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
+			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+		</Context>
+		
+		<Context name="callblocking" path="/callblocking" docBase="E:\workspaces\sip-servlets\sip-servlets-test-suite\applications\call-blocking-servlet\src\main\sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
 			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
 		</Context>
 		
