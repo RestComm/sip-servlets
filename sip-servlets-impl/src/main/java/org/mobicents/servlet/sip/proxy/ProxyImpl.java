@@ -187,9 +187,8 @@ public class ProxyImpl implements Proxy {
 		{
 			ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
 			this.proxyBranches.put(uri, pbi);
-			pbi.start();
 		}
-
+		startProxy();
 	}
 
 	/* (non-Javadoc)
