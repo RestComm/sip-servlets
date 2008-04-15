@@ -269,7 +269,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		if(response.getStatus() >= 200)
 		{
-			this.proxy.onFinalResponse(this);
+			if(response.getRequest() != null && response.getRequest().isInitial()) {
+				this.proxy.onFinalResponse(this);
+			} else {
+				this.proxy.sendBestFinalResponse(response, this);
+			}
 		}
 		
 	}
@@ -280,6 +284,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 	
 	public void proxyInDialogRequest(SipServletRequestImpl request)
 	{
+		// Update the last proxied request
+		request.setRoutingState(RoutingState.PROXIED);
+		proxy.setOriginalRequest(request);
+		
 		// No proxy params, sine the target is already in the Route headers
 		ProxyParams params = new ProxyParams(null, null, null, null);
 		Request clonedRequest = 

@@ -418,4 +418,8 @@ public class ProxyImpl implements Proxy {
 	ProxyUtils getProxyUtils() {
 		return proxyUtils;
 	}
+
+	void setOriginalRequest(SipServletRequestImpl originalRequest) {
+		this.originalRequest = originalRequest;
+	}
 }
