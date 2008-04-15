@@ -110,23 +110,17 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Address#getExpires()
 	 */
-	public int getExpires() {
-		javax.sip.address.URI uri = this.address.getURI();
-		if (uri instanceof SipURI) {
-			SipURI sipUri = (SipURI) uri;
-			return sipUri.getParameter("expires") == null ? -1 : Integer
-					.parseInt(sipUri.getParameter("expires"));
-		} else
-			throw new UnsupportedOperationException("Illegal operation");
+	public int getExpires() {		
+		return this.parameters.get("expires") == null ? -1 : 
+			Integer.parseInt(this.parameters.get("expires").getValue());		
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Address#getQ()
 	 */
 	public float getQ() {
-		SipURI sipUri = this.getUriAsSipUri();
-		return sipUri.getParameter("q") == null ? (float) -1.0 : Float
-				.parseFloat(sipUri.getParameter("q"));
+		return this.parameters.get("expires") == null ? (float) -1.0  : 
+			Float.parseFloat(this.parameters.get("expires").getValue());
 	}
 	/*
 	 * (non-Javadoc)
