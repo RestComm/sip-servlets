@@ -401,7 +401,7 @@ public class SipFactoryImpl implements SipFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Parameterable createParametrable(String s) {
+	public Parameterable createParameterable(String s) {
 		// TODO Auto-generated method stub
 		return null;
 	}
