@@ -5,7 +5,7 @@
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>Sip Servlets Parent Pom</name>
 	<url>http://sip-servlets.dev.java.net</url>
 	<issueManagement>
@@ -209,6 +209,6 @@
 
 	<!-- the tomcat location where the generated artifacts will be copied -->
 	<properties>
-		<tomcat.home>E:\servers\apache-tomcat-5.5.25</tomcat.home>
+		<tomcat.home>E:\servers\apache-tomcat-6.0.14</tomcat.home>
 	</properties>
 </project>

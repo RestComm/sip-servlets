@@ -21,6 +21,7 @@
       <subsection name="Version 0.2 - 02/01/2008">
         <p>        
         <img src="images/orange.jpeg"/> Listeners and Timers <br/>
+        <img src="images/orange.jpeg"/> More sip phones interoperability <br/>
         <img src="images/red.jpeg"/> Security <br/>
         <img src="images/red.jpeg"/> JSR 289 Public Review API Alignement <br/>        
         <img src="images/red.jpeg"/> J2EE integration/J2EE converged applications<br/>
@@ -33,6 +34,11 @@
         <img src="images/red.jpeg"/> Real world Application Router <br/>
         <img src="images/red.jpeg"/> Distributable applications <br/>       
         <img src="images/red.jpeg"/> TCK <br/>
+        </p>
+      </subsection>
+      <subsection name="Version 0.4 - 04/01/2008">
+        <p>
+        <img src="images/red.jpeg"/> Failover support <br/>
         </p>
       </subsection>
     </section>

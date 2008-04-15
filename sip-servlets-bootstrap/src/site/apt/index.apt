@@ -1,8 +1,12 @@
                                     ------
                                     Sip-Servlets
+                                    ------                                    
                                     ------
-                                    ------
-                                    ------
+                                    ------                                    
+
+	<<Project Lead>> : {{{mailto:deruelle_jean@dev.java.net}Jean Deruelle}}
+	
+	<<Team>> : check out the {{{team-list.html}team members}}
 
 Goals  
 
@@ -32,4 +36,8 @@ Try it !
 
 	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 5.x to become a sip-servlet converged container.
 	
-	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.	 
+	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.
+	
+Feedback
+
+	To provide any kind of feedback (bad or good), please feel free to post a mail on the {{{dev@sip-servlets.dev.java.net}dev list}}, {{{servlets/ProjectIssues}post an issue}} in the bugtracker, mail one of the {{{team-list.html}team members}} or join the project.	 
