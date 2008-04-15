@@ -1,9 +1,9 @@
-Click To Call
+	<<Important Note :>> <This example has been taken mostly from the {{{https://sailfin.dev.java.net/}sailfin project}} 
+	and is originally available at {{{http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}}.
+	It is has been modified to fit the new JSR 289 application selection process and slimmed down to its minimum. 
+	The purpose here is to demonstrate interoperability between containers and show backward compatibility with JSR 116.>
 
-<<Important Note :>> <This example has been taken mostly from the {{{https://sailfin.dev.java.net/}sailfin project}} 
-and is originally available at {{{http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}}.
-It is has been modified to fit the new JSR 289 application selection process and slimmed down to its minimum. 
-The purpose here is to demonstrate interoperability between containers and show backward compatibility with JSR 116.>
+Click To Call
 
 * Service Description
 

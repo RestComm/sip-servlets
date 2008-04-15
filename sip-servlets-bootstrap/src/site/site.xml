@@ -8,7 +8,7 @@
   <body>
     <menu>
       <item name="Introduction" href="index.html"/>
-      <item name="Install" href="install.html"/>
+      <item name="Installation" href="installation.html"/>
       <item name="Examples" href="examples/examples.html"/>
       <item name="Roadmap" href="roadmap.html"/>
       
