@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -56,17 +58,17 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  *
  */
 public class SipSessionImpl implements SipSession {
-	private static final Log logger = LogFactory.getLog(SipSessionImpl.class);
+	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
 	
 	private SipApplicationSessionImpl sipApplicationSession;	
 	
-	private ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners;
-	private ArrayList<SipSessionBindingListener> sipSessionBindingListeners;
-	private ArrayList<SipSessionListener> sipSessionListeners;
+	private List<SipSessionAttributeListener> sipSessionAttributeListeners;
+	private List<SipSessionBindingListener> sipSessionBindingListeners;
+	private List<SipSessionListener> sipSessionListeners;
 	
 	private ProxyBranchImpl proxyBranch;
 
-	private HashMap<String, Object> sipSessionAttributeMap;
+	private Map<String, Object> sipSessionAttributeMap;
 	
 	private SipSessionKey key;
 	
@@ -157,30 +159,30 @@ public class SipSessionImpl implements SipSession {
 		//FIXME create and start a timer for session expiration
 	}
 	
-	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
+	public List<SipSessionAttributeListener> getSipSessionAttributeListeners() {
 		return sipSessionAttributeListeners;
 	}
 
 	public void setSipSessionAttributeListeners(
-			ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners) {
+			List<SipSessionAttributeListener> sipSessionAttributeListeners) {
 		this.sipSessionAttributeListeners = sipSessionAttributeListeners;
 	}
 
-	public ArrayList<SipSessionBindingListener> getSipSessionBindingListeners() {
+	public List<SipSessionBindingListener> getSipSessionBindingListeners() {
 		return sipSessionBindingListeners;
 	}
 
 	public void setSipSessionBindingListeners(
-			ArrayList<SipSessionBindingListener> sipSessionBindingListeners) {
+			List<SipSessionBindingListener> sipSessionBindingListeners) {
 		this.sipSessionBindingListeners = sipSessionBindingListeners;
 	}
 
-	public ArrayList<SipSessionListener> getSipSessionListeners() {
+	public List<SipSessionListener> getSipSessionListeners() {
 		return sipSessionListeners;
 	}
 
 	public void setSipSessionListeners(
-			ArrayList<SipSessionListener> sipSessionListeners) {
+			List<SipSessionListener> sipSessionListeners) {
 		this.sipSessionListeners = sipSessionListeners;
 	}
 

@@ -3,11 +3,13 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.io.Serializable;
+
 /**
  * @author Jean Deruelle
  *
  */
-public class SipSessionKey {
+public class SipSessionKey implements Serializable {
 	String fromAddress;
 	String fromTag;
 	String toAddress;

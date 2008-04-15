@@ -203,7 +203,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));					
 				}
 			}			
-			//Adding the recorded route headers as route headers
+			//Application Routing : Adding the recorded route headers as route headers, should it be Via Headers ?
 			ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
 			while (recordRouteHeaders.hasNext()) {
 				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
@@ -618,10 +618,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			
 			if (super.getTransaction() == null) {
-
-				ViaHeader viaHeader = JainSipUtils.createViaHeader(super.sipFactoryImpl.getSipProviders(),
-						transport, null);
-				request.setHeader(viaHeader);
 
 				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
 						super.sipFactoryImpl.getSipProviders(), transport);

@@ -190,30 +190,38 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#sendReliably()
+	 */
 	public void sendReliably() throws Rel100Exception {
-		// TODO Auto-generated method stub
-
+		//FIXME add support for it
+		throw new Rel100Exception(Rel100Exception.NOT_SUPPORTED);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#setStatus(int)
+	 */
 	public void setStatus(int statusCode) {
-		// FIXME
 		try {
 			response.setStatusCode(statusCode);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalArgumentException(e);
 		}
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#setStatus(int, java.lang.String)
+	 */
 	public void setStatus(int statusCode, String reasonPhrase) {
-		// FIXME
 		try {
 			response.setStatusCode(statusCode);
 			response.setReasonPhrase(reasonPhrase);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalArgumentException(e);
 		}
 
 	}
