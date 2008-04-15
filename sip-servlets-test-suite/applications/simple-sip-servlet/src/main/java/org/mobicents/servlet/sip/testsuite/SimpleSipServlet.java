@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(CallForwardingSipServlet.class);
+	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
 	
 	
 	/** Creates a new instance of SimpleProxyServlet */

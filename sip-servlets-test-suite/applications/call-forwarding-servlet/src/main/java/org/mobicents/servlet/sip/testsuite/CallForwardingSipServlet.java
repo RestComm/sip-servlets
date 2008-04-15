@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 public class CallForwardingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);
+	private static Log logger = LogFactory.getLog(CallForwardingSipServlet.class);
 	
 	
 	/** Creates a new instance of CallForwardingSipServlet */

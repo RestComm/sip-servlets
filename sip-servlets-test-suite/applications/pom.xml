@@ -15,7 +15,7 @@
 		<module>b2bua-sip-servlet</module>		
 		<module>call-blocking-servlet</module>
 		<module>call-forwarding-servlet</module>
-		<module>call-blocking-b2bua-servlet</module>
+		<module>call-forwarding-b2bua-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
