@@ -199,10 +199,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			SipSessionImpl session = (SipSessionImpl) this.getSession();
 			
 			// Update Session state
-			if( this.getStatus()>=200 && this.getStatus()<300 )
-				session.setState(State.CONFIRMED);
-			if( this.getStatus()>=100 && this.getStatus()<200 )
-				session.setState(State.EARLY);
+			session.updateStateOnResponse(this);
 			
 			ServerTransaction st = (ServerTransaction) getTransaction();
 			

@@ -591,10 +591,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						responseEvent.getClientTransaction(), session, responseEvent.getDialog());
 
 			// Update Session state
-			if( sipServletResponse.getStatus()>=200 && sipServletResponse.getStatus()<300 )
-				session.setState(State.CONFIRMED);
-			if( sipServletResponse.getStatus()>=100 && sipServletResponse.getStatus()<200 )
-				session.setState(State.EARLY);
+			session.updateStateOnResponse(sipServletResponse);
 			
 			try {
 				// See if this is a response to a proxied request

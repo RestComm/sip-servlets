@@ -21,6 +21,7 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -572,4 +574,12 @@ public class SipSessionImpl implements SipSession {
 	public Set<Transaction> getOngoingTransactions() {
 		return this.ongoingTransactions;
 	}	
+	
+	public void updateStateOnResponse(SipServletResponseImpl response)
+	{
+		if( response.getStatus()>=200 && response.getStatus()<300 )
+			this.setState(State.CONFIRMED);
+		if( response.getStatus()>=100 && response.getStatus()<200 )
+			this.setState(State.EARLY);
+	}
 }

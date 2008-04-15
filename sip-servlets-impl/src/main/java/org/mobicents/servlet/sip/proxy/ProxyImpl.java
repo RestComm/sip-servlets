@@ -328,12 +328,16 @@ public class ProxyImpl implements Proxy {
 	
 	public void onBranchTimeOut(ProxyBranchImpl branch)
 	{
-		startNextUntriedBranch();
+		if(this.parallel)
+			startNextUntriedBranch();
 	}
 	
 	// In sequential proxying get some untried branch and start it, then wait for response and repeat
 	public void startNextUntriedBranch()
 	{
+		if(!this.parallel) 
+			throw new IllegalStateException("This method is only for sequantial proxying");
+		
 		for(ProxyBranch pb: this.proxyBranches.values())
 		{
 			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;
