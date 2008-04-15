@@ -158,7 +158,7 @@ Click To Call
 	     <<<</auth-constraint>>>>\
 	 <<<</security-constraint>>>>
 	 
-	 <<<<login-config>>>>\ 
-         	<<<<auth-method>DIGEST</auth-method>>>>\ 
-         	<<<<realm-name>sip-servlets-realm</realm-name>>>>\ 
+	 <<<<login-config>>>>\
+         	<<<<auth-method>DIGEST</auth-method>>>>\
+         	<<<<realm-name>sip-servlets-realm</realm-name>>>>\
    	 <<<</login-config>>>>
