@@ -2,7 +2,7 @@ Installation Instructions
 
 * From the binary
 	
-	Download our JSR 289 sip-servlet-ized 0.1 version of Tomcat 5.5.25 {{{source/browse/*checkout*/sip-servlets/trunk/sip-servlets-bootstrap/release/Sip-Servlet-0.1_Apache-Tomcat-5.5.25.zip?rev=366}here}}
+	Download our JSR 289 sip-servlet-ized 0.1 version of Tomcat 5.5.25 {{{source/browse/*checkout*/sip-servlets/trunk/sip-servlets-bootstrap/release/Sip-Servlet-0.1_Apache-Tomcat-5.5.25.zip?rev=370}here}}
 	
 	Unzip it and run it from bin directory with ./catalina.bat run or ./catalina.sh run command. 
 	
