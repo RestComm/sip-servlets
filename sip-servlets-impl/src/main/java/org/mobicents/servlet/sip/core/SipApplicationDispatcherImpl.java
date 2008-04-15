@@ -9,10 +9,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationRouter;
 import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationRoutingDirective;
+import javax.servlet.sip.SipServletRequest;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.RequestEvent;
@@ -32,6 +34,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -147,17 +150,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			//TODO sends an error message
 		} else {
-			SipContext sipContext = applicationDeployed.get(applicationRouterInfo);
+			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
 			String mainServlet = sipContext.getMainServlet();
 			Container container = sipContext.findChild(mainServlet);
+			SipServletImpl SipServletImpl = (SipServletImpl) container;
 			try {
-				container.invoke(null, null);
-			} catch (IOException e) {
+				Servlet servlet = SipServletImpl.allocate();	        
+				servlet.service(sipServletRequest, null);
+			} catch (ServletException e) {				
+				logger.error(e);
 				//TODO sends an error message
-				logger.error("Problem during invocation of servlet "+ mainServlet,e);				
-			} catch (ServletException e) {
+			} catch (IOException e) {				
+				logger.error(e);
 				//TODO sends an error message
-				logger.error("Problem during invocation of servlet "+ mainServlet,e);				
 			}
 		}
 		logger.info("Request event dispatched");

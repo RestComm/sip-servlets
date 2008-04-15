@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
@@ -54,12 +53,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public void init() throws Exception {
 		logger.info("Initializing the sip context");
-		if (this.getParent() != null) {
-			// Add the main configuration listener for sip applications
-			LifecycleListener sipConfigurationListener = new SipContextConfig();
-			this.addLifecycleListener(sipConfigurationListener);
-			setDelegate(true);
-		}
+//		if (this.getParent() != null) {
+//			// Add the main configuration listener for sip applications
+//			LifecycleListener sipConfigurationListener = new SipContextConfig();
+//			this.addLifecycleListener(sipConfigurationListener);			
+//			setDelegate(true);
+//		}
 		setWrapperClass(SipServletImpl.class.getName());
 		// call the super method to correctly initialize the context and fire
 		// up the

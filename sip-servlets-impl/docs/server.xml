@@ -114,16 +114,6 @@
 	sipStackName="SIP-Servlet-Tomcat-Server" 
 	sipPathName="gov.nist"/>
 	
-	<Connector port="5080" 
-	ipAddress = "127.0.0.1"
-	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	signalingTransport="udp" 
-    	logLevel="DEBUG"
-	debugLog = "../logs/debuglog.txt" 
-	serverLog = "../logs/serverlog.txt"
-	sipStackName="SIP-Servlet-Tomcat-Server" 
-	sipPathName="gov.nist"/>
-	
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone
          analyzes the HTTP headers included with the request, and passes them
@@ -203,7 +193,7 @@
        -->
       <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false">
 
-		<Context path="sip-test" docBase="E:\workspaces\sip-servlets\simple-sip-servlet\src\main\sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext"/>
+		<Context name="sip-test-context" path="sip-test" docBase="E:\workspaces\sip-servlets\simple-sip-servlet\src\main\sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig"/>
 		
         <!-- Defines a cluster for this node,
              By defining this element, means that every manager will be changed.

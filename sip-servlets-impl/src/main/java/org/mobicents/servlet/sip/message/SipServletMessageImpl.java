@@ -460,9 +460,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getMethod()
+	 */
 	public String getMethod() {
-		// TODO Auto-generated method stub
-		return null;
+		return request.getMethod();
 	}
 
 	public Parameterable getParameterableHeader(String name)

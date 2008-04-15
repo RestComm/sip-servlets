@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.startup.loading;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.core.StandardWrapper;
+import org.mobicents.servlet.sip.core.SipServletWrapperValve;
 
 /**
  * Sip implementation of the <b>Wrapper</b> interface that represents
@@ -11,10 +12,17 @@ import org.apache.catalina.core.StandardWrapper;
  *
  */
 public class SipServletImpl extends StandardWrapper {
-	public String icon;
-	public String servletName;
-	public String displayName;
-	public String description;
+	private String icon;
+	private String servletName;
+	private String displayName;
+	private String description;
+	private SipServletWrapperValve sipServletWrapperValve;
+	
+	public SipServletImpl() {
+		super();
+		sipServletWrapperValve = new SipServletWrapperValve();
+        pipeline.setBasic(sipServletWrapperValve);
+	}
 	
 	@Override
 	public void load() throws ServletException {

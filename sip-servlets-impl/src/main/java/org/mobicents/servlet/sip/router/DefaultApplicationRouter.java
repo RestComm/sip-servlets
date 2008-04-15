@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.router;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -154,6 +155,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	public DefaultApplicationRouter() {
 		containerDeployedApplicationNames = new ArrayList<String>();
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
+		sipApplicationRouterInfos = new HashMap<String, List<SipApplicationRouterInfo>>();
 	}
 	
 	/**
@@ -191,14 +193,16 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	public SipApplicationRouterInfo getNextApplication(
 			SipServletRequest initialRequest,
 			SipApplicationRoutingRegion region,
-			SipApplicationRoutingDirective directive, Serializable stateInfo) {
+			SipApplicationRoutingDirective directive, Serializable stateInfo) {		
 		// TODO implements the real matching logic for now it's gonna be first app is the one always interested :-)
-		List<SipApplicationRouterInfo> sipApplicationRouterInfoList = 
-			sipApplicationRouterInfos.get(initialRequest.getMethod());
-		if(sipApplicationRouterInfoList != null || sipApplicationRouterInfoList.size() > 0) {
-			return sipApplicationRouterInfoList.get(0);
-		}	
-		return null;
+		if(initialRequest != null) {			
+			List<SipApplicationRouterInfo> sipApplicationRouterInfoList = 
+				sipApplicationRouterInfos.get(initialRequest.getMethod());
+			if(sipApplicationRouterInfoList != null || sipApplicationRouterInfoList.size() > 0) {
+				return sipApplicationRouterInfoList.get(0);
+			}	
+		}
+		return new SipApplicationRouterInfo(null,null,null,null,null);
 	}
 
 	/**
