@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.ListeningPoint;
@@ -14,7 +13,6 @@ import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
-import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
@@ -29,8 +27,6 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 
@@ -41,7 +37,7 @@ import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
  * @author M. Ranganathan
  */
 
-public class CallForwardingTestSipListener extends TestCase implements SipListener {
+public class CallForwardingTestSipListener implements SipListener {
 
 	private SipProvider sipProvider;
 
@@ -88,10 +84,65 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 				+ " received at " + protocolObjects.sipStack.getStackName()
 				+ " with server transaction id " + serverTransactionId);
 
-		// We are the UAC so the only request we get is the BYE.
+		if (request.getMethod().equals(Request.INVITE)) {
+			processInvite(requestReceivedEvent, serverTransactionId);
+		}
+				
 		if (request.getMethod().equals(Request.BYE))
 			processBye(request, serverTransactionId);
 
+	}
+	
+	/**
+	 * Process the invite request.
+	 */
+	public void processInvite(RequestEvent requestEvent,
+			ServerTransaction serverTransaction) {
+		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+		Request request = requestEvent.getRequest();
+		try {
+			logger.info("shootme: got an Invite " + request); 
+			Response response = protocolObjects.messageFactory.createResponse(
+					Response.TRYING, request);
+			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+			Address address = protocolObjects.addressFactory
+					.createAddress("Shootme <sip:127.0.0.1:" + myPort
+							+";transport="+protocolObjects.transport
+							+ ">");
+			ServerTransaction st = requestEvent.getServerTransaction();
+
+			if (st == null) {
+				st = sipProvider.getNewServerTransaction(request);
+			}
+			Dialog dialog = st.getDialog();
+			
+			this.dialogCount ++;
+			this.dialog = dialog;
+			
+			logger.info("Shootme: dialog = " + dialog);
+			
+			st.sendResponse(response);
+			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+			
+			Response ringing = protocolObjects.messageFactory
+			.createResponse(Response.RINGING, request);
+			toHeader = (ToHeader) ringing.getHeader(ToHeader.NAME);
+			toHeader.setTag("5432"); // Application is supposed to set.
+			st.sendResponse(ringing);			
+		
+			Response okResponse = protocolObjects.messageFactory
+					.createResponse(Response.OK, request);
+			toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
+			toHeader.setTag("5432"); // Application is supposed to set.
+			okResponse.addHeader(contactHeader);			
+
+			Thread.sleep(1000);
+			st.sendResponse(okResponse);
+
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public void processBye(Request request,
@@ -104,8 +155,7 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 				return;
 			}
 			
-			Dialog dialog = serverTransactionId.getDialog();
-			assertTrue(dialog == this.dialog);
+			Dialog dialog = serverTransactionId.getDialog();			
 			logger.info("Dialog State = " + dialog.getState());
 			Response response = protocolObjects.messageFactory.createResponse(
 					200, request);
@@ -113,9 +163,7 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 			this.transactionCount++;
 			logger.info("shootist:  Sending OK.");
 			logger.info("Dialog State = " + dialog.getState());
-			assertTrue(serverTransactionId.getState() == TransactionState.COMPLETED);
-			assertTrue(dialog.getState() == DialogState.TERMINATED);
-
+		
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
@@ -146,11 +194,15 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 					Request ackRequest = dialog.createAck(cseq.getSeqNumber());
 					logger.info("Sending ACK");
 					dialog.sendAck(ackRequest);
+					
+					Thread.sleep(1000);
+					// If the caller is supposed to send the bye
+					Request byeRequest = this.dialog.createRequest(Request.BYE);
+					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+					dialog.sendRequest(ct);
 				} 
 			} else if  (response.getStatusCode() == Response.MOVED_TEMPORARILY) {
 				// Dialog dies as soon as you get an error response.
-				assertTrue(tid.getDialog().getState() == DialogState.TERMINATED);
-				assertTrue(tid.getDialog() == this.dialog);
 				this.redirectReceived = true;
 				if (cseq.getMethod().equals(Request.INVITE)) {
 					// lookup the contact header
@@ -208,11 +260,12 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 					ContactHeader chdr = (ContactHeader)response.getHeader(ContactHeader.NAME);
 					
 					SipURI sipUri = (SipURI)chdr.getAddress().getURI();
-					sipUri.setLrParam();
+//					sipUri.setLrParam();
 					RouteHeader routeHeader = 
 						protocolObjects.headerFactory.createRouteHeader(chdr.getAddress());
 					invRequest.addHeader(routeHeader);
-				
+					invRequest.setRequestURI(sipUri);
+					
 					logger.info("Sending INVITE to "
 							+ contHdr.getAddress().getURI().toString());
 					inviteTid = sipProvider.getNewClientTransaction(invRequest);
@@ -220,10 +273,8 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 					
 					logger.info("New TID = " + inviteTid);
 					inviteTid.sendRequest();
-					assertTrue(inviteTid.getState() == TransactionState.CALLING);
 					logger.info("sendReqeust succeeded " + inviteTid);
 					Dialog dialog = inviteTid.getDialog();
-					assertTrue("Stack must allocate a new dialog", dialog != this.dialog);
 					this.dialogCount ++;
 					this.dialog = dialog;
 				
@@ -235,7 +286,6 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 			 */
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			fail("unexpeced exception");
 		}
 
 	}
@@ -243,7 +293,6 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
 
 		logger.info("Transaction Time out");
-		fail("Unexpected event");
 	}
 
 	
@@ -254,8 +303,6 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 				"127.0.0.1", myPort, protocolObjects.transport);
 		this.sipProvider = protocolObjects.sipStack
 				.createSipProvider(listeningPoint);
-		assertTrue("listening point should be the same as what the provider returns for this transport",
-				listeningPoint == sipProvider.getListeningPoint(protocolObjects.transport));
 		return sipProvider;
 
 	}
@@ -395,17 +442,13 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 
 			this.transactionCount ++;
 			
-			assertTrue(inviteTid.getState() == TransactionState.CALLING);
 			
 			logger.info("client tx = " + inviteTid);
 			dialog = inviteTid.getDialog();
 			this.dialogCount++;
-			assertTrue(dialog != null);
-			assertTrue(dialog.getState() == null);
 
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(),ex);
-			fail("unexpected exception");
 		}
 	}
 	
@@ -436,11 +479,5 @@ public class CallForwardingTestSipListener extends TestCase implements SipListen
 			DialogTerminatedEvent dialogTerminatedEvent) {
 		this.dialogTerminatedCount++;
 
-	}
-
-	public void checkState() {
-		assertTrue(dialogTerminatedCount == dialogCount);
-		assertTrue(this.byeReceived  && this.redirectReceived );
-		
-	}
+	}	
 }

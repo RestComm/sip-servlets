@@ -50,20 +50,9 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 				+ request.getMethod());
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_MOVED_TEMPORARILY);
-		SipURI sipUri= sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");
-//		sipUri.setLrParam(true);
-		sipUri.setTransportParam("udp");
-		
-		sipServletResponse.setHeader("Contact", sipUri.toString());
+		SipURI sipUri= sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");		
+		sipServletResponse.addHeader("Contact", sipUri.toString());		
 		sipServletResponse.send();
-//		List<SipURI> outboundInterfaces = (List<SipURI>) getServletContext().getAttribute(OUTBOUND_INTERFACES);
-		
-//		SipURI sipURI = sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");		
-//		Proxy proxy = request.getProxy();
-//		proxy.setOutboundInterface(outboundInterfaces.get(0));
-//		proxy.setRecordRoute(true);
-//		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");		
-//		proxy.proxyTo(sipURI);		
 	}
 	
 	// SipErrorListener methods
