@@ -5,6 +5,8 @@ import gov.nist.javax.sip.stack.SIPTransaction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -36,42 +38,72 @@ public class SipSessionImpl implements SipSession {
 
 	private HashMap<String, Object> sipSessionAttributeMap;
 	
+	/**
+	 * Unique ID for this session.
+	 */
 	private UUID uuid;
 	
+	/**
+	 * Creation time.
+	 */
 	private long creationTime;
+	
+	/**
+	 * Last access time.
+	 */
 	private long lastAccessTime;
 	
+	/**
+	 * Routing region per session/dialog.
+	 */
 	private SipApplicationRoutingRegion routingRegion;
 	
+	/**
+	 * Current state of the session, one of INTITIAL, EARLY, ESTABLISHED and TERMINATED.
+	 */
 	private State state;
 	
+	/**
+	 * Is the session valid.
+	 */
 	private boolean valid;
+	
+	/**
+	 * The name of the servlet withing this same app to handle all subsequent requests.
+	 */
+	private String handlerServlet;
 	
 	
 	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===
 	// TODO: Refactor this into two Session classes to avoid nulls
 	// and branching on nulls
-	
 	/**
-	 * We use this for dialog-related requests
+	 * We use this for dialog-related requests. In this case the dialog
+	 * directly corresponds to the session.
 	 */
 	private Dialog sessionCreatingDialog;
 	
 	/**
-	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info
+	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info.
+	 * In this case the session only spans a single transaction.
 	 */
 	private SIPTransaction sessionCreatingTransaction;
-	
 	// =============================================================
+	
+	private Set<SIPTransaction> ongoingTransactions = new TreeSet<SIPTransaction>();
+	
+	private boolean supervisedMode;
 	
 	public SipSessionImpl ( Dialog dialog, SIPTransaction transaction, SipApplicationSessionImpl sipApp) {
 		this.sessionCreatingDialog = dialog;
 		this.sessionCreatingTransaction = transaction;
+		this.ongoingTransactions.add(transaction);
 		this.sipApplicationSession = sipApp;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
 		this.uuid = UUID.randomUUID();
 		this.state = State.INITIAL;
 		this.valid = true;
+		this.supervisedMode = true;
 	}
 	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
@@ -166,14 +198,21 @@ public class SipSessionImpl implements SipSession {
 	}
 
 	public void invalidate() {
-		// TODO Auto-generated method stub
+		if(state.equals(State.CONFIRMED)
+				|| state.equals(State.EARLY))
+			throw new IllegalStateException("Can not invalidate sessions in" + 
+					state.toString() + " state.");
+		if(isSupervisedMode() && ongoingTransactions.size()>0)
+			throw new IllegalStateException("Can not invalidate session with " +
+					"ongoing transactions in supervised mode.");
 		valid = false;
-
 	}
 
 	public boolean isOngoingTransaction() {
-		// TODO Auto-generated method stub
-		return false;
+		if(!isSupervisedMode())
+			return false;
+		else
+			return ongoingTransactions.size()>0;
 	}
 
 	public boolean isValid() {
@@ -291,6 +330,11 @@ public class SipSessionImpl implements SipSession {
 		this.sessionCreatingTransaction = initialTransaction;
 	}
 
-	
+	public boolean isSupervisedMode() {
+		return supervisedMode;
+	}
 
+	public void setSupervisedMode(boolean supervisedMode) {
+		this.supervisedMode = supervisedMode;
+	}
 }
