@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +31,9 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationRouter;
@@ -77,10 +79,12 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -109,7 +113,7 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
  * dispatching them to those sip applications interested in the messages.
  * @author Jean Deruelle 
  */
-public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
+public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {
 	//the logger
 	private static transient Log logger = LogFactory
 			.getLog(SipApplicationDispatcherImpl.class);
@@ -169,7 +173,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		sessionManager = new SessionManager();
 		sipFactoryImpl = new SipFactoryImpl(this);
-		hostNames = Collections.synchronizedList(new ArrayList<String>());
+		hostNames = Collections.synchronizedList(new ArrayList<String>());		
 	}
 	
 	/**
@@ -191,6 +195,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
 		}		
 		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));
+		
+		if( oname == null ) {
+			try {				
+                oname=new ObjectName(domain + ":type=SipApplicationDispatcher");                
+                Registry.getRegistry(null, null)
+                    .registerComponent(this, oname, null);
+                logger.info("Sip Application dispatcher registered under following name " + oname);
+            } catch (Exception e) {
+                logger.error("Impossible to register the Sip Application dispatcher in domain" + domain, e);
+            }
+		}
 	}
 	/**
 	 * {@inheritDoc}
@@ -254,6 +269,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		sessionManager.dumpSipSessions();
 		sessionManager.dumpSipApplicationSessions();		
 		sipApplicationRouter.destroy();		
+		if(oname != null) {
+			Registry.getRegistry(null, null).unregisterComponent(oname);
+		}
 	}
 	
 	/**
@@ -1722,5 +1740,52 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public SipContext findSipApplication(String applicationName) {
 		return applicationDeployed.get(applicationName);
+	}
+
+	// -------------------- JMX and Registration  --------------------
+    protected String domain;
+    protected ObjectName oname;
+    protected MBeanServer mserver;
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+    
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.management.MBeanRegistration#postDeregister()
+	 */
+	public void postDeregister() {}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.management.MBeanRegistration#postRegister(java.lang.Boolean)
+	 */
+	public void postRegister(Boolean registrationDone) {}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.management.MBeanRegistration#preDeregister()
+	 */
+	public void preDeregister() throws Exception {}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.management.MBeanRegistration#preRegister(javax.management.MBeanServer, javax.management.ObjectName)
+	 */
+	public ObjectName preRegister(MBeanServer server, ObjectName name)
+			throws Exception {
+		oname=name;
+        mserver=server;
+        domain=name.getDomain();
+        return name;
 	}
 }

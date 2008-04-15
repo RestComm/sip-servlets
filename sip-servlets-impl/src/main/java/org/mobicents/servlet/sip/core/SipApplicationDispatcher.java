@@ -142,4 +142,8 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * @return
 	 */
 	SipApplicationRouterInfo getNextInterestedApplication(SipServletRequestImpl sipServletRequestImpl);
+	
+	public String getDomain();
+    
+    public void setDomain(String domain);
 }

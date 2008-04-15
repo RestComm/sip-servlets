@@ -48,6 +48,8 @@ public class SipStandardService extends StandardService implements SipService {
 	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
 	private String darConfigurationFileLocation;
+	//
+	private boolean connectorsStartedExternally = false;
 	/**
 	 * 
 	 */
@@ -56,8 +58,8 @@ public class SipStandardService extends StandardService implements SipService {
 	}
 	
 	@Override
-	public void init() {		
-		super.init();			
+	public void init() {			
+		super.init();		
 	}
 	
 	@Override
@@ -105,14 +107,15 @@ public class SipStandardService extends StandardService implements SipService {
 		if(darConfigurationFileLocation != null && !darConfigurationFileLocation.startsWith("file:///")) {
 			darConfigurationFileLocation = "file:///" + System.getProperty("catalina.base").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
  		}
-		System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
+		System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);			
+		super.initialize();
+		sipApplicationDispatcher.setDomain(this.domain);
 		sipApplicationDispatcher.init(sipApplicationRouterClassName);
-		super.initialize();		
 	}
 	
 	@Override
 	public void start() throws LifecycleException {
-		super.start();	
+		super.start();		
 		synchronized (connectors) {
 			for (int i = 0; i < connectors.length; i++) {
 				//Jboss sepcific loading case
@@ -122,7 +125,8 @@ public class SipStandardService extends StandardService implements SipService {
 					logger.info("Attaching the sip application dispatcher " +
 							"as a sip listener to connector listening on port " + 
 							connectors[i].getPort());
-					connectors[i].getProtocolHandler().setAttribute("SipApplicationDispatcher", sipApplicationDispatcher);						
+					connectors[i].getProtocolHandler().setAttribute("SipApplicationDispatcher", sipApplicationDispatcher);
+					connectorsStartedExternally = true;
 				} 
 				//Tomcat specific loading case
 				SipProvider sipProvider = (SipProvider)
@@ -131,13 +135,16 @@ public class SipStandardService extends StandardService implements SipService {
 					try {
 						sipProvider.addSipListener(sipApplicationDispatcher);
 						sipApplicationDispatcher.addSipProvider(sipProvider);
+						connectorsStartedExternally = false;
 					} catch (TooManyListenersException e) {					
 						throw new LifecycleException(e);
 					}	
 				}
 			}
 		}
-		sipApplicationDispatcher.start();
+		if(!connectorsStartedExternally) {
+			sipApplicationDispatcher.start();
+		}
 	}
 
 	@Override
@@ -153,7 +160,9 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 			}
 		}
-		sipApplicationDispatcher.stop();
+		if(!connectorsStartedExternally) {
+			sipApplicationDispatcher.stop();
+		}
 		super.stop();
 	}
 	

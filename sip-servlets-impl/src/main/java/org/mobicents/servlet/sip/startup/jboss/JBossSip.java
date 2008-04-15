@@ -593,6 +593,11 @@ public class JBossSip extends AbstractConvergedContainer
       //the multiple services in tomcat server.xml
       startAllConnectors();
       
+      // start the sip application disptacher after the connectors have been started
+      // so that serverl can act as UAC in servletInitialized callback
+      ObjectName sipApplicationDispatcher = new ObjectName(catalinaDomain + ":type=SipApplicationDispatcher");      
+      server.invoke(sipApplicationDispatcher,"start", args, sig);
+      
       // Notify listeners that connectors have started processing requests
       sendNotification(new Notification(TOMCAT_CONNECTORS_STARTED,
             this, getNextNotificationSequenceNumber()));
@@ -613,6 +618,10 @@ public class JBossSip extends AbstractConvergedContainer
       //There may be a need to stop the connectors that are defined in
       //the multiple services in tomcat server.xml 
       stopAllConnectors();
+      
+      // stop the sip application disptacher 
+      ObjectName sipApplicationDispatcher = new ObjectName(catalinaDomain + ":type=SipApplicationDispatcher");      
+      server.invoke(sipApplicationDispatcher,"stop", args, sig);
    }
 
    public void handleNotification(Notification msg, Object handback)

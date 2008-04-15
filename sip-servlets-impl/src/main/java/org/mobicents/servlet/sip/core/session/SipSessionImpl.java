@@ -429,6 +429,9 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#invalidate()
 	 */
 	public void invalidate() {
+		if(!valid) {
+			throw new IllegalStateException("SipSession already invalidated !");
+		}
 		checkInvalidation();
 		
 		for (String key : sipSessionAttributeMap.keySet()) {
