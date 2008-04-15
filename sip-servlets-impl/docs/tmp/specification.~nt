@@ -4988,8 +4988,6 @@
 <XPD:ATTR name="TypeExpression" type="string">javax.servlet.sip.Proxy</XPD:ATTR>
 <XPD:REF name="BehavioralFeature">m4jqub4FO0CwemOowXOAdgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::Proxying - parallel == true::::">bPdaTel+wEOI1pTWMuk0EQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Operations[8]" type="UMLOperation" guid="2zY0ljWRyUWS6Ut6/CdBHAAA">
 <XPD:ATTR name="Name" type="string">getProxy</XPD:ATTR>
@@ -5184,8 +5182,6 @@
 <XPD:REF name="TypedParameters[25]">RS246y/J6U2xER4OqA1KRgAA</XPD:REF>
 <XPD:REF name="TypedParameters[26]">ojPVuoK0YE689EFH0jINlwAA</XPD:REF>
 <XPD:REF name="TypedParameters[27]">OwUBTmTjhEmi22GCxEWF2gAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::">hd47dHx99Eqdu4CUZTMZhQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[22]" type="UMLInterface" guid="6T7+ymclMEmw7DVF/vB5dgAA">
 <XPD:ATTR name="Name" type="string">SipServletResponse</XPD:ATTR>
@@ -6533,8 +6529,6 @@
 <XPD:ATTR name="Name" type="string">setProxyBranchTimeout</XPD:ATTR>
 <XPD:REF name="Owner">L3b1g9jJ6kazk/UwJ4IVFAAA</XPD:REF>
 </XPD:OBJ>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::">nB4SK2rU40mztfBw1xB/3AAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[40]" type="UMLInterface" guid="aAno3Gq1O0+xEokONVJiXwAA">
 <XPD:ATTR name="Name" type="string">Proxy</XPD:ATTR>
@@ -6815,15 +6809,11 @@
 <XPD:OBJ name="Operations[26]" type="UMLOperation" guid="gGECM88zcEO+M4c0HnS/sAAA">
 <XPD:ATTR name="Name" type="string">startProxy</XPD:ATTR>
 <XPD:REF name="Owner">aAno3Gq1O0+xEokONVJiXwAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
-<XPD:REF name="CallActions[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::Proxying - parallel == true::start::">mDGrS/gAjEul/PpkR9c77wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
 <XPD:REF name="TypedFeatures[0]" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::ProxyBranchImpl::proxy">lRa32+KSs0adD8rxNa93SwAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::proxy::">GBiTM0EgDkyWxjllX7bvBwAA</XPD:REF>
-<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
-<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 10 - Proxy::chapter 1 - Proxy::">UvwUGZYYU0O7xUl08azNPAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[41]" type="UMLInterface" guid="wAUGtcvoxU63fXpdvfr6cgAA">
 <XPD:ATTR name="Name" type="string">SipApplicationRouter</XPD:ATTR>
