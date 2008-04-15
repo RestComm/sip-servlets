@@ -61,10 +61,16 @@ public class SipHostConfig extends HostConfig {
 	 * @param sar
 	 * @param string
 	 */
-	private void deploySAR(String name, File sar, String string) {
+	private void deploySAR(String contextPath, File sar, String file) {
+		if (deploymentExists(contextPath))
+            return;
+		if(logger.isDebugEnabled()) {
+    		logger.debug(SipContextConfig.APPLICATION_SIP_XML + " found in " 
+    				+ sar + ". Enabling sip servlet archive deployment");
+    	}
 		String initialHostConfigClass = host.getConfigClass();
 		host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
-		deployWAR(name, sar, string);
+		deployWAR(contextPath, sar, file);
 		host.setConfigClass(initialHostConfigClass);
 	}
 
@@ -111,16 +117,7 @@ public class SipHostConfig extends HostConfig {
                 continue;
             File dir = new File(appBase, files[i]);
             boolean isSipServletApplication = isSipServletArchive(dir);
-            if(isSipServletApplication) {
-            	if(logger.isDebugEnabled()) {
-            		logger.debug(SipContextConfig.APPLICATION_SIP_XML + " found in " 
-            				+ dir + ". Enabling sip servlet archive deployment");
-            	}
-            	String initialConfigClass = configClass;
-        		String initialContextClass = contextClass;
-        		host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
-        		setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
-        		setContextClass(SIP_CONTEXT_CLASS);
+            if(isSipServletApplication) {            	            	
                 // Calculate the context path and make sure it is unique
                 String contextPath = "/" + files[i];
                 int period = contextPath.lastIndexOf(".");
@@ -133,7 +130,12 @@ public class SipHostConfig extends HostConfig {
                     continue;
                 
                 String file = files[i];
-                
+                                
+                String initialConfigClass = configClass;
+        		String initialContextClass = contextClass;
+        		host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
+        		setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
+        		setContextClass(SIP_CONTEXT_CLASS);
                 deploySAR(contextPath, dir, file);
                 host.setConfigClass(initialConfigClass);
                 configClass = initialConfigClass;
