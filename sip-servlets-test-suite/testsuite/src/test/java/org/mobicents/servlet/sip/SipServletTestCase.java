@@ -24,6 +24,8 @@ public abstract class SipServletTestCase extends TestCase {
 		Properties properties = new Properties();
 		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
 				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
+//		InputStream inputStream = getClass().getResourceAsStream(
+//				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
 		properties.load(inputStream);		
 		tomcatBasePath = properties.getProperty("tomcat.home");		
 		projectHome = properties.getProperty("project.home");

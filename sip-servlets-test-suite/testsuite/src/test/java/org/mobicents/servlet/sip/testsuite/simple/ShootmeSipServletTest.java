@@ -1,6 +1,11 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 
+import java.text.ParseException;
+
+import javax.sip.InvalidArgumentException;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,8 +58,18 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		}
 	}
 	
-	public void testCallForwarding() throws InterruptedException {
-		sender.sendInvite();
+	public void testShootme() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendInvite(fromAddress, toAddress);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());		
 	}

@@ -36,8 +36,11 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 
 		logger.info("Got request:\n"
 				+ request.getMethod());
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
-		sipServletResponse.send();		
+		logger.info(request.getFrom().getURI().toString());
+		if(request.getFrom().getURI().toString().indexOf("sip:blocked-sender@sip-servlets.com") != -1) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
+			sipServletResponse.send();		
+		}
 	}
 
 	// SipErrorListener methods

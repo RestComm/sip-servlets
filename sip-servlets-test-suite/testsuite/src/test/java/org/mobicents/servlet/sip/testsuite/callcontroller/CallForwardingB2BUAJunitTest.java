@@ -1,6 +1,11 @@
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.text.ParseException;
+
+import javax.sip.InvalidArgumentException;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,33 +44,40 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() {
-		try {
-			super.setUp();						
-			
-			senderProtocolObjects =new ProtocolObjects(
-					"sender", "gov.nist", TRANSPORT, AUTODIALOG);
-			receiverProtocolObjects = new ProtocolObjects(
-					"receiver" , "gov.nist", TRANSPORT, AUTODIALOG);
-						
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects);
-			SipProvider senderProvider = sender.createProvider();			
+	protected void setUp() throws Exception {		
+		super.setUp();
 
-			receiver = new TestSipListener(5090, -1, receiverProtocolObjects);
-			SipProvider receiverProvider = receiver.createProvider();
-			
-			receiverProvider.addSipListener(receiver);
-			senderProvider.addSipListener(sender);
-			
-			senderProtocolObjects.start();
-			receiverProtocolObjects.start();
-		} catch (Exception ex) {
-			fail("unexpected exception ");
-		}
+		senderProtocolObjects = new ProtocolObjects("forward-sender",
+				"gov.nist", TRANSPORT, AUTODIALOG);
+		receiverProtocolObjects = new ProtocolObjects("receiver",
+				"gov.nist", TRANSPORT, AUTODIALOG);
+
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+		
 	}
 	
-	public void testCallForwarding() throws InterruptedException {
-		sender.sendInvite();
+	public void testCallForwarding() throws InterruptedException, ParseException, SipException, InvalidArgumentException {
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendInvite(fromAddress, toAddress);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());

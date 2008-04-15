@@ -21,8 +21,6 @@ import org.apache.catalina.security.SecurityConfig;
 import org.apache.catalina.startup.CatalinaProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
@@ -86,6 +84,7 @@ public class SipEmbedded {
 		
 		// Set the home directory
 		System.setProperty("CATALINA_HOME", getPath());
+		System.setProperty("CATALINA_BASE", getPath());
 		System.setProperty("catalina.home", getPath());
 		System.setProperty("catalina.base", getPath());		
 		//logging configuration

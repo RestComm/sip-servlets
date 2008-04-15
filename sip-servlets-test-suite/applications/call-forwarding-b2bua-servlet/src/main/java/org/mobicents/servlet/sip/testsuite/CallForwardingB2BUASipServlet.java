@@ -52,24 +52,27 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 
 		logger.info("Got INVITE: "
 				+ request.getMethod());
-		helper = request.getB2buaHelper();
-		
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-				SIP_FACTORY);
-		
-		Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
-		Set<String> toHeaderSet = new HashSet<String>();
-		toHeaderSet.add("sip:forward-receiver@sip-servlets.com");
-		headers.put("To", toHeaderSet);
-		
-		SipServletRequest forkedRequest = helper.createRequest(request, true,
-				headers);
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
-		forkedRequest.setRequestURI(sipUri);						
-		
-		logger.info("forkedRequest = " + forkedRequest);
-		
-		forkedRequest.send();
+		logger.info(request.getFrom().getURI().toString());
+		if(request.getFrom().getURI().toString().indexOf("sip:forward-sender@sip-servlets.com") != -1) {
+			helper = request.getB2buaHelper();
+			
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+					SIP_FACTORY);
+			
+			Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
+			Set<String> toHeaderSet = new HashSet<String>();
+			toHeaderSet.add("sip:forward-receiver@sip-servlets.com");
+			headers.put("To", toHeaderSet);
+			
+			SipServletRequest forkedRequest = helper.createRequest(request, true,
+					headers);
+			SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
+			forkedRequest.setRequestURI(sipUri);						
+			
+			logger.info("forkedRequest = " + forkedRequest);
+			
+			forkedRequest.send();
+		}
 	}	
 	
 	@Override

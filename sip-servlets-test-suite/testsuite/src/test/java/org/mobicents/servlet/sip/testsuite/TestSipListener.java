@@ -1,5 +1,6 @@
 package org.mobicents.servlet.sip.testsuite;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,10 +8,12 @@ import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
+import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.TransactionTerminatedEvent;
@@ -311,43 +314,22 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendInvite() {
-
-		try {
-			/**
-			 * either use udp or tcp
-			 */
-
-			String fromName = "sender";
-			String fromSipAddress = "sip-servlets.com";
-			String fromDisplayName = "Sender";
-
-			String toSipAddress = "sip-servlets.com";
-			String toUser = "receiver";
-			String toDisplayName = "Receiver";
-
+	public void sendInvite(SipURI fromURI, SipURI toURI) throws SipException, ParseException, InvalidArgumentException {
 			// create >From Header
-			SipURI fromAddress = protocolObjects.addressFactory.createSipURI(
-					fromName, fromSipAddress);
-
 			Address fromNameAddress = protocolObjects.addressFactory
-					.createAddress(fromAddress);
-			fromNameAddress.setDisplayName(fromDisplayName);
+					.createAddress(fromURI);			
 			FromHeader fromHeader = protocolObjects.headerFactory
 					.createFromHeader(fromNameAddress, "12345");
 
-			// create To Header
-			SipURI toAddress = protocolObjects.addressFactory.createSipURI(
-					toUser, toSipAddress);
+			// create To Header			
 			Address toNameAddress = protocolObjects.addressFactory
-					.createAddress(toAddress);
-			toNameAddress.setDisplayName(toDisplayName);
+					.createAddress(toURI);			
 			ToHeader toHeader = protocolObjects.headerFactory.createToHeader(
 					toNameAddress, null);
 
 			// create Request URI
 			this.requestURI = protocolObjects.addressFactory.createSipURI(
-					toUser, peerHostPort);
+					toURI.getUser(), peerHostPort);
 			this.requestURI.setPort(peerPort);
 			
 			// Create ViaHeaders
@@ -384,7 +366,7 @@ public class TestSipListener implements SipListener {
 			String host = "127.0.0.1";
 
 			SipURI contactUrl = protocolObjects.addressFactory.createSipURI(
-					fromName, host);
+					fromURI.getUser(), host);
 			/**
 			 * either use tcp or udp
 			 */
@@ -398,7 +380,7 @@ public class TestSipListener implements SipListener {
 			contactUrl.setLrParam();
 
 			// Add the contact address.
-			contactAddress.setDisplayName(fromName);
+//			contactAddress.setDisplayName(fromName);
 
 			contactHeader = protocolObjects.headerFactory
 					.createContactHeader(contactAddress);
@@ -450,10 +432,6 @@ public class TestSipListener implements SipListener {
 			logger.info("client tx = " + inviteTid);
 			dialog = inviteTid.getDialog();
 			this.dialogCount++;
-
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(),ex);
-		}
 	}
 	
 	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects) {

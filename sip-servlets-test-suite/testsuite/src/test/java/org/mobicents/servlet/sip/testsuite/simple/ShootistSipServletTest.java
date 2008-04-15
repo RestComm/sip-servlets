@@ -50,7 +50,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		}
 	}
 	
-	public void testCallForwarding() throws InterruptedException {
+	public void testShootist() throws InterruptedException {
 //		receiver.sendInvite();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		

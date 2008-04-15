@@ -9,12 +9,12 @@ import org.apache.commons.logging.LogFactory;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
-import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.SipUnitServletTestCase;
 
-public class CallForwardingSipUnitTest extends SipServletTestCase {
+public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 
-	private static Log logger = LogFactory.getLog(CallForwardingSipUnitTest.class);
-
+	private static Log logger = LogFactory.getLog(CallControllerSipUnitTest.class);	
+	
 	private SipStack sipStackSender;
 	private SipPhone sipPhoneSender;	
 	
@@ -26,8 +26,9 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();
+		autoDeployOnStartup = false;
 		SipStack.setTraceEnabled(true);
+		super.setUp();		
 	}
 
 	@Override
@@ -41,18 +42,31 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"sip-test-context", 
-				"sip-test"));
+		deployCallBlocking();
+		deployCallForwarding();
 	}
 
+	private void deployCallBlocking() {
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
+				"call-blocking-context", 
+				"call-blocking"));
+	}
+	
+	private void deployCallForwarding() {
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+				"call-forwarding-b2bua-context", 
+				"call-forwarding-b2bua"));
+	}
+	
+	
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///"
 				+ projectHome
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-forwarding-b2bua-servlet-dar.properties";
+				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-controller-servlet-dar.properties";
 	}
 
 	public SipStack makeStack(String transport, int port) throws Exception {
@@ -71,22 +85,30 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 		return new SipStack(transport, port, properties);		
 	}
 
-	public void setupPhone() throws Exception {
+	public void setupPhone(String fromAddress, String toAddress) throws Exception {
 			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);					
 			sipPhoneSender = sipStackSender.createSipPhone("localhost",
-					SipStack.PROTOCOL_UDP, 5070, "sip:forward-sender@sip-servlets.com");		
+					SipStack.PROTOCOL_UDP, 5070, fromAddress);		
 			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, 5090);					
 			sipPhoneReceiver = sipStackReceiver.createSipPhone("localhost",
-					SipStack.PROTOCOL_UDP, 5070, "sip:forward-receiver@sip-servlets.com");
+					SipStack.PROTOCOL_UDP, 5070, toAddress);
 	}
 
-	public void init() throws Exception {
-		setupPhone();		
-	}
 
-	// Check if we receive the forwarded call for our invite
+	// Check if we receive a FORBIDDEN response for our invite
+	public void testCallBlockingInvite() throws Exception {
+		deployCallBlocking();
+		setupPhone("sip:blocked-sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
+		SipCall sender = sipPhoneSender.createSipCall();
+		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));	
+		assertResponseReceived(Response.FORBIDDEN, sender);
+	}
+	
+	// 
 	public void testCallForwarding() throws Exception {
-		init();
+		deployCallForwarding();
+		setupPhone("sip:forward-sender@sip-servlets.com", "sip:forward-receiver@sip-servlets.com");
 		
 		SipCall sender = sipPhoneSender.createSipCall();
 		SipCall receiver  = sipPhoneReceiver.createSipCall();		

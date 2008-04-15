@@ -67,7 +67,7 @@ public class CallBlockingTest extends SipUnitServletTestCase {
 	public void setupPhone() throws Exception {
 			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);					
 			sipPhoneSender = sipStackSender.createSipPhone("localhost",
-					SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");		
+					SipStack.PROTOCOL_UDP, 5070, "sip:blocked-sender@sip-servlets.com");		
 	}
 
 	public void init() throws Exception {
@@ -78,7 +78,7 @@ public class CallBlockingTest extends SipUnitServletTestCase {
 	public void testCallBlockingInvite() throws Exception {
 		init();
 		SipCall sender = sipPhoneSender.createSipCall();
-		assertTrue(sender.initiateOutgoingCall("sip:receiver@nist.gov", null));
+		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
 		assertTrue(sender.waitOutgoingCallResponse(timeout));	
 		assertResponseReceived(Response.FORBIDDEN, sender);
 	}
