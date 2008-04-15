@@ -60,6 +60,7 @@ public class ProxyImpl implements Proxy {
 		this.sipFactoryImpl = sipFactoryImpl;
 		proxyBranches = new HashMap<URI, ProxyBranch> ();
 		proxyUtils = new ProxyUtils(sipFactoryImpl, this);
+		proxyTimeout = 10; // 10 secs default
 	}
 	
 	/* (non-Javadoc)
@@ -199,7 +200,7 @@ public class ProxyImpl implements Proxy {
 		
 		ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
 		this.proxyBranches.put(uri, pbi);
-		pbi.start();
+		startProxy();
 
 	}
 
@@ -294,7 +295,7 @@ public class ProxyImpl implements Proxy {
 		}
 
 	}
-
+	
 	public SipURI getOutboundInterface() {
 		return outboundInterface;
 	}
@@ -339,15 +340,22 @@ public class ProxyImpl implements Proxy {
 		if(allResponsesHaveArrived())
 		{
 			bestResponse.getSipSession().setProxyBranch(branch);
-			sendBestFinalResponse(bestResponse);
+			sendBestFinalResponse(bestResponse, bestBranch);
+		}
+		else
+		{
+			if(!parallel)
+			{
+				startNextUntriedBranch();
+			}
 		}
 
 	}
 	
 	public void onBranchTimeOut(ProxyBranchImpl branch)
 	{
-		if(!this.parallel)
-			startNextUntriedBranch();
+		// The branch already generated a timeout response, just handle it normally.
+		onFinalResponse(branch);
 	}
 	
 	// In sequential proxying get some untried branch and start it, then wait for response and repeat
@@ -381,18 +389,18 @@ public class ProxyImpl implements Proxy {
 			if(pbi.isStarted())
 			{
 				if(    response == null 
-					|| response.getStatus() < 200
-					|| pbi.isTimedOut())
+					|| response.getStatus() < 200)
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	public void sendBestFinalResponse(SipServletResponseImpl response)
+	public void sendBestFinalResponse(SipServletResponseImpl response,
+			ProxyBranchImpl proxyBranch)
 	{
 		SipServletResponse proxiedResponse = 
-			proxyUtils.createProxiedResponse(response);
+			proxyUtils.createProxiedResponse(response, proxyBranch);
 		
 		if(proxiedResponse == null) 
 			return; // this response was addressed to this proxy

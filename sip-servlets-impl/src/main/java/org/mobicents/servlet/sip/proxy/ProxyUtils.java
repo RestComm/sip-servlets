@@ -65,11 +65,20 @@ public class ProxyUtils {
 			}
 			else
 			{
-				clonedRequest.removeFirst(RouteHeader.NAME);
-				RouteHeader routeHeader = (RouteHeader) clonedRequest
-					.getHeader(RouteHeader.NAME);
-				if(routeHeader != null)
-					clonedRequest.setRequestURI(routeHeader.getAddress().getURI());
+				// CANCELs are hop-by-hop, so here must remove any existing Via
+				// headers,
+				// Record-Route headers. We insert Via header below so we will
+				// get response.
+				if (clonedRequest.getMethod().equals(Request.CANCEL)) {
+					clonedRequest.removeHeader(ViaHeader.NAME);
+					clonedRequest.removeHeader(RecordRouteHeader.NAME);
+				} else {
+					clonedRequest.removeFirst(RouteHeader.NAME);
+					RouteHeader routeHeader = (RouteHeader) clonedRequest
+						.getHeader(RouteHeader.NAME);
+					if(routeHeader != null)
+						clonedRequest.setRequestURI(routeHeader.getAddress().getURI());
+				}
 			}
 
 			// Decrease max forwards if available
@@ -193,14 +202,20 @@ public class ProxyUtils {
 		}
 	}
 	
-	public SipServletResponseImpl createProxiedResponse(SipServletResponseImpl sipServetResponse)
+	public SipServletResponseImpl createProxiedResponse(SipServletResponseImpl sipServetResponse, ProxyBranchImpl proxyBranch)
 	{
 		Response response = (Response)sipServetResponse.getMessage();
 		Response clonedResponse = (Response)  response.clone();
 
-		// 1. TODO: Update timer C for provisional responses
-
-
+		// 1. Update timer C for provisional responses
+		if(sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE))
+			if(100<response.getStatusCode() && response.getStatusCode()<200)
+			{
+				proxyBranch.updateTimer();
+			} else if(response.getStatusCode()>=200)
+			{//remove it if response is final
+				proxyBranch.cancelTimer();
+			}
 			
 		// 2. Remove topmost via
 		Iterator viaHeaderIt = clonedResponse.getHeaders(ViaHeader.NAME);

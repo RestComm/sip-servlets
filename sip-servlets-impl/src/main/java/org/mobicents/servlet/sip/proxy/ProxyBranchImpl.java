@@ -5,6 +5,8 @@ package org.mobicents.servlet.sip.proxy;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
@@ -45,6 +47,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private SipFactoryImpl sipFactoryImpl;
 	private ProxyUtils proxyUtils;
 	private boolean timedOut;
+	private int proxyBranchTimeout;
+	private Timer proxyBranchTimer;
+	private ProxyBranchTimerTask proxyTimeoutTask;
+	private boolean canceled;
 	
 	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
 	{
@@ -58,6 +64,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 		if(recordRouteURI != null)
 			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();
 		this.proxyUtils = proxy.getProxyUtils();
+		this.proxyBranchTimeout = proxy.getProxyTimeout();
+		this.canceled = false;
 	}
 	
 	/* (non-Javadoc)
@@ -66,7 +74,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 	public void cancel() {
 		try
 		{
-			outgoingRequest.createCancel().send();
+			if(this.isStarted() && !canceled && !timedOut) {
+				outgoingRequest.createCancel().send();
+				canceled = true;
+			}
 		}
 		catch(Exception e)
 		{
@@ -86,8 +97,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#getProxyBranchTimeout()
 	 */
 	public int getProxyBranchTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
+		return proxyBranchTimeout;
 	}
 
 	/* (non-Javadoc)
@@ -138,12 +148,15 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#setProxyBranchTimeout(int)
 	 */
 	public void setProxyBranchTimeout(int seconds) {
-		// TODO Auto-generated method stub
+		this.proxyBranchTimeout = seconds;
 
 	}
 	
 	public void start()
 	{
+		// Initialize these here for efficiency.
+		updateTimer();
+		
 		SipURI recordRoute = null;
 		
 		// If the proxy is not adding record-route header, set it to null and it
@@ -179,18 +192,6 @@ public class ProxyBranchImpl implements ProxyBranch {
 		}
 	}
 	
-	public void forwardRequestStateless(Request request)
-	{
-		String transport = JainSipUtils.findTransport(request);
-		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-				sipFactoryImpl.getSipProviders(), transport);
-		try {
-			sipProvider.sendRequest(request);
-		} catch (SipException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	public void forwardRequest(Request request, boolean subsequent) throws TransactionUnavailableException
 	{
 		String transport = JainSipUtils.findTransport(request);
@@ -202,6 +203,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 				sipFactoryImpl,
 				null,
 				tx, null, false);
+		
+		this.outgoingRequest = clonedRequest;
 		
 		// Initialize the sip session for the new request if initial
 		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
@@ -239,7 +242,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		{
 
 			SipServletResponse proxiedResponse = 
-				proxyUtils.createProxiedResponse(response);
+				proxyUtils.createProxiedResponse(response, this);
 			
 			if(proxiedResponse == null) 
 				return; // this response was addressed to this proxy
@@ -301,6 +304,37 @@ public class ProxyBranchImpl implements ProxyBranch {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void onTimeout()
+	{
+		this.cancel();
+		this.timedOut = true;
+		// Just do a timeout response
+		this.lastResponse = (SipServletResponseImpl) this.originalRequest.createResponse(408);
+		proxy.onBranchTimeOut(this);
+	}
+	
+	public void updateTimer()
+	{
+		if(proxyBranchTimer != null) {
+			proxyBranchTimer.cancel();
+			proxyBranchTimer.purge();
+		}
+		proxyBranchTimer = new Timer();
+		proxyTimeoutTask = new ProxyBranchTimerTask(this);
+		if(this.getProxyBranchTimeout() != 0)
+			proxyBranchTimer.schedule(proxyTimeoutTask, this.getProxyBranchTimeout() * 1000);
+	}
+	
+	/**
+	 * Stop the C Timer.
+	 */
+	public void cancelTimer()
+	{
+		proxyBranchTimer.cancel();
+		proxyBranchTimer.purge();
+		proxyBranchTimer = null;
 	}
 
 }
