@@ -21,7 +21,7 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	private SipStack sipStackReceiver;
 	private SipPhone sipPhoneReceiver;
 
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
 //	private static final int TIMEOUT = 1000000;
 
 	public CallControllerSipUnitTest(String name) {
@@ -106,7 +106,7 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		SipCall sender = sipPhoneSender.createSipCall();
 		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
 		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));	
-		assertResponseReceived(Response.FORBIDDEN, sender);
+		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));
 	}
 	
 	// 

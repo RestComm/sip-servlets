@@ -71,7 +71,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info(request.getFrom().getURI().toString());
 		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
-			helper = request.getB2buaHelper();
+			helper = request.getB2buaHelper();						
 			
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 					SIP_FACTORY);
@@ -118,6 +118,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info("forkedRequest = " + forkedRequest);			
 		forkedRequest.send();		
 	}	
+	
+	@Override
+	protected void doCancel(SipServletRequest request) throws ServletException,
+			IOException {		
+		logger.info("Got CANCEL: " + request.toString());		
+	}
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)

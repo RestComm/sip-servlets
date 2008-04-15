@@ -47,7 +47,7 @@ public class ShootistSipServlet
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			ackRequest.send();
 			try {
-				Thread.sleep(500);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {				
 				logger.error(e);
 			}
