@@ -40,14 +40,14 @@ public class TransactionApplicationData {
 	/**
 	 * @return the proxy
 	 */
-	ProxyImpl getProxy() {
+	public ProxyImpl getProxy() {
 		return proxy;
 	}
 	
 	/**
 	 * @return the proxyBranch
 	 */
-	ProxyBranchImpl getProxyBranch() {
+	public ProxyBranchImpl getProxyBranch() {
 		return proxyBranch;
 	}
 	

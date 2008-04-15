@@ -47,6 +47,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -384,16 +385,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public void processResponse(ResponseEvent arg0) {
 		logger.info("Response " + arg0.getResponse().toString());
 		Response response = arg0.getResponse();
-		SipServletResponseImpl sipServletResponse = new
-			SipServletResponseImpl(response, (SipProvider)arg0.getSource(),
-				arg0.getClientTransaction(), null, arg0.getDialog());
-		Object appData = sipServletResponse.getTrasactionApplicationData();
-		if(appData instanceof org.mobicents.servlet.sip.proxy.ProxyBranchImpl)
+		
+		Object appData = arg0.getClientTransaction().getApplicationData();
+		if(appData instanceof org.mobicents.servlet.sip.message.TransactionApplicationData)
 		{
-			org.mobicents.servlet.sip.proxy.ProxyBranchImpl proxyBranch =
-				(org.mobicents.servlet.sip.proxy.ProxyBranchImpl) appData;
-			proxyBranch.onResponse(sipServletResponse);
+			org.mobicents.servlet.sip.message.TransactionApplicationData tad =
+				(org.mobicents.servlet.sip.message.TransactionApplicationData) appData;
+			
+			SipServletResponseImpl sipServletResponse = new
+				SipServletResponseImpl(response, (SipProvider)arg0.getSource(),
+						arg0.getClientTransaction(), tad.getSipSession(), arg0.getDialog());
+
+			ProxyBranchImpl proxyBranch = tad.getProxyBranch();
+			if(proxyBranch != null)
+				proxyBranch.onResponse(sipServletResponse); 
+				// If in supervised mode proxyBranch.onResponse() will pass the response
+				// to the servlet.
+			else
+			{
+				// TODO: Here the response should be delivered to the servlet?
+			}
 		}
+		
+
+
 	}
 	/**
 	 * {@inheritDoc}
