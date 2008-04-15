@@ -50,6 +50,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.AuthorizationHeader;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
@@ -217,12 +218,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 					}
 					if (statusCode == Response.OK ) {
-						// Add the contact header for the dialog.
-						String transport = ((ViaHeader) request
-								.getHeader(ViaHeader.NAME)).getTransport();					
-						ContactHeader contactHeader = JainSipUtils
-								.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
-						response.setHeader(contactHeader);
+						//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
+						if(!Request.REGISTER.equals(request.getMethod()) && !Request.OPTIONS.equals(request.getMethod())) { 
+							// Add the contact header for the dialog.
+							String transport = ((ViaHeader) request
+									.getHeader(ViaHeader.NAME)).getTransport();					
+							ContactHeader contactHeader = JainSipUtils
+									.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
+							response.setHeader(contactHeader);
+						}
 					}
 				}
 			}
