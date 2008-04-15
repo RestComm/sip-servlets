@@ -35,8 +35,17 @@ public abstract class SipServletTestCase extends TestCase {
 				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
 			properties.load(inputStream);
 		}
-		tomcatBasePath = properties.getProperty("tomcat.home");		
-		projectHome = properties.getProperty("project.home");
+		
+		// First try to use the env variables - useful for shell scripting
+		tomcatBasePath = System.getProperty("CATALINA_HOME");	
+		projectHome = System.getProperty("SIP_SERVLETS_HOME");
+		
+		// Otherwise use the properties
+		if(this.tomcatBasePath == null || this.tomcatBasePath.isEmpty()) 
+			this.tomcatBasePath = properties.getProperty("tomcat.home");
+		if(this.projectHome == null || this.projectHome.isEmpty())
+			this.projectHome = properties.getProperty("project.home");
+		
 		//starting tomcat
 		tomcat = new SipEmbedded();
 		tomcat.setPath(tomcatBasePath);		
