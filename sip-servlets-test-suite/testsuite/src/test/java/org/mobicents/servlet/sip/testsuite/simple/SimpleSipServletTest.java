@@ -48,6 +48,12 @@ public class SimpleSipServletTest extends SipServletTestCase implements SipListe
 	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
 	
 	@Override
+	protected void setUp() throws Exception {	
+		super.setUp();		
+		deployApplication();
+	}		
+	
+	@Override
 	public void deployApplication() {
 		tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",

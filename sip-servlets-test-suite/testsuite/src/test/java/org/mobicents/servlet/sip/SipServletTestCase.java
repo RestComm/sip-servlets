@@ -31,13 +31,12 @@ public abstract class SipServletTestCase extends TestCase {
 		tomcat.setPath(tomcatBasePath);		
 		tomcat.setLoggingFilePath(projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/logging.properties");
 		String darConfigurationFile = getDarConfigurationFile();
-		tomcat.setDarConfigurationFilePath(darConfigurationFile);
+		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
 		tomcat.startTomcat();
-		deployApplication();
 	}
 	
 	@Override
-	protected void tearDown() throws Exception {
+	protected void tearDown() throws Exception {	
 		tomcat.stopTomcat();
 		super.tearDown();
 	}

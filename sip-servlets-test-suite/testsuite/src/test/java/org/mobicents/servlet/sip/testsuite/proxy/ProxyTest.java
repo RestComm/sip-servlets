@@ -1,25 +1,16 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.sip.ListeningPoint;
 import javax.sip.message.Response;
 
-import org.cafesip.sipunit.SipCall;
-import org.cafesip.sipunit.SipPhone;
-import org.cafesip.sipunit.SipResponse;
-import org.cafesip.sipunit.SipStack;
-import org.cafesip.sipunit.SipTestCase;
-import org.cafesip.sipunit.SipTransaction;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cafesip.sipunit.SipCall;
+import org.cafesip.sipunit.SipPhone;
+import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
@@ -39,14 +30,20 @@ public class ProxyTest extends SipServletTestCase{
 	public void deployApplication() {
 		tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test");
-		init();
+				"sip-test-context", "sip-test");		
 	}
 
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
 				"org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
+	}
+	
+	@Override
+	protected void setUp() throws Exception {		
+		super.setUp();
+		deployApplication();
+		init();
 	}
 	
 	public void setupPhones() {
