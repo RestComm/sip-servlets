@@ -13,19 +13,22 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
+import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.Transaction;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.mobicents.servlet.sip.SipFactories;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
 public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
-	
+	private static Log logger =  LogFactory.getLog(SipServletResponseImpl.class);
 	
 	Response response;
 	
@@ -81,8 +84,19 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletResponse#createAck()
 	 */
 	public SipServletRequest createAck() {
-		super.getTransaction().getDialog();
-		return null;
+		Dialog dialog = super.session.getSessionCreatingDialog();
+		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
+		SipServletRequestImpl sipServletAckRequest = null; 
+		try {
+			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
+			sipServletAckRequest = new SipServletRequestImpl(
+					ackRequest,this.sipFactoryImpl, this.getSession(), this.getTransaction(), dialog, false); 
+		} catch (InvalidArgumentException e) {
+			logger.error("Impossible to create the ACK",e);
+		} catch (SipException e) {
+			logger.error("Impossible to create the ACK",e);
+		}		
+		return sipServletAckRequest;
 	}
 
 	public SipServletRequest createPrack() {

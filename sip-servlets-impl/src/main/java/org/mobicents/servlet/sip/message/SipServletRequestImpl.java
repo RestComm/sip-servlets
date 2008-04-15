@@ -229,9 +229,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
-				dialog.setApplicationData( this.transactionApplicationData.getSipSession());
 				this.session.setSessionCreatingDialog(dialog);
-
+				dialog.setApplicationData( this.transactionApplicationData);				
 			}
 			this.b2buahelper = new B2buaHelperImpl(this);
 			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
@@ -596,6 +595,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 			String transport = JainSipUtils.findTransport(request);
 			
+			if(Request.ACK.equals(request.getMethod())) {
+				getDialog().sendAck(request);
+				return;
+			}
+			
 			if (super.getTransaction() == null) {
 
 				ViaHeader viaHeader = JainSipUtils.createViaHeader(super.sipFactoryImpl.getSipProviders(),
@@ -631,6 +635,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				Dialog dialog = ctx.getDialog();
 				if (dialog == null && this.createDialog) {
 					dialog = sipProvider.getNewDialog(ctx);
+					this.session.setSessionCreatingDialog(dialog);
 				}
 
 				// Make the dialog point here so that when the dialog event
