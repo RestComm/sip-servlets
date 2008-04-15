@@ -200,6 +200,12 @@ public class SipEmbedded {
 		return context.getAvailable();			
 	}
 	
+	public boolean deployContext(SipStandardContext context) {
+		context.setParent(host);
+		host.addChild(context);
+		return context.getAvailable();	
+	}
+	
 	public void undeployContext(Container context) {
 		host.removeChild(context);
 	}
