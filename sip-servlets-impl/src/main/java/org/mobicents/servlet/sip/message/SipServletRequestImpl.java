@@ -32,6 +32,7 @@ import java.util.Vector;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipApplicationRouterInfo;
@@ -809,6 +810,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException("Cancel received and already replied with a 487!");
 		}
 		this.routingState = routingState;	
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#addAuthHeader(javax.servlet.sip.SipServletResponse, javax.servlet.sip.AuthInfo)
+	 */
+	public void addAuthHeader(SipServletResponse challengeResponse,
+			AuthInfo authInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#addAuthHeader(javax.servlet.sip.SipServletResponse, java.lang.String, java.lang.String)
+	 */
+	public void addAuthHeader(SipServletResponse challengeResponse,
+			String username, String password) {
+		// TODO Auto-generated method stub
+		
 	}	
 
 }

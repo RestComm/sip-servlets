@@ -26,8 +26,6 @@ import javax.sip.address.SipURI;
 import javax.sip.header.FromHeader;
 import javax.sip.header.HeaderFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -39,8 +37,8 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class AddressImpl  extends ParameterableImpl implements Address{
 
-	private static Log logger = LogFactory.getLog(AddressImpl.class
-			.getCanonicalName());
+//	private static Log logger = LogFactory.getLog(AddressImpl.class
+//			.getCanonicalName());
 	
 	private javax.sip.address.Address address;	
 
@@ -60,6 +58,7 @@ public class AddressImpl  extends ParameterableImpl implements Address{
 	
 	public AddressImpl() {}
 	
+	@SuppressWarnings("unchecked")
 	public AddressImpl (javax.sip.address.Address address) {
 		this.address = address;				
 		SipURI sipURI = getUriAsSipUri();

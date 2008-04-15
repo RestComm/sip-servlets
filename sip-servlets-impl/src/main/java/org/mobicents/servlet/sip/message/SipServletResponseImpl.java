@@ -16,6 +16,7 @@ package org.mobicents.servlet.sip.message;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
 
@@ -123,6 +124,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletResponse#createAck()
 	 */
+	@SuppressWarnings("unchecked")
 	public SipServletRequest createAck() {
 		Dialog dialog = super.session.getSessionCreatingDialog();
 		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
@@ -326,5 +328,14 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			logger.error(e);
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#getChallengeRealms()
+	 */
+	public Iterator<String> getChallengeRealms() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

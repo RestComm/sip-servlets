@@ -298,6 +298,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#addAcceptLanguage(java.util.Locale)
+	 */
 	public void addAcceptLanguage(Locale locale) {
 		AcceptLanguageHeader ach = headerFactory
 				.createAcceptLanguageHeader(locale);
@@ -305,6 +309,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#addAddressHeader(java.lang.String, javax.servlet.sip.Address, boolean)
+	 */
 	public void addAddressHeader(String name, Address addr, boolean first)
 			throws IllegalArgumentException {
 
@@ -346,6 +354,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#addHeader(java.lang.String, java.lang.String)
+	 */
 	public void addHeader(String name, String value) {
 
 		String hName = getFullHeaderName(name);
@@ -372,6 +384,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#addParameterableHeader(java.lang.String, javax.servlet.sip.Parameterable, boolean)
+	 */
 	public void addParameterableHeader(String name, Parameterable param,
 			boolean first) {
 		try {
@@ -394,9 +410,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied");
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getAcceptLanguage()
+	 */
 	public Locale getAcceptLanguage() {
 		AcceptLanguageHeader alh = (AcceptLanguageHeader) this.message
 				.getHeader(AcceptLanguageHeader.NAME);
@@ -407,6 +426,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getAcceptLanguages()
+	 */
 	public Iterator<Locale> getAcceptLanguages() {
 		LinkedList<Locale> ll = new LinkedList<Locale>();
 		Iterator<Header> it = (Iterator<Header>) this.message
@@ -418,6 +441,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return ll.iterator();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getAddressHeader(java.lang.String)
+	 */
 	@SuppressWarnings("unchecked")
 	public Address getAddressHeader(String name) throws ServletParseException {
 		if (name == null)
@@ -454,6 +481,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getAddressHeaders(java.lang.String)
+	 */
 	@SuppressWarnings("unchecked")
 	public ListIterator<Address> getAddressHeaders(String name)
 			throws ServletParseException {
@@ -521,17 +552,29 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getAttribute(java.lang.String)
+	 */
 	public Object getAttribute(String name) {
 		if (name == null)
 			throw new NullPointerException("Attribute name can not be null.");
 		return this.attributes.get(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getAttributeNames()
+	 */
 	public Enumeration<String> getAttributeNames() {
 		Vector<String> names = new Vector<String>(this.attributes.keySet());
 		return names.elements();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getCallId()
+	 */
 	public String getCallId() {
 
 		CallIdHeader id = (CallIdHeader) this.message
@@ -542,6 +585,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getCharacterEncoding()
+	 */
 	public String getCharacterEncoding() {
 
 		if (this.message.getContentEncoding() != null)
@@ -554,12 +601,20 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return this.message.getContent();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getContent(java.lang.Class[])
+	 */
 	public Object getContent(Class[] classes) throws IOException,
 			UnsupportedEncodingException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getContentLanguage()
+	 */
 	public Locale getContentLanguage() {
 		if (this.message.getContentLanguage() != null)
 			return this.message.getContentLanguage().getContentLanguage();
@@ -567,6 +622,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getContentLength()
+	 */
 	public int getContentLength() {
 		if (this.message.getContent() != null
 				&& this.message.getContentLength() != null)
@@ -575,6 +634,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getContentType()
+	 */
 	public String getContentType() {
 		ContentTypeHeader cth = (ContentTypeHeader) this.message
 				.getHeader(getCorrectHeaderName(ContentTypeHeader.NAME));
@@ -590,6 +653,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getExpires()
+	 */
 	public int getExpires() {
 		if (this.message.getExpires() != null)
 			return this.message.getExpires().getExpires();
@@ -624,17 +691,27 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getHeaderForm()
+	 */
 	public HeaderForm getHeaderForm() {
-
 		return this._headerForm;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getHeaderNames()
+	 */
 	public Iterator<String> getHeaderNames() {
 		return this.message.getHeaderNames();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getHeaders(java.lang.String)
+	 */
 	public ListIterator<String> getHeaders(String name) {
-
 		String nameToSearch = getCorrectHeaderName(name);
 		ArrayList<String> result = new ArrayList<String>();
 
@@ -649,10 +726,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					+ "], name searched[" + nameToSearch + "]", e);
 			return result.listIterator();
 		}
-
 		return result.listIterator();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getLocalAddr()
+	 */
 	public String getLocalAddr() {
 		if (this.localAddr == null)
 			return null;
@@ -660,8 +740,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return this.localAddr.getHostAddress();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getLocalPort()
+	 */
 	public int getLocalPort() {
-
 		return this.localPort;
 	}
 
@@ -676,6 +759,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				: ((CSeqHeader) message.getHeader(CSeqHeader.NAME)).getMethod();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getParameterableHeader(java.lang.String)
+	 */
 	public Parameterable getParameterableHeader(String name)
 			throws ServletParseException {
 
@@ -693,6 +780,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return createParameterable(h.toString(), getFullHeaderName(name));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getParameterableHeaders(java.lang.String)
+	 */
 	public ListIterator<Parameterable> getParameterableHeaders(String name)
 			throws ServletParseException {
 
@@ -707,12 +798,20 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		return result.listIterator();
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getProtocol()
+	 */
 	public String getProtocol() {
 		// For this version of the SIP Servlet API this is always "SIP/2.0"
 		return "SIP/2.0";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getRawContent()
+	 */
 	public byte[] getRawContent() throws IOException {
 		SIPMessage message = (SIPMessage) this.message;
 		if (message != null)
@@ -720,24 +819,24 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		else
 			return null;
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getRemoteAddr()
+	 */
 	public String getRemoteAddr() {
-
 		// FIXME: Ambigious description!!!!
 		// But: that originated the message from the message Via header fields.
 		// or we have to play in proxy stuff - but thats insane!!!! - we will
 		// stick to Via only... ;/
 		// So for reqeust it will be top via
 		// For response Via ontop of local host ?
-
 		if (this.remoteAddr == null) {
 			// If its null it means that transport level info has not been
 			// set... ;/
 			if (this.message instanceof Response) {
-
 				// FIXME:....
 				return null;
-
 			} else {
 				// isntanceof Reqeust
 				ListIterator<ViaHeader> vias = this.message
@@ -754,13 +853,20 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} else {
 			return this.remoteAddr.getHostAddress();
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getRemotePort()
+	 */
 	public int getRemotePort() {
 		return this.remotePort;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getRemoteUser()
+	 */
 	public String getRemoteUser() {
 		if (this.transaction != null
 				&& this.transaction.getDialog() != null
@@ -814,35 +920,70 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.session = session;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getTo()
+	 */
 	public Address getTo() {
 		return new AddressImpl(((ToHeader) this.message
 				.getHeader(getCorrectHeaderName(ToHeader.NAME))).getAddress());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getTransport()
+	 */
 	public String getTransport() {
-
 		return this.transport;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getUserPrincipal()
+	 */
 	public Principal getUserPrincipal() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#isCommitted()
+	 */
 	public boolean isCommitted() {
 		return this.transaction.getState() != null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#isSecure()
+	 */
 	public boolean isSecure() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#isUserInRole(java.lang.String)
+	 */
 	public boolean isUserInRole(String role) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#removeAttribute(java.lang.String)
+	 */
+	public void removeAttribute(String name) {
+		this.attributes.remove(name);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#removeHeader(java.lang.String)
+	 */
 	public void removeHeader(String name) {
 
 		String hName = getFullHeaderName(name);
@@ -858,19 +999,28 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#send()
+	 */
 	public abstract void send();
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setAcceptLanguage(java.util.Locale)
+	 */
 	public void setAcceptLanguage(Locale locale) {
-
 		AcceptLanguageHeader alh = headerFactory
 				.createAcceptLanguageHeader(locale);
 
 		this.message.addHeader(alh);
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setAddressHeader(java.lang.String, javax.servlet.sip.Address)
+	 */
 	public void setAddressHeader(String name, Address addr) {
-
 		String hName = getFullHeaderName(name);
 
 		if (logger.isDebugEnabled())
@@ -878,18 +1028,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					+ addr + "]");
 
 		if (isSystemHeader(hName)) {
-
 			logger.error("Error, cant remove system header [" + hName + "]");
-
 			throw new IllegalArgumentException(
 					"Cant set system header, it is maintained by container!!");
 		}
 
 		if (!isAddressTypeHeader(hName)) {
-
 			logger.error("Error, set header, its not address type header ["
 					+ hName + "]!!");
-
 			throw new IllegalArgumentException(
 					"This header is not address type header");
 		}
@@ -900,12 +1046,15 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					.toString());
 			this.message.setHeader(h);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Parsing problem while setting address header with name "
+					+ name + " and address "+ addr, e);			
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setAttribute(java.lang.String, java.lang.Object)
+	 */
 	public void setAttribute(String name, Object o) {
 		if (name == null)
 			throw new NullPointerException("Attribute name can not be null.");
@@ -974,8 +1123,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setContentType(java.lang.String)
+	 */
 	public void setContentType(String type) {
-
 		String name = getCorrectHeaderName(ContentTypeHeader.NAME);
 		try {
 			Header h = headerFactory.createHeader(name, type);
@@ -988,6 +1140,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setExpires(int)
+	 */
 	public void setExpires(int seconds) {
 		try {
 			Expires expiresHeader = new Expires();
@@ -996,9 +1152,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} catch (Exception e) {
 			throw new RuntimeException("Error setting expiration!", e);
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setHeader(java.lang.String, java.lang.String)
+	 */
 	public void setHeader(String name, String value) {
 		try {
 			Header header = SipFactory.getInstance().createHeaderFactory()
@@ -1007,25 +1166,29 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating header!", e);
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setHeaderForm(javax.servlet.sip.SipServletMessage.HeaderForm)
+	 */
 	public void setHeaderForm(HeaderForm form) {
 
 		// When form changes to HeaderForm.COMPACT or HeaderForm.LONG - all
 		// names must transition, if it is changed to HeaderForm.DEFAULT, no
 		// action is performed
-		if(form==HeaderForm.DEFAULT)
+		if(form == HeaderForm.DEFAULT)
 			return;
 		
-		if(form==HeaderForm.COMPACT)
-		{
-			//If header has compact name - we must change name to compact, if not, its left as it is.
-			
+		if(form == HeaderForm.COMPACT) {
+			//TODO If header has compact name - we must change name to compact, if not, its left as it is.
 		}
-
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#setParameterableHeader(java.lang.String, javax.servlet.sip.Parameterable)
+	 */
 	public void setParameterableHeader(String name, Parameterable param) {
 		// TODO Auto-generated method stub
 
@@ -1150,15 +1313,22 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return this.transaction;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		// FIXME
 		return super.clone();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-
 		return this.message.toString();
 	}
 
@@ -1190,7 +1360,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.transaction = transaction;
 	}
 
-	// TRANSPORT LEVEL, TO BE SET WHEN THIS IS RECEIVED
+	// TRANSPORT LEVEL, TO BE SET WHEN THIS IS RECEIVED	
 	public void setLocalAddr(InetAddress localAddr) {
 		this.localAddr = localAddr;
 	}
@@ -1232,7 +1402,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		stringHeader.replace("<", "");
 		String[] split = stringHeader.split(">");
 		String value = split[0];
-		HashMap paramMap = new HashMap();
+		Map<String, String> paramMap = new HashMap<String, String>();
 
 		if (split[1].contains(";")) {
 			// repleace first ";" with ""

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.sip.Address;
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationRouterInfo;
@@ -50,6 +51,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.AuthInfoImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
@@ -162,13 +164,17 @@ public class SipFactoryImpl implements SipFactory {
 	 * @see javax.servlet.sip.SipFactory#createApplicationSession()
 	 */
 	public SipApplicationSession createApplicationSession() {
-
 		throw new UnsupportedOperationException("use createApplicationSession(SipContext sipContext) instead !");
 	}
 	
+	/**
+	 * Creates an application session associated with the context
+	 * @param sipContext
+	 * @return
+	 */
 	public SipApplicationSession createApplicationSession(SipContext sipContext) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Creating new application session");
+			logger.debug("Creating new application session for sip context "+ sipContext.getApplicationName());
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
@@ -504,5 +510,56 @@ public class SipFactoryImpl implements SipFactory {
 	 */
 	public SipApplicationRouterInfo getNextInterestedApplication(SipServletRequestImpl sipServletRequestImpl) {
 		return sipApplicationDispatcher.getNextInterestedApplication(sipServletRequestImpl);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createApplicationSessionByAppName(java.lang.String)
+	 */
+	public SipApplicationSession createApplicationSessionByAppName(
+			String sipAppName) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Creating new application session for application name " + sipAppName);
+		}
+		SipContext sipContext = sipApplicationDispatcher.findSipApplication(sipAppName);
+		if(sipContext == null) {
+			throw new IllegalArgumentException("The specified application "+sipAppName+" is not currently deployed");
+		}
+		return createApplicationSession(sipContext);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createApplicationSessionByKey(java.lang.String)
+	 */
+	public SipApplicationSession createApplicationSessionByKey(
+			String sipApplicationKey) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Creating new application session by following key " + sipApplicationKey);
+		}
+		SipApplicationSessionKey sipApplicationSessionKey;
+		try {
+			sipApplicationSessionKey = SessionManager.parseSipApplicationSessionKey(
+					sipApplicationKey);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException(sipApplicationKey + " is not a valid sip application session key", e);
+		}		
+		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
+				sipApplicationSessionKey, true);
+		SipContext sipContext = sipApplicationDispatcher.findSipApplication(sipApplicationSessionKey.getApplicationName());
+		if(sipContext == null) {
+			throw new IllegalArgumentException("The specified application "+sipApplicationSessionKey.getApplicationName()+" is not currently deployed");
+		}
+		sipApplicationSession.setSipContext(sipContext);
+		return sipApplicationSession;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createAuthInfo()
+	 */
+	public AuthInfo createAuthInfo() {
+		// FIXME
+		return new AuthInfoImpl();
 	}
 }

@@ -49,7 +49,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 * @param value - initial value of parametrable value
 	 * @param parameters - parameter map - it can be null;
 	 */
-	public ParameterableImpl(Map params) {
+	public ParameterableImpl(Map<String, String> params) {
 		 if(params!=null) {			 
 			 Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
 			 while(entries.hasNext()) {

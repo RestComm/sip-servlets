@@ -15,11 +15,8 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
@@ -56,7 +53,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private long expirationTime;
 	
-	private Set<ServletTimer> servletTimers;
+	private Map<String, ServletTimer> servletTimers;
 	
 	private boolean valid;
 
@@ -78,11 +75,11 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
+		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
-		valid = true;
-		servletTimers = Collections.synchronizedSet(new HashSet<ServletTimer>());
+		valid = true;		
 		//FIXME create and start a timer for session expiration
 	}
 	
@@ -226,7 +223,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#getTimers()
 	 */
 	public Collection<ServletTimer> getTimers() {
-		return servletTimers;
+		return servletTimers.values();
 	}
 
 	/**
@@ -234,7 +231,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @param servletTimer the servlet timer to add
 	 */
 	public void addServletTimer(ServletTimer servletTimer){
-		servletTimers.add(servletTimer);
+		servletTimers.put(servletTimer.getId(), servletTimer);
 	}
 	/**
 	 * Remove a servlet timer from this application session
@@ -409,6 +406,22 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 	public void setKey(SipApplicationSessionKey key) {
 		this.key = key;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getApplicationName()
+	 */
+	public String getApplicationName() {		
+		return key.getApplicationName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipApplicationSession#getTimer(java.lang.String)
+	 */
+	public ServletTimer getTimer(String id) {
+		return servletTimers.get(id);
 	}
 	
 //	public void timerScheduled(ServletTimerImpl st) {

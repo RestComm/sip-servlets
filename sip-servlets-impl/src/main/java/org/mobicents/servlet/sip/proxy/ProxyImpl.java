@@ -79,6 +79,15 @@ public class ProxyImpl implements Proxy {
 		cancelAllExcept(null);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Proxy#cancel(java.lang.String[], int[], java.lang.String[])
+	 */
+	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
+		// TODO vlad can you check this ?
+		cancelAllExcept(null, protocol, reasonCode, reasonText);
+	}
+	
 	public void cancelAllExcept(ProxyBranch except) {
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
@@ -87,6 +96,15 @@ public class ProxyImpl implements Proxy {
 		}
 	}
 
+	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText) {
+		//TODO vlad can you check this ?
+		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
+			if(!proxyBranch.equals(except)) {
+				proxyBranch.cancel(protocol, reasonCode, reasonText);
+			}
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.Proxy#createProxyBranches(java.util.List)
 	 */
@@ -434,8 +452,7 @@ public class ProxyImpl implements Proxy {
 		try {
 			proxiedResponse.send();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("A problem occured while proxying the final response", e);
 		}
 	}
 	
@@ -445,5 +462,5 @@ public class ProxyImpl implements Proxy {
 
 	void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
-	}
+	}	
 }

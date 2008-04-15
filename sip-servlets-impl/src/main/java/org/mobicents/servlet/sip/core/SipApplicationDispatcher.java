@@ -13,6 +13,7 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -65,6 +66,20 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * @param sipApplicationName the sip application logical name of the application to remove
 	 */
 	SipContext removeSipApplication(String sipApplicationName);
+	
+	/**
+	 * Find the sip applications to which sip messages can currently be routed
+	 * @return the sip applications to which sip messages can currently be routed
+	 */
+	Iterator<SipContext> findSipApplications();
+	
+	/**
+	 * Find the sip application to which sip messages can currently be routed by its name
+	 * @param applicationName the name of the application
+	 * @return the sip application to which sip messages can currently be routed by its name
+	 * if it has been find, null otherwise
+	 */
+	SipContext findSipApplication(String applicationName);
 	
 	/**
 	 * Add a sip Provider to the current set of sip providers

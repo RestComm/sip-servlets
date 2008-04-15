@@ -14,14 +14,13 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.io.Serializable;
+import java.rmi.server.UID;
 import java.util.concurrent.ScheduledFuture;
 
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
@@ -30,8 +29,8 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	/**
 	 * Logger for this class
 	 */
-	private static Log logger = LogFactory.getLog(ServletTimerImpl.class
-			.getCanonicalName());
+//	private static Log logger = LogFactory.getLog(ServletTimerImpl.class
+//			.getCanonicalName());
 	/**
 	 * A future dalayed scheduled action to be run
 	 */
@@ -88,6 +87,10 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	private Boolean isCanceled = null;
 
 	/**
+	 * Timer unique id
+	 */
+	String id = null;
+	/**
 	 * Registered listener that will get a timeout event when executed.
 	 */
 	private TimerListener listener;
@@ -117,7 +120,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	public ServletTimerImpl(Serializable info, long delay,
 			TimerListener listener, SipApplicationSessionImpl appSession) {
 		this(info, delay, false, 0, listener, appSession);
-		isRepeatingTimer = false;
+		isRepeatingTimer = false;		
 	}
 
 	/**
@@ -137,6 +140,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	public ServletTimerImpl(Serializable info, long delay, boolean fixedDelay,
 			long period, TimerListener listener,
 			SipApplicationSessionImpl appSession) {
+		this.id = new UID().toString();
 		this.info = info;
 		this.delay = delay;
 		this.scheduledExecutionTime = delay + System.currentTimeMillis();
@@ -283,6 +287,14 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 						+ (++numInvocations * period);
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.ServletTimer#getId()
+	 */
+	public String getId() {		
+		return id;
 	}
 
 }

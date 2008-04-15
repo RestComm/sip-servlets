@@ -87,7 +87,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 	
 	//FIXME @jean.deruelle session map is never cleaned up => could lead to memory leak
 	//shall we have a thread scanning for invalid sessions and removing them accordingly ?
-	private ConcurrentHashMap<SipSessionImpl, SipSessionImpl> sessionMap = new ConcurrentHashMap<SipSessionImpl, SipSessionImpl>();
+	//FIXME this is not a one to one mapping - B2BUA can link to more than one other sip session
+	private Map<SipSessionImpl, SipSessionImpl> sessionMap = new ConcurrentHashMap<SipSessionImpl, SipSessionImpl>();
 
 	private SipFactoryImpl sipFactoryImpl;
 

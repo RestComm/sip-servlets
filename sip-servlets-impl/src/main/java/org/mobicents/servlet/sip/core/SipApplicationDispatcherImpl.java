@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -1232,7 +1233,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	
 	/**
 	 * {@inheritDoc}
-	 */
+	 */	
 	public void processResponse(ResponseEvent responseEvent) {
 		logger.info("Response " + responseEvent.getResponse().toString());
 		Response response = responseEvent.getResponse();
@@ -1595,5 +1596,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			}
 		}
 		return applicationRouterInfo;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#findSipApplications()
+	 */
+	public Iterator<SipContext> findSipApplications() {
+		return applicationDeployed.values().iterator();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#findSipApplication(java.lang.String)
+	 */
+	public SipContext findSipApplication(String applicationName) {
+		return applicationDeployed.get(applicationName);
 	}
 }

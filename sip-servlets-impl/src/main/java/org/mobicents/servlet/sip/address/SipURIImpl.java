@@ -13,6 +13,8 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.address.SipUri;
+
 import java.text.ParseException;
 import java.util.Iterator;
 
@@ -42,58 +44,100 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		return (javax.sip.address.SipURI) super.uri;
 
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getHeader(java.lang.String)
+	 */
 	public String getHeader(String name) {
-
 		return ((SipURI) super.uri).getHeader(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getHeaderNames()
+	 */
 	@SuppressWarnings("unchecked")
 	public Iterator<String> getHeaderNames() {
-
 		return getSipURI().getHeaderNames();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getHost()
+	 */
 	public String getHost() {
 		return getSipURI().getHost();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getLrParam()
+	 */
 	public boolean getLrParam() {
-
 		return getSipURI().hasLrParam();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getPort()
+	 */
 	public int getPort() {
 		return getSipURI().getPort();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getTTLParam()
+	 */
 	public int getTTLParam() {
-
 		return getSipURI().getTTLParam();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getTransportParam()
+	 */
 	public String getTransportParam() {
-
 		return getSipURI().getTransportParam();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getUser()
+	 */
 	public String getUser() {
 		return getSipURI().getUser();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getUserParam()
+	 */
 	public String getUserParam() {
 		return getSipURI().getUserParam();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getUserPassword()
+	 */
 	public String getUserPassword() {
 		return getSipURI().getUserPassword();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#isSecure()
+	 */
 	public boolean isSecure() {
-
 		return getSipURI().isSecure();
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setHeader(java.lang.String, java.lang.String)
+	 */
 	public void setHeader(String name, String value) {
 		try {
 			getSipURI().setHeader(name, value);
@@ -103,6 +147,10 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setHost(java.lang.String)
+	 */
 	public void setHost(String host) {
 		try {
 			getSipURI().setHost(host);
@@ -110,17 +158,24 @@ public class SipURIImpl extends URIImpl implements SipURI {
 			logger.error("parse exception occured", e);
 			throw new IllegalArgumentException("Bad arg!",e);
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setLrParam(boolean)
+	 */
 	public void setLrParam(boolean flag) {
-		if (flag)
+		if (flag) {
 			getSipURI().setLrParam();
-		else
+		} else {
 			getSipURI().removeParameter("lr");
-
+		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setMAddrParam(java.lang.String)
+	 */
 	public void setMAddrParam(String maddr) {
 		try {
 			getSipURI().setMAddrParam(maddr);
@@ -130,6 +185,10 @@ public class SipURIImpl extends URIImpl implements SipURI {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setMethodParam(java.lang.String)
+	 */
 	public void setMethodParam(String method) {
 		try {
 			getSipURI().setMethodParam(method);
@@ -137,17 +196,28 @@ public class SipURIImpl extends URIImpl implements SipURI {
 			logger.error("parse exception occured", e);
 			throw new IllegalArgumentException("Bad arg " + method, e);
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setPort(int)
+	 */
 	public void setPort(int port) {
 		getSipURI().setPort(port);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setSecure(boolean)
+	 */
 	public void setSecure(boolean b) {
 		getSipURI().setSecure(b);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setTTLParam(int)
+	 */
 	public void setTTLParam(int ttl) {
 		try {
 			getSipURI().setTTLParam(ttl);
@@ -156,6 +226,10 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setTransportParam(java.lang.String)
+	 */
 	public void setTransportParam(String transport) {
 		try {
 			getSipURI().setTransportParam(transport);
@@ -164,6 +238,10 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setUser(java.lang.String)
+	 */
 	public void setUser(String user) {
 		try {
 			getSipURI().setUser(user);
@@ -172,6 +250,10 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setUserParam(java.lang.String)
+	 */
 	public void setUserParam(String user) {
 		try {
 			getSipURI().setUserParam(user);
@@ -180,25 +262,39 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#setUserPassword(java.lang.String)
+	 */
 	public void setUserPassword(String password) {
 		try {
 			getSipURI().setUserPassword(password);
 		} catch (ParseException e) {
 			logger.error("error setting parameter ", e);
 			throw new IllegalArgumentException("Bad arg", e	);
-		
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getMAddrParam()
+	 */
 	public String getMAddrParam() {
 		return getSipURI().getMAddrParam();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#getMethodParam()
+	 */
 	public String getMethodParam() {
-
 		return getSipURI().getMethodParam();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.address.URIImpl#toString()
+	 */
 	public String toString() {
 		// URI scheme ->
 		// sip:alice@atlanta.com?subject=project%20x&priority=urgent
@@ -207,7 +303,10 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		return getSipURI().toString();
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Parameterable#setValue(java.lang.String)
+	 */
 	public void setValue(String value) {
 		try {
 			this.uri = SipFactories.addressFactory.createURI(value);
@@ -219,13 +318,30 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Parameterable#getValue()
+	 */
 	public String getValue() {
 		return this.uri.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.address.URIImpl#clone()
+	 */
 	@Override
-	public Object clone() {
+	public SipURI clone() {
 		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipURI#removeHeader(java.lang.String)
+	 */
+	public void removeHeader(String name) {
+		//FIXME it's using jain sip RI implementation classes, it should not
+		((SipUri)getSipURI()).removeHeader(name);
 	}
 
 }

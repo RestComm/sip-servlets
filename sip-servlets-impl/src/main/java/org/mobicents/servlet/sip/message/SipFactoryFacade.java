@@ -16,6 +16,7 @@ package org.mobicents.servlet.sip.message;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
@@ -78,15 +79,24 @@ public class SipFactoryFacade implements SipFactory {
 	public SipApplicationSession createApplicationSession() {
 		SipApplicationSessionImpl sipApplicationSessionImpl = 
 			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession(sipContext);
-		// a servlet wants to create a sip application
-		// session, we can retrieve its http session in the thread local data 
-		// if it has a sip http session (sip servlet only won't have any http sessions)  
-		// and associate it with the sip app session.
+		associateHttpSession(sipApplicationSessionImpl);
+		return sipApplicationSessionImpl;
+	}
+
+	/**
+	 * A servlet wants to create a sip application
+	 * session, we can retrieve its http session in the thread local data 
+	 * if it has a sip http session (sip servlet only won't have any http sessions)  
+	 * and associate it with the sip app session.
+	 * @param sipApplicationSessionImpl the app session to assocaiate the http session with
+	 */
+	private void associateHttpSession(
+			SipApplicationSessionImpl sipApplicationSessionImpl) {
+		
 		HttpSession httpSession = threadLocalHttpSession.get();
 		if(httpSession != null) {
 			sipApplicationSessionImpl.addHttpSession(httpSession);
 		}
-		return sipApplicationSessionImpl;
 	}
 
 	/* (non-Javadoc)
@@ -182,5 +192,37 @@ public class SipFactoryFacade implements SipFactory {
 	 */
 	public HttpSession retrieveHttpSession() {
 		return threadLocalHttpSession.get();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createApplicationSessionByAppName(java.lang.String)
+	 */
+	public SipApplicationSession createApplicationSessionByAppName(
+			String sipAppName) {
+		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl)
+			sipFactoryImpl.createApplicationSessionByAppName(sipAppName);
+		associateHttpSession(sipApplicationSessionImpl);
+		return sipApplicationSessionImpl;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createApplicationSessionByKey(java.lang.String)
+	 */
+	public SipApplicationSession createApplicationSessionByKey(
+			String sipApplicationKey) {
+		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl)
+			sipFactoryImpl.createApplicationSessionByKey(sipApplicationKey);
+		associateHttpSession(sipApplicationSessionImpl);
+		return sipApplicationSessionImpl;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createAuthInfo()
+	 */
+	public AuthInfo createAuthInfo() {		
+		return sipFactoryImpl.createAuthInfo();
 	}
 }

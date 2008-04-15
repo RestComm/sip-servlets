@@ -101,6 +101,15 @@ public class ProxyBranchImpl implements ProxyBranch {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.ProxyBranch#cancel(java.lang.String[], int[], java.lang.String[])
+	 */
+	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
+		//TODO refactor to be able to pass those informations
+		cancel();
+	}
+	
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.ProxyBranch#getProxy()
 	 */
@@ -281,8 +290,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			try {
 				proxiedResponse.send();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("A problem occured while proxying a response", e);
 			}
 			
 			return;
@@ -347,8 +355,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 				forwardRequest(clonedRequest, true);
 			}
 		} catch (SipException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("A problem occured while proxying a subsequent request", e);
 		}
 	}
 	
@@ -397,6 +404,5 @@ public class ProxyBranchImpl implements ProxyBranch {
 
 	public boolean isCanceled() {
 		return canceled;
-	}
-
+	}	
 }
