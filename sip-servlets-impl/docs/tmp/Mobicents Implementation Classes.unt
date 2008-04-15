@@ -2,9 +2,10 @@
 <XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
 <XPD:HEADER>
 <XPD:SUBUNITS>
-<XPD:UNIT owner="NSOHPG0n+kmg/wUTiaaKwAAA" index="0">proxy overview diagrams.unt</XPD:UNIT>
 <XPD:UNIT owner="QnLaTaw6w0WRUkZdmKZH7wAA" index="0">Impl classes - sip package.unt</XPD:UNIT>
+<XPD:UNIT owner="NSOHPG0n+kmg/wUTiaaKwAAA" index="0">proxy overview diagrams.unt</XPD:UNIT>
 <XPD:UNIT owner="NSOHPG0n+kmg/wUTiaaKwAAA" index="1">Sip Servlets Loading Class Diagram.unt</XPD:UNIT>
+<XPD:UNIT owner="NSOHPG0n+kmg/wUTiaaKwAAA" index="2">Specific diagrams - Timers.unt</XPD:UNIT>
 </XPD:SUBUNITS>
 </XPD:HEADER>
 <XPD:BODY>

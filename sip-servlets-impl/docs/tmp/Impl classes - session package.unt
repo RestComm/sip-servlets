@@ -7,7 +7,7 @@
 <XPD:BODY>
 <XPD:OBJ name="DocumentElement" type="UMLPackage" guid="33nbT1WKG0uiBU7TgHsWUwAA">
 <XPD:ATTR name="Name" type="string">session</XPD:ATTR>
-<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">4</XPD:ATTR>
 <XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="zcrMBpO/g0+SWqsrta1WHAAA">
 <XPD:ATTR name="Name" type="string">SipSessionImpl</XPD:ATTR>
 <XPD:REF name="Namespace">33nbT1WKG0uiBU7TgHsWUwAA</XPD:REF>
@@ -228,9 +228,16 @@
 <XPD:ATTR name="TypeExpression" type="string">HashMap&lt;String,Object&gt;</XPD:ATTR>
 <XPD:REF name="Owner">N/79IWincU6clojpU/dPwAAA</XPD:REF>
 </XPD:OBJ>
-<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
+<XPD:ATTR name="#Instances" type="integer">3</XPD:ATTR>
 <XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">xludbvJ/vUSOt1CBLxvJeAAA</XPD:REF>
 <XPD:REF name="Instances[1]" pathname="::Sequence actions::chapter 8 - Listeners::chapter 8 - Listeners::">O2Oh5h30YEC0THTcw6dGdQAA</XPD:REF>
+<XPD:REF name="Instances[2]" pathname="::Sequence actions::chapter 9 - TimerService::Timer sequences::">kmy1A0bFdUK6rIuPSJuQqgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLClass" guid="zZifulvi6kWOhjsJ5XfgigAA">
+<XPD:ATTR name="Name" type="string">AgregatingTimerListener</XPD:ATTR>
+<XPD:REF name="Namespace">33nbT1WKG0uiBU7TgHsWUwAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 9 - TimerService::Timer sequences::">c6qVzurcoEiPDN/P3CLf1wAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:BODY>

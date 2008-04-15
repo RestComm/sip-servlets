@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLModel" guid="Uso5hRpQCkakKyoYLcy3BAAA">
+<XPD:ATTR name="Name" type="string">Timers</XPD:ATTR>
+<XPD:ATTR name="#OwnedDiagrams" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedDiagrams[0]" type="UMLClassDiagram" guid="PbDjh8fa20mesU1+cxqsmQAA">
+<XPD:ATTR name="Name" type="string">Timer Service overview</XPD:ATTR>
+<XPD:REF name="DiagramOwner">Uso5hRpQCkakKyoYLcy3BAAA</XPD:REF>
+<XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="fww7Xymkl0m91KBhGnj9FQAA">
+<XPD:REF name="Diagram">PbDjh8fa20mesU1+cxqsmQAA</XPD:REF>
+<XPD:ATTR name="#OwnedViews" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="OwnedViews[0]" type="UMLClassView" guid="A/AF13hAjUOE8eLwsHRqAgAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">187</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">129</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">151</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">43</XPD:ATTR>
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::timers::ExecutorServiceWrapper">U9ch9wRskUeUZRa9VYW1HAAA</XPD:REF>
+<XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="Dzco/KJWm06b9KEqBDCxWwAA">
+<XPD:OBJ name="NameLabel" type="LabelView" guid="10fXQ6NmvEu2hTtuAKn/nwAA">
+<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">ExecutorServiceWrapper</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="StereotypeLabel" type="LabelView" guid="/YuwQYY+hESoXPysVBEAmgAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="PropertyLabel" type="LabelView" guid="mUCCmpRDskq/+6TXN9gcoAAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="AttributeCompartment" type="UMLAttributeCompartmentView" guid="7xnf6X1/m0GliRtOhhj7pQAA">
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::timers::ExecutorServiceWrapper">U9ch9wRskUeUZRa9VYW1HAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OperationCompartment" type="UMLOperationCompartmentView" guid="LWNSb2WNm0KCa0IUK1pEJwAA">
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::timers::ExecutorServiceWrapper">U9ch9wRskUeUZRa9VYW1HAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="TemplateParameterCompartment" type="UMLTemplateParameterCompartmentView" guid="/ld7a0c9uU+d3mCiaeB+UAAA">
+<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
+<XPD:REF name="Model" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::timers::ExecutorServiceWrapper">U9ch9wRskUeUZRa9VYW1HAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[1]" type="UMLNoteView" guid="a+9O/wQsmkWnHCtD4OAKOgAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">196</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">44</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">601</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">30</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">This  class embeds some kind of execution service - timer service doesnt have to know how it works and what is it exactly
+</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[2]" type="UMLNoteLinkView" guid="eFDh4QFGVEKsHMcpH0YgpQAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">315,129;458,73</XPD:ATTR>
+<XPD:REF name="Head">a+9O/wQsmkWnHCtD4OAKOgAA</XPD:REF>
+<XPD:REF name="Tail">A/AF13hAjUOE8eLwsHRqAgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

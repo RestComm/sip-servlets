@@ -30,7 +30,7 @@
 <XPD:REF name="TypedFeatures[0]">IQsEhKR1zUedrMW++h82MAAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">aeifepiMvEmWQNnbNMFoPAAA</XPD:REF>
-<XPD:ATTR name="#Attributes" type="integer">10</XPD:ATTR>
+<XPD:ATTR name="#Attributes" type="integer">11</XPD:ATTR>
 <XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="wiEChsMQnUGIqleyBZmvfgAA">
 <XPD:ATTR name="Name" type="string">sipApplicationSessionAttributeListeners</XPD:ATTR>
 <XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;SipApplicationSessionAttributeListener&gt;</XPD:ATTR>
@@ -76,7 +76,12 @@
 <XPD:ATTR name="TypeExpression" type="string">ArrayList&lt;SipErrorListener&gt;</XPD:ATTR>
 <XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Attributes[9]" type="UMLAttribute" guid="MeYDgmnIN06cyEHEmhAm9QAA">
+<XPD:OBJ name="Attributes[9]" type="UMLAttribute" guid="Gmkb69JF4USJpyzBLsXS8wAA">
+<XPD:ATTR name="Name" type="string">servletContextListeners</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ArraysList&lt;ServletContextListener&gt;</XPD:ATTR>
+<XPD:REF name="Owner">dS63KLOANUi/BdjLrHzmrwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[10]" type="UMLAttribute" guid="MeYDgmnIN06cyEHEmhAm9QAA">
 <XPD:ATTR name="Name" type="string">timerListener</XPD:ATTR>
 <XPD:ATTR name="TypeExpression" type="string">TimerListener</XPD:ATTR>
 <XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::TimerListener">1ssCH/dKWUKbhhM/0xfAdwAA</XPD:REF>
