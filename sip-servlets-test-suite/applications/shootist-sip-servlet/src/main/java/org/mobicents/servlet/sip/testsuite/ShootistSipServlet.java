@@ -51,8 +51,13 @@ public class ShootistSipServlet extends SipServlet implements SipErrorListener, 
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
-		sipServletResponse.createAck();
-		sipServletResponse.send();
+		int status = sipServletResponse.getStatus();
+		if (status == SipServletResponse.SC_OK) {
+			sipServletResponse.createAck();
+			sipServletResponse.send();
+		} else {
+			super.doResponse(sipServletResponse);
+		}
 	}
 
 	// SipErrorListener methods

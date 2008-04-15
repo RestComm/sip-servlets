@@ -44,6 +44,22 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	protected void doResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		logger.info("Got : " + sipServletResponse.getStatus() + " "
+				+ sipServletResponse.getMethod());
+//		int status = sipServletResponse.getStatus();
+//		if (status == SipServletResponse.SC_OK) {
+//			sipServletResponse.createAck();
+//			sipServletResponse.send();
+//		} else {
+			super.doResponse(sipServletResponse);
+//		}
+	}
+	
+	/**
 	 * 
 	 * {@inheritDoc}
 	 */

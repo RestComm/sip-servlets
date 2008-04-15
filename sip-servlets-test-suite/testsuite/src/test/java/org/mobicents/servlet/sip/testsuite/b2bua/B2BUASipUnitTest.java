@@ -17,6 +17,8 @@ import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
 public class B2BUASipUnitTest extends SipServletTestCase {
 	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
+//	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 100000000; 
 	SipStack sipStackA;
 	SipStack sipStackB;
 	
@@ -85,17 +87,17 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 			callB.listenForIncomingCall();Thread.sleep(300);
 			callA.initiateOutgoingCall("sip:receiver@nist.gov", null);
 			
-			assertTrue(callB.waitForIncomingCall(10000));
+			assertTrue(callB.waitForIncomingCall(TIMEOUT));
 			
 			assertTrue(callB.sendIncomingCallResponse(Response.RINGING, "Ringing", 0));
-			assertTrue(callA.waitOutgoingCallResponse(10000));
+			assertTrue(callA.waitOutgoingCallResponse(TIMEOUT));
 			
-			assertTrue(callB.sendIncomingCallResponse(Response.OK, "Answer", 0));
-			assertTrue(callA.waitOutgoingCallResponse(10000));
+			assertTrue(callB.sendIncomingCallResponse(Response.OK, "OK", 0));
+			assertTrue(callA.waitOutgoingCallResponse(TIMEOUT));
 			
 			assertTrue(callA.sendInviteOkAck());
 			
-			assertTrue(callB.waitForAck(10000));
+			assertTrue(callB.waitForAck(TIMEOUT));
 			
 			assertTrue(callA.disconnect());
 			assertTrue(callB.respondToDisconnect());
