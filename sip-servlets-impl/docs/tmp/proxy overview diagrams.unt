@@ -13,7 +13,7 @@
 <XPD:REF name="DiagramOwner">W7/q+or27EWaoQ/3r9AvKQAA</XPD:REF>
 <XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="QsChjbZ+/Eqf6FXNVmPw4QAA">
 <XPD:REF name="Diagram">3x2fznjqpkOIWQQTiumHwQAA</XPD:REF>
-<XPD:ATTR name="#OwnedViews" type="integer">16</XPD:ATTR>
+<XPD:ATTR name="#OwnedViews" type="integer">17</XPD:ATTR>
 <XPD:OBJ name="OwnedViews[0]" type="UMLClassView" guid="y+1OVlNol02reAMBtd9dpQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
@@ -171,7 +171,7 @@
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">768</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">696</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">828</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">82</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">45</XPD:ATTR>
 <XPD:ATTR name="StereotypeDisplay" type="UMLStereotypeDisplayKind">sdkIcon</XPD:ATTR>
@@ -252,7 +252,7 @@
 <XPD:OBJ name="OwnedViews[8]" type="UMLRealizationView" guid="S0TkEKWkZkizKds4q/DHYAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">804,960;808,717</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">805,960;808,849</XPD:ATTR>
 <XPD:REF name="Model">GjlWBBC3j0qiFQRU8wL5PwAA</XPD:REF>
 <XPD:REF name="Head">avOf29s1BE6QjURhLs1X3AAA</XPD:REF>
 <XPD:REF name="Tail">FxzCfkaGgU+9tTLdW4VEogAA</XPD:REF>
@@ -594,6 +594,23 @@ This will add new branches
 <XPD:ATTR name="Text" type="string">Should branches that tx terminates shoudl be removed?
 </XPD:ATTR>
 </XPD:OBJ>
+<XPD:OBJ name="OwnedViews[16]" type="UMLNoteView" guid="0IZLksJ4sk+9S4A+M+KV3AAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">clLime</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">8</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">628</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">779</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">128</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">   1.  push different route headers to the associated SipServletRequest with the proxy branch.
+   2. cancel a certain proxy branch, by issuing a CANCEL request. The mechanism that the container
+ uses to resolve the race condition of receiving a final response of the branch and mechanism of not 
+sending CANCEL until the provisional response is received are same as defined for Proxy.cancel() 
+method which cancels all the proxy branches and all branches created recursively.
+   3. set different record-route, path parameter, recurse flag or proxy timeout for the branch.
+   4. add/remove non system headers from the SipServletRequest before the request is proxied.
+   5. any other method invoked on SipServletRequest object (like send(), createCancel(). etc), not relevant for this context MUST throw IllegalStateException.
+</XPD:ATTR>
+</XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:ATTR name="#OwnedElements" type="integer">7</XPD:ATTR>
@@ -713,8 +730,8 @@ This will add new branches
 <XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::ProxyBranchImpl">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">yEuMF8+xv0GtZUN4RGB/lAAA</XPD:REF>
-<XPD:REF name="Views[1]">EpxpmeKGjEe8PIDB2jT+ywAA</XPD:REF>
-<XPD:REF name="Views[2]">YOg7gpYqEkeKhuQAqz46FwAA</XPD:REF>
+<XPD:REF name="Views[1]">YOg7gpYqEkeKhuQAqz46FwAA</XPD:REF>
+<XPD:REF name="Views[2]">EpxpmeKGjEe8PIDB2jT+ywAA</XPD:REF>
 <XPD:REF name="Views[3]">+qMOybzJp06vbv9aiiLx5QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="K0k3Vd+Q5kaZHnsa9kq9jwAA">
@@ -723,8 +740,8 @@ This will add new branches
 <XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::proxy::BranchState">tF8XAfZ2Z0Oh6/nRy9ad+AAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">lEDTho/s9Eu/SBXpXRVK+wAA</XPD:REF>
-<XPD:REF name="Views[1]">4XXFj8gEQEGu9Gmxnfh32wAA</XPD:REF>
-<XPD:REF name="Views[2]">umS+uiTQiU2cl+7pjILn9QAA</XPD:REF>
+<XPD:REF name="Views[1]">umS+uiTQiU2cl+7pjILn9QAA</XPD:REF>
+<XPD:REF name="Views[2]">4XXFj8gEQEGu9Gmxnfh32wAA</XPD:REF>
 <XPD:REF name="Views[3]">9yEBxgK7Q0Kogfz5LC1XrwAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
