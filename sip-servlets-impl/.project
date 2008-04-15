@@ -1,0 +1,15 @@
+<projectDescription>
+  <name>sip-servlets-impl</name>
+  <comment/>
+  <projects>
+    <project>sip-servlets-spec</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>
