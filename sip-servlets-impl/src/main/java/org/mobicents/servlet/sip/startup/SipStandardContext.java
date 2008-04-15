@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
+import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -48,6 +49,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	private String mainServlet;	
 	private Map securityRoles;
 	private Map<String,Object> sipApplicationSessionAttributeMap;
+	private SipFactoryFacade sipFactoryFacade;
+	
 	/**
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
@@ -91,8 +94,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			throw new Exception("cannot find any application dispatcher for this context " + name);
 		}		
 		
+		sipFactoryFacade = new SipFactoryFacade(sipApplicationDispatcher.getSipFactory(), this);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
-				sipApplicationDispatcher.getSipFactory());
+				sipFactoryFacade);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 				sipApplicationDispatcher.getOutboundInterfaces());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,

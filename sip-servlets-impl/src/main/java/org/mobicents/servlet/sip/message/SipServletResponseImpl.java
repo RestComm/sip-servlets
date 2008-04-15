@@ -20,6 +20,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
 public class SipServletResponseImpl extends SipServletMessageImpl implements
@@ -74,11 +75,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 
 		return isSystemHeader;
 	}
-
 	
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletResponse#createAck()
+	 */
 	public SipServletRequest createAck() {
-		// TODO Auto-generated method stub
+		super.getTransaction().getDialog();
 		return null;
 	}
 

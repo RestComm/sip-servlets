@@ -30,11 +30,13 @@ import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
+import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
@@ -603,6 +605,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
 						super.sipFactoryImpl.getSipProviders(), transport);
 				
+				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
+				if(contactHeader == null) {
+					FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
+					//TODO what about other schemes ?
+					String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();					
+					ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
+					// Create the contact name address.
+					javax.sip.address.SipURI contactURI = 
+						SipFactories.addressFactory.createSipURI(fromName, listeningPoint.getIPAddress());
+					contactURI.setPort(listeningPoint.getPort());
+
+					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(contactURI);
+
+					// Add the contact address.
+					contactAddress.setDisplayName(fromName);
+
+					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);
+					request.addHeader(contactHeader);
+				}
+				
 				ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);
 
@@ -634,8 +656,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}
 			super.session.addOngoingTransaction(getTransaction());
-		} catch (Exception ex) {
-			throw new IllegalStateException("Error sending reuqest");
+		} catch (Exception ex) {			
+			throw new IllegalStateException("Error sending reuqest",ex);
 		}
 
 	}

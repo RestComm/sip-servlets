@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -72,7 +73,7 @@ public class SipFactoryImpl implements SipFactory {
 	 * Dafault constructor
 	 */
 	public SipFactoryImpl() {
-		this.sipProviders = new HashSet<SipProvider>();
+		this.sipProviders = Collections.synchronizedSet(new HashSet<SipProvider>());
 	}
 
 	/*
@@ -321,7 +322,7 @@ public class SipFactoryImpl implements SipFactory {
 
 			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
-					+ Math.random() * 100000000);
+					+ new Random().nextInt() );
 			callIdHeader = SipFactories.headerFactory
 					.createCallIdHeader(((SipApplicationSessionImpl) sipAppSession)
 							.getId());

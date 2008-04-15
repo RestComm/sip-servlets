@@ -370,10 +370,18 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		return retval.listIterator();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession()
+	 */
 	public SipApplicationSession getApplicationSession() {
-		return this.applicationSession;
+		return getApplicationSession(true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession(boolean)
+	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
 		if ( this.applicationSession != null ) return this.applicationSession;
 		else if (this.session != null && this.session.getApplicationSession() != null ) {
@@ -517,10 +525,18 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} else return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getSession()
+	 */
 	public SipSession getSession() {
-		return this.session;
+		return getSession(true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getSession(boolean)
+	 */
 	public SipSession getSession(boolean create) {
 		if ( this.session == null && create)
 			this.session = new SipSessionImpl( sipFactoryImpl, (SipApplicationSessionImpl)this.getApplicationSession());

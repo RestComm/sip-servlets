@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +53,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
@@ -167,10 +169,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 						sipServletListener.servletInitialized(sipServletContextEvent);					
 					}
 				} catch (ServletException e) {
-					logger.error("Cannot allocate the servlet for notifying the listener " +
+					logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
 							"that it has been initialized", e);
 					ok = false; 
-				}				
+				} catch (Throwable e) {
+					logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
+					ok = false; 
+				}					
 			}
 		}			
 		return ok;
@@ -228,17 +233,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void processRequest(RequestEvent requestEvent) {
-		SipProvider sp = (SipProvider)requestEvent.getSource();
+		SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
 		Request request = requestEvent.getRequest();
 		logger.info("Got a request event "  + request.getMethod());
 		
 		if ( transaction == null ) {
 			try {
-				transaction = sp.getNewServerTransaction(request);
+				transaction = sipProvider.getNewServerTransaction(request);
 			} catch ( TransactionUnavailableException tae) {
-				//TODO Create a 500 Internal server error and return it here.
-				return;
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);				
+                return;
 			} catch ( TransactionAlreadyExistsException taex ) {
 				// Already processed this request so just return.
 				return;				
@@ -246,18 +252,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		}
 		SipSessionImpl session = sessionManager.getRequestSession(sipFactoryImpl, requestEvent, transaction);
 		
-		SipServletRequestImpl sipServletRequest = null;		
-		try {			
-			sipServletRequest = new SipServletRequestImpl(
+		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 					request,
 					sipFactoryImpl,
 					session,
 					transaction,
-					session.getSessionCreatingDialog(),true);
-		}
-		catch(Exception e) {
-			throw new RuntimeException("Failure getting the transaction for current request", e);
-		}
+					session.getSessionCreatingDialog(),true);		
 		
 		//check if the request is initial
 		boolean isInitialRequest = isInitialRequest(sipServletRequest, requestEvent.getDialog());		
@@ -291,22 +291,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				switch(sipRouteModifier) {
 					case ROUTE :
 						String route = applicationRouterInfo.getRoute();
+						Address routeAddress = null; 
+						RouteHeader routeHeader = null;
+						try {
+							routeAddress = SipFactories.addressFactory.createAddress(route);
+							routeHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
+						} catch (ParseException e) {
+							logger.error("Impossible to parse the route into a compliant address",e);							
+							// Sends a 500 Internal server error and stops processing.				
+							JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+							return;
+						}
 						//TODO : check if the route is external
 						boolean isExternal = false;
 						if(isExternal) {
-							// TODO push the route as the top Route header field value and send the request externally
-	//						sipServletRequest.addHeader(RouteHeader.NAME, route);
+							// push the route as the top Route header field value and send the request externally
+							sipServletRequest.addHeader(RouteHeader.NAME, route);
+							sipServletRequest.send();
+							return;
 						} else {
 							// the container MUST make the route available to the applications 
-							// via the SipServletRequest.getPoppedRoute() method.						
-							try {
-								Address routeAdress = SipFactories.addressFactory.createAddress(route);
-								RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(routeAdress);
-								sipServletRequest.setPoppedRoute(routeHeader);
-							} catch (ParseException e) {
-								logger.error("Impossible to parse the route into a compliant sip address",e);
-								//TODO send a 500 server internal error
-							}						
+							// via the SipServletRequest.getPoppedRoute() method.											
+							sipServletRequest.setPoppedRoute(routeHeader);												
 						}
 						break;
 					case CLEAR_ROUTE :
@@ -325,13 +331,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			if(applicationRouterInfo.getNextApplicationName() == null) {
 				//TODO check if the request point to another domain
 				boolean isAnotherDomain = false;
-				if(isAnotherDomain) {
-					// TODO If the Request-URI points to a different domain, or if there are one or more Route headers, 
+				ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
+				if(isAnotherDomain || routeHeaders.hasNext()) {
+					// the Request-URI points to a different domain, or there are one or more Route headers, 
 					// send the request externally according to standard SIP mechanism.
+					sipServletRequest.send();
+					return;
 				} else {
-					// TODO If the Request-URI does not point to another domain, and there is no Route header, 
+					// the Request-URI does not point to another domain, and there is no Route header, 
 					// the container should not send the request as it will cause a loop. 
-					// Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.
+					// Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.					 			
+					JainSipUtils.sendErrorResponse(Response.NOT_FOUND, transaction, request, sipProvider);
+					return;
 				}
 			} else {
 				// TODO set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().
@@ -344,16 +355,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					}
 				} catch (ParseException pe) {					
 					logger.error(pe);
-					//TODO send a 500 server internal error
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return;
 				}
 				// follow the procedures of Chapter 16 to select a servlet from the application.			
 				SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
 				//no matching deployed apps
 				if(sipContext == null) {
-					// this should never happen
 					logger.error("No matching deployed application has been found !");
-					//TODO send a 500 server internal error
-					return ;
+					// Sends a 503 Service Unavailable error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
+					return;
 				}
 				session.setSipContext(sipContext);
 				String sipSessionHandlerName = ((SipSessionImpl)sipServletRequest.getSession()).getHandler();						
@@ -365,10 +378,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					} catch (ServletException e) {
 						// this should never happen
 						logger.error(e);
-						//TODO send a 500 server internal error
+						// Sends a 500 Internal server error and stops processing.				
+						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+						return;
 					} catch (IllegalStateException ise) {
 						logger.error(ise);
-						//TODO send a 500 server internal error
+						// Sends a 500 Internal server error and stops processing.				
+						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+						return;
 					}
 				}
 				Container container = sipContext.findChild(sipSessionHandlerName);
@@ -378,10 +395,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					servlet.service(sipServletRequest, null);
 				} catch (ServletException e) {				
 					logger.error(e);
-					//TODO sends an error message
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return;
 				} catch (IOException e) {				
 					logger.error(e);
-					//TODO sends an error message
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return;
+				} catch (Throwable e) {
+					// Sends a 500 Internal server error and stops processing.				
+					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return;
 				}
 			}
 			logger.info("Request event dispatched");
@@ -394,10 +419,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				servlet.service(sipServletRequest, null);
 			} catch (ServletException e) {				
 				logger.error(e);
-				//TODO sends an error message
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return;
 			} catch (IOException e) {				
 				logger.error(e);
-				//TODO sends an error message
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return;
+			} catch (Throwable e) {
+				logger.error(e);
+				// Sends a 500 Internal server error and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return;
 			}
 		}
 	}
@@ -461,12 +495,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void processResponse(ResponseEvent arg0) {
-		logger.info("Response " + arg0.getResponse().toString());
-		Response response = arg0.getResponse();
+	public void processResponse(ResponseEvent responseEvent) {
+		logger.info("Response " + responseEvent.getResponse().toString());
+		Response response = responseEvent.getResponse();
 		
 		// See if this transaction has been here before
-		Object appData = arg0.getClientTransaction().getApplicationData();
+		Object appData = responseEvent.getClientTransaction().getApplicationData();
 		if(appData instanceof org.mobicents.servlet.sip.message.TransactionApplicationData)
 		{
 			org.mobicents.servlet.sip.message.TransactionApplicationData tad =
@@ -477,7 +511,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new
 				SipServletResponseImpl(response, sipFactoryImpl,
-						arg0.getClientTransaction(), session, arg0.getDialog());
+						responseEvent.getClientTransaction(), session, responseEvent.getDialog());
 
 			// Update Session state
 			if( sipServletResponse.getStatus()>=200 && sipServletResponse.getStatus()<300 )
