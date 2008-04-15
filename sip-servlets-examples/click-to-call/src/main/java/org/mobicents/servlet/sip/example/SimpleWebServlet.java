@@ -26,8 +26,23 @@ public class SimpleWebServlet extends HttpServlet
         String toAddr = request.getParameter("to");
         String fromAddr = request.getParameter("from");
         URI to = sf.createAddress(toAddr).getURI();
-        URI from = sf.createAddress(fromAddr).getURI();
+        URI from = sf.createAddress(fromAddr).getURI();              
+
+        // Create app session and request
+//        SipApplicationSession appSession = 
+//        	((ConvergedHttpSession)request.getSession()).getApplicationSession();
+        SipApplicationSession appSession = 
+        	sf.createApplicationSession();
+        SipServletRequest req = sf.createRequest(appSession, "INVITE", from, to);
         
+        // Set some attribute
+        req.getSession().setAttribute("SecondPartyAddress", sf.createAddress(fromAddr));
+        
+        // Send the INVITE request            
+        req.send();
+        
+        // This hsould be at the end otherwise the response will have been committed and 
+        // the session can't be accessed anymore 
         // Write some web page content
     	PrintWriter	out;
         response.setContentType("text/html");
@@ -40,15 +55,5 @@ public class SimpleWebServlet extends HttpServlet
         if(sf == null) out.println("</BR>Error: SipFactory is null");
         out.println("</BODY></HTML>");
         out.close();
-
-        // Create app session and request
-        SipApplicationSession appSession = sf.createApplicationSession();
-        SipServletRequest req = sf.createRequest(appSession, "INVITE", from, to);
-        
-        // Set some attribute
-        req.getSession().setAttribute("SecondPartyAddress", sf.createAddress(fromAddr));
-        
-        // Send the INVITE request            
-        req.send();
     }
 }
