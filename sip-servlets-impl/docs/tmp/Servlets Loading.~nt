@@ -73,7 +73,7 @@
 <XPD:OBJ name="OwnedViews[2]" type="UMLSeqObjectView" guid="5fcNau9utkewWb/F89UWnQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">496</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">492</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">32</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">113</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">915</XPD:ATTR>
@@ -81,7 +81,7 @@
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="tEH0NqKLrUe7Y8eDSf3R4wAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="g0yYobwBZU2HbXKBswFcfQAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string"> : StandardService</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipStandardService</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="75vJSoycS0SAawqqJwrQ+AAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -171,13 +171,13 @@
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">1136</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">28</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">96</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">110</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">669</XPD:ATTR>
 <XPD:REF name="Model">82Ek8EVbz0mJ3gYwpI1yrQAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="3hJ6lVHk0U+dvT0n1l7bigAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="+WvFDIGS9EKnXsF1VXOkbAAA">
 <XPD:ATTR name="FontStyle" type="integer">4</XPD:ATTR>
-<XPD:ATTR name="Text" type="string"> : StandardEngine</XPD:ATTR>
+<XPD:ATTR name="Text" type="string"> : SipStandardEngine</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="PeypoGSz8EClhPoxYsMk5wAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
@@ -429,7 +429,7 @@ such as StandardServer and its StandardService which in turn has its Connector a
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">352,135;545,135</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">352,135;541,135</XPD:ATTR>
 <XPD:REF name="Model">ui2rygqjJkCSjfCvc3VK9AAA</XPD:REF>
 <XPD:REF name="Head">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
 <XPD:REF name="Tail">cUVStE2sHkqYlcAtfxnX0wAA</XPD:REF>
@@ -455,7 +455,7 @@ such as StandardServer and its StandardService which in turn has its Connector a
 <XPD:REF name="HostEdge">w8h1+/MPQ0alkDoWQyZK+QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="6nPZOgOfZEufFIwsfW5r3AAA">
-<XPD:ATTR name="Left" type="integer">545</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">541</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">135</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">106</XPD:ATTR>
@@ -465,7 +465,7 @@ such as StandardServer and its StandardService which in turn has its Connector a
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,139;1876,139</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,139;1876,139</XPD:ATTR>
 <XPD:REF name="Model">socM3umZYka04nkRzqTycgAA</XPD:REF>
 <XPD:REF name="Head">yGJC6zn9S0CHThl9DPskxAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -519,7 +519,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,174;1876,174</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,174;1876,174</XPD:ATTR>
 <XPD:REF name="Model">CJm3PLfblEy0wDitx3YdwwAA</XPD:REF>
 <XPD:REF name="Head">yGJC6zn9S0CHThl9DPskxAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -555,7 +555,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,209;1876,209</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,209;1876,209</XPD:ATTR>
 <XPD:REF name="Model">moumDOQlU0a1ry6oqRm4cQAA</XPD:REF>
 <XPD:REF name="Head">yGJC6zn9S0CHThl9DPskxAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -663,7 +663,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,239;676,239</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,239;676,239</XPD:ATTR>
 <XPD:REF name="Model">ynr3xNGu5UOeUO6fNjqyJQAA</XPD:REF>
 <XPD:REF name="Head">EqCPy2RK0EunowgLD3wGaAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -807,7 +807,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">352,258;545,258</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">352,258;541,258</XPD:ATTR>
 <XPD:REF name="Model">FMpFyn9HQUqw37a/JNl+JAAA</XPD:REF>
 <XPD:REF name="Head">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
 <XPD:REF name="Tail">cUVStE2sHkqYlcAtfxnX0wAA</XPD:REF>
@@ -833,7 +833,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:REF name="HostEdge">hY5DbSip00qwUMXjonV0eQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="gjn2mRol50mvLepnniBsSwAA">
-<XPD:ATTR name="Left" type="integer">545</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">541</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">258</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">651</XPD:ATTR>
@@ -843,7 +843,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,310;1177,310</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,310;1184,310</XPD:ATTR>
 <XPD:REF name="Model">Pf4LhRGgzEWVn73TqTvXHgAA</XPD:REF>
 <XPD:REF name="Head">n2eMSGk6jUiZbnUkUt0K3wAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -869,7 +869,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:REF name="HostEdge">I77LqgZ4sUq06rFawH7bUgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="vRR4eVNPUUigK7cNN4h/9QAA">
-<XPD:ATTR name="Left" type="integer">1177</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">1184</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">310</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">198</XPD:ATTR>
@@ -879,7 +879,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">1190,315;1220,315;1220,335;1197,335</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1197,315;1227,315;1227,335;1204,335</XPD:ATTR>
 <XPD:REF name="Model">0PlnrN/ZyUmDf+BbXEjLNwAA</XPD:REF>
 <XPD:REF name="Head">n2eMSGk6jUiZbnUkUt0K3wAA</XPD:REF>
 <XPD:REF name="Tail">n2eMSGk6jUiZbnUkUt0K3wAA</XPD:REF>
@@ -905,7 +905,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:REF name="HostEdge">w3QHtdrhdUC4xWPGsYimIgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="35etQNwyOkaCDJylaTj3agAA">
-<XPD:ATTR name="Left" type="integer">1184</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">1191</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">335</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">29</XPD:ATTR>
@@ -915,7 +915,7 @@ many sip stack can be started in parallel ro the same sip stack instance will be
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">1190,458;1296,458</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1197,458;1296,458</XPD:ATTR>
 <XPD:REF name="Model">CkggS+44q06Hhd07xdjYSgAA</XPD:REF>
 <XPD:REF name="Head">2vVUNcJ9b06eaAyRFhUBJAAA</XPD:REF>
 <XPD:REF name="Tail">n2eMSGk6jUiZbnUkUt0K3wAA</XPD:REF>
@@ -1185,7 +1185,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,728;1876,728</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,728;1876,728</XPD:ATTR>
 <XPD:REF name="Model">yoS6pF76T0SbittnjybsAQAA</XPD:REF>
 <XPD:REF name="Head">yGJC6zn9S0CHThl9DPskxAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -1257,7 +1257,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,752;676,752</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,752;676,752</XPD:ATTR>
 <XPD:REF name="Model">xpiUpf0nW0qlCoRLfS8K8gAA</XPD:REF>
 <XPD:REF name="Head">EqCPy2RK0EunowgLD3wGaAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -1365,7 +1365,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,848;788,848</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,848;788,848</XPD:ATTR>
 <XPD:REF name="Model">k2jHfstwgUe3VWLV9RhSfQAA</XPD:REF>
 <XPD:REF name="Head">yqrKYgrBUEq3assw+0xLPwAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -1401,7 +1401,7 @@ The parent object check if it is initialized, it is not so it calls init method
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">788,864;558,864</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">788,864;554,864</XPD:ATTR>
 <XPD:REF name="Model">GooILoCtWk6NcjfirP7PxAAA</XPD:REF>
 <XPD:REF name="Head">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
 <XPD:REF name="Tail">yqrKYgrBUEq3assw+0xLPwAA</XPD:REF>
@@ -1428,7 +1428,7 @@ The parent object check if it is initialized, it is not so it calls init method
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="l2hzED/5e0WLWmDkqrx4BQAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">545</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">541</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">864</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">29</XPD:ATTR>
@@ -1449,7 +1449,7 @@ On this sipProvider we will add the sipApplicationDistacher as SipListener
 <XPD:OBJ name="OwnedViews[49]" type="UMLNoteLinkView" guid="R0MDlJ2K9k26BUCURW/GeQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">673,848;733,992</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">671,848;733,992</XPD:ATTR>
 <XPD:REF name="Head">n/AV7UxrFE28vCXgvk/6FQAA</XPD:REF>
 <XPD:REF name="Tail">uJIsahX/i0SV/k2dmkVNpgAA</XPD:REF>
 </XPD:OBJ>
@@ -1467,7 +1467,7 @@ This allows to be able to plug any custom SipApplicationDispatcher
 <XPD:OBJ name="OwnedViews[51]" type="UMLNoteLinkView" guid="iFesvr8j006SCDFq05dyRAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">1217,139;1315,125</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1215,139;1313,125</XPD:ATTR>
 <XPD:REF name="Head">UL5pZ/f1CEu3NEGMlG1zLAAA</XPD:REF>
 <XPD:REF name="Tail">MNFmw9cu7E6byzBo1uTDDwAA</XPD:REF>
 </XPD:OBJ>
@@ -1492,7 +1492,7 @@ This allows to be able to plug any custom SipApplicationDispatcher
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">558,905;920,905</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">554,905;920,905</XPD:ATTR>
 <XPD:REF name="Model">CyexkSrYhU+/7+k9gmyphAAA</XPD:REF>
 <XPD:REF name="Head">NA7KOftAoEOrD6ATre5qRAAA</XPD:REF>
 <XPD:REF name="Tail">mbPwXTq010y+wvtyj+8fyQAA</XPD:REF>
@@ -3902,7 +3902,7 @@ For section 3.4 still need to define how all the parameters except SipFactory ar
 <XPD:REF name="ReceivingStimuli[1]">Ni+30r+nwkSU3KLBgEDC9wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[2]" type="UMLObject" guid="mjCyNbb00kOL9g8uVC6onQAA">
-<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::apache::catalina::core::StandardService">Bf0wjZtzQUGrzT8dmXJa7AAA</XPD:REF>
+<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::SipStandardService">X2ObIh0Bxk64zbvAIin5CAAA</XPD:REF>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">5fcNau9utkewWb/F89UWnQAA</XPD:REF>
@@ -3961,7 +3961,7 @@ For section 3.4 still need to define how all the parameters except SipFactory ar
 <XPD:REF name="ReceivingStimuli[0]">APIeuP0dlkyfb1rLDJ/ASQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[6]" type="UMLObject" guid="82Ek8EVbz0mJ3gYwpI1yrQAA">
-<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::apache::catalina::core::StandardEngine">xDjciYOEF0mp03FzC7+8ggAA</XPD:REF>
+<XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::SipStandardEngine">GCv6tkKAJkyoNbur9rc32gAA</XPD:REF>
 <XPD:REF name="CollaborationInstanceSet">h8JhUxaFD0mtTON1I5uwjwAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">nb05ADqKqkyTVVjWk2TNCwAA</XPD:REF>

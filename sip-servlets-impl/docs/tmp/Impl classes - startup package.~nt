@@ -122,6 +122,8 @@
 <XPD:REF name="SupplierDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">ousM27dOcUupSTMG4SdwbAAA</XPD:REF>
 <XPD:ATTR name="#Generalizations" type="integer">1</XPD:ATTR>
 <XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">z0hHTu9QZEmW2P64OuaHUQAA</XPD:REF>
+<XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">jQNt5phz30K3ZmfXn/gHHAAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[4]" type="UMLInterface" guid="uTveSh8AB0mjPeHSAahOEwAA">
 <XPD:ATTR name="Name" type="string">SipService</XPD:ATTR>

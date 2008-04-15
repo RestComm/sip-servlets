@@ -8,7 +8,7 @@
 <XPD:BODY>
 <XPD:OBJ name="DocumentElement" type="UMLPackage" guid="KGBmSnbTlUadIk2096olrgAA">
 <XPD:ATTR name="Name" type="string">startup</XPD:ATTR>
-<XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">6</XPD:ATTR>
 <XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="RjmF8NG/DkWbuKl98DZJ9wAA">
 <XPD:ATTR name="Name" type="string">SipContextConfig</XPD:ATTR>
 <XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
@@ -124,6 +124,8 @@
 <XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">z0hHTu9QZEmW2P64OuaHUQAA</XPD:REF>
 <XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
 <XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">jQNt5phz30K3ZmfXn/gHHAAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">mjCyNbb00kOL9g8uVC6onQAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[4]" type="UMLInterface" guid="uTveSh8AB0mjPeHSAahOEwAA">
 <XPD:ATTR name="Name" type="string">SipService</XPD:ATTR>
@@ -156,6 +158,12 @@
 </XPD:OBJ>
 <XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
 <XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">9jsbtXDlNEWl02WaOEywegAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[5]" type="UMLClass" guid="GCv6tkKAJkyoNbur9rc32gAA">
+<XPD:ATTR name="Name" type="string">SipStandardEngine</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">82Ek8EVbz0mJ3gYwpI1yrQAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:BODY>
