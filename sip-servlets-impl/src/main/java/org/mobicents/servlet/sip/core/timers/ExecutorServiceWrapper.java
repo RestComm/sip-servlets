@@ -5,11 +5,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.SipContainerThreadPool;
-import org.mobicents.servlet.sip.SipServletMessageImpl;
-
 
 public class ExecutorServiceWrapper {
 
@@ -21,8 +16,8 @@ public class ExecutorServiceWrapper {
 
 	private ScheduledThreadPoolExecutor myThreadPool = null;
 
-	private static transient Log log = LogFactory
-			.getLog(SipContainerThreadPool.class.getName());
+//	private static transient Log log = LogFactory
+//			.getLog(SipContainerThreadPool.class.getName());
 
 	public static ExecutorServiceWrapper getInstance() {
 		return singletonInstance;
@@ -87,7 +82,7 @@ public class ExecutorServiceWrapper {
 				myRunnable.run();
 
 			} catch (Throwable t) {
-				log.fatal("error while executing task:", t);
+//				log.fatal("error while executing task:", t);
 				throw new RuntimeException(t);
 			}
 		}

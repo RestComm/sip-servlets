@@ -11,10 +11,7 @@ import javax.servlet.sip.TimerService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-
-
-import org.mobicents.servlet.sip.core.session.*;
+import org.mobicents.servlet.sip.core.session.SipServletApplicationImpl;
 
 
 

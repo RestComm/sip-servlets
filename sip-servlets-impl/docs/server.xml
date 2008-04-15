@@ -37,7 +37,10 @@
    -->
 
   <!-- Define the Tomcat Stand-Alone Service -->
-  <Service name="Catalina">
+  <Service name="Catalina" 
+  		className="org.mobicents.servlet.sip.startup.SipStandardService" 
+  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned.  Each Connector passes requests on to the
@@ -109,7 +112,17 @@
 	serverLog = "../logs/serverlog.txt"
 	sipStackName="SIP-Servlet-Tomcat-Server" 
 	sipPathName="gov.nist"/>
-
+	
+	<Connector port="5080" 
+	ipAddress = "127.0.0.1"
+	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	signalingTransport="udp" 
+    	logLevel="DEBUG"
+	debugLog = "../logs/debuglog.txt" 
+	serverLog = "../logs/serverlog.txt"
+	sipStackName="SIP-Servlet-Tomcat-Server" 
+	sipPathName="gov.nist"/>
+	
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone
          analyzes the HTTP headers included with the request, and passes them

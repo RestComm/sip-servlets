@@ -17,9 +17,13 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
+import org.apache.catalina.startup.DigesterFactory;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tomcat.util.digester.Digester;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.SAXException;
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures
@@ -34,7 +38,7 @@ public class SipContextConfig extends ContextConfig implements
 	private static final String APPLICATION_SIP_XML = "/WEB-INF/sip.xml";
 
 	private static transient Log logger = LogFactory
-			.getLog(SipContextConfig.class.getCanonicalName());
+			.getLog(SipContextConfig.class);
 
 	/**
 	 * {@inheritDoc}
@@ -55,7 +59,7 @@ public class SipContextConfig extends ContextConfig implements
 		logger.info("starting sipContextConfig");
 		ServletContext servletContext = context.getServletContext();
 		// calling start on the parent to initialize web resources of the web
-		// app if any
+		// app if any. That mean that this is a converged application.
 		InputStream webXmlInputStream = servletContext
 				.getResourceAsStream(Constants.ApplicationWebXml);
 		if (webXmlInputStream != null) {
@@ -66,20 +70,35 @@ public class SipContextConfig extends ContextConfig implements
 		// processing of the sip.xml file
 		if (sipXmlInputStream != null) {
 			log.info(APPLICATION_SIP_XML + " has been found !");
-			try {
-		
-			} catch (Exception e) {
-				log.error("Impossible to parse the sip deployment descriptor",
-						e);
-				ok = false;
-			}
+				//
+				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
+                        xmlNamespaceAware,
+                        new SipRuleSet());
+				EntityResolver entityResolver = new SipEntityResolver();
+				sipDigester.setValidating(false);		
+				sipDigester.setEntityResolver(entityResolver);				
+				//push the context to the digester
+				sipDigester.push(context);
+				//parse the sip.xml and populate the context with it
+				try {
+					sipDigester.resolveEntity(null, null);
+					sipDigester.parse(sipXmlInputStream);
+				} catch (IOException e) {
+					log.error("Impossible to parse the sip deployment descriptor",
+							e);
+					ok = false;
+				} catch (SAXException e) {
+					log.error("Impossible to parse the sip deployment descriptor",
+							e);
+					ok = false;
+				}						
 		} else {
 			log.info(APPLICATION_SIP_XML + " has not been found !");
 			ok = false;
 		}
 		// Make our application available if no problems were encountered
 		if (ok) {
-			context.setConfigured(true);
+			context.setConfigured(true);						
 		} else {
 			logger.warn("contextConfig.unavailable");
 			context.setAvailable(false);

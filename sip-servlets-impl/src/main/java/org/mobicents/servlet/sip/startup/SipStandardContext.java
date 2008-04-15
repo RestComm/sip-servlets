@@ -3,12 +3,20 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import java.util.HashMap;
+
 import org.apache.catalina.Container;
+import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Service;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * Sip implementation of the <b>Context</b> interface extending the standard
@@ -18,12 +26,24 @@ import org.apache.commons.logging.LogFactory;
  * @author jean deruelle
  * 
  */
-public class SipStandardContext extends StandardContext {
-	private static final String CONFIG_CLASSNAME = "org.mobicents.servlet.sip.startup.SipContextConfig";
-
-	// the logger
+public class SipStandardContext extends StandardContext implements SipContext {
+	//	 the logger
 	private static transient Log logger = LogFactory
-			.getLog(SipStandardContext.class.getCanonicalName());
+			.getLog(SipStandardContext.class);
+//	private static final String CONFIG_CLASSNAME = "org.mobicents.servlet.sip.startup.SipContextConfig";
+
+	public String applicationName;
+	public String smallIcon;
+	public String largeIcon;
+	public String description;
+	public SipListenersHolder listeners;
+	public String mainServlet;
+	public HashMap sipServlets;
+	public int proxyTimeout;
+	public int sessionTimeout;
+	public HashMap securityConstraints;
+	public HashMap securityRoles;
+	public HashMap<String,Object> sipApplicationSessionAttributeMap;
 	
 	/**
 	 * 
@@ -41,6 +61,7 @@ public class SipStandardContext extends StandardContext {
 			this.addLifecycleListener(sipConfigurationListener);
 			setDelegate(true);
 		}
+		setWrapperClass(SipServletImpl.class.getName());
 		// call the super method to correctly initialize the context and fire
 		// up the
 		// init event on the new registered SipContextConfig, so that the
@@ -53,7 +74,24 @@ public class SipStandardContext extends StandardContext {
 	@Override
 	public synchronized void start() throws LifecycleException {
 		logger.info("Starting the sip context");
+		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
+		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
+		//and call load on startup which is equivalent to
+		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
 		super.start();
+		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
+		//called implicitky within sipApplicationDispatcher.addSipApplication
+		Container container = getParent().getParent();
+		if(container instanceof Engine) {
+			Service service = ((Engine)container).getService();
+			if(service instanceof SipService) {
+				SipApplicationDispatcher sipApplicationDispatcher = 
+					((SipService)service).getSipApplicationDispatcher();				
+				sipApplicationDispatcher.addSipApplication(applicationName, this);
+			}
+		}				
+		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
+		sipListenerStart();
 		logger.info("sip context started");
 	}
 
@@ -66,6 +104,243 @@ public class SipStandardContext extends StandardContext {
 
 	@Override
 	public void loadOnStartup(Container[] containers) {
-		super.loadOnStartup(containers);
+		super.loadOnStartup(containers);	
+	}
+
+	@Override
+	public Wrapper createWrapper() {		
+		return super.createWrapper();
+	}
+	
+	public void addChild(SipServletImpl arg0) {	
+		super.addChild(arg0);
+	}
+	
+	public boolean sipListenerStart() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public boolean sipListenerStop() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getApplicationName()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getApplicationName()
+	 */
+	public String getApplicationName() {
+		return applicationName;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setApplicationName(java.lang.String)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setApplicationName(java.lang.String)
+	 */
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getDescription()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getDescription()
+	 */
+	public String getDescription() {
+		return description;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setDescription(java.lang.String)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setDescription(java.lang.String)
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getLargeIcon()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getLargeIcon()
+	 */
+	public String getLargeIcon() {
+		return largeIcon;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setLargeIcon(java.lang.String)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setLargeIcon(java.lang.String)
+	 */
+	public void setLargeIcon(String largeIcon) {
+		this.largeIcon = largeIcon;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getListeners()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getListeners()
+	 */
+	public SipListenersHolder getListeners() {
+		return listeners;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setListeners(org.mobicents.servlet.sip.core.session.SipListenersHolder)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setListeners(org.mobicents.servlet.sip.core.session.SipListenersHolder)
+	 */
+	public void setListeners(SipListenersHolder listeners) {
+		this.listeners = listeners;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getMainServlet()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getMainServlet()
+	 */
+	public String getMainServlet() {
+		return mainServlet;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setMainServlet(java.lang.String)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setMainServlet(java.lang.String)
+	 */
+	public void setMainServlet(String mainServlet) {
+		this.mainServlet = mainServlet;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getProxyTimeout()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getProxyTimeout()
+	 */
+	public int getProxyTimeout() {
+		return proxyTimeout;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setProxyTimeout(int)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setProxyTimeout(int)
+	 */
+	public void setProxyTimeout(int proxyTimeout) {
+		this.proxyTimeout = proxyTimeout;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSecurityConstraints()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSecurityConstraints()
+	 */
+	public HashMap getSecurityConstraints() {
+		return securityConstraints;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSecurityConstraints(java.util.HashMap)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setSecurityConstraints(java.util.HashMap)
+	 */
+	public void setSecurityConstraints(HashMap securityConstraints) {
+		this.securityConstraints = securityConstraints;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSecurityRoles()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSecurityRoles()
+	 */
+	public HashMap getSecurityRoles() {
+		return securityRoles;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSecurityRoles(java.util.HashMap)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setSecurityRoles(java.util.HashMap)
+	 */
+	public void setSecurityRoles(HashMap securityRoles) {
+		this.securityRoles = securityRoles;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getServlets()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipServlets()
+	 */
+	public HashMap getSipServlets() {
+		return sipServlets;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setServlets(java.util.HashMap)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setSipServlets(java.util.HashMap)
+	 */
+	public void setSipServlets(HashMap sipServlets) {
+		this.sipServlets = sipServlets;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSessionTimeout()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSessionTimeout()
+	 */
+	public int getSessionTimeout() {
+		return sessionTimeout;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSessionTimeout(int)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setSessionTimeout(int)
+	 */
+	public void setSessionTimeout(int sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSipApplicationSessionAttributeMap()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionAttributeMap()
+	 */
+	public HashMap<String, Object> getSipApplicationSessionAttributeMap() {
+		return sipApplicationSessionAttributeMap;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSipApplicationSessionAttributeMap(java.util.HashMap)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setSipApplicationSessionAttributeMap(java.util.HashMap)
+	 */
+	public void setSipApplicationSessionAttributeMap(
+			HashMap<String, Object> sipApplicationSessionAttributeMap) {
+		this.sipApplicationSessionAttributeMap = sipApplicationSessionAttributeMap;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSmallIcon()
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSmallIcon()
+	 */
+	public String getSmallIcon() {
+		return smallIcon;
+	}
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSmallIcon(java.lang.String)
+	 */
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#setSmallIcon(java.lang.String)
+	 */
+	public void setSmallIcon(String smallIcon) {
+		this.smallIcon = smallIcon;
 	}
 }

@@ -19,7 +19,7 @@ import org.mobicents.servlet.sip.SipFactories;
  * This is the sip protocol handler that will get called upon creation of the
  * tomcat connector defined in the server.xml.<br/> To use a sip connector, one
  * need to specify a new connector in server.xml with
- * org.open.servlet.sip.startup.SipProtocolHandler as the value for the
+ * org.mobicents.servlet.sip.startup.SipProtocolHandler as the value for the
  * protocol attribute.<br/>
  * 
  * Some of the fields (representing the sip stack propeties) get populated
@@ -32,6 +32,7 @@ public class SipProtocolHandler implements ProtocolHandler {
 	// the logger
 	private static transient Log logger = LogFactory.getLog(SipProtocolHandler.class.getName());
 
+	private Adapter adapter = null;
 
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -107,9 +108,8 @@ public class SipProtocolHandler implements ProtocolHandler {
 		logger.info("Sip stack stopped");
 	}
 
-	public Adapter getAdapter() {
-		// TODO Auto-generated method stub
-		return null;
+	public Adapter getAdapter() {		
+		return adapter;
 	}
 
 	/**
@@ -134,17 +134,17 @@ public class SipProtocolHandler implements ProtocolHandler {
 	}
 
 	public void pause() throws Exception {
-		// TODO Auto-generated method stub
+		//This is optionnal, no implementation there
 
 	}
 
 	public void resume() throws Exception {
-		// TODO Auto-generated method stub
+		// This is optionnal, no implementation there
 
 	}
 
-	public void setAdapter(Adapter arg0) {
-		// TODO Auto-generated method stub
+	public void setAdapter(Adapter adapter) {
+		this.adapter = adapter;
 
 	}
 
@@ -187,10 +187,10 @@ public class SipProtocolHandler implements ProtocolHandler {
 			listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
 			sipProvider = sipStack.createSipProvider(listeningPoint);
-//			sipProvider.addSipListener(ApplicationDispatcher.getInstance());
 			sipStack.start();
-			//starting the singleton application dispatcher for this container
-//			ApplicationDispatcher.getInstance().start();
+			//made the sip stack and the sipProvider available to the service implementation
+			setAttribute("sipStack", sipStack);
+			setAttribute("sipProvider", sipProvider);			
 			
 			logger.info("Sip stack started on ip address : " + ipAddress
 					+ " and port " + port);
