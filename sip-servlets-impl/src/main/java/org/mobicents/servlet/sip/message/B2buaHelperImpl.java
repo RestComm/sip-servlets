@@ -51,6 +51,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 /**
  * Implementation of the B2BUA helper class.
  * 
+ * 
  * @author mranga
  * @author jean.deruelle
  */
@@ -153,7 +154,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			session.setHandler(originalSession.getHandler());
 			appSession.setSipContext(session.getSipApplicationSession().getSipContext());
 			
-			//since B2BUA is considered as an end point , it is normal to do reinitialize 
+			//since B2BUA is considered as an end point , it is normal to reinitialize 
 			//the via header chain
 			ViaHeader newViaHeader = JainSipUtils.createViaHeader(
 					sipFactoryImpl.getSipProviders(), viaHeader.getTransport(), null);
@@ -168,20 +169,14 @@ public class B2buaHelperImpl implements B2buaHelper {
 					sipFactoryImpl,
 					session, null, null, true);			
 			//JSR 289 Section 15.1.6
-			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
-			//set AR State Info from previous request
-			newSipServletRequest.getSipSession().setStateInfo(origRequestImpl.getSipSession().getStateInfo());
-			//needed for application composition
-			newSipServletRequest.setCurrentApplicationName(origRequestImpl.getCurrentApplicationName());
+			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			for (String contactHeaderValue : contactHeaderSet) {
 				newSipServletRequest.addHeader(ContactHeader.NAME, contactHeaderValue);
 			}
-			
-			origRequestImpl.setLinkedRequest(newSipServletRequest);
-			newSipServletRequest.setLinkedRequest(origRequestImpl);
+						
 			if (linked) {
 				sessionMap.put(originalSession, session);
 				sessionMap.put(session, originalSession);				
@@ -246,9 +241,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(newRequest,sipFactoryImpl,
 					session, sessionImpl.getSessionCreatingTransaction(), dialog, false);
 			//JSR 289 Section 15.1.6
-			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
-			//needed for application composition
-			newSipServletRequest.setCurrentApplicationName(originalSession.getKey().getApplicationName());
+			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
@@ -259,9 +252,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			if(logger.isDebugEnabled()) {
 				logger.debug("newRequest = " + newRequest);
 			}			
-			
-			origRequestImpl.setLinkedRequest(newSipServletRequest);
-			newSipServletRequest.setLinkedRequest(origRequestImpl);			
+								
 			sessionMap.put(originalSession, sessionImpl);
 			sessionMap.put(sessionImpl, originalSession);
 
@@ -305,8 +296,6 @@ public class B2buaHelperImpl implements B2buaHelper {
 				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
 						.next();				
 				response.addHeader(recordRouteHeader);
-//				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
-//				response.addHeader(routeHeader);
 			}			
 			
 			if(status ==  Response.OK) {

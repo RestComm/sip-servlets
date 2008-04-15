@@ -18,5 +18,7 @@ public enum RoutingState {
 	// request has been proxied, stop routing
 	PROXIED,
 	//request has been relayed, stop routing
-	RELAYED;
+	RELAYED, 
+	//request has been canncelled, stop routing
+	CANCELLED;
 }

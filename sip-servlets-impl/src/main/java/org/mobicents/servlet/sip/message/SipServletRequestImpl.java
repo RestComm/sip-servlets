@@ -294,9 +294,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
 			this.transactionApplicationData.setProxy(proxy);
 		}
-		
-		
-
 		return this.transactionApplicationData.getProxy();
 	}
 
@@ -445,6 +442,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				throw new IllegalStateException(
 						"Bad state -- cannot set routing directive");
+			} else {
+				//set AR State Info from previous request
+				session.setStateInfo(origRequestImpl.getSipSession().getStateInfo());
+				//needed for application composition
+				currentApplicationName = origRequestImpl.getCurrentApplicationName();
+				//linking the requests
+				//FIXME one request can be linked to  many more as for B2BUA
+				origRequestImpl.setLinkedRequest(this);
+				setLinkedRequest(origRequestImpl);
 			}
 		} else {				
 			//This request must be a request created in a new SipSession 
@@ -658,10 +664,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if (dialog != null)
 					dialog.setApplicationData(this.transactionApplicationData);
 
+				//Keeping the transactions mapping in application data for CANCEL handling
+				if(linkedRequest != null) {
+					//keeping the client transaction in the server transaction's application data
+					((TransactionApplicationData)linkedRequest.getTransaction().getApplicationData()).setTransaction(ctx);
+					//keeping the server transaction in the client transaction's application data
+					this.transactionApplicationData.setTransaction(linkedRequest.getTransaction());
+				}
+				
 				// SIP Request is ALWAYS pointed to by the client tx.
 				// Notice that the tx appplication data is cached in the request
 				// copied over to the tx so it can be quickly accessed when response
-				// arrives.
+				// arrives.				
 				ctx.setApplicationData(this.transactionApplicationData);
 
 				super.setTransaction(ctx);
@@ -752,8 +766,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/**
 	 * @param routingState the routingState to set
 	 */
-	public void setRoutingState(RoutingState routingState) {
-		this.routingState = routingState;
+	public void setRoutingState(RoutingState routingState) throws IllegalStateException {
+		//JSR 289 Section 11.2.3
+		if(routingState.equals(RoutingState.CANCELLED) && this.routingState.equals(RoutingState.FINAL_RESPONSE_SENT)) {
+			throw new IllegalStateException("Cannot cancel final response already sent!");
+		}
+		if(routingState.equals(RoutingState.FINAL_RESPONSE_SENT) && this.routingState.equals(RoutingState.CANCELLED)) {
+			throw new IllegalStateException("Cancel received and already replied with a 487!");
+		}
+		this.routingState = routingState;	
 	}	
 
 }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -49,7 +50,10 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -317,27 +321,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 										
 			if(sipServletRequest.isInitial()) {
 				logger.info("Routing of Initial Request " + request);
-				boolean continueRouting = routeInitialRequest(sipProvider, sipServletRequest);
-				// if continueRouting is true it means two things :
-				// A) the app returned by the Application Router returned an app
-				// that is not currently deployed
-				// B) the app that was called didn't do anything with the request
-				// in any case we should route back to container statefully 
-				if(continueRouting) {
-					forwardStatefully(sipProvider, transaction,
-							sipServletRequest);
-				}				
+				routeInitialRequest(sipProvider, sipServletRequest);							
 			} else {
 				logger.info("Routing of Subsequent Request " + request);
 				Dialog dialog = sipServletRequest.getDialog();				
-				boolean continueRouting = routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
-				// if continueRouting is true it means the app that was called 
-				// didn't do anything with the request
-				// in any case we should route back to container statefully 
-				if(continueRouting) {
-					forwardStatefully(sipProvider, transaction,
-							sipServletRequest);
-				}										
+				if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
+					routeCancel(sipProvider, sipServletRequest, dialog);
+				} else {
+					routeSubsequentRequest(sipProvider, sipServletRequest, dialog);
+				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -352,7 +344,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * Forward statefully a request whether it is initial or subsequent
 	 * and keep track of the transactions used in application data of each transaction
 	 * @param sipProvider the sip provider used to get a new client Transaction
-	 * @param transaction the server transaction on which we received the request
+	 * @param serverTransaction the server transaction on which we received the request
 	 * @param sipServletRequest the sip servlet request to forward statefully
 	 * @throws ParseException 
 	 * @throws TransactionUnavailableException
@@ -360,26 +352,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @throws InvalidArgumentException 
 	 */
 	private void forwardStatefully(SipProvider sipProvider,
-			ServerTransaction transaction,
-			SipServletRequestImpl sipServletRequest) throws ParseException,
+			ServerTransaction serverTransaction,
+			SipServletRequestImpl sipServletRequest,
+			Dialog dialog) throws ParseException,
 			TransactionUnavailableException, SipException, InvalidArgumentException {
-		sipServletRequest.addInfoForRoutingBackToContainer();
-		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();
-		if(logger.isDebugEnabled()) {
-			logger.debug("Routing Back to the container the following initial request " 
-					+ clonedRequest);
-		}												
+				
+		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();		
+		
 		//Add via header
-		String transport = JainSipUtils.findTransport(clonedRequest);
-		String handlerName = sipServletRequest.getSipSession().getHandler();
+		String transport = JainSipUtils.findTransport(clonedRequest);		
 		ViaHeader viaHeader = JainSipUtils.createViaHeader(
 				sipFactoryImpl.getSipProviders(), transport, null);
+		String handlerName = sipServletRequest.getSipSession().getHandler();
+		
 		if(handlerName != null) { 
 			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
 					sipServletRequest.getSipSession().getKey().getApplicationName());
 			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
 					sipServletRequest.getSipSession().getHandler());
 		} else {
+			// if the handler name is null it means that the app returned by the AR was not deployed
+			// and couldn't be called, 
+			// we specify it so that on response handling this app can be skipped
 			viaHeader.setParameter(SipApplicationDispatcherImpl.APP_NOT_DEPLOYED,
 					sipServletRequest.getSipSession().getKey().getApplicationName());						
 		}					
@@ -393,14 +387,77 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		} else {
 			mf.setMaxForwards(mf.getMaxForwards() - 1);
 		}
-		ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
-		//keeping the server transaction in the client transaction's application data
-		TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
-		appData.setTransaction(transaction);
-		ctx.setApplicationData(appData);
-		//keeping the client transaction in the server transaction's application data
-		((TransactionApplicationData)transaction.getApplicationData()).setTransaction(ctx);
-		ctx.sendRequest();
+		if(logger.isDebugEnabled()) {
+			logger.debug("Routing Back to the container the following request " 
+					+ clonedRequest);
+		}				
+		if(dialog == null) {
+			Transaction transaction = ((TransactionApplicationData)
+					sipServletRequest.getTransaction().getApplicationData()).getSipServletMessage().getTransaction();
+			if(transaction == null || transaction instanceof ServerTransaction) {
+				ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
+				//keeping the server transaction in the client transaction's application data
+				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
+				appData.setTransaction(serverTransaction);
+				ctx.setApplicationData(appData);
+				//keeping the client transaction in the server transaction's application data
+				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);
+				ctx.sendRequest();
+			} else {
+				((ClientTransaction)transaction).sendRequest();
+			}
+		} else if ( clonedRequest.getMethod().equals("ACK") ) {
+            dialog.sendAck(clonedRequest);
+		} else {
+			Request dialogRequest=
+				dialog.createRequest(clonedRequest.getMethod());
+	        Object content=clonedRequest.getContent();
+	        if (content!=null) {
+	        	ContentTypeHeader contentTypeHeader= (ContentTypeHeader)
+	        		clonedRequest.getHeader(ContentTypeHeader.NAME);
+	            if (contentTypeHeader!=null) {
+	            	dialogRequest.setContent(content,contentTypeHeader);
+	        	}
+	                     
+	            // Copy all the headers from the original request to the 
+	            // dialog created request:	            
+                ListIterator l=clonedRequest.getHeaderNames();
+                while (l.hasNext() ) {
+                     String name=(String)l.next();
+                     Header header=dialogRequest.getHeader(name);
+                     if (header==null  ) {
+                        ListIterator li=clonedRequest.getHeaders(name);
+                        if (li!=null) {
+                            while (li.hasNext() ) {
+                                Header  h=(Header)li.next();
+                                dialogRequest.addHeader(h);
+                            }
+                        }
+                     }
+                     else {
+                         if ( header instanceof ViaHeader) {
+                             ListIterator li= clonedRequest.getHeaders(name);
+                             if (li!=null) {
+                                 dialogRequest.removeHeader(name);
+                                 Vector v=new Vector();
+                                 while (li.hasNext() ) {
+                                     Header  h=(Header)li.next();
+                                     v.addElement(h);
+                                 }
+                                 for (int k=(v.size()-1);k>=0;k--) {
+                                     Header  h=(Header)v.elementAt(k);
+                                     dialogRequest.addHeader(h);
+                                 }
+                             }
+                         }
+                     }
+                }       
+	            	                    
+	            ClientTransaction clientTransaction =
+				sipProvider.getNewClientTransaction(dialogRequest);
+	                    dialog.sendRequest(clientTransaction);
+	        }
+		}
 	}
 
 	/**
@@ -408,68 +465,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param transaction
 	 * @param request
 	 * @param sipServletRequest
+	 * @throws InvalidArgumentException 
+	 * @throws SipException 
+	 * @throws ParseException 
+	 * @throws TransactionUnavailableException 
 	 */
-	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest, Dialog dialog) {
+	private boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest, Dialog dialog) throws TransactionUnavailableException, ParseException, SipException, InvalidArgumentException {
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
-		//TODO Extract information from the Record Route Header
-		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
 
-		/*
-		 * WARNING: TODO: We need to find a way to route CANCELs through the app path
-		 * of the INVITE. CANCEL does not contain Route headers as other requests related
-		 * to the dialog.
-		 */
-		/* If there is a proxy with the request, let's try to send it directly there.
-		 * This is needed because of CANCEL which is a subsequent request that might
-		 * not have Routes. For example if the callee has'n responded the caller still
-		 * doesn't know the route-record and just sends cancel to the outbound proxy.
-		 */
-		boolean proxyCancel = false;
-		if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
-			Transaction inviteTransaction = ((SIPServerTransaction) transaction ).getCanceledInviteTransaction();
-			Object appData = inviteTransaction.getApplicationData();
-			TransactionApplicationData tad = (TransactionApplicationData) appData;
-			if(tad.getProxy() != null)
-			{
-				try {
-					// First we need to send OK ASAP because of retransmissions.
-					ServerTransaction cancelTransaction = 
-						(ServerTransaction) sipServletRequest.getTransaction();
-					SipServletResponseImpl cancelResponse = (SipServletResponseImpl) 
-					sipServletRequest.createResponse(200, "Canceling");
-					Response cancelJsipResponse = (Response) cancelResponse.getMessage();
-					cancelTransaction.sendResponse(cancelJsipResponse);
-				} catch (SipException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvalidArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				tad.getProxy().cancel();
-				proxyCancel = true;
-				return false;
-			}
-			
-			// TODO: This is a temporary patch. Rewrite when AR uses transactions
-			// This code handles CANCEL requests that got back to the container
-			// after being proxied for example.
-			if(poppedAddress != null)
-			{
-				try {
-					sipProvider.sendRequest((Request)sipServletRequest.getMessage());
-				} catch (SipException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			// End of code to rewrite
-		}
-		if(!proxyCancel && poppedAddress==null){
+		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
+				
+		if(poppedAddress==null){
 			throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
-		}			
-		
+		}
+		//Extract information from the Record Route Header		
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
 		if(applicationName == null || applicationName.length() < 1 || 
@@ -550,35 +560,155 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		RoutingState routingState = sipServletRequest.getRoutingState();
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
 				RoutingState.PROXIED.equals(routingState) ||
-				RoutingState.RELAYED.equals(routingState)) {
+				RoutingState.RELAYED.equals(routingState) ||
+				RoutingState.CANCELLED.equals(routingState)) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
 						"The Container hence stops routing the initial request.");
 			}
 			return false;
-		} else {
-			// Check if the request is meant for me. If so, strip the topmost
-			// Route header.
+		} else {		
+			// Check if the request is meant for me. 
 			RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
-			//Popping the router header if it's for the container as
-			//specified in JSR 289 - Section 15.8
-			if(! isRouteExternal(routeHeader)) {
-				request.removeFirst(RouteHeader.NAME);
-				sipServletRequest.setPoppedRoute(routeHeader);
-				return true;
-			} else {
-				// the Request-URI points to a different domain, or there are one or more Route headers, 
-				// send the request externally according to standard SIP mechanism.
+			if(routeHeader == null || isRouteExternal(routeHeader)) {
+				// no route header or external, send outside the container
+				// FIXME send it statefully
 				try{
 					sipProvider.sendRequest((Request)request.clone());						
 					logger.info("Subsequent Request dispatched outside the container" + request.toString());
 				} catch (Exception ex) {			
 					throw new IllegalStateException("Error sending request",ex);
-				}				
-				return false;				
-			}					
+				}	
+				return false;
+			} else {		
+				//route header is meant for the container hence we continue
+				forwardStatefully(sipProvider, transaction,
+						sipServletRequest, dialog);
+				return true;
+			}
 		}		
+	}
+
+	/**
+	 * @param sipProvider
+	 * @param sipServletRequest
+	 * @param transaction
+	 * @param request
+	 * @param poppedAddress
+	 */
+	private boolean routeCancel(SipProvider sipProvider, SipServletRequestImpl sipServletRequest, Dialog dialog) {
+		
+		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
+		Request request = (Request) sipServletRequest.getMessage();		
+						
+		/*
+		 * WARNING: TODO: We need to find a way to route CANCELs through the app path
+		 * of the INVITE. CANCEL does not contain Route headers as other requests related
+		 * to the dialog.
+		 */
+		/* If there is a proxy with the request, let's try to send it directly there.
+		 * This is needed because of CANCEL which is a subsequent request that might
+		 * not have Routes. For example if the callee has'n responded the caller still
+		 * doesn't know the route-record and just sends cancel to the outbound proxy.
+		 */	
+//		boolean proxyCancel = false;
+		try {
+			// First we need to send OK ASAP because of retransmissions both for 
+			//proxy or app
+			ServerTransaction cancelTransaction = 
+				(ServerTransaction) sipServletRequest.getTransaction();
+			SipServletResponseImpl cancelResponse = (SipServletResponseImpl) 
+			sipServletRequest.createResponse(200, "Canceling");
+			Response cancelJsipResponse = (Response) cancelResponse.getMessage();
+			cancelTransaction.sendResponse(cancelJsipResponse);
+		} catch (SipException e) {
+			logger.error("Impossible to send the ok to the CANCEL",e);
+			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			return false;
+		} catch (InvalidArgumentException e) {
+			logger.error("Impossible to send the ok to the CANCEL",e);
+			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			return false;
+		}
+							
+		Transaction inviteTransaction = ((SIPServerTransaction) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
+		TransactionApplicationData appData = (TransactionApplicationData) 
+			inviteTransaction.getApplicationData();
+		if(appData.getProxy() != null) {				
+			appData.getProxy().cancel();
+//			proxyCancel = true;
+			return true;
+		} else {
+			SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
+				appData.getSipServletMessage();
+			SipServletResponseImpl inviteResponse = (SipServletResponseImpl) 
+				inviteRequest.createResponse(487);
+			try {
+				inviteRequest.setRoutingState(RoutingState.CANCELLED);
+			} catch (IllegalStateException e) {
+				logger.info("Final response already sent, dropping the cancel");
+				return false;
+			}
+			try {
+				Response requestTerminatedResponse = (Response) inviteResponse.getMessage();
+					((ServerTransaction)inviteTransaction).sendResponse(requestTerminatedResponse);
+				((SipServletRequestImpl)appData.getSipServletMessage()).setRoutingState(RoutingState.CANCELLED);
+			} catch (SipException e) {
+				logger.error("Impossible to send the 487 to the INVITE transaction corresponding to CANCEL",e);
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return false;
+			} catch (InvalidArgumentException e) {
+				logger.error("Impossible to send the ok 487 to the INVITE transaction corresponding to CANCEL",e);
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return false;
+			}
+			//Forwarding the cancel on the other B2BUA side
+			if(inviteRequest.getLinkedRequest() != null) {					
+				SipServletRequestImpl cancelRequest = (SipServletRequestImpl)
+					inviteRequest.getLinkedRequest().createCancel();
+//				cancelRequest.getMessage().removeFirst(RouteHeader.NAME);
+//				cancelRequest.getMessage().removeFirst(RecordRouteHeader.NAME);				
+				cancelRequest.send();
+				return true;
+			} else {
+				SipSessionImpl sipSession = inviteRequest.getSipSession();
+				sipServletRequest.setSipSession(sipSession);
+				Wrapper servletWrapper = (Wrapper) applicationDeployed.get(sipSession.getKey().getApplicationName()).findChild(sipSession.getHandler());
+				try{
+					Servlet servlet = servletWrapper.allocate();
+					servlet.service(sipServletRequest, null);
+					return true;
+				} catch (ServletException e) {				
+					logger.error(e);
+					// Sends a 500 Internal server error and stops processing.				
+//						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return false;
+				} catch (IOException e) {				
+					logger.error(e);
+					// Sends a 500 Internal server error and stops processing.				
+//						JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+					return false;
+				}
+			}
+		}
+		
+		// TODO: This is a temporary patch. Rewrite when AR uses transactions
+		// This code handles CANCEL requests that got back to the container
+		// after being proxied for example.
+//			if(poppedAddress != null)
+//			{
+//				try {
+//					sipProvider.sendRequest((Request)sipServletRequest.getMessage());
+//				} catch (SipException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+		// End of code to rewrite
+//		if(!proxyCancel && poppedAddress==null){
+//			throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
+//		}
 	}
 
 	/**
@@ -589,21 +719,23 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param session
 	 * @param sipServletRequest
 	 * @throws ParseException 
+	 * @throws InvalidArgumentException 
+	 * @throws SipException 
+	 * @throws TransactionUnavailableException 
 	 */
-	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws ParseException {
+	private boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws ParseException, TransactionUnavailableException, SipException, InvalidArgumentException {
 		//15.4.1 Routing an Initial request Algorithm
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();
 		
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
-		
+		logger.info("popped route : " + poppedAddress);
 		//set directive from popped route header if it is present			
 		Serializable stateInfo = null;
 		SipApplicationRoutingDirective sipApplicationRoutingDirective = SipApplicationRoutingDirective.NEW;;
 		if(poppedAddress != null) {
 			// get the state info associated with the request because it means 
-			// that is has been routed back to the container
-			logger.info("popped route : " + poppedAddress);
+			// that is has been routed back to the container			
 			String directive = poppedAddress.getParameter(ROUTE_PARAM_DIRECTIVE);
 			if(directive != null && directive.length() > 0) {
 				logger.info("directive before the request has been routed back to container : " + directive);
@@ -614,6 +746,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				SipSessionKey sipSessionKey = SessionManager.getSipSessionKey(previousAppName, request, false);
 				SipSessionImpl sipSession = sessionManager.getSipSession(sipSessionKey, false, sipFactoryImpl);
 				stateInfo = sipSession.getStateInfo();
+				sipServletRequest.setSipSession(sipSession);
 				logger.info("state info before the request has been routed back to container : " + stateInfo);
 			}
 		} else if(sipServletRequest.getSipSession() != null) {
@@ -696,14 +829,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			boolean isAnotherDomain = isExternal(host, port, transport);			
 			ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
 			if(isAnotherDomain || routeHeaders.hasNext()) {
-				// the Request-URI points to a different domain, or there are one or more Route headers, 
-				// send the request externally according to standard SIP mechanism.
+				// FIXME send it statefully
 				try{
 					sipProvider.sendRequest((Request)request.clone());						
-					logger.info("Request event dispatched to another domain" + request.toString());
+					logger.info("Subsequent Request dispatched outside the container" + request.toString());
 				} catch (Exception ex) {			
 					throw new IllegalStateException("Error sending request",ex);
-				}				
+				}	
 				return false;
 			} else {
 				// the Request-URI does not point to another domain, and there is no Route header, 
@@ -750,8 +882,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			//no matching deployed apps
 			if(sipContext == null) {
 				logger.error("No matching deployed application has been found !");
-				// Sends a 503 Service Unavailable error and stops processing.				
-//				JainSipUtils.sendErrorResponse(Response.SERVICE_UNAVAILABLE, transaction, request, sipProvider);
+				// the app returned by the Application Router returned an app
+				// that is not currently deployed we continue routing to see if 
+				// other apps are interested
+				sipServletRequest.addInfoForRoutingBackToContainer();
+				forwardStatefully(sipProvider, transaction, sipServletRequest, null);
 				return true;
 			}
 			appSession.setSipContext(sipContext);
@@ -791,7 +926,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			RoutingState routingState = sipServletRequest.getRoutingState();			
 			if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
 					RoutingState.PROXIED.equals(routingState) ||
-					RoutingState.RELAYED.equals(routingState)) {
+					RoutingState.RELAYED.equals(routingState) ||
+					RoutingState.CANCELLED.equals(routingState)) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
 							"The Container hence stops routing the initial request.");
@@ -803,7 +939,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 							"The Container hence continue routing the initial request.");
 				}
 				try {
+					// the app that was called didn't do anything with the request
+					// in any case we should route back to container statefully 
 					sipServletRequest.addAppCompositionRRHeader();
+					sipServletRequest.addInfoForRoutingBackToContainer();
+					forwardStatefully(sipProvider, transaction,
+							sipServletRequest, null);
 					return true;
 				} catch (SipException e) {				
 					logger.error(e);

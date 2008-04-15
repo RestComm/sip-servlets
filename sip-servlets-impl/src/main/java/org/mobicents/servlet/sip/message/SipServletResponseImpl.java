@@ -301,7 +301,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			ServerTransaction st = (ServerTransaction) getTransaction();
 			
 			logger.info("sending response "+ this.message);
-			st.sendResponse( (Response)this.message );
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop
 			//processing the request
@@ -309,6 +308,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);
 			}
+			st.sendResponse( (Response)this.message );			
 		} catch (Exception e) {			
 			logger.error(e);
 			throw new IllegalStateException(e);
