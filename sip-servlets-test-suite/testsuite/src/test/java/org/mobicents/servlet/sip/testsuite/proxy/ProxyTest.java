@@ -41,8 +41,7 @@ public class ProxyTest extends SipServletTestCase{
 	
 	@Override
 	protected void setUp() throws Exception {		
-		super.setUp();
-		deployApplication();
+		super.setUp();		
 		init();
 	}
 	

@@ -25,7 +25,7 @@ public class B2BUATest extends SipServletTestCase {
 	@Override
 	public void deployApplication() {
 		tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
+				projectHome + "/sip-servlets-test-suite/applications/b2bua-sip-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test");
 	}
 

@@ -45,13 +45,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class SimpleSipServletTest extends SipServletTestCase implements SipListener {
-	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);
-	
-	@Override
-	protected void setUp() throws Exception {	
-		super.setUp();		
-		deployApplication();
-	}		
+	private static Log logger = LogFactory.getLog(SimpleSipServletTest.class);		
 	
 	@Override
 	public void deployApplication() {

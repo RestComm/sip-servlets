@@ -14,7 +14,8 @@ import junit.framework.TestCase;
 public abstract class SipServletTestCase extends TestCase {
 	protected String tomcatBasePath;
 	protected String projectHome;
-	protected SipEmbedded tomcat;	
+	protected SipEmbedded tomcat;
+	protected boolean autoDeployOnStartup = true;
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -33,6 +34,9 @@ public abstract class SipServletTestCase extends TestCase {
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
 		tomcat.startTomcat();
+		if(autoDeployOnStartup) {
+			deployApplication();
+		}
 	}
 	
 	@Override

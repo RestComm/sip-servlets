@@ -344,6 +344,12 @@ public class ShootistSipServletTest extends SipServletTestCase implements SipLis
 
 	}
 	
+	@Override
+	protected void setUp() throws Exception {
+		super.autoDeployOnStartup = false;
+		super.setUp();
+	}
+	
 	public void testShootistSipServlet() throws InterruptedException {
 		init();
 		deployApplication();
