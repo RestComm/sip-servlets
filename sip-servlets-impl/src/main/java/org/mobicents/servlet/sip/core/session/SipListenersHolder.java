@@ -37,9 +37,9 @@ public class SipListenersHolder {
 	private ArrayList<String> sipServletsWithListeners;
 	private ArrayList<SipErrorListener> sipErrorListeners;
 	private ArrayList<ServletContextListener> servletContextListeners;
+	private ArrayList<TimerListener> timerListeners;
 	
-	
-	private TimerListener timerListener;
+	//private TimerListener timerListener;
 
 	
 	
@@ -49,6 +49,18 @@ public class SipListenersHolder {
 	public SipListenersHolder(Collection<String> listenerList,
 			ClassLoader classLoader)
 	{
+		
+		this.sipApplicationSessionAttributeListeners=new ArrayList<SipApplicationSessionAttributeListener>();;
+		this.sipApplicationSessionBindingListeners=new ArrayList<SipApplicationSessionBindingListener>();;
+		this.sipApplicationSessionListeners=new ArrayList<SipApplicationSessionListener>();;
+		this.sipSessionActivationListeners=new ArrayList<SipSessionActivationListener>();;
+		this.sipSessionAttributeListeners=new ArrayList<SipSessionAttributeListener>();;
+		this.sipSessionBindingListeners=new ArrayList<SipSessionBindingListener>();;
+		this.sipSessionListeners=new ArrayList<SipSessionListener>();;
+		this.sipServletsWithListeners=new ArrayList<String>();;
+		this.sipErrorListeners=new ArrayList<SipErrorListener>();;
+		this.servletContextListeners=new ArrayList<ServletContextListener>();;
+		this.timerListeners=new ArrayList<TimerListener>();;
 		
 		// Instantiate all the listeners
 		Iterator<String> itr = listenerList.iterator();
@@ -63,7 +75,7 @@ public class SipListenersHolder {
 					continue;
 				}
 				
-				addListener(listener);
+				addListenerToBunch(listener);
 				
 			
 
@@ -74,7 +86,7 @@ public class SipListenersHolder {
 		}
 	}
 	
-	private void addListener(EventListener listener) {
+	private void addListenerToBunch(EventListener listener) {
 		
 		if(listener instanceof SipApplicationSessionAttributeListener)
 		{
@@ -124,6 +136,10 @@ public class SipListenersHolder {
 			this.addListener((ServletContextListener)listener);
 		}
 		
+		if(listener instanceof TimerListener)
+		{
+			this.addListener((TimerListener)listener);
+		}
 		
 		throw new IllegalArgumentException("Wrong type of LISTENER!!!["+listener+"]");
 	}
@@ -176,7 +192,10 @@ public class SipListenersHolder {
 	}
 	
 	
-
+	public void addListener(TimerListener listener)
+	{
+		this.timerListeners.add(listener);
+	}
 	
 
 
@@ -223,10 +242,13 @@ public class SipListenersHolder {
 		return servletContextListeners;
 	}
 
-	public TimerListener getTimerListener() {
-		return timerListener;
+	//public TimerListener getTimerListener() {
+	//	return timerListener;
+	//}
+	public ArrayList<TimerListener> getTimerListeners() {
+		return timerListeners;
 	}
-
+	
 	/**
 	 * Empty vectors to allow garbage collection
 	 */
@@ -244,8 +266,8 @@ public class SipListenersHolder {
 		this.sipServletsWithListeners.clear();
 		this.sipErrorListeners.clear();
 		this.servletContextListeners.clear();
-		
-		this.timerListener=null;
+		this.timerListeners.clear();
+		//this.timerListener=null;
 		
 		
 	}

@@ -1,4 +1,8 @@
+package org.mobicents.servlet.sip.core.session;
+
+import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,9 +13,11 @@ import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.URI;
 
 import org.apache.catalina.deploy.LoginConfig;
+import org.mobicents.servlet.sip.core.timers.ServletTimerImpl;
 
 //
 //
@@ -24,13 +30,9 @@ import org.apache.catalina.deploy.LoginConfig;
 //
 //
 
+public class SipServletApplicationImpl implements SipApplicationSession {
 
-
-
-public class SipServletApplicationImpl implements SipApplicationSession{
-	
-	
-	//----- GENERATED FROM STAR UML
+	// ----- GENERATED FROM STAR UML
 	private String _applicationName;
 	private String _smallIcon;
 	private String _largeIcon;
@@ -38,6 +40,11 @@ public class SipServletApplicationImpl implements SipApplicationSession{
 	private String _description;
 	private boolean _distributable;
 	private HashMap _contextParams;
+	/**
+	 * Holds instances of timers that are valid for this SipApplicationSession
+	 * object, meaning references to timers inside of this object must not be
+	 * shared
+	 */
 	private SipListenersHolder _listeners;
 	private String _mainServlet;
 	private HashMap _servlets;
@@ -52,146 +59,265 @@ public class SipServletApplicationImpl implements SipApplicationSession{
 	private HashMap _envEntries;
 	private HashMap _ejbRefs;
 	private HashMap _ejbLocalRefs;
-	private HashMap<String,Object> _sipApplicationSessionAttributeMap;
+	private HashMap<String, Object> _sipApplicationSessionAttributeMap;
+
+	// ------ END GENERATED
+
+	private TimerListener _agregatingListener;
+	private ArrayList<ServletTimer> _runningTimers;
+
+	private HashMap<String, SipSession> id2SipSession;
+
+	/**
+	 * Passed as info object into Servelt timer that ticks for this sip app
+	 * session as expiration timer
+	 */
+	private Serializable _endObject;
+
+	/**
+	 * Lock for this application session
+	 */
+	private Object _APP_LOCK=new Object();
 	
-	//------ END GENERATED
-	private HashMap<String,SipSession> id2SipSession;
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public SipServletApplicationImpl(String name, String icon, String icon2,
+			String name2, String _description, boolean _distributable,
+			HashMap params, SipListenersHolder _listeners, String servlet,
+			HashMap _servlets, HashMap mapping, int timeout, int timeout2,
+			HashMap envRefs, HashMap ref, HashMap constraints,
+			LoginConfig config, HashMap roles, HashMap entries, HashMap refs,
+			HashMap localRefs,
+			HashMap<String, Object> applicationSessionAttributeMap,
+			TimerListener listener, ArrayList<ServletTimer> timers,
+			HashMap<String, SipSession> id2SipSession) {
+		super();
+		_applicationName = name;
+		_smallIcon = icon;
+		_largeIcon = icon2;
+		_displayName = name2;
+		this._description = _description;
+		this._distributable = _distributable;
+		_contextParams = params;
+		this._listeners = _listeners;
+		_mainServlet = servlet;
+		this._servlets = _servlets;
+		_servletMapping = mapping;
+		_proxyTimeout = timeout;
+		_sessionTimeout = timeout2;
+		_resourceEnvRefs = envRefs;
+		_resourcesRef = ref;
+		_securityConstraints = constraints;
+		_loginConfig = config;
+		_securityRoles = roles;
+		_envEntries = entries;
+		_ejbRefs = refs;
+		_ejbLocalRefs = localRefs;
+		_sipApplicationSessionAttributeMap = applicationSessionAttributeMap;
+		_agregatingListener = listener;
+		_runningTimers = timers;
+		this.id2SipSession = id2SipSession;
+		
+		this._agregatingListener=new AgregatingListener(this);
+	}
+
 	public void encodeURI(URI uri) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	public URL encodeURL(URL url) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Object getAttribute(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Iterator<String> getAttributeNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public long getCreationTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 	public long getExpirationTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 	public String getId() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public long getLastAccessedTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 	public Iterator<?> getSessions() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Iterator<?> getSessions(String protocol) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public SipSession getSipSession(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public Collection<ServletTimer> getTimers() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public void invalidate() {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	public boolean isValid() {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	public void removeAttribute(String name) {
-		
-		
-		if(!isValid())
-			throw new IllegalStateException("Can not bind object to session that has been invalidated!!");
-		
-		if(name==null)
-			//throw new NullPointerException("Name of attribute to bind cant be null!!!");
+
+		if (!isValid())
+			throw new IllegalStateException(
+					"Can not bind object to session that has been invalidated!!");
+
+		if (name == null)
+			// throw new NullPointerException("Name of attribute to bind cant be
+			// null!!!");
 			return;
-	
-		
-		SipApplicationSessionBindingEvent event=new SipApplicationSessionBindingEvent(this,name);
-		
-		for(SipApplicationSessionBindingListener l:this._listeners.getSipApplicationSessionBindingListeners())
-		{
+
+		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
+				this, name);
+
+		for (SipApplicationSessionBindingListener l : this._listeners
+				.getSipApplicationSessionBindingListeners()) {
 			l.valueUnbound(event);
-			
+
 		}
-		
-		for(SipApplicationSessionAttributeListener l: this._listeners.getSipApplicationSessionAttributeListeners())
-		{
+
+		for (SipApplicationSessionAttributeListener l : this._listeners
+				.getSipApplicationSessionAttributeListeners()) {
 			l.attributeRemoved(event);
 		}
-		
+
 		this._sipApplicationSessionAttributeMap.remove(name);
 	}
+
 	public void setAttribute(String key, Object attribute) {
-		
-		
-		if(!isValid())
-			throw new IllegalStateException("Can not bind object to session that has been invalidated!!");
-		
-		if(key==null)
-			throw new NullPointerException("Name of attribute to bind cant be null!!!");
-		if(attribute==null)
-			throw new NullPointerException("Attribute that is to be bound cant be null!!!");
-		
-		
-		SipApplicationSessionBindingEvent event=new SipApplicationSessionBindingEvent(this,key);
-		if(_sipApplicationSessionAttributeMap.containsKey(key))
-		{
-			//This is initial, we need to send value bound event
-			
-			for(SipApplicationSessionBindingListener l:this._listeners.getSipApplicationSessionBindingListeners())
-			{
+
+		if (!isValid())
+			throw new IllegalStateException(
+					"Can not bind object to session that has been invalidated!!");
+
+		if (key == null)
+			throw new NullPointerException(
+					"Name of attribute to bind cant be null!!!");
+		if (attribute == null)
+			throw new NullPointerException(
+					"Attribute that is to be bound cant be null!!!");
+
+		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
+				this, key);
+		if (_sipApplicationSessionAttributeMap.containsKey(key)) {
+			// This is initial, we need to send value bound event
+
+			for (SipApplicationSessionBindingListener l : this._listeners
+					.getSipApplicationSessionBindingListeners()) {
 				l.valueBound(event);
-				
+
 			}
-			
-			for(SipApplicationSessionAttributeListener l: this._listeners.getSipApplicationSessionAttributeListeners())
-			{
+
+			for (SipApplicationSessionAttributeListener l : this._listeners
+					.getSipApplicationSessionAttributeListeners()) {
 				l.attributeAdded(event);
 			}
-			
-		}else
-		{
-			
-			for(SipApplicationSessionAttributeListener l: this._listeners.getSipApplicationSessionAttributeListeners())
-			{
+
+		} else {
+
+			for (SipApplicationSessionAttributeListener l : this._listeners
+					.getSipApplicationSessionAttributeListeners()) {
 				l.attributeReplaced(event);
 			}
-			
+
 		}
-		
-		
+
 		this._sipApplicationSessionAttributeMap.put(key, attribute);
-		
+
 	}
+
 	public int setExpires(int deltaMinutes) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 	public SipListenersHolder getListeners() {
 		return _listeners;
 	}
+
 	public void setListeners(SipListenersHolder listeners) {
 		this._listeners = listeners;
 	}
+
+	public TimerListener getAgregatingListener() {
+		return this._agregatingListener;
+	}
+
+	public boolean hasTimerListeners() {
+		return this._listeners.getTimerListeners().size() > 0;
+	}
+
+	public void timerScheduled(ServletTimerImpl st) {
+		
+		this._runningTimers.add(st);
+
+	}
+
+	public void timerCanceled(ServletTimer st) {
+	}
+
+	
+	//========================
+	// Methods used when expire timer fires , or is beeing set
+	Serializable getEndObject() {
+		if (this._endObject == null)
+			this._endObject = new Serializable() {
+			};
+
+		return this._endObject;
+	}
+	
+	void expirationTimerFired()
+	{
+		
+	}
 	
 	
-	
+	//=========================
+
 }
