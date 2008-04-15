@@ -137,54 +137,34 @@ Installation Instructions
 		
 		* in tomcat_home/lib directory, there should be a commons-logging-1.1.jar
 	
-	make a backup of your tomcat_home/conf/server.xml file
+	Make a backup of your tomcat_home/conf/server.xml file
+	copy the server-tomcat-6.xml located in docs to tomcat_home/conf and rename it to server.xml
+	   	
+	Go to your tomcat_home/bin directory\
+	run the following command : <<<./catalina.bat run>>> or <<<./catalina.sh run>>>  
 	
-	copy the server.xml located in docs to tomcat_home/conf
-	
-	look for the context tag in the server.xml file and 
-	modify the docbase attribute to map to your existing simple-sip-servlet application
-	
-	make sure to run a mvn clean install at the root of simple-sip-servlet project too
-	
-	Run mvn war:inplace 
-	
-	and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
-	and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
-	
-	(This would be removed automatically through maven when time will permit...)
-	    	
-	go to your tomcat_home/bin directory
-	
-	run the following command : ./catalina.bat run or ./catalina.sh run  
-	
-	When the server has been started you should see the following logs on the standard output
-	
+	Run a mvn clean install at the root of simple-sip-servlet project\
+	and drop in the tomcat_home\webapps directory the war file generated in target dir of simple-sip-servlet, you should see the deployment occuring.
+
 	18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
-	INFO: /WEB-INF/sip.xml has been found !
-	
+	INFO: /WEB-INF/sip.xml has been found !\
 	18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start
-	INFO: /WEB-INF/sip.xml has been parsed !
-	
-	log4j:WARN No appenders could be found for logger (SipContainer).
-	
-	log4j:WARN Please initialize the log4j system properly.
-	
-	the simple sip servlet has been started
-	
+	INFO: /WEB-INF/sip.xml has been parsed !\
+	log4j:WARN No appenders could be found for logger (SipContainer).\
+	log4j:WARN Please initialize the log4j system properly.\
+	the simple sip servlet has been started\
 	18 juil. 2007 08:09:48 org.apache.coyote.http11.Http11BaseProtocol start
-	INFO: DÚmarrage de Coyote HTTP/1.1 sur http-8080
-	
+	INFO: DÚmarrage de Coyote HTTP/1.1 sur http-8080\
 	18 juil. 2007 08:09:48 org.apache.jk.common.ChannelSocket init
-	INFO: JK: ajp13 listening on /0.0.0.0:8009
-	
+	INFO: JK: ajp13 listening on /0.0.0.0:8009\
 	18 juil. 2007 08:09:48 org.apache.jk.server.JkMain start
-	INFO: Jk running ID=0 time=0/15  config=null
-	
+	INFO: Jk running ID=0 time=0/15  config=null\
 	18 juil. 2007 08:09:48 org.apache.catalina.storeconfig.StoreLoader load
-	INFO: Find registry server-registry.xml at classpath resource
-	
+	INFO: Find registry server-registry.xml at classpath resource\
 	18 juil. 2007 08:09:48 org.apache.catalina.startup.Catalina start
-	INFO: Server startup in 1984 ms
+	INFO: Server startup in 1984 ms\
 			
 	In any case send an email on the {{{dev@sip-servlets.dev.java.net}issues mailing list}} or {{{servlets/ProjectIssues}file a bug}} on the bugtracker if you encounter any problems.
+	
+	To play with real examples check out the different examples located under {{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/}location}} from the svn repository.
 	

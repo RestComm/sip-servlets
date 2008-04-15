@@ -12,7 +12,16 @@
       	<item name="Tomcat Installation" href="installation-tomcat.html"/>
       	<item name="Jboss Installation" href="installation-jboss.html"/>
       </item>
-      <item name="Examples" href="examples/examples.html"/>
+      <item name="Examples" href="examples/examples.html">
+      	<item name="Call Blocking" href="examples/call_blocking.html"/>
+      	<item name="Call Forwarding" href="examples/call_forwarding.html"/>
+      	<item name="Call Controller" href="examples/call_controller.html"/>
+      	<item name="Speed Dial" href="examples/speed_dial.html"/>
+      	<item name="Location Service" href="examples/location_service.html"/>
+      	<item name="Speed Dial/Location Service" href="examples/speeddial_locationservice.html"/>
+      	<item name="Click to Call" href="examples/click2call.html"/>
+      	<item name="Chat Server" href="examples/chatserver.html"/>
+      </item>
       <item name="Roadmap" href="roadmap.html"/>
       
       <item name="Mailing lists" href="servlets/ProjectMailingListList"/>
