@@ -71,6 +71,7 @@ public class ProxyTest extends SipServletTestCase implements SipListener{
 					e.printStackTrace();
 				}
 		}
+		if(shootist.ended == false) fail("Conversation not complete!");
 	}
 	
 	@Override

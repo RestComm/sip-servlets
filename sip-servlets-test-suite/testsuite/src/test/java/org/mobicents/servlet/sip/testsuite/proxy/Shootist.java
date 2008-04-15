@@ -51,7 +51,6 @@ public class Shootist implements SipListener {
 			   Request byeRequest = this.dialog.createRequest(Request.BYE);
 			   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 			   dialog.sendRequest(ct);
-			   ended = true;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				System.exit(0);
@@ -181,6 +180,9 @@ public class Shootist implements SipListener {
 								.getNewClientTransaction(byeRequest);
 						dialog.sendRequest(ct);
 
+					} else if(cseq.getMethod().equals(Request.BYE)) {
+
+						   ended = true;
 					}
 
 				}
@@ -234,8 +236,8 @@ public class Shootist implements SipListener {
 				"shootistlog.txt");
 
 		// Drop the client connection after we are done with the transaction.
-		properties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS",
-				"false");
+		//properties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS",
+		//		"false");
 		// Set to 0 (or NONE) in your production code for max speed.
 		// You need 16 (or TRACE) for logging traces. 32 (or DEBUG) for debug + traces.
 		// Your code will limp at 32 but it is best for debugging.
