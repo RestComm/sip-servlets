@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>0.1</version>
+		<version>0.2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-impl</artifactId>
@@ -56,21 +56,22 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Tomcat dependencies -->
 		<dependency>
-			<groupId>tomcat</groupId>
+			<groupId>org.apache.tomcat</groupId>
 			<artifactId>catalina</artifactId>
-			<version>5.5.15</version>
+			<version>6.0.14</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>tomcat</groupId>
-			<artifactId>tomcat-coyote</artifactId>
-			<version>5.5.15</version>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>coyote</artifactId>
+			<version>6.0.14</version>
 			<scope>provided</scope>
 		</dependency>
 		
-		<dependency>
+		<!--dependency>
 			<groupId>tomcat</groupId>
 			<artifactId>tomcat-util</artifactId>
 			<version>5.5.15</version>
@@ -82,7 +83,7 @@
 			<artifactId>naming-resources</artifactId>
 			<version>0.8</version>
 			<scope>provided</scope>			
-		</dependency>
+		</dependency-->
 	</dependencies>
 	<build>
 		<plugins>
@@ -95,8 +96,8 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}\server\lib"/>
-								<copy verbose="true" file="docs/logging.properties" todir="${tomcat.home}/common/classes"/>
+								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${tomcat.home}\lib"/>
+								<copy verbose="true" file="docs/logging.properties" todir="${tomcat.home}/conf"/>
 							</tasks>
 						</configuration>
 						<goals>
@@ -116,8 +117,8 @@
 								<goal> copy-dependencies </goal>
  	            			</goals>
  	            			<configuration>
-							<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j</includeArtifactIds>
-			    			<outputDirectory>${tomcat.home}/common/lib</outputDirectory>
+							<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging</includeArtifactIds>
+			    			<outputDirectory>${tomcat.home}/lib</outputDirectory>
  	            			</configuration>
  	          		</execution>
  	        	</executions>

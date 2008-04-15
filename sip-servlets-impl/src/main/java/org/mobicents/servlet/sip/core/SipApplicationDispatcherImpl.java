@@ -1331,9 +1331,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			
 			try {
 				session.setHandler(handlerName);
+				TransactionApplicationData applicationData = null;
 				// See if this is a response to a proxied request
-				TransactionApplicationData applicationData = (TransactionApplicationData)
-					responseEvent.getClientTransaction().getApplicationData();
+				if(clientTransaction != null) {
+					applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
+				}
+				//there is no client transaction associated with it, it means that this is a retransmission
+				else if(dialog != null){	
+					applicationData = (TransactionApplicationData)dialog.getApplicationData();
+				}				
 				// We can not use session.getProxyBranch() because all branches belong to the same session
 				// and the session.proxyBranch is overwritten each time there is activity on the branch.
 				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();

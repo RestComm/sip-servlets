@@ -1,8 +1,8 @@
 Install maven 2
-Install Tomcat 5.5.20
+Install Tomcat 6.0.14
 
 open up the pom.xml from sip-servlets-bootstrap project and change the following property tomcat.home at the end of the file
-Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-5.5.20 
+Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-6.0.14
 
 Run mvn clean install from the project root (sip-servlets-bootstrap)
 
@@ -22,12 +22,13 @@ if it behaves otherwise mail me to jean.deruelle@gmail.com
 
 To run the sip servlet container :
 check that the following files have been copied during the mvn clean install
-in tomcat_home/server/lib directory, there should be a sip-servlets-1.0-SNAPSHOT.jar
-in tomcat_home/common/lib directory, there should be a sip-servlets-spec-1.0-SNAPSHOT.jar
-in tomcat_home/common/lib directory, there should be a jain-sip-api.jar
-in tomcat_home/common/lib directory, there should be a jain-sip-ri.jar
-in tomcat_home/common/lib directory, there should be a concurrent.jar
-in tomcat_home/common/lib directory, there should be a log4j.jar
+in tomcat_home/lib directory, there should be a sip-servlets-0.2-SNAPSHOT.jar
+in tomcat_home/lib directory, there should be a sip-servlets-spec-1.0-SNAPSHOT.jar
+in tomcat_home/lib directory, there should be a jain-sip-api-1.2.jar
+in tomcat_home/lib directory, there should be a jain-sip-ri-1.2.jar
+in tomcat_home/lib directory, there should be a concurrent-1.3.4.jar
+in tomcat_home/lib directory, there should be a log4j-1.2.14.jar
+in tomcat_home/lib directory, there should be a commons-logging-1.1.jar
 
 make a backup of your tomcat_home/conf/server.xml file
 copy the server.xml located in docs to tomcat_home/conf
@@ -42,7 +43,7 @@ and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
 (This would be removed automatically through maven when time will permit...)
     	
 go to your tomcat_home/bin directory
-run the following commande
+run the following command
 catalina.bat run
 When the server has been started you should see the following logs on the standard output
 18 juil. 2007 08:09:46 org.mobicents.servlet.sip.startup.SipContextConfig start

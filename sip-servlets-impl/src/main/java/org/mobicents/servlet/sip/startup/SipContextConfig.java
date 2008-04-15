@@ -75,7 +75,7 @@ public class SipContextConfig extends ContextConfig implements
 		// app if any. That mean that this is a converged application.
 		InputStream webXmlInputStream = servletContext
 				.getResourceAsStream(Constants.ApplicationWebXml);
-		log.info(Constants.ApplicationWebXml + " has been found, calling super.start() !");
+		logger.info(Constants.ApplicationWebXml + " has been found, calling super.start() !");
 		context.setWrapperClass(StandardWrapper.class.getName());
 		if (webXmlInputStream != null) {
 			super.start();
@@ -85,7 +85,7 @@ public class SipContextConfig extends ContextConfig implements
 				.getResourceAsStream(APPLICATION_SIP_XML);
 		// processing of the sip.xml file
 		if (sipXmlInputStream != null) {
-			log.info(APPLICATION_SIP_XML + " has been found !");
+			logger.info(APPLICATION_SIP_XML + " has been found !");
 				//
 				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
                         xmlNamespaceAware,
@@ -100,16 +100,16 @@ public class SipContextConfig extends ContextConfig implements
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
 				} catch (IOException e) {
-					log.error("Impossible to parse the sip deployment descriptor",
+					logger.error("Impossible to parse the sip deployment descriptor",
 							e);
 					ok = false;
 				} catch (SAXException e) {
-					log.error("Impossible to parse the sip deployment descriptor",
+					logger.error("Impossible to parse the sip deployment descriptor",
 							e);
 					ok = false;
 				}						
 		} else {
-			log.info(APPLICATION_SIP_XML + " has not been found !");
+			logger.info(APPLICATION_SIP_XML + " has not been found !");
 			ok = false;
 		}
 		// Make our application available if no problems were encountered

@@ -409,10 +409,10 @@ final class SetAuthConstraintRule extends Rule {
         SecurityConstraint securityConstraint =
             (SecurityConstraint) digester.peek();
         securityConstraint.setAuthConstraint(true);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger()
-               .debug("Calling SecurityConstraint.setAuthConstraint(true)");
-        }
+//        if (digester.getLogger().isDebugEnabled()) {
+//            digester.getLogger()
+//               .debug("Calling SecurityConstraint.setAuthConstraint(true)");
+//        }
     }
 
 }
@@ -432,10 +432,10 @@ final class SetDistributableRule extends Rule {
         throws Exception {
         Context context = (Context) digester.peek();
         context.setDistributable(true);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug
-               (context.getClass().getName() + ".setDistributable( true)");
-        }
+//        if (digester.getLogger().isDebugEnabled()) {
+//            digester.getLogger().debug
+//               (context.getClass().getName() + ".setDistributable( true)");
+//        }
     }
 
 }
@@ -468,15 +468,15 @@ final class SetPublicIdRule extends Rule {
         try {
             m = top.getClass().getMethod(method, paramClasses);
         } catch (NoSuchMethodException e) {
-            digester.getLogger().error("Can't find method " + method + " in "
-                                       + top + " CLASS " + top.getClass());
+//            digester.getLogger().error("Can't find method " + method + " in "
+//                                       + top + " CLASS " + top.getClass());
             return;
         }
 
         m.invoke(top, (Object [])paramValues);
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("" + top.getClass().getName() + "." 
-                                       + method + "(" + paramValues[0] + ")");
+//        if (digester.getLogger().isDebugEnabled())
+//            digester.getLogger().debug("" + top.getClass().getName() + "." 
+//                                       + method + "(" + paramValues[0] + ")");
 
     }
 
@@ -499,15 +499,15 @@ final class WrapperCreateRule extends Rule {
             (Context) digester.peek(digester.getCount() - 1);
         Wrapper wrapper = context.createWrapper();
         digester.push(wrapper);
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("new " + wrapper.getClass().getName());
+//        if (digester.getLogger().isDebugEnabled())
+//            digester.getLogger().debug("new " + wrapper.getClass().getName());
     }
 
     public void end(String namespace, String name)
         throws Exception {
         Wrapper wrapper = (Wrapper) digester.pop();
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("pop " + wrapper.getClass().getName());
+//        if (digester.getLogger().isDebugEnabled())
+//            digester.getLogger().debug("pop " + wrapper.getClass().getName());
     }
 
 }
