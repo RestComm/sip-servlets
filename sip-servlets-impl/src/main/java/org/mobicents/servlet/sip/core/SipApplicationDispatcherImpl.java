@@ -49,8 +49,8 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
 import javax.sip.header.CallIdHeader;
-import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -88,17 +88,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	private static transient Log logger = LogFactory
 			.getLog(SipApplicationDispatcherImpl.class);
 	
-	public static final String ROUTE_PARAM_DIRECTIVE = "Directive";
+	public static final String ROUTE_PARAM_DIRECTIVE = "directive";
 	
-	public static final String ROUTE_PARAM_PREV_APPLICATION_NAME = "PreviousAppName";
+	public static final String ROUTE_PARAM_PREV_APPLICATION_NAME = "previousappname";
 	/* 
 	 * This parameter is to know which app handled the request 
 	 */
-	public static final String RR_PARAM_APPLICATION_NAME = "AppName";
+	public static final String RR_PARAM_APPLICATION_NAME = "appname";
 	/* 
 	 * This parameter is to know which servlet handled the request 
 	 */
-	public static final String RR_PARAM_HANDLER_NAME = "Handler";
+	public static final String RR_PARAM_HANDLER_NAME = "handler";
 	
 	private static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
@@ -756,7 +756,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		return true;
 	}
 	
-	
+	/**
+	 * Check if the via header is external
+	 * @param viaHeader the via header to check 
+	 * @return true if the via header is external, false otherwise
+	 */
+	private boolean isViaHeaderExternal(ViaHeader viaHeader) {
+		if (viaHeader != null) {						
+			ListeningPoint listeningPoint = JainSipUtils.findMatchingListeningPoint(
+					sipFactoryImpl.getSipProviders(), viaHeader.getHost(), viaHeader.getPort(), viaHeader.getTransport());
+			if(listeningPoint != null) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	/**
 	 * Method checking whether or not the sip servlet request in parameter is initial
@@ -855,32 +869,45 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		
 		// FIXME TODO : Note by Jean : remove the loops and send responses back statefully to the stack
 		//(clone response, add route header to route back, and new clientTx) 
-		
-		RouteHeader routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
-		Address address = null;
-		if(! isRouteExternal(routeHeader)) {
-			logger.info("routing response by route headers ");
-			address = routeHeader.getAddress();
-			response.removeFirst(RouteHeader.NAME);
-			while(address != null) {
-				routeResponse(response, address, clientTransaction, dialog);
-				routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
-				address = null;
-				if(! isRouteExternal(routeHeader)) {			
-					address = routeHeader.getAddress();
-					response.removeFirst(RouteHeader.NAME);
-				}
+		Response clonedResponse = (Response) response.clone();
+		ListIterator<ViaHeader> viaHeaders = clonedResponse.getHeaders(ViaHeader.NAME);
+		boolean continueRouting = true;
+		while (viaHeaders.hasNext() && continueRouting) {
+			ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
+			if(!isViaHeaderExternal(viaHeader)) {
+				continueRouting = routeResponse(clonedResponse, viaHeader, clientTransaction, dialog);
+				clonedResponse.removeFirst(ViaHeader.NAME);
+			} else {
+				//TODO forward response statefully
+//				Response newResponse = (Response) response.clone();
+				logger.error("viaHeader is external "+ viaHeader.toString());
 			}
-		} else {
-			logger.info("routing response by record route headers ");
-			ListIterator<RecordRouteHeader> recordRouteHeaders = 
-				response.getHeaders(RecordRouteHeader.NAME);
-			while (recordRouteHeaders.hasNext()) {
-				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
-						.next();
-				routeResponse(response, recordRouteHeader.getAddress(), clientTransaction, dialog);	
-			}			
-		}						
+		}
+//		RouteHeader routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
+//		Address address = null;
+//		if(! isRouteExternal(routeHeader)) {
+//			logger.info("routing response by route headers ");
+//			address = routeHeader.getAddress();
+//			response.removeFirst(RouteHeader.NAME);
+//			while(address != null) {
+//				routeResponse(response, address, clientTransaction, dialog);
+//				routeHeader = (RouteHeader) response.getHeader(RouteHeader.NAME);
+//				address = null;
+//				if(! isRouteExternal(routeHeader)) {			
+//					address = routeHeader.getAddress();
+//					response.removeFirst(RouteHeader.NAME);
+//				}
+//			}
+//		} else {
+//			logger.info("routing response by record route headers ");
+//			ListIterator<RecordRouteHeader> recordRouteHeaders = 
+//				response.getHeaders(RecordRouteHeader.NAME);
+//			while (recordRouteHeaders.hasNext()) {
+//				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+//						.next();
+//				routeResponse(response, recordRouteHeader.getAddress(), clientTransaction, dialog);	
+//			}			
+//		}						
 	}
 
 	/**
@@ -889,11 +916,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * @param address
 	 * @return
 	 */
-	private boolean routeResponse(Response response, Address address, ClientTransaction clientTransaction, Dialog dialog) {		
-		
-		javax.sip.address.SipURI routeURI = (javax.sip.address.SipURI)address.getURI();
-		String appName = routeURI.getParameter(RR_PARAM_APPLICATION_NAME); 
-		String handlerName = routeURI.getParameter(RR_PARAM_HANDLER_NAME);
+	private boolean routeResponse(Response response, ViaHeader viaHeader, ClientTransaction clientTransaction, Dialog dialog) {
+		logger.info("viaHeader = " + viaHeader.toString());
+		String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
+		String handlerName = viaHeader.getParameter(RR_PARAM_HANDLER_NAME);
 		SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, false);
 		SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl);									
 		// Transate the repsponse to SipServletResponse
@@ -920,6 +946,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				if(proxyBranch.getProxy().getSupervised()) {
 					callServlet(sipServletResponse, session);
 				}
+				return false;
 			}
 			else {
 				callServlet(sipServletResponse, session);
@@ -942,7 +969,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			return false;
 		}		
 			
-		return true;
+		return false;
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {

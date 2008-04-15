@@ -88,29 +88,20 @@ public class ProxyUtils {
 				mf.setMaxForwards(mf.getMaxForwards() - 1);
 			}
 
-			String transport = JainSipUtils.findTransport(clonedRequest);
+			String transport = JainSipUtils.findTransport(clonedRequest);			
+			if (clonedRequest.getMethod().equals(Request.CANCEL)) {				
+				// Cancel is hop by hop so remove all other via headers.
+				clonedRequest.removeHeader(ViaHeader.NAME);				
+			} 
 			//Add via header
-			ViaHeader viaHeader = null;
-
-			if (clonedRequest.getMethod().equals(Request.CANCEL)) {
-				// Branch Id will be assigned by the stack.
-				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipProviders(), transport, null);
-
-				if (clonedRequest.getMethod().equals(Request.CANCEL)) {
-					// Cancel is hop by hop so remove all other via headers.
-					clonedRequest.removeHeader(ViaHeader.NAME);
-				}
-			} else {
-
-				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipProviders(), transport, generateBranchId());
-			}
-
-			if (viaHeader != null) {
-				clonedRequest.addHeader(viaHeader);
-				
-			}
+			ViaHeader viaHeader = JainSipUtils.createViaHeader(
+					sipFactoryImpl.getSipProviders(), transport, generateBranchId());
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+					originalRequest.getSipSession().getKey().getApplicationName());
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+					originalRequest.getSipSession().getHandler());
+			clonedRequest.addHeader(viaHeader);				
+			
 			
 			//Add route-record header, if enabled and if needed (if not null)
 			if(params.routeRecord != null) {

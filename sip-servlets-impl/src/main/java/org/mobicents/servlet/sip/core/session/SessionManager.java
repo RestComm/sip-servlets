@@ -123,8 +123,7 @@ public class SessionManager {
 	 * @return the computed key 
 	 * @throws NullPointerException if application name is null
 	 */
-	public static SipSessionKey getSipSessionKey(final String applicationName, final Message message, boolean inverted) {
-		//FIXME should be different whether the message is an instance of Request or Response
+	public static SipSessionKey getSipSessionKey(final String applicationName, final Message message, boolean inverted) {		
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}

@@ -39,6 +39,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -395,10 +396,13 @@ public class SipFactoryImpl implements SipFactory {
 
 				toHeader.setParameter(key, from.getParameter(key));
 			}
-
+			//This method acts as a UAC, setting the via header 
 			viaHeader = JainSipUtils.createViaHeader(sipProviders, transport,
-					null);
-			
+					null);			
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName());
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+					((SipApplicationSessionImpl)sipAppSession).getSipContext().getMainServlet());
 			List<Header> viaHeaders = new ArrayList<Header>();
 			viaHeaders.add(viaHeader);
 			

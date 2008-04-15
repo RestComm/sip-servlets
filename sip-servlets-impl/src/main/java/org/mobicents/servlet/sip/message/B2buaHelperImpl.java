@@ -42,6 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -98,13 +99,12 @@ public class B2buaHelperImpl implements B2buaHelper {
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			Request newRequest = (Request) origRequestImpl.message.clone();
-			newRequest.removeContent();					
+			newRequest.removeContent();				
+			//removing the via header from original request
 			ViaHeader viaHeader = (ViaHeader) newRequest
 					.getHeader(ViaHeader.NAME);
-			newRequest.removeHeader(ViaHeader.NAME);
-			ViaHeader newViaHeader = JainSipUtils.createViaHeader(
-					sipFactoryImpl.getSipProviders(), viaHeader.getTransport(), null);
-			newRequest.setHeader(newViaHeader);
+			newRequest.removeHeader(ViaHeader.NAME);	
+			
 			((FromHeader) newRequest.getHeader(FromHeader.NAME))
 					.removeParameter("tag");
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
@@ -152,6 +152,16 @@ public class B2buaHelperImpl implements B2buaHelper {
 			session.setSipApplicationSession(appSession);
 			session.setHandler(originalSession.getHandler());
 			appSession.setSipContext(session.getSipApplicationSession().getSipContext());
+			
+			//since B2BUA is considered as an end point , it is normal to do reinitialize 
+			//the via header chain
+			ViaHeader newViaHeader = JainSipUtils.createViaHeader(
+					sipFactoryImpl.getSipProviders(), viaHeader.getTransport(), null);
+			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+					session.getKey().getApplicationName());
+			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+					session.getHandler());
+			newRequest.setHeader(newViaHeader);
 			
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,

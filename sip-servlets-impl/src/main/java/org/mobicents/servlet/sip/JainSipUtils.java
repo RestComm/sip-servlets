@@ -43,7 +43,7 @@ public class JainSipUtils {
 	 	int port = listeningPoint.getPort();
 	 		 	
         try {
-            ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, null);
+            ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, branch);
           
             return via;
         } catch (Exception ex) {

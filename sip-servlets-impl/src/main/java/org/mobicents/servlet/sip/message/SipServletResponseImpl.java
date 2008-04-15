@@ -116,6 +116,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletRequestImpl sipServletAckRequest = null; 
 		try {
 			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
+			logger.info("ackRequest just created " + ackRequest);
 			//Application Routing to avoid going through the same app that created the ack
 			ListIterator<RouteHeader> routeHeaders = ackRequest.getHeaders(RouteHeader.NAME);
 			ackRequest.removeHeader(RouteHeader.NAME);
