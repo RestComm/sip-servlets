@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="test-suite" name="sip-servlets-test-suite">
 	<property environment="env" />
-	<property name="M2_REPO" value="C:/Documents and Settings/DRAGAN/.m2/repository" />
+	<property name="M2_REPO" value="${env.M2_REPO}" />
 	<property name="junit.output.dir" value="junit" />
 	<property name="debuglevel" value="source,lines,vars" />
 	<property name="target" value="1.5" />
@@ -10,8 +10,7 @@
 	<property name="test-classes" value="target/test-classes" />
 	<path id="sip-servlets-test-suite.classpath">
 		<pathelement location="${classes}" />
-		<pathelement location="${test-classes}" />
-		<pathelement location="${M2_REPO}/tomcat/tomcat-coyote/5.5.15/tomcat-coyote-5.5.15.jar" />
+		<pathelement location="${test-classes}" />		
 		<pathelement location="${M2_REPO}/commons-logging/commons-logging/1.1/commons-logging-1.1.jar" />
 		<pathelement location="${M2_REPO}/log4j/log4j/1.2.14/log4j-1.2.14.jar" />
 		<pathelement location="${M2_REPO}/logkit/logkit/1.0.1/logkit-1.0.1.jar" />
@@ -38,6 +37,7 @@
 	</path>
 
 	<target name="init">
+		<echo message="${M2_REPO}"/>
 		<mkdir dir="${classes}" />
 		<mkdir dir="${test-classes}" />
 	</target>
