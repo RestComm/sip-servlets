@@ -55,8 +55,6 @@
               
           
               
-            
-            
       
             
       
@@ -70,13 +68,15 @@
       
             
       
+            
+            
               
             <li class="expanded">
               <a href="../examples/examples.html">Examples</a>
                 <ul>
                   
     <li class="none">
-              <strong>Call Blocking</strong>
+              <a href="../examples/call_blocking.html">Call Blocking</a>
         </li>
                   
     <li class="none">
@@ -104,7 +104,7 @@
         </li>
                   
     <li class="none">
-              <a href="../examples/chatserver.html">Chat Server</a>
+              <strong>Chat Server</strong>
         </li>
               </ul>
         </li>
@@ -183,30 +183,31 @@
     </div>
     <div id="bodyColumn">
       <div id="contentBox">
-        <div class="section"><h2>Call Blocking</h2>
+        <p><b>Important Note :</b>
+ <i>This example has been taken from the <a class="externalLink" href="http://dev2dev.bea.com/pub/a/2006/02/sip-servlet.html"> BEA dev2dev</a>
+. It is has been modified to fit the new JSR 289 specification. The purpose here is to demonstrate MESSAGE sip extension support.</i>
+</p>
+<div class="section"><h2>Chat Server</h2>
 <div class="section"><h3>Service Description</h3>
-<p>When receiving an INVITE request, Call Blocking checks if the from address is a blocked contact. If that's the case it sends out a FORBIDDEN in response otherwise it does nothing.</p>
-<p>The blocked contacts are for now hard-coded addresses, and should later evolve towards a database.</p>
-<p>Here is the list of blocked contacts :</p>
-<ul><li>sip:blocked-sender@sip-servlets.com</li>
-<li>sip:blocked-sender@127.0.0.1</li>
+<p>A chat server is a virtual location where many instant messenger applications can talk to each other.<br />
+Messages that arrive in a chat room are broadcast to all other people in the room. In other words, all messages are seen by all users. This means when a message arrives at our server application, the user's address will be added to a list. Then the message will be sent to all users in that list.</p>
+<p>Additionally, you could implement &quot;commands.&quot; A command begins with a forward slash (/) and is not broadcast, but instead is processed by the server itself for special features. The commands implemented are:</p>
+<ul><li>/join: Silently enter a chat room without broadcasting anything. * /who: Print the list of all users in this chat room. * /quit: Leave the chat room; no more messages will come in.</li>
 </ul>
 </div>
 <div class="section"><h3>How to activate it</h3>
-<div class="section"><h4>From the binary</h4>
-<p>The binary distribution already contains all the needed dar files to run the examples, you just have to specify the dar file for this service to use in the Service xml tag, darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.</p>
-<p>The darConfigurationFileLocation attribute of the Service tag should be equal to &quot;conf/dars/call-blocking-servlet-dar.properties&quot;</p>
-<p>You can now run Tomcat.</p>
-</div>
 <div class="section"><h4>From the source</h4>
-<p>Please check out the call-blocking example located under this <a class="externalLink" href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/call-blocking">location</a>
- from the svn repository. Follow the instructions in the README.txt to build and run the example. </p>
+<p>Please check out the chatserver example located under this <a class="externalLink" href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/chatserver">location</a>
+ from the svn repository. Follow the instructions in the README.txt to build and run the example.</p>
+<p>The DAR file for this example can be found in the sip servlets impl project under the <a class="externalLink" href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-impl/docs">docs directory</a>
+ Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat or jboss's server.xml): file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-chatserver.properties </p>
 </div>
 </div>
 <div class="section"><h3>How to play with it</h3>
-<p>Start a SIP Phone of your choice such as the account name should be blocked-sender. The From Header should be one of the following addresses : sip:blocked-sender@sip-servlets.com or sip:blocked-sender@127.0.0.1</p>
-<p>The SIP phone doesn't have to be registered.</p>
-<p>Make a call to any address, you should receive a Forbidden.</p>
+<p>Starts Two SIP Chat Clients. Point them to <tt>sip:just4fun@127.0.0.1:5070</tt>
+<br />
+Type your message and then click on the send button </p>
+<p>You should see the messages in both clients once they are both in the chat server (that is when they sent at least one message to it).</p>
 </div>
 </div>
 
