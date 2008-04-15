@@ -51,12 +51,9 @@ public class SipFactoryImpl implements SipFactory {
 			.getCanonicalName());
 
 	public static class NamesComparator implements Comparator<String> {
-
 		public int compare(String o1, String o2) {
-
 			return o1.compareToIgnoreCase(o2);
 		}
-
 	}
 
 	private static final TreeSet<String> forbbidenToHeaderParams = new TreeSet<String>(
@@ -74,7 +71,7 @@ public class SipFactoryImpl implements SipFactory {
 	private Set<SipProvider> sipProviders = null;
 
 	private SessionManager sessionManager = null;
-	
+
 	/**
 	 * Dafault constructor
 	 * @param sessionManager 
@@ -482,6 +479,5 @@ public class SipFactoryImpl implements SipFactory {
 	 */
 	public SessionManager getSessionManager() {
 		return sessionManager;
-	}
-
+	}			
 }

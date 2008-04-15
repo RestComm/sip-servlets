@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -62,6 +63,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 * 
 	 */
 	public SipStandardContext() {
+		super();
+		pipeline.setBasic(new SipStandardContextValve());
 		listeners = new SipListenersHolder();
 	}
 
@@ -126,6 +129,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 		//called implicitly within sipApplicationDispatcher.addSipApplication
 		if(getAvailable()) {
+			//set the session manager on the specific sipstandardmanager to handle converged http sessions
+			//FIXME the session manager should be refactored and made part of the sipstandardmanager
+			if(getManager() instanceof SipStandardManager) {
+				((SipStandardManager)getManager()).setSipFactoryImpl(
+						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
+			}
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
 			logger.info("sip context started");
 		} else {
@@ -261,7 +270,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	@Override
 	public Wrapper createWrapper() {		
 		return super.createWrapper();
-	}
+	}		
+	
 	
 	public void addChild(SipServletImpl sipServletImpl) {	
 		super.addChild(sipServletImpl);
@@ -353,33 +363,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super.removeConstraint(securityConstraint);
 	}
 	
-//	/* (non-Javadoc)
-//	 * @see org.mobicents.servlet.sip.startup.SipContext#getSecurityRoles()
-//	 */
-//	public Map getSecurityRoles() {
-//		return securityRoles;
-//	}
-//
-//	/* (non-Javadoc)
-//	 * @see org.mobicents.servlet.sip.startup.SipContext#setSecurityRoles(java.util.HashMap)
-//	 */
-//	public void setSecurityRoles(Map securityRoles) {
-//		this.securityRoles = securityRoles;
-//	}
-//	
-//	/* (non-Javadoc)
-//	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionAttributeMap()
-//	 */
-//	public Map<String, Object> getSipApplicationSessionAttributeMap() {
-//		return sipApplicationSessionAttributeMap;
-//	}
-//	/* (non-Javadoc)
-//	 * @see org.mobicents.servlet.sip.startup.SipContext#setSipApplicationSessionAttributeMap(java.util.HashMap)
-//	 */
-//	public void setSipApplicationSessionAttributeMap(
-//			Map<String, Object> sipApplicationSessionAttributeMap) {
-//		this.sipApplicationSessionAttributeMap = sipApplicationSessionAttributeMap;
-//	}
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getSmallIcon()
 	 */
@@ -472,4 +455,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
     public String[] findSipApplicationListeners() {
         return (sipApplicationListeners);
     }
+
+	/**
+	 * @return the sipApplicationDispatcher
+	 */
+	public SipApplicationDispatcher getSipApplicationDispatcher() {
+		return sipApplicationDispatcher;
+	}
+
+	/**
+	 * @return the sipFactoryFacade
+	 */
+	public SipFactoryFacade getSipFactoryFacade() {
+		return sipFactoryFacade;
+	}
 }

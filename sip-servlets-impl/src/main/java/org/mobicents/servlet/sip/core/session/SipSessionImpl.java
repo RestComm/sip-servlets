@@ -496,7 +496,7 @@ public class SipSessionImpl implements SipSession {
 			SipApplicationSessionImpl sipApplicationSession) {
 		this.sipApplicationSession = sipApplicationSession;
 		if ( sipApplicationSession != null) {
-			if(sipApplicationSession.getSipSession(key.toString())!=null) {
+			if(sipApplicationSession.getSipSession(key.toString()) == null) {
 				sipApplicationSession.addSipSession(this);
 			}
 		}

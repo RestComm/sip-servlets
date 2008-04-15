@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
@@ -24,11 +25,15 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 
 	private static long DEFAULT_LIFETIME = 1000*60*60;
 	
+	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey"; 
+	
 //	private SipListenersHolder listeners;
 	
-	private Map<String, Object> sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
+	private Map<String, Object> sipApplicationSessionAttributeMap;
 
-	private Map<SipSessionKey,SipSessionImpl> sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
+	private Map<SipSessionKey,SipSessionImpl> sipSessions;
+	
+	private Map<String, HttpSession> httpSessions;
 	
 	private SipApplicationSessionKey key;	
 	
@@ -56,7 +61,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 //	private Serializable endObject;					
 	
-	public SipApplicationSessionImpl(SipApplicationSessionKey key ) {		
+	public SipApplicationSessionImpl(SipApplicationSessionKey key ) {
+		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
+		sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
+		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		this.key = key;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
@@ -68,6 +76,22 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	protected void addSipSession( SipSessionImpl sipSessionImpl) {
 		this.sipSessions.put(sipSessionImpl.getKey(), sipSessionImpl);
 //		sipSessionImpl.setSipApplicationSession(this);
+	}
+	
+	protected SipSessionImpl removeSipSession (SipSessionImpl sipSessionImpl) {
+		return this.sipSessions.remove(sipSessionImpl.getKey());
+	}
+	
+	public void addHttpSession( HttpSession httpSession) {
+		this.httpSessions.put(httpSession.getId(), httpSession);
+	}
+	
+	public HttpSession removeHttpSession (HttpSession httpSession) {
+		return this.httpSessions.remove(httpSession.getId());
+	}
+	
+	public HttpSession findHttpSession (HttpSession httpSession) {
+		return this.httpSessions.get(httpSession.getId());
 	}
 	
 	/*
@@ -91,13 +115,13 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			if(urlStr.contains("?"))
 			{
 				ret = new URL(
-						url + "&org.mobicents.servlet.sip.ApplicationSessionKey="
+						url + "&"+ SIP_APPLICATION_KEY_PARAM_NAME + "="
 							+ getId().toString());
 			}
 			else
 			{
 				ret = new URL(
-						url + "?org.mobicents.servlet.sip.ApplicationSessionKey="
+						url + "?"+ SIP_APPLICATION_KEY_PARAM_NAME + "="
 							+ getId().toString());
 			}
 			return ret;

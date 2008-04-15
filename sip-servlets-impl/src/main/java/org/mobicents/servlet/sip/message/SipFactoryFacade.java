@@ -4,6 +4,7 @@
 package org.mobicents.servlet.sip.message;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
@@ -32,10 +33,12 @@ public class SipFactoryFacade implements SipFactory {
 	
 	private SipFactoryImpl sipFactoryImpl;
 	private SipContext sipContext;
+	private ThreadLocal<HttpSession> threadLocalHttpSession;
 	
 	public SipFactoryFacade(SipFactoryImpl sipFactoryImpl, SipContext sipContext) {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.sipContext = sipContext;
+		threadLocalHttpSession = new ThreadLocal<HttpSession>();
 	}
 	
 	/* (non-Javadoc)
@@ -64,7 +67,15 @@ public class SipFactoryFacade implements SipFactory {
 	 */
 	public SipApplicationSession createApplicationSession() {
 		SipApplicationSessionImpl sipApplicationSessionImpl = 
-			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession(sipContext);		
+			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession(sipContext);
+		// a servlet wants to create a sip application
+		// session, we can retrieve its http session in the thread local data 
+		// if it has a sip http session (sip servlet only won't have any http sessions)  
+		// and associate it with the sip app session.
+		HttpSession httpSession = threadLocalHttpSession.get();
+		if(httpSession != null) {
+			sipApplicationSessionImpl.addHttpSession(httpSession);
+		}
 		return sipApplicationSessionImpl;
 	}
 
@@ -145,5 +156,21 @@ public class SipFactoryFacade implements SipFactory {
 				logger.error("Impossible to set the default handler on the newly created request "+ request.toString(),se);
 			} 
 		}
+	}
+	
+	/**
+	 * Store the http session in the sip Factory's thread local 
+	 * @param httpSession the http session to store for later retrieval
+	 */
+	public void storeHttpSession(HttpSession httpSession) {
+		threadLocalHttpSession.set(httpSession);
+	}
+	
+	/**
+	 * Retrieve the http session previously stored in the sip Factory's thread local
+	 * @return the http session previously stored in the sip Factory's thread local
+	 */
+	public HttpSession retrieveHttpSession() {
+		return threadLocalHttpSession.get();
 	}
 }

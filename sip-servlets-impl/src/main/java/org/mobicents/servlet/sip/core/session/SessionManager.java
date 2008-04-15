@@ -1,9 +1,11 @@
 package org.mobicents.servlet.sip.core.session;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
@@ -26,7 +28,8 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * already exsits it will be returned otherwise it will be created. 
  * One should be expected to remove the sessions from this manager through the
  * remove methods when the sessions are no longer used.
- *    
+ *
+ * FIXME the session manager should be refactored and made part of the sipstandardmanager
  */
 public class SessionManager {
 	private static transient Log logger = LogFactory.getLog(SessionManager.class);
@@ -287,6 +290,20 @@ public class SessionManager {
 	public Iterator<SipApplicationSessionImpl> getAllSipApplicationSessions() {
 		return sipApplicationSessions.values().iterator();
 	}
+	
+	/**
+	 * Retrieves the sip application session holding the converged http session in parameter
+	 * @param convergedHttpSession the converged session to look up
+	 * @return the sip application session holding a reference to it or null if none references it
+	 */
+	public SipApplicationSessionImpl findSipApplicationSession(HttpSession httpSession) {
+		for (SipApplicationSessionImpl sipApplicationSessionImpl : sipApplicationSessions.values()) {			
+			if(sipApplicationSessionImpl.findHttpSession(httpSession) != null) {
+				return sipApplicationSessionImpl;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * 
@@ -314,5 +331,34 @@ public class SessionManager {
 				logger.debug(sipApplicationSessionKey.toString());
 			}
 		}
+	}
+
+	/**
+	 * Parse a sip application key that was previously generated and put as an http request param
+	 * through the encodeURL method of SipApplicationSession
+	 * @param sipApplicationKey the stringified version of the sip application key
+	 * @return the corresponding sip application session key
+	 * @throws ParseException if the stringfied key cannot be parse to a valid key
+	 */
+	public static SipApplicationSessionKey parseSipApplicationSessionKey(
+			String sipApplicationKey) throws ParseException {
+		
+		int indexOfLeftParenthesis = sipApplicationKey.indexOf("(");
+		int indexOfComma = sipApplicationKey.indexOf(",");
+		int indexOfRightParenthesis = sipApplicationKey.indexOf(")");
+		if(indexOfLeftParenthesis == -1) {
+			throw new ParseException("The left parenthesis could not be found in the following key " + sipApplicationKey, 0);
+		}
+		if(indexOfComma == -1) {
+			throw new ParseException("The comma could not be found in the following key " + sipApplicationKey, 0);
+		}
+		if(indexOfRightParenthesis == -1) {
+			throw new ParseException("The right parenthesis could not be found in the following key " + sipApplicationKey, 0);
+		}
+		
+		String callId = sipApplicationKey.substring(indexOfLeftParenthesis + 1, indexOfComma);
+		String applicationName = sipApplicationKey.substring(indexOfComma + 1, indexOfRightParenthesis);
+		
+		return getSipApplicationSessionKey(applicationName, callId);			
 	}
 }
