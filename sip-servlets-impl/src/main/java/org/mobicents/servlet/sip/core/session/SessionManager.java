@@ -66,11 +66,8 @@ public class SessionManager {
 			}
 		}
 		
-		if(session != null)
-		{
-			logger.info("Dialog session associated!");
-		}
-		else // If it's not in the dialog or the transaction, we MUST create a new session
+		
+		if(session == null) // If it's not in the dialog or the transaction, we MUST create a new session
 		{
 			try
 			{
