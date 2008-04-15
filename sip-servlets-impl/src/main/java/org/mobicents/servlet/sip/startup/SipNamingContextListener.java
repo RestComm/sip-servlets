@@ -18,6 +18,8 @@ import javax.servlet.sip.SipFactory;
 
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.core.NamingContextListener;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.naming.ContextAccessController;
 
 /**
@@ -28,6 +30,9 @@ import org.apache.naming.ContextAccessController;
  *
  */
 public class SipNamingContextListener extends NamingContextListener {
+	private static transient Log logger = LogFactory
+		.getLog(SipNamingContextListener.class);
+	
 	public static final String NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT = "addSipFactory";
 	public static final String NAMING_CONTEXT_SIPFACTORY_REMOVED_EVENT = "removeSipFactory";
 	public static final String SIP_SUBCONTEXT = "sip";
@@ -37,18 +42,23 @@ public class SipNamingContextListener extends NamingContextListener {
 	public void containerEvent(ContainerEvent event) {		
 		super.containerEvent(event);
 		// Setting the context in read/write mode
-        ContextAccessController.setWritable(getName(), container);
-        
+        ContextAccessController.setWritable(getName(), container);        
         String type = event.getType();
 		if (type.equals(NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT)) {
 			SipFactory sipFactory = (SipFactory) event.getData();
             if (sipFactory != null) {                
                 addSipFactory(sipFactory);
+                if(logger.isDebugEnabled()) {
+                	logger.debug("Sip Factory added to the JNDI context for container " + event.getContainer());
+                }
             }
-        } else if (type.equals(NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT)) {
+        } else if (type.equals(NAMING_CONTEXT_SIPFACTORY_REMOVED_EVENT)) {
         	SipFactory sipFactory = (SipFactory) event.getData();
             if (sipFactory != null) {                
                 removeSipFactory(sipFactory);
+                if(logger.isDebugEnabled()) {
+                	logger.debug("Sip Factory removed from the JNDI context for container " + event.getContainer());
+                }
             }
         }
 		// Setting the context in read only mode
@@ -61,7 +71,8 @@ public class SipNamingContextListener extends NamingContextListener {
 	 */
 	private void removeSipFactory(SipFactory sipFactory) {
 		try {
-			envCtx.unbind(SIPFACTORY_JNDI_NAME);
+			javax.naming.Context sipContext = (javax.naming.Context)envCtx.lookup(SIP_SUBCONTEXT);
+			sipContext.unbind(SIPFACTORY_JNDI_NAME);
 			envCtx.destroySubcontext(SIP_SUBCONTEXT);
 		} catch (NamingException e) {
 			logger.error(sm.getString("naming.bindFailed", e));
@@ -75,8 +86,8 @@ public class SipNamingContextListener extends NamingContextListener {
 	 */
 	private void addSipFactory(SipFactory sipFactory) {
 		try {
-			envCtx.createSubcontext(SIP_SUBCONTEXT);
-			envCtx.bind(SIPFACTORY_JNDI_NAME, sipFactory);
+			javax.naming.Context sipContext = envCtx.createSubcontext(SIP_SUBCONTEXT);
+			sipContext.bind(SIPFACTORY_JNDI_NAME, sipFactory);
 		} catch (NamingException e) {
 			logger.error(sm.getString("naming.bindFailed", e));
 		}			

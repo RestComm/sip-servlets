@@ -63,10 +63,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //	private Map securityRoles;
 //	private Map<String,Object> sipApplicationSessionAttributeMap;
 	private SipFactoryFacade sipFactoryFacade;	
-	/**
-     * The naming context listener for this web application.
-     */
-    private transient NamingContextListener namingContextListener = null;
+	
     protected String namingContextName;
     
 	/**
@@ -152,38 +149,29 @@ public class SipStandardContext extends StandardContext implements SipContext {
             }
         }
         // Reading the "catalina.useNaming" environment variable
-//        String useNamingProperty = System.getProperty("catalina.useNaming");
-//        if ((useNamingProperty != null)
-//            && (useNamingProperty.equals("false"))) {
-//            setUseNaming(false);
-//        }
-//        //deactivating the naming instantiation from the parent since this is handled 
-//        //here. FIXME when we move to Tomcat 6 
-//        boolean useNaming = isUseNaming();
-//        if (isUseNaming()) {    
-//        	if (namingContextListener == null) {
-//            	NamingContextListener namingContextListener = new SipNamingContextListener();
-//                namingContextListener.setName(getNamingContextName());
-//                addLifecycleListener(namingContextListener);
-//                addContainerListener(namingContextListener);
-//            }
-//            setUseNaming(false);
-//        }                
+        String useNamingProperty = System.getProperty("catalina.useNaming");
+        if ((useNamingProperty != null)
+            && (useNamingProperty.equals("false"))) {
+            setUseNaming(false);
+        }
+        //activating our custom naming context to be able to set the sip factory in JNDI
+        if (isUseNaming()) {    
+        	if (getNamingContextListener() == null) {
+            	NamingContextListener namingContextListener = new SipNamingContextListener();
+                namingContextListener.setName(getNamingContextName());
+                setNamingContextListener(namingContextListener);
+                addLifecycleListener(namingContextListener);
+                addContainerListener(namingContextListener);
+            }
+        }                
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
 		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
 		super.start();		
-		//reactivating the naming instantiation from the parent since this is handled 
-        //here. FIXME when we move to Tomcat 6
-//		if (useNaming) {			
-//			setUseNaming(true);
-//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT, sipFactoryFacade);
-//		}
 		//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 		//called implicitly within sipApplicationDispatcher.addSipApplication
 		if(getAvailable()) {
-			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
 			//FIXME the session manager should be refactored and made part of the sipstandardmanager
 			if(getManager() instanceof SipStandardManager) {
@@ -322,6 +310,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	@Override
 	public void loadOnStartup(Container[] containers) {
+		// Adding Sip Factory to JNDI Context
+		if (isUseNaming()) {			
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIPFACTORY_ADDED_EVENT, sipFactoryFacade);
+		}
 		super.loadOnStartup(containers);	
 	}
 
