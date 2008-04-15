@@ -3,7 +3,7 @@
   <skin>
     <groupId>org.jvnet.maven-javanet-skin</groupId>
     <artifactId>maven-javanet-skin</artifactId>
-    <version>1.0</version>
+    <version>RELEASE</version>
   </skin>
   <body>
     <menu>
