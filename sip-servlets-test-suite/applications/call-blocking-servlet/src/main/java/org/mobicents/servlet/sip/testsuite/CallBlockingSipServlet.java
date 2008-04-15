@@ -32,6 +32,7 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		super.init(servletConfig);
 		blockedUris = new ArrayList<String>();
 		blockedUris.add("sip:blocked-sender@sip-servlets.com");
+		blockedUris.add("sip:blocked-sender@127.0.0.1");
 	}
 
 	@Override
@@ -39,13 +40,17 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 			IOException {
 
 		logger.info("Got request:\n"
-				+ request.getMethod());
-		logger.info(request.getFrom().getURI().toString());
+				+ request.toString());
+		String fromUri = request.getFrom().getURI().toString();
+		logger.info(fromUri);
 		
-		if(blockedUris.contains(request.getFrom().getURI().toString())) {
+		if(blockedUris.contains(fromUri)) {
+			logger.info(fromUri + " has been blocked !");
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
 			sipServletResponse.send();		
-		}		
+		} else {
+			logger.info(fromUri + " has not been blocked.");
+		}
 	}
 
 	// SipErrorListener methods

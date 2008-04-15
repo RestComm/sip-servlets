@@ -43,6 +43,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:blocked-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-sender@127.0.0.1", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:blocked-sender@127.0.0.1", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 	}
 	
 	@Override
@@ -79,6 +83,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			logger.info("forkedRequest = " + forkedRequest);
 			
 			forkedRequest.send();
+		} else {
+			logger.info("INVITE has not been forwarded.");
 		}
 	}	
 	
@@ -120,12 +126,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if(cSeqValue.indexOf("INVITE") != -1) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
+			logger.info("Sending " +  ackRequest);
 			ackRequest.send();
 			//create and sends OK for the first call leg
 			SipSession originalSession =   
 			    helper.getLinkedSession(sipServletResponse.getSession());					
 			SipServletResponse responseToOriginalRequest = 
 				helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
 			responseToOriginalRequest.send();
 		}			
 	}
@@ -141,6 +149,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		    helper.getLinkedSession(sipServletResponse.getSession());					
 		SipServletResponse responseToOriginalRequest = 
 			helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 		responseToOriginalRequest.send();		
 	}
 	
