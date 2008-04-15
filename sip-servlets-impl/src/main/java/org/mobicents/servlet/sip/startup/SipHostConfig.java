@@ -50,8 +50,8 @@ public class SipHostConfig extends HostConfig {
 	}
 
 	@Override
-	protected void deployDescriptor(String arg0, File arg1, String arg2) {
-		super.deployDescriptor(arg0, arg1, arg2);
+	protected void deployDescriptor(String contextPath, File contextXml, String file) {
+		super.deployDescriptor(contextPath, contextXml, file);
 	}
 	
 	@Override

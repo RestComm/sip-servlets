@@ -114,8 +114,7 @@ public class SipStandardService extends StandardService implements SipService {
 	}
 
 	@Override
-	public void stop() throws LifecycleException {
-		super.stop();
+	public void stop() throws LifecycleException {		
 		synchronized (connectors) {
 			for (int i = 0; i < connectors.length; i++) {
 				SipProvider sipProvider = (SipProvider)
@@ -126,6 +125,7 @@ public class SipStandardService extends StandardService implements SipService {
 			}
 		}
 		sipApplicationDispatcher.stop();
+		super.stop();
 	}
 	
 	/**
