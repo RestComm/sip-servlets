@@ -28,7 +28,6 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
-import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -674,8 +673,35 @@ public class TestSipListener implements SipListener {
 		return ackReceived;
 	}
 
-	// send message 
-	public void sendMessage(String messageToSend) throws SipException, InvalidArgumentException, ParseException {		
+	/**
+	 * 
+	 * @param messageToSend
+	 * @throws SipException
+	 * @throws InvalidArgumentException
+	 * @throws ParseException
+	 */ 
+	public void sendMessageInDialog(String messageToSend) throws SipException, InvalidArgumentException, ParseException {
+		lastMessageContent = null;
+		Request message = dialog.createRequest(Request.MESSAGE);
+		ContentLengthHeader contentLengthHeader = 
+			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());
+		ContentTypeHeader contentTypeHeader = 
+			protocolObjects.headerFactory.createContentTypeHeader("text","plain;charset=UTF-8");
+		message.setContentLength(contentLengthHeader);
+		message.setContent(messageToSend, contentTypeHeader);
+		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
+		dialog.sendRequest(clientTransaction);
+	}
+	
+	/**
+	 * 
+	 * @param messageToSend
+	 * @throws SipException
+	 * @throws InvalidArgumentException
+	 * @throws ParseException
+	 */ 
+	public void sendMessageNoDialog(String messageToSend) throws SipException, InvalidArgumentException, ParseException {
+		lastMessageContent = null;
 		Request message = dialog.createRequest(Request.MESSAGE);
 		ContentLengthHeader contentLengthHeader = 
 			protocolObjects.headerFactory.createContentLengthHeader(messageToSend.length());

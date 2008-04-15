@@ -9,7 +9,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
@@ -30,7 +29,6 @@ import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
-import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,8 +37,9 @@ import org.apache.commons.logging.LogFactory;
 public class ListenersSipServlet
 		extends SipServlet 
 		implements SipErrorListener, SipServletListener, 
-		SipSessionListener, SipSessionActivationListener, SipSessionAttributeListener, SipSessionBindingListener,
-		SipApplicationSessionListener, SipApplicationSessionActivationListener, SipApplicationSessionAttributeListener, SipApplicationSessionBindingListener {
+		SipSessionListener, SipSessionActivationListener, SipSessionBindingListener,
+		SipApplicationSessionListener, SipApplicationSessionActivationListener, SipApplicationSessionBindingListener,
+		SipSessionAttributeListener, SipApplicationSessionAttributeListener {
 
 	private static Log logger = LogFactory.getLog(ListenersSipServlet.class);
 	
@@ -48,12 +47,33 @@ public class ListenersSipServlet
 	
 	private static final String OK = "OK";
 	private static final String KO = "KO";
-
-	private static final String SIP_SESSION_CREATED = "sipSessionCreated";
+	
+	private static final String ATTRIBUTE = "attribute";
+	private static final String VALUE = "value";
+	private static final String NEW_VALUE = "new_value";
+	
 	private static final String NO_ACK_RECEIVED = "noAckReceived";
-	private static final String NO_PRACK_RECEIVED = "noAckReceived";
+	private static final String NO_PRACK_RECEIVED = "noPrackReceived";
 	private static final String SIP_SERVLET_INITIALIZED = "sipServletInitialized";
+	private static final String SIP_SESSION_CREATED = "sipSessionCreated";
 	private static final String SIP_SESSION_DESTROYED = "sipSessionDestroyed";
+	private static final String SIP_APP_SESSION_VALUE_UNBOUND = "sipAppSessionValueUnbound";
+	private static final String SIP_APP_SESSION_VALUE_BOUND = "sipAppSessionValueBound";
+	private static final String SIP_APP_SESSION_ATTRIBUTE_REPLACED = "sipAppSessionAttributeReplaced";
+	private static final String SIP_APP_SESSION_ATTRIBUTE_REMOVED = "sipAppSessionAttributeRemoved";
+	private static final String SIP_APP_SESSION_ATTRIBUTE_ADDED = "sipAppSessionAttributeAdded";
+	private static final String SIP_APP_SESSION_PASSIVATED = "sipAppSessionPassivated";
+	private static final String SIP_APP_SESSION_ACTIVATED = "sipAppSessionActivated";
+	private static final String SIP_APP_SESSION_EXPIRED = "sipAppSessionExpired";
+	private static final String SIP_APP_SESSION_DESTROYED = "sipAppSessionDestroyed";
+	private static final String SIP_APP_SESSION_CREATED = "sipAppSessionCreated";
+	private static final String SIP_SESSION_VALUE_UNBOUND = "sipSessionValueUnbound";
+	private static final String SIP_SESSION_VALUE_BOUND = "sipSessionValueBound";
+	private static final String SIP_SESSION_ATTRIBUTE_REPLACED = "sipSessionAttributeReplaced";
+	private static final String SIP_SESSION_ATTRIBUTE_REMOVED = "sipSessionAttributeRemoved";
+	private static final String SIP_SESSION_ATTRIBUTE_ADDED = "sipSessionAttributeAdded";
+	private static final String SIP_SESSION_PASSIVATED = "sipSessionPassivated";
+	private static final String SIP_SESSION_ACTIVATED = "sipSessionActivated";	
 
 	private SipFactory sipFactory;	
 	
@@ -121,7 +141,7 @@ public class ListenersSipServlet
 	private void processMessage(SipServletRequest request) {
 		try {
 			String message = (String)request.getContent();
-			if(SIP_SESSION_CREATED.equals(message)) {
+			if(message != null && message.length() > 0) {
 				SipServletRequest responseMessage = request.getSession().createRequest("MESSAGE");
 //				SipServletRequest responseMessage = sipFactory.createRequest(
 //						request.getApplicationSession(),
@@ -131,10 +151,9 @@ public class ListenersSipServlet
 //				SipURI requestURI = sipFactory.createSipURI("sender", "127.0.0.1:5080");
 //				responseMessage.setRequestURI(requestURI);
 				responseMessage.setContentLength(2);
-				if(request.getSession().getAttribute(SIP_SESSION_CREATED) != null) {
+				responseMessage.setContent(KO, CONTENT_TYPE);
+				if (hasListenerBeenCalled(request, message)) {
 					responseMessage.setContent(OK, CONTENT_TYPE);
-				} else {
-					responseMessage.setContent(KO, CONTENT_TYPE);
 				}
 				responseMessage.send();
 			}
@@ -147,6 +166,90 @@ public class ListenersSipServlet
 //			logger.error("a parse exception occured", e);
 //		}
 		
+	}
+
+	/**
+	 * Check if a particular listener has been called
+	 * @param request the request the message has been received on 
+	 * @param message the message containing the listener to check
+	 * @return true if the listener has been called, flase otherwise
+	 */
+	private boolean hasListenerBeenCalled(SipServletRequest request, String message) {
+		if(SIP_SESSION_CREATED.equals(message) 
+				&& request.getSession().getAttribute(message) != null) {
+			return true;
+		} else if (SIP_SESSION_DESTROYED.equals(message)) {
+			request.getSession().invalidate();
+			if(request.getSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}
+		} if(SIP_APP_SESSION_CREATED.equals(message) 
+				&& request.getApplicationSession().getAttribute(message) != null) {
+			return true;
+		} else if (SIP_APP_SESSION_DESTROYED.equals(message)) {
+			request.getApplicationSession().invalidate();
+			if(request.getApplicationSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (SIP_SESSION_ATTRIBUTE_ADDED.equals(message) || 
+				SIP_SESSION_VALUE_BOUND.equals(message)) {
+			request.getSession().setAttribute(ATTRIBUTE, VALUE);
+			if(request.getSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}
+		}else if (SIP_SESSION_ATTRIBUTE_REMOVED.equals(message) ||
+				SIP_SESSION_VALUE_UNBOUND.equals(message)) {
+			request.getSession().setAttribute(ATTRIBUTE, VALUE);
+			request.getSession().removeAttribute(ATTRIBUTE);
+			if(request.getSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (SIP_SESSION_ATTRIBUTE_REPLACED.equals(message)) {
+			request.getSession().setAttribute(ATTRIBUTE, VALUE);
+			request.getSession().setAttribute(ATTRIBUTE, NEW_VALUE);
+			if(request.getSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}			
+		} else if (SIP_APP_SESSION_ATTRIBUTE_ADDED.equals(message) || 
+				SIP_APP_SESSION_VALUE_BOUND.equals(message)) {
+			request.getApplicationSession().setAttribute(ATTRIBUTE, VALUE);
+			if(request.getApplicationSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}
+		}else if (SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(message) ||
+				SIP_APP_SESSION_VALUE_UNBOUND.equals(message)) {
+			request.getApplicationSession().setAttribute(ATTRIBUTE, VALUE);
+			request.getApplicationSession().removeAttribute(ATTRIBUTE);
+			if(request.getApplicationSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(message)) {
+			request.getApplicationSession().setAttribute(ATTRIBUTE, VALUE);
+			request.getApplicationSession().setAttribute(ATTRIBUTE, NEW_VALUE);
+			if(request.getApplicationSession().getAttribute(message) != null) {
+				return true;
+			} else {
+				return false;
+			}			
+		} else if (SIP_SERVLET_INITIALIZED.equals(message)
+				&& getServletContext().getAttribute(message) != null) {
+			return true;
+		}
+		return false;
 	}
 
 	// Listeners methods	
@@ -198,15 +301,16 @@ public class ListenersSipServlet
 	 * @see javax.servlet.sip.SipSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipSessionEvent)
 	 */
 	public void sessionDidActivate(SipSessionEvent se) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip session activated " +  se.getSession());
+		se.getSession().setAttribute(SIP_SESSION_ACTIVATED, OK);			
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSessionActivationListener#sessionWillPassivate(javax.servlet.sip.SipSessionEvent)
 	 */
 	public void sessionWillPassivate(SipSessionEvent se) {
-		// TODO Auto-generated method stub
+		logger.info("sip session passivated " +  se.getSession());
+		se.getSession().setAttribute(SIP_SESSION_PASSIVATED, OK);
 		
 	}
 	/*
@@ -214,119 +318,157 @@ public class ListenersSipServlet
 	 * @see javax.servlet.sip.SipSessionAttributeListener#attributeAdded(javax.servlet.sip.SipSessionBindingEvent)
 	 */
 	public void attributeAdded(SipSessionBindingEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip session attribute added " +  ev.getName());
+		if(!SIP_SESSION_ATTRIBUTE_ADDED.equals(ev.getName()) && 
+				!SIP_SESSION_VALUE_BOUND.equals(ev.getName()) && 
+				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) { 
+			ev.getSession().setAttribute(SIP_SESSION_ATTRIBUTE_ADDED, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSessionAttributeListener#attributeRemoved(javax.servlet.sip.SipSessionBindingEvent)
 	 */
 	public void attributeRemoved(SipSessionBindingEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip session attribute removed " +  ev.getName());
+		if(!SIP_SESSION_ATTRIBUTE_REMOVED.equals(ev.getName()) && 
+				!SIP_SESSION_VALUE_UNBOUND.equals(ev.getName()) && 
+				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) { 
+			ev.getSession().setAttribute(SIP_SESSION_ATTRIBUTE_REMOVED, OK);
+		}		
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSessionAttributeListener#attributeReplaced(javax.servlet.sip.SipSessionBindingEvent)
 	 */
 	public void attributeReplaced(SipSessionBindingEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip session attribute removed " +  ev.getName());
+		if(!SIP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
+			ev.getSession().setAttribute(SIP_SESSION_ATTRIBUTE_REPLACED, OK);
+		}		
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSessionBindingListener#valueBound(javax.servlet.sip.SipSessionBindingEvent)
 	 */
 	public void valueBound(SipSessionBindingEvent event) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip session attribute bound " +  event.getName());
+		if(!SIP_SESSION_VALUE_BOUND.equals(event.getName()) && 
+				!SIP_SESSION_ATTRIBUTE_ADDED.equals(event.getName()) && 
+				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
+			event.getSession().setAttribute(SIP_SESSION_VALUE_BOUND, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSessionBindingListener#valueUnbound(javax.servlet.sip.SipSessionBindingEvent)
 	 */
 	public void valueUnbound(SipSessionBindingEvent event) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip session attribute unbound " +  event.getName());
+		if(!SIP_SESSION_VALUE_UNBOUND.equals(event.getName()) && 
+				!SIP_SESSION_ATTRIBUTE_REMOVED.equals(event.getName()) && 
+				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
+			event.getSession().setAttribute(SIP_SESSION_VALUE_UNBOUND, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionListener#sessionCreated(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionCreated(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session created " +  ev.getApplicationSession());
+		ev.getApplicationSession().setAttribute(SIP_APP_SESSION_CREATED, OK);
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionListener#sessionDestroyed(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session destroyed " +  ev.getApplicationSession());
+		ev.getApplicationSession().setAttribute(SIP_APP_SESSION_DESTROYED, OK);
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionListener#sessionExpired(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionExpired(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session expired " +  ev.getApplicationSession());
+		ev.getApplicationSession().setAttribute(SIP_APP_SESSION_EXPIRED, OK);
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionDidActivate(SipApplicationSessionEvent se) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session activated " +  se.getApplicationSession());
+		se.getApplicationSession().setAttribute(SIP_APP_SESSION_ACTIVATED, OK);
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionWillPassivate(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionWillPassivate(SipApplicationSessionEvent se) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session passivated " +  se.getApplicationSession());
+		se.getApplicationSession().setAttribute(SIP_APP_SESSION_PASSIVATED, OK);
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionAttributeListener#attributeAdded(javax.servlet.sip.SipApplicationSessionBindingEvent)
 	 */
 	public void attributeAdded(SipApplicationSessionBindingEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session attribute added " +  ev.getName());
+		if(!SIP_APP_SESSION_ATTRIBUTE_ADDED.equals(ev.getName()) && 
+				!SIP_APP_SESSION_VALUE_BOUND.equals(ev.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) { 
+			ev.getApplicationSession().setAttribute(SIP_APP_SESSION_ATTRIBUTE_ADDED, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionAttributeListener#attributeRemoved(javax.servlet.sip.SipApplicationSessionBindingEvent)
 	 */
 	public void attributeRemoved(SipApplicationSessionBindingEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session attribute removed " +  ev.getName());		
+		if(!SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(ev.getName()) && 
+				!SIP_APP_SESSION_VALUE_UNBOUND.equals(ev.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) { 
+			ev.getApplicationSession().setAttribute(SIP_APP_SESSION_ATTRIBUTE_REMOVED, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionAttributeListener#attributeReplaced(javax.servlet.sip.SipApplicationSessionBindingEvent)
 	 */
 	public void attributeReplaced(SipApplicationSessionBindingEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session attribute replaced " +  ev.getName());
+		if(!SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(ev.getName()) && 
+				!SIP_APP_SESSION_VALUE_UNBOUND.equals(ev.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
+			ev.getApplicationSession().setAttribute(SIP_APP_SESSION_ATTRIBUTE_REPLACED, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionBindingListener#valueBound(javax.servlet.sip.SipApplicationSessionBindingEvent)
 	 */
 	public void valueBound(SipApplicationSessionBindingEvent event) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session value bound " +  event.getName());
+		if(!SIP_APP_SESSION_VALUE_BOUND.equals(event.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_ADDED.equals(event.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
+			event.getApplicationSession().setAttribute(SIP_APP_SESSION_VALUE_BOUND, OK);
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionBindingListener#valueUnbound(javax.servlet.sip.SipApplicationSessionBindingEvent)
 	 */
 	public void valueUnbound(SipApplicationSessionBindingEvent event) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session value unbound " +  event.getName());
+		if(!SIP_APP_SESSION_VALUE_UNBOUND.equals(event.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(event.getName()) && 
+				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
+			event.getApplicationSession().setAttribute(SIP_APP_SESSION_VALUE_UNBOUND, OK);
+		}
 	}
 }

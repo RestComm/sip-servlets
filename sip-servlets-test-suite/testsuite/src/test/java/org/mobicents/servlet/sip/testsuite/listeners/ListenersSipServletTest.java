@@ -22,8 +22,29 @@ public class ListenersSipServletTest extends SipServletTestCase {
 	private static final int TIMEOUT = 1000;	
 //	private static final int TIMEOUT = 100000000;
 	
-	private static final String OK = "OK";	
-	private static final String SIP_SESSION_CREATED = "sipSessionCreated";
+	private static final String OK = "OK";
+	// the order is important here 
+	private static final String[] LISTENERS_TO_TEST = new String[]{
+		"sipServletInitialized",
+		"sipAppSessionCreated",		
+		"sipAppSessionValueBound", "sipAppSessionValueUnbound", 
+		"sipAppSessionAttributeReplaced","sipAppSessionAttributeRemoved", "sipAppSessionAttributeAdded", 
+		"sipSessionCreated", 
+		"sipSessionValueBound", "sipSessionValueUnbound",  
+		"sipSessionAttributeReplaced", "sipSessionAttributeRemoved", "sipSessionAttributeAdded"
+		};		
+	
+	private static final String[] LISTENERS_TO_TEST_AFTER = new String[]{
+		"sipAppSessionExpired", "sipSessionDestroyed", "sipAppSessionDestroyed"
+	};
+	
+	private static final String[] LISTENERS_NOT_TESTED = new String[]{
+		//difficult to test, leave it for now 
+		"noAckReceived", 
+		//require the container to support Prack, it currently doesn't
+		"noPrackReceived",  
+		//require the container to session persistence or distribution, it currently doesn't
+		"sipAppSessionPassivated", "sipAppSessionActivated", "sipSessionPassivated", "sipSessionActivated"};
 	
 	TestSipListener sender;
 	
@@ -80,14 +101,28 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		sender.sendInvite(fromAddress, toAddress);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
-		sender.sendMessage("sipSessionCreated");
-		Thread.sleep(TIMEOUT);
-		assertNotNull(sender.getLastMessageContent());
-		assertEquals(OK, sender.getLastMessageContent());
+		for (int i = 0; i < LISTENERS_TO_TEST.length; i++) {
+			logger.info("Testing following listener " + LISTENERS_TO_TEST[i]);
+			sender.sendMessageInDialog(LISTENERS_TO_TEST[i]);
+			Thread.sleep(TIMEOUT);
+			assertNotNull(sender.getLastMessageContent());
+			if(!OK.equals(sender.getLastMessageContent())) {
+				fail("following listener " + LISTENERS_TO_TEST[i] + " was not fired");
+			}
+		}		
 		Thread.sleep(TIMEOUT);
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());		
+		assertTrue(sender.getOkToByeReceived());
+//		for (int i = 0; i < LISTENERS_TO_TEST_AFTER.length; i++) {
+//			logger.info("Testing following listener " + LISTENERS_TO_TEST_AFTER[i]);
+//			sender.sendMessageNoDialog(LISTENERS_TO_TEST_AFTER[i]);
+//			Thread.sleep(TIMEOUT);
+//			assertNotNull(sender.getLastMessageContent());
+//			if(!OK.equals(sender.getLastMessageContent())) {
+//				fail("following listener " + LISTENERS_TO_TEST_AFTER[i] + " was not fired");
+//			}
+//		}
 	}
 
 	@Override
