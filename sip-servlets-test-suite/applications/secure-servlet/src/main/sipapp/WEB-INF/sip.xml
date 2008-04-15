@@ -24,4 +24,24 @@
 			org.mobicents.servlet.sip.testsuite.SecureServlet
 		</listener-class>
 	</listener>
+	
+	<security-constraint>
+	   <display-name>MyServlet Security Constraint</display-name>
+	      <resource-collection>
+	          <resource-name>SecureServlete</resource-name>
+	          <description>Securing Teh SecureServlet</description>
+	          <servlet-name>SecureServlet</servlet-name>
+	          <sip-method>INVITE</sip-method>   
+	     </resource-collection>   
+	     <auth-constraint>      
+	           <role-name>testrole</role-name>  
+	     </auth-constraint>
+	 </security-constraint>
+	 
+	 <login-config> 
+         <auth-method>DIGEST</auth-method> 
+         <realm-name>sip-servlets-realm</realm-name> 
+   </login-config> 
+
+	
 </sip-app>

@@ -38,9 +38,11 @@ public class UACvsUASSecurityTest extends SipServletTestCase implements SipListe
 
 	protected Hashtable providerTable = new Hashtable();
 
-	private static final int timeout = 5000;
+	private SipStack sipStackTracker;
 
-	private static final int receiversCount = 1;
+	//private SipPhone sipPhoneTracker;
+	
+	private Tracker tracker;
 
 	public UACvsUASSecurityTest(String name) {
 		super(name);
@@ -48,14 +50,23 @@ public class UACvsUASSecurityTest extends SipServletTestCase implements SipListe
 
 	@Override
 	public void setUp() throws Exception {
+		//init();
+		tracker = new Tracker();
 		super.setUp();
 	}
 
 	public void testSecurity() {
+		tracker.init();
 		try {
-			Thread.sleep(50000);
+			for(int q=0; q<10; q++)
+			{
+				if(tracker.receivedInvite) break;
+				Thread.sleep(1111);
+			}
+			if(!tracker.receivedInvite) 
+				fail("Didnt receive notification that the security scenario is complete.");
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			fail("Security test failed: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -91,7 +102,7 @@ public class UACvsUASSecurityTest extends SipServletTestCase implements SipListe
 	}
 
 	public void init() {
-		// setupPhones();
+
 	}
 
 	private SipListener getSipListener(EventObject sipEvent) {
