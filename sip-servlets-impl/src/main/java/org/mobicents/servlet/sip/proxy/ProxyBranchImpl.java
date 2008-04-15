@@ -331,9 +331,12 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 */
 	public void cancelTimer()
 	{
-		proxyBranchTimer.cancel();
-		proxyBranchTimer.purge();
-		proxyBranchTimer = null;
+		if(proxyBranchTimer != null)
+		{
+			proxyBranchTimer.cancel();
+			proxyBranchTimer.purge();
+			proxyBranchTimer = null;
+		}
 	}
 
 }
