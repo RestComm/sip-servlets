@@ -169,8 +169,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	@Override
 	public void send() throws IOException {
 		try {
-			super.provider.sendResponse((Response)this.message);
-		} catch (SipException e) {
+			ServerTransaction st = (ServerTransaction) transaction;
+			st.sendResponse( (Response)this.message );
+		} catch (Exception e) {
 			//TODO logger
 			throw new IOException(e.getMessage());
 		}
