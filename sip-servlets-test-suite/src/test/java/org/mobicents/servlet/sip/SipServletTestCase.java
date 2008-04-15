@@ -1,5 +1,5 @@
 package org.mobicents.servlet.sip;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -15,7 +15,7 @@ public abstract class SipServletTestCase extends TestCase {
 		super.setUp();
 Properties properties = new Properties();
 		
-		properties.load(new FileReader("tomcat.properties"));
+		properties.load(new FileInputStream("tomcat.properties"));
 		
 		TOMCAT_BASE_PATH = properties.getProperty("tomcat.home");
 		
