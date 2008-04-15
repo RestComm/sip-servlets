@@ -69,6 +69,8 @@ public class CallForwardingTestSipListener implements SipListener {
 
 	private boolean redirectReceived;
 
+	private boolean okToByeReceived;
+	
 	private SipURI requestURI;
 	
 	private static Logger logger = Logger.getLogger(CallForwardingTestSipListener.class);
@@ -200,7 +202,9 @@ public class CallForwardingTestSipListener implements SipListener {
 					Request byeRequest = this.dialog.createRequest(Request.BYE);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 					dialog.sendRequest(ct);
-				} 
+				} else if(cseq.getMethod().equals(Request.BYE)) {
+					okToByeReceived = true;
+				}
 			} else if  (response.getStatusCode() == Response.MOVED_TEMPORARILY) {
 				// Dialog dies as soon as you get an error response.
 				this.redirectReceived = true;
@@ -479,5 +483,13 @@ public class CallForwardingTestSipListener implements SipListener {
 			DialogTerminatedEvent dialogTerminatedEvent) {
 		this.dialogTerminatedCount++;
 
+	}
+
+	public boolean getOkToByeReceived() {
+		return okToByeReceived;
+	}
+	
+	public boolean getByeReceived() {
+		return byeReceived;
 	}	
 }

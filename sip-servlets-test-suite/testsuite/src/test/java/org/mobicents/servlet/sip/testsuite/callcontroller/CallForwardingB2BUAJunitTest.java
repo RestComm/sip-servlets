@@ -13,8 +13,8 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-//	private static final int TIMEOUT = 5000;	
-	private static final int TIMEOUT = 100000000;
+	private static final int TIMEOUT = 5000;	
+//	private static final int TIMEOUT = 100000000;
 	
 	CallForwardingTestSipListener sender;
 	CallForwardingTestSipListener receiver;
@@ -66,6 +66,8 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 	public void testCallForwarding() throws InterruptedException {
 		sender.sendInvite();
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
 	}
 
 	@Override

@@ -1,12 +1,15 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -51,7 +54,22 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				+ request.getMethod());
 		helper = request.getB2buaHelper();
 		
-		forkAndSendRequest(request);
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);
+		
+		Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
+		Set<String> toHeaderSet = new HashSet<String>();
+		toHeaderSet.add("sip:forward-receiver@sip-servlets.com");
+		headers.put("To", toHeaderSet);
+		
+		SipServletRequest forkedRequest = helper.createRequest(request, true,
+				headers);
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
+		forkedRequest.setRequestURI(sipUri);						
+		
+		logger.info("forkedRequest = " + forkedRequest);
+		
+		forkedRequest.send();
 	}	
 	
 	@Override
@@ -59,53 +77,46 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			IOException {
 		logger.info("Got BYE: "
 				+ request.getMethod());
-		forkAndSendRequest(request);
-	}
-	
-	/**
-	 * @param request
-	 * @throws ServletParseException
-	 * @throws IOException
-	 */
-	private void forkAndSendRequest(SipServletRequest request)
-			throws ServletParseException, IOException {
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-				SIP_FACTORY);		
-		SipServletRequest forkedRequest = helper.createRequest(request, true,
+		//we send the OK directly to the first call leg
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		sipServletResponse.send();
+		
+		//we forward the BYE
+		SipSession linkedSession = helper.getLinkedSession(request.getSession());		
+		SipServletRequest forkedRequest = helper.createRequest(
+				linkedSession,
+				request, 
 				null);
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
-		forkedRequest.setHeader("To", "sip:forward-receiver@sip-servlets.com");
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:127.0.0.1:5090");				
+		forkedRequest.setRequestURI(sipUri);						
 		
 		logger.info("forkedRequest = " + forkedRequest);
 		
-		forkedRequest.setRequestURI(sipUri);
 		forkedRequest.send();
-	}
+	}	
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void doResponse(SipServletResponse sipServletResponse)
+	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());		
-		int status = sipServletResponse.getStatus();
-		if (status == SipServletResponse.SC_OK) {
-			String cSeqValue = sipServletResponse.getHeader("CSeq");
-			//if this is a BYE we don't need to ack it 
-			if(cSeqValue.indexOf("BYE") == -1) {
-				SipServletRequest ackRequest = sipServletResponse.createAck();
-				ackRequest.send();			
-			}
+		
+		String cSeqValue = sipServletResponse.getHeader("CSeq");
+		//if this is a response to an INVITE we ack it and forward the OK 
+		if(cSeqValue.indexOf("INVITE") != -1) {
+			SipServletRequest ackRequest = sipServletResponse.createAck();
+			ackRequest.send();
 			//create and sends OK for the first call leg
 			SipSession originalSession =   
 			    helper.getLinkedSession(sipServletResponse.getSession());					
 			SipServletResponse responseToOriginalRequest = 
-				helper.createResponseToOriginalRequest(originalSession, SipServletResponse.SC_OK, "OK");
+				helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
 			responseToOriginalRequest.send();
-		} else {
-			super.doResponse(sipServletResponse);
-		}
+		}			
 	}
 	
 	
