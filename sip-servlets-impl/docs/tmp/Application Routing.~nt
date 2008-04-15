@@ -21,7 +21,7 @@
 <XPD:REF name="DiagramOwner">YG8ZLZ0oCkGKHjhcHI08EwAA</XPD:REF>
 <XPD:OBJ name="DiagramView" type="UMLSequenceDiagramView" guid="Da9z0HaOUU6OVauiYp3DrAAA">
 <XPD:REF name="Diagram">okyxFzmld0qpSj6GBGavOAAA</XPD:REF>
-<XPD:ATTR name="#OwnedViews" type="integer">34</XPD:ATTR>
+<XPD:ATTR name="#OwnedViews" type="integer">33</XPD:ATTR>
 <XPD:OBJ name="OwnedViews[0]" type="UMLSeqObjectView" guid="p0r9MNdG0kezsPB41cVUrgAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
@@ -222,7 +222,7 @@
 <XPD:ATTR name="Left" type="integer">259</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">140</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">529</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">494</XPD:ATTR>
 </XPD:OBJ>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLSeqStimulusView" guid="tYkqBtISrUqqrvGR6jZc1QAA">
@@ -430,7 +430,7 @@
 <XPD:ATTR name="Top" type="integer">724</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">428</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">53</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">step 5 to 13 can be done n times until
+<XPD:ATTR name="Text" type="string">step 4 to 10 can be done n times until
 chain ends when either an application acts as a UAS or
 if no more applications are selected and the request is sent to an external SIP entity.
 </XPD:ATTR>
@@ -501,12 +501,11 @@ by the application to clearly define its intentions. see JSR 289 Section 15.2
 <XPD:OBJ name="OwnedViews[22]" type="UMLNoteView" guid="aUi63FHEtE6vOd2+SRnJWAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">748</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">266</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">53</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">664</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">369</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">38</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">We have to record somewhere the application path
- for dialog creating requests for 
-subsequent requests JSR 289 Spec 15.6
+ for dialog creating requests for subsequent requests JSR 289 Spec 15.6
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[23]" type="UMLSeqStimulusView" guid="LizcasITMkKAxWb2W4E6aAAA">
@@ -730,48 +729,12 @@ path by itself as stated in 15.6
 <XPD:ATTR name="Left" type="integer">266</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">558</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">102</XPD:ATTR>
-</XPD:OBJ>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[33]" type="UMLSeqStimulusView" guid="w0kJf0fF3kCiz1mT8AA+CwAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">279,608;309,608;309,628;286,628</XPD:ATTR>
-<XPD:REF name="Model">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
-<XPD:REF name="Head">VYQmkC4pNkO65tOy7Ywl9QAA</XPD:REF>
-<XPD:REF name="Tail">VYQmkC4pNkO65tOy7Ywl9QAA</XPD:REF>
-<XPD:OBJ name="NameLabel" type="EdgeLabelView" guid="3SF9qoaPiEO0h/scJauXLgAA">
-<XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
-<XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">14 : checkDirective()</XPD:ATTR>
-<XPD:REF name="Model">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
-<XPD:REF name="HostEdge">w0kJf0fF3kCiz1mT8AA+CwAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="StereotypeLabel" type="EdgeLabelView" guid="1lOkJ9qRkEmfQVQ8jH7VqwAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Alpha" type="real">1.5707963267949</XPD:ATTR>
-<XPD:ATTR name="Distance" type="real">25</XPD:ATTR>
-<XPD:REF name="Model">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
-<XPD:REF name="HostEdge">w0kJf0fF3kCiz1mT8AA+CwAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="PropertyLabel" type="EdgeLabelView" guid="fnqT1RsbJ06F+xQzxM89twAA">
-<XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Alpha" type="real">-1.5707963267949</XPD:ATTR>
-<XPD:ATTR name="Distance" type="real">10</XPD:ATTR>
-<XPD:REF name="Model">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
-<XPD:REF name="HostEdge">w0kJf0fF3kCiz1mT8AA+CwAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="Activation" type="UMLActivationView" guid="5RPsCe8R2kmc+cIhbnKCvQAA">
-<XPD:ATTR name="Left" type="integer">273</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">628</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">29</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">73</XPD:ATTR>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:ATTR name="#ParticipatingStimuli" type="integer">14</XPD:ATTR>
+<XPD:ATTR name="#ParticipatingStimuli" type="integer">13</XPD:ATTR>
 <XPD:OBJ name="ParticipatingStimuli[0]" type="UMLStimulus" guid="ShGFWmyRZUqcCLWIEaTQ0QAA">
 <XPD:ATTR name="Name" type="string">request</XPD:ATTR>
 <XPD:REF name="Sender">2QTqDPuA50anpggYi7p4dQAA</XPD:REF>
@@ -956,20 +919,6 @@ path by itself as stated in 15.6
 <XPD:REF name="Views[2]">FDPpBvj91kKbfb0u77btZQAA</XPD:REF>
 <XPD:REF name="Views[3]">FTGTBFv1MEqbN0ujherF+wAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="ParticipatingStimuli[13]" type="UMLStimulus" guid="Mt15wtjcbkKfvHygnVGl9QAA">
-<XPD:ATTR name="Name" type="string">checkDirective</XPD:ATTR>
-<XPD:REF name="Sender">4pRDE2BvSEC57TIFYVlpJgAA</XPD:REF>
-<XPD:REF name="Receiver">4pRDE2BvSEC57TIFYVlpJgAA</XPD:REF>
-<XPD:OBJ name="Action" type="UMLCallAction" guid="/oLCOz02KUSAR3OIed0JCAAA">
-<XPD:REF name="Stimulus">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
-</XPD:OBJ>
-<XPD:REF name="InteractionInstanceSet">YG8ZLZ0oCkGKHjhcHI08EwAA</XPD:REF>
-<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
-<XPD:REF name="Views[0]">w0kJf0fF3kCiz1mT8AA+CwAA</XPD:REF>
-<XPD:REF name="Views[1]">3SF9qoaPiEO0h/scJauXLgAA</XPD:REF>
-<XPD:REF name="Views[2]">1lOkJ9qRkEmfQVQ8jH7VqwAA</XPD:REF>
-<XPD:REF name="Views[3]">fnqT1RsbJ06F+xQzxM89twAA</XPD:REF>
-</XPD:OBJ>
 </XPD:OBJ>
 <XPD:ATTR name="#ParticipatingInstances" type="integer">4</XPD:ATTR>
 <XPD:OBJ name="ParticipatingInstances[0]" type="UMLObject" guid="4pRDE2BvSEC57TIFYVlpJgAA">
@@ -978,7 +927,7 @@ path by itself as stated in 15.6
 <XPD:ATTR name="#Views" type="integer">2</XPD:ATTR>
 <XPD:REF name="Views[0]">p0r9MNdG0kezsPB41cVUrgAA</XPD:REF>
 <XPD:REF name="Views[1]">VYQmkC4pNkO65tOy7Ywl9QAA</XPD:REF>
-<XPD:ATTR name="#SendingStimuli" type="integer">10</XPD:ATTR>
+<XPD:ATTR name="#SendingStimuli" type="integer">9</XPD:ATTR>
 <XPD:REF name="SendingStimuli[0]">h/0w516WTE+zMFkdFhhdgwAA</XPD:REF>
 <XPD:REF name="SendingStimuli[1]">SSJ+KxgJWUyLiKq+0xF97QAA</XPD:REF>
 <XPD:REF name="SendingStimuli[2]">dYQlYJBNiUSh8nA3mZRQKgAA</XPD:REF>
@@ -988,8 +937,7 @@ path by itself as stated in 15.6
 <XPD:REF name="SendingStimuli[6]">bAjTB5gDWkyMQ+ZO4VlkewAA</XPD:REF>
 <XPD:REF name="SendingStimuli[7]">cRXesxNohE+gC7MRVXd/vAAA</XPD:REF>
 <XPD:REF name="SendingStimuli[8]">A6rCz7IcuUKAUn4t7Es2cAAA</XPD:REF>
-<XPD:REF name="SendingStimuli[9]">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
-<XPD:ATTR name="#ReceivingStimuli" type="integer">11</XPD:ATTR>
+<XPD:ATTR name="#ReceivingStimuli" type="integer">10</XPD:ATTR>
 <XPD:REF name="ReceivingStimuli[0]">h/0w516WTE+zMFkdFhhdgwAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[1]">SSJ+KxgJWUyLiKq+0xF97QAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[2]">Gy/2GJpjn0e1QF7DUeAQKAAA</XPD:REF>
@@ -1000,7 +948,6 @@ path by itself as stated in 15.6
 <XPD:REF name="ReceivingStimuli[7]">cRXesxNohE+gC7MRVXd/vAAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[8]">A6rCz7IcuUKAUn4t7Es2cAAA</XPD:REF>
 <XPD:REF name="ReceivingStimuli[9]">ShGFWmyRZUqcCLWIEaTQ0QAA</XPD:REF>
-<XPD:REF name="ReceivingStimuli[10]">Mt15wtjcbkKfvHygnVGl9QAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="ParticipatingInstances[1]" type="UMLObject" guid="FTlnF5kvPUi4y5T7EwMu7wAA">
 <XPD:REF name="Classifier" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::router::DefaultApplicationRouter">+yBcVu/UbEeSFidInewxtAAA</XPD:REF>

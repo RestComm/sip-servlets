@@ -1,4 +1,8 @@
 Install maven 2
+Install Tomcat 5.5.20
+
+open up the pom.xml from sip-servlets-bootstrap project and change the following property tomcat.home at the end of the file
+Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-5.5.20 
 
 Run mvn clean install from the project root (sip-servlets-bootstrap)
 
@@ -12,26 +16,28 @@ on the new popup, click on 'New' button
 on the new popup(what a popup mess :-)), 
 enter M2_REPO for the name input field 
 and <your user directory>/.m2/repository for the value.
-on windows <your user directory> 
-shall be replaced by C:/Documents and Settings/Ranga
+on windows <your user directory> shall be replaced by C:/Documents and Settings/Ranga by example.
 Then OK to all and close all remaining popups. This should compile without errors
 if it behaves otherwise mail me to jean.deruelle@gmail.com
 
 To run the sip servlet container :
-
-Download the tomcat 5.5.20
-copy the jars (concurrent, jainsipapi, jainsipri, log4j) from lib directory to your tomcat_home/common/lib directory
-
 check that the following files have been copied during the mvn clean install
 in tomcat_home/server/lib directory, there should be a sip-servlets-1.0-SNAPSHOT.jar
 in tomcat_home/common/lib directory, there should be a sip-servlets-spec-1.0-SNAPSHOT.jar
+in tomcat_home/common/lib directory, there should be a jain-sip-api.jar
+in tomcat_home/common/lib directory, there should be a jain-sip-ri.jar
+in tomcat_home/common/lib directory, there should be a concurrent.jar
+in tomcat_home/common/lib directory, there should be a log4j.jar
 
-make a bakup of your tomcat_home/conf/server.xml file
+make a backup of your tomcat_home/conf/server.xml file
 copy the server.xml located in docs to tomcat_home/conf
 look for the context tag in the server.xml file and 
 modify the docbase attribute to map to your existing simple-sip-servlet application
 
 make sure to run a mvn clean install at the root of simple-sip-servlet project too
+and remove the web.xml in both following directories simple-sip-servlet/src/main/sipapp/WEB-INF/ 
+and simple-sip-servlet/target/simple-sip-servlet-1.0-SNAPSHOT/WEB-INF/ after it.
+(This would be removed automatically through maven when time will permit...)
     	
 go to your tomcat_home/bin directory
 run the following commande
@@ -56,4 +62,4 @@ INFO: Find registry server-registry.xml at classpath resource
 INFO: Server startup in 1984 ms
 
 otherwise this file has not yet been updated with the latest steps or I screwed up somewhere. 
-In any case send me an email or ping me on gmail jean.deruelle@gmail.com ;-)
+In any case send me an email or ping me on gmail jean.deruelle@gmail.com if you encounter any problems ;-)

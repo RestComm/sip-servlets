@@ -204,25 +204,25 @@ public class SipRuleSet extends RuleSetBase {
                                "setScope", 0);        
         //Handles Security Constraint
         digester.addObjectCreate(prefix + "sip-app/security-constraint",
-                                 "org.apache.catalina.deploy.SecurityConstraint");
+                                 "org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint");
         digester.addSetNext(prefix + "sip-app/security-constraint",
-                            "addConstraint",
-                            "org.apache.catalina.deploy.SecurityConstraint");
+                            "addConstraint");
+//                            "org.apache.catalina.deploy.SecurityConstraint");
         digester.addCallMethod(prefix + "sip-app/security-constraint/display-name",
                 "setDisplayName", 0);
         digester.addObjectCreate(prefix + "sip-app/security-constraint/resource-collection",
-        		"org.apache.catalina.deploy.SecurityCollection");
+        		"org.mobicents.servlet.sip.startup.loading.SipSecurityCollection");
 		digester.addSetNext(prefix + "sip-app/security-constraint/resource-collection",
-				"addCollection",
-		   		"org.apache.catalina.deploy.SecurityCollection");
+				"addCollection");
+//		   		"org.apache.catalina.deploy.SecurityCollection");
 		digester.addCallMethod(prefix + "sip-app/security-constraint/resource-collection/resource-name",
 				"setName", 0);
-		digester.addCallMethod(prefix + "sip-app/security-constraint/resource-collection/description",
-				"setDescription", 0);
+//		digester.addCallMethod(prefix + "sip-app/security-constraint/resource-collection/description",
+//				"setDescription", 0);
 		digester.addCallMethod(prefix + "sip-app/security-constraint/resource-collection/servlet-name",
 				"addServletName", 0);
 		digester.addCallMethod(prefix + "sip-app/security-constraint/resource-collection/sip-method",
-				"addMethod", 0);			
+				"addSipMethod", 0);			
 		digester.addCallMethod(prefix + "sip-app/security-constraint/proxy-authentication",
 				"setProxyAuthentication", 0);
         digester.addRule(prefix + "sip-app/security-constraint/auth-constraint",
@@ -241,10 +241,10 @@ public class SipRuleSet extends RuleSetBase {
         digester.addRule(prefix + "sip-app/login-config",
                          loginConfig);
         digester.addObjectCreate(prefix + "sip-app/login-config",
-                                 "org.apache.catalina.deploy.LoginConfig");
+                                 "org.mobicents.servlet.sip.startup.loading.SipLoginConfig");
         digester.addSetNext(prefix + "sip-app/login-config",
-                            "setLoginConfig",
-                            "org.apache.catalina.deploy.LoginConfig");
+                            "setSipLoginConfig");
+//                            "org.apache.catalina.deploy.LoginConfig");
         digester.addCallMethod(prefix + "sip-app/login-config/auth-method",
                                "setAuthMethod", 0);
         digester.addCallMethod(prefix + "sip-app/login-config/realm-name",

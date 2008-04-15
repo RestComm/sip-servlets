@@ -3,10 +3,14 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationRouter;
+import javax.servlet.sip.SipApplicationRouterInfo;
+import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.RequestEvent;
@@ -14,6 +18,7 @@ import javax.sip.ResponseEvent;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -115,8 +120,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void processRequest(RequestEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		logger.info("got a request event");
+//		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
+//				requestEvent.getRequest(), (SipProvider) requestEvent
+//						.getSource(), requestEvent.getDialog(),requestEvent.getServerTransaction());
+		logger.info("dispatching the request event");
+		SipApplicationRouterInfo applicationRouterInfo = 
+			sipApplicationRouter.getNextApplication(null, null, SipApplicationRoutingDirective.NEW, null);
+		if(applicationRouterInfo.getNextApplicationName() == null) {
+			//TODO sends an error message
+		} else {
+			SipContext sipContext = applicationDeployed.get(applicationRouterInfo);
+			String mainServlet = sipContext.getMainServlet();
+			Container container = sipContext.findChild(mainServlet);
+			try {
+				container.invoke(null, null);
+			} catch (IOException e) {
+				//TODO sends an error message
+				logger.error("Problem during invocation of servlet "+ mainServlet,e);				
+			} catch (ServletException e) {
+				//TODO sends an error message
+				logger.error("Problem during invocation of servlet "+ mainServlet,e);				
+			}
+		}
+		logger.info("request event dispatched");
 	}
 	/**
 	 * {@inheritDoc}

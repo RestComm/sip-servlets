@@ -1,6 +1,6 @@
 package org.mobicents.servlet.sip.startup;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -67,56 +67,40 @@ public interface SipContext extends Context {
 	 */
 	void setProxyTimeout(int proxyTimeout);
 
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSecurityConstraints()
-	 */
-	HashMap getSecurityConstraints();
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSecurityConstraints(java.util.HashMap)
-	 */
-	void setSecurityConstraints(HashMap securityConstraints);
+	void addConstraint(org.apache.catalina.deploy.SecurityConstraint securityConstraint);
+	
+	void removeConstraint(org.apache.catalina.deploy.SecurityConstraint securityConstraint);
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSecurityRoles()
 	 */
-	HashMap getSecurityRoles();
+	Map getSecurityRoles();
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSecurityRoles(java.util.HashMap)
 	 */
-	void setSecurityRoles(HashMap securityRoles);
+	void setSecurityRoles(Map securityRoles);
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getServlets()
 	 */
-	HashMap getSipServlets();
+	Map getSipServlets();
 
 	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setServlets(java.util.HashMap)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setServlets(java.util.Map)
 	 */
-	void setSipServlets(HashMap sipServlets);
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSessionTimeout()
-	 */
-	int getSessionTimeout();
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSessionTimeout(int)
-	 */
-	void setSessionTimeout(int sessionTimeout);
+	void setSipServlets(Map sipServlets);
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSipApplicationSessionAttributeMap()
 	 */
-	HashMap<String, Object> getSipApplicationSessionAttributeMap();
+	Map<String, Object> getSipApplicationSessionAttributeMap();
 
 	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSipApplicationSessionAttributeMap(java.util.HashMap)
+	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setSipApplicationSessionAttributeMap(java.util.Map)
 	 */
 	void setSipApplicationSessionAttributeMap(
-			HashMap<String, Object> sipApplicationSessionAttributeMap);
+			Map<String, Object> sipApplicationSessionAttributeMap);
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSmallIcon()
