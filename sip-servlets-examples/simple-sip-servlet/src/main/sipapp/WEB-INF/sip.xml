@@ -16,7 +16,7 @@
 		<servlet-class>
 			org.mobicents.servlet.sip.example.SimpleSipServlet
 		</servlet-class>
-		<!--load-on-startup>1</load-on-startup-->
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<listener>
