@@ -120,9 +120,9 @@ public interface SipSession{
      *
      */
     public enum State{
-    	CONFIRMED,
-    	EARLY,
     	INITIAL,
+    	EARLY,
+    	CONFIRMED,
     	TERMINATED;
     }
 }
