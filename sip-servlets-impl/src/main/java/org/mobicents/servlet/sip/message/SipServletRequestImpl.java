@@ -276,7 +276,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public Proxy getProxy() throws TooManyHopsException {
 		if ( this.b2buahelper != null ) throw new IllegalStateException("Cannot proxy request");
-		return transactionApplicationData.getProxy();
+		return getProxy(true);
 	}
 
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
@@ -289,7 +289,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		
 		
 
-		return getProxy();
+		return this.transactionApplicationData.getProxy();
 	}
 
 	/*

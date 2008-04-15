@@ -33,7 +33,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private boolean started;
 	private SipProvider provider;
 	
-	private ProxyUtils proxyUtils = new ProxyUtils(provider, this);
+	private ProxyUtils proxyUtils;
 	
 	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipProvider provider, SipURI recordRouteURI)
 	{
@@ -43,7 +43,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.recordRouteURI = proxy.getRecordRouteURI();
 		this.outboundInterface = proxy.getOutboundInterface();
 		this.provider = provider;
-		this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();
+		if(recordRouteURI != null)
+			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();
+		this.proxyUtils = new ProxyUtils(provider, this);
 	}
 	
 	/* (non-Javadoc)
