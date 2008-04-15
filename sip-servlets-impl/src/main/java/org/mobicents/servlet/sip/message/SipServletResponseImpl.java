@@ -2,6 +2,7 @@ package org.mobicents.servlet.sip.message;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -28,12 +29,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
 	
 	
-	
+	Response response;
 	
 
 	public SipServletResponseImpl (Response response, SipProvider provider, Transaction transaction, SipSession session, Dialog dialog) {
 		super(response, provider, transaction, session, dialog);
-		
+		this.response = (Response) response;
 	}
 	
 	
@@ -100,8 +101,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 	public String getReasonPhrase() {
-		// TODO Auto-generated method stub
-		return null;
+		return response.getReasonPhrase();
 	}
 
 	public SipServletRequest getRequest() {
@@ -110,8 +110,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 	public int getStatus() {
-		// TODO Auto-generated method stub
-		return 0;
+		return response.getStatusCode();
 	}
 
 	public PrintWriter getWriter() throws IOException {
@@ -125,12 +124,23 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 	public void setStatus(int statusCode) {
-		// TODO Auto-generated method stub
+		try {
+			response.setStatusCode(statusCode);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
 	public void setStatus(int statusCode, String reasonPhrase) {
-		// TODO Auto-generated method stub
+		try {
+			response.setStatusCode(statusCode);
+			response.setReasonPhrase(reasonPhrase);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -173,6 +183,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	public void send()  {
 		try {
 			SipSessionImpl session = (SipSessionImpl) this.getSession();
+			
+			// Update Session state
 			if( this.getStatus()>=200 && this.getStatus()<300 )
 				session.setState(State.CONFIRMED);
 			if( this.getStatus()>=100 && this.getStatus()<200 )

@@ -17,6 +17,7 @@ import javax.servlet.sip.SipApplicationRouter;
 import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipRouteModifier;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
@@ -47,6 +48,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -386,42 +388,112 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		logger.info("Response " + arg0.getResponse().toString());
 		Response response = arg0.getResponse();
 		
+		// See if this transaction has been here before
 		Object appData = arg0.getClientTransaction().getApplicationData();
 		if(appData instanceof org.mobicents.servlet.sip.message.TransactionApplicationData)
 		{
 			org.mobicents.servlet.sip.message.TransactionApplicationData tad =
 				(org.mobicents.servlet.sip.message.TransactionApplicationData) appData;
 			
+			SipSessionImpl session = tad.getSipSession();
+			
+			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new
 				SipServletResponseImpl(response, (SipProvider)arg0.getSource(),
-						arg0.getClientTransaction(), tad.getSipSession(), arg0.getDialog());
+						arg0.getClientTransaction(), session, arg0.getDialog());
 
+			// Update Session state
+			if( sipServletResponse.getStatus()>=200 && sipServletResponse.getStatus()<300 )
+				session.setState(State.CONFIRMED);
+			if( sipServletResponse.getStatus()>=100 && sipServletResponse.getStatus()<200 )
+				session.setState(State.EARLY);
+			
+			// See if this is a response to a proxied request
 			ProxyBranchImpl proxyBranch = tad.getProxyBranch();
 			if(proxyBranch != null)
+			{
+				// Handle it at the branch
 				proxyBranch.onResponse(sipServletResponse); 
-				// If in supervised mode proxyBranch.onResponse() will pass the response
-				// to the servlet.
+				
+				// Notfiy the servlet
+				if(proxyBranch.getProxy().getSupervised())
+				{
+					callServlet(sipServletResponse, session);
+				}
+			}
 			else
 			{
-				// TODO: Here the response should be delivered to the servlet?
+				callServlet(sipServletResponse, session);
 			}
 		}
-		
-
-
 	}
+	
+	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session)
+	{
+		Container container = session.getSipContext().findChild(session.getHandler());
+		Wrapper sipServletImpl = (Wrapper) container;
+		try {
+			Servlet servlet = sipServletImpl.allocate();	        
+			servlet.service(request, null);
+		} catch (ServletException e) {				
+			logger.error(e);
+			//TODO sends an error message
+		} catch (IOException e) {				
+			logger.error(e);
+			//TODO sends an error message
+		}
+	}
+	
+	public static void callServlet(SipServletResponseImpl response, SipSessionImpl session)
+	{
+		Container container = session.getSipContext().findChild(session.getHandler());
+		Wrapper sipServletImpl = (Wrapper) container;
+		try {
+			Servlet servlet = sipServletImpl.allocate();	        
+			servlet.service(null, response);
+		} catch (ServletException e) {				
+			logger.error(e);
+			//TODO sends an error message
+		} catch (IOException e) {				
+			logger.error(e);
+			//TODO sends an error message
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	public void processTimeout(TimeoutEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// TODO: FIX ME
+		Transaction tx = null;
+		if(arg0.isServerTransaction())
+		{
+			tx = arg0.getServerTransaction();
+		}
+		else
+		{
+			tx = arg0.getClientTransaction();
+		}
+		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();
+		tad.getSipSession().onTransactionTimeout(tx);
+
 	}
 	/**
 	 * {@inheritDoc}
 	 */
 	public void processTransactionTerminated(TransactionTerminatedEvent arg0) {
-		// TODO Auto-generated method stub
+		// TODO: FIX ME
+		Transaction tx = null;
+		if(arg0.isServerTransaction())
+		{
+			tx = arg0.getServerTransaction();
+		}
+		else
+		{
+			tx = arg0.getClientTransaction();
+		}
+		TransactionApplicationData tad = (TransactionApplicationData)tx.getApplicationData();
+		tad.getSipSession().onTransactionTimeout(tx);
 		
 	}
 
