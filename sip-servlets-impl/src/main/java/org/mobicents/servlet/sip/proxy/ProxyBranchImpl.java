@@ -203,7 +203,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		if(response.getStatus() >= 300)
 		{
 			// TODO: Send ACK to the callee
-			
+			// ACTUALLY: This ACK is sent by the stack
 		}
 		
 

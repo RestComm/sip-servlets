@@ -3,10 +3,13 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
+import gov.nist.javax.sip.header.SIPHeader;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.sip.Proxy;
@@ -15,6 +18,8 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.header.ContactHeader;
+import javax.sip.header.Header;
 
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -308,7 +313,19 @@ public class ProxyImpl implements Proxy {
 		if(response.getStatus() >= 300 && response.getStatus() < 400
 				&& getRecurse())
 		{
-			// Recurse
+			// We may want to store these for "moved permanently" and others
+			ListIterator<Header> headers = 
+				response.getMessage().getHeaders(ContactHeader.NAME);
+			while(headers.hasNext())
+			{
+				ContactHeader contactHeader = (ContactHeader) headers.next();
+				SipURIImpl sipUri = new SipURIImpl(
+						(javax.sip.address.SipURI)contactHeader.getAddress().getURI());
+				ProxyBranchImpl pb = new ProxyBranchImpl(sipUri, this, sipFactoryImpl, this.recordRouteURI);
+				this.proxyBranches.put(sipUri, pb);
+				if(parallel) pb.start();
+				// if not parallel, just adding it to the list is enough
+			}
 		}
 		
 		// Sort best do far		
@@ -356,9 +373,17 @@ public class ProxyImpl implements Proxy {
 		{
 			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;
 			SipServletResponse response = pb.getResponse();
-			if(pbi.isStarted() && (response == null || response.getStatus() < 200
-					|| pbi.isTimedOut()))
+			
+			// The unstarted branches still haven't got a chance to get response
+			if(!pbi.isStarted()) return false;
+			
+			if(pbi.isStarted())
+			{
+				if(    response == null 
+					|| response.getStatus() < 200
+					|| pbi.isTimedOut())
 				return false;
+			}
 		}
 		return true;
 	}
