@@ -41,7 +41,8 @@ import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
  */
 
 public class TestSipListener implements SipListener {
-
+	private boolean sendBye;
+	
 	private SipProvider sipProvider;
 
 	private ProtocolObjects protocolObjects;
@@ -93,8 +94,13 @@ public class TestSipListener implements SipListener {
 			processInvite(requestReceivedEvent, serverTransactionId);
 		}
 				
-		if (request.getMethod().equals(Request.BYE))
+		if (request.getMethod().equals(Request.BYE)) {
 			processBye(request, serverTransactionId);
+		}
+		
+		if (request.getMethod().equals(Request.ACK)) {
+			processAck(request, serverTransactionId);
+		}
 
 	}
 	
@@ -176,6 +182,24 @@ public class TestSipListener implements SipListener {
 		}
 	}
 
+	public void processAck(Request request,
+			ServerTransaction serverTransactionId) {
+		try {
+			logger.info("shootist:  got a " + request);
+			logger.info("shootist:  got an ACK. ServerTxId = " + serverTransactionId);
+			if(sendBye) {											
+				Thread.sleep(1000);
+				Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
+				ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+				logger.info("Sending BYE : " + byeRequest);
+				serverTransactionId.getDialog().sendRequest(ct);
+				logger.info("Dialog State = " + serverTransactionId.getDialog().getState());
+			}							
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(0);
+		}
+	}
 	public void processResponse(ResponseEvent responseReceivedEvent) {
 		logger.info("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
@@ -202,9 +226,11 @@ public class TestSipListener implements SipListener {
 					
 					Thread.sleep(1000);
 					// If the caller is supposed to send the bye
-					Request byeRequest = this.dialog.createRequest(Request.BYE);
-					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
-					dialog.sendRequest(ct);
+					if(sendBye) {
+						Request byeRequest = this.dialog.createRequest(Request.BYE);
+						ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+						dialog.sendRequest(ct);
+					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					okToByeReceived = true;
 				}
@@ -434,13 +460,14 @@ public class TestSipListener implements SipListener {
 			this.dialogCount++;
 	}
 	
-	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects) {
-		this.protocolObjects = protocolObjects;
+	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects, boolean callerSendBye) {
+		this.protocolObjects = protocolObjects;		
 		this.myPort = myPort;
 		if(peerPort > 0) {
 			this.peerPort = peerPort;
 			this.peerHostPort = "127.0.0.1:"+ peerPort;
 		}
+		this.sendBye = callerSendBye;
 	}
 
 	public void processIOException(IOExceptionEvent exceptionEvent) {

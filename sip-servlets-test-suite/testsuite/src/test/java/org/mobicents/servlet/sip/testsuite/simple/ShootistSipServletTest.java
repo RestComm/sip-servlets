@@ -39,7 +39,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 			receiverProtocolObjects =new ProtocolObjects(
 					"sender", "gov.nist", TRANSPORT, AUTODIALOG);
 						
-			receiver = new TestSipListener(5080, 5070, receiverProtocolObjects);
+			receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 			SipProvider senderProvider = receiver.createProvider();			
 			
 			senderProvider.addSipListener(receiver);

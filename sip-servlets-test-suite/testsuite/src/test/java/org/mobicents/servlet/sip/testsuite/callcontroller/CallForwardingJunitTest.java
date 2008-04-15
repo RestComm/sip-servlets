@@ -52,10 +52,10 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 		receiverProtocolObjects = new ProtocolObjects("receiver", "gov.nist",
 				TRANSPORT, AUTODIALOG);
 
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, -1, receiverProtocolObjects);
+		receiver = new TestSipListener(5090, -1, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);

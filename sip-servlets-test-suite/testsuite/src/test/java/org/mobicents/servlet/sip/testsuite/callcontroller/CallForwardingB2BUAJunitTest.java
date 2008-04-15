@@ -1,9 +1,5 @@
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
-import java.text.ParseException;
-
-import javax.sip.InvalidArgumentException;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -51,11 +47,14 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT, AUTODIALOG);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG);
-
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects);
+			
+	}
+	
+	public void testCallForwardingCallerSendBye() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects);
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -63,10 +62,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-		
-	}
-	
-	public void testCallForwarding() throws InterruptedException, ParseException, SipException, InvalidArgumentException {
+
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -83,11 +79,42 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 	}
 
+	public void testCallForwardingCalleeSendBye() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendInvite(fromAddress, toAddress);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());
+		assertTrue(sender.getByeReceived());		
+	}
+
+	
 	@Override
-	protected void tearDown() {					
+	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();
 		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");		
+		logger.info("Test completed");
+		super.tearDown();
 	}
 
 
