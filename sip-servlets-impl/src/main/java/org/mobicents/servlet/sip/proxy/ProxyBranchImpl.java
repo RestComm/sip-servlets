@@ -289,12 +289,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 				sipFactoryImpl.getSipProviders(), transport);
 		
 		try {
-			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK))
-			{
+			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK)) {
 				sipProvider.sendRequest(clonedRequest);
 			}
-			else
-			{
+			else {
 				forwardRequest(clonedRequest, true);
 			}
 		} catch (SipException e) {

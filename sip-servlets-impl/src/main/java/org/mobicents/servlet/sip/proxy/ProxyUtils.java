@@ -63,6 +63,14 @@ public class ProxyUtils {
 				
 				clonedRequest.setHeader(rheader);
 			}
+			else
+			{
+				clonedRequest.removeFirst(RouteHeader.NAME);
+				RouteHeader routeHeader = (RouteHeader) clonedRequest
+					.getHeader(RouteHeader.NAME);
+				if(routeHeader != null)
+					clonedRequest.setRequestURI(routeHeader.getAddress().getURI());
+			}
 
 			// Decrease max forwards if available
 			MaxForwardsHeader mf = (MaxForwardsHeader) clonedRequest
