@@ -56,6 +56,7 @@ public class SipStandardService extends StandardService implements SipService {
 		if(sipProvider != null) {
 			try {
 				sipProvider.addSipListener(sipApplicationDispatcher);
+				sipApplicationDispatcher.addSipProvider(sipProvider);
 			} catch (TooManyListenersException e) {
 				log.error("Connector.initialize", e);
 			}			
@@ -68,7 +69,8 @@ public class SipStandardService extends StandardService implements SipService {
 		SipProvider sipProvider = (SipProvider)
 		connector.getProtocolHandler().getAttribute("sipProvider");
 		if(sipProvider != null) {
-			sipProvider.removeSipListener(sipApplicationDispatcher);			
+			sipProvider.removeSipListener(sipApplicationDispatcher);
+			sipApplicationDispatcher.removeSipProvider(sipProvider);
 		}
 		super.removeConnector(connector);
 	}
@@ -104,6 +106,7 @@ public class SipStandardService extends StandardService implements SipService {
 				if(sipProvider != null) {
 					try {
 						sipProvider.addSipListener(sipApplicationDispatcher);
+						sipApplicationDispatcher.addSipProvider(sipProvider);
 					} catch (TooManyListenersException e) {					
 						throw new LifecycleException(e);
 					}	
@@ -120,7 +123,8 @@ public class SipStandardService extends StandardService implements SipService {
 				SipProvider sipProvider = (SipProvider)
 					connectors[i].getProtocolHandler().getAttribute("sipProvider");
 				if(sipProvider != null) {					
-					sipProvider.removeSipListener(sipApplicationDispatcher);					
+					sipProvider.removeSipListener(sipApplicationDispatcher);
+					sipApplicationDispatcher.removeSipProvider(sipProvider);
 				}
 			}
 		}

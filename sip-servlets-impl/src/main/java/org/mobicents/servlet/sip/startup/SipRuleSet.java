@@ -118,7 +118,7 @@ public class SipRuleSet extends RuleSetBase {
         
         //Handles Listeners
         digester.addCallMethod(prefix + "sip-app/listener/listener-class",
-                                "addListener", 0);
+                                "addSipApplicationListener", 0);
          
         //Handles Main Servlet
         digester.addCallMethod(prefix + "sip-app/main-servlet",

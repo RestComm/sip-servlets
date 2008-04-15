@@ -24,20 +24,18 @@ public class TimerServiceImpl implements TimerService {
 	
 	private static TimerServiceImpl instance = new TimerServiceImpl();
 
-	public static TimerServiceImpl getInstance() {
+	public static synchronized TimerServiceImpl getInstance() {
 		return instance;
 	}
 	
 	public ServletTimer createTimer(SipApplicationSession appSession,
-			long delay, boolean isPersistent, Serializable info) {
-			
+			long delay, boolean isPersistent, Serializable info) {			
 		return this.createTimer(appSession, delay, isPersistent, info, false);
 	}
 
 	public ServletTimer createTimer(SipApplicationSession appSession,
 			long delay, long period, boolean fixedDelay, boolean isPersistent,
 			Serializable info) {
-		// TODO Auto-generated method stub
 		return this.createTimer(appSession, delay, period, fixedDelay, isPersistent, info,false);
 	}
 	

@@ -82,16 +82,6 @@ public interface SipContext extends Context {
 	void setSecurityRoles(Map securityRoles);
 
 	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getServlets()
-	 */
-	Map getSipServlets();
-
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#setServlets(java.util.Map)
-	 */
-	void setSipServlets(Map sipServlets);
-
-	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.loading.SipServletApplication#getSipApplicationSessionAttributeMap()
 	 */
 	Map<String, Object> getSipApplicationSessionAttributeMap();

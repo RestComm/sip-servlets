@@ -1,10 +1,11 @@
 package org.mobicents.servlet.sip.message;
 
-import gov.nist.javax.sip.stack.SIPTransaction;
-
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -17,24 +18,15 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.ClientTransaction;
-import javax.sip.Dialog;
-import javax.sip.InvalidArgumentException;
-import javax.sip.ListeningPoint;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.TransactionUnavailableException;
-import javax.sip.address.AddressFactory;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
-import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
-import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
@@ -42,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -49,13 +42,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
 public class SipFactoryImpl implements SipFactory {
 	private static final Log logger = LogFactory.getLog(SipFactoryImpl.class
-			.getCanonicalName());
-
-
-	private static AddressFactory addressFactory = SipFactories.addressFactory;
-	private static final SipFactoryImpl instance = new SipFactoryImpl();
-
-	
+			.getCanonicalName());	
 
 	public static class NamesComparator implements Comparator<String> {
 
@@ -69,33 +56,29 @@ public class SipFactoryImpl implements SipFactory {
 	private static final TreeSet<String> forbbidenToHeaderParams = new TreeSet<String>(
 			new NamesComparator());
 
-	static {
-		forbbidenToHeaderParams.add("tag");
-
-	}
-
-	static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
+	private static final TreeSet<String> dialogCreationMethods = new TreeSet<String>(
 			new NamesComparator());
 
 	static {
+		forbbidenToHeaderParams.add("tag");
 		dialogCreationMethods.add(Request.INVITE);
 		dialogCreationMethods.add(Request.SUBSCRIBE);
 	}
 
-	// TODO: Initialize those
-	// ---- SIP GOV.NIST
-	private SipProvider sipProvider = null;
 
-	private MessageFactory sipMessageFactory = null;
-
-	private HeaderFactory sipHeaderFactory = null;
-
-	private AddressFactory sipAddressFactory = null;
-
-	public static synchronized SipFactoryImpl getInstance() {
-		return instance;
+	private Set<SipProvider> sipProviders = null;
+	
+	/**
+	 * Dafault constructor
+	 */
+	public SipFactoryImpl() {
+		this.sipProviders = new HashSet<SipProvider>();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createAddress(java.lang.String)
+	 */
 	public Address createAddress(String sipAddress)
 			throws ServletParseException {
 
@@ -111,18 +94,26 @@ public class SipFactoryImpl implements SipFactory {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI)
+	 */
 	public Address createAddress(URI uri) {
 		try {
 			if (logger.isDebugEnabled())
 				logger.debug("Creating Address fromm URI[" + uri.toString()
 						+ "]");
 			URIImpl uriImpl = (URIImpl)uri;
-			return new AddressImpl(addressFactory.createAddress(uriImpl.getURI()));
+			return new AddressImpl(SipFactories.addressFactory.createAddress(uriImpl.getURI()));
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI, java.lang.String)
+	 */
 	public Address createAddress(URI uri, String displayName) {
 		try {
 			if (logger.isDebugEnabled())
@@ -130,7 +121,7 @@ public class SipFactoryImpl implements SipFactory {
 						+ "] with display name[" + displayName + "]");
 			
 			
-			javax.sip.address.Address address = addressFactory.createAddress( ((URIImpl)uri).getURI());
+			javax.sip.address.Address address = SipFactories.addressFactory.createAddress( ((URIImpl)uri).getURI());
 			address.setDisplayName(displayName);
 			return new AddressImpl(address);
 			
@@ -139,6 +130,10 @@ public class SipFactoryImpl implements SipFactory {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createApplicationSession()
+	 */
 	public SipApplicationSession createApplicationSession() {
 
 		if (logger.isDebugEnabled())
@@ -146,10 +141,17 @@ public class SipFactoryImpl implements SipFactory {
 		return new SipApplicationSessionImpl(UUID.randomUUID().toString());
 	}
 
+	/*
+	 * 
+	 */
 	public SipApplicationSessionImpl createApplicationSessionImpl(String id) {
 		return new SipApplicationSessionImpl(id);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createRequest(javax.servlet.sip.SipApplicationSession, java.lang.String, javax.servlet.sip.Address, javax.servlet.sip.Address)
+	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
 			String method, Address from, Address to) {
 		if (logger.isDebugEnabled())
@@ -162,9 +164,13 @@ public class SipFactoryImpl implements SipFactory {
 
 		validateCreation(method, sipAppSession);
 
-		return createSipServletRequest(sipAppSession, method, from, to);
+		return createSipServletRequest(sipAppSession, method, from, to, null);
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createRequest(javax.servlet.sip.SipApplicationSession, java.lang.String, javax.servlet.sip.URI, javax.servlet.sip.URI)
+	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
 			String method, URI from, URI to) {
 		if (logger.isDebugEnabled())
@@ -180,10 +186,13 @@ public class SipFactoryImpl implements SipFactory {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA);
+		return createSipServletRequest(sipAppSession, method, fromA, toA, null);
 
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createRequest(javax.servlet.sip.SipApplicationSession, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
 			String method, String from, String to) throws ServletParseException {
 		if (logger.isDebugEnabled())
@@ -200,31 +209,45 @@ public class SipFactoryImpl implements SipFactory {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA);
+		return createSipServletRequest(sipAppSession, method, fromA, toA, null);
 
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createRequest(javax.servlet.sip.SipServletRequest, boolean)
+	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest,
 			boolean sameCallId) {
 		if (logger.isDebugEnabled())
 			logger.debug("Creating SipServletRequest from original request["
 					+ origRequest + "] with same call id[" + sameCallId + "]");
-		// TODO Auto-generated method stub
+		
+//		return createSipServletRequest(sipAppSession, method, from, to, origRequest);		
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String, java.lang.String)
+	 */
 	public SipURI createSipURI(String user, String host) {
 		if (logger.isDebugEnabled())
 			logger.debug("Creating SipURI from USER[" + user + "] HOST[" + host
-					+ "]");
-		// TODO Auto-generated method stub
-		return null;
+					+ "]");			
+		try {
+			return new SipURIImpl(SipFactories.addressFactory.createSipURI(user, host));
+		} catch (ParseException e) {
+			logger.error("couldn't parse the SipURI from USER[" + user + "] HOST[" + host
+					+ "]", e);
+			return null;
+		}		
 	}
 
-	public URI createURI(String s) throws ServletParseException {
+	public URI createURI(String uri) throws ServletParseException {
 		if (logger.isDebugEnabled())
-			logger.debug("Creating uri from [" + s + "]");
-		// TODO Auto-generated method stub
+			logger.debug("Creating uri from [" + uri + "]");
+		//TODO is a generic uri needed here as in jain sip ?
+//		return new URIImpl(SipFactories.addressFactory.createURI(uri));
 		return null;
 	}
 
@@ -263,7 +286,7 @@ public class SipFactoryImpl implements SipFactory {
 	 */
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
-			Address to) {
+			Address to, SipServletRequest originalRequest) {
 
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
@@ -280,30 +303,29 @@ public class SipFactoryImpl implements SipFactory {
 		
 		// FIXME: Is this nough?
 		// We need address from which this will be sent, also this one will be
-		// default for contact and via
-		ListeningPoint lp = sipProvider.getListeningPoint("udp");
-		String transport = lp.getTransport();
+		// default for contact and via		
+		String transport = "udp"; 					
 		
 		// LETS CREATE OUR HEADERS
 
 		try {
-			cseqHeader = sipHeaderFactory.createCSeqHeader(1L, method);
+			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 
-			javax.sip.address.Address fromAddres = sipAddressFactory
+			javax.sip.address.Address fromAddres = SipFactories.addressFactory
 					.createAddress(from.getURI().toString());
 			fromAddres.setDisplayName(from.getDisplayName());
 
-			javax.sip.address.Address toAddress = sipAddressFactory
+			javax.sip.address.Address toAddress = SipFactories.addressFactory
 					.createAddress(to.getURI().toString());
 			toAddress.setDisplayName(to.getDisplayName());
 
-			toHeader = sipHeaderFactory.createToHeader(toAddress, null);
-			fromHeader = sipHeaderFactory.createFromHeader(fromAddres, ""
+			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);
+			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
 					+ Math.random() * 100000000);
-			callIdHeader = sipHeaderFactory
+			callIdHeader = SipFactories.headerFactory
 					.createCallIdHeader(((SipApplicationSessionImpl) sipAppSession)
 							.getId());
-			maxForwardsHeader = sipHeaderFactory.createMaxForwardsHeader(70);
+			maxForwardsHeader = SipFactories.headerFactory.createMaxForwardsHeader(70);
 			
 			
 			// FIXME: ADD ROUTE? HOW?
@@ -312,13 +334,8 @@ public class SipFactoryImpl implements SipFactory {
 
 			// routeHeader = sipHeaderFactory.createRouteHeader(routeAddress);
 
-			javax.sip.address.SipURI requestURI = null;
-
-
-			requestURI = (javax.sip.address.SipURI) (((javax.sip.address.URI)to.getURI()).clone());
-			
-		
-		
+			SipURIImpl requestURI =  
+				(SipURIImpl)((SipURIImpl)to.getURI()).clone();					
 
 			// now lets put header params into headers.
 			Iterator<String> keys = to.getParameterNames();
@@ -339,12 +356,12 @@ public class SipFactoryImpl implements SipFactory {
 				toHeader.setParameter(key, from.getParameter(key));
 			}
 
-			requestToWrapp = sipMessageFactory.createRequest(null);
+			requestToWrapp = SipFactories.messageFactory.createRequest(null);
 			
-			viaHeader = JainSipUtils.createViaHeader(sipProvider, transport);
+			viaHeader = JainSipUtils.createViaHeader(sipProviders, transport, null);
 		
 			// Add all headers
-			requestToWrapp.setRequestURI(requestURI);
+			requestToWrapp.setRequestURI(requestURI.getSipURI());
 			requestToWrapp.addHeader(toHeader);
 			requestToWrapp.addHeader(fromHeader);
 			requestToWrapp.addHeader(callIdHeader);
@@ -354,24 +371,22 @@ public class SipFactoryImpl implements SipFactory {
 			if (contactHeader != null)
 				requestToWrapp.addHeader(contactHeader);
 			if (routeHeader != null)
-				requestToWrapp.addHeader(routeHeader);
-			
-		
+				requestToWrapp.addHeader(routeHeader);						
 
-			SipSessionImpl session = new SipSessionImpl(sipProvider,(SipApplicationSessionImpl) sipAppSession);
+			SipSessionImpl session = new SipSessionImpl(this,(SipApplicationSessionImpl) sipAppSession);
 		
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrapp,
-					sipProvider, session, null,null, dialogCreationMethods.contains(method));
-
+					this, session, null,null, dialogCreationMethods.contains(method));
 			// TODO: Do session association?
-			// TODO set the routing directive as defined in 15.2.2
 			
+			// set the routing directive as defined in 15.2.2
+			if(originalRequest != null) {
+				retVal.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
+			}
 			return retVal;
-		} catch (Exception  e) {
-
-			e.printStackTrace();
-			logger.error("Error creating sipServletRequest" );
+		} catch (Exception  e) {			
+			logger.error("Error creating sipServletRequest",e );
 		}
 
 		return null;
@@ -385,5 +400,26 @@ public class SipFactoryImpl implements SipFactory {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	/**
+	 * Add a sip Provider to the current set of sip providers
+	 * @param sipProvider the sip provider to add
+	 */
+	public void addSipProvider(SipProvider sipProvider) {
+		sipProviders.add(sipProvider);
+	}
+	/**
+	 * remove the sip provider form the current set of sip providers
+	 * @param sipProvider the sip provider to remove
+	 */
+	public void removeSipProvider(SipProvider sipProvider) {
+		sipProviders.remove(sipProvider);
+	}
+	/**
+	 * This method returns a read only set of the sip providers 
+	 * @return read only set of the sip providers
+	 */
+	public Set<SipProvider> getSipProviders() {
+		return Collections.unmodifiableSet(sipProviders);
+	}
+	
 }

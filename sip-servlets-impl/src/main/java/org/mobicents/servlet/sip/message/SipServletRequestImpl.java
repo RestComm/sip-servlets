@@ -1,20 +1,15 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.core.NameValue;
-import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.header.RecordRoute;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -35,19 +30,16 @@ import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
-import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
-import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -59,8 +51,6 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
@@ -69,7 +59,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
 	private SipServletRequestImpl nextRequest;
-
+	private SipServletRequestImpl originalRequest;
+	
 	private boolean createDialog;
 	/*
 	 * Popped route header - when we are the UAS we pop and keep the route
@@ -85,10 +76,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
 
-	public SipServletRequestImpl(Request request, SipProvider provider,
+	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			SipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
-		super(request, provider, transaction, sipSession, dialog);
+		super(request, sipFactoryImpl, transaction, sipSession, dialog);
 		this.createDialog = createDialog;
 
 	}
@@ -140,12 +131,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException("No client transaction found!");
 
 		try {
+			Request request = (Request) super.message;
+			String transport = JainSipUtils.findTransport(request);
+			SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+					sipFactoryImpl.getSipProviders(), transport);
+			
 			Request cancelRequest = ((ClientTransaction) getTransaction())
 					.createCancel();
-			ClientTransaction clientTransaction = super.provider
+			ClientTransaction clientTransaction = sipProvider
 					.getNewClientTransaction(cancelRequest);
 			SipServletRequest newRequest = new SipServletRequestImpl(
-					cancelRequest, super.provider, super.session,
+					cancelRequest, sipFactoryImpl, super.session,
 					clientTransaction, getTransaction().getDialog(), false);
 
 			return newRequest;
@@ -181,14 +177,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					String transport = ((ViaHeader) request
 							.getHeader(ViaHeader.NAME)).getTransport();
 					ContactHeader contactHeader = JainSipUtils
-							.createContactForProvider(provider, transport);
+							.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
 					response.setHeader(contactHeader);
 				}
 
 				// response.addHeader(SipFactories.headerFactory.createHeader(RouteHeader.NAME,
 				// "org.mobicents.servlet.sip.example.SimpleSipServlet_SimpleSipServlet"));
 			}
-			return new SipServletResponseImpl(response, provider,
+			return new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog());
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode,
@@ -208,7 +204,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					statusCode, request);
 			response.setReasonPhrase(reasonPhrase);
 
-			return new SipServletResponseImpl(response, provider,
+			return new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog());
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode);
@@ -224,7 +220,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {
 			if (this.getTransaction() != null
 					&& this.getTransaction().getDialog() == null) {
-				Dialog dialog = this.provider.getNewDialog(this
+				Request request = (Request) super.message;
+				String transport = JainSipUtils.findTransport(request);
+				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+						sipFactoryImpl.getSipProviders(), transport);
+				
+				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
 				dialog.setApplicationData( this.transactionApplicationData.getSipSession());
 				this.session.setSessionCreatingDialog(dialog);
@@ -283,7 +284,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if ( this.b2buahelper != null ) throw new IllegalStateException("Cannot proxy request");
 		
 		if (create && transactionApplicationData.getProxy() == null) {
-			ProxyImpl proxy = new ProxyImpl(this, provider);
+			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
 			this.transactionApplicationData.setProxy(proxy);
 		}
 		
@@ -418,17 +419,25 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#setRoutingDirective(javax.servlet.sip.SipApplicationRoutingDirective, javax.servlet.sip.SipServletRequest)
+	 */
 	public void setRoutingDirective(SipApplicationRoutingDirective directive,
 			SipServletRequest origRequest) throws IllegalStateException {
-		Request request = (Request) message;
-		javax.sip.address.URI uri = request.getRequestURI();
+		Request request = (Request) message;		
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
-				&& (!origRequestImpl.isInitial || origRequestImpl.isCommitted())) {
-			throw new IllegalStateException(
-					"Bad state -- cannot set routing directive");
+		//the origRequest can be null
+		if(origRequestImpl != null) {
+			if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
+					&& (!origRequestImpl.isInitial() || origRequestImpl.isCommitted())) {
+				throw new IllegalStateException(
+						"Bad state -- cannot set routing directive");
+			}
+			//TODO remove nextRequest... Why do we have a next request, I don't get it ? 
+			origRequestImpl.setNextRequest(this);
 		}
-
+		
 		RecordRouteHeader rrh = (RecordRouteHeader) request
 				.getHeader(RecordRouteHeader.NAME);
 		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh
@@ -447,8 +456,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			String s = "error while setting routing directive";
 			logger.error(s, ex);
 			throw new IllegalArgumentException(s, ex);
-		}
-		origRequestImpl.setNextRequest(this);
+		}			
+		originalRequest = origRequestImpl;
 
 	}
 
@@ -583,30 +592,23 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {
 			Request request = (Request) super.message;
 
-			String transport = "udp";
-
-			String transportParam = ((javax.sip.address.SipURI) request
-					.getRequestURI()).getTransportParam();
-
-			if (transportParam != null
-					&& transportParam.equalsIgnoreCase("tls")) {
-				transport = "tls";
-			} else if (request.getContentLength().getContentLength() > 4096) {
-				transport = "tcp";
-			}
-
+			String transport = JainSipUtils.findTransport(request);
+			
 			if (super.getTransaction() == null) {
 
-				ViaHeader viaHeader = JainSipUtils.createViaHeader(provider,
-						transport);
+				ViaHeader viaHeader = JainSipUtils.createViaHeader(super.sipFactoryImpl.getSipProviders(),
+						transport, null);
 				request.setHeader(viaHeader);
 
-				ClientTransaction ctx = provider
+				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+						super.sipFactoryImpl.getSipProviders(), transport);
+				
+				ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);
 
 				Dialog dialog = ctx.getDialog();
 				if (dialog == null && this.createDialog) {
-					dialog = this.provider.getNewDialog(ctx);
+					dialog = sipProvider.getNewDialog(ctx);
 				}
 
 				// Make the dialog point here so that when the dialog event

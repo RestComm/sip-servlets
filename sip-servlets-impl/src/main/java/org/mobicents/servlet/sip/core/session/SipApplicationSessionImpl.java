@@ -4,12 +4,10 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.ServletTimer;
@@ -67,12 +65,14 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		this.id = UUID.randomUUID().toString();
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
+		valid = true;
 	}
 	
 	public SipApplicationSessionImpl(String id ) {
 		this.id = id;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
+		valid = true;
 	}
 	
 	public void addSipSession( SipSessionImpl sipSessionImpl) {

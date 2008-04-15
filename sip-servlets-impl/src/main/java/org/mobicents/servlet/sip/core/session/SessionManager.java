@@ -1,23 +1,9 @@
 package org.mobicents.servlet.sip.core.session;
 
-import gov.nist.javax.sip.SipProviderImpl;
-import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.message.SIPRequest;
-import gov.nist.javax.sip.stack.SIPDialog;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
-import gov.nist.javax.sip.stack.SIPTransaction;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSession.State;
-import javax.sip.ClientTransaction;
-import javax.sip.Dialog;
 import javax.sip.RequestEvent;
-import javax.sip.SipException;
-import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
@@ -27,9 +13,7 @@ import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 public class SessionManager {
 	private Map<String, SipApplicationSessionImpl> appSessions = new HashMap<String, SipApplicationSessionImpl>();
@@ -55,7 +39,7 @@ public class SessionManager {
 	 *            a JAIN SIP request event
 	 * @return
 	 */
-	public SipSessionImpl getRequestSession(RequestEvent requestEvent,
+	public SipSessionImpl getRequestSession(SipFactoryImpl sipFactoryImpl, RequestEvent requestEvent,
 			Transaction transaction) {
 		
 		/*
@@ -64,7 +48,7 @@ public class SessionManager {
 		 */
 		Request request = requestEvent.getRequest();
 		SipSessionImpl session = null;
-		SipProvider provider = (SipProvider) requestEvent.getSource();
+		
 		try {
 			String initialSessionId = getInitialSessionId(request); // without
 																	// to-tag
@@ -82,7 +66,7 @@ public class SessionManager {
 					session = sipSessions.get(initialSessionId);
 					logger.info("Found initial session " + initialSessionId);
 				} else {
-					session = new SipSessionImpl(provider, null);
+					session = new SipSessionImpl(sipFactoryImpl, null);
 					sipSessions.put(initialSessionId, session);
 					logger.info("Created initial session " + initialSessionId);
 				}

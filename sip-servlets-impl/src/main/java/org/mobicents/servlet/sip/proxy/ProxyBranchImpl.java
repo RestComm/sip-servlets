@@ -14,6 +14,7 @@ import javax.servlet.sip.SipURI;
 import javax.sip.SipProvider;
 
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -32,11 +33,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private SipURI recordRouteURI;
 	private SipURI pathURI;
 	private boolean started;
-	private SipProvider provider;
+	private SipFactoryImpl sipFactoryImpl;
 	private ProxyUtils proxyUtils;
 	private boolean timedOut;
 	
-	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipProvider provider, SipURI recordRouteURI)
+	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
 	{
 		this.targetURI = uri;
 		this.proxy = proxy;
@@ -44,7 +45,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.recordRouteURI = proxy.getRecordRouteURI();
 		this.pathURI = proxy.getPathURI();
 		this.outboundInterface = proxy.getOutboundInterface();
-		this.provider = provider;
+		this.sipFactoryImpl = sipFactoryImpl;
 		if(recordRouteURI != null)
 			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();
 		this.proxyUtils = proxy.getProxyUtils();

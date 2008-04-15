@@ -1,6 +1,5 @@
 package org.mobicents.servlet.sip.core.session;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -14,9 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipApplicationSessionAttributeListener;
-import javax.servlet.sip.SipApplicationSessionBindingEvent;
-import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionAttributeListener;
@@ -25,7 +21,6 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
@@ -37,10 +32,8 @@ import javax.sip.message.Request;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
-import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.startup.SipContext;
-
 
 /**
  * 
@@ -53,8 +46,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipSessionImpl implements SipSession {
 
-	private SipApplicationSessionImpl sipApplicationSession;
-	
+	private SipApplicationSessionImpl sipApplicationSession;	
 	
 	private ArrayList<SipSessionAttributeListener> sipSessionAttributeListeners;
 	private ArrayList<SipSessionBindingListener> sipSessionBindingListeners;
@@ -138,10 +130,10 @@ public class SipSessionImpl implements SipSession {
 	/*
 	 * The almighty provider
 	 */
-	private SipProvider provider;
+	private SipFactoryImpl sipFactory;
 	
-	public SipSessionImpl (SipProvider provider,  SipApplicationSessionImpl sipApp) {
-		this.provider = provider;
+	public SipSessionImpl (SipFactoryImpl sipFactoryImpl,  SipApplicationSessionImpl sipApp) {
+		this.sipFactory = sipFactoryImpl;
 		this.sipApplicationSession = sipApp;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();
 		this.uuid = UUID.randomUUID();
@@ -190,7 +182,7 @@ public class SipSessionImpl implements SipSession {
 			throw new IllegalArgumentException(
 					"Can not create ACK or CANCEL requests with this method");
 		
-		return SipFactoryImpl.getInstance().createRequest(
+		return sipFactory.createRequest(
 				this.sipApplicationSession,
 				method,
 				this.getLocalParty(),
@@ -442,9 +434,9 @@ public class SipSessionImpl implements SipSession {
 		this.sipContext = sipContext;
 	}
 
-	public SipProvider getProvider() {
+	public Set<SipProvider> getProviders() {
 		
-		return this.provider;
+		return sipFactory.getSipProviders();
 	}
 
 	

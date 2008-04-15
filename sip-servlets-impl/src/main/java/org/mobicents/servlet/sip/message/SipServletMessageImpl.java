@@ -1,7 +1,6 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.AddressParametersHeader;
-import gov.nist.javax.sip.header.ContentEncoding;
 import gov.nist.javax.sip.header.ContentLanguage;
 import gov.nist.javax.sip.header.ContentLength;
 import gov.nist.javax.sip.header.ContentType;
@@ -9,9 +8,6 @@ import gov.nist.javax.sip.header.Expires;
 import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.stack.SIPClientTransaction;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
-import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -25,8 +21,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.servlet.sip.Address;
@@ -35,13 +29,8 @@ import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.ListeningPoint;
-import javax.sip.ServerTransaction;
-import javax.sip.SipException;
 import javax.sip.SipFactory;
-import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.AcceptLanguageHeader;
 import javax.sip.header.AlertInfoHeader;
@@ -59,7 +48,6 @@ import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
-import javax.sip.header.Parameters;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.ReplyToHeader;
@@ -73,10 +61,10 @@ import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
-import org.mobicents.servlet.sip.SipFactories;
 
 /**
  * Implementation of SipServletMessage
@@ -87,9 +75,9 @@ import org.mobicents.servlet.sip.SipFactories;
 public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected Message message;
-	protected SipProvider provider;
+	protected SipFactoryImpl sipFactoryImpl;
 	protected SipSessionImpl session;
-	protected static SipFactoryImpl sipFactory = SipFactoryImpl.getInstance();
+	
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
 	private Transaction transaction;
 	protected TransactionApplicationData transactionApplicationData;
@@ -193,11 +181,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		headerCompactNamesMappings.put("k", SupportedHeader.NAME);
 	}
 
-	protected SipServletMessageImpl ( Message message, SipProvider provider, Transaction transaction, SipSession sipSession, Dialog dialog) {
-		if ( provider == null )throw new NullPointerException("Null providerr");
+	protected SipServletMessageImpl ( Message message, SipFactoryImpl sipFactoryImpl, Transaction transaction, SipSession sipSession, Dialog dialog) {
+		if ( sipFactoryImpl == null )throw new NullPointerException("Null factory");
 		if ( message == null ) throw new NullPointerException("Null message");
 		if ( sipSession == null ) throw new NullPointerException("Null session");
-		this.provider = provider;
+		this.sipFactoryImpl = sipFactoryImpl;
 		this.message = message;
 		this.transaction = transaction;
 		this.session = (SipSessionImpl) sipSession;
@@ -535,7 +523,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	public SipSession getSession(boolean create) {
 		if ( this.session == null && create)
-			this.session = new SipSessionImpl( provider, (SipApplicationSessionImpl)this.getApplicationSession());
+			this.session = new SipSessionImpl( sipFactoryImpl, (SipApplicationSessionImpl)this.getApplicationSession());
 		return this.session;
 	}
 

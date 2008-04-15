@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +17,11 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationRouter;
 import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipApplicationRoutingDirective;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipRouteModifier;
+import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
@@ -48,7 +53,9 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -75,7 +82,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 		nonInitialSipRequestMethods.add("PRACK");
 		nonInitialSipRequestMethods.add("ACK");
 	};
-	
+	// sip providers available to this dispatcher
+//	private Set<SipProvider> sipProviders = null;
+	//the sip factory implementation, it is not clear if the sip factory should be the same instance
+	//for all applications
+	private SipFactoryImpl sipFactoryImpl = null;
 	//the sip application router responsible for the routing logic of sip messages to
 	//sip servlet applications
 	private SipApplicationRouter sipApplicationRouter = null;
@@ -86,11 +97,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	
 	private SessionManager sessionManager = new SessionManager();
 	
+	private Boolean started = false;
+	
 	/**
 	 * 
 	 */
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = new HashMap<String, SipContext>();
+		sipFactoryImpl = new SipFactoryImpl();
+//		sipProviders = Collections.synchronizedSet(new HashSet<SipProvider>());		
 	}
 	
 	/**
@@ -117,9 +132,46 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void start() {
-		// TODO nothing to do here for now
-		
+		synchronized (started) {
+			started = true;
+		}
+		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
+		for (SipContext sipContext : applicationDeployed.values()) {
+			notifySipServletsListeners(sipContext);
+		}		
 	}
+	
+	/**
+	 * Notifies the sip servlet listeners that the servlet has been initialized
+	 * and that it is ready for service
+	 * @param sipContext the sip context of the application where the listeners reside.
+	 * @return true if all listeners have been notified correctly
+	 */
+	private boolean notifySipServletsListeners(SipContext sipContext) {
+		boolean ok = true;
+		SipListenersHolder sipListenersHolder = sipContext.getListeners();
+		List<SipServletListener> sipServletListeners = sipListenersHolder.getSipServletsListeners();
+		Container[] children = sipContext.findChildren();	
+		for (Container container : children) {
+			if(container instanceof Wrapper) {			
+				Wrapper wrapper = (Wrapper) container;
+				try {
+					Servlet sipServlet = wrapper.allocate();
+					SipServletContextEvent sipServletContextEvent = 
+						new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
+					for (SipServletListener sipServletListener : sipServletListeners) {					
+						sipServletListener.servletInitialized(sipServletContextEvent);					
+					}
+				} catch (ServletException e) {
+					logger.error("Cannot allocate the servlet for notifying the listener " +
+							"that it has been initialized", e);
+					ok = false; 
+				}				
+			}
+		}			
+		return ok;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -133,7 +185,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {
 		synchronized (applicationDeployed) {
 			applicationDeployed.put(sipApplicationName, sipApplication);	
-		}				
+		}		
+		//if the ApplicationDispatcher is started, notification is sent that the servlets are ready for service
+		//otherwise the notification will be delayed until the ApplicationDispatcher has started
+		synchronized (started) {
+			if(started) {
+				notifySipServletsListeners(sipApplication);
+			}
+		}
 		logger.info("the following sip servlet application has been added : " + sipApplicationName);
 	}
 	/**
@@ -181,13 +240,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 				return;				
 			} 
 		}
-		SipSessionImpl session = sessionManager.getRequestSession(requestEvent,transaction);
+		SipSessionImpl session = sessionManager.getRequestSession(sipFactoryImpl, requestEvent, transaction);
 		
 		SipServletRequestImpl sipServletRequest = null;		
 		try {			
 			sipServletRequest = new SipServletRequestImpl(
 					request,
-					(SipProvider) requestEvent.getSource(),
+					sipFactoryImpl,
 					session,
 					transaction,
 					session.getSessionCreatingDialog(),true);
@@ -413,7 +472,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 			
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new
-				SipServletResponseImpl(response, (SipProvider)arg0.getSource(),
+				SipServletResponseImpl(response, sipFactoryImpl,
 						arg0.getClientTransaction(), session, arg0.getDialog());
 
 			// Update Session state
@@ -523,5 +582,33 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 	 */
 	public void setSipApplicationRouter(SipApplicationRouter sipApplicationRouter) {
 		this.sipApplicationRouter = sipApplicationRouter;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#addSipProvider(javax.sip.SipProvider)
+	 */
+	public void addSipProvider(SipProvider sipProvider) {
+		sipFactoryImpl.addSipProvider(sipProvider);
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#removeSipProvider(javax.sip.SipProvider)
+	 */
+	public void removeSipProvider(SipProvider sipProvider) {
+		sipFactoryImpl.removeSipProvider(sipProvider);
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipProviders()
+	 */
+	public Set<SipProvider> getSipProviders() {
+		return sipFactoryImpl.getSipProviders();
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipFactory()
+	 */
+	public SipFactory getSipFactory() {
+		return sipFactoryImpl;
 	}
 }

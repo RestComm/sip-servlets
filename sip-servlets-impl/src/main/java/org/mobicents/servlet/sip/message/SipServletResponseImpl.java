@@ -12,11 +12,8 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSession.State;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
-import javax.sip.SipException;
-import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
@@ -32,8 +29,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	Response response;
 	
 
-	public SipServletResponseImpl (Response response, SipProvider provider, Transaction transaction, SipSession session, Dialog dialog) {
-		super(response, provider, transaction, session, dialog);
+	public SipServletResponseImpl (Response response, SipFactoryImpl sipFactoryImpl, Transaction transaction, SipSession session, Dialog dialog) {
+		super(response, sipFactoryImpl, transaction, session, dialog);
 		this.response = (Response) response;
 	}
 	

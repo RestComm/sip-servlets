@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
@@ -19,6 +20,7 @@ import javax.sip.SipProvider;
 
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -44,19 +46,19 @@ public class ProxyImpl implements Proxy {
 	private SipURI pathURI;
 	private SipURI recordRouteURI;
 	private SipURI outboundInterface;
-	private SipProvider provider;
+	private SipFactoryImpl sipFactoryImpl;
 	private int proxyId;
 	
 	private ProxyUtils proxyUtils;
 	
 	private Map<URI, ProxyBranch> proxyBranches;
 	
-	public ProxyImpl(SipServletRequestImpl request, SipProvider provider)
+	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
 		this.originalRequest = request;
-		this.provider = provider;
+		this.sipFactoryImpl = sipFactoryImpl;
 		proxyBranches = new HashMap<URI, ProxyBranch> ();
-		proxyUtils = new ProxyUtils(provider, this);
+		proxyUtils = new ProxyUtils(sipFactoryImpl, this);
 	}
 	
 	/* (non-Javadoc)
@@ -80,7 +82,7 @@ public class ProxyImpl implements Proxy {
 		ArrayList<ProxyBranch> list = new ArrayList<ProxyBranch>();
 		for(URI target: targets)
 		{
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, provider, this.recordRouteURI);
+			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, sipFactoryImpl, this.recordRouteURI);
 			list.add(branch);
 		}
 		return list;
@@ -183,7 +185,7 @@ public class ProxyImpl implements Proxy {
 	public void proxyTo(List<? extends URI> uris) {
 		for (URI uri : uris)
 		{
-			ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, provider, this.recordRouteURI);
+			ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
 			this.proxyBranches.put(uri, pbi);
 			pbi.start();
 		}
@@ -195,7 +197,7 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void proxyTo(URI uri) {
 		
-		ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, provider, this.recordRouteURI);
+		ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
 		this.proxyBranches.put(uri, pbi);
 		pbi.start();
 
@@ -238,7 +240,7 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void setRecordRoute(boolean rr) {
 		
-		this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( this.provider));
+		this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipProviders(), null));
 		this.recordRoutingEnabled = rr;
 
 	}

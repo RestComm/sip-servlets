@@ -20,18 +20,20 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
 public class ProxyUtils {
 	
-	private SipProvider provider;
+	private SipFactoryImpl sipFactoryImpl;
 	private ProxyImpl proxy;
 	
-	public ProxyUtils(SipProvider provider, ProxyImpl proxy)
+	public ProxyUtils(SipFactoryImpl sipFactoryImpl, ProxyImpl proxy)
 	{
-		this.provider = provider;
+		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxy = proxy;
 	}
 	
@@ -65,17 +67,14 @@ public class ProxyUtils {
 			
 			clonedRequest.setHeader(rheader);
 			
+			String transport = JainSipUtils.findTransport(clonedRequest);
 			//Add via header
-			Iterator lps = provider.getSipStack().getListeningPoints();
-			ListeningPoint lp = (ListeningPoint) lps.next();
-			String stackIPAddress = params.stack.getHost() == null ? lp.getIPAddress() : params.stack.getHost();
-
 			ViaHeader viaHeader = null;
 
 			if (clonedRequest.getMethod().equals(Request.CANCEL)) {
 				// Branch Id will be assigned by the stack.
-				viaHeader = SipFactories.headerFactory.createViaHeader(stackIPAddress,
-						lp.getPort(), lp.getTransport(), null);
+				viaHeader = JainSipUtils.createViaHeader(
+						sipFactoryImpl.getSipProviders(), transport, null);
 
 				if (clonedRequest.getMethod().equals(Request.CANCEL)) {
 					// Cancel is hop by hop so remove all other via headers.
@@ -83,8 +82,8 @@ public class ProxyUtils {
 				}
 			} else {
 
-				viaHeader = SipFactories.headerFactory.createViaHeader(stackIPAddress,
-						lp.getPort(), lp.getTransport(), generateBranchId());
+				viaHeader = JainSipUtils.createViaHeader(
+						sipFactoryImpl.getSipProviders(), transport, generateBranchId());
 			}
 
 			if (viaHeader != null) {
@@ -93,18 +92,13 @@ public class ProxyUtils {
 			}
 			
 			//Add route-record header, if enabled and if needed (if not null)
-			if(params.routeRecord != null)
-			{
-				javax.sip.address.SipURI rrURI = SipFactories.addressFactory.createSipURI(null,
-						stackIPAddress);
-				rrURI.setPort(lp.getPort());
-				rrURI.setTransportParam(lp.getTransport());
+			if(params.routeRecord != null) {
+				javax.sip.address.SipURI rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipProviders(), transport);
 				
 				Iterator<String> paramNames = params.routeRecord.getParameterNames();
 				
 				// Copy the parameters set by the user
-				while(paramNames.hasNext())
-				{
+				while(paramNames.hasNext()) {
 					String paramName = paramNames.next();
 					rrURI.setParameter(paramName,
 							params.routeRecord.getParameter(paramName));
@@ -136,16 +130,12 @@ public class ProxyUtils {
 			// Add path header
 			if(params.path != null)
 			{
-				javax.sip.address.SipURI pathURI = SipFactories.addressFactory.createSipURI(null,
-						stackIPAddress);
-				pathURI.setPort(lp.getPort());
-				pathURI.setTransportParam(lp.getTransport());
+				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipProviders(), transport);
 
 				Iterator<String> paramNames = params.path.getParameterNames();
 				
 				// Copy the parameters set by the user
-				while(paramNames.hasNext())
-				{
+				while(paramNames.hasNext()) {
 					String paramName = paramNames.next();
 					pathURI.setParameter(paramName,
 							params.path.getParameter(paramName));
@@ -175,11 +165,12 @@ public class ProxyUtils {
 					clonedRequest.addHeader(pathHeader);
 				}
 			}
-			
-			ClientTransaction tx = provider.getNewClientTransaction(clonedRequest);
+			SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
+					sipFactoryImpl.getSipProviders(), transport);
+			ClientTransaction tx = sipProvider.getNewClientTransaction(clonedRequest);
 			SipServletRequestImpl ret = new	SipServletRequestImpl(
 					clonedRequest,
-					provider,
+					sipFactoryImpl,
 					originalRequest.getSession(),
 					tx, null, false);
 			
@@ -213,7 +204,7 @@ public class ProxyUtils {
 			(SipServletRequestImpl) this.proxy.getOriginalRequest();
 		
 		return new SipServletResponseImpl(clonedResponse,
-				this.provider,
+				sipFactoryImpl,
 				originalRequest.getTransaction(),
 				originalRequest.getSession(),
 				null);

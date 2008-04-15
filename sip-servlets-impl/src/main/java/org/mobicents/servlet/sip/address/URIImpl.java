@@ -1,10 +1,6 @@
 package org.mobicents.servlet.sip.address;
 
-import java.text.ParseException;
-import java.util.Iterator;
-
 import javax.servlet.sip.URI;
-import javax.sip.address.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
