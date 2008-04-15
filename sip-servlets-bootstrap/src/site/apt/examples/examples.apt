@@ -1,1 +1,43 @@
 Examples
+
+	Here is our list of examples that also helps us testing out our implementation :
+	
+	* {{{call_blocking.html}Call Blocking}} : UAS application 
+	
+	* {{{call_forwarding.html}Call Forwarding}} : B2BUA application
+	 
+	* The two previous examples can be composed and become a new application known as {{{call_controller.html}Call Controller}}
+	
+	* {{{speed_dial.html}Speed Dial}} : proxy application
+	
+	* {{{location_service.html}Location Service}} : proxy application
+	
+	* The two previous examples can be composed and become a new application showing what can be achieved
+	with two {{{speeddial_locationservice.html}chained proxy applications}}
+	
+	* {{{click2call.html}Click to Call}} : Converged application
+
+	You can play with our examples in 2 differents ways. 
+	From the binary or right from the source like a true hacker :-)
+	
+	For testing against the examples you'll need to use some SIP softphones.
+	We tested most of the examples with WengoPhone, 3CX VoIP Client and SJ Phone 1.65.
+	Most of the examples uses the 5090 port for one the SIP softphone 
+	to be contacted so please make sure, it is configured that way.
+	
+* From the binary 
+
+	The examples are already installed in the binary distribution that you should 
+	have already installed as described in the {{{../installation.html}installation page}}. 
+	However, in order to use them you'll need to change the default application router properties file 
+	(also know as DAR properties file, check Appendix C of JSR 289 for more information).
+	
+	The binary distribution already contains all the needed dar files to run the examples, you just have
+	to specify the new dar file to use in the Service xml tag, 
+	darConfigurationFileLocation attribute of the tomcat_home/conf/server.xml file.  
+
+* From the source
+
+	Please check out the sip-servlets examples you want to play with located under this 
+	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/}location}} 
+	from the svn repository. 
