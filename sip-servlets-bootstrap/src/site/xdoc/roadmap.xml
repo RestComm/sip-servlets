@@ -21,13 +21,13 @@
       <subsection name="Version 0.2 - 02/01/2008">
         <p>        
         <img src="images/orange.jpeg"/> Listeners and Timers <br/>
-        <img src="images/orange.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=8}More sip phones interoperability}} <br/>
-        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=2}Security}} <br/>
-        <img src="images/green.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=3}JSR 289 Public Review API Alignement}} <br/>        
-        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7}J2EE integration/J2EE converged applications}}<br/>
-        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=6}Servlet 2.5 Alignement and Annotations}}<br/>                      
-        <img src="images/orange.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=4}Running on top of Tomcat 6}} <br/>        
-        <img src="images/red.jpeg"/> {{{https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=5}Running on top of Jboss AS}} <br/>
+        <img src="images/orange.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=8">More sip phones interoperability</a> <br/>
+        <img src="images/red.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=2">Security</a> <br/>
+        <img src="images/green.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=3">JSR 289 Public Review API Alignement</a> <br/>        
+        <img src="images/red.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7">J2EE integration/J2EE converged applications</a><br/>
+        <img src="images/red.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=6">Servlet 2.5 Alignement and Annotations</a><br/>                      
+        <img src="images/orange.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=4">Running on top of Tomcat 6</a> <br/>        
+        <img src="images/red.jpeg"/> <a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=5">Running on top of Jboss AS</a> <br/>
         </p>
       </subsection>
       <subsection name="Version 0.3 - 03/01/2008">
