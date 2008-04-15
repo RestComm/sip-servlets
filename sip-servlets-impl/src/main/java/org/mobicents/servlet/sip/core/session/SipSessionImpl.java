@@ -1,7 +1,5 @@
 package org.mobicents.servlet.sip.core.session;
 
-import gov.nist.javax.sip.header.From;
-import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -38,6 +36,13 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
+
+/**
+ * 
+ * Implementation of the SipSession interface.
+ * 
+ *
+ */
 public class SipSessionImpl implements SipSession {
 
 	private SipApplicationSessionImpl sipApplicationSession;
@@ -241,8 +246,8 @@ public class SipSessionImpl implements SipSession {
 		{
 			try
 			{
-				From toHeader = (From)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
-				return new AddressImpl(toHeader);
+				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
+				return new AddressImpl(toHeader.getAddress());
 			}
 			catch(Exception e)
 			{
@@ -400,7 +405,7 @@ public class SipSessionImpl implements SipSession {
 		return sessionCreatingTransaction;
 	}
 
-	public void setSessionCreatingTransaction(SIPTransaction initialTransaction) {
+	public void setSessionCreatingTransaction(Transaction initialTransaction) {
 		this.sessionCreatingTransaction = initialTransaction;
 	}
 
