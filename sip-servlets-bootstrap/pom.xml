@@ -227,8 +227,7 @@
 	</repositories>
 
 	<!-- the tomcat location where the generated artifacts will be copied -->
-	<properties>
-		
+	<properties>		
 		<jboss.version>4.2.2.GA</jboss.version>
 	</properties>
 </project>
