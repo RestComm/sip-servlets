@@ -14,11 +14,10 @@ import javax.servlet.sip.SipServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	
-	
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
 	
 	
