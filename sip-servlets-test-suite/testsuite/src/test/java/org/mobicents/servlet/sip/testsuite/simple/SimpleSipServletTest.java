@@ -49,9 +49,9 @@ public class SimpleSipServletTest extends SipServletTestCase implements SipListe
 	
 	@Override
 	public void deployApplication() {
-		tomcat.deployContext(
+		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test");
+				"sip-test-context", "sip-test"));
 	}
 
 	@Override

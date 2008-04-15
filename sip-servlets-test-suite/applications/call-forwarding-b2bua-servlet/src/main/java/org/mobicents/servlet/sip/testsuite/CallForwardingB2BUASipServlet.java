@@ -6,14 +6,15 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
-import javax.sip.header.ToHeader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		Servlet {
 
 	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);
-	
+	B2buaHelper helper = null;
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */
 	public CallForwardingB2BUASipServlet() {
@@ -47,33 +48,33 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			IOException {
 
 		logger.info("Got INVITE: "
-				+ request.getMethod());		
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-				SIP_FACTORY);
-		B2buaHelper helper = request.getB2buaHelper();
-		SipServletRequest forkedRequest = helper.createRequest(request, true,
-				null);
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
-		request.setHeader("To", "sip:forward-receiver@sip-servlets.com");
+				+ request.getMethod());
+		helper = request.getB2buaHelper();
 		
-		logger.info("forkedRequest = " + forkedRequest);
-		
-		forkedRequest.setRequestURI(sipUri);
-		forkedRequest.send();
-	}
+		forkAndSendRequest(request);
+	}	
 	
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got BYE: "
 				+ request.getMethod());
+		forkAndSendRequest(request);
+	}
+	
+	/**
+	 * @param request
+	 * @throws ServletParseException
+	 * @throws IOException
+	 */
+	private void forkAndSendRequest(SipServletRequest request)
+			throws ServletParseException, IOException {
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-				SIP_FACTORY);
-		B2buaHelper helper = request.getB2buaHelper();
+				SIP_FACTORY);		
 		SipServletRequest forkedRequest = helper.createRequest(request, true,
 				null);
 		SipURI sipUri = (SipURI) sipFactory.createURI("sip:forward-receiver@127.0.0.1:5090");		
-		request.setHeader("To", "sip:forward-receiver@sip-servlets.com");
+		forkedRequest.setHeader("To", "sip:forward-receiver@sip-servlets.com");
 		
 		logger.info("forkedRequest = " + forkedRequest);
 		
@@ -97,9 +98,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				ackRequest.send();			
 			}
 			//create and sends OK for the first call leg
-			SipServletRequest originalRequest = sipServletResponse.getRequest();			
+			SipSession originalSession =   
+			    helper.getLinkedSession(sipServletResponse.getSession());					
 			SipServletResponse responseToOriginalRequest = 
-				originalRequest.getB2buaHelper().createResponseToOriginalRequest(originalRequest.getSession(), SipServletResponse.SC_OK, "OK");
+				helper.createResponseToOriginalRequest(originalSession, SipServletResponse.SC_OK, "OK");
 			responseToOriginalRequest.send();
 		} else {
 			super.doResponse(sipServletResponse);

@@ -49,14 +49,14 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 	protected void doResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
-				+ sipServletResponse.getMethod());
-//		int status = sipServletResponse.getStatus();
-//		if (status == SipServletResponse.SC_OK) {
-//			SipServletRequest ackRequest = sipServletResponse.createAck();
-//			ackRequest.send();
-//		} else {
+				+ sipServletResponse.getMethod());		
+		int status = sipServletResponse.getStatus();
+		if (status == SipServletResponse.SC_OK) {
+			SipServletRequest ackRequest = sipServletResponse.createAck();
+			ackRequest.send();
+		} else {
 			super.doResponse(sipServletResponse);
-//		}
+		}
 	}
 	
 	/**

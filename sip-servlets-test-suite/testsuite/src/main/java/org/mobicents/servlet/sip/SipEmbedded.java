@@ -85,6 +85,7 @@ public class SipEmbedded {
 	public void startTomcat() throws Exception {
 		
 		// Set the home directory
+		System.setProperty("CATALINA_HOME", getPath());
 		System.setProperty("catalina.home", getPath());
 		System.setProperty("catalina.base", getPath());		
 		//logging configuration
@@ -172,7 +173,7 @@ public class SipEmbedded {
 	 * Deploy a context to the embedded tomcat container
 	 * @param contextPath the context Path of the context to deploy
 	 */
-	public Container deployContext(String docBase, String name, String path) {
+	public boolean deployContext(String docBase, String name, String path) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(docBase);
 		context.setName(name);
@@ -180,7 +181,7 @@ public class SipEmbedded {
 		context.setParent(host);
 		context.addLifecycleListener(new SipContextConfig());		 
 		host.addChild(context);
-		return context;
+		return context.getAvailable();			
 	}
 	
 	public void undeployContext(Container context) {

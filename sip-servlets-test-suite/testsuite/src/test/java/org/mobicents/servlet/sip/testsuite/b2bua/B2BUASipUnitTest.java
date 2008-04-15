@@ -26,9 +26,9 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 	SipPhone sipPhoneB;
 	@Override
 	public void deployApplication() {
-		tomcat.deployContext(
+		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/b2bua-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test");
+				"sip-test-context", "sip-test"));
 	}
 
 	@Override

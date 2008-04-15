@@ -23,10 +23,10 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 
 	@Override
 	public void deployApplication() {
-		tomcat.deployContext(
+		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-servlet/src/main/sipapp",
 				"sip-test-context", 
-				"sip-test");
+				"sip-test"));
 	}
 
 	@Override

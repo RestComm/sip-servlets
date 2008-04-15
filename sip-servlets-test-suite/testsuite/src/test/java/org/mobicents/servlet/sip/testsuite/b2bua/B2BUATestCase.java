@@ -7,9 +7,7 @@ import javax.sip.SipProvider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.testsuite.ScenarioHarness;
-import org.mobicents.servlet.sip.testsuite.simple.SimpleSipServletTest;
 
 public class B2BUATestCase extends ScenarioHarness implements
 		SipListener {
