@@ -210,11 +210,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 									DAR_SUSCRIBER_PREFIX_LENGTH);
 							subscriberIdentity = initialRequest.getHeader(headerName);
 						}
-						//TODO ask EG : the SipApplicationRoutingRegion is missing from the constructor !!
-						// already asked =>
-						//http://groups.google.com/group/sipservlets/browse_thread/thread/ec708ff63acfd14d/1e7ce3b7e0e29da0?lnk=gst&q=SipApplicationRouterInfo&rnum=4#1e7ce3b7e0e29da0		
 						return new SipApplicationRouterInfo(
 								defaultSipApplicationRouterInfo.getApplicationName(),
+								defaultSipApplicationRouterInfo.getRoutingRegion(), 
 								subscriberIdentity,
 								defaultSipApplicationRouterInfo.getRoute(),
 								defaultSipApplicationRouterInfo.getRouteModifier(),
@@ -223,7 +221,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 				}
 			}
 		}
-		return new SipApplicationRouterInfo(null,null,null,null,null);
+		return new SipApplicationRouterInfo(null,null,null,null,null,null);
 	}
 
 	/**

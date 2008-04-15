@@ -358,7 +358,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher {
 					"in this popped routed header " + poppedAddress);
 		}
 		boolean inverted = false;
-		if(dialog != null && dialog.getFirstTransaction() instanceof ClientTransaction) {
+		if(dialog != null && !dialog.isServer()) {
 			inverted = true;
 		}
 		

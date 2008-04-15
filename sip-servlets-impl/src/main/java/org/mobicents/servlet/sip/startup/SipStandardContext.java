@@ -72,8 +72,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //			LifecycleListener sipConfigurationListener = new SipContextConfig();
 //			this.addLifecycleListener(sipConfigurationListener);			
 //			setDelegate(true);
-//		}
-		setWrapperClass(SipServletImpl.class.getName());
+//		}				
 		// call the super method to correctly initialize the context and fire
 		// up the
 		// init event on the new registered SipContextConfig, so that the

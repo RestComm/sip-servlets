@@ -3,7 +3,7 @@
  */
 package org.mobicents.servlet.sip.router;
 
-import javax.servlet.sip.SipApplicationRoutingRegionType;
+import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipRouteModifier;
 
 /**
@@ -15,7 +15,7 @@ import javax.servlet.sip.SipRouteModifier;
 public class DefaultSipApplicationRouterInfo {
 	private String applicationName;
 	private String subscriberIdentity;
-	private SipApplicationRoutingRegionType routingRegionType;
+	private SipApplicationRoutingRegion routingRegion;
 	private String route;
 	private SipRouteModifier routeModifier;
 	private int order;
@@ -36,12 +36,12 @@ public class DefaultSipApplicationRouterInfo {
 	 */
 	public DefaultSipApplicationRouterInfo(String applicationName,
 			String subscriberIdentity,
-			SipApplicationRoutingRegionType routingRegionType, String route,
+			SipApplicationRoutingRegion routingRegion, String route,
 			SipRouteModifier routeModifier, int order) {
 		super();
 		this.applicationName = applicationName;
 		this.subscriberIdentity = subscriberIdentity;
-		this.routingRegionType = routingRegionType;
+		this.routingRegion = routingRegion;
 		this.route = route;
 		this.routeModifier = routeModifier;
 		this.order = order;
@@ -74,14 +74,14 @@ public class DefaultSipApplicationRouterInfo {
 	/**
 	 * @return the routingRegionType
 	 */
-	public SipApplicationRoutingRegionType getRoutingRegionType() {
-		return routingRegionType;
+	public SipApplicationRoutingRegion getRoutingRegion() {
+		return routingRegion;
 	}
 	/**
 	 * @param routingRegionType the routingRegionType to set
 	 */
-	public void setRoutingRegionType(SipApplicationRoutingRegionType routingRegionType) {
-		this.routingRegionType = routingRegionType;
+	public void setRoutingRegionType(SipApplicationRoutingRegion routingRegion) {
+		this.routingRegion = routingRegion;
 	}
 	/**
 	 * @return the route

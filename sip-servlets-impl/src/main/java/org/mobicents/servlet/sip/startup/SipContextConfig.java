@@ -15,6 +15,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.DigesterFactory;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 
@@ -63,9 +65,12 @@ public class SipContextConfig extends ContextConfig implements
 		// app if any. That mean that this is a converged application.
 		InputStream webXmlInputStream = servletContext
 				.getResourceAsStream(Constants.ApplicationWebXml);
+		log.info(Constants.ApplicationWebXml + " has been found, calling super.start() !");
+		context.setWrapperClass(StandardWrapper.class.getName());
 		if (webXmlInputStream != null) {
 			super.start();
-		}
+		}		
+		context.setWrapperClass(SipServletImpl.class.getName());
 		InputStream sipXmlInputStream = servletContext
 				.getResourceAsStream(APPLICATION_SIP_XML);
 		// processing of the sip.xml file

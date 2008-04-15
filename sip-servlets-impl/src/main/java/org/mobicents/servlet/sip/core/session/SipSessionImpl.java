@@ -349,7 +349,7 @@ public class SipSessionImpl implements SipSession {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#isOngoingTransaction()
 	 */
-	public boolean isOngoingTransaction() {
+	public boolean hasOngoingTransaction() {
 		if(!isSupervisedMode())
 			return false;
 		else

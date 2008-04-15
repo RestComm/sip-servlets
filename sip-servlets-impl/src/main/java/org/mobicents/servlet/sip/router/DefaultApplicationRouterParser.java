@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipApplicationRoutingRegionType;
 import javax.servlet.sip.SipRouteModifier;
 
@@ -153,7 +154,10 @@ public class DefaultApplicationRouterParser {
 				//subsriberURI
 				sipApplicationRouterInfoParameters[1],
 				//routing region
-				SipApplicationRoutingRegionType.valueOf(SipApplicationRoutingRegionType.class,sipApplicationRouterInfoParameters[2]),
+				new SipApplicationRoutingRegion(
+						sipApplicationRouterInfoParameters[2],
+						SipApplicationRoutingRegionType.valueOf(
+								SipApplicationRoutingRegionType.class,sipApplicationRouterInfoParameters[2])),
 				//route
 				sipApplicationRouterInfoParameters[3],
 				//sip route modifier
