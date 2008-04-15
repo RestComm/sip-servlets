@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -30,13 +31,16 @@ import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.Header;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -199,12 +203,25 @@ public class SipSessionImpl implements SipSession {
 		if(Request.BYE.equalsIgnoreCase(method)) {			
 			try {
 				Request byeRequest = this.sessionCreatingDialog.createRequest(Request.BYE);
+				String transport = JainSipUtils.findTransport(byeRequest);
+				
+				ViaHeader viaHeader = JainSipUtils.createViaHeader(sipFactory.getSipProviders(), transport,
+						null);			
+				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+						key.getApplicationName());
+				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+						handlerServlet);				
+				byeRequest.setHeader(viaHeader);
+				
 				sipServletRequest = new SipServletRequestImpl(
 						byeRequest, this.sipFactory, this, null, null,
 						false);
 			} catch (SipException e) {
 				logger.error("Cannot create the bye request form the dialog",e);
-				throw new IllegalArgumentException("Cannot create the bye request");
+				throw new IllegalArgumentException("Cannot create the bye request",e);
+			} catch (ParseException e) {
+				logger.error("Cannot add the via header to the bye request form the dialog",e);
+				throw new IllegalArgumentException("Cannot create the bye request",e);
 			}			
 		} else {
 			sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
@@ -213,7 +230,10 @@ public class SipSessionImpl implements SipSession {
 				this.getLocalParty(),
 				this.getRemoteParty());
 		}
-		//Application Routing to avoid going through the same app that created the ack
+		//Application Routing :
+		//removing the route headers and adding them back again except the one
+		//corresponding to the app that is creating the subsequent request
+		//avoid going through the same app that created the subsequent request
 		ListIterator<RouteHeader> routeHeaders = sipServletRequest.getMessage().getHeaders(RouteHeader.NAME);
 		sipServletRequest.getMessage().removeHeader(RouteHeader.NAME);
 		while (routeHeaders.hasNext()) {
