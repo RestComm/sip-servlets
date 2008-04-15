@@ -85,6 +85,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Implementation of SipServletMessage
@@ -538,18 +539,20 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
 		} else if (create) {			
+			SipContext sipContext = 
+				sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(currentApplicationName);
 			SipApplicationSessionKey key = SessionManager.getSipApplicationSessionKey(
 					currentApplicationName, 
 					((CallIdHeader)message.getHeader((CallIdHeader.NAME))).getCallId());
 			SipApplicationSessionImpl applicationSession = 
-				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create);
+				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create, sipContext);
 			if(this.session == null) {
 				SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message, false);
 				this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
-						sipFactoryImpl);
+						sipFactoryImpl, applicationSession);
 				this.session.setSessionCreatingTransaction(transaction);				
 			} 
-			this.session.setSipApplicationSession(applicationSession);
+//			this.session.setSipApplicationSession(applicationSession);
 			return this.session.getApplicationSession();			
 		}		
 		return null;
@@ -901,9 +904,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if (this.session == null && create) {
 			SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message, false);
 			this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
-					sipFactoryImpl);
+					sipFactoryImpl, (SipApplicationSessionImpl)getApplicationSession(create));
 			this.session.setSessionCreatingTransaction(transaction);
-			session.setSipApplicationSession((SipApplicationSessionImpl)getApplicationSession(create));
 		}
 		return this.session;
 	}

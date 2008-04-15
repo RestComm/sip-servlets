@@ -95,6 +95,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	private B2buaHelper b2buahelper;
 	
+	private SipServletResponse lastFinalResponse;
+	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			SipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
@@ -641,7 +643,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					//add a route header to direct the request back to the container 
 					//to check if there is any other apps interested in it
-					addInfoForRoutingBackToContainer();
+					addInfoForRoutingBackToContainer(session.getKey().getApplicationName());
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("routing outside the container " +
@@ -738,7 +740,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	}
 
-	public void addInfoForRoutingBackToContainer() throws ParseException {		
+	/**
+	 * Add a route header to route back to the container
+	 * @param applicationName the application name that was chosen by the AR to route the request
+	 * @throws ParseException
+	 */
+	public void addInfoForRoutingBackToContainer(String applicationName) throws ParseException {		
 		Request request = (Request) super.message;
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipProviders(), 
@@ -747,7 +754,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_DIRECTIVE, 
 				routingDirective.toString());
 		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_PREV_APPLICATION_NAME, 
-				session.getKey().getApplicationName());
+				applicationName);
 		javax.sip.address.Address routeAddress = 
 			SipFactories.addressFactory.createAddress(sipURI);
 		RouteHeader routeHeader = 
@@ -830,6 +837,23 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			String username, String password) {
 		// TODO Auto-generated method stub
 		
-	}	
+	}
 
+	/**
+	 * @return the finalResponse
+	 */
+	public SipServletResponse getLastFinalResponse() {
+		return lastFinalResponse;
+	}
+
+	/**
+	 * @param finalResponse the finalResponse to set
+	 */
+	public void setLastFinalResponse(SipServletResponse finalResponse) {
+		if(finalResponse.getStatus() >= 200 && 
+				(lastFinalResponse == null || lastFinalResponse.getStatus() < finalResponse.getStatus())) {
+			this.lastFinalResponse = finalResponse;
+		}
+	}	
+	
 }

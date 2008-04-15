@@ -180,8 +180,7 @@ public class SipFactoryImpl implements SipFactory {
 				sipContext.getApplicationName(), 
 				JainSipUtils.findMatchingSipProvider(sipProviders, "udp").getNewCallId().getCallId());		
 		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
-				sipApplicationSessionKey, true);
-		sipApplicationSession.setSipContext(sipContext);
+				sipApplicationSessionKey, true, sipContext);		
 		return sipApplicationSession;
 	}
 
@@ -445,8 +444,7 @@ public class SipFactoryImpl implements SipFactory {
 
 			SipSessionKey key = SessionManager.getSipSessionKey(
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap, false);
-			SipSessionImpl session = sipApplicationDispatcher.getSessionManager().getSipSession(key, true, this);
-			session.setSipApplicationSession((SipApplicationSessionImpl)sipAppSession);			
+			SipSessionImpl session = sipApplicationDispatcher.getSessionManager().getSipSession(key, true, this, (SipApplicationSessionImpl)sipAppSession);
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,
@@ -544,13 +542,12 @@ public class SipFactoryImpl implements SipFactory {
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(sipApplicationKey + " is not a valid sip application session key", e);
 		}		
-		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
-				sipApplicationSessionKey, true);
 		SipContext sipContext = sipApplicationDispatcher.findSipApplication(sipApplicationSessionKey.getApplicationName());
 		if(sipContext == null) {
 			throw new IllegalArgumentException("The specified application "+sipApplicationSessionKey.getApplicationName()+" is not currently deployed");
 		}
-		sipApplicationSession.setSipContext(sipContext);
+		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
+				sipApplicationSessionKey, true, sipContext);		
 		return sipApplicationSession;
 	}
 
@@ -561,5 +558,20 @@ public class SipFactoryImpl implements SipFactory {
 	public AuthInfo createAuthInfo() {
 		// FIXME
 		return new AuthInfoImpl();
+	}
+
+	/**
+	 * @return the sipApplicationDispatcher
+	 */
+	public SipApplicationDispatcher getSipApplicationDispatcher() {
+		return sipApplicationDispatcher;
+	}
+
+	/**
+	 * @param sipApplicationDispatcher the sipApplicationDispatcher to set
+	 */
+	public void setSipApplicationDispatcher(
+			SipApplicationDispatcher sipApplicationDispatcher) {
+		this.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
 }

@@ -16,23 +16,42 @@ package org.mobicents.servlet.sip.core.session;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.startup.SipContext;
 
-
+/**
+ * 
+ * Implementation of the SipApplicationSession interface.
+ * An instance of this sip application session can only be retrieved through the Session Manager
+ * to constrain the creation of sip application session and to make sure that all sessions created
+ * can be retrieved only through the session manager 
+ *
+ */
 public class SipApplicationSessionImpl implements SipApplicationSession {
+	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
 
+	private enum SipApplicationSessionEventType {
+		CREATION, DELETION, EXPIRATION;
+	}
+	
 	private static long DEFAULT_LIFETIME = 1000*60*60;
 	
 	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey"; 
@@ -71,16 +90,49 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 //	private Serializable endObject;					
 	
-	public SipApplicationSessionImpl(SipApplicationSessionKey key ) {
+	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
+		this.sipContext = sipContext;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expirationTime = lastAccessTime + DEFAULT_LIFETIME;
-		valid = true;		
+		valid = true;
+		// the sip context can be null if the AR returned an application that was not deployed
+		if(sipContext != null) {
+			notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
+		}
 		//FIXME create and start a timer for session expiration
+	}
+	
+	/**
+	 * Notifies the listeners that a lifecycle event occured on that sip application session 
+	 * @param sipApplicationSessionEventType the type of event that happened
+	 */
+	private void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {				
+		SipApplicationSessionEvent event = new SipApplicationSessionEvent(this);
+		if(logger.isDebugEnabled()) {
+			logger.debug("notifying sip application session listeners of context " + 
+					key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
+		}
+		List<SipApplicationSessionListener> listeners = 
+			sipContext.getListeners().getSipApplicationSessionListeners();
+		for (SipApplicationSessionListener sipApplicationSessionListener : listeners) {
+			try {
+				if(SipApplicationSessionEventType.CREATION.equals(sipApplicationSessionEventType)) {
+					sipApplicationSessionListener.sessionCreated(event);
+				} else if (SipApplicationSessionEventType.DELETION.equals(sipApplicationSessionEventType)) {
+					sipApplicationSessionListener.sessionDestroyed(event);
+				} else if (SipApplicationSessionEventType.EXPIRATION.equals(sipApplicationSessionEventType)) {
+					sipApplicationSessionListener.sessionExpired(event);
+				}
+				
+			} catch (Throwable t) {
+				logger.error("SipApplicationSessionListener threw exception", t);
+			}
+		}		
 	}
 	
 	protected void addSipSession( SipSessionImpl sipSessionImpl) {
@@ -253,7 +305,11 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 						"and HTTP sessions must be invalidated" +
 						" before invalidating the application session.");
 		}
-		valid = false;
+		valid = false;		
+		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
+		// FIXME get rid of the reference in the session manager (refactor session manager
+		// to map to tomcat session management)
+//		sipContext.getSessionManager().removeSipApplicationSession(key);
 	}
 
 	/*
@@ -284,12 +340,19 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		SipListenersHolder listeners = sipContext.getListeners();
 		for (SipApplicationSessionBindingListener listener : listeners
 				.getSipApplicationSessionBindingListeners()) {
-			listener.valueUnbound(event);
+			try {
+				listener.valueUnbound(event);
+			} catch (Throwable t) {
+				logger.error("SipApplicationSessionBindingListener threw exception", t);
+			}
 		}
-
 		for (SipApplicationSessionAttributeListener listener : listeners
 				.getSipApplicationSessionAttributeListeners()) {
-			listener.attributeRemoved(event);
+			try {
+				listener.attributeRemoved(event);
+			} catch (Throwable t) {
+				logger.error("SipApplicationSessionAttributeListener threw exception", t);
+			}
 		}
 
 		this.sipApplicationSessionAttributeMap.remove(name);
@@ -319,26 +382,31 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			// This is initial, we need to send value bound event						
 			for (SipApplicationSessionBindingListener listener : listeners
 					.getSipApplicationSessionBindingListeners()) {
-				listener.valueBound(event);
-
+				try { 
+					listener.valueBound(event);
+				} catch (Throwable t) {
+					logger.error("SipApplicationSessionBindingListener threw exception", t);
+				}				
 			}
-
 			for (SipApplicationSessionAttributeListener listener : listeners
 					.getSipApplicationSessionAttributeListeners()) {
-				listener.attributeAdded(event);
+				try {
+					listener.attributeAdded(event);
+				} catch (Throwable t) {
+					logger.error("SipApplicationSessionAttributeListener threw exception", t);
+				}
 			}
-
 		} else {
-
 			for (SipApplicationSessionAttributeListener listener : listeners
 					.getSipApplicationSessionAttributeListeners()) {
-				listener.attributeReplaced(event);
+				try {
+					listener.attributeReplaced(event);
+				} catch (Throwable t) {
+					logger.error("SipApplicationSessionAttributeListener threw exception", t);
+				}
 			}
-
 		}
-
 		this.sipApplicationSessionAttributeMap.put(key, attribute);
-
 	}
 	
 	/*
@@ -369,10 +437,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return sipContext;
 	}
 
-	public void setSipContext(SipContext sipContext) {
-		this.sipContext = sipContext;
-	}
-	
+//	public void setSipContext(SipContext sipContext) {
+//		this.sipContext = sipContext;
+//	}
+//	
 //	public TimerListener getAgregatingListener() {
 //		return agregatingListener;
 //	}
@@ -389,9 +457,8 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 //		return this.endObject;
 //	}
 	
-	void expirationTimerFired()
-	{
-		
+	void expirationTimerFired() {
+		notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
 	}
 
 	/**
@@ -429,5 +496,51 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 //		this.runningTimers.add(st);
 //
 //	}
+	
+	/**
+     * Perform the internal processing required to passivate
+     * this session.
+     */
+    public void passivate() {
+        // Notify ActivationListeners
+    	SipApplicationSessionEvent event = null;
+        Set<String> keySet = sipApplicationSessionAttributeMap.keySet();
+        for (String key : keySet) {
+        	Object attribute = sipApplicationSessionAttributeMap.get(key);
+            if (attribute instanceof SipApplicationSessionActivationListener) {
+                if (event == null)
+                    event = new SipApplicationSessionEvent(this);
+                try {
+                    ((SipApplicationSessionActivationListener)attribute)
+                        .sessionWillPassivate(event);
+                } catch (Throwable t) {
+                    logger.error("SipApplicationSessionActivationListener threw exception", t);
+                }
+            }
+		}
+    }
+    
+    /**
+     * Perform internal processing required to activate this
+     * session.
+     */
+    public void activate() {        
+        // Notify ActivationListeners
+    	SipApplicationSessionEvent event = null;
+        Set<String> keySet = sipApplicationSessionAttributeMap.keySet();
+        for (String key : keySet) {
+        	Object attribute = sipApplicationSessionAttributeMap.get(key);
+            if (attribute instanceof SipApplicationSessionActivationListener) {
+                if (event == null)
+                    event = new SipApplicationSessionEvent(this);
+                try {
+                    ((SipApplicationSessionActivationListener)attribute)
+                        .sessionDidActivate(event);
+                } catch (Throwable t) {
+                    logger.error("SipApplicationSessionActivationListener threw exception", t);
+                }
+            }
+		}
+    }
 
 }

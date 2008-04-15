@@ -128,7 +128,7 @@ public class ConvergedSession
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.ConvergedHttpSession#getApplicationSession()
 	 */
-	public SipApplicationSession getApplicationSession() {
+	public SipApplicationSession getApplicationSession() {		
 		//the application session if currently associated is returned, 
 		SipApplicationSessionImpl sipApplicationSession =
 			sipFactoryImpl.getSessionManager().findSipApplicationSession(this);
@@ -139,10 +139,7 @@ public class ConvergedSession
 					((SipContext)manager.getContainer()).getApplicationName(), 
 					JainSipUtils.findMatchingSipProvider(sipFactoryImpl.getSipProviders(), "udp").getNewCallId().getCallId());
 			sipApplicationSession = 
-				sipFactoryImpl.getSessionManager().getSipApplicationSession(sipApplicationSessionKey, true);
-			if(manager.getContainer() instanceof SipContext) {
-				sipApplicationSession.setSipContext((SipContext)manager.getContainer());
-			}
+				sipFactoryImpl.getSessionManager().getSipApplicationSession(sipApplicationSessionKey, true, (SipContext)manager.getContainer());			
 			sipApplicationSession.addHttpSession(this);
 		}
 		return sipApplicationSession;

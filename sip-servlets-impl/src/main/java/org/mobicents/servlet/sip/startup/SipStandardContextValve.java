@@ -186,7 +186,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 						SessionManager.parseSipApplicationSessionKey(sipApplicationKey);
 					SipApplicationSessionImpl sipApplicationSessionImpl = 
 						((SipFactoryImpl)context.getSipApplicationDispatcher().getSipFactory()).
-							getSessionManager().getSipApplicationSession(sipApplicationSessionKey, false);
+							getSessionManager().getSipApplicationSession(sipApplicationSessionKey, false, context);
 					sipApplicationSessionImpl.addHttpSession(request.getSession());
 				} catch (ParseException pe) {
 					logger.error(pe);

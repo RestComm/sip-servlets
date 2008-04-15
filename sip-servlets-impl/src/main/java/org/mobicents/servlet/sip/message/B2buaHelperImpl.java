@@ -163,10 +163,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 					.getSipApplicationSession();				
 			
 			SipSessionKey key = SessionManager.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl);			
-			session.setSipApplicationSession(appSession);
+			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
-			appSession.setSipContext(session.getSipApplicationSession().getSipContext());
+//			appSession.setSipContext(session.getSipApplicationSession().getSipContext());
 			
 			//since B2BUA is considered as an end point , it is normal to reinitialize 
 			//the via header chain

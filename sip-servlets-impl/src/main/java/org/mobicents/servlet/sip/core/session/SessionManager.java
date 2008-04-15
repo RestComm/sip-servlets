@@ -16,9 +16,12 @@ package org.mobicents.servlet.sip.core.session;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
@@ -27,6 +30,7 @@ import javax.sip.message.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * This class is used as a central place to get a session be it a sip session
@@ -62,72 +66,6 @@ public class SessionManager {
 	private Object sipApplicationSessionLock = new Object();
 	
 	/**
-	 * Associates requests to sessions. It uses
-	 * (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID) intially as a session id until the
-	 * to-tag becomes available then changes the session key to
-	 * (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,TO-TAG) expecting all further
-	 * requests to have a to-tag.
-	 * 
-	 * In the future we must handle multiple responses to the same request more
-	 * gracefully.
-	 * 
-	 * @param requestEvent
-	 *            a JAIN SIP request event
-	 * @return
-	 */
-//	public SipSessionImpl getRequestSession(SipFactoryImpl sipFactoryImpl, Message message,
-//			Transaction transaction) {
-//		
-//		SipSessionImpl session = null;
-//		
-//		try {
-//			String initialSessionId = getInitialSessionId(message); // without
-//																	// to-tag
-//			
-//			 //with  to-tag  (null if  there is  no  to-tag) 
-//			String ackSessionId = getAcknoledgedSessionId(message); 
-//		
-//		
-//			if (ackSessionId == null) // if the we still dont have a dialog
-//										// (to-tag)
-//			{
-//				if (sipSessions.get(initialSessionId) != null) {
-//					// See if we have previous initial session (happens when
-//					// handling subsequent REGSITERs).
-//					session = sipSessions.get(initialSessionId);
-//					logger.info("Found initial session " + initialSessionId);
-//				} else {
-//					session = new SipSessionImpl(sipFactoryImpl, null);
-//					session.setSessionCreatingTransaction(transaction);
-//					sipSessions.put(initialSessionId, session);
-//					logger.info("Created initial session " + initialSessionId);
-//				}
-//			} else {
-//				// If ack-ed session exists (dialog) delete the initial session
-//				// (the one without to-tag)
-//				if (sipSessions.get(ackSessionId) == null
-//						&& sipSessions.get(initialSessionId) != null) {
-//					synchronized (lock) {
-//						sipSessions.put(ackSessionId, sipSessions
-//								.get(initialSessionId));
-//						sipSessions.remove(initialSessionId); 
-//					}
-//					logger
-//							.info("Got rid of the initial session, subsequent requests will have the to tag.");
-//				}
-//				session = sipSessions.get(ackSessionId);
-//
-//				logger.info("Found acknoledged session " + ackSessionId);
-//			}
-//		} catch (Exception ex) {
-//			logger.info(ex.getMessage());
-//			throw new RuntimeException("Error associating session!", ex);
-//		}
-//		return session;
-//
-//	}
-
-	/**
 	 * Computes the sip session key from the input parameters. The sip session
 	 * key will be of the form (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,APPNAME)
 	 * @param applicationName the name of the application that will be the fifth component of the key
@@ -155,18 +93,6 @@ public class SessionManager {
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 				applicationName);
 		}
-//		StringBuffer sessionId = new StringBuffer();
-//		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
-//				.getAddress().getURI().toString());
-//		sessionId = sessionId.append(((FromHeader) message.getHeader(FromHeader.NAME))
-//						.getParameter(TAG_PARAMETER_NAME));
-//		sessionId = sessionId.append(((ToHeader) message.getHeader(ToHeader.NAME)).getAddress()
-//						.getURI().toString());
-//		sessionId = sessionId.append(((CallIdHeader) message.getHeader(CallIdHeader.NAME))
-//						.getCallId());
-//		sessionId = sessionId.append(applicationName);
-//
-//		return sessionId.toString();
 	}
 	
 	/**
@@ -189,27 +115,6 @@ public class SessionManager {
 				applicationName);		
 	}
 
-//	// Gives (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,TO-TAG)
-//	public static String getAcknoledgedSessionId(String applicationName, Message message) {
-//		if (((ToHeader) message.getHeader(ToHeader.NAME)).getTag() == null)
-//			return null;
-//
-//		String sessionId = getInitialSessionId(applicationName, message)
-//				+ ((ToHeader) message.getHeader(ToHeader.NAME)).getTag();
-//
-//		return sessionId;
-//	}
-
-//	// Gives (FROM-ADDR,FROM-TAG,TO-ADDR,CALL-ID,TO-TAG)
-//	public static String getAcknowledgedSessionId(Dialog dialog) {
-//		if (((ToHeader) message.getHeader(ToHeader.NAME)).getTag() == null)
-//			return null;
-//
-//		String sessionId = getInitialSessionId(message)
-//				+ ((ToHeader) message.getHeader(ToHeader.NAME)).getTag();
-//
-//		return sessionId;
-//	}
 	
 	/**
 	 * Removes a sip session from the manager by its key
@@ -244,22 +149,25 @@ public class SessionManager {
 	 * the creation through the create parameter to true.
 	 * @param key the key identifying the sip application session to retrieve 
 	 * @param create if set to true, if no session has been found one will be created
+	 * @param SipContext to associate the SipApplicationSession with if create is set to true, if false it won't be used
 	 * @return the sip application session matching the key
 	 */
-	public SipApplicationSessionImpl getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
-		SipApplicationSessionImpl sipApplicationSessionImpl = sipApplicationSessions.get(key);
-		if(sipApplicationSessionImpl ==null && create) {
-			sipApplicationSessionImpl = new SipApplicationSessionImpl(key);
-			if(logger.isDebugEnabled()) {
-				logger.debug("Adding a sip application session with the key : " + key);
+	public SipApplicationSessionImpl getSipApplicationSession(final SipApplicationSessionKey key, final boolean create, final SipContext sipContext) {
+		SipApplicationSessionImpl sipApplicationSessionImpl = null;
+		synchronized (sipApplicationSessionLock) {
+			sipApplicationSessionImpl = sipApplicationSessions.get(key);
+			if(sipApplicationSessionImpl == null && create) {
+				sipApplicationSessionImpl = new SipApplicationSessionImpl(key, sipContext);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Adding a sip application session with the key : " + key);
+				}			
+				sipApplicationSessions.put(key, sipApplicationSessionImpl);			
 			}
-			synchronized (sipApplicationSessionLock) {
-				sipApplicationSessions.put(key, sipApplicationSessionImpl);	
-			}			
 		}
 		return sipApplicationSessionImpl;
 	}	
-	
+
+
 	/**
 	 * Retrieve a sip session from its key. If none exists, one can enforce
 	 * the creation through the create parameter to true. the sip factory cannot be null
@@ -267,22 +175,24 @@ public class SessionManager {
 	 * @param key the key identifying the sip session to retrieve 
 	 * @param create if set to true, if no session has been found one will be created
 	 * @param sipFactoryImpl needed only for sip session creation.
+	 * @param sipApplicationSessionImpl to associate the SipSession with if create is set to true, if false it won't be used
 	 * @return the sip session matching the key
 	 * @throws IllegalArgumentException if create is set to true and sip Factory is null
 	 */
-	public SipSessionImpl getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl) {
+	public SipSessionImpl getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final SipApplicationSessionImpl sipApplicationSessionImpl) {
 		if(create && sipFactoryImpl == null) {
 			throw new IllegalArgumentException("the sip factory should not be null");
 		}
-		SipSessionImpl sipSessionImpl = sipSessions.get(key);
-		if(sipSessionImpl == null && create) {
-			sipSessionImpl = new SipSessionImpl(key, sipFactoryImpl);
-			if(logger.isDebugEnabled()) {
-				logger.debug("Adding a sip session with the key : " + key);
-			}
-			synchronized (sipSessionLock) {				
+		SipSessionImpl sipSessionImpl = null;
+		synchronized (sipSessionLock) {
+			sipSessionImpl = sipSessions.get(key);
+			if(sipSessionImpl == null && create) {
+				sipSessionImpl = new SipSessionImpl(key, sipFactoryImpl, sipApplicationSessionImpl);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Adding a sip session with the key : " + key);
+				}
 				sipSessions.put(key, sipSessionImpl);					
-			}			
+			}		
 		}
 		return sipSessionImpl;
 	}

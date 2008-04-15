@@ -157,7 +157,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
             setUseNaming(false);
         }
         //activating our custom naming context to be able to set the sip factory in JNDI
-        /*
         if (isUseNaming()) {    
         	if (getNamingContextListener() == null) {
             	NamingContextListener namingContextListener = new SipNamingContextListener();
@@ -166,7 +165,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
                 addLifecycleListener(namingContextListener);
                 addContainerListener(namingContextListener);
             }
-        }      */ 
+        }
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to

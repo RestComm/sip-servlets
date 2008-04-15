@@ -170,7 +170,7 @@ public class SipFactoryFacade implements SipFactory {
 		if(sipSessionImpl.getHandler() == null) {
 			try {
 				sipSessionImpl.setHandler(sipContext.getMainServlet());
-				((SipApplicationSessionImpl)sipSessionImpl.getApplicationSession()).setSipContext(sipContext);
+//				((SipApplicationSessionImpl)sipSessionImpl.getApplicationSession()).setSipContext(sipContext);
 			} catch (ServletException se) {
 				//should never happen
 				logger.error("Impossible to set the default handler on the newly created request "+ request.toString(),se);

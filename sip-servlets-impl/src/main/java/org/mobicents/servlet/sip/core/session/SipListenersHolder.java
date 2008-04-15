@@ -18,6 +18,7 @@ import java.util.EventListener;
 import java.util.List;
 
 import javax.servlet.ServletContextListener;
+import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipApplicationSessionListener;
@@ -38,6 +39,7 @@ public class SipListenersHolder {
 	private List<SipApplicationSessionAttributeListener> sipApplicationSessionAttributeListeners;
 	private List<SipApplicationSessionBindingListener> sipApplicationSessionBindingListeners;
 	private List<SipApplicationSessionListener> sipApplicationSessionListeners;
+	private List<SipApplicationSessionActivationListener> sipApplicationSessionActivationListeners;
 	private List<SipSessionActivationListener> sipSessionActivationListeners;
 	private List<SipSessionAttributeListener> sipSessionAttributeListeners;
 	private List<SipSessionBindingListener> sipSessionBindingListeners;
@@ -55,6 +57,7 @@ public class SipListenersHolder {
 		this.sipApplicationSessionAttributeListeners = new ArrayList<SipApplicationSessionAttributeListener>();
 		this.sipApplicationSessionBindingListeners = new ArrayList<SipApplicationSessionBindingListener>();
 		this.sipApplicationSessionListeners = new ArrayList<SipApplicationSessionListener>();
+		this.sipApplicationSessionActivationListeners = new ArrayList<SipApplicationSessionActivationListener>();
 		this.sipSessionActivationListeners = new ArrayList<SipSessionActivationListener>();
 		this.sipSessionAttributeListeners = new ArrayList<SipSessionAttributeListener>();
 		this.sipSessionBindingListeners = new ArrayList<SipSessionBindingListener>();
@@ -101,6 +104,11 @@ public class SipListenersHolder {
 			added = true;
 		}
 
+		if (listener instanceof SipApplicationSessionActivationListener) {
+			this.addListener((SipApplicationSessionActivationListener) listener);
+			added = true;
+		}
+		
 		if (listener instanceof SipApplicationSessionListener) {
 			this.addListener((SipApplicationSessionListener) listener);
 			added = true;
@@ -162,6 +170,10 @@ public class SipListenersHolder {
 		this.sipApplicationSessionBindingListeners.add(listener);
 	}
 
+	public void addListener(SipApplicationSessionActivationListener listener) {
+		this.sipApplicationSessionActivationListeners.add(listener);
+	}
+	
 	// this.sipApplicationSessionListeners.clear();
 	public void addListener(SipApplicationSessionListener listener) {
 		this.sipApplicationSessionListeners.add(listener);
@@ -219,6 +231,10 @@ public class SipListenersHolder {
 		return sipApplicationSessionBindingListeners;
 	}
 
+	public List<SipApplicationSessionActivationListener> getSipApplicationSessionActivationListeners() {
+		return sipApplicationSessionActivationListeners;
+	}
+	
 	public List<SipApplicationSessionListener> getSipApplicationSessionListeners() {
 		return sipApplicationSessionListeners;
 	}
@@ -264,6 +280,7 @@ public class SipListenersHolder {
 		// all other listeners from Session for instance
 		this.sipApplicationSessionAttributeListeners.clear();
 		this.sipApplicationSessionBindingListeners.clear();
+		this.sipApplicationSessionActivationListeners.clear();
 		this.sipApplicationSessionListeners.clear();
 		this.sipSessionActivationListeners.clear();
 		this.sipSessionAttributeListeners.clear();
