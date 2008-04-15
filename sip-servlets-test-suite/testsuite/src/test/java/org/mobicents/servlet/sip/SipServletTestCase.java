@@ -37,8 +37,8 @@ public abstract class SipServletTestCase extends TestCase {
 		}
 		
 		// First try to use the env variables - useful for shell scripting
-		tomcatBasePath = System.getProperty("CATALINA_HOME");	
-		projectHome = System.getProperty("SIP_SERVLETS_HOME");
+		tomcatBasePath = System.getenv("CATALINA_HOME");	
+		projectHome = System.getenv("SIP_SERVLETS_HOME");
 		
 		// Otherwise use the properties
 		if(this.tomcatBasePath == null || this.tomcatBasePath.length() <= 0) 
