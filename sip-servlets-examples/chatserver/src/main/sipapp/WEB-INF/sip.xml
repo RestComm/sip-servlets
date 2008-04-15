@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.ChatroomSipServlet</app-name>
+	<display-name>Chatroom Sip Servlet</display-name>
+	<description>Chatroom Sip Servlet</description>
+	
+	<main-servlet>
+		ChatroomSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>ChatroomSipServlet</servlet-name>
+		<display-name>ChatroomSipServlet</display-name>
+		<description>Chatroom SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.ChatroomSipServlet
+		</servlet-class>
+		<init-param>
+         <param-name>chatroomservername</param-name>
+         <param-value>sip:just4fun@127.0.0.1:5070</param-value> 
+      </init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>	
+</sip-app>
