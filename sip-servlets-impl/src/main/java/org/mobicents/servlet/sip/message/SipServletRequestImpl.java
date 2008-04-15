@@ -6,6 +6,7 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -21,6 +22,7 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipApplicationRoutingDirective;
+import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -53,15 +55,20 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.InitialRequestType;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
 
+	//request state info
+	private Serializable stateInfo;
+	//request routing region
+	private SipApplicationRoutingRegion routingRegion;
+	
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
-	private SipServletRequestImpl nextRequest;
-	private SipServletRequestImpl originalRequest;
+	private SipServletRequestImpl nextRequest;	
 	
 	private boolean createDialog;
 	/*
@@ -73,7 +80,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/* Cache the application routing directive in the record route header */
 	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
 
-	private boolean isInitial = true;
+	private InitialRequestType isInitial = InitialRequestType.INITIAL;
 	private B2buaHelper b2buahelper;
 
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
@@ -326,12 +333,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#isInitial()
 	 */
 	public boolean isInitial() {
-
-		return this.isInitial;
-
+		return this.isInitial.equals(InitialRequestType.INITIAL);
 	}
 
-	public void setInitial(boolean isInitial) {
+	public void setInitial(InitialRequestType isInitial) {
 		this.isInitial = isInitial;
 	}
 
@@ -458,7 +463,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			logger.error(s, ex);
 			throw new IllegalArgumentException(s, ex);
 		}			
-		originalRequest = origRequestImpl;
+		linkedRequest = origRequestImpl;
 
 	}
 
@@ -674,6 +679,34 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	public SipServletRequestImpl getLinkedRequest() {
 		return this.linkedRequest;
+	}
+
+	/**
+	 * @return the stateInfo
+	 */
+	public Serializable getStateInfo() {
+		return stateInfo;
+	}
+
+	/**
+	 * @param stateInfo the stateInfo to set
+	 */
+	public void setStateInfo(Serializable stateInfo) {
+		this.stateInfo = stateInfo;
+	}
+
+	/**
+	 * @return the routingRegion
+	 */
+	public SipApplicationRoutingRegion getRoutingRegion() {
+		return routingRegion;
+	}
+
+	/**
+	 * @param routingRegion the routingRegion to set
+	 */
+	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
+		this.routingRegion = routingRegion;
 	}
 
 }

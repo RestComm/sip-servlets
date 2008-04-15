@@ -135,6 +135,8 @@ public class SipRuleSet extends RuleSetBase {
         		"setLargeIcon", 0);
         digester.addCallMethod(prefix + "sip-app/servlet/servlet-name",
                 "setName", 0);
+        digester.addCallMethod(prefix + "sip-app/servlet/servlet-name",
+                "setServletName", 0);
         digester.addCallMethod(prefix + "sip-app/servlet/display-name",
                 "setDisplayName", 0);
 //        digester.addCallMethod(prefix + "sip-app/servlet/description",

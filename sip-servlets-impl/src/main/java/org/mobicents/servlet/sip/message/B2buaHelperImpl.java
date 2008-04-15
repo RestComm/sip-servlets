@@ -104,7 +104,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			session.setHandler(originalSession.getHandler());
 			appSession.setSipContext(((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext());
 			
-			SipServletRequestImpl retVal = new SipServletRequestImpl(
+			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,
 					session, null, null, true);
@@ -112,11 +112,11 @@ public class B2buaHelperImpl implements B2buaHelper {
 			if (linked) {
 				sessionMap.put(originalSession, session);
 				sessionMap.put(session, originalSession);
-				origRequestImpl.setLinkedRequest(retVal);
-				retVal.setLinkedRequest(origRequestImpl);
+				origRequestImpl.setLinkedRequest(newSipServletRequest);
+				newSipServletRequest.setLinkedRequest(origRequestImpl);
 			}
 
-			return retVal;
+			return newSipServletRequest;
 		} catch (Exception ex) {
 			logger.error("Unexpected exception ", ex);
 			throw new IllegalArgumentException(

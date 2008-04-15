@@ -1,7 +1,6 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -32,12 +30,14 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 
+import org.apache.catalina.Container;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * 
@@ -93,12 +93,7 @@ public class SipSessionImpl implements SipSession {
 	 * The name of the servlet withing this same app to handle all subsequent requests.
 	 */
 	private String handlerServlet;
-	
-//	/**
-//	 * The first sip application for subsequent requests.
-//	 */
-//	private SipContext sipContext;
-	
+		
 	/**
 	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
 	 */
@@ -148,8 +143,6 @@ public class SipSessionImpl implements SipSession {
 		this.supervisedMode = true;
 		if ( sipApp != null) sipApp.addSipSession(this);
 	}
-	
-	
 	
 	public ArrayList<SipSessionAttributeListener> getSipSessionAttributeListeners() {
 		return sipSessionAttributeListeners;
@@ -208,19 +201,35 @@ public class SipSessionImpl implements SipSession {
 		return sipServletRequest;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getApplicationSession()
+	 */
 	public SipApplicationSession getApplicationSession() {
 		return this.sipApplicationSession;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getAttribute(java.lang.String)
+	 */
 	public Object getAttribute(String name) {
 		return sipSessionAttributeMap.get(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getAttributeNames()
+	 */
 	public Enumeration<String> getAttributeNames() {
 		Vector<String> names = new Vector<String>(sipSessionAttributeMap.keySet());
 		return names.elements();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getCallId()
+	 */
 	public String getCallId() {
 		if(this.sessionCreatingDialog != null)
 			return this.sessionCreatingDialog.getCallId().getCallId();
@@ -228,18 +237,34 @@ public class SipSessionImpl implements SipSession {
 			return ((CallIdHeader)this.sessionCreatingTransaction.getRequest().getHeader(CallIdHeader.NAME)).getCallId();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getCreationTime()
+	 */
 	public long getCreationTime() {
 		return creationTime;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getId()
+	 */
 	public String getId() {
 		return uuid.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getLastAccessedTime()
+	 */
 	public long getLastAccessedTime() {
 		return lastAccessTime;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getLocalParty()
+	 */
 	public Address getLocalParty() {
 		if(sessionCreatingDialog != null)
 			return new AddressImpl(sessionCreatingDialog.getLocalParty());
@@ -257,10 +282,22 @@ public class SipSessionImpl implements SipSession {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getRegion()
+	 */
 	public SipApplicationRoutingRegion getRegion() {
 		return routingRegion;
 	}
 
+	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
+		this.routingRegion = routingRegion;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getRemoteParty()
+	 */
 	public Address getRemoteParty() {
 		if(sessionCreatingDialog != null)
 			return new AddressImpl(sessionCreatingDialog.getLocalParty());
@@ -278,10 +315,18 @@ public class SipSessionImpl implements SipSession {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getState()
+	 */
 	public State getState() {
 		return this.state;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#getSubscriberURI()
+	 */
 	public URI getSubscriberURI() {
 		if (this.subscriberURI == null)
 			throw new IllegalStateException("Subscriber URI is only available for outbound sessions.");
@@ -289,6 +334,10 @@ public class SipSessionImpl implements SipSession {
 			return this.subscriberURI;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#invalidate()
+	 */
 	public void invalidate() {
 		if(state.equals(State.CONFIRMED)
 				|| state.equals(State.EARLY))
@@ -300,6 +349,10 @@ public class SipSessionImpl implements SipSession {
 		valid = false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#isOngoingTransaction()
+	 */
 	public boolean isOngoingTransaction() {
 		if(!isSupervisedMode())
 			return false;
@@ -307,10 +360,18 @@ public class SipSessionImpl implements SipSession {
 			return ongoingTransactions.size()>0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#isValid()
+	 */
 	public boolean isValid() {
 		return this.valid;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#removeAttribute(java.lang.String)
+	 */
 	public void removeAttribute(String name) {
 
 		if(!isValid())
@@ -322,72 +383,95 @@ public class SipSessionImpl implements SipSession {
 		
 		SipSessionBindingEvent event = new SipSessionBindingEvent(this, name);
 
-		for (SipSessionBindingListener l : this.getSipSessionBindingListeners()) {
-			l.valueUnbound(event);
-
+		for (SipSessionBindingListener listener : this.getSipSessionBindingListeners()) {
+			listener.valueUnbound(event);
 		}
-
-		for (SipSessionAttributeListener l : this
+		for (SipSessionAttributeListener listener : this
 				.getSipSessionAttributeListeners()) {
-			l.attributeRemoved(event);
+			listener.attributeRemoved(event);
 		}
 
 		this.sipSessionAttributeMap.remove(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#setAttribute(java.lang.String, java.lang.Object)
+	 */
 	public void setAttribute(String key, Object attribute) {
-
-		
-		if(!isValid())
+		if(!isValid()) {
 			throw new IllegalStateException("Can not bind object to session that has been invalidated!!");
-		
-		if(key==null)
+		}
+		if(key == null) {
 			throw new NullPointerException("Name of attribute to bind cant be null!!!");
-		if(attribute==null)
+		}
+		if(attribute == null) {
 			throw new NullPointerException("Attribute that is to be bound cant be null!!!");
+		}
 		
 		SipSessionBindingEvent event = new SipSessionBindingEvent(this, key);
-		if (this.sipSessionAttributeMap.containsKey(key)) {
+		if (!this.sipSessionAttributeMap.containsKey(key)) {
 			// This is initial, we need to send value bound event
-
-			for (SipSessionBindingListener l : this
+			for (SipSessionBindingListener listener : this
 					.getSipSessionBindingListeners()) {
-				l.valueBound(event);
+				listener.valueBound(event);
 
 			}
-
-			for (SipSessionAttributeListener l : this
+			for (SipSessionAttributeListener listener : this
 					.getSipSessionAttributeListeners()) {
-				l.attributeAdded(event);
+				listener.attributeAdded(event);
 			}
-
 		} else {
-
-			for (SipSessionAttributeListener l : this
+			for (SipSessionAttributeListener listener : this
 					.getSipSessionAttributeListeners()) {
-				l.attributeReplaced(event);
+				listener.attributeReplaced(event);
 			}
-
 		}
 
 		this.sipSessionAttributeMap.put(key, attribute);
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#setHandler(java.lang.String)
+	 */
 	public void setHandler(String name) throws ServletException {
 		if(!valid) {
 			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
 		}
-		//TODO throw a ServletException if no servlet with the specified name exists in this application
-		// this implies that the sipsession knows all the servlet of the application, the constructor should refactored for that
+		SipContext sipContext = getSipApplicationSession().getSipContext();
+		Container[] containers = sipContext.findChildren();
+		boolean isServletExists = false;
+		int i = 0;
+		while (i < containers.length && !isServletExists) {
+			if(containers[i] instanceof SipServletImpl) {
+				final SipServletImpl sipServletImpl = (SipServletImpl)containers[i];
+				if(sipServletImpl.getServletName().equals(name)) {
+					isServletExists = true;
+				}
+			}
+			i++;
+		}
+		if(!isServletExists) {
+			throw new ServletException("the sip servlet with the name "+ name + 
+					" doesn't exist in the sip application " + sipContext.getApplicationName());
+		}
 		this.handlerServlet = name;
 	}
 	
-	public String getHandler()
-	{
+	/**
+	 * Retrieve the handler associated with this sip session
+	 * @return the handler associated with this sip session
+	 */
+	public String getHandler() {
 		return handlerServlet;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#setOutboundInterface(javax.servlet.sip.SipURI)
+	 */
 	public void setOutboundInterface(SipURI uri) {
 		// TODO: validate from the list in servlet context
 		this.outboundInterface = uri;
@@ -425,9 +509,7 @@ public class SipSessionImpl implements SipSession {
 
 	public Transaction getSessionCreatingTransaction() {
 		return sessionCreatingTransaction;
-	}
-
-	
+	}	
 
 	public boolean isSupervisedMode() {
 		return supervisedMode;
@@ -445,23 +527,12 @@ public class SipSessionImpl implements SipSession {
 		return outboundInterface;
 	}
 
-//	public SipContext getSipContext() {
-//		return sipContext;
-//	}
-//
-//	public void setSipContext(SipContext sipContext) {
-//		this.sipContext = sipContext;
-//	}
-
-	public Set<SipProvider> getProviders() {
-		
+	public Set<SipProvider> getProviders() {		
 		return sipFactory.getSipProviders();
 	}
 	
-	public void onDialogTimeout(Dialog dialog)
-	{
-		if(this.ongoingTransactions.size()>0)
-		{
+	public void onDialogTimeout(Dialog dialog) {
+		if(this.ongoingTransactions.size()>0) {
 			throw new IllegalStateException("Dialog timed out, but there are active transactions.");
 		}
 		this.state = State.TERMINATED;
@@ -470,8 +541,6 @@ public class SipSessionImpl implements SipSession {
 	public void setState(State state) {
 		this.state = state;
 	}
-
-
 
 	/**
 	 * Add an ongoing tx to the session.
@@ -493,11 +562,7 @@ public class SipSessionImpl implements SipSession {
 		}		
 	}
 	
-	public Collection<Transaction>  getOngoingTransactions() {
+	public Set<Transaction> getOngoingTransactions() {
 		return this.ongoingTransactions;
 	}
-
-
-
-	
 }

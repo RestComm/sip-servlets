@@ -151,13 +151,6 @@ public class SipFactoryImpl implements SipFactory {
 	}
 
 	/*
-	 * 
-	 */
-	public SipApplicationSessionImpl createApplicationSessionImpl(String id) {
-		return new SipApplicationSessionImpl(id);
-	}
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see javax.servlet.sip.SipFactory#createRequest(javax.servlet.sip.SipApplicationSession,

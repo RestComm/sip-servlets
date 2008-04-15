@@ -2,7 +2,6 @@ package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.ContentLanguage;
-import gov.nist.javax.sip.header.ContentLength;
 import gov.nist.javax.sip.header.ContentType;
 import gov.nist.javax.sip.header.Expires;
 import gov.nist.javax.sip.header.SIPHeader;
@@ -67,7 +66,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
-import org.mobicents.servlet.sip.address.ParameterableImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 
@@ -759,6 +757,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			this.session = new SipSessionImpl(sipFactoryImpl,
 					(SipApplicationSessionImpl) this.getApplicationSession());
 		return this.session;
+	}
+	
+	public SipSessionImpl getSipSession() {
+		return session;
 	}
 
 	public Address getTo() {

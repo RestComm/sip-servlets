@@ -76,4 +76,23 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * @return immutable List containing the SipURI representation of IP addresses 
 	 */
 	public List<SipURI> getOutboundInterfaces();
+	/**
+	 * Add a new hostname to the application dispatcher.
+	 * This information is used for the routing algorithm of an incoming Request.
+	 * @param hostName the host name
+	 */
+	public void addHostName(String hostName);
+	/**
+	 * Remove the hostname from the application dispatcher.
+	 * This information is used for the routing algorithm of an incoming Request.
+	 * @param hostName the host name
+	 */
+	public void removeHostName(String hostName);
+	/**
+	 * Returns An immutable instance of the java.util.List interface containing
+	 * the sip application dispatcher registered host names
+	 * @return An immutable instance of the java.util.List interface containing
+	 * the sip application dispatcher registered host names
+	 */
+	public List<String> findHostNames();
 }

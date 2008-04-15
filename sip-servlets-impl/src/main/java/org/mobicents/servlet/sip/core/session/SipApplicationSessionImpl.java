@@ -251,14 +251,14 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
 				this, name);
 		SipListenersHolder listeners = sipContext.getListeners();
-		for (SipApplicationSessionBindingListener l : listeners
+		for (SipApplicationSessionBindingListener listener : listeners
 				.getSipApplicationSessionBindingListeners()) {
-			l.valueUnbound(event);
+			listener.valueUnbound(event);
 		}
 
-		for (SipApplicationSessionAttributeListener l : listeners
+		for (SipApplicationSessionAttributeListener listener : listeners
 				.getSipApplicationSessionAttributeListeners()) {
-			l.attributeRemoved(event);
+			listener.attributeRemoved(event);
 		}
 
 		this.sipApplicationSessionAttributeMap.remove(name);
@@ -286,22 +286,22 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		SipListenersHolder listeners = sipContext.getListeners();
 		if (sipApplicationSessionAttributeMap.containsKey(key)) {
 			// This is initial, we need to send value bound event						
-			for (SipApplicationSessionBindingListener l : listeners
+			for (SipApplicationSessionBindingListener listener : listeners
 					.getSipApplicationSessionBindingListeners()) {
-				l.valueBound(event);
+				listener.valueBound(event);
 
 			}
 
-			for (SipApplicationSessionAttributeListener l : listeners
+			for (SipApplicationSessionAttributeListener listener : listeners
 					.getSipApplicationSessionAttributeListeners()) {
-				l.attributeAdded(event);
+				listener.attributeAdded(event);
 			}
 
 		} else {
 
-			for (SipApplicationSessionAttributeListener l : listeners
+			for (SipApplicationSessionAttributeListener listener : listeners
 					.getSipApplicationSessionAttributeListeners()) {
-				l.attributeReplaced(event);
+				listener.attributeReplaced(event);
 			}
 
 		}

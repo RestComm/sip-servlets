@@ -63,7 +63,10 @@ public class SipFactoryFacade implements SipFactory {
 	 * @see javax.servlet.sip.SipFactory#createApplicationSession()
 	 */
 	public SipApplicationSession createApplicationSession() {
-		return sipFactoryImpl.createApplicationSession();
+		SipApplicationSessionImpl sipApplicationSessionImpl = 
+			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSession();
+		sipApplicationSessionImpl.setSipContext(sipContext);
+		return sipApplicationSessionImpl;
 	}
 
 	/* (non-Javadoc)

@@ -163,7 +163,14 @@ public class JainSipUtils {
 		}	
 	}
 	
-	public static SipProvider findMatchingSipProvider(Set<SipProvider> sipProviders, String transport) {
+	/**
+	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
+	 * @param sipProviders the set of sip providers to look into
+	 * @param transport the transport
+	 * @return Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
+	 * If none has been found, null is returned.
+	 */
+	public static SipProvider findMatchingSipProvider(Set<SipProvider> sipProviders, String transport) {		
 		Iterator<SipProvider> it = sipProviders.iterator();		 
 		while (it.hasNext()) {
 			SipProvider sipProvider = it.next();
@@ -171,6 +178,56 @@ public class JainSipUtils {
 			if(listeningPoint != null) {
 				return sipProvider;
 			}
+		}					
+		return null; 
+	}
+	/**
+	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the 
+	 * ipAddress port and transport given in parameter.
+	 * @param sipProviders the set of sip providers to look into
+	 * @param ipAddress the ip address
+	 * @param port the port
+	 * @param transport the transport
+	 * @return Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
+	 * If none has been found, null is returned.
+	 */
+	public static ListeningPoint findMatchingListeningPoint(
+			Set<SipProvider> sipProviders, String ipAddress, int port, String transport) {		
+		Iterator<SipProvider> it = sipProviders.iterator();		 
+		while (it.hasNext()) {
+			SipProvider sipProvider = it.next();
+			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
+			if(listeningPoint != null && 
+					listeningPoint.getIPAddress().equals(ipAddress) &&
+					listeningPoint.getPort() == port) {
+				return listeningPoint;
+			}
+		}					
+		return null; 
+	}
+	
+	/**
+	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the 
+	 * ipAddress and port given in parameter.
+	 * @param sipProviders the set of sip providers to look into
+	 * @param ipAddress the ip address
+	 * @param port the port
+	 * @return Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
+	 * If none has been found, null is returned.
+	 */
+	public static ListeningPoint findMatchingListeningPoint(
+			Set<SipProvider> sipProviders, String ipAddress, int port) {		
+		Iterator<SipProvider> it = sipProviders.iterator();		 
+		while (it.hasNext()) {
+			SipProvider sipProvider = it.next();
+			ListeningPoint[] listeningPoints = sipProvider.getListeningPoints();
+			for (ListeningPoint listeningPoint : listeningPoints) {
+				if(listeningPoint != null && 
+						listeningPoint.getIPAddress().equals(ipAddress) &&
+						listeningPoint.getPort() == port) {
+					return listeningPoint;
+				}
+			}			
 		}					
 		return null; 
 	}
@@ -209,7 +266,7 @@ public class JainSipUtils {
 			SipProvider sipProvider) {
 		try{
 			Response response=SipFactories.messageFactory.createResponse
-	        	(Response.SERVER_INTERNAL_ERROR,request);				
+	        	(Response.SERVER_INTERNAL_ERROR,request);			
 	        if (transaction!=null) {
 	        	transaction.sendResponse(response);
 	        } else { 
