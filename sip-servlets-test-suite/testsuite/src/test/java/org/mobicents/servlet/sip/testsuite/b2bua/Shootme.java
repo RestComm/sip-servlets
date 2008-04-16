@@ -1,19 +1,42 @@
-package org.mobicents.servlet.sip.testsuite.b2bua;
+/*
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */package org.mobicents.servlet.sip.testsuite.b2bua;
 
+import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.sip.Dialog;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
+import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
+import javax.sip.ServerTransaction;
 import javax.sip.SipListener;
-import javax.sip.TimeoutEvent;
+import javax.sip.SipProvider;
+import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
-
-import java.util.*;
-
-import javax.sip.*;
-import javax.sip.message.*;
-import javax.sip.address.*;
-import javax.sip.header.*;
+import javax.sip.address.Address;
+import javax.sip.header.ContactHeader;
+import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
+import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import junit.framework.TestCase;
 

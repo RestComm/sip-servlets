@@ -1,3 +1,19 @@
+/*
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.servlet.sip;
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +52,10 @@ import org.mobicents.servlet.sip.startup.SipStandardService;
 
 /**
  * This class is emulating an embedded tomcat configured with sip servlets extension
- * to allow deployment of sip servlets apps to it. It is for the test suite purposes only for now... 
+ * to allow deployment of sip servlets apps to it. It is for the test suite purposes only for now...
+ * 
+ *  @author Jean Deruelle
+ *  @author Vladimir Ralev
  */
 public class SipEmbedded {		
 	private static Log log = LogFactory.getLog(SipEmbedded.class);

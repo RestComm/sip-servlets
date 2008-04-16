@@ -1,36 +1,41 @@
+/*
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.servlet.sip.testsuite.security;
-
-import junit.framework.Assert;
 import java.util.EventObject;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.TooManyListenersException;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
-import javax.sip.ListeningPoint;
-import javax.sip.ObjectInUseException;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
-import javax.sip.message.Response;
 
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cafesip.sipunit.SipCall;
-import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
+
 
 public class UACvsUASSecurityTest extends SipServletTestCase implements SipListener {
 
