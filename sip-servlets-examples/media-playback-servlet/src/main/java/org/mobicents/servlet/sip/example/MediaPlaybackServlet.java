@@ -26,13 +26,10 @@ import javax.servlet.sip.SipServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsConnectionEvent;
-import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.MsSignalGenerator;
 import org.mobicents.mscontrol.impl.MsProviderImpl;
-import org.mobicents.mscontrol.signal.Announcement;
 
 /**
  * This example shows a simple User agent that can playback audio.
@@ -64,7 +61,6 @@ public class MediaPlaybackServlet extends SipServlet {
 		Object sdpObj = request.getContent();
 		byte[] sdpBytes = (byte[]) sdpObj;
 		String sdp = new String(sdpBytes); 
-		inviteRequest = request;
 	
 		MsProviderImpl provider = new MsProviderImpl();
 		MsSession session = provider.createSession();

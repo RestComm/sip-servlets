@@ -34,7 +34,7 @@
 			<artifactId>mscontrol</artifactId>
 			<version>1.0-ALPHA</version>
 			<scope>system</scope>
-			<systemPath>/home/vralev/mobicents/mobicents-google/servers/media/mscontrol/msc/jars/mscontrol.jar</systemPath>
+			<systemPath>${basedir}/lib/mscontrol.jar</systemPath>
 		</dependency>
 
 		<!-- JAIN-SIP dependency for the shootist -->
