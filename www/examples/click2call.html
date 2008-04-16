@@ -259,9 +259,9 @@ Here are the steps to make a simple configuration with static users, passwords a
 <li>In the file props/sip-servlets-users.properties put this:<br />
 # A sample users.properties file, this line creates user &quot;admin&quot; with password &quot;admin&quot; for &quot;sip-servlets-realm&quot;<br />
 admin=9640e13fedc736bdafa6b9007d965c56<p>The cryptic string here is the A1 value of the digest authentication algorithm and can be generated with the following command:<br />
-<tt>java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username &quot;My Realm&quot; password RFC2617</tt>
+<tt>java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username &quot;My Realm&quot; password</tt>
 <br />
-<tt>A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea</tt>
+<tt>RFC2617 A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea</tt>
 </p>
 </li>
 <li>In the file props/sip-servlets-roles.properties put this:<br />
