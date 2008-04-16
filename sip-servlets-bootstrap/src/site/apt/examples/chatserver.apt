@@ -17,7 +17,9 @@ Chat Server
 	The commands implemented are:
 
     * /join: Silently enter a chat room without broadcasting anything.
+    
     * /who: Print the list of all users in this chat room.
+    
     * /quit: Leave the chat room; no more messages will come in.
  	
 	 
