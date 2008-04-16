@@ -14,12 +14,12 @@ public class UserInterface extends VerticalPanel{
 		this.setWidth("100%");
 		RouterConfigurationPage routerPage = new RouterConfigurationPage();
 		routerPage.setTitle("Router Configuration");
-		TabPanel tabPanel = new TabPanel();
-		tabPanel.add(routerPage);
-		tabPanel.setMinTabWidth(115);  
-		tabPanel.setTabWidth(135);
+//		TabPanel tabPanel = new TabPanel();
+//		tabPanel.add(routerPage);
+//		tabPanel.setMinTabWidth(115);  
+//		tabPanel.setTabWidth(135);
 		add(getHeader());
-		add(tabPanel);
+		add(routerPage);
 	}
 	
 	private Widget getHeader() {

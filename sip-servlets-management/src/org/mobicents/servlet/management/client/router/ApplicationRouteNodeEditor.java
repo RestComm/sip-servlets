@@ -69,7 +69,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		panel.add(component);
 	}
 	
-	private ComboBox makeCombo(Store store, String field, ComboBoxListenerAdapter listener) {
+	private ComboBox makeCombo(Store store, String field, ComboBoxListenerAdapter listener, String defaultValue) {
 		final ComboBox box;
 		box = new ComboBox();  
 		box.setForceSelection(true);  
@@ -77,7 +77,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		box.setDisplayField(field);  
 		box.setMode(ComboBox.LOCAL);  
 		box.setTriggerAction(ComboBox.ALL);  
-		box.setEmptyText("...");  
+		box.setEmptyText("Select Value");  
 		box.setValueField(field);
 		box.setSelectOnFocus(true);  
 		box.setEditable(true);
@@ -85,6 +85,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		box.setWidth(160); 
 		box.setHideTrigger(false);
 		box.addListener(listener);
+		box.setValue(defaultValue);
 		return box;
 	}
 	
@@ -134,6 +135,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 				Store original = applicationName.getStore();
 				original.removeAll();
 				original.add(storeTemp.getRecords());
+				if(apps.length>0) applicationName.setValue(apps[0]);
 				Console.info("Successfully enumerated deployed applications");
 			}
 			
@@ -143,7 +145,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	
 	private TextField makeTextField(String label, String name, int length) {
 		TextField text = new TextField(label, name, length);  
-		text.setAllowBlank(false); 
+		text.setAllowBlank(true); 
 		text.setHideLabel(true);
 		return text;
 	}
@@ -161,7 +163,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		final Store regionStore = new SimpleStore(new String[]{"region"}, regions);  
 		regionStore.load();  
 	
-		this.routingRegion = makeCombo(regionStore, "region", new RoutingRegionComboListener(this));  
+		this.routingRegion = makeCombo(regionStore, "region", new RoutingRegionComboListener(this), (String) regions[0][0]);  
 		
 		// Route 
 		this.route = makeTextField("Route", "Route", 160);
@@ -175,10 +177,11 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 			public void onSelect(ComboBox comboBox, com.gwtext.client.data.Record record, int index) {  
 				System.out.println("Route modifiers::onSelect('" + record.getAsString("modifiers") + "')");  
 			}  
-		});  
+		}, (String) routeModifiers[0][0]);  
 		
 		// Order 
 		this.order = makeTextField("Order", "Order", 160);
+		this.order.setBlankText("0");
 		
 		// Set up the form
 		formPanel.setFrame(true);   
@@ -267,6 +270,8 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	}
 	
 	public String getOrder() {
+		String text = order.getText();
+		if(text == null || text.equals("")) return "0";
 		return order.getText();
 	}
 	
