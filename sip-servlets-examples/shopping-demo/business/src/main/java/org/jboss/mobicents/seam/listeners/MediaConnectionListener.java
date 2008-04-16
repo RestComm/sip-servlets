@@ -53,7 +53,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 		String endpoint = connection.getEndpoint();
 		
 		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);
-		String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audio.files.path");
+		String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audioFilePath");
 		if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
 			java.io.File speech = new File("speech.wav");
 			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());

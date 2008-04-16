@@ -32,7 +32,7 @@ import org.mobicents.mscontrol.MsSession;
 /**
  * Sip Servlet handling responses to call initiated due to actions made on the web shopping demo
  * 
- * @author Jean Deruelle
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
 public class ShoppingSipServlet 
@@ -66,7 +66,7 @@ public class ShoppingSipServlet
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
 			String sdp = new String(sdpBytes);
-			sipServletResponse.getSession().getApplicationSession().setAttribute("audio.files.path", (String)getServletContext().getAttribute("audio.files.path"));
+			sipServletResponse.getSession().getApplicationSession().setAttribute("audioFilePath", (String)getServletContext().getAttribute("audioFilePath"));
 			MsConnection connection = (MsConnection)sipServletResponse.getSession().getApplicationSession().getAttribute("connection");
 			connection.modify("$", sdp);			
 		}
@@ -88,7 +88,7 @@ public class ShoppingSipServlet
 			logger.info("DTMF session in started state, parsing message content");
 			if(messageContent != null && messageContent.length() > 0 && signalIndex != -1) {
 				String signal = messageContent.substring("Signal=".length(),"Signal=".length()+1).trim();
-				String pathToAudioDirectory = (String)getServletContext().getAttribute("audio.files.path");
+				String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
 				logger.info("Signal received " + signal );													
 				
 				if(request.getSession().getApplicationSession().getAttribute("orderApproval") != null) {

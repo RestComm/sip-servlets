@@ -19,10 +19,10 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
-	<context-param>
+	<!--context-param>
       <param-name>audio.files.path</param-name>
       <param-value>file:///home/dereuelle/workspaces/sip-servlets/sip-servlets-examples/shopping-demo/resources/audio/</param-value>
-    </context-param>
+    </context-param-->
     
     <context-param>
       <param-name>order.approval.waitingtime</param-name>

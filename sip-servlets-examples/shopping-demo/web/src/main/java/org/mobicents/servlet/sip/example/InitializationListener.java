@@ -16,8 +16,13 @@
  */
 package org.mobicents.servlet.sip.example;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -27,29 +32,99 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
- *
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ * 
  */
 public class InitializationListener implements ServletContextListener {
-	private static Log logger = LogFactory.getLog(ShoppingSipServlet.class);
-	
-	/* (non-Javadoc)
+	private static Log logger = LogFactory.getLog(InitializationListener.class);
+	private static final String AUDIO_DIR = "audio";
+	private static final String FILE_PROTOCOL = "file://";
+	private static final String[] AUDIO_FILES = new String[] {
+			"AdminReConfirm.wav", "OrderApproved.wav", "OrderCancelled.wav", "OrderConfirmed.wav",
+			"OrderConfirm.wav", "OrderDeliveryDate.wav", "OrderShipped.wav",
+			"ReConfirm.wav" };
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */	
-	public void contextDestroyed(ServletContextEvent arg0) {}
+	public void contextDestroyed(ServletContextEvent arg0) {
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */	
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		ServletContext servletcontext = servletContextEvent.getServletContext();
-		Enumeration<String> initParamNames = servletcontext.getInitParameterNames();
-		
+		ServletContext servletContext = servletContextEvent.getServletContext();
+
+		File tempWriteDir = (File) servletContext
+				.getAttribute("javax.servlet.context.tempdir");
+		servletContext.setAttribute("audioFilePath", FILE_PROTOCOL + tempWriteDir
+				.getAbsolutePath() + File.separatorChar);
+		for (int i = 0; i < AUDIO_FILES.length; i++) {
+			String audioFile = AUDIO_FILES[i];
+			logger.info("Writing " + audioFile + " to webapp temp dir : "
+					+ tempWriteDir);
+			InputStream is = InitializationListener.class.getClassLoader()
+					.getResourceAsStream(AUDIO_DIR + "/" + audioFile);
+			copyToTempDir(is, tempWriteDir, audioFile);
+		} 
+
+		Enumeration<String> initParamNames = servletContext
+				.getInitParameterNames();
 		logger.info("Setting init Params into application context");
 		while (initParamNames.hasMoreElements()) {
 			String initParamName = (String) initParamNames.nextElement();
-			servletcontext.setAttribute(initParamName, servletcontext.getInitParameter(initParamName));
-			logger.info("Param key=" + initParamName + ", value = " + servletcontext.getInitParameter(initParamName));
+			servletContext.setAttribute(initParamName, servletContext
+					.getInitParameter(initParamName));
+			logger.info("Param key=" + initParamName + ", value = "
+					+ servletContext.getInitParameter(initParamName));
+		}
+	}
+
+	private void copyToTempDir(InputStream is, File tempWriteDir,
+			String fileName) {
+		File file = new File(tempWriteDir, fileName);
+
+		final int bufferSize = 1000;
+		BufferedOutputStream fout = null;
+		BufferedInputStream fin = null;
+		try {
+			fout = new BufferedOutputStream(new FileOutputStream(file));
+			fin = new BufferedInputStream(is);
+			byte[] buffer = new byte[bufferSize];
+			int readCount = 0;
+			while ((readCount = fin.read(buffer)) != -1) {
+				if (readCount < bufferSize) {
+					fout.write(buffer, 0, readCount);
+				} else {
+					fout.write(buffer);
+				}
+			}
+		} catch (IOException e) {
+			logger.error("An unexpected exception occured while copying audio files",
+							e);
+		} finally {
+			try {
+				if (fout != null) {
+					fout.flush();
+					fout.close();
+				}
+			} catch (IOException e) {
+				logger.error("An unexpected exception while closing stream",
+								e);
+			}
+			try {
+				if (fin != null) {
+					fin.close();
+				}
+			} catch (IOException e) {
+				logger.error("An unexpected exception while closing stream",
+								e);
+			}			
 		}
 	}
 
