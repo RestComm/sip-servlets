@@ -63,6 +63,10 @@
 		
 		<ant target="deploy-mgmnt"/>
 		
+		<!-- Media server is taken from JBOSS_HOME, assuming you have run the media server
+		build prior to running this release scripts. This will be fixed soon. -->
+		<ant target="deploy-media"/>
+		
 		<ant target="make-final-zip-jboss"></ant>
 		<ant target="make-final-zip-tomcat"></ant>
 		
@@ -79,6 +83,12 @@
 			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
 			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
+	</target>
+	
+	<target name="deploy-media">
+		<copy todir="${base.path}/jboss-${jboss.version}/server/default/deploy">
+			<fileset dir="${sys.JBOSS_HOME}/server/default/deploy" includes="mediaserver.sar/**"/>
+		</copy>
 	</target>
 	
 	<target name="make-final-zip-jboss">

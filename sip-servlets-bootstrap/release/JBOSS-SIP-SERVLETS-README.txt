@@ -9,8 +9,14 @@ check this link out https://sip-servlets.dev.java.net/examples/examples.html
 There is an Application Router Management Console at this location http://localhost:8080/sip-servlets-management.
 This application will help you to more easily configure the default application router.
 
+This package includes Mobicents Media Server ALPHA2 to allows developers to create complete SIP/JEE/Web/Media
+converged applications. For more information about Media Server visit http://groups.google.com/group/mobicents-public/web/mobicents-media-server.
+You can find a real example demonstrating Sip Servlets, JEE, JBoss Seam, Media Server, Text to Speech and
+jBPM working together here https://sip-servlets.dev.java.net/examples/shopping-demo.html.
+
 The default port for SIP is 5080. There is one predeployed sample application - click2call. You can navigate
 to http://localhost:8080/click2call in order to see it in action.
+
 
 
 What is different from JBoss standard version
