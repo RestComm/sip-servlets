@@ -40,6 +40,13 @@
 			<version>1.0.4</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Media dependencies -->
+		<dependency>
+			<groupId>org.mobicents.media</groupId>
+			<artifactId>mscontrol</artifactId>
+			<version>1.0-ALPHA</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- j2ee dependencies -->		
 		<dependency>
 			<groupId>com.sun.facelets</groupId>
@@ -73,7 +80,37 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-	<build>		
+	<build>
+		<!--plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<configuration>
+							<tasks>
+
+
+								<move
+									todir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/"
+									includeemptydirs="false" verbose="true">
+									<fileset
+										dir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/">
+										<include name="**/*-1.0.jar" />
+									</fileset>
+									<mapper type="glob" from="*-1.0.jar"
+										to="*.jar" />
+								</move>
+
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>		
+		</plugins-->
 		<extensions>
 			<extension>
 				<groupId>org.jvnet.wagon-svn</groupId>

@@ -1,15 +1,33 @@
+IMPORTANT NOTE : make JBoss a converged sip servlets AS before following those steps. 
+Checkout the instructions at https://sip-servlets.dev.java.net/installation-jboss.html
+
 Instructions to build and deploy
 --------------------------------
 
 To build:
+0. Install media server in JBoss AS. Follow Oleg's instructions from the google repository.
+1. If the media server's jboss-service.xml doesnt have an IVR endpoint add one like this:
+   <mbean code="org.mobicents.media.server.impl.ivr.IVREndpointManagement" 
+           name="media.mobicents:endpoint=ivr"> 
+        <attribute name="JndiName">media/trunk/IVR/1</attribute>
+        <attribute name="BindAddress">${jboss.bind.address}</attribute>
+        <attribute name="Jitter">60</attribute>
+        <attribute name="PacketizationPeriod">20</attribute>
+        <attribute name="PortRange">1024-65535</attribute>
+        <attribute name="PCMA">true</attribute>
+    </mbean>
+    
 mvn clean install from shopping-demo dir
 
 To deploy:
-drop the generated ear file located in shopping-demo/ear/target in the Jboss deploy directory.
 
+1. use the shopping-demo-dar.properties located in the same dir as this README file 
+2. drop the ear file located in shopping-demo/ear/target into the Jboss deploy directory.
 
 To use
 ------
 
-go to http://localhost:8080/shopping-demo
+1. Start Jboss
+2. Go to http://localhost:8080/shopping-demo and follow instructions on how to play with the example at 
+http://groups.google.com/group/mobicents-public/web/converged-application-demo
 

@@ -26,5 +26,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1-SNAPSHOT/sip-servlets-spec-1.1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/media/mscontrol/1.0-ALPHA/mscontrol-1.0-ALPHA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

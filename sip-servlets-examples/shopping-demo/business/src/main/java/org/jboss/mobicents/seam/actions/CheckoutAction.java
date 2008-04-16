@@ -6,7 +6,7 @@
  */
 package org.jboss.mobicents.seam.actions;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,14 +22,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.servlet.sip.Address;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioSystem;
 
+import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.model.Customer;
 import org.jboss.mobicents.seam.model.Inventory;
 import org.jboss.mobicents.seam.model.Order;
@@ -45,6 +47,15 @@ import org.jboss.seam.annotations.bpm.CreateProcess;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.faces.FacesMessages;
+import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsPeer;
+import org.mobicents.mscontrol.MsPeerFactory;
+import org.mobicents.mscontrol.MsProvider;
+import org.mobicents.mscontrol.MsSession;
+
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
+import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
 
 @Stateful
 @Name("checkout")
@@ -162,16 +173,33 @@ public class CheckoutAction implements Checkout, Serializable {
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
 			URI requestURI = sipFactory.createURI(customerPhone);
 			sipServletRequest.setRequestURI(requestURI);
-			sipServletRequest.send();			
-		} catch (ServletParseException spe) {
-			// TODO: log exception
-			spe.printStackTrace();
-		} catch (IOException ioe) {
-			// TODO log exception
-			ioe.printStackTrace();
+			//TTS file creation		
+			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append(customerName);
+			stringBuffer.append(" has placed an order of $");
+			stringBuffer.append(ammount);
+			stringBuffer.append(". Press 1 to approve and 2 to reject.");				
+			
+			buildAudio(stringBuffer.toString(), "speech.wav");
+			Thread.sleep(300);
+			//Media Server Control Creation
+			MsPeer peer = MsPeerFactory.getPeer();
+			MsProvider provider = peer.getProvider();
+			MsSession session = provider.createSession();
+			MsConnection connection = session.createNetworkConnection("media/trunk/IVR/1");
+			MediaConnectionListener listener = new MediaConnectionListener();
+			listener.setInviteRequest(sipServletRequest);
+			connection.addConnectionListener(listener);
+			connection.modify("$", null);
+			sipApplicationSession.setAttribute("customerName", customerName);
+			sipApplicationSession.setAttribute("amountOrder", amount);
+			sipApplicationSession.setAttribute("connection", connection);			
 		} catch (UnsupportedOperationException uoe) {
 			// TODO log exception
 			uoe.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}				
 		
 //		try {
@@ -202,6 +230,50 @@ public class CheckoutAction implements Checkout, Serializable {
 //		}
 	}
 
+	private void buildAudio(String text, String filename) throws Exception {
+		VoiceManager mgr = VoiceManager.getInstance();
+		Voice voice = mgr.getVoice("kevin16");
+		voice.allocate();
+		File speech = new File(filename);
+		SingleFileAudioPlayer player = new SingleFileAudioPlayer(getBasename(speech.getAbsolutePath()), getAudioType(filename));
+		voice.setAudioPlayer(player);
+		voice.startBatch();
+		boolean ok = voice.speak(text);
+		voice.endBatch();
+		player.close();
+		voice.deallocate();
+	}
+	
+	private static String getBasename(String path) {
+		int index = path.lastIndexOf(".");
+		if (index == -1) {
+			return path;
+		} else {
+			return path.substring(0, index);
+		}
+	}
+	
+	private static String getExtension(String path) {
+		int index = path.lastIndexOf(".");
+		if (index == -1) {
+			return null;
+		} else {
+			return path.substring(index + 1);
+		}
+	}
+	
+	private static AudioFileFormat.Type getAudioType(String file) {
+		AudioFileFormat.Type[] types = AudioSystem.getAudioFileTypes();
+		String extension = getExtension(file);
+
+		for (int i = 0; i < types.length; i++) {
+			if (types[i].getExtension().equals(extension)) {
+				return types[i];
+			}
+		}
+		return null;
+	}
+	
 	@Remove
 	public void destroy() {
 	}
