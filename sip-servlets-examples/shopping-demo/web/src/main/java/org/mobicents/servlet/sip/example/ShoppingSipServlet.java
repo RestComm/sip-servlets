@@ -92,19 +92,15 @@ public class ShoppingSipServlet
 				authInfo.addAuthInfo(
 						response.getStatus(), 
 						response.getChallengeRealms().next(), 
-						(String) sipApplicationSession.getAttribute("caller"), 
+						"650390127", 
 						(String) sipApplicationSession.getAttribute("callerPassword"));
-				Address fromAddress = sipFactory.createAddress((String) sipApplicationSession.getAttribute("caller"));
-				String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");
-				String customerContact = (String) sipApplicationSession.getAttribute("customerContact");
-				if(sipApplicationSession.getAttribute("adminApproval") != null) {
-					customerContact = (String) sipApplicationSession.getAttribute("adminContactAddress");					
-				}			
-				Address toAddress = sipFactory.createAddress(customerPhone);
-				SipServletRequest challengeRequest = 
-					sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
-				URI requestURI = sipFactory.createURI(customerContact);			
-				challengeRequest.setRequestURI(requestURI);				
+				SipServletRequest originalRequest = response.getRequest();
+				SipServletRequest challengeRequest = sipFactory.createRequest(
+						response.getApplicationSession(), 
+						originalRequest.getMethod(), 
+						originalRequest.getFrom(), 
+						originalRequest.getTo());								
+				challengeRequest.setRequestURI(originalRequest.getRequestURI());
 				challengeRequest.addAuthHeader(response, authInfo);
 				MsConnection connection =  (MsConnection) 
 					sipApplicationSession.getAttribute("connection");
@@ -178,8 +174,13 @@ public class ShoppingSipServlet
 		SipServletResponse resp = req.createResponse(response);				
 		Address address = req.getAddressHeader(CONTACT_HEADER);
 		String fromURI = req.getFrom().getURI().toString();
-
-		if(address.getExpires() == 0) {			
+		
+		int expires = address.getExpires();		
+		if(expires < 0) {
+			expires = req.getExpires();
+		}
+		
+		if(expires == 0) {			
 			users.remove(fromURI);
 			logger.info("User " + fromURI + " unregistered");
 		} else {			
@@ -192,7 +193,7 @@ public class ShoppingSipServlet
 			}
 			logger.info("User " + fromURI + 
 					" registered this contact address " + address + 
-					" with an Expire time of " + address.getExpires());
+					" with an Expire time of " + expires);
 		}							
 		
 		resp.send();
