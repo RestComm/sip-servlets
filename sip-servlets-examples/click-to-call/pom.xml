@@ -35,20 +35,7 @@
 			<artifactId>commons-logging-api</artifactId>
 			<version>1.0.4</version>
 			<scope>provided</scope>
-		</dependency>
-		<!-- JAIN-SIP dependency for the shootist -->
-		<dependency>
-			<groupId>javax.sip</groupId>
-			<artifactId>jain-sip-api</artifactId>
-			<version>1.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.sip</groupId>
-			<artifactId>jain-sip-ri</artifactId>
-			<version>1.2</version>
-			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		<!-- j2ee dependencies -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
