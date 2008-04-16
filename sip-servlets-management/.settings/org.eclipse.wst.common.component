@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+<wb-module deploy-name="sip-servlets-management">
+<wb-resource deploy-path="/" source-path="/WebContent"/>
+<wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+<wb-resource deploy-path="/" source-path="/build/gwtOutput/org.mobicents.servlet.management.SipServletsManagement"/>
+<wb-resource deploy-path="/" source-path="/build/gwtOutput/com.gwt.components.User"/>
+<property name="context-root" value="sip-servlets-management"/>
+<property name="java-output-path" value="build/classes"/>
+</wb-module>
+</project-modules>

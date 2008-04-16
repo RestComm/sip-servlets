@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="deploy" name="Mobicents_Management_Console">
+	<property environment="system" />
+	<property file="build.properties"/>
+	<property name="war-name" value="sip-servlets-management.war" />
+
+	<property name="project.bin" value="bin" />
+	<property name="project.src" value="src" />
+	<property name="project.webcontent" value="WebContent" />
+	<property name="project.webcontent.lib" value="WebContent/WEB-INF/lib" />
+	<property name="project.modified.lib" value="lib-modified/" />
+	<property name="project.gwt" value="GWT/org.mobicents.servlet.management.SipServletsManagement" />
+	<property name="project.lib" value="lib" />
+	<property name="project.build" value="build" />
+	<property name="project.build.tmp" value="${project.build}/tmp" />
+	<property name="project.war" value="${project.build}/${war-name}" />
+	<property name="project.war.classes" value="${project.war}/WEB-INF/classes" />
+	<property name="project.war.lib" value="${project.war}/WEB-INF/lib" />
+	<property name="project.public.lib" value="src/org/mobicents/servlet/management/public/lib"/>
+
+	<property name="jboss.home" value="${system.JBOSS_HOME}" />
+	<property name="jboss.deploy" value="${jboss.home}/server/default/deploy" />
+	
+	
+	<target name="init">
+		<fail message="JBOSS_HOME environment variable is not set.">
+			<condition>
+				<not>
+					<isset property="system.JBOSS_HOME" />
+				</not>
+			</condition>
+		</fail>
+		<fail message="GWT_HOME environment variable is not set. YOU MUST USE GWT 1.4">
+			<condition>
+				<not>
+					<isset property="system.GWT_HOME" />
+				</not>
+			</condition>
+		</fail>
+
+		<path id="project.classpath">
+			<pathelement path="${project.modified.lib}/gwt-user.jar" />
+			<pathelement path="${project.modified.lib}/servlet-api.jar" />
+			<pathelement path="${project.public.lib}/gwt-dnd-2.0.7.jar"/>
+			<pathelement path="${project.public.lib}/gwtext.jar"/>
+			<pathelement path="${M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/0.3-SNAPSHOT/sip-servlets-impl-0.3-SNAPSHOT.jar"/>
+			<pathelement path="${M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/1.1-SNAPSHOT/sip-servlets-spec-1.1-SNAPSHOT.jar"/>
+			<pathelement path="${M2_REPO}/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar"/>
+			<pathelement path="${M2_REPO}/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
+		</path>
+
+		<path id="project.classpath.gwt">
+			<pathelement path="src" />
+			<path refid="project.classpath"/>
+			<fileset dir="${system.GWT_HOME}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+
+		<mkdir dir="${project.bin}" />
+		<mkdir dir="${project.build.tmp}" />
+		<mkdir dir="${project.war}" />
+		<mkdir dir="${project.war.classes}" />
+		<mkdir dir="${project.war.lib}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${project.build}" />
+		<delete dir="${project.bin}"/>
+	</target>
+
+	<target name="compile.gwt" depends="init">
+		<java classname="com.google.gwt.dev.GWTCompiler" fork="true" failonerror="true">
+			<classpath>
+				<path refid="project.classpath.gwt" />
+			</classpath>
+			<!-- THIS CAN COLIDE WITH ECLIPSE, JVM, JBOSS, OR ANYTHING ELSE THAT RESERVES HEAP STACK...., BUT OTHERWISE MMC DOES NTO COMPILE ANYMORE -->
+			<jvmarg value="-Xmx768M"/>
+			<arg value="-out" />
+			<arg value="GWT" />
+			<arg value="org.mobicents.servlet.management.SipServletsManagement" />
+
+		</java>
+	</target>
+
+	<target name="shell.gwt" depends="init">
+		<java classname="com.google.gwt.dev.GWTShell" fork="true">
+			<classpath>
+				<path refid="project.classpath.gwt" />
+			</classpath>
+
+			<arg value="-out" />
+			<arg value="GWT" />
+			<arg value="org.mobicents.servlet.management.SipServletsManagement/SipServletsManagement.html" />
+
+		</java>
+	</target>
+
+
+	<target name="compile" depends="init">
+		<javac destdir="${project.bin}" srcdir="${project.src}"
+			source="1.5" target="1.5">
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="war" depends="clean,compile,compile.gwt">
+		<copy todir="${project.war}">
+			<fileset dir="${project.webcontent}" />
+			<fileset dir="${project.gwt}" />
+		</copy>
+		<copy verbose="true" todir="${project.war}/WEB-INF/lib/">
+			<fileset dir="${project.modified.lib}/" includes="gwt-servlet*"/>
+		</copy>
+		<copy todir="${project.war.classes}">
+			<fileset dir="${project.bin}" includes="**/*.class" />
+		</copy>
+
+		<delete file="${project.build.tmp}/${war-name}" />
+		<jar destfile="${project.build.tmp}/${war-name}">
+			<fileset dir="${project.build}/${war-name}" />
+		</jar>
+	</target>
+
+	<target name="deploy" depends="war">
+		<copy todir="${jboss.deploy}" file="${project.build.tmp}/${war-name}" />
+	</target>
+
+	<target name="undeploy">
+		<delete file="${jboss.deploy}/${war-name}" />
+	</target>
+
+	<target name="redeploy" depends="undeploy,deploy" />
+</project>
