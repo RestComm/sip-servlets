@@ -26,6 +26,7 @@ import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
@@ -80,8 +81,9 @@ public class CheckoutAction implements Checkout, Serializable {
 	@Out(value = "cutomerphone", scope = ScopeType.BUSINESS_PROCESS, required = false)
 	String customerPhone;
 
-	@Resource(mappedName="java:/sip/SipFactory") SipFactory sipFactory;
-	@Resource(mappedName="java:/sip/TimerService") TimerService sipTimerService;
+	@Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	@Resource(mappedName="java:/sip/shopping-demo/TimerService") TimerService sipTimerService;
+	@Resource(mappedName="java:/sip/shopping-demo/SipSessionsUtil") SipSessionsUtil sipSessionsUtil;
 	
 	@Begin(nested = true, pageflow = "checkout")
 	public void createOrder() {
@@ -147,13 +149,13 @@ public class CheckoutAction implements Checkout, Serializable {
 
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	private void fireEvent(long orderId, BigDecimal ammount,
-			String customerName, String customerPhone) {
-		//TODO replace by Sip Servlets call
+			String customerName, String customerPhone) {		
 		System.out.println("SIPTIMERSERVICE" + sipTimerService);
 		System.out.println("SIPFACTORY" + sipFactory);
-		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSessionByAppName("shopping-demo");
+		System.out.println("SIPSESSIONUTIL" + sipSessionsUtil);		
 		//TODO remove hard coded uri from address header
 		try {
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			Address fromAddress = sipFactory.createAddress("sip:admin@sip-servlets.com");
 			Address toAddress = sipFactory.createAddress(customerPhone);
 			SipServletRequest sipServletRequest = 
@@ -167,7 +169,10 @@ public class CheckoutAction implements Checkout, Serializable {
 		} catch (IOException ioe) {
 			// TODO log exception
 			ioe.printStackTrace();
-		}		
+		} catch (UnsupportedOperationException uoe) {
+			// TODO log exception
+			uoe.printStackTrace();
+		}				
 		
 //		try {
 //

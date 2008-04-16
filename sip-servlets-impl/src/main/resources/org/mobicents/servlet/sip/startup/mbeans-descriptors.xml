@@ -303,6 +303,30 @@
                returnType="javax.naming.directory.DirContext">    
     </operation>
     
+    <operation name="getSipFactoryFacade"
+               description="Return the sip factory facade associated with this sip servlets application"
+               impact="INFO"
+               returnType="javax.servlet.sip.SipFactory">    
+    </operation>
+    
+    <operation name="getSipSessionsUtil"
+               description="Return the sip sessions util associated with this sip servlets application"
+               impact="INFO"
+               returnType="javax.servlet.sip.SipSessionsUtil">    
+    </operation>
+    
+    <operation name="getTimerService"
+               description="Return the timer service associated with this sip servlets application"
+               impact="INFO"
+               returnType="javax.servlet.sip.TimerService">    
+    </operation>
+    
+    <operation name="getApplicationName"
+               description="Return the sip application name associated with this sip servlets application"
+               impact="INFO"
+               returnType="java.lang.String">    
+    </operation>
+    
   </mbean>
   
   <mbean name="SipStandardContextValve"

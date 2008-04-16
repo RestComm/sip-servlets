@@ -15,7 +15,7 @@
 	<name>Shopping Demo EAR</name>
 	<url>http://sip-servlets.dev.java.net</url>
 	<dependencies>
-		<!-- j2ee dependencies -->		
+		<!-- j2ee dependencies -->
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam</artifactId>
@@ -36,7 +36,7 @@
 			</exclusions>
 			<type>ejb</type>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-el</artifactId>
@@ -118,7 +118,7 @@
 				</exclusion>
 			</exclusions>
 			<type>jar</type>
-		</dependency>		
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -135,7 +135,9 @@
 					<modules>
 						<jarModule>
 							<groupId>org.hibernate</groupId>
-							<artifactId>hibernate-commons-annotations</artifactId>
+							<artifactId>
+								hibernate-commons-annotations
+							</artifactId>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
 						<jarModule>
@@ -151,12 +153,8 @@
 						<jarModule>
 							<groupId>org.jboss.seam</groupId>
 							<artifactId>jboss-el</artifactId>
-							<bundleDir>lib</bundleDir>							
+							<bundleDir>lib</bundleDir>
 						</jarModule>
-						<ejbModule>
-				                	<groupId>org.jboss.seam</groupId>
-							<artifactId>jboss-seam</artifactId>							
-				             	</ejbModule>
 						<jarModule>
 							<groupId>commons-beanutils</groupId>
 							<artifactId>commons-beanutils</artifactId>
@@ -167,21 +165,39 @@
 							<artifactId>lucene-core</artifactId>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
-             					<ejbModule>
-				                	<groupId>org.mobicents.servlet.sip.example</groupId>
-							<artifactId>shopping-demo-business</artifactId>				               		
-				             	</ejbModule>
 						<webModule>
-				                	<groupId>org.mobicents.servlet.sip.example</groupId>
-							<artifactId>shopping-demo-web</artifactId>				               		
+							<groupId>
+								org.mobicents.servlet.sip.example
+							</groupId>
+							<artifactId>shopping-demo-web</artifactId>
 							<contextRoot>/shopping-demo</contextRoot>
-				             	</webModule>
-				        </modules>
-          				<jboss>
-						<version>4</version>
-						<loader-repository>seam.jboss.org:loader=/shopping-demo</loader-repository>				
+						</webModule>
+						<ejbModule>
+							<groupId>
+								org.mobicents.servlet.sip.example
+							</groupId>
+							<artifactId>
+								shopping-demo-business
+							</artifactId>
+						</ejbModule>
+						<ejbModule>
+							<groupId>org.jboss.seam</groupId>
+							<artifactId>jboss-seam</artifactId>
+						</ejbModule>
+					</modules>
+					<jboss>
+						<version>4.2</version>
+						<loader-repository>
+							seam.jboss.org:loader=/shopping-demo
+						</loader-repository>
+						<module-order>implicit</module-order>
+						<data-sources>
+							<data-source>
+								ShoppingDemo-ds.xml
+							</data-source>
+						</data-sources>
 					</jboss>
-			        </configuration>
+				</configuration>
 			</plugin>
 		</plugins>
 		<extensions>

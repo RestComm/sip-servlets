@@ -26,6 +26,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.TimerService;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
@@ -609,6 +611,20 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public SipFactoryFacade getSipFactoryFacade() {
 		return sipFactoryFacade;
 	}		
+	
+	/**
+	 * @return the sipSessionsUtil
+	 */
+	public SipSessionsUtil getSipSessionsUtil() {
+		return sipSessionsUtil;
+	}
+	
+	/**
+	 * @return the timerService
+	 */
+	public TimerService getTimerService() {
+		return TimerServiceImpl.getInstance();
+	}
 	
 	/**
      * Get naming context full name.

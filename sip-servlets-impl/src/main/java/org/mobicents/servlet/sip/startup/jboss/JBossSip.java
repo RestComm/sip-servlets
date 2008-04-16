@@ -30,16 +30,11 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.security.jacc.PolicyContext;
-import javax.servlet.sip.SipFactory;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
-import org.apache.naming.ContextAccessController;
 import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.deployment.SubDeployerExt;
@@ -48,17 +43,13 @@ import org.jboss.security.plugins.JaasSecurityManagerServiceMBean;
 import org.jboss.system.ServiceControllerMBean;
 import org.jboss.system.server.Server;
 import org.jboss.system.server.ServerImplMBean;
-import org.jboss.util.naming.NonSerializableFactory;
-import org.jboss.util.naming.Util;
 import org.jboss.web.AbstractWebDeployer;
 import org.jboss.web.tomcat.security.HttpServletRequestPolicyContextHandler;
 import org.jboss.web.tomcat.service.DeployerConfig;
 import org.jboss.web.tomcat.service.JBossWebMBean;
 import org.jboss.web.tomcat.service.session.SessionIDGenerator;
-import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
-import org.mobicents.servlet.sip.startup.SipNamingContextListener;
 
 
 /**
@@ -599,25 +590,8 @@ public class JBossSip extends AbstractConvergedContainer
       
       // start the sip application disptacher after the connectors have been started
       // so that serverl can act as UAC in servletInitialized callback
-      ObjectName sipApplicationDispatcher = new ObjectName(catalinaDomain + ":type=SipApplicationDispatcher");
-      SipFactory sipFactory = (SipFactory) server.invoke(sipApplicationDispatcher,"getSipFactory", args, sig);
-      server.invoke(sipApplicationDispatcher,"start", args, sig);
-      
-      try {
-			InitialContext iniCtx = new InitialContext();
-			Context globalEnvCtx = (Context) iniCtx.lookup("java:/");
-//			Context sipServletsSubcontext = Util.createSubcontext(globalEnvCtx, SipNamingContextListener.SIP_SERVLETS_SUBCONTEXT);			
-			Context sipSubcontext = Util.createSubcontext(globalEnvCtx,SipNamingContextListener.SIP_SUBCONTEXT);
-//			Context applicationNameSubcontext = sipSubcontext.createSubcontext(applicationName);			
-			NonSerializableFactory.rebind(sipSubcontext,SipNamingContextListener.SIP_FACTORY_JNDI_NAME, sipFactory);
-//			sipSubcontext.bind(SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
-			Util.bind(sipSubcontext,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME, TimerServiceImpl.getInstance());
-			ContextAccessController.setReadOnly(getName());
-		} catch (NamingException e) {
-			ContextAccessController.setReadOnly(getName());
-			log.error("Impossible to get the naming context ", e);
-			throw new IllegalStateException(e);
-		}
+      ObjectName sipApplicationDispatcher = new ObjectName(catalinaDomain + ":type=SipApplicationDispatcher");      
+      server.invoke(sipApplicationDispatcher,"start", args, sig);            
       
       // Notify listeners that connectors have started processing requests
       sendNotification(new Notification(TOMCAT_CONNECTORS_STARTED,
@@ -665,7 +639,7 @@ public class JBossSip extends AbstractConvergedContainer
    public AbstractWebDeployer getDeployer(DeploymentInfo di) throws Exception
    {
       ClassLoader loader = di.ucl;
-      Class deployerClass = loader.loadClass("org.jboss.web.tomcat.service.TomcatDeployer");
+      Class deployerClass = loader.loadClass("org.mobicents.servlet.sip.startup.jboss.TomcatConvergedDeployer");
       AbstractWebDeployer deployer = (AbstractWebDeployer) deployerClass.newInstance();
       DeployerConfig config = new DeployerConfig();
       config.setDefaultSecurityDomain(this.defaultSecurityDomain);

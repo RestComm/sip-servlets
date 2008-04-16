@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>shopping-demo</app-name>
+	<display-name>Shopping Demo Sip Servlet</display-name>
+	<description>Shopping Demo Sip Servlet</description>
+	
+	<main-servlet>
+		ShoppingSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>ShoppingSipServlet</servlet-name>
+		<display-name>ShoppingSipServlet</display-name>
+		<description>Shopping SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.ShoppingSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>
