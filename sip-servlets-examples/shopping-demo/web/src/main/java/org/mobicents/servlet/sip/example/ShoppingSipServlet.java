@@ -85,10 +85,10 @@ public class ShoppingSipServlet
 		if(response.getStatus() == SipServletResponse.SC_UNAUTHORIZED || 
 				response.getStatus() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
 			// Avoid re-sending if the auth repeatedly fails.
-			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
+			if(!"true".equals(response.getApplicationSession().getAttribute("FirstResponseRecieved")))
 			{
 				SipApplicationSession sipApplicationSession = response.getApplicationSession();
-				getServletContext().setAttribute("FirstResponseRecieved", "true");
+				sipApplicationSession.setAttribute("FirstResponseRecieved", "true");
 				AuthInfo authInfo = sipFactory.createAuthInfo();
 				authInfo.addAuthInfo(
 						response.getStatus(), 
