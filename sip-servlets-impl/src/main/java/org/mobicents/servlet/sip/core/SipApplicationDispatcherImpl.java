@@ -229,7 +229,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		// outbound interfaces set here and not in sipstandardcontext because
 		// depending on jboss or tomcat context can be started before or after
 		// connectors
-		setOutboundInterfaces();
+		resetOutboundInterfaces();
 		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
 		for (SipContext sipContext : applicationDeployed.values()) {
 			notifySipServletsListeners(sipContext);
@@ -299,7 +299,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {
+	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {		
 		applicationDeployed.put(sipApplicationName, sipApplication);
 		List<String> newlyApplicationsDeployed = new ArrayList<String>();
 		newlyApplicationsDeployed.add(sipApplicationName);
@@ -1221,7 +1221,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	/**
 	 * Check whether or not the triplet host, port and transport are corresponding to an interface
-	 * @param host canbe hostname or ipaddress
+	 * @param host can be hostname or ipaddress
 	 * @param port port number
 	 * @param transport transport used
 	 * @return true if the triplet host, port and transport are corresponding to an interface
@@ -1618,7 +1618,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void addSipProvider(SipProvider sipProvider) {
 		sipFactoryImpl.addSipProvider(sipProvider);
 		if(started) {
-			setOutboundInterfaces();
+			resetOutboundInterfaces();
 		}
 	}
 	/*
@@ -1628,7 +1628,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void removeSipProvider(SipProvider sipProvider) {
 		sipFactoryImpl.removeSipProvider(sipProvider);
 		if(started) {
-			setOutboundInterfaces();
+			resetOutboundInterfaces();
 		}
 	}
 	/*
@@ -1731,7 +1731,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * set the outbound interfaces on all servlet context of applications deployed
 	 */
-	private void setOutboundInterfaces() {
+	private void resetOutboundInterfaces() {
 		List<SipURI> outboundInterfaces = getOutboundInterfaces();
 		for (SipContext sipContext : applicationDeployed.values()) {
 			sipContext.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
