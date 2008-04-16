@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<packaging>pom</packaging>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
 	<name>Sip Servlets Parent Pom</name>
 	<url>http://sip-servlets.dev.java.net</url>
 	<issueManagement>
@@ -151,15 +149,9 @@
 		</repository>
 	</distributionManagement>
 	<scm>
-		<connection>
-			scm:svn:https://svn.dev.java.net/svn/sip-servlets/trunk/
-		</connection>
-		<developerConnection>
-			scm:svn:https://svn.dev.java.net/svn/sip-servlets/trunk/
-		</developerConnection>
-		<url>
-			https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/
-		</url>
+		<connection>scm:svn:https://svn.dev.java.net/svn/sip-servlets/tags/sip-servlets-bootstrap-0.3</connection>
+		<developerConnection>scm:svn:https://svn.dev.java.net/svn/sip-servlets/tags/sip-servlets-bootstrap-0.3</developerConnection>
+		<url>https://sip-servlets.dev.java.net/source/browse/sip-servlets/tags/sip-servlets-bootstrap-0.3</url>
 	</scm>
 	<modules>
 		<module>../sip-servlets-spec</module>
