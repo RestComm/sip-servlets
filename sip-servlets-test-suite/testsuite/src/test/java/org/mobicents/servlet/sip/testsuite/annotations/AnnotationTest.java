@@ -89,7 +89,7 @@ public class AnnotationTest extends SipServletTestCase implements SipListener {
 		context.setPath("sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
-		tomcat.deployContext(context);
+		assertTrue(tomcat.deployContext(context));
 	}
 
 	@Override

@@ -95,7 +95,7 @@ public class UACvsUASSecurityTest extends SipServletTestCase implements SipListe
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
 				+ "org/mobicents/servlet/sip/testsuite/security/tomcat-users.xml");
 		context.setRealm(realm);
-		tomcat.deployContext(context);
+		assertTrue(tomcat.deployContext(context));
 	}
 
 	@Override
