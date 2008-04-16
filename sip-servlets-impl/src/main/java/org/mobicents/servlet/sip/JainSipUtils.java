@@ -172,7 +172,7 @@ public class JainSipUtils {
 			SipProvider sipProvider = it.next();
 			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
 			if(listeningPoint != null && 
-					listeningPoint.getIPAddress().equals(ipAddress) &&
+					(listeningPoint.getIPAddress().equals(ipAddress) || listeningPoint.getIPAddress().equals("0.0.0.0"))  &&
 					listeningPoint.getPort() == port) {
 				return listeningPoint;
 			}
