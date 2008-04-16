@@ -74,13 +74,20 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		
 		if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
 		
+		SipURI obi = null;
+		
 		for(SipURI uri:outboundInterfaces) {
 			if(uri.toString().indexOf("127.0.0.1")>0) {
 				// pick the lo interface, since its universal on all machines
 				proxy.setOutboundInterface(uri);
+				obi = uri;
 				break;
 			}
 		}
+		
+		if(obi == null) throw new NullPointerException("No loopback interface found.");
+		
+		
 		//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
 		proxy.setRecordRoute(true);
 		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
