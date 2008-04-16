@@ -17,6 +17,7 @@ Shopping Demo
 
 
     * Once User places an order, he/she receives call to confirm for the same.
+    
     	* User presses 1 and order state remains as OPEN and flow continues. If User presses 2 order gets CANCELLED and flow completes
 
     * If order is less than 100$ it gets approved automatically as per the rule set by jBPM and User receives call to set delivery date and time.
@@ -24,10 +25,13 @@ Shopping Demo
     * If order is greater than 100$, Admin has to either approve or reject the order.
 
     * If Admin doesn't log on the site and take necessary action, call is initiated to Admin and Admin preses DTMF to take necessary action
+    
     	* Admin presses 1 and order state changes to PROCESSING and flow continues. If Admin presses 2 order gets CANCELLED and flow completes.
+    	
 		* User id for Admin is 'manager' and password is 'password'
 
     * Once order is approved by Admin, a call is initiated to User to set the date and time for delivery
+    
 		* Please note that for orders greater than 100$ call to User to set delivery date and time is only initiated if Admin logs on to system and approves. This is becuase the logic is tied with jBPM process and I haven't yet taken care that in SBB.
 
     * User sets delivery date and time by punching numbers on his/her phone. As soon as this is done user can see the delivery date and time set on 'My Orders' tab and click on 'Show Details' for corresponding order.
@@ -55,7 +59,7 @@ Shopping Demo
 
 ** From the source
 
-	Setup your Jboss AS to become a converged container as explained {{{installation-jboss.html}here}}.
+	Setup your Jboss AS to become a converged container as explained {{{/installation-jboss.html}here}}.
 
 	Please check out the shopping demo example located under this 
 	{{{https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/shopping-demo}location}} 
@@ -77,7 +81,9 @@ Shopping Demo
 	For SIP Phone settings you can see examples at {{{http://groups.google.com/group/mobicents-public/web/sip-phone-settings-for-converged-demo?hl=en}SIP Phone Settings for Converged Demo}} 
 
     * After creation of account once you check out the cart a call will be received on SIP Phone for confirmation.
+    
     * You can check your Order Status via 'My Orders' tab
-    * After 30000 milli secs ( value specified for order.approval.waitingtime in convergeddemo.properties ) 
+    
+    * After 30000 milli secs ( value specified for order.approval.waitingtime in convergeddemo.properties) 
     call is received by Admin to confirm the order for Shipping or Cancel if order is greater than 100$ or 
     a call will be received on the sip phone for choosing delivery date if order is lower than 100$ 

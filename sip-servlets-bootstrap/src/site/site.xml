@@ -21,6 +21,7 @@
       	<item name="Speed Dial/Location Service" href="examples/speeddial_locationservice.html"/>
       	<item name="Click to Call" href="examples/click2call.html"/>
       	<item name="Chat Server" href="examples/chatserver.html"/>
+      	<item name="Shopping Demo" href="examples/shopping-demo.html"/>
       </item>
       <item name="QA" href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/"/>
       <item name="Roadmap" href="roadmap.html"/>

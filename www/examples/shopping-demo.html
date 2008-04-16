@@ -60,10 +60,50 @@
       
             
       
+            
+            
               
-        <li class="collapsed">
+            <li class="expanded">
               <a href="../examples/examples.html">Examples</a>
-              </li>
+                <ul>
+                  
+    <li class="none">
+              <a href="../examples/call_blocking.html">Call Blocking</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/call_forwarding.html">Call Forwarding</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/call_controller.html">Call Controller</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/speed_dial.html">Speed Dial</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/location_service.html">Location Service</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/speeddial_locationservice.html">Speed Dial/Location Service</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/click2call.html">Click to Call</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/chatserver.html">Chat Server</a>
+        </li>
+                  
+    <li class="none">
+              <strong>Shopping Demo</strong>
+        </li>
+              </ul>
+        </li>
               
     <li class="none">
               <a href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/">QA</a>
@@ -154,11 +194,19 @@ This application only works on a full JEE Container, in other words it will only
 <div class="section"><h3>Service Description</h3>
 <p>The idea is to have a converged application that shows how JEE application can leverage Sip Servlets to have voice, message and data transfer seamlessly.&#160; This example is built using Seam, Mobicents Sip Servlets and Mobicents Media Server deployed on Jboss AS. </p>
 <div class="section"><h4>Application Flow </h4>
-<ul><li>Once User places an order, he/she receives call to confirm for the same. * User presses 1 and order state remains as OPEN and flow continues. If User presses 2 order gets CANCELLED and flow completes</li>
+<ul><li>Once User places an order, he/she receives call to confirm for the same.<ul><li>User presses 1 and order state remains as OPEN and flow continues. If User presses 2 order gets CANCELLED and flow completes</li>
+</ul>
+</li>
 <li>If order is less than 100$ it gets approved automatically as per the rule set by jBPM and User receives call to set delivery date and time.</li>
 <li>If order is greater than 100$, Admin has to either approve or reject the order.</li>
-<li>If Admin doesn't log on the site and take necessary action, call is initiated to Admin and Admin preses DTMF to take necessary action * Admin presses 1 and order state changes to PROCESSING and flow continues. If Admin presses 2 order gets CANCELLED and flow completes. * User id for Admin is 'manager' and password is 'password'</li>
-<li>Once order is approved by Admin, a call is initiated to User to set the date and time for delivery * Please note that for orders greater than 100$ call to User to set delivery date and time is only initiated if Admin logs on to system and approves. This is becuase the logic is tied with jBPM process and I haven't yet taken care that in SBB.</li>
+<li>If Admin doesn't log on the site and take necessary action, call is initiated to Admin and Admin preses DTMF to take necessary action<ul><li>Admin presses 1 and order state changes to PROCESSING and flow continues. If Admin presses 2 order gets CANCELLED and flow completes.<ul><li>User id for Admin is 'manager' and password is 'password'</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Once order is approved by Admin, a call is initiated to User to set the date and time for delivery<ul><li>Please note that for orders greater than 100$ call to User to set delivery date and time is only initiated if Admin logs on to system and approves. This is becuase the logic is tied with jBPM process and I haven't yet taken care that in SBB.</li>
+</ul>
+</li>
 <li>User sets delivery date and time by punching numbers on his/her phone. As soon as this is done user can see the delivery date and time set on 'My Orders' tab and click on 'Show Details' for corresponding order.</li>
 <li>Once again the ball roles on to Admin, and he/she has to log in the site and mark the order for Shipping</li>
 <li>As soon as Admin marks the order for Shipping, call is initiated to User to remind him/her date and time when the shipment will arrive.</li>
@@ -182,7 +230,7 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 <p>You can now run your Jboss AS Converged Container.</p>
 </div>
 <div class="section"><h4>From the source</h4>
-<p>Setup your Jboss AS to become a converged container as explained <a href="installation-jboss.html">here</a>
+<p>Setup your Jboss AS to become a converged container as explained <a href="/installation-jboss.html">here</a>
 .</p>
 <p>Please check out the shopping demo example located under this <a href="https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/sip-servlets-examples/shopping-demo" class="externalLink">location</a>
  from the svn repository. Follow the instructions in the README.txt to build and run the example.</p>
@@ -195,7 +243,9 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 <p>Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone</p>
 <p>For SIP Phone settings you can see examples at <a href="http://groups.google.com/group/mobicents-public/web/sip-phone-settings-for-converged-demo?hl=en" class="externalLink">SIP Phone Settings for Converged Demo</a>
  </p>
-<ul><li>After creation of account once you check out the cart a call will be received on SIP Phone for confirmation. * You can check your Order Status via 'My Orders' tab * After 30000 milli secs ( value specified for order.approval.waitingtime in convergeddemo.properties ) call is received by Admin to confirm the order for Shipping or Cancel if order is greater than 100$ or a call will be received on the sip phone for choosing delivery date if order is lower than 100$ </li>
+<ul><li>After creation of account once you check out the cart a call will be received on SIP Phone for confirmation.</li>
+<li>You can check your Order Status via 'My Orders' tab</li>
+<li>After 30000 milli secs ( value specified for order.approval.waitingtime in convergeddemo.properties) call is received by Admin to confirm the order for Shipping or Cancel if order is greater than 100$ or a call will be received on the sip phone for choosing delivery date if order is lower than 100$ </li>
 </ul>
 </div>
 </div>
