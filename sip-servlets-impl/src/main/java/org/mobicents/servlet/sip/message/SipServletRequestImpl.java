@@ -224,7 +224,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							String transport = ((ViaHeader) request
 									.getHeader(ViaHeader.NAME)).getTransport();					
 							ContactHeader contactHeader = JainSipUtils
-									.createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
+									.createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
 							response.setHeader(contactHeader);
 						}
 					}
@@ -702,19 +702,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(contactHeader == null) {
 					FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 					//TODO what about other schemes ?
-					String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();					
-					ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
+					String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();										
 					// Create the contact name address.
-					javax.sip.address.SipURI contactURI = 
-						SipFactories.addressFactory.createSipURI(fromName, listeningPoint.getIPAddress());
-					contactURI.setPort(listeningPoint.getPort());
+					contactHeader = 
+						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), transport, fromName);										
 
-					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(contactURI);
-
-					// Add the contact address.
-					contactAddress.setDisplayName(fromName);
-
-					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);
 					request.addHeader(contactHeader);
 				}				
 				if(logger.isDebugEnabled()) {
@@ -722,6 +714,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
+				
+				super.session.setSessionCreatingTransaction(ctx);
 				
 				Dialog dialog = ctx.getDialog();
 				if (dialog == null && this.createDialog) {					
@@ -873,6 +867,166 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		this.routingState = routingState;	
 	}
 
+//	private void md5Computation() {
+//		// Now can begin to build the authentication header using a MD5
+//		// digest scheme
+//		WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response
+//				.getHeader(WWWAuthenticateHeader.NAME);
+//		ProxyAuthenticateHeader proxyAuthenticateHeader = (ProxyAuthenticateHeader) response
+//				.getHeader(ProxyAuthenticateHeader.NAME);
+//
+//		String realm = null;
+//		String nonce = null;
+//		// Check whether we've received an wwwAuthenticationHeader
+//		// or a ProxyAuthenticationHeader from the proxy server
+//		if (wwwAuthenticateHeader != null) {
+//			if (log.isDebugEnabled()) {
+//				log.debug("wwwAuthenticateHeader found!");
+//			}
+//			// Retrieve the realm from the authentication header
+//			realm = wwwAuthenticateHeader.getRealm();
+//			// Retrieve the nonce from the wwwAuthenticateHeader
+//			nonce = wwwAuthenticateHeader.getNonce();
+//
+//		} else if (proxyAuthenticateHeader != null) {
+//			if (log.isDebugEnabled()) {
+//				log.debug("ProxyAuthenticateHeader found!");
+//			}
+//			// Retrieve the realm from the authentication header
+//			realm = proxyAuthenticateHeader.getRealm();
+//			// Retrieve the nonce from the wwwAuthenticateHeader
+//			nonce = proxyAuthenticateHeader.getNonce();
+//		} else {
+//			if (log.isDebugEnabled()) {
+//				log
+//						.debug("Neither a ProxyAuthenticateHeader or AuthorizationHeader found!");
+//			}
+//			return null;
+//		}
+//
+//		// Retrieve the method from the CSeqHeader
+//		final String method = cseqHeader.getMethod();
+//
+//		// Get the user name
+//		final FromHeader fromHeader = ((FromHeader) response
+//				.getHeader(FromHeader.NAME));
+//		Address address = fromHeader.getAddress();
+//		String fromHost = null;
+//		String fromUser = null;
+//		int fromPort = 0;
+//
+//		String toHost = null;
+//		String toUser = null;
+//		int toPort = 0;
+//
+//		SipURI fromSipURI = null;
+//		SipURI toSipURI = null;
+//		try {
+//			fromSipURI = convertAddressToSipURI(address);
+//			toSipURI = convertAddressToSipURI(toAddress);
+//		} catch (ParseException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+//		fromHost = fromSipURI.getHost();
+//		fromUser = fromSipURI.getUser();
+//		fromPort = fromSipURI.getPort();
+//
+//		toHost = toSipURI.getHost();
+//		toUser = toSipURI.getUser();
+//		toPort = toSipURI.getPort();
+//
+//		// Appened the port to the fromHost if available
+//		if (fromPort != -1) {
+//			fromHost += ":" + fromPort;
+//		}
+//
+//		// Get the URI to set in the header
+//		SipURI uri = null;
+//		try {
+//			// uri = request.getRequestURI();
+//			uri = addressFactory.createSipURI(toUser, toHost);
+//		} catch (ParseException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//
+//		// create the digest for the response
+//		MessageDigest md5 = null;
+//		try {
+//			md5 = MessageDigest.getInstance("MD5");
+//		} catch (NoSuchAlgorithmException e) {
+//			e.printStackTrace();
+//		}
+//
+//		// Generate the response digest according to RFC 2069, i.e.
+//		// response-digest = <"> < KD ( H(A1), unquoted nonce-value ":"
+//		// H(A2) > <">
+//		// A1 = unquoted username-value ":" unquoted realm-value ":"
+//		// password
+//		// password = < user's password >
+//		// A2 = Method ":" digest-uri-value
+//		// H(A1) = The digested value of A1 converted to a hex string
+//		// H(A2) = The digested value of A2 converted to a hex string
+//		// KD = H(A1) ":" nonce ":" H(A2)
+//
+//		// Create A1 and A2
+//		String A1 = fromUser + ":" + realm + ":" + password;
+//		String A2 = method.toUpperCase() + ":" + uri.toString();
+//		// MD5 digest A1
+//		byte mdbytes[] = md5.digest(A1.getBytes());
+//		// Create H(A1)
+//		String HA1 = toHexString(mdbytes);
+//		// MD5 digest A2
+//		mdbytes = md5.digest(A2.getBytes());
+//		// Create H(A2)
+//		String HA2 = toHexString(mdbytes);
+//		// Create KD
+//		String KD = HA1 + ":" + nonce + ":" + HA2;
+//		mdbytes = md5.digest(KD.getBytes());
+//
+//		// Check if we're dealing with an wwwAuthenticateHeader or a
+//		// ProxyAuthenticationHeader one more time, we're needed to reply
+//		// with the same header type.
+//		// as the one we received from the proxy server.
+//		if (wwwAuthenticateHeader != null) {
+//			AuthorizationHeader ah = null;
+//
+//			try {
+//				ah = headerFactory.createAuthorizationHeader("Digest");
+//				ah.setUsername(fromUser);
+//				ah.setRealm(realm);
+//				ah.setAlgorithm("MD5");
+//				ah.setURI(uri);
+//				ah.setNonce(nonce);
+//
+//				ah.setResponse(toHexString(mdbytes));
+//
+//				newRequest.setHeader(ah);
+//			} catch (ParseException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		} else { // if Proxy Authentication
+//			ProxyAuthorizationHeader pah = null;
+//			try {
+//				pah = headerFactory
+//						.createProxyAuthorizationHeader("Digest");
+//				pah.setUsername(fromUser);
+//				pah.setRealm(realm);
+//				pah.setAlgorithm("MD5");
+//				pah.setURI(uri);
+//				pah.setNonce(nonce);
+//				pah.setResponse(toHexString(mdbytes));
+//
+//				newRequest.setHeader(pah);
+//			} catch (ParseException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletRequest#addAuthHeader(javax.servlet.sip.SipServletResponse, javax.servlet.sip.AuthInfo)

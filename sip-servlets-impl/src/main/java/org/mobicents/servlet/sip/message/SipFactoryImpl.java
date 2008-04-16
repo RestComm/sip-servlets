@@ -364,7 +364,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		// FIXME: Is this nough?
 		// We need address from which this will be sent, also this one will be
 		// default for contact and via
-		String transport = "udp";
+		String transport = ListeningPoint.UDP;
 
 		// LETS CREATE OUR HEADERS
 

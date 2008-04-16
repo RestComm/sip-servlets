@@ -43,13 +43,17 @@ import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
+import javax.sip.TransactionUnavailableException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -65,6 +69,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
@@ -254,11 +259,61 @@ public class SipSessionImpl implements SipSession {
 				throw new IllegalArgumentException("Cannot create the bye request",e);
 			}			
 		} else {
-			sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
-				this.sipApplicationSession,
-				method,
-				this.getLocalParty(),
-				this.getRemoteParty());
+			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(Request.REGISTER)) {
+				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
+						this.sipApplicationSession,
+						method,
+						this.getLocalParty(),
+						this.getRemoteParty());
+				
+				CSeqHeader cSeq = (CSeqHeader) sessionCreatingTransaction.getRequest().getHeader((CSeqHeader.NAME));
+				try {
+					cSeq.setSeqNumber(cSeq.getSeqNumber() + 1l);
+				} catch (InvalidArgumentException e) {
+					logger.error("Cannot increment the Cseq header to the new REGISTER request",e);
+					throw new IllegalArgumentException("Cannot create the REGISTER request",e);				
+				}
+				sipServletRequest.getMessage().setHeader(cSeq);
+				((Request)sipServletRequest.getMessage()).setRequestURI(sessionCreatingTransaction.getRequest().getRequestURI());
+				
+				ListIterator<ContactHeader> contactsHeaders = sessionCreatingTransaction.getRequest().getHeaders(ContactHeader.NAME);
+				while (contactsHeaders.hasNext()) {
+					ContactHeader contactHeader = contactsHeaders.next();
+					sipServletRequest.getMessage().addHeader(contactHeader);
+				}
+				
+				SipProvider sipProvider = sipFactory.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						JainSipUtils.findTransport((Request)sipServletRequest.getMessage()), false).getSipProvider();
+				FromHeader originalFromHeader = (FromHeader) sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
+				FromHeader newFromHeader = (FromHeader) sipServletRequest.getMessage().getHeader(FromHeader.NAME);
+				try {
+					newFromHeader.setTag(originalFromHeader.getTag());
+				} catch (ParseException e1) {
+					logger.error("Cannot set the from tag to the one of the previous REGISTER request",e1);
+					throw new IllegalArgumentException("Cannot set the from tag to the one of the previous REGISTER request",e1);
+				}				
+				try {
+					ClientTransaction retryTran = sipProvider
+						.getNewClientTransaction((Request)sipServletRequest.getMessage());
+					sessionCreatingTransaction = retryTran;				
+													
+					// SIP Request is ALWAYS pointed to by the client tx.
+					// Notice that the tx appplication data is cached in the request
+					// copied over to the tx so it can be quickly accessed when response
+					// arrives.				
+					retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
+					sipServletRequest.setTransaction(retryTran);					
+				} catch (TransactionUnavailableException e) {
+					logger.error("Cannot get a new transaction for the new REGISTER request",e);
+					throw new IllegalArgumentException("Cannot get a new transaction for the REGISTER request",e);
+				}
+			} else {
+				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
+					this.sipApplicationSession,
+					method,
+					this.getLocalParty(),
+					this.getRemoteParty());			
+			}
 		}
 		//Application Routing :
 		//removing the route headers and adding them back again except the one
@@ -267,8 +322,7 @@ public class SipSessionImpl implements SipSession {
 		final ListIterator<RouteHeader> routeHeaders = sipServletRequest.getMessage().getHeaders(RouteHeader.NAME);
 		sipServletRequest.getMessage().removeHeader(RouteHeader.NAME);
 		while (routeHeaders.hasNext()) {
-			RouteHeader routeHeader = (RouteHeader) routeHeaders
-					.next();
+			RouteHeader routeHeader = routeHeaders.next();
 			String routeAppName = ((javax.sip.address.SipURI)routeHeader .getAddress().getURI()).
 				getParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME);
 			if(routeAppName == null || !routeAppName.equals(getKey().getApplicationName())) {

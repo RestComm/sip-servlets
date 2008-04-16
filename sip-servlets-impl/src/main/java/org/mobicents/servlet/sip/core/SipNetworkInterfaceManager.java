@@ -166,16 +166,20 @@ public class SipNetworkInterfaceManager {
 		
 		List<String> listeningPointAddresses = listeningPoint.getIpAddresses();
 		//resolving by ipaddress an port
-		if(listeningPointAddresses.contains(ipAddress) &&					
-				listeningPoint.getPort() == portChecked) {
+		if((listeningPointAddresses.contains(ipAddress) &&					
+				listeningPoint.getPort() == portChecked) ||
+				(listeningPoint.getGlobalIpAddress() != null && listeningPoint.getGlobalIpAddress().equalsIgnoreCase(ipAddress) &&					
+				listeningPoint.getGlobalPort() == portChecked)){
 			return true;
 		}
 		//resolving by hostname
 		try {
 			InetAddress[] inetAddresses = InetAddress.getAllByName(ipAddress);				
 			for (InetAddress inetAddress : inetAddresses) {
-				if(listeningPointAddresses.contains(inetAddress.getHostAddress())
-						&& listeningPoint.getPort() == portChecked) {
+				if((listeningPointAddresses.contains(inetAddress.getHostAddress())
+						&& listeningPoint.getPort() == portChecked) ||
+						(listeningPoint.getGlobalIpAddress() != null && listeningPoint.getGlobalIpAddress().equalsIgnoreCase(inetAddress.getHostAddress()) &&					
+						listeningPoint.getGlobalPort() == portChecked)) {
 					return true;
 				}
 			}

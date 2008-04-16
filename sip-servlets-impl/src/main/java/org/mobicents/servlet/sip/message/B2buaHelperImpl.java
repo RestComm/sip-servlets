@@ -318,7 +318,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			if(status ==  Response.OK) {
 				ContactHeader contactHeader = 
 					JainSipUtils.createContactHeader(
-							sipFactoryImpl.getSipNetworkInterfaceManager(), JainSipUtils.findTransport(request));
+							sipFactoryImpl.getSipNetworkInterfaceManager(), JainSipUtils.findTransport(request), null);
 				response.addHeader(contactHeader);
 			}
 			

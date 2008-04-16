@@ -122,7 +122,7 @@ public class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport) {
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport, String displayName) {
 		
 		ExtendedListeningPoint listeningPoint = 
 			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);						
@@ -142,9 +142,13 @@ public class JainSipUtils {
 		try {
 			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
 			sipURI.setHost(host);
-			sipURI.setPort(port);
+			sipURI.setPort(port);			
 			sipURI.setTransportParam(transport);
-			ContactHeader contact = SipFactories.headerFactory.createContactHeader(SipFactories.addressFactory.createAddress(sipURI));
+			javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
+			if(displayName != null && displayName.length() > 0) {
+				contactAddress.setDisplayName(displayName);
+			}
+			ContactHeader contact = SipFactories.headerFactory.createContactHeader(contactAddress);
 		
 			return contact;
 		} catch (ParseException ex) {

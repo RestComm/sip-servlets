@@ -18,11 +18,14 @@ package org.mobicents.servlet.sip.startup;
 
 import gov.nist.javax.sip.SipStackImpl;
 
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
@@ -36,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
@@ -58,6 +62,11 @@ public class SipProtocolHandler implements ProtocolHandler {
 	// the logger
 	private static transient Log logger = LogFactory.getLog(SipProtocolHandler.class.getName());
 
+	/**
+     * The random port number generator that we use in getRandomPortNumer()
+     */
+    private static Random portNumberGenerator = new Random();
+    
 	private Adapter adapter = null;
 
 	private Map<String, Object> attributes = new HashMap<String, Object>();
@@ -237,9 +246,14 @@ public class SipProtocolHandler implements ProtocolHandler {
 				if(InetAddress.getByName(ipAddress).isLoopbackAddress()) {
 					logger.warn("The Ip address provided is the loopback address, stun won't be enabled for it");
 				} else {
-					//TODO port should be chosen randomly
+					//chooses stun port randomly
+					DatagramSocket randomSocket = initRandomPortSocket();
+					int randomPort = randomSocket.getLocalPort();
+					randomSocket.disconnect();
+					randomSocket.close();
+					randomSocket = null;
 					StunAddress localStunAddress = new StunAddress(ipAddress,
-							port);
+							randomPort);
 	
 					StunAddress serverStunAddress = new StunAddress(
 							stunServerAddress, stunServerPort);
@@ -262,6 +276,9 @@ public class SipProtocolHandler implements ProtocolHandler {
 
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
+			if(useStun) {
+				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
+			}
 			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
 			sipStack.start();
 			
@@ -299,6 +316,56 @@ public class SipProtocolHandler implements ProtocolHandler {
 			throw ex;
 		}
 	}	
+	
+	/**
+     * Initializes and binds a socket that on a random port number. The method
+     * would try to bind on a random port and retry 5 times until a free port
+     * is found.
+     *
+     * @return the socket that we have initialized on a randomport number.
+     */
+    private DatagramSocket initRandomPortSocket() {
+        int bindRetries = 5;
+        int currentlyTriedPort = 
+        	getRandomPortNumber(JainSipUtils.MIN_PORT_NUMBER, JainSipUtils.MAX_PORT_NUMBER);
+
+        DatagramSocket resultSocket = null;
+        //we'll first try to bind to a random port. if this fails we'll try
+        //again (bindRetries times in all) until we find a free local port.
+        for (int i = 0; i < bindRetries; i++) {
+            try {
+                resultSocket = new DatagramSocket(currentlyTriedPort);
+                //we succeeded - break so that we don't try to bind again
+                break;
+            }
+            catch (SocketException exc) {
+                if (exc.getMessage().indexOf("Address already in use") == -1) {
+                    logger.fatal("An exception occurred while trying to create"
+                                 + "a local host discovery socket.", exc);                    
+                    return null;
+                }
+                //port seems to be taken. try another one.
+                logger.debug("Port " + currentlyTriedPort + " seems in use.");
+                currentlyTriedPort = 
+                	getRandomPortNumber(JainSipUtils.MIN_PORT_NUMBER, JainSipUtils.MAX_PORT_NUMBER);
+                logger.debug("Retrying bind on port " + currentlyTriedPort);
+            }
+        }
+
+        return resultSocket;
+    }
+	
+	/**
+     * Returns a random local port number, greater than min and lower than max.
+     *
+     * @param min the minimum allowed value for the returned port number.
+     * @param max the maximum allowed value for the returned port number.
+     *
+     * @return a random int located between greater than min and lower than max.
+     */
+    public static int getRandomPortNumber(int min, int max) {
+        return portNumberGenerator.nextInt(max - min) + min;
+    }
 	
 	/**
 	 * @return the retransmissionFilter
