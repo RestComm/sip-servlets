@@ -1220,6 +1220,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						if(logger.isDebugEnabled()) {
 							logger.debug("routing outside the container " +
 									"since no more apps are is interested.");
+							
+							// If a servlet does not generate final response the routing process
+							// will continue (non-terminating routing state). This code stops
+							// routing these requests.
+							javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+							String host = sipRequestUri.getHost();
+							int port = sipRequestUri.getPort();
+							String transport = JainSipUtils.findTransport(request);
+							boolean isAnotherDomain = isExternal(host, port, transport);
+							if(!isAnotherDomain) return false;
 						}
 					}
 					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION);
