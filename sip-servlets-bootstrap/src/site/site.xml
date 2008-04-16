@@ -12,7 +12,7 @@
       	<item name="Tomcat Installation" href="installation-tomcat.html"/>
       	<item name="Jboss Installation" href="installation-jboss.html"/>
       </item>
-      <item name="Media support" href="security.html"/>
+      <item name="Media support" href="media.html"/>
       <item name="Security" href="security.html"/>      
       <item name="STUN suport" href="stun.html"/>
       <item name="Examples" href="examples/examples.html" collapse="true">
