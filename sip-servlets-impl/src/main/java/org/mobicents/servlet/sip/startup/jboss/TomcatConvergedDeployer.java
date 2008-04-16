@@ -20,6 +20,7 @@ import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
@@ -108,14 +109,19 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 			if(server.isRegistered(objectName)) {
 				
 				String applicationName = (String) server.invoke(objectName, "getApplicationName", new Object[]{}, new String[]{});
-						
-				InitialContext iniCtx = new InitialContext();
-				Context applicationNameEnvCtx = (Context) iniCtx.lookup("java:/sip/"+applicationName);				
-				Util.unbind(applicationNameEnvCtx,SipNamingContextListener.SIP_FACTORY_JNDI_NAME);
-				Util.unbind(applicationNameEnvCtx, SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME);
-				Util.unbind(applicationNameEnvCtx,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME);
-				Context sipEnvCtx = (Context) iniCtx.lookup("java:/sip/");
-				sipEnvCtx.destroySubcontext(applicationName);
+				
+				try {
+					InitialContext iniCtx = new InitialContext();
+					Context applicationNameEnvCtx = (Context) iniCtx.lookup("java:/sip/" + applicationName);				
+					Util.unbind(applicationNameEnvCtx,SipNamingContextListener.SIP_FACTORY_JNDI_NAME);
+					Util.unbind(applicationNameEnvCtx, SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME);
+					Util.unbind(applicationNameEnvCtx,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME);
+					Context sipEnvCtx = (Context) iniCtx.lookup("java:/sip");				
+					sipEnvCtx.destroySubcontext(applicationName);
+				} catch (OperationNotSupportedException onse) {
+					log.warn("Could not remove the JNDI context java:/sip/" + applicationName);
+				}
+				
 			}
 		}
 		

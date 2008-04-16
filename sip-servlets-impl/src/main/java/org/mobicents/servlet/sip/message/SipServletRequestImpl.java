@@ -722,7 +722,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				Dialog dialog = ctx.getDialog();
 				if (dialog == null && this.createDialog) {					
 					dialog = sipProvider.getNewDialog(ctx);
-					this.session.setSessionCreatingDialog(dialog);
+					super.session.setSessionCreatingDialog(dialog);
 					if(logger.isDebugEnabled()) {
 						logger.debug("new Dialog for request " + request + ", ref = " + dialog);
 					}

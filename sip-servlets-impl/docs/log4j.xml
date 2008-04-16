@@ -19,7 +19,7 @@
     </layout> 
   </appender> 
   <root> 
-    <priority value ="INFO" />     
+    <priority value ="DEBUG" />     
     <appender-ref ref="rolling-file" /> 
     <appender-ref ref="console" />
   </root>   

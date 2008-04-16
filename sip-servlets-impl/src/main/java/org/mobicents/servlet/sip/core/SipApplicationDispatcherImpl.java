@@ -299,7 +299,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {		
+	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Adding the following sip servlet application " + sipApplicationName + ", SipContext=" + sipApplication);
+		}
 		applicationDeployed.put(sipApplicationName, sipApplication);
 		List<String> newlyApplicationsDeployed = new ArrayList<String>();
 		newlyApplicationsDeployed.add(sipApplicationName);

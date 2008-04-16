@@ -633,7 +633,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			}
 			return content;
 		} else {
-			return this.message.getContent();
+			return this.message.getRawContent();
 		}
 	}
 
