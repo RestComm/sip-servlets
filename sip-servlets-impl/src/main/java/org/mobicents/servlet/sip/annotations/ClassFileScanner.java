@@ -99,7 +99,7 @@ public class ClassFileScanner {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		_scan(new File(this.docbase));
 	}
@@ -130,11 +130,8 @@ public class ClassFileScanner {
 				processListenerAnnotation(clazz);
 				processServletAnnotation(clazz);
 				processSipApplicationKeyAnnotation(clazz);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 				logger.error("Failed to parse annotations for class " + classpath);
 			}
     	}
@@ -162,7 +159,6 @@ public class ClassFileScanner {
     			}
     		}
     	} catch (Throwable e) {
-    		e.printStackTrace();
     		logger.error("Annotations not parsed. Error enumerating methods for class: " + clazz.toString());
     	}
     }
