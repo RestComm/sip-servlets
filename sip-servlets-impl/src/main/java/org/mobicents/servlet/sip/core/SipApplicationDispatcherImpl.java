@@ -22,9 +22,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1638,12 +1642,23 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			for (int i = 0; i < listeningPoints.length; i++) {
 				javax.sip.address.SipURI jainSipURI;
 				try {
-					jainSipURI = SipFactories.addressFactory.createSipURI(
-							null, listeningPoints[i].getIPAddress());
-					jainSipURI.setPort(listeningPoints[i].getPort());
-					jainSipURI.setTransportParam(listeningPoints[i].getTransport());
-					SipURI sipURI = new SipURIImpl(jainSipURI);
-					outboundInterfaces.add(sipURI);
+					String ipAddress = listeningPoints[i].getIPAddress();
+					// If we are binding to all adapters, add the actual IPs
+					if("0.0.0.0".equals(ipAddress)) {
+						addAllLocalInterfaces(outboundInterfaces,
+								listeningPoints[i].getPort(),
+								listeningPoints[i].getTransport());
+					
+					// Else, we will add only the specified IP
+					} else {
+						jainSipURI = SipFactories.addressFactory.createSipURI(
+								null, listeningPoints[i].getIPAddress());
+						jainSipURI.setPort(listeningPoints[i].getPort());
+						jainSipURI.setTransportParam(listeningPoints[i].getTransport());
+						SipURI sipURI = new SipURIImpl(jainSipURI);
+						outboundInterfaces.add(sipURI);
+						logger.info("Added outbound interface: " + sipURI.toString());
+					}
 				} catch (ParseException e) {
 					logger.error("cannot add the following listening point "+
 							listeningPoints[i].getIPAddress()+":"+
@@ -1654,6 +1669,47 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		
 		return Collections.unmodifiableList(outboundInterfaces);
+	}
+	
+	/**
+	 * This method will enumerate all network interfaces and add them to
+	 * the list of outbound interfaces. It should be used only when someone
+	 * is trying to bind to 0.0.0.0, which is equivalent to all interfaces.
+	 * @param list list of the outbound URIs
+	 * @param port
+	 * @param transport
+	 */
+	private void addAllLocalInterfaces(List<SipURI> list, int port, String transport) {
+		try {
+			Enumeration ifaces = NetworkInterface.getNetworkInterfaces();
+			while(ifaces.hasMoreElements()) {
+				NetworkInterface ni = (NetworkInterface) ifaces.nextElement();
+				Enumeration bindings = ni.getInetAddresses();
+				while(bindings.hasMoreElements()) {
+					InetAddress addr = (InetAddress) bindings.nextElement();
+					String ip = addr.getHostAddress();
+					try {
+
+						javax.sip.address.SipURI jainSipURI = 
+							SipFactories.addressFactory.createSipURI(
+								null, ip);
+						jainSipURI.setPort(port);
+						jainSipURI.setTransportParam(transport);
+						SipURIImpl uri = new SipURIImpl(jainSipURI);
+						if(!list.contains(uri)) {
+							list.add(uri);
+							logger.info("Added outbound interface: " + uri.toString());
+						}
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch (SocketException e) {
+			logger.warn("Unable to enumerate local interfaces. Binding to 0.0.0.0 may not work.");
+		}
+		
 	}
 	
 	/**

@@ -16,10 +16,13 @@
  */
 package org.mobicents.servlet.sip.router;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipApplicationRouter;
@@ -154,7 +157,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * </p>
  */
-public class DefaultApplicationRouter implements SipApplicationRouter {	
+public class DefaultApplicationRouter implements SipApplicationRouter, ManageableApplicationRouter{	
 	//	the logger
 	private static Log log = LogFactory.getLog(DefaultApplicationRouter.class);
 	//the prefix used in the dar configuration file to specify the subscriber URI to use
@@ -261,6 +264,54 @@ public class DefaultApplicationRouter implements SipApplicationRouter {
 	public void init(List<String> deployedApplicationNames) {
 		init();
 //		this.containerDeployedApplicationNames.addAll(deployedApplicationNames);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.router.ManageableApplicationRouter#configure(java.lang.Object)
+	 */
+	public synchronized void configure(Object configuration) {
+		
+		if(!(configuration instanceof Properties)) 
+			throw new IllegalArgumentException("Configuration for DAR must be of type Properties.");
+		
+		Properties properties = (Properties) configuration;
+		try {
+			defaultSipApplicationRouterInfos = 
+				this.defaultApplicationRouterParser.parse(properties);
+		} catch (ParseException e1) {
+			throw new IllegalArgumentException("Failed to parse the new DAR properties", e1);
+		}
+		
+		String configFileLocation = defaultApplicationRouterParser.getDarConfigurationFileLocation();
+		
+		if(configFileLocation.startsWith("file:/")) {
+			int i = 5;
+			while(configFileLocation.charAt(i) == '/') i++;
+			configFileLocation = configFileLocation.substring(i-1);
+		} else {
+			log.warn("Can not write persist DAR configuration to " + configFileLocation + ". Make sure you have write permissions and make sure it's a local file. NOTE THAT THE NEW DAR CONFIGURATION IS LOADED AND EFFECTIVE.");
+			return;
+		}
+		
+		if(configFileLocation == null || configFileLocation.length()<1) 
+			throw new IllegalStateException("Configuration file name is empty.");
+		
+		File configFile = new File(configFileLocation);
+		
+		try {
+			properties.store(new FileOutputStream(configFile), "Application Router Configuration");
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to store configuration file.", e);
+		}
+		
+		log.info("Stored DAR configuration in " + configFile.getAbsolutePath());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.router.ManageableApplicationRouter#getCurrentConfiguration()
+	 */
+	public synchronized Object getCurrentConfiguration() {
+		return defaultApplicationRouterParser.getProperties();
 	}
 
 }

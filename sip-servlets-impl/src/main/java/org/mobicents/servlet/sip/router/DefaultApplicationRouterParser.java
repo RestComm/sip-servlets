@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.router;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -59,7 +60,7 @@ public class DefaultApplicationRouterParser {
 	 */
 	public void init() {
 		//load the configuration file
-		String darConfigurationFileLocation = System.getProperty("javax.servlet.sip.dar");
+		String darConfigurationFileLocation = getDarConfigurationFileLocation();
 		if(log.isDebugEnabled()) {
 			log.debug("Default Application Router file Location : "+darConfigurationFileLocation);
 		}
@@ -103,6 +104,41 @@ public class DefaultApplicationRouterParser {
 			sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
 		}
 		return sipApplicationRoutingInfo;
+	}
+	
+	/**
+	 * Same method as above, but loads DAR configuration from a string.
+	 * @param configuration
+	 * @return
+	 * @throws ParseException
+	 */
+	public Map<String, List<DefaultSipApplicationRouterInfo>> parse(String configuration) throws ParseException {
+		Map<String, List<DefaultSipApplicationRouterInfo>> sipApplicationRoutingInfo = 
+			new HashMap<String, List<DefaultSipApplicationRouterInfo>>();
+		Properties tempProperties = new Properties();
+		// tempProperties.load(new StringReader(configuration)); // This needs Java 1.6
+		ByteArrayInputStream stringStream = new ByteArrayInputStream(configuration.getBytes());
+		try {
+			tempProperties.load(stringStream);
+		} catch (IOException e) {
+			log.warn("Failed to update AR configuration. Will use the old properties.");
+			return null;
+		}
+		this.properties = tempProperties;
+		return parse();
+	}
+	
+	/**
+	 * Same method as above, but loads DAR configuration from properties.
+	 * @param configuration
+	 * @return
+	 * @throws ParseException
+	 */
+	public Map<String, List<DefaultSipApplicationRouterInfo>> parse(Properties properties) throws ParseException {
+		Map<String, List<DefaultSipApplicationRouterInfo>> sipApplicationRoutingInfo = 
+			new HashMap<String, List<DefaultSipApplicationRouterInfo>>();
+		this.properties = properties;
+		return parse();
 	}
 		
 	/**
@@ -180,5 +216,13 @@ public class DefaultApplicationRouterParser {
 				SipRouteModifier.valueOf(SipRouteModifier.class,sipApplicationRouterInfoParameters[4]),
 				//stateinfo
 				order);		
+	}
+	
+	public String getDarConfigurationFileLocation() {
+		return System.getProperty("javax.servlet.sip.dar");
+	}
+	
+	public Properties getProperties() {
+		return properties;
 	}
 }
