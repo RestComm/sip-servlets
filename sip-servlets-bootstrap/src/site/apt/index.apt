@@ -24,13 +24,13 @@ Version 0.3 is out !
 		
 		* Management Console : {{{ssmc/sip-servlets-managment.htm}check this out}}
 		
-		* Media Support : check the media demo or the shopping demo examples (only for Jboss)
+		* Media Support : {{{media.html}check this out}} check the {{{examples/media-demo.html}media demo}} or the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
 		
-		* JEE integration / JEE converged applications : check the shopping demo example (only for Jboss)
+		* JEE integration / JEE converged applications : check the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
 		
-		* STUN Support and DNS SRV lookups
+		* STUN Support and DNS SRV lookups : {{{stun.html}check this out}}
 		
-		* usual round of bug fixes : {{{roadmap.htm}check this out}}
+		* usual round of bug fixes : {{{roadmap.html}check this out}}
 		
 	It is shipped with :		
 	
