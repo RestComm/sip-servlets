@@ -108,7 +108,7 @@
                proxyPort="80" disableUploadTimeout="true" />
     -->
 
-	<!-- Define a SIP Connector on port 5070 -->
+	<!-- Define a SIP Connector -->
     <Connector port="5070" 
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
