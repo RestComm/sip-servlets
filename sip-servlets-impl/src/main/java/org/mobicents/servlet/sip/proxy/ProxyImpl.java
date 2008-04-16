@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -71,9 +72,11 @@ public class ProxyImpl implements Proxy {
 	{
 		this.originalRequest = request;
 		this.sipFactoryImpl = sipFactoryImpl;
-		proxyBranches = new HashMap<URI, ProxyBranch> ();
-		proxyUtils = new ProxyUtils(sipFactoryImpl, this);
-		proxyTimeout = 10; // 10 secs default
+		this.proxyBranches = new HashMap<URI, ProxyBranch> ();
+		this.proxyUtils = new ProxyUtils(sipFactoryImpl, this);
+		this.proxyTimeout = 10; // 10 secs default
+		this.outboundInterface = ((SipSessionImpl)request.getSession()).getOutboundInterface();
+		
 	}
 	
 	/* (non-Javadoc)

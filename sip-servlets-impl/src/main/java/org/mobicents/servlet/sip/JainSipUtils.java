@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip;
 
 
 import java.text.ParseException;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.sip.InvalidArgumentException;
@@ -79,6 +80,30 @@ public class JainSipUtils {
 
 	public static final int MAX_FORWARD_HEADER_VALUE = 70;
 	
+	// RFC 1918 address spaces
+	private static int getAddressOutboundness(String address) {
+		if(address.startsWith("127.0")) return 0;
+		if(address.startsWith("192.168")) return 1;
+		if(address.startsWith("10.")) return 2;
+		if(address.startsWith("172.")) return 3;
+		if(address.indexOf(".")>0) return 4; // match IPv4 addresses heuristically
+		return -1; // matches IPv6 or something malformed;
+	}
+	private static String getMostOutboundAddress(List<String> addresses) {
+		// getIpAddresses() returns [0:0:0:0:0:0:0:1, 127.0.0.1, 2001:0:d5c7:a2ca:3065:1735:3f57:fe71, fe80:0:0:0:3065:1735:3f57:fe71%15, 192.168.1.142, fe80:0:0:0:0:5efe:c0a8:18e%21]
+		// IPv6 addresses are not good for default value
+		String bestAddr = "127.0.0.1"; // The default is something completely fails
+		int bestAddrOutboundness = -2;
+		for(String address:addresses)  {
+			int addrOutboundness = getAddressOutboundness(address);
+			if(addrOutboundness>bestAddrOutboundness) {
+				bestAddr = address;
+				bestAddrOutboundness = addrOutboundness;
+			}
+		}
+		return bestAddr;
+	}
+	
 	/**
 	 * 
 	 * @param sipNetworkInterfaceManager
@@ -99,7 +124,8 @@ public class JainSipUtils {
 			host = globalIpAddress;
 			port = listeningPoint.getGlobalPort();
 		} else {
-			host = listeningPoint.getIpAddresses().get(0);
+			
+			host = getMostOutboundAddress(listeningPoint.getIpAddresses());
 			port = listeningPoint.getPort();
 		}
 	 		 	
