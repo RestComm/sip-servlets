@@ -16,10 +16,12 @@ To build:
         <attribute name="PortRange">1024-65535</attribute>
         <attribute name="PCMA">true</attribute>
     </mbean>
-2. Modify the context param audio.files.path yo map to your file system in 
-sip-servlets/sip-servlets-examples/shopping-demo/web/src/main/webapp/WEB-INF/sip.xml file.
-and the order.approval.waitingtime (the time between the moment the customer confirm 
-its order and the next phone cal made to ask for delivery date default to 6 sec) if needed
+2. Modify the context params in sip-servlets/sip-servlets-examples/shopping-demo/web/src/main/webapp/WEB-INF/sip.xml file.
+ 		audio.files.path to map to your file system 
+		order.approval.waitingtime : the time between the moment the customer confirm 
+			its order and the next phone call made to ask for delivery date or for admin to confirm if order is > 100$. 
+			You can let the default
+    	admin.sip : the sip address of the admin to be called for confirmation on orders > 100$
     
 mvn clean install from shopping-demo dir
 
@@ -37,3 +39,4 @@ http://groups.google.com/group/mobicents-public/web/converged-application-demo
 
 Note : Use DTMF INFO as a way for sending DTMF for now, 
 couldn't get media server to work with rfc2833 or inband currently
+working nicely on linphone on linux
