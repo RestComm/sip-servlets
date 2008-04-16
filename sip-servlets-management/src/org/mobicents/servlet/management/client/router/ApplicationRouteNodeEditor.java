@@ -1,44 +1,25 @@
 package org.mobicents.servlet.management.client.router;
 
-import java.util.HashMap;
-
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.gwtext.client.core.Position;
 import com.gwtext.client.data.ArrayReader;
 import com.gwtext.client.data.FieldDef;
 import com.gwtext.client.data.MemoryProxy;
-import com.gwtext.client.data.Reader;
 import com.gwtext.client.data.RecordDef;
 import com.gwtext.client.data.SimpleStore;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.StringFieldDef;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.form.ComboBox;
-import com.gwtext.client.widgets.form.Field;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
-import com.gwtext.client.widgets.form.TimeField;
-import com.gwtext.client.widgets.form.VType;
 import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
-import com.gwtext.client.widgets.grid.GridEditor;
-import com.gwtext.client.widgets.grid.GridPanel;
-import com.gwtext.client.widgets.grid.GridView;
-import com.gwtext.client.widgets.grid.PropertyGridPanel;
-import com.gwtext.client.widgets.layout.AnchorLayoutData;
-import com.gwtext.client.widgets.layout.ColumnLayout;
-import com.gwtext.client.widgets.layout.ColumnLayoutData;
-import com.gwtext.client.widgets.layout.FormLayout;
 
 public class ApplicationRouteNodeEditor extends VerticalPanel {
-	private Panel parent;
 	final FormPanel formPanel = new FormPanel();
 	private Widget dragHandle;
 	private ComboBox applicationName;
@@ -47,6 +28,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	private TextField route;
 	private ComboBox routeModified; //CLEAR NO_ROUTE ROUTE
 	private TextField order;
+	private boolean isNew = true; // if this node is just created by the user or loaded from the config file
 
 	private static Object[][] regions = new Object[][]{  
 		new Object[]{"TERMINATING"},  
@@ -57,7 +39,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	private static Object[][] routeModifiers = new Object[][]{  
 		new Object[]{"NO_ROUTE"},  
 		new Object[]{"ROUTE"},
-		new Object[]{"CLEAR"}
+		new Object[]{"CLEAR_ROUTE"}
 	};  
 
 	private void addLabeledControl(String label, Widget component, Panel panel) {
@@ -135,7 +117,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 				Store original = applicationName.getStore();
 				original.removeAll();
 				original.add(storeTemp.getRecords());
-				if(apps.length>0) applicationName.setValue(apps[0]);
+				if(apps.length>0 && isNew) applicationName.setValue(apps[0]);
 				Console.info("Successfully enumerated deployed applications");
 			}
 			
@@ -216,6 +198,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	
 	public ApplicationRouteNodeEditor(DARRouteNode node) {
 		this();
+		isNew = false;
 		setApplicationName(node.getApplication());
 		setSubscriberIdentity(node.getSubscriber());
 		setOrder(node.getOrder());

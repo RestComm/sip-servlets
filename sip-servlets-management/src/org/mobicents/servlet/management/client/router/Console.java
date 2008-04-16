@@ -27,13 +27,13 @@ public class Console extends Window{
 	}
 	
 	public static void error(Object object) {
-		println("<b>[ERROR] " + object.toString() + "</b>");
 		instance.show(); // Pop the window on error.
+		println("<b>[ERROR] " + object.toString() + "</b>");
 	}
 	
 	public static void warn(Object object) {
-		println("[WARN] " + object.toString());
 		instance.show(); // Pop the window on warning.
+		println("[WARN] " + object.toString());
 	}
 	
 	public static void info(Object object) {
@@ -41,7 +41,7 @@ public class Console extends Window{
 	}	
 	
 	public static void fatal(Object object) {
-		println("[FATAL] " + object.toString());
 		instance.show(); // Pop the window on fatal error.
+		println("[FATAL] " + object.toString());
 	}
 }
