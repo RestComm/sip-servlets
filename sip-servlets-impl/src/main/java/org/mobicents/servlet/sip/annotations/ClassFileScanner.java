@@ -117,7 +117,10 @@ public class ClassFileScanner {
     }
     
     private void analyzeClass(String path) {
+    	
+    	// TODO: must check if there are extra /// or \\\ or /./ in the path after classes/
     	int classesIndex = path.toLowerCase().lastIndexOf("classes/");
+    	if(classesIndex < 0) classesIndex = path.toLowerCase().lastIndexOf("classes\\");
     	classesIndex += "classes/".length();
     	String classpath = path.substring(classesIndex);
     	classpath = classpath.replace('/', '.').replace('\\', '.');
