@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.address.SipUri;
+
 import java.text.ParseException;
 import java.util.Iterator;
 
@@ -123,7 +125,7 @@ public class TelURLImpl extends URIImpl implements TelURL {
 		try {
 			telUrl.setParameter(name, value);
 		} catch (ParseException e) {
-			throw new IllegalArgumentException(e);
+			throw new IllegalArgumentException("Problem setting parameter", e);
 		}
 	}
 

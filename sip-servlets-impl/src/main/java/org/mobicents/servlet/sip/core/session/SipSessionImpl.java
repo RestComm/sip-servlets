@@ -54,9 +54,12 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
@@ -259,7 +262,8 @@ public class SipSessionImpl implements SipSession {
 				throw new IllegalArgumentException("Cannot create the bye request",e);
 			}			
 		} else {
-			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(Request.REGISTER)) {
+			//case where other requests are sent with the same session like REGISTER or for challenge requests
+			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)) {
 				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
 						this.sipApplicationSession,
 						method,
@@ -275,12 +279,26 @@ public class SipSessionImpl implements SipSession {
 				}
 				sipServletRequest.getMessage().setHeader(cSeq);
 				((Request)sipServletRequest.getMessage()).setRequestURI(sessionCreatingTransaction.getRequest().getRequestURI());
-				
+
+				sipServletRequest.getMessage().removeHeader(ContactHeader.NAME);
 				ListIterator<ContactHeader> contactsHeaders = sessionCreatingTransaction.getRequest().getHeaders(ContactHeader.NAME);
 				while (contactsHeaders.hasNext()) {
 					ContactHeader contactHeader = contactsHeaders.next();
 					sipServletRequest.getMessage().addHeader(contactHeader);
 				}
+				ListIterator<RecordRouteHeader> recordRouteHeaders = sessionCreatingTransaction.getRequest().getHeaders(RecordRouteHeader.NAME);
+				while (recordRouteHeaders.hasNext()) {
+					RecordRouteHeader recordRouteHeader = recordRouteHeaders.next();
+					sipServletRequest.getMessage().addHeader(recordRouteHeader);
+				}
+				ExpiresHeader expiresHeader = (ExpiresHeader) sessionCreatingTransaction.getRequest().getHeader(ExpiresHeader.NAME);
+				if(expiresHeader != null) {
+					sipServletRequest.getMessage().addHeader(expiresHeader);
+				}
+				UserAgentHeader userAgentHeader = (UserAgentHeader) sessionCreatingTransaction.getRequest().getHeader(UserAgentHeader.NAME);
+				if(userAgentHeader != null) {
+					sipServletRequest.getMessage().addHeader(userAgentHeader);
+				}				
 				
 				SipProvider sipProvider = sipFactory.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						JainSipUtils.findTransport((Request)sipServletRequest.getMessage()), false).getSipProvider();
@@ -289,8 +307,8 @@ public class SipSessionImpl implements SipSession {
 				try {
 					newFromHeader.setTag(originalFromHeader.getTag());
 				} catch (ParseException e1) {
-					logger.error("Cannot set the from tag to the one of the previous REGISTER request",e1);
-					throw new IllegalArgumentException("Cannot set the from tag to the one of the previous REGISTER request",e1);
+					logger.error("Cannot set the from tag to the one of the previous " + method +" request",e1);
+					throw new IllegalArgumentException("Cannot set the from tag to the one of the previous " + method +" request",e1);
 				}				
 				try {
 					ClientTransaction retryTran = sipProvider
@@ -304,9 +322,10 @@ public class SipSessionImpl implements SipSession {
 					retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
 					sipServletRequest.setTransaction(retryTran);					
 				} catch (TransactionUnavailableException e) {
-					logger.error("Cannot get a new transaction for the new REGISTER request",e);
-					throw new IllegalArgumentException("Cannot get a new transaction for the REGISTER request",e);
+					logger.error("Cannot get a new transaction for the new " + method +" request",e);
+					throw new IllegalArgumentException("Cannot get a new transaction for the " + method +" request",e);
 				}
+				return sipServletRequest;
 			} else {
 				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
 					this.sipApplicationSession,

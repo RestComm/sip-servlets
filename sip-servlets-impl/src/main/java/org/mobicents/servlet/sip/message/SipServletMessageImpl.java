@@ -1445,7 +1445,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		String value = split[0];
 		Map<String, String> paramMap = new HashMap<String, String>();
 
-		if (split[1].contains(";")) {
+		if (split.length > 1 && split[1].contains(";")) {
 			// repleace first ";" with ""
 			split[1] = split[1].replaceFirst(";", "");
 			split = split[1].split(";");

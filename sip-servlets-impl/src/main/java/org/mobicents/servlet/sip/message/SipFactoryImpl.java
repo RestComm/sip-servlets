@@ -358,8 +358,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		CSeqHeader cseqHeader = null;
 		ViaHeader viaHeader = null;
 		CallIdHeader callIdHeader = null;
-		MaxForwardsHeader maxForwardsHeader = null;
-		RouteHeader routeHeader = null;
+		MaxForwardsHeader maxForwardsHeader = null;		
 
 		// FIXME: Is this nough?
 		// We need address from which this will be sent, also this one will be
@@ -436,11 +435,18 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 					viaHeaders, 
 					maxForwardsHeader);
 
-			
+			//Adding default contact header for register
+			if(Request.REGISTER.equalsIgnoreCase(method)) {				
+				//TODO what about other schemes ?
+				String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();										
+				// Create the contact name address.
+				contactHeader = 
+					JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);														
+			}
 			// Add all headers		
-//			if(contactHeader != null) {
-//				requestToWrap.addHeader(contactHeader);
-//			}
+			if(contactHeader != null) {
+				requestToWrap.addHeader(contactHeader);
+			}
 //			if(routeHeader != null) {
 //				requestToWrap.addHeader(routeHeader);
 //			}

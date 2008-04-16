@@ -347,4 +347,13 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		((SipUri)getSipURI()).removeHeader(name);
 	}
 
+	@Override
+	public void setParameter(String name, String value) {		
+		super.setParameter(name, value);
+		try {
+			((SipUri)getSipURI()).setParameter(name, value);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Problem setting parameter",e);
+		}
+	}
 }

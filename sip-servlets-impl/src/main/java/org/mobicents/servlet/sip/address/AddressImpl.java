@@ -240,4 +240,15 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	public void setAddress(javax.sip.address.Address address) {
 		this.address = address;
 	}
+	
+	@Override
+	public void setParameter(String name, String value) {		
+		super.setParameter(name, value);
+		SipURI sipUri = getUriAsSipUri();
+		try {
+			sipUri.setParameter(name, value);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Problem setting parameter",e);
+		}
+	}
 }
