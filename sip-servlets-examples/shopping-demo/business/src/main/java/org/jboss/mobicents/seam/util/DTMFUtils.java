@@ -104,7 +104,12 @@ public class DTMFUtils {
 	}
 
 	public static void updateDeliveryDate(SipSession session, String signal) {
-		int cause = Integer.parseInt(signal);		
+		int cause = -1;
+		try {
+			cause = Integer.parseInt(signal);
+		} catch (java.lang.NumberFormatException e) {
+			return;
+		}
 
 		synchronized(session) {
 			String dateAndTime = (String) session.getAttribute("dateAndTime");
