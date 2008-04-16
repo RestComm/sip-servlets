@@ -110,8 +110,20 @@ public class ProxyUtils {
 				clonedRequest.removeHeader(ViaHeader.NAME);				
 			} 
 			//Add via header
-			ViaHeader viaHeader = JainSipUtils.createViaHeader(
-					sipFactoryImpl.getSipProviders(), transport, generateBranchId());
+			ViaHeader viaHeader = null;
+			if(proxy.getOutboundInterface() == null) { 
+				viaHeader = JainSipUtils.createViaHeader(
+						sipFactoryImpl.getSipProviders(), transport, generateBranchId());
+			} else { //If outbound interface is specified use it
+				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
+				if(outboundTransport == null) outboundTransport = "udp";
+				viaHeader = SipFactories.headerFactory.createViaHeader(
+						proxy.getOutboundInterface().getHost(),
+						proxy.getOutboundInterface().getPort(),
+						outboundTransport,
+						generateBranchId());
+			}
+					
 			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
 					originalRequest.getSipSession().getKey().getApplicationName());
 			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
@@ -121,8 +133,12 @@ public class ProxyUtils {
 			
 			//Add route-record header, if enabled and if needed (if not null)
 			if(params.routeRecord != null) {
-				javax.sip.address.SipURI rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipProviders(), transport);
-				
+				javax.sip.address.SipURI rrURI = null;
+				if(proxy.getOutboundInterface() == null) {
+					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipProviders(), transport);
+				} else {
+					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();
+				}
 				Iterator<String> paramNames = params.routeRecord.getParameterNames();
 				
 				// Copy the parameters set by the user
