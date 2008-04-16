@@ -615,12 +615,15 @@ public class AnnotationsClassLoader
     	if(!dir.isDirectory()) throw new IllegalArgumentException("dirPath must be a directory: " + dirPath);
     	File[] files = dir.listFiles();
     	for(File file:files) {
-    		try {
-				addJar(file.getName(), new JarFile(file), file );
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		if(!file.isDirectory()) {    			    	
+	    		try {
+					addJar(file.getName(), new JarFile(file), file );
+				} catch (IOException e) {
+					log.error("An exception occured when trying to add the following jar to the AnnotationsClassLoader : " + file.getName(), e);
+				}
+    		} else {
+    			log.error(file.getName() + " is a directory in " + dirPath + " and as such will be skipped.");
+    		}
     	}
     }
     
