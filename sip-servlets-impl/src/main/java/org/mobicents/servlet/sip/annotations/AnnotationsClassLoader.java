@@ -612,7 +612,10 @@ public class AnnotationsClassLoader
 
     public void addJarDir(String dirPath) {
     	File dir = new File(dirPath);
-    	if(!dir.isDirectory()) throw new IllegalArgumentException("dirPath must be a directory: " + dirPath);
+    	if(!dir.isDirectory()) {
+    		log.info("No libraries loaded from this directory: " + dir.getAbsolutePath());
+    		return;
+    	}
     	File[] files = dir.listFiles();
     	for(File file:files) {
     		if(!file.isDirectory()) {    			    	
