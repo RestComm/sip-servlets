@@ -5,7 +5,7 @@
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-test-suite-applications</artifactId>
 	<packaging>pom</packaging>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
 	<name>Sip Servlets Test Suite Applications Parent Pom</name>
 	<url>http://sip-servlets.dev.java.net</url>
 	<modules>
@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1.3</version>
 			<scope>provided</scope>
 		</dependency>
 		

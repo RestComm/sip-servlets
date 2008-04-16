@@ -9,7 +9,7 @@ Alternatively you can add a context entry in the tomcat's server.xml like this
 	<Context 
 	className="org.mobicents.servlet.sip.startup.SipStandardContext" 
 	configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
-	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\location-service\target\location-service-1.0-SNAPSHOT" 
+	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\location-service\target\location-service-1.0" 
 	name="location-service-context" 
 	path="/location-service">
 		<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						

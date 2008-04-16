@@ -9,7 +9,7 @@ Alternatively you can add a context entry in the tomcat's server.xml like this
 	<Context 
 	className="org.mobicents.servlet.sip.startup.SipStandardContext" 
 	configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
-	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\call-blocking\target\call-blocking-1.0-SNAPSHOT" 
+	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\call-blocking\target\call-blocking-1.0" 
 	name="call-blocking-context" 
 	path="/call-blocking">
 		<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						

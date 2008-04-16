@@ -6,19 +6,19 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>shopping-demo-parent</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>shopping-demo-web</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>Shopping Demo WebApp</name>
 	<url>http://sip-servlets.dev.java.net</url>
 	<dependencies>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>shopping-demo-business</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- logging dependency -->
@@ -121,10 +121,10 @@
 			
 			
 			<move
-			todir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/"
+			todir="${basedir}/target/media-playback-servlet-1.0/WEB-INF/lib/"
 			includeemptydirs="false" verbose="true">
 			<fileset
-			dir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/">
+			dir="${basedir}/target/media-playback-servlet-1.0/WEB-INF/lib/">
 			<include name="**/*-1.0.jar" />
 			</fileset>
 			<mapper type="glob" from="*-1.0.jar"

@@ -22,8 +22,8 @@ if it behaves otherwise mail me to jean.deruelle@gmail.com
 
 To run the sip servlet container :
 check that the following files have been copied during the mvn clean install
-in tomcat_home/lib directory, there should be a sip-servlets-0.2-SNAPSHOT.jar
-in tomcat_home/lib directory, there should be a sip-servlets-spec-1.0-SNAPSHOT.jar
+in tomcat_home/lib directory, there should be a sip-servlets-0.2.jar
+in tomcat_home/lib directory, there should be a sip-servlets-spec-1.0.jar
 in tomcat_home/lib directory, there should be a jain-sip-api-1.2.jar
 in tomcat_home/lib directory, there should be a jain-sip-ri-1.2.jar
 in tomcat_home/lib directory, there should be a concurrent-1.3.4.jar

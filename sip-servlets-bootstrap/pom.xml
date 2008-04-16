@@ -5,7 +5,7 @@
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<packaging>pom</packaging>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
 	<name>Sip Servlets Parent Pom</name>
 	<url>http://sip-servlets.dev.java.net</url>
 	<issueManagement>

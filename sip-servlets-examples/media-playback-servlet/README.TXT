@@ -16,7 +16,7 @@ Instructions to build and deploy
     
 2. mvn clean install war:inplace.
 4. IMPORTANT: Don't deploy the packaged war file. Deploy the exploded directory 
-media-playback-servlet/target/media-playback-servlet-1.0-SNAPSHOT with .sar2 extension.
+media-playback-servlet/target/media-playback-servlet-1.0 with .sar2 extension.
 This is needed because the packaged war file contains jar files in WEB-INF/lib that are
 renamed by maven to include version suffix, however this breaks FreeTTS. In the exploded
 directory, this is fixed.
