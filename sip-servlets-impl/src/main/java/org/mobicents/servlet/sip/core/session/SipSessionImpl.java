@@ -571,7 +571,9 @@ public class SipSessionImpl implements SipSession {
 			for (Transaction transaction : ongoingTransactions) {
 				if(TransactionState.CALLING.equals(transaction.getState()) ||
 					TransactionState.TRYING.equals(transaction.getState()) ||
-					TransactionState.PROCEEDING.equals(transaction.getState())) {
+					TransactionState.PROCEEDING.equals(transaction.getState()) ||
+					TransactionState.COMPLETED.equals(transaction.getState()) ||
+					TransactionState.CONFIRMED.equals(transaction.getState())) {
 						return true;
 				}
 			}
