@@ -167,10 +167,11 @@ public class CheckoutAction implements Checkout, Serializable {
 			sipServletRequest.setRequestURI(requestURI);
 			//TTS file creation		
 			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append("Welcome ");
 			stringBuffer.append(customerName);
-			stringBuffer.append(" has placed an order of $");
+			stringBuffer.append(". You have placed an order of $");
 			stringBuffer.append(ammount);
-			stringBuffer.append(". Press 1 to approve and 2 to reject.");				
+			stringBuffer.append(". Press 1 to confirm and 2 to decline.");				
 			
 			TTSUtils.buildAudio(stringBuffer.toString(), "speech.wav");
 			Thread.sleep(300);

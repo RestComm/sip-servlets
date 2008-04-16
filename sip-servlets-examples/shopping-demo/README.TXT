@@ -16,8 +16,7 @@ To build:
         <attribute name="PortRange">1024-65535</attribute>
         <attribute name="PCMA">true</attribute>
     </mbean>
-2. Modify the context params in sip-servlets/sip-servlets-examples/shopping-demo/web/src/main/webapp/WEB-INF/sip.xml file.
- 		audio.files.path to map to your file system 
+2. Modify the context params in sip-servlets/sip-servlets-examples/shopping-demo/web/src/main/webapp/WEB-INF/sip.xml file. 		
 		order.approval.waitingtime : the time between the moment the customer confirm 
 			its order and the next phone call made to ask for delivery date or for admin to confirm if order is > 100$. 
 			You can let the default
