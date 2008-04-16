@@ -40,8 +40,13 @@
     </context-param>
     
     <context-param>
+      <param-name>caller.domain</param-name>
+      <param-value>callwithus.com</param-value>
+    </context-param>    
+    
+    <context-param>
       <param-name>caller.sip</param-name>
-      <param-value>sip:650390127@callwithus.com</param-value>
+      <param-value>650390127</param-value>
     </context-param>
     
     <context-param>

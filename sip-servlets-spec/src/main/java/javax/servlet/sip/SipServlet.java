@@ -215,6 +215,12 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
 			doMessage(req);
 		else if ("INFO".equals(m))
 			doInfo(req);
+		else if ("REFER".equals(m))
+			doRefer(req);
+		else if ("PUBLISH".equals(m))
+			doPublish(req);
+		else if ("UPDATE".equals(m))
+			doUpdate(req);
 		else if ("PRACK".equals(m))
 			doPrack(req);
 		else if (req.isInitial())

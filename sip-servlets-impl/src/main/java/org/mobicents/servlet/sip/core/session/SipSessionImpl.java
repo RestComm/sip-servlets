@@ -72,7 +72,6 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
-import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
@@ -237,7 +236,7 @@ public class SipSessionImpl implements SipSession {
 					sessionCreatingDialog);
 		}
 		SipServletRequestImpl sipServletRequest = null;
-		if(this.sessionCreatingDialog != null) {			
+		if(this.sessionCreatingDialog != null && !JainSipUtils.dialogCreatingMethods.contains(method)) {			
 			try {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
 				final String transport = JainSipUtils.findTransport(methodRequest);
@@ -280,7 +279,9 @@ public class SipSessionImpl implements SipSession {
 				}
 				sipServletRequest.getMessage().setHeader(cSeq);
 				((Request)sipServletRequest.getMessage()).setRequestURI(sessionCreatingTransaction.getRequest().getRequestURI());
-
+				
+				//TODO Fix this to copy all headers 
+				
 				sipServletRequest.getMessage().removeHeader(ContactHeader.NAME);
 				ListIterator<ContactHeader> contactsHeaders = sessionCreatingTransaction.getRequest().getHeaders(ContactHeader.NAME);
 				while (contactsHeaders.hasNext()) {
@@ -315,17 +316,31 @@ public class SipSessionImpl implements SipSession {
 					ClientTransaction retryTran = sipProvider
 						.getNewClientTransaction((Request)sipServletRequest.getMessage());
 					sessionCreatingTransaction = retryTran;				
-													
 					// SIP Request is ALWAYS pointed to by the client tx.
 					// Notice that the tx appplication data is cached in the request
 					// copied over to the tx so it can be quickly accessed when response
-					// arrives.				
+					// arrives.
 					retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
+					
+					Dialog dialog = retryTran.getDialog();
+					if (dialog == null && JainSipUtils.dialogCreatingMethods.contains(sipServletRequest.getMethod())) {					
+						dialog = sipProvider.getNewDialog(retryTran);
+						this.setSessionCreatingDialog(dialog);
+						dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
+						if(logger.isDebugEnabled()) {
+							logger.debug("new Dialog for request " + sipServletRequest + ", ref = " + dialog);
+						}
+					}													
+															
 					sipServletRequest.setTransaction(retryTran);					
 				} catch (TransactionUnavailableException e) {
 					logger.error("Cannot get a new transaction for the new " + method +" request",e);
 					throw new IllegalArgumentException("Cannot get a new transaction for the " + method +" request",e);
+				} catch (SipException e) {
+					logger.error("Cannot get a new dialog for the new " + method +" request",e);
+					throw new IllegalArgumentException("Cannot get a new dialog for the " + method +" request",e);
 				}
+				
 				return sipServletRequest;
 			} else {
 				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(

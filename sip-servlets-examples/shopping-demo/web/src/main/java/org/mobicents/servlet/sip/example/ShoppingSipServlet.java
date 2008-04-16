@@ -17,6 +17,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.URI;
 
@@ -92,16 +93,15 @@ public class ShoppingSipServlet
 				authInfo.addAuthInfo(
 						response.getStatus(), 
 						response.getChallengeRealms().next(), 
-						"650390127", 
-						(String) sipApplicationSession.getAttribute("callerPassword"));
-				SipServletRequest originalRequest = response.getRequest();
-				SipServletRequest challengeRequest = sipFactory.createRequest(
-						response.getApplicationSession(), 
-						originalRequest.getMethod(), 
-						originalRequest.getFrom(), 
-						originalRequest.getTo());								
-				challengeRequest.setRequestURI(originalRequest.getRequestURI());
+						getServletContext().getInitParameter("caller.sip"), 
+						getServletContext().getInitParameter("caller.password"));
+				
+				SipServletRequest challengeRequest = response.getSession().createRequest(
+						response.getRequest().getMethod());
+				
 				challengeRequest.addAuthHeader(response, authInfo);
+				logger.info("Sending the challenge request " + challengeRequest);
+				
 				MsConnection connection =  (MsConnection) 
 					sipApplicationSession.getAttribute("connection");
 				String sdp = connection.getLocalDescriptor();
@@ -207,7 +207,10 @@ public class ShoppingSipServlet
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();		
 		SipFactory sipFactory = (SipFactory) sipApplicationSession.getAttribute("sipFactory");
 		try {			
-			Address fromAddress = sipFactory.createAddress((String) sipApplicationSession.getAttribute("caller"));
+			String callerAddress = (String)sipApplicationSession.getAttribute("caller");
+			String callerDomain = (String)sipApplicationSession.getAttribute("callerDomain");
+			SipURI fromURI = sipFactory.createSipURI(callerAddress, callerDomain);
+			Address fromAddress = sipFactory.createAddress(fromURI);
 			String customerName = (String) sipApplicationSession.getAttribute("customerName");
 			BigDecimal amount = (BigDecimal) sipApplicationSession.getAttribute("amountOrder");
 			String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");

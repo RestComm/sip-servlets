@@ -41,7 +41,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public interface SipApplicationDispatcher extends SipListener {
 
 	// List of sip extensions supported by the container
-	String[] EXTENSIONS_SUPPORTED = new String[] {"MESSAGE"};
+	String[] EXTENSIONS_SUPPORTED = new String[] {"MESSAGE", "INFO"};
 	
 	/**
 	 * Initialize the sip application dispatcher and its associated sip application router implementation

@@ -11,6 +11,7 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
@@ -66,7 +67,9 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 		try {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();			
 			String callerAddress = (String)Contexts.getApplicationContext().get("caller.sip");
-			Address fromAddress = sipFactory.createAddress(callerAddress);
+			String callerDomain = (String)Contexts.getApplicationContext().get("caller.domain");
+			SipURI fromURI = sipFactory.createSipURI(callerAddress, callerDomain);
+			Address fromAddress = sipFactory.createAddress(fromURI);
 			Address toAddress = sipFactory.createAddress(cutomerphone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);

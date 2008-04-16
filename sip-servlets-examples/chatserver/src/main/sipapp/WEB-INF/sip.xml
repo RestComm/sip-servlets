@@ -18,7 +18,7 @@
 		</servlet-class>
 		<init-param>
          <param-name>chatroomservername</param-name>
-         <param-value>sip:just4fun@127.0.0.1:5070</param-value> 
+         <param-value>sip:just4fun@127.0.0.1:5080</param-value> 
       </init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>	

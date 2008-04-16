@@ -70,6 +70,7 @@ public class AfterOrderProcessedAction implements AfterOrderProcessed, Serializa
 		sipApplicationSession.setAttribute("deliveryDate", true);
 		sipApplicationSession.setAttribute("sipFactory", sipFactory);
 		sipApplicationSession.setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
+		sipApplicationSession.setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
 		sipApplicationSession.setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
 		sipApplicationSession.setAttribute("adminAddress", (String)Contexts.getApplicationContext().get("admin.sip"));
 		sipApplicationSession.setAttribute("adminContactAddress", (String)Contexts.getApplicationContext().get("admin.sip.default.contact"));
