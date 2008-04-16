@@ -62,4 +62,4 @@ and drop in the jboss_home\server\default\deploy directory the war file generate
 To play with real examples check out the different examples located under trunk/sip-servlets-examples on the svn repo.
 
 otherwise this file has not yet been updated with the latest steps or I screwed up somewhere.  
-In any case send me an email or ping me on gmail jean.deruelle@gmail.com if you encounter any problems ;-)
+In any case provide some feedback as explained at the bottom of the home page at https://sip-servlets.dev.java.net/

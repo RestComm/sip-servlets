@@ -18,11 +18,13 @@ Examples
 	* {{{click2call.html}Click to Call}} : Converged application
 	
 	* {{{chatserver.html}Chat Server}} : support for sip extension MESSAGE
+	
+	* {{{shopping-example.html}SEAM Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   
 
 	You can play with our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)
 	
 	For testing against the examples you'll need to use some SIP softphones.
-	We tested most of the examples with WengoPhone, 3CX VoIP Client and SJ Phone 1.65, Ekiga and XLite.
+	We tested most of the examples with WengoPhone, 3CX VoIP Client, SJ Phone 1.65, Ekiga, linphone and XLite.
 	Most of the examples uses the 5090 port for one of the SIP softphone 
 	to be contacted so please make sure, it is configured that way.

@@ -25,14 +25,12 @@ Version 0.2 is out !
 
 	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=575044}Mobicents Sip Servlet 0.2 downloads}}
 
-Roadmap and Implementation tasks
+Roadmap
 
   As the JSR 289 spec is not yet finalized and as we are in the process of implementing it,
-  Please consider that this is still a work in progress and as such is still unstable
+  Please consider that this is still a work in progress and as such might be unstable. Look below to provide some feedback.
 
-  Please check out our {{{roadmap.html}roadmap}} to follow project progress and to know what will happen next.
-
-  Here are the {{{http://docs.google.com/Doc?id=dfcjr48z_65gpwxnz}implementation tasks}} needed to implement the JSR 289 spec.
+  Please check out our {{{roadmap.html}roadmap}} to follow project progress and to know what will happen next.  
 
   Here is a {{{http://spreadsheets.google.com/pub?key=pl-Xe-Wa5z7INjR4kdhxBEg&gid=1}document}} showing their approximative completion.
   

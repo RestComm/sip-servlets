@@ -51,7 +51,7 @@ log4j:WARN No appenders could be found for logger (SipContainer).
 log4j:WARN Please initialize the log4j system properly.
 the simple sip servlet has been started
 18 juil. 2007 08:09:48 org.apache.coyote.http11.Http11BaseProtocol start
-INFO: DÚmarrage de Coyote HTTP/1.1 sur http-8080
+INFO: Dï¿½marrage de Coyote HTTP/1.1 sur http-8080
 18 juil. 2007 08:09:48 org.apache.jk.common.ChannelSocket init
 INFO: JK: ajp13 listening on /0.0.0.0:8009
 18 juil. 2007 08:09:48 org.apache.jk.server.JkMain start
@@ -62,6 +62,6 @@ INFO: Find registry server-registry.xml at classpath resource
 INFO: Server startup in 1984 ms
 
 otherwise this file has not yet been updated with the latest steps or I screwed up somewhere. 
-In any case send me an email or ping me on gmail jean.deruelle@gmail.com if you encounter any problems ;-)
+In any case provide some feedback as explained at the bottom of the home page at https://sip-servlets.dev.java.net/
 
 To play with real examples check out the different examples located under trunk/sip-servlets-examples on the svn repo.
