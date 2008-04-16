@@ -26,7 +26,8 @@
       </item>
       <item name="Media support" href="media.html"/>
       <item name="Security" href="security.html"/>      
-      <item name="STUN suport" href="stun.html"/>      
+      <item name="STUN suport" href="stun.html"/>
+      <item name="Management Console" href="ssmc/sip-servlets-managment.htm"/>
       <item name="Roadmap" href="roadmap.html"/>
       <item name="License" href="license.html"/>
       <item name="QA" href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/"/>      

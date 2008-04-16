@@ -13,7 +13,7 @@ Media Example
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://download.java.net/maven/2/org/mobicents/servlet/sip/example/media-playback-servlet/1.0-SNAPSHOT/media-playback-servlet-1.0-SNAPSHOT.war}here}}.\
+ 	{{{http://download.java.net/maven/2/org/mobicents/servlet/sip/example/media-playback-servlet/1.0/media-playback-servlet-1.0.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/darfiles/media-playback-dar.properties}dar configuration file}}.\

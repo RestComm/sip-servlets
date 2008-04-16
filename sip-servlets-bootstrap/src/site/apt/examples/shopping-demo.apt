@@ -46,7 +46,7 @@ Shopping Demo
 ** From the binary (only available starting from the 0.3 binary)
 
 	You can find the ear file corresponding to this example
- 	{{{http://download.java.net/maven/2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0-SNAPSHOT/shopping-demo-ear-1.0-SNAPSHOT.ear}here}}.\
+ 	{{{http://download.java.net/maven/2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0/shopping-demo-ear-1.0.ear}here}}.\
  	Rename it to shopping-demo.ear\
  	Drop the renamed shopping-demo.ear file into your <<<jboss_home/server/default/deploy>>> directory. 	 	 
  	

@@ -18,12 +18,31 @@ Goals
   standalone with the Tomcat HTTP server as well as in an application server 
   integrated with JSLEE. Many interesting hacks in progress folks!
 
-Version 0.2 is out !
+Version 0.3 is out !
 
-	Our latest release is now working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA.\
-	It is shipped with the updated {{{examples/click2call.html}click to call sample application}}, to download this release and try it out, follow the following link : 
+	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :\
+		
+		* Management Console : {{{ssmc/sip-servlets-managment.htm}check this out}}
+		
+		* Media Support : check the media demo or the shopping demo examples (only for Jboss)
+		
+		* JEE integration / JEE converged applications : check the shopping demo example (only for Jboss)
+		
+		* STUN Support and DNS SRV lookups
+		
+		* usual round of bug fixes : {{{roadmap.htm}check this out}}
+		
+	It is shipped with :		
+	
+		* {{{ssmc/sip-servlets-managment.htm}Management Console}}
+	
+		* Educational converged example : {{{examples/click2call.html}Click To Call}}}
+	
+		* Mobicents Media Server 1.0-ALPHA2 (JBoss only)
+	
+	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=575044}Mobicents Sip Servlet 0.2 downloads}}
+	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.3 downloads}}
 
 Roadmap
 
