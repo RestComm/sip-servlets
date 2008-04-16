@@ -12,6 +12,9 @@
       	<item name="Tomcat Installation" href="installation-tomcat.html"/>
       	<item name="Jboss Installation" href="installation-jboss.html"/>
       </item>
+      <item name="Media support" href="security.html"/>
+      <item name="Security" href="security.html"/>      
+      <item name="STUN suport" href="stun.html"/>
       <item name="Examples" href="examples/examples.html" collapse="true">
       	<item name="Call Blocking" href="examples/call_blocking.html"/>
       	<item name="Call Forwarding" href="examples/call_forwarding.html"/>

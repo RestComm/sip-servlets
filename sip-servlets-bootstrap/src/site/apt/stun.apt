@@ -1,0 +1,50 @@
+STUN Support
+
+* STUN Description
+
+	STUN provides a mean for applications to discover the presence and type of firewalls or NATs 
+	between them and the public internet. 
+	
+	Additionally, in presence of a NAT STUN can be used by applications to learn 
+	the public Internet Protocol (IP) address assigned to the NAT.
+	
+	For more information on STUN, check the following links :
+	
+		* {{{http://www.ietf.org/rfc/rfc3489.txt}RFC 3489}}
+	
+		* {{{http://en.wikipedia.org/wiki/Simple_traversal_of_UDP_over_NATs}STUN on Wikipedia}}		  		
+		
+		* {{{http://www.voip-info.org/wiki-STUN}http://www.voip-info.org/wiki-STUN}}
+
+
+* Mobicents Sip Servlets STUN support
+	
+	Mobicents Sip Servlets provides STUN support at the sip connector level through the STUN4J project available at {{{https://stun4j.dev.java.net/}https://stun4j.dev.java.net/}}. 
+	
+	So each connector can choose whether or not it wants to use STUN to dicsover 
+	its public IP address and use this public IP address in SIP messages that will be sent through it. 
+
+	To configure a SIP connector to be STUN enabled, you need to add the three 
+	following properties to the corresponding Connector tag in the server.xml (whether on jboss or Tomcat) :
+	
+	<<<useStun="true">>>\
+	<<<stunServerAddress="stun01.sipphone.com">>>\
+	<<<stunServerPort="3478">>>\
+	
+		* <<<useStun>>> : enable STUN for this connector
+		
+		* <<<stunServerAddress>>> : The STUN server address that will be used for discovering the public IP address of this SIP connector
+		
+		* <<<stunServerPort>>> : The STUN server port of the STUN server used in the previous property (will rarely be changed if ever)
+		
+
+* Limitations and Future Work
+
+	STUN standard is currently being reworked in STUN-bis and STUN sits along side a number of other techniques 
+	to achieve NAT traversal.\
+	These include TURN, ICE UPnP and Session Border controllers. 
+	ICE provides a framework pulls together a number of different techniques: 
+	STUN, TURN, RSIP, to allow a client to investigate its environment.\
+
+	STUN-bis, TURN and ICE will be addressed in further versions of Mobicents Sip Servlets if current STUN support is really found too limited.  
+		

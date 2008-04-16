@@ -43,6 +43,18 @@
               <a href="../installation.html">Installation</a>
               </li>
               
+    <li class="none">
+              <a href="../security.html">Media support</a>
+        </li>
+              
+    <li class="none">
+              <a href="../security.html">Security</a>
+        </li>
+              
+    <li class="none">
+              <a href="../stun.html">STUN suport</a>
+        </li>
+              
                 
               
       
@@ -58,6 +70,8 @@
       
             
             
+            
+      
             
       
               
@@ -95,6 +109,10 @@
                   
     <li class="none">
               <a href="../examples/chatserver.html">Chat Server</a>
+        </li>
+                  
+    <li class="none">
+              <a href="../examples/shopping-demo.html">Shopping Demo</a>
         </li>
               </ul>
         </li>
@@ -228,139 +246,9 @@ By default it will accept any password, see below for instructions on how to ena
 You will see the index page where you can enter two SIP URIs. Enter the URIs of the two SIP phones you just started and click &quot;Submit&quot;.<br />
 The SIP phones don't have to be registered.</p>
 <p>After you pick up both phones the RTP session starts.</p>
-<div class="section"><h4>To enable security in JBoss AS</h4>
-<p>To enable security for JBoss Application Server, basically you have to create a security domain suitable for digest authentication and then configure your Sip Servlets application to use this security domain.<br />
-Here are the steps to make a simple configuration with static users, passwords and roles:</p>
-<ol type="1"><li>In server/default/conf/login-config.xml add a new security policy with hashed passwords, like this:<br />
-<tt>&lt;application-policy name = &quot;sip-servlets&quot;</tt>
-&gt;<br />
-<tt>&lt;authentication</tt>
-&gt;<br />
-<tt>&lt;login-module code=&quot;org.jboss.security.auth.spi.UsersRolesLoginModule&quot; flag = &quot;required&quot;</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;usersProperties&quot;&gt;props/sip-servlets-users.properties&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;rolesProperties&quot;&gt;props/sip-servlets-roles.properties&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;hashAlgorithm&quot;&gt;MD5&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;hashEncoding&quot;&gt;rfc2617&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;hashUserPassword&quot;&gt;false&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;hashStorePassword&quot;&gt;true&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;passwordIsA1Hash&quot;&gt;true&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;module-option name=&quot;storeDigestCallback&quot;&gt;org.jboss.security.auth.spi.RFC2617Digest&lt;/module-option</tt>
-&gt;<br />
-<tt>&lt;/login-module</tt>
-&gt;<br />
-<tt>&lt;/authentication</tt>
-&gt;<br />
-<tt>&lt;/application-policy</tt>
-&gt;</li>
-<li>In the file props/sip-servlets-users.properties put this:<br />
-# A sample users.properties file, this line creates user &quot;admin&quot; with password &quot;admin&quot; for &quot;sip-servlets-realm&quot;<br />
-admin=9640e13fedc736bdafa6b9007d965c56<p>The cryptic string here is the A1 value of the digest authentication algorithm and can be generated with the following command:<br />
-<tt>java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username &quot;My Realm&quot; password</tt>
-<br />
-<tt>RFC2617 A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea</tt>
+<div class="section"><h4>Security </h4>
+<p>To enable security for this application check the following <a href="/security.html">page</a>
 </p>
-</li>
-<li>In the file props/sip-servlets-roles.properties put this:<br />
-# A sample roles.properties file for use with some roles<br />
-admin=caller,role1,role2,..<p>Each line in this file assigns roles to the users defined in sip-servlets-users.properties</p>
-</li>
-<li>In jboss-web.xml in your application put this:<br />
-<tt>&lt;jboss-web</tt>
-&gt;<br />
-<tt>&lt;!-- Uncomment the security-domain to enable security. You will need to edit the htmladaptor login configuration to setup the login modules used to authentication users. --</tt>
-&gt;<br />
-<tt>&lt;security-domain&gt;java:/jaas/sip-servlets&lt;/security-domain</tt>
-&gt;<br />
-<tt>&lt;/jboss-web</tt>
-&gt;</li>
-<li>In sip.xml in your application add some security constraint and authentication type, for example:<br />
-<tt>&lt;security-constraint</tt>
-&gt;<br />
-<tt>&lt;display-name&gt;REGISTER Method Security Constraint&lt;/display-name</tt>
-&gt;<br />
-<tt>&lt;resource-collection</tt>
-&gt;<br />
-<tt>&lt;resource-name&gt;SimpleSipServlet&lt;/resource-name</tt>
-&gt;<br />
-<tt>&lt;description&gt;Require authenticated REGSITER requests&lt;/description</tt>
-&gt;<br />
-<tt>&lt;servlet-name&gt;SimpleSipServlet&lt;/servlet-name</tt>
-&gt;<br />
-<tt>&lt;sip-method&gt;REGISTER&lt;/sip-method</tt>
-&gt;<br />
-<tt>&lt;/resource-collection</tt>
-&gt;<br />
-<tt>&lt;auth-constraint</tt>
-&gt;<br />
-<tt>&lt;role-name&gt;caller&lt;/role-name</tt>
-&gt;<br />
-<tt>&lt;/auth-constraint</tt>
-&gt;<br />
-<tt>&lt;/security-constraint</tt>
-&gt;<p><tt>&lt;login-config</tt>
-&gt;<br />
-<tt>&lt;auth-method&gt;DIGEST&lt;/auth-method</tt>
-&gt;<br />
-<tt>&lt;realm-name&gt;sip-servlets-realm&lt;/realm-name</tt>
-&gt;<br />
-<tt>&lt;/login-config</tt>
-&gt;</p>
-</li>
-</ol>
-</div>
-<div class="section"><h4>To enable security in Tomcat</h4>
-<p>You have to specify some security realm for the servlet container or it's parents, and add some contraints to the application. There are the steps: \</p>
-<ol type="1"><li>Open <tt>&lt;tomcat_home&gt;/conf/server.xml</tt>
- and uncomment the following line:<br />
-<tt>&lt;Realm className=&quot;org.apache.catalina.realm.MemoryRealm&quot; /</tt>
-&gt;</li>
-<li>Open <tt>&lt;tomcat_home&gt;/conf/tomcat-users.xml</tt>
- and add the following <i>user</i>
- sub-element:<br />
-<tt>&lt;user name=&quot;user&quot; password=&quot;password&quot; roles=&quot;caller&quot; /</tt>
-&gt;</li>
-<li>In sip.xml in your application add some security constraint and authentication type, for example:<br />
-<tt>&lt;security-constraint</tt>
-&gt;<br />
-<tt>&lt;display-name&gt;REGISTER Method Security Constraint&lt;/display-name</tt>
-&gt;<br />
-<tt>&lt;resource-collection</tt>
-&gt;<br />
-<tt>&lt;resource-name&gt;SimpleSipServlet&lt;/resource-name</tt>
-&gt;<br />
-<tt>&lt;description&gt;Require authenticated REGSITER requests&lt;/description</tt>
-&gt;<br />
-<tt>&lt;servlet-name&gt;SimpleSipServlet&lt;/servlet-name</tt>
-&gt;<br />
-<tt>&lt;sip-method&gt;REGISTER&lt;/sip-method</tt>
-&gt;<br />
-<tt>&lt;/resource-collection</tt>
-&gt;<br />
-<tt>&lt;auth-constraint</tt>
-&gt;<br />
-<tt>&lt;role-name&gt;caller&lt;/role-name</tt>
-&gt;<br />
-<tt>&lt;/auth-constraint</tt>
-&gt;<br />
-<tt>&lt;/security-constraint</tt>
-&gt;<p><tt>&lt;login-config</tt>
-&gt;<br />
-<tt>&lt;auth-method&gt;DIGEST&lt;/auth-method</tt>
-&gt;<br />
-<tt>&lt;realm-name&gt;sip-servlets-realm&lt;/realm-name</tt>
-&gt;<br />
-<tt>&lt;/login-config</tt>
-&gt;</p>
-</li>
-</ol>
 </div>
 </div>
 </div>
@@ -379,7 +267,7 @@ admin=caller,role1,role2,..<p>Each line in this file assigns roles to the users 
 
   
   
-  &nbsp;| Last Published: 03/20/2008
+  &nbsp;| Last Published: 04/09/2008
   &nbsp;| Version: 0.3-SNAPSHOT
 </div>
       <div class="clear">
