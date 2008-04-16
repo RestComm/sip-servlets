@@ -37,15 +37,8 @@
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
-		<!-- Create a source jar of the jbossweb/servlet classes >
-		<zip destfile="${tomcat.jars}/jbossweb-src.zip">
-			<fileset dir="${basedir}/java">
-				<include name="org/**" />
-				<exclude name="org/jboss/logging/**" />
-				<include name="javax/servlet/**" />
-				<include name="javax/el/**" />
-			</fileset>
-		</zip-->
+		<zip destfile="${base.path}/mss-0.2-apache-tomcat-${tomcat.version}.zip" basedir="${base.path}/apache-tomcat-${tomcat.version}"/>
+		<zip destfile="${base.path}/mss-0.2-jboss-${jboss.version}.zip" basedir="${base.path}/jboss-${jboss.version}"/>			
 	</target>
 
 	<target name="clean">
