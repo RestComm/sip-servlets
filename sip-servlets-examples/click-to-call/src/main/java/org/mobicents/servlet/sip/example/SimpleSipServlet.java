@@ -211,14 +211,19 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		
 		Address address = req.getAddressHeader(CONTACT_HEADER);
 		String fromURI = req.getFrom().getURI().toString();
-		if(address.getExpires() == 0) {
+		
+		int expires = address.getExpires();
+		if(expires < 0) {
+			expires = req.getExpires();
+		}
+		if(expires == 0) {
 			users.remove(fromURI);
 			logger.info("User " + fromURI + " unregistered");
 		} else {
 			resp.setAddressHeader(CONTACT_HEADER, address);
 			users.put(fromURI, address.getURI().toString());
 			logger.info("User " + fromURI + 
-					" registered with an Expire time of " + address.getExpires());
+					" registered with an Expire time of " + expires);
 		}				
 						
 		resp.send();
