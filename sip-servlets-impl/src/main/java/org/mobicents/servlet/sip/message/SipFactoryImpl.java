@@ -55,7 +55,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
-import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
@@ -66,10 +65,11 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 public class SipFactoryImpl implements SipFactory, Serializable {
-	private transient static final Log logger = LogFactory.getLog(SipFactoryImpl.class
+	private static final transient Log logger = LogFactory.getLog(SipFactoryImpl.class
 			.getCanonicalName());
 
 	public static class NamesComparator implements Comparator<String> {
@@ -106,8 +106,9 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			throws ServletParseException {
 
 		try {
-			if (logger.isDebugEnabled())
+			if (logger.isDebugEnabled()) {
 				logger.debug("Creating Address from [" + sipAddress + "]");
+			}
 
 			AddressImpl retval = new AddressImpl();
 			retval.setValue(sipAddress);
@@ -123,16 +124,13 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI)
 	 */
 	public Address createAddress(URI uri) {
-		try {
-			if (logger.isDebugEnabled())
-				logger.debug("Creating Address fromm URI[" + uri.toString()
-						+ "]");
-			URIImpl uriImpl = (URIImpl) uri;
-			return new AddressImpl(SipFactories.addressFactory
-					.createAddress(uriImpl.getURI()));
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Creating Address fromm URI[" + uri.toString()
+					+ "]");
 		}
+		URIImpl uriImpl = (URIImpl) uri;
+		return new AddressImpl(SipFactories.addressFactory
+				.createAddress(uriImpl.getURI()));
 	}
 
 	/*
@@ -143,9 +141,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 */
 	public Address createAddress(URI uri, String displayName) {
 		try {
-			if (logger.isDebugEnabled())
+			if (logger.isDebugEnabled()) {
 				logger.debug("Creating Address from URI[" + uri.toString()
 						+ "] with display name[" + displayName + "]");
+			}
 
 			javax.sip.address.Address address = SipFactories.addressFactory
 					.createAddress(((URIImpl) uri).getURI());
@@ -192,13 +191,14 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
 			String method, Address from, Address to) {
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
 							+ sipAppSession
 							+ "] METHOD["
 							+ method
 							+ "] FROM_A[" + from + "] TO_A[" + to + "]");
+		}
 
 		validateCreation(method, sipAppSession);
 
@@ -213,13 +213,14 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
 			String method, URI from, URI to) {
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
 							+ sipAppSession
 							+ "] METHOD["
 							+ method
 							+ "] FROM_URI[" + from + "] TO_URI[" + to + "]");
+		}
 
 		validateCreation(method, sipAppSession);
 
@@ -238,7 +239,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
 			String method, String from, String to) throws ServletParseException {
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
 							+ sipAppSession
@@ -246,6 +247,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 							+ method
 							+ "] FROM["
 							+ from + "] TO[" + to + "]");
+		}
 
 		validateCreation(method, sipAppSession);
 
@@ -264,9 +266,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest,
 			boolean sameCallId) {
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger.debug("Creating SipServletRequest from original request["
 					+ origRequest + "] with same call id[" + sameCallId + "]");
+		}
 
 	    return origRequest.getB2buaHelper().createRequest(origRequest, true, null);
 	}
@@ -278,9 +281,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 *      java.lang.String)
 	 */
 	public SipURI createSipURI(String user, String host) {
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger.debug("Creating SipURI from USER[" + user + "] HOST[" + host
 					+ "]");
+		}
 		try {
 			return new SipURIImpl(SipFactories.addressFactory.createSipURI(
 					user, host));
@@ -303,7 +307,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 						(javax.sip.address.TelURL) jainUri);
 
 			}
-		} catch (Exception ex) {
+		} catch (ParseException ex) {
 			throw new ServletParseException("Bad param " + uri, ex);
 		}
 		throw new IllegalArgumentException("Unsupported Scheme : " + uri);
@@ -316,19 +320,21 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 * exception
 	 * 
 	 */
-	private void validateCreation(String method, SipApplicationSession app)
-			throws IllegalArgumentException {
+	private static void validateCreation(String method, SipApplicationSession app) {
 
-		if (method.equals(Request.ACK))
+		if (method.equals(Request.ACK)) {
 			throw new IllegalArgumentException(
 					"Wrong method to create request with[" + Request.ACK + "]!");
-		if (method.equals(Request.CANCEL))
+		}
+		if (method.equals(Request.CANCEL)) {
 			throw new IllegalArgumentException(
 					"Wrong method to create request with[" + Request.CANCEL
 							+ "]!");
-		if (!app.isValid())
+		}
+		if (!app.isValid()) {
 			throw new IllegalArgumentException(
 					"Cant associate request with invalidaded sip session application!");
+		}
 
 	}
 
@@ -385,7 +391,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
 					((SipApplicationSessionImpl)sipAppSession).getKey().getCallId());
 			maxForwardsHeader = SipFactories.headerFactory
-					.createMaxForwardsHeader(70);
+					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 
 			// FIXME: ADD ROUTE? HOW?
 			// Address routeAddress = sipAddressFactory.createAddress("sip:"
@@ -435,11 +441,13 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 					maxForwardsHeader);
 
 			
-			// Add all headers
-			if (contactHeader != null)
-				requestToWrap.addHeader(contactHeader);
-			if (routeHeader != null)
-				requestToWrap.addHeader(routeHeader);
+			// Add all headers		
+//			if(contactHeader != null) {
+//				requestToWrap.addHeader(contactHeader);
+//			}
+//			if(routeHeader != null) {
+//				requestToWrap.addHeader(routeHeader);
+//			}
 
 			SipSessionKey key = SessionManager.getSipSessionKey(
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap, false);
@@ -540,7 +548,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating new application session by following key " + sipApplicationKey);
 		}
-		SipApplicationSessionKey sipApplicationSessionKey;
+		SipApplicationSessionKey sipApplicationSessionKey = null;
 		try {
 			sipApplicationSessionKey = SessionManager.parseSipApplicationSessionKey(
 					sipApplicationKey);

@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityCollection;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
@@ -34,7 +34,7 @@ public class SipSecurityUtils {
 	
 	private static Log log = LogFactory.getLog(SipSecurityUtils.class);
 	
-	public static boolean authenticate(SipStandardContext sipStandardContext,
+	public static boolean authenticate(SipContext sipStandardContext,
 			SipServletRequestImpl request,
 			SipSecurityConstraint sipConstraint)
 	{
@@ -50,7 +50,7 @@ public class SipSecurityUtils {
 						DigestAuthenticator auth = new DigestAuthenticator();
 						auth.setContext(sipStandardContext);
 						SipServletResponseImpl response = createErrorResponse(request, sipConstraint);
-						authenticated = auth.authenticate(request, (SipServletResponseImpl) response, loginConfig);		
+						authenticated = auth.authenticate(request, response, loginConfig);		
 						request.setUserPrincipal(auth.getPrincipal());
 					} else if(authMethod.equalsIgnoreCase("BASIC")) {
 						throw new IllegalStateException("Basic authentication not supported in JSR 289");
@@ -82,13 +82,15 @@ public class SipSecurityUtils {
     	return (SipServletResponseImpl) response;
 	}
 	
-	public static boolean authorize(SipStandardContext sipStandardContext, SipServletRequestImpl request)
+	public static boolean authorize(SipContext sipStandardContext, SipServletRequestImpl request)
 	{
 		boolean allConstrainsSatisfied = true;
 		SecurityConstraint[] constraints = sipStandardContext.findConstraints();
 		
 		// If we have no constraints, just authorize the request;
-		if(constraints.length == 0) return true;
+		if(constraints.length == 0) {
+			return true;
+		}
 		
 		for(SecurityConstraint constraint:constraints)
 		{

@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -119,7 +120,7 @@ public class AnnotationsClassLoader
         Boolean.valueOf(System.getProperty("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "true")).booleanValue();
     
     protected class PrivilegedFindResource
-        implements PrivilegedAction {
+        implements PrivilegedAction<Object> {
 
         protected File file;
         protected String path;
@@ -228,13 +229,13 @@ public class AnnotationsClassLoader
      * The cache of ResourceEntry for classes and resources we have loaded,
      * keyed by resource name.
      */
-    protected HashMap resourceEntries = new HashMap();
+    protected Map<String, ResourceEntry> resourceEntries = new HashMap<String, ResourceEntry>();
 
 
     /**
      * The list of not found resources.
      */
-    protected HashMap notFoundResources = new HashMap();
+    protected Map<String, String> notFoundResources = new HashMap<String, String>();
 
 
     /**
@@ -333,7 +334,7 @@ public class AnnotationsClassLoader
      * The PermissionCollection for each CodeSource for a web
      * application context.
      */
-    protected HashMap loaderPC = new HashMap();
+    protected Map loaderPC = new HashMap();
 
 
     /**
@@ -1617,7 +1618,7 @@ public class AnnotationsClassLoader
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
         if (ENABLE_CLEAR_REFERENCES) {
-            Iterator loadedClasses = ((HashMap) resourceEntries.clone()).values().iterator();
+            Iterator loadedClasses = ((HashMap)((HashMap) resourceEntries).clone()).values().iterator();
             while (loadedClasses.hasNext()) {
                 ResourceEntry entry = (ResourceEntry) loadedClasses.next();
                 if (entry.loadedClass != null) {

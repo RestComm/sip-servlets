@@ -16,8 +16,11 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import java.lang.reflect.Method;
+
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 
 /**
  * A <b>SipContext</b> is a Container that represents a sip/converged servlet context, and
@@ -69,4 +72,17 @@ public interface SipContext extends Context {
 
 	void setSmallIcon(String smallIcon);
 
+	void addSipApplicationListener(String listener);
+	
+	void removeSipApplicationListener(String listener);
+	
+	String[] findSipApplicationListeners();
+	
+	Method getSipApplicationKeyMethod();
+	
+	void setSipApplicationKeyMethod(Method sipApplicationKeyMethod);
+	
+	void setSipLoginConfig(SipLoginConfig config);
+	
+	SipLoginConfig getSipLoginConfig();
 }

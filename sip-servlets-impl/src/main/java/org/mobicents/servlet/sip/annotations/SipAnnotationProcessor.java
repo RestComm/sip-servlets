@@ -25,12 +25,10 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import javax.servlet.sip.SipFactory;
-import javax.servlet.sip.SipServlet;
 import javax.xml.ws.WebServiceRef;
 
 import org.apache.catalina.util.DefaultAnnotationProcessor;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.SipContext;
 /**
  * An annotation processor which tries to inject resources found in the servlet context
  * instead of the naming context of the servlet.
@@ -40,7 +38,7 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
  */
 public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 
-	private SipStandardContext sipContext;
+	private SipContext sipContext;
 	
 	@Override
 	public void processAnnotations(Object instance) throws IllegalAccessException, InvocationTargetException, NamingException {
@@ -102,7 +100,7 @@ public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 	}
 	        
 
-	public SipAnnotationProcessor(Context context, SipStandardContext sipContext) {
+	public SipAnnotationProcessor(Context context, SipContext sipContext) {
 		super(context);
 		this.sipContext = sipContext;
 	}

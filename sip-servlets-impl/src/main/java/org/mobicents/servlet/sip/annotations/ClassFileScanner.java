@@ -17,14 +17,8 @@
 package org.mobicents.servlet.sip.annotations;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.jar.JarFile;
-import java.util.zip.ZipFile;
 
 import javax.servlet.sip.annotation.SipApplication;
 import javax.servlet.sip.annotation.SipApplicationKey;
@@ -32,10 +26,9 @@ import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
@@ -57,7 +50,7 @@ public class ClassFileScanner {
 			
 	private String docbase;
 	
-	private SipStandardContext sipContext;
+	private SipContext sipContext;
 	
 	private String parsedAnnotatedPackage = null;
 	
@@ -69,7 +62,7 @@ public class ClassFileScanner {
 	
 	SipServletImpl parsedServletData = null;
 	
-	public ClassFileScanner(String docbase, SipStandardContext ctx) {
+	public ClassFileScanner(String docbase, SipContext ctx) {
 		this.docbase = docbase;
 		this.sipContext = ctx;
 	}
@@ -250,7 +243,7 @@ public class ClassFileScanner {
 		}
     }
     
-    private SipStandardContext parseSipApplication(SipStandardContext context, SipApplication appData, String packageName) {
+    private SipContext parseSipApplication(SipContext context, SipApplication appData, String packageName) {
     	context.setMainServlet(appData.mainServlet());
     	context.setProxyTimeout(appData.proxyTimeout());
     	context.setSessionTimeout(appData.sessionTimeout());
@@ -282,7 +275,7 @@ public class ClassFileScanner {
     	return null;
     }
     
-    private static void copyParsedProperties(SipStandardContext from, SipStandardContext to) {
+    private static void copyParsedProperties(SipContext from, SipContext to) {
     	to.setMainServlet(from.getMainServlet());
     	to.setApplicationName(from.getApplicationName());
     	to.setDisplayName(from.getDisplayName());

@@ -111,8 +111,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipServletRequest, boolean, java.util.Map)
 	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest,
-			boolean linked, Map<String, Set<String>> headerMap)
-			throws IllegalArgumentException {
+			boolean linked, Map<String, Set<String>> headerMap) {
 
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
@@ -140,28 +139,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//but is populated by the container as usual
 			newRequest.removeHeader(ContactHeader.NAME);
 
-			//but If Contact header is present in the headerMap 
-			//then relevant portions of Contact header is to be used in the request created, 
-			//in accordance with section 4.1.3 of the specification.
-			//They will be added later after the sip servlet request has been created
-			Set<String> contactHeaderSet = new HashSet<String>();
-			if(headerMap != null) {
-				for (String headerName : headerMap.keySet()) {
-					if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
-						for (String value : headerMap.get(headerName)) {							
-							Header header = SipFactories.headerFactory.createHeader(
-									headerName, value);
-							if(! singletonHeadersNames.contains(header.getName())) {
-								newRequest.addHeader(header);
-							} else {
-								newRequest.setHeader(header);
-							}
-						}
-					} else {
-						contactHeaderSet = headerMap.get(headerName);
-					}
-				}
-			}			
+			Set<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+					newRequest);			
 			SipSessionImpl originalSession = origRequestImpl.getSipSession();
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();				
@@ -215,16 +194,14 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipSession, javax.servlet.sip.SipServletRequest, java.util.Map)
 	 */
 	public SipServletRequest createRequest(SipSession session,
-			SipServletRequest origRequest, Map<String, Set<String>> headerMap)
-			throws IllegalArgumentException {
+			SipServletRequest origRequest, Map<String, Set<String>> headerMap) {
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			SipSessionImpl sessionImpl = (SipSessionImpl) session;
 
 			Dialog dialog = sessionImpl.getSessionCreatingDialog();
 			
-			Request newRequest = dialog.createRequest(((SipServletRequest) origRequest)
-					.getMethod());
+			Request newRequest = dialog.createRequest(origRequest.getMethod());
 									
 			SipSessionImpl originalSession = origRequestImpl.getSipSession();
 
@@ -238,24 +215,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			//They will be added later after the sip servlet request has been created
-			Set<String> contactHeaderSet = new HashSet<String>();
-			if(headerMap != null) {
-				for (String headerName : headerMap.keySet()) {
-					if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
-						for (String value : headerMap.get(headerName)) {							
-							Header header = SipFactories.headerFactory.createHeader(
-									headerName, value);
-							if(! singletonHeadersNames.contains(header.getName())) {
-								newRequest.addHeader(header);
-							} else {
-								newRequest.setHeader(header);
-							}
-						}
-					} else {
-						contactHeaderSet = headerMap.get(headerName);
-					}
-				}
-			}
+			Set<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+					newRequest);
 			
 			//we already have a dialog since it is a subsequent request			
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
@@ -289,6 +250,36 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 	}
 
+	/**
+	 * @param headerMap
+	 * @param newRequest
+	 * @return
+	 * @throws ParseException
+	 */
+	private static Set<String> retrieveContactHeaders(
+			Map<String, Set<String>> headerMap, Request newRequest)
+			throws ParseException {
+		Set<String> contactHeaderSet = new HashSet<String>();
+		if(headerMap != null) {
+			for (String headerName : headerMap.keySet()) {
+				if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
+					for (String value : headerMap.get(headerName)) {							
+						Header header = SipFactories.headerFactory.createHeader(
+								headerName, value);
+						if(! singletonHeadersNames.contains(header.getName())) {
+							newRequest.addHeader(header);
+						} else {
+							newRequest.setHeader(header);
+						}
+					}
+				} else {
+					contactHeaderSet = headerMap.get(headerName);
+				}
+			}
+		}
+		return contactHeaderSet;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#createResponseToOriginalRequest(javax.servlet.sip.SipSession, int, java.lang.String)
@@ -296,8 +287,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 	public SipServletResponse createResponseToOriginalRequest(
 			SipSession session, int status, String reasonPhrase) {
 
-		if (session == null)
+		if (session == null) {
 			throw new NullPointerException("Null arg");
+		}
 
 		SipSessionImpl sipSession = (SipSessionImpl) session;
 
@@ -313,13 +305,13 @@ public class B2buaHelperImpl implements B2buaHelper {
 		try {
 			Response response = SipFactories.messageFactory.createResponse(
 					status, request);
-			if (reasonPhrase != null)
+			if (reasonPhrase != null) {
 				response.setReasonPhrase(reasonPhrase);
+			}
 						
 			ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);			
 			while (recordRouteHeaders.hasNext()) {
-				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
-						.next();				
+				RecordRouteHeader recordRouteHeader = recordRouteHeaders.next();				
 				response.addHeader(recordRouteHeader);
 			}			
 			
@@ -343,7 +335,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#getLinkedSession(javax.servlet.sip.SipSession)
 	 */
 	public SipSession getLinkedSession(SipSession session) {
-		if ( session == null )throw new NullPointerException("the argument is null");
+		if ( session == null) { 
+			throw new NullPointerException("the argument is null");
+		}
 		if(!session.isValid()) {
 			throw new IllegalArgumentException("the session is invalid");
 		}
@@ -391,8 +385,12 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#linkSipSessions(javax.servlet.sip.SipSession, javax.servlet.sip.SipSession)
 	 */
 	public void linkSipSessions(SipSession session1, SipSession session2) {
-		if ( session1 == null )throw new NullPointerException("First argument is null");
-		if ( session2 == null )throw new NullPointerException("Second argument is null");
+		if ( session1 == null) {
+			throw new NullPointerException("First argument is null");
+		}
+		if ( session2 == null) {
+			throw new NullPointerException("Second argument is null");
+		}
 		
 		if(!session1.isValid() || !session2.isValid() || 
 				State.TERMINATED.equals(((SipSessionImpl)session1).getState()) ||
@@ -414,7 +412,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#unlinkSipSessions(javax.servlet.sip.SipSession)
 	 */
 	public void unlinkSipSessions(SipSession session) {		
-		if ( session == null )throw new NullPointerException("the argument is null");
+		if ( session == null) { 
+			throw new NullPointerException("the argument is null");
+		}
 		if(!session.isValid() || 
 				State.TERMINATED.equals(((SipSessionImpl)session).getState()) ||
 				sessionMap.get(session) == null) {
@@ -422,7 +422,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 		SipSessionImpl key = (SipSessionImpl) session;
 		SipSessionImpl value  = this.sessionMap.get(key);
-		if ( value != null) this.sessionMap.remove(value);
+		if (value != null) {
+			this.sessionMap.remove(value);
+		}
 		this.sessionMap.remove(key);
 	}
 

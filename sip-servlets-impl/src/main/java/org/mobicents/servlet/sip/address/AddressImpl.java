@@ -173,9 +173,10 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 				throw new IllegalArgumentException("Problem setting parameter",
 						e);
 			}
-		} else
+		} else {
 			throw new IllegalArgumentException(
 					"Can only set parameter for Sip URI");
+		}
 	}
 	/*
 	 * (non-Javadoc)

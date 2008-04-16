@@ -19,7 +19,9 @@ package org.mobicents.servlet.sip.message;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
@@ -39,8 +41,10 @@ import javax.sip.Transaction;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -80,7 +84,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			SipServletRequestImpl originalRequest) {
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);
-		this.response = (Response) response;
+		this.response = response;
 		this.originalRequest = originalRequest;
 	}
 	
@@ -98,19 +102,20 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		// This doesnt contain contact!!!!
 		boolean isSystemHeader = systemHeaders.contains(hName);
 
-		if (isSystemHeader)
+		if (isSystemHeader) {
 			return isSystemHeader;
+		}
 
 		boolean isContactSystem = false;
-		Response response = (Response) this.message;
+		Response sipResponse = (Response) this.message;
 
-		String method = ((CSeqHeader) response.getHeader(CSeqHeader.NAME))
+		String method = ((CSeqHeader) sipResponse.getHeader(CSeqHeader.NAME))
 				.getMethod();
 		//Killer condition, see comment above for meaning
 		if (method.equals(Request.REGISTER)
-				|| (299 < response.getStatusCode() && response.getStatusCode() < 400)
-				|| response.getStatusCode() == 485
-				|| (response.getStatusCode() == 200 && method.equals(Request.OPTIONS))) {
+				|| (Response.MULTIPLE_CHOICES <= sipResponse.getStatusCode() && sipResponse.getStatusCode() < Response.BAD_REQUEST)
+				|| sipResponse.getStatusCode() == Response.AMBIGUOUS
+				|| (sipResponse.getStatusCode() == Response.OK && method.equals(Request.OPTIONS))) {
 			isContactSystem = false;
 		} else {
 			isContactSystem = true;
@@ -141,8 +146,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			ListIterator<RouteHeader> routeHeaders = ackRequest.getHeaders(RouteHeader.NAME);
 			ackRequest.removeHeader(RouteHeader.NAME);
 			while (routeHeaders.hasNext()) {
-				RouteHeader routeHeader = (RouteHeader) routeHeaders
-						.next();
+				RouteHeader routeHeader = routeHeaders.next();
 				String routeAppName = ((SipURI)routeHeader .getAddress().getURI()).
 					getParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME);
 				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
@@ -382,8 +386,17 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletResponse#getChallengeRealms()
 	 */
 	public Iterator<String> getChallengeRealms() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> realms = new ArrayList<String>();
+		if(response.getStatusCode() == SipServletResponse.SC_UNAUTHORIZED) {
+			WWWAuthenticateHeader authenticateHeader = (WWWAuthenticateHeader) 
+				response.getHeader(WWWAuthenticateHeader.NAME);
+			realms.add(authenticateHeader.getRealm());
+		} else if (response.getStatusCode() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
+			ProxyAuthenticateHeader authenticateHeader = (ProxyAuthenticateHeader) 
+				response.getHeader(ProxyAuthenticateHeader.NAME);
+			realms.add(authenticateHeader.getRealm());
+		}
+		return realms.iterator();
 	}
 
 

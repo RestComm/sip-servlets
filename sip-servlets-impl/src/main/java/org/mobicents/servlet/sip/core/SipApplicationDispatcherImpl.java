@@ -119,7 +119,7 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
  * dispatching them to those sip applications interested in the messages.
  * @author Jean Deruelle 
  */
-public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {
+public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {	
 	//the logger
 	private static transient Log logger = LogFactory
 			.getLog(SipApplicationDispatcherImpl.class);
@@ -141,13 +141,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public static final String APP_NOT_DEPLOYED = "appnotdeployed";
 	
-	public static Set<String> nonInitialSipRequestMethods = new HashSet<String>();
+	public static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
 		nonInitialSipRequestMethods.add("CANCEL");
 		nonInitialSipRequestMethods.add("BYE");
 		nonInitialSipRequestMethods.add("PRACK");
 		nonInitialSipRequestMethods.add("ACK");
+		nonInitialSipRequestMethods.add("UPDATE");
+		nonInitialSipRequestMethods.add("INFO");
 	};
 	
 //	private enum InitialRequestRouting {
@@ -242,7 +244,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param sipContext the sip context of the application where the listeners reside.
 	 * @return true if all listeners have been notified correctly
 	 */
-	private boolean notifySipServletsListeners(SipContext sipContext) {
+	private static boolean notifySipServletsListeners(SipContext sipContext) {
 		boolean ok = true;
 		SipListenersHolder sipListenersHolder = sipContext.getListeners();
 		List<SipServletListener> sipServletListeners = sipListenersHolder.getSipServletsListeners();
@@ -344,8 +346,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			Although the jsip stacktransaction might have ended, the message that ended it
 			is not yet delivered to the container and the servlet at this time.
         */
-		if(!sipSessionImpl.hasOngoingTransaction())
+		if(!sipSessionImpl.hasOngoingTransaction()) {
 			sessionManager.removeSipSession(sipSessionImpl.getKey());
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -462,7 +465,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		MaxForwardsHeader mf = (MaxForwardsHeader) clonedRequest
 			.getHeader(MaxForwardsHeader.NAME);
 		if (mf == null) {
-			mf = SipFactories.headerFactory.createMaxForwardsHeader(70);
+			mf = SipFactories.headerFactory.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 			clonedRequest.addHeader(mf);
 		} else {
 			mf.setMaxForwards(mf.getMaxForwards() - 1);
@@ -506,27 +509,27 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	                     
 	            // Copy all the headers from the original request to the 
 	            // dialog created request:	            
-                ListIterator l=clonedRequest.getHeaderNames();
-                while (l.hasNext() ) {
-                     String name=(String)l.next();
+                ListIterator<String> headerNamesListIterator=clonedRequest.getHeaderNames();
+                while (headerNamesListIterator.hasNext()) {
+                     String name=headerNamesListIterator.next();
                      Header header=dialogRequest.getHeader(name);
                      if (header==null  ) {
-                        ListIterator li=clonedRequest.getHeaders(name);
+                        ListIterator<Header> li=clonedRequest.getHeaders(name);
                         if (li!=null) {
                             while (li.hasNext() ) {
-                                Header  h=(Header)li.next();
+                                Header  h = li.next();
                                 dialogRequest.addHeader(h);
                             }
                         }
                      }
                      else {
                          if ( header instanceof ViaHeader) {
-                             ListIterator li= clonedRequest.getHeaders(name);
+                             ListIterator<Header> li= clonedRequest.getHeaders(name);
                              if (li!=null) {
                                  dialogRequest.removeHeader(name);
                                  Vector v=new Vector();
                                  while (li.hasNext() ) {
-                                     Header  h=(Header)li.next();
+                                     Header  h=li.next();
                                      v.addElement(h);
                                  }
                                  for (int k=(v.size()-1);k>=0;k--) {
@@ -585,7 +588,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			inverted = true;
 		}
 		
-		SipStandardContext sipContext = (SipStandardContext) this.applicationDeployed.get(applicationName);
+		SipContext sipContext = this.applicationDeployed.get(applicationName);
 		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
 		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, false, null);
@@ -913,7 +916,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 	}
 	
-	private SipApplicationSessionKey makeAppSessionKey(SipStandardContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) {
+	private SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) {
 		String callId = null;
 		Request request = (Request) sipServletRequestImpl.getMessage();
 		Method appKeyMethod = null;
@@ -1078,7 +1081,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
-			SipStandardContext sipContext = (SipStandardContext) applicationDeployed.get(applicationRouterInfo.getNextApplicationName());			
+			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());			
 			//sip appliation session association
 			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
@@ -1429,7 +1432,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, inverted);
 			logger.info("route response on following session " + sessionKey);
-			SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl, null);									
+			SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+			
+			TransactionApplicationData applicationData = null;
+			SipServletRequestImpl originalRequest = null;
+			if(clientTransaction != null) {
+				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
+				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
+					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+				}
+			}
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
 					response, 
@@ -1437,17 +1449,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					clientTransaction, 
 					session, 
 					dialog, 
-					null);				
+					originalRequest);				
 			
 			try {
-				session.setHandler(handlerName);
-				TransactionApplicationData applicationData = null;
+				session.setHandler(handlerName);				
 				// See if this is a response to a proxied request
-				if(clientTransaction != null) {
-					applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
-					if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
-						((SipServletRequestImpl)applicationData.getSipServletMessage()).setLastFinalResponse(sipServletResponse);
-					}
+				if(originalRequest != null) {				
+						originalRequest.setLastFinalResponse(sipServletResponse);					
 				}
 				//there is no client transaction associated with it, it means that this is a retransmission
 				else if(dialog != null){	
@@ -1532,7 +1540,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public static boolean securityCheck(SipServletRequestImpl request)
 	{
 		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
-		SipStandardContext sipStandardContext = (SipStandardContext) appSession.getSipContext();
+		SipContext sipStandardContext = appSession.getSipContext();
 		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
 		
 		// This will propagate the identity for the thread and all called components
