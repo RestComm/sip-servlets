@@ -113,13 +113,13 @@
 			<subsection name="Planned Versions">
 				<subsection name="Version 0.3 - 04/01/2008">
 					<p>
-						<img src="images/red.jpeg" />
+						<img src="images/orange.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7">
 							J2EE integration/J2EE converged applications
 						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="images/green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=19">
 							Media Server Control Connector (JSR 309)
@@ -187,6 +187,13 @@
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=18">
 									Content-Encoding header abusely
 									added
+								</a>
+							</li>
+							<li>
+								<img src="images/green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=24">
+									Annotations parser Refactoring
 								</a>
 							</li>
 						</ul>
