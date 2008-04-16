@@ -36,6 +36,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String tomcatBasePath;
 	protected String projectHome;
 	protected SipEmbedded tomcat;
+	protected String sipIpAddress = "127.0.0.1";
 	protected boolean autoDeployOnStartup = true;
 		
 	public SipServletTestCase(String name) {
@@ -71,6 +72,7 @@ public abstract class SipServletTestCase extends TestCase {
 		//starting tomcat
 		tomcat = new SipEmbedded();
 		tomcat.setPath(tomcatBasePath);		
+		tomcat.setSipIPAdress(sipIpAddress);
 		tomcat.setLoggingFilePath(				
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 

@@ -70,6 +70,8 @@ public class SipEmbedded {
 
 	private StandardHost host = null;
 
+	private String sipIPAdress = "127.0.0.1";
+
 	/**
 	 * Default Constructor
 	 * 
@@ -169,7 +171,7 @@ public class SipEmbedded {
 				.getProtocolHandler();
 		ph.setPort(5070);
 		ph.setDebugLog("../logs/debuglog.txt");
-		ph.setIpAddress("127.0.0.1");
+		ph.setIpAddress(sipIPAdress);
 		ph.setLogLevel("DEBUG");
 		ph.setServerLog("../logs/serverlog.xml");
 		ph.setSignalingTransport("udp");
@@ -583,4 +585,12 @@ public class SipEmbedded {
         }
 
     }
+
+	public String getSipIPAdress() {
+		return sipIPAdress;
+	}
+
+	public void setSipIPAdress(String sipIPAdress) {
+		this.sipIPAdress = sipIPAdress;
+	}
 }
