@@ -29,7 +29,7 @@ STUN Support
 	
 	<<<useStun="true">>>\
 	<<<stunServerAddress="stun01.sipphone.com">>>\
-	<<<stunServerPort="3478">>>\
+	<<<stunServerPort="3478">>>
 	
 		* <<<useStun>>> : enable STUN for this connector
 		
@@ -44,7 +44,7 @@ STUN Support
 	to achieve NAT traversal.\
 	These include TURN, ICE UPnP and Session Border controllers. 
 	ICE provides a framework pulls together a number of different techniques: 
-	STUN, TURN, RSIP, to allow a client to investigate its environment.\
+	STUN, TURN, RSIP, to allow a client to investigate its environment.
 
 	STUN-bis, TURN and ICE will be addressed in further versions of Mobicents Sip Servlets if current STUN support is really found too limited.  
 		
