@@ -17,7 +17,7 @@
 	<mailingLists>
 		<mailingList>
 			<name>dev</name>
-			<subscribe>
+						<subscribe>
 				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
 			</subscribe>
 			<unsubscribe>
