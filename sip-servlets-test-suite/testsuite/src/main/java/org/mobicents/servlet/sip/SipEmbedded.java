@@ -110,7 +110,7 @@ public class SipEmbedded {
 		System.setProperty("catalina.base", getPath());		
 		//logging configuration
 		System.setProperty("java.util.logging.config.file", loggingFilePath + "logging.properties");
-		DOMConfigurator.configure(new URL(loggingFilePath + "log4j.xml"));		
+//		DOMConfigurator.configure(new URL(loggingFilePath + "log4j.xml"));		
 //		BasicConfigurator.configure();
 //		PropertyConfigurator.configure(loggingFilePath);		
 		//Those are for trying to make it work under mvn test command
