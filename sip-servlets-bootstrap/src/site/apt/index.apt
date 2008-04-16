@@ -18,9 +18,12 @@ Goals
   standalone with the Tomcat HTTP server as well as in an application server 
   integrated with JSLEE. Many interesting hacks in progress folks!
 
-Download
+Version 0.2 is out !
 
-	{{{source/browse/*checkout*/sip-servlets/trunk/sip-servlets-bootstrap/release/Sip-Servlet-0.1_Apache-Tomcat-5.5.25.zip?rev=370}Sip-Servlet-0.1_Apache-Tomcat-5.5.25.zip}}
+	Our latest release is now working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA.\
+	It is shipped with the updated {{{examples/click2call.html}click to call sample application}}, to download this release and try it out, follow the following link : 
+
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=575044}Mobicents Sip Servlet 0.2 downloads}}
 
 Roadmap and Implementation tasks
 
@@ -35,7 +38,7 @@ Roadmap and Implementation tasks
   
 Try it !
 
-	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 5.x to become a sip-servlet converged container.
+	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or Jboss 4.2.2.GA to become a sip-servlet converged container.
 	
 	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.
 	

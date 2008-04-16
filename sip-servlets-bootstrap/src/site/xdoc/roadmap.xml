@@ -5,7 +5,7 @@
 	<body>
 		<section name="Roadmap">
 			<subsection name="Released Versions">
-				<subsection name="Version 0.2 - 02/08/2008">
+				<subsection name="Version 0.2 - 02/09/2008">
 					<p>
 						<i>This version has been rescheduled to a week later than initially planned due to JSR 289 face to face meeting</i>
 					</p>
@@ -152,7 +152,7 @@
 						<br />
 					</p>
 				</subsection>
-				<subsection name="Version 0.4 - 04/01/2008">
+				<subsection name="Version 0.4 - 05/01/2008">
 					<p>
 						<img src="images/red.jpeg" />
 						Failover support
