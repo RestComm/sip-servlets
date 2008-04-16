@@ -98,13 +98,13 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!--plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webXml>${basedir}/src/main/sipapp/WEB-INF/sip.xml</webXml>
 					<warSourceDirectory>${basedir}/src/main/sipapp</warSourceDirectory>
 				</configuration>
-			</plugin>
+			</plugin-->
 		</plugins>
 	</build>
 	<!-- repositories -->
