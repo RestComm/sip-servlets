@@ -48,8 +48,7 @@ public class MediaResourceListener implements MsResourceListener {
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.mscontrol.MsResourceListener#update(org.mobicents.mscontrol.MsNotifyEvent)
-	 */
-	@Override
+	 */	
 	public void update(MsNotifyEvent event) {
 		logger.info("event ID " + event.getEventID());
 		logger.info("event cause " + event.getCause());

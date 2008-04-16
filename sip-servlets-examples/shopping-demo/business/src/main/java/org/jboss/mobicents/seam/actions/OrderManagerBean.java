@@ -26,8 +26,7 @@ public class OrderManagerBean implements OrderManager, Serializable {
 	@Logger private Log log;
 	
 	@PersistenceContext EntityManager em;
-	
-	@Override
+		
 	public void cancelOrder(long orderId) {
 		Order order = (Order) em.createQuery(
 				"select o from Order o where o.orderId = :orderId")
@@ -52,8 +51,7 @@ public class OrderManagerBean implements OrderManager, Serializable {
 			log.info("No Admin Timer to cancel");
 		}
 	}
-
-	@Override
+	
 	public void confirmOrder(long orderId) {
 		Order order = (Order) em.createQuery(
 				"select o from Order o where o.orderId = :orderId")
@@ -64,8 +62,7 @@ public class OrderManagerBean implements OrderManager, Serializable {
 		Contexts.getApplicationContext().remove("deliveryDateTimer" + orderId);
 		Contexts.getApplicationContext().remove("adminTimer" + orderId);
 	}
-
-	@Override
+	
 	public void setDeliveryDate(Object orderId, Timestamp deliveryDate) {
 		Order order = (Order) em.createQuery(
 				"select o from Order o where o.orderId = :orderId")

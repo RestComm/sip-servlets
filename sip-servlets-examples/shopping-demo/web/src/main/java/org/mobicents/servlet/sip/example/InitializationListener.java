@@ -35,14 +35,12 @@ public class InitializationListener implements ServletContextListener {
 	
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-	 */
-	@Override
+	 */	
 	public void contextDestroyed(ServletContextEvent arg0) {}
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-	 */
-	@Override
+	 */	
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		ServletContext servletcontext = servletContextEvent.getServletContext();
 		Enumeration<String> initParamNames = servletcontext.getInitParameterNames();
