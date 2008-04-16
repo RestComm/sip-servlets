@@ -93,7 +93,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 			
 			//annotations scanning
 			SipStandardContext sipctx = (SipStandardContext) context;
-			ClassFileScanner scanner = new ClassFileScanner(sipctx.getJbossBasePath() + "/WEB-INF/classes/", sipctx);
+			ClassFileScanner scanner = new ClassFileScanner(sipctx.getJbossBasePath(), sipctx);
 			scanner.scan();
 			
 			InputStream sipXmlInputStream = servletContext

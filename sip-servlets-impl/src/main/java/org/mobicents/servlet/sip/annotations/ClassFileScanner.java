@@ -17,11 +17,14 @@
 package org.mobicents.servlet.sip.annotations;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
 import javax.servlet.sip.annotation.SipApplication;
 import javax.servlet.sip.annotation.SipApplicationKey;
@@ -29,6 +32,9 @@ import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.loader.WebappClassLoader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -45,7 +51,10 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  *
  */
 public class ClassFileScanner {
-	
+
+	private static transient Log logger = LogFactory
+	.getLog(ClassFileScanner.class);
+			
 	private String docbase;
 	
 	private SipStandardContext sipContext;
@@ -56,7 +65,7 @@ public class ClassFileScanner {
 	
 	private Method sipAppKey = null;
 	
-	private URLClassLoader classLoader;
+	private AnnotationsClassLoader classLoader;
 	
 	SipServletImpl parsedServletData = null;
 	
@@ -65,17 +74,33 @@ public class ClassFileScanner {
 		this.sipContext = ctx;
 	}
 	
-	
 	public void scan() {
 		ClassLoader cl = this.sipContext.getClass().getClassLoader();
 		try {
-			this.classLoader = new URLClassLoader(
-					new URL [] {new URL("file:///" + this.docbase)},
+			this.classLoader = new AnnotationsClassLoader(
 					cl);
-		} catch (MalformedURLException e) {
+			this.classLoader.setResources(this.sipContext.getResources());
+			this.classLoader.setAntiJARLocking(true);
+			this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
+			
+			// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib
+			this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
+			this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
+			
+			// Try to add the EAR binaries as repositories
+			File earJarDir = new File(this.docbase + "/../APP-INF/lib");
+			File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
+			if(earJarDir.exists())
+				this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
+			if(earClassesDir.exists())
+				this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
+			
+			// TODO: Add META-INF classpath
+			
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}//WebInfClassLoader(this.docbase, cl);
+		}
 		_scan(new File(this.docbase));
 	}
 	
@@ -92,7 +117,9 @@ public class ClassFileScanner {
     }
     
     private void analyzeClass(String path) {
-    	String classpath = path.substring(docbase.length());
+    	int classesIndex = path.toLowerCase().lastIndexOf("classes/");
+    	classesIndex += "classes/".length();
+    	String classpath = path.substring(classesIndex);
     	classpath = classpath.replace('/', '.').replace('\\', '.');
     	if(classpath.endsWith(".class")) {
     		classpath = classpath.substring(0, classpath.length() - 6);
@@ -106,6 +133,9 @@ public class ClassFileScanner {
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (Throwable e) {
+				e.printStackTrace();
+				logger.error("Failed to parse annotations for class " + classpath);
 			}
     	}
     }
@@ -117,18 +147,23 @@ public class ClassFileScanner {
     }
     
     private void processSipApplicationKeyAnnotation(Class<?> clazz) {
-    	Method[] methods = clazz.getMethods();
-    	for(Method method:methods) {
-    		if(method.getAnnotation(SipApplicationKey.class)!=null &&
-    				Modifier.isStatic(method.getModifiers())) {
-    			//if(!method.getGenericReturnType().equals(String.class.)) continue;
-    			//Type[] types = method.getGenericParameterTypes();
-    			//if(!types[0].equals(SipServletRequest.class)) continue;
-    			if(this.sipAppKey != null) throw new IllegalStateException(
-    					"More than one SipApplicationKey annotated method is not allowed.");
-    			this.sipAppKey = method;
-    			sipContext.setSipApplicationKeyMethod(method);
+    	try {
+    		Method[] methods = clazz.getMethods();
+    		for(Method method:methods) {
+    			if(method.getAnnotation(SipApplicationKey.class)!=null &&
+    					Modifier.isStatic(method.getModifiers())) {
+    				//if(!method.getGenericReturnType().equals(String.class.)) continue;
+    				//Type[] types = method.getGenericParameterTypes();
+    				//if(!types[0].equals(SipServletRequest.class)) continue;
+    				if(this.sipAppKey != null) throw new IllegalStateException(
+    				"More than one SipApplicationKey annotated method is not allowed.");
+    				this.sipAppKey = method;
+    				sipContext.setSipApplicationKeyMethod(method);
+    			}
     		}
+    	} catch (Throwable e) {
+    		e.printStackTrace();
+    		logger.error("Annotations not parsed. Error enumerating methods for class: " + clazz.toString());
     	}
     }
     

@@ -91,7 +91,7 @@ public class SipContextConfig extends ContextConfig implements
 			
 			//annotations scanning
 			SipStandardContext sipctx = (SipStandardContext) context;
-			ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath() + "/WEB-INF/classes/", sipctx);
+			ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath(), sipctx);
 			scanner.scan();
 			
 			InputStream sipXmlInputStream = servletContext
