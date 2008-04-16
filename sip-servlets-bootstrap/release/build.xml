@@ -4,8 +4,26 @@
 
 	<property file="build.properties" />
 	<property name="jboss.home" value="${sys.JBOSS_HOME}"/>
-	
-	<target name="release" depends="">
+	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
+	    <os family="windows"/>
+	</condition>
+	<target name="checks">
+		<fail message="M2_HOME environment variable is not set">
+			<condition>
+				<not>
+					<isset property="sys.M2_HOME" />
+				</not>
+			</condition>
+		</fail>
+		<fail message="GWT_HOME environment variable is not set. GWT 1.4 is required.">
+			<condition>
+				<not>
+					<isset property="sys.GWT_HOME" />
+				</not>
+			</condition>
+		</fail>
+	</target>
+	<target name="release" depends="checks">
 		<antcall target="extract"/>
 		
 		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${base.path}/apache-tomcat-${tomcat.version}"/>
@@ -25,15 +43,15 @@
 		<copy file="${base.path}/jboss-service.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>
 		<copy file="${base.path}/webserver-xmbean.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 
-		<exec executable="mvn" dir="${base.path}/..">
+		<exec executable="${mvn.executable}" dir="${base.path}/..">
 			<arg line="clean install -DCATALINA_HOME=${base.path}/../sip-servlets-bootstrap/release/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
-		<exec executable="mvn" dir="${base.path}/..">
+		<exec executable="${mvn.executable}" dir="${base.path}/..">
 			<arg line="clean install -P jboss -DJBOSS_HOME=${base.path}/../sip-servlets-bootstrap/release/jboss-${jboss.version}"/>
 		</exec>
 
-		<exec executable="mvn" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install"/>
 		</exec>
 		
@@ -43,14 +61,71 @@
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
-		<zip destfile="${base.path}/mss-0.2-apache-tomcat-${tomcat.version}.zip" basedir="${base.path}/apache-tomcat-${tomcat.version}"/>
-		<zip destfile="${base.path}/mss-0.2-jboss-${jboss.version}.zip" basedir="${base.path}/jboss-${jboss.version}"/>			
+		<ant target="deploy-mgmnt"/>
+		
+		<ant target="make-final-zip-jboss"></ant>
+		<ant target="make-final-zip-tomcat"></ant>
+		
+		<!--
+		<zip destfile="${base.path}/mss-0.3-apache-tomcat-${tomcat.version}.zip" basedir="${base.path}/apache-tomcat-${tomcat.version}"/>
+		<zip destfile="${base.path}/mss-0.3-jboss-${jboss.version}.zip" basedir="${base.path}/jboss-${jboss.version}"/>			
+		-->
 	</target>
 	
-	<target name="release-mc-distro" depends="">
+	<target name="deploy-mgmnt">
+		<ant dir="${base.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
+		</ant>
+		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
+			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
+		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
+			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
+	</target>
+	
+	<target name="make-final-zip-jboss">
+		<fixcrlf srcdir="${base.path}/jboss-${jboss.version}/bin" includes="*.sh"
+		         eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}.zip" filesonly="false">
+			<zipfileset dir="${base.path}/jboss-${jboss.version}/bin"
+		            filemode="755" prefix="bin">
+		            <include name="*.sh" />
+			</zipfileset>
+         	<zipfileset dir="${base.path}/jboss-${jboss.version}/bin"
+         		prefix="bin">
+            	<exclude name="*.sh" />
+         	</zipfileset>
+         	<zipfileset dir="${base.path}/jboss-${jboss.version}"
+            	prefix="">
+            	<exclude name="bin/**"/>
+            	<exclude name="server/*/data/**"/>
+            	<exclude name="server/*/log/**"/>
+            	<exclude name="server/*/tmp/**"/>
+            	<exclude name="server/*/work/**"/>
+            	<exclude name="server/tmp/**"/>
+         	</zipfileset>
+		</zip>
+	</target>
 
-		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}/../"/>
-		
+	<target name="make-final-zip-tomcat">
+		<fixcrlf srcdir="${base.path}/apache-tomcat-${tomcat.version}/bin" includes="*.sh"
+		         eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}.zip" filesonly="false">
+			<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin"
+		            filemode="755" prefix="server/bin">
+		            <include name="*.sh" />
+			</zipfileset>
+         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin"
+         		prefix="bin">
+            	<exclude name="*.sh" />
+         	</zipfileset>
+         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}"
+            	prefix="">
+            	<exclude name="bin/**"/>
+         	</zipfileset>
+		</zip>
+	</target>
+	
+	<target name="release-mc-distro" depends="checks">
+
 		<mkdir dir="${jboss.home}/server/default/conf/dars"/>
 		<copy file="${base.path}/../src/site/resources/darfiles/click2call-dar.properties" 
 			todir="${jboss.home}/server/default/conf/dars"/>
