@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>
+		org.mobicents.servlet.sip.example.UACRegisterSipServlet
+	</app-name>
+	<display-name>UAC RegisterSip Servlet</display-name>
+	<description>UAC RegisterSip Servlet</description>
+
+	<main-servlet>UACRegisterSipServlet</main-servlet>
+
+	<servlet>
+		<servlet-name>UACRegisterSipServlet</servlet-name>
+		<display-name>UACRegisterSipServlet</display-name>
+		<description>UAC RegisterSIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.UACRegisterSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.UACRegisterSipServlet
+		</listener-class>
+	</listener>
+	
+	<context-param>
+      <param-name>domain.name</param-name>
+      <param-value>callwithus.com</param-value>
+    </context-param>
+	
+	<context-param>
+      <param-name>user.name</param-name>
+      <param-value>650390127</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>password</param-name>
+      <param-value>XXXXXX</param-value>
+    </context-param>
+</sip-app>
