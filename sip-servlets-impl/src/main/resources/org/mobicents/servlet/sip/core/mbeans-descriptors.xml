@@ -1,27 +1,32 @@
 <?xml version="1.0"?>
 <mbeans-descriptors>
-  
-  <mbean name="SipApplicationDispatcher"
-         description="Sip Application Dispatcher Component"
-         domain="Catalina"
-         group="SipApplicationDispatcher"
-         type="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">
-    
-    <attribute name="managedResource"
-               description="The managed resource this MBean is associated with"
-               type="java.lang.Object"/>
-      
-    <operation name="init"
-               description="Initialize the sip application dispatcher and its associated sip application router implementation"
-               impact="ACTION"
-               returnType="void">
-      <parameter name="sipApplicationRouterClassName"
-                 description=" the class name of the sip application router"
-                 type="java.lang.String"/>
-    </operation>
-    
-    <operation name="start" description="Start" impact="ACTION" returnType="void" />
-    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
-  </mbean>
+
+	<mbean name="SipApplicationDispatcher"
+		description="Sip Application Dispatcher Component" domain="Catalina"
+		group="SipApplicationDispatcher"
+		type="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">
+
+		<attribute name="managedResource"
+			description="The managed resource this MBean is associated with"
+			type="java.lang.Object" />
+
+		<operation name="init"
+			description="Initialize the sip application dispatcher and its associated sip application router implementation"
+			impact="ACTION" returnType="void">
+			<parameter name="sipApplicationRouterClassName"
+				description=" the class name of the sip application router"
+				type="java.lang.String" />
+		</operation>
+
+		<operation name="start" description="Start" impact="ACTION"
+			returnType="void" />
+
+		<operation name="stop" description="Stop" impact="ACTION"
+			returnType="void" />
+
+		<operation name="getSipFactory"
+			description="retrieve the sip factory used by this application dispatcher"
+			impact="ACTION" returnType="javax.servlet.sip.SipFactory" />
+	</mbean>
 
 </mbeans-descriptors>

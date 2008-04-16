@@ -47,6 +47,7 @@ public class SipNamingContextListener extends NamingContextListener {
 	public static final String NAMING_CONTEXT_SIP_SESSIONS_UTIL_REMOVED_EVENT = "removeSipSessionsUtil";
 	public static final String NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT = "addTimerService";
 	public static final String NAMING_CONTEXT_TIMER_SERVICE_REMOVED_EVENT = "removeTimerService";
+	public static final String SIP_SERVLETS_SUBCONTEXT = "sip-servlets";
 	public static final String SIP_SUBCONTEXT = "sip";
 	public static final String SIP_FACTORY_JNDI_NAME = "SipFactory";
 	public static final String SIP_SESSIONS_UTIL_JNDI_NAME = "SipSessionsUtil";

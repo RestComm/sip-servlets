@@ -38,14 +38,14 @@
 		<dependency>
 			<groupId>javax.sip</groupId>
 			<artifactId>jain-sip-api</artifactId>
-			<version>1.2</version>
+			<version>1.2.1</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.sip</groupId>
 			<artifactId>jain-sip-ri</artifactId>
-			<version>1.2</version>
+			<version>1.2.1</version>
 			<scope>provided</scope>
 		</dependency>
 

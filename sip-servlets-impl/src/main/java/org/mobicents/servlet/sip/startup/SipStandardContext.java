@@ -206,10 +206,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 								getNamingContextListener().getEnvContext(),
 								this));
 			} else {
+				// jboss or other kind of naming
 				try {
 					InitialContext iniCtx = new InitialContext();
-					Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-					// jboss or other kind of naming
+					Context envCtx = (Context) iniCtx.lookup("java:comp/env");					
 					this.setAnnotationProcessor(
 							new SipAnnotationProcessor(
 									envCtx,
@@ -217,7 +217,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				} catch (NamingException e) {
 					logger.error("Impossible to get the naming context ", e);
 				}						
-			}
+			}			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
 			//FIXME the session manager should be refactored and made part of the sipstandardmanager
 			if(getManager() instanceof SipStandardManager) {
@@ -382,7 +382,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_ADDED_EVENT, null);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT, sipFactoryFacade);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_ADDED_EVENT, sipSessionsUtil);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());			
 		} else {
         	try {
 				InitialContext iniCtx = new InitialContext();
@@ -395,8 +395,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			} catch (NamingException e) {
 				logger.error("Impossible to get the naming context ", e);
 				throw new IllegalStateException(e);
-			}	        	
-        }   
+			}	        			
+        }		
 		super.loadOnStartup(containers);	
 	}
 
