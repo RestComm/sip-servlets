@@ -6,20 +6,28 @@
  */
 package org.jboss.mobicents.seam.actions;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.ejb.Remove;
 import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
+import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.TimerService;
+import javax.servlet.sip.URI;
 
 import org.jboss.mobicents.seam.model.Customer;
 import org.jboss.mobicents.seam.model.Inventory;
@@ -72,6 +80,9 @@ public class CheckoutAction implements Checkout, Serializable {
 	@Out(value = "cutomerphone", scope = ScopeType.BUSINESS_PROCESS, required = false)
 	String customerPhone;
 
+	@Resource(mappedName="java:/sip/SipFactory") SipFactory sipFactory;
+	@Resource(mappedName="java:/sip/TimerService") TimerService sipTimerService;
+	
 	@Begin(nested = true, pageflow = "checkout")
 	public void createOrder() {
 		currentOrder = new Order();
@@ -138,13 +149,32 @@ public class CheckoutAction implements Checkout, Serializable {
 	private void fireEvent(long orderId, BigDecimal ammount,
 			String customerName, String customerPhone) {
 		//TODO replace by Sip Servlets call
+		System.out.println("SIPTIMERSERVICE" + sipTimerService);
+		System.out.println("SIPFACTORY" + sipFactory);
+		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSessionByAppName("shopping-demo");
+		//TODO remove hard coded uri from address header
+		try {
+			Address fromAddress = sipFactory.createAddress("sip:admin@sip-servlets.com");
+			Address toAddress = sipFactory.createAddress(customerPhone);
+			SipServletRequest sipServletRequest = 
+				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
+			URI requestURI = sipFactory.createURI(customerPhone);
+			sipServletRequest.setRequestURI(requestURI);
+			sipServletRequest.send();			
+		} catch (ServletParseException spe) {
+			// TODO: log exception
+			spe.printStackTrace();
+		} catch (IOException ioe) {
+			// TODO log exception
+			ioe.printStackTrace();
+		}		
 		
 //		try {
 //
 //			InitialContext ic = new InitialContext();
 //
-//			SleeConnectionFactory factory = (SleeConnectionFactory) ic
-//					.lookup("java:/MobicentsConnectionFactory");
+//			SipFactory factory = (SipFactory) ic
+//					.lookup("java:/sip-servlets");
 //
 //			SleeConnection conn1 = null;
 //			conn1 = factory.getConnection();
