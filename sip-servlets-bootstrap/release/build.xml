@@ -22,18 +22,21 @@
 		<copy file="${base.path}/jboss-service.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>
 		<copy file="${base.path}/webserver-xmbean.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 
-		<exec executable="${maven.home}/bin/mvn.bat" dir="${base.path}/..">
+		<exec executable="mvn" dir="${base.path}/..">
 			<arg line="clean install -DCATALINA_HOME=${base.path}/../sip-servlets-bootstrap/release/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
-		<exec executable="${maven.home}/bin/mvn.bat" dir="${base.path}/..">
+		<exec executable="mvn" dir="${base.path}/..">
 			<arg line="clean install -P jboss -DJBOSS_HOME=${base.path}/../sip-servlets-bootstrap/release/jboss-${jboss.version}"/>
 		</exec>
 
-		<exec executable="${maven.home}/bin/mvn.bat" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+		<exec executable="mvn" dir="${base.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install"/>
 		</exec>
-
+		
+		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/all"/>
+		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
+		
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
