@@ -69,7 +69,7 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 		//starting tomcat
 		tomcat = new SipEmbedded();
 		tomcat.setPath(tomcatBasePath);		
-		tomcat.setLoggingFilePath("file:"+ File.separatorChar + File.separatorChar + File.separatorChar + 
+		tomcat.setLoggingFilePath("file:///" +  
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
 				File.separatorChar + "src" +
