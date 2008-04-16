@@ -93,7 +93,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 * @param sipApplicationDispatcher 
 	 */
 	public SipFactoryImpl(SipApplicationDispatcher sipApplicationDispatcher) {
-		this.sipProviders = Collections.synchronizedSet(new HashSet<SipProvider>());
+		this.sipProviders = new HashSet<SipProvider>();
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
 
@@ -177,7 +177,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
-				JainSipUtils.findMatchingSipProvider(sipProviders, "udp").getNewCallId().getCallId());		
+				JainSipUtils.findMatchingSipProvider(getSipProviders(), "udp").getNewCallId().getCallId());		
 		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
 				sipApplicationSessionKey, true, sipContext);		
 		return sipApplicationSession;
@@ -415,7 +415,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 				toHeader.setParameter(key, from.getParameter(key));
 			}
 			//This method acts as a UAC, setting the via header 
-			viaHeader = JainSipUtils.createViaHeader(sipProviders, transport,
+			viaHeader = JainSipUtils.createViaHeader(getSipProviders(), transport,
 					null);			
 			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName());
@@ -473,7 +473,9 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 *            the sip provider to add
 	 */
 	public void addSipProvider(SipProvider sipProvider) {
-		sipProviders.add(sipProvider);
+		synchronized (sipProviders) {
+			sipProviders.add(sipProvider);	
+		}		
 	}
 
 	/**
@@ -483,7 +485,9 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 *            the sip provider to remove
 	 */
 	public void removeSipProvider(SipProvider sipProvider) {
-		sipProviders.remove(sipProvider);
+		synchronized (sipProviders) {
+			sipProviders.remove(sipProvider);
+		}
 	}
 
 	/**
@@ -492,7 +496,9 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 * @return read only set of the sip providers
 	 */
 	public Set<SipProvider> getSipProviders() {
-		return Collections.unmodifiableSet(sipProviders);
+		synchronized (sipProviders) {
+			return Collections.unmodifiableSet(sipProviders);
+		}
 	}
 
 	/**

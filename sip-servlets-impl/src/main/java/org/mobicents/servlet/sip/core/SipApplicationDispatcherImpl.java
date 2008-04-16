@@ -1452,7 +1452,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								
 				// We can not use session.getProxyBranch() because all branches belong to the same session
 				// and the session.proxyBranch is overwritten each time there is activity on the branch.
-				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
+				ProxyBranchImpl proxyBranch = null;
+				if(applicationData != null) {
+					proxyBranch = applicationData.getProxyBranch();
+				}
 				if(proxyBranch != null) {
 					sipServletResponse.setProxyBranch(proxyBranch);
 					// Update Session state
@@ -1660,7 +1663,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				try {
 					String ipAddress = listeningPoints[i].getIPAddress();
 					// If we are binding to all adapters, add the actual IPs
-					if("0.0.0.0".equals(ipAddress)) {
+					if(JainSipUtils.GLOBAL_IPADDRESS.equals(ipAddress)) {
 						addAllLocalInterfaces(outboundInterfaces,
 								listeningPoints[i].getPort(),
 								listeningPoints[i].getTransport());
@@ -1697,12 +1700,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	private void addAllLocalInterfaces(List<SipURI> list, int port, String transport) {
 		try {
-			Enumeration ifaces = NetworkInterface.getNetworkInterfaces();
+			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 			while(ifaces.hasMoreElements()) {
-				NetworkInterface ni = (NetworkInterface) ifaces.nextElement();
-				Enumeration bindings = ni.getInetAddresses();
+				NetworkInterface ni = ifaces.nextElement();
+				Enumeration<InetAddress> bindings = ni.getInetAddresses();
 				while(bindings.hasMoreElements()) {
-					InetAddress addr = (InetAddress) bindings.nextElement();
+					InetAddress addr = bindings.nextElement();
 					String ip = addr.getHostAddress();
 					try {
 
@@ -1717,13 +1720,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							logger.info("Added outbound interface: " + uri.toString());
 						}
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error("an unexpected exception has been thrown while adding outbound interfaces",e);
 					}
 				}
 			}
 		} catch (SocketException e) {
-			logger.warn("Unable to enumerate local interfaces. Binding to 0.0.0.0 may not work.");
+			logger.warn("Unable to enumerate local interfaces. Binding to 0.0.0.0 may not work.",e);
 		}
 		
 	}

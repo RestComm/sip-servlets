@@ -17,8 +17,15 @@
 package org.mobicents.servlet.sip;
 
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -39,14 +46,19 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 
 /**
  * 
- * Various helpful utilities to map jain sip abstractions.
+ * Various helpful utilities to map jain sip abstractions. 
  * 
  * @author mranga
+ * @author Jean Deruelle
  */
 public class JainSipUtils {
+	//TODO since listening points don't change often, use a cache system
+	//or hashmap with correct keys to improve performance
 	
 	private static Log logger = LogFactory.getLog(JainSipUtils.class);
 
+	public static String GLOBAL_IPADDRESS = "0.0.0.0";
+	
 	public static final TreeSet<String> dialogCreatingMethods = new TreeSet<String>(
 			new NamesComparator());
 	
@@ -171,13 +183,60 @@ public class JainSipUtils {
 		while (it.hasNext()) {
 			SipProvider sipProvider = it.next();
 			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
-			if(listeningPoint != null && 
-					(listeningPoint.getIPAddress().equals(ipAddress) || listeningPoint.getIPAddress().equals("0.0.0.0"))  &&
-					listeningPoint.getPort() == port) {
+			
+			if(isListeningPointMatching(ipAddress, port, listeningPoint)) {
 				return listeningPoint;
 			}
 		}					
 		return null; 
+	}
+
+	/**
+	 * Check if the ipAddress and port is matching the listening point
+	 * @param ipAddress ipAddress to check the listening point against
+	 * @param port port to check the listening point against
+	 * @param listeningPoint the listening point to check if it matches the ipaddress and port 
+	 * @return true if the ipAddress and port is matching the listening point
+	 */
+	public static boolean isListeningPointMatching(String ipAddress, int port,
+			ListeningPoint listeningPoint) {
+		List<String> listeningPointAddresses = new ArrayList<String>();
+		listeningPointAddresses.add(listeningPoint.getIPAddress());
+		//if the listening point is bound to 0.0.0.0 then adding all corresponding IP address
+		if(GLOBAL_IPADDRESS.equals(listeningPoint.getIPAddress())) {
+			try {
+				Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+				while(networkInterfaces.hasMoreElements()) {
+					NetworkInterface networkInterface = networkInterfaces.nextElement();
+					Enumeration<InetAddress> bindings = networkInterface.getInetAddresses();
+					while(bindings.hasMoreElements()) {
+						InetAddress addr = bindings.nextElement();
+						String networkInterfaceIpAddress = addr.getHostAddress();
+						listeningPointAddresses.add(networkInterfaceIpAddress);
+					}
+				}
+			} catch (SocketException e) {
+				logger.warn("Unable to enumerate local interfaces. Binding to 0.0.0.0 may not work.",e);
+			}				
+		}
+		//resolving by ipaddress an port
+		if(listeningPointAddresses.contains(ipAddress) &&					
+				listeningPoint.getPort() == port) {
+			return true;
+		}
+		//resolving by hostname
+		try {
+			InetAddress[] inetAddresses = InetAddress.getAllByName(ipAddress);				
+			for (int i = 0; i < inetAddresses.length; i++) {
+				if(listeningPointAddresses.contains(inetAddresses[i].getHostAddress())) {
+					return true;
+				}
+			}
+		} catch (UnknownHostException e) {
+			//not important it can mean that the ipAddress provided is not a hostname
+			// but an ip address not found in the searched listening points above				
+		}
+		return false;
 	}
 	
 	/**
@@ -196,9 +255,7 @@ public class JainSipUtils {
 			SipProvider sipProvider = it.next();
 			ListeningPoint[] listeningPoints = sipProvider.getListeningPoints();
 			for (ListeningPoint listeningPoint : listeningPoints) {
-				if(listeningPoint != null && 
-						listeningPoint.getIPAddress().equals(ipAddress) &&
-						listeningPoint.getPort() == port) {
+				if(isListeningPointMatching(ipAddress, port, listeningPoint)) {
 					return listeningPoint;
 				}
 			}			
