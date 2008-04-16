@@ -111,9 +111,9 @@
 				</subsection>
 			</subsection>
 			<subsection name="Planned Versions">
-				<subsection name="Version 0.3 - 04/01/2008">
+				<subsection name="Version 0.3 - 04/10/2008">
 					<p>
-						<img src="images/orange.jpeg" />
+						<img src="images/green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7">
 							J2EE integration/J2EE converged applications
@@ -149,31 +149,9 @@
 							Refactor Test framework
 						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="images/green.jpeg" />
 						Various Enhancements and Bug fixes :
-						<ul>
-							<li>
-								<img src="images/red.jpeg" />
-								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=16">
-									Derived Sip Sessions
-								</a>
-							</li>
-							<li>
-								<img src="images/red.jpeg" />
-								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=13">
-									Servlet-mapping still supported in
-									1.1
-								</a>
-							</li>
-							<li>
-								<img src="images/red.jpeg" />
-								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=10">
-									New Cancel methods on Proxy feature
-								</a>
-							</li>
+						<ul>							
 							<li>
 								<img src="images/green.jpeg" />
 								<a
@@ -224,6 +202,32 @@
 						<img src="images/red.jpeg" />
 						More Extensions : SUBSCRIBE/NOTIFY
 						<br />
+						<img src="images/red.jpeg" />
+						Various Enhancements and Bug fixes :
+						<ul>
+							<li>
+								<img src="images/red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=16">
+									Derived Sip Sessions
+								</a>
+							</li>
+							<li>
+								<img src="images/red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=13">
+									Servlet-mapping still supported in
+									1.1
+								</a>
+							</li>
+							<li>
+								<img src="images/red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=10">
+									New Cancel methods on Proxy feature
+								</a>
+							</li>
+						</ul>
 					</p>
 				</subsection>
 			</subsection>

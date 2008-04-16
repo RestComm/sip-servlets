@@ -1,6 +1,9 @@
 package org.jboss.mobicents.seam.listeners;
+import javax.servlet.sip.SipSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.MsResourceListener;
@@ -15,17 +18,20 @@ public class DTMFListener implements MsResourceListener{
 	
 	MsSignalDetector dtmfDetector;
 	MsConnection connection;
-	javax.servlet.sip.SipSession session;
+	SipSession session;
+	private String pathToAudioDirectory;
 	
-	public DTMFListener(MsSignalDetector detector, MsConnection connection) {
+	public DTMFListener(MsSignalDetector detector, MsConnection connection, SipSession session, String pathToAudioDirectory) {
 		this.dtmfDetector = detector;
 		this.connection = connection;
+		this.pathToAudioDirectory = pathToAudioDirectory;
+		this.session = session;
 	}
 	
 	public void update(MsNotifyEvent event) {
-		event = event;
-		
+		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});
 		logger.info("DTMF: " + event.getMessage());
+		String signal = event.getMessage();		
 		/**
 		 * Concurency issue:
 		 * 20:56:33,012 ERROR [STDERR] Exception in thread "Thread-104" 
@@ -40,7 +46,17 @@ public class DTMFListener implements MsResourceListener{
 20:56:33,020 ERROR [STDERR] 	at org.mobicents.media.server.impl.rtp.ReceiveStream.run(ReceiveStream.java:127)
 20:56:33,020 ERROR [STDERR] 	at java.lang.Thread.run(Thread.java:619)
 		 */
-		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});
+		if(session.getApplicationSession().getAttribute("orderApproval") != null) {
+			if(session.getApplicationSession().getAttribute("adminApproval") != null) {
+				logger.info("customer approval in progress.");
+				DTMFUtils.adminApproval(session, signal, pathToAudioDirectory);
+			} else {
+				logger.info("customer approval in progress.");
+				DTMFUtils.orderApproval(session, signal, pathToAudioDirectory);
+			}
+		} else if(session.getApplicationSession().getAttribute("deliveryDate") != null) {
+			DTMFUtils.updateDeliveryDate(session, signal);
+		}				
 	}
 
 }

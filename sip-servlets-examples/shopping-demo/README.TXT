@@ -37,6 +37,8 @@ To use
 2. Go to http://localhost:8080/shopping-demo and follow instructions on how to play with the example at 
 http://groups.google.com/group/mobicents-public/web/converged-application-demo
 
-Note : Use DTMF INFO as a way for sending DTMF for now, 
-couldn't get media server to work with rfc2833 or inband currently
-working nicely on linphone on linux
+Note : Use DTMF INFO or inband as a way for sending DTMF for now, 
+couldn't get media server to work with rfc2833 currently for outgoing calls
+
+working nicely on linphone on linux for SIP info
+working nicely with wengo for inband
