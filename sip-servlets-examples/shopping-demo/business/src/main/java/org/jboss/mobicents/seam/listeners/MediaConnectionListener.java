@@ -24,12 +24,12 @@ import org.mobicents.mscontrol.signal.Basic;
  * @author Jean Deruelle
  *
  */
-public class MediaConnectionListener implements MsConnectionListener{
+public class MediaConnectionListener implements MsConnectionListener {
 	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
 	
 	private SipServletRequest inviteRequest;	
 	
-	public void connectionCreated(MsConnectionEvent event) {
+	public void connectionCreated(MsConnectionEvent event) {		
 		MsConnection connection = event.getConnection();
 		String sdp = connection.getLocalDescriptor();
 		try {
@@ -39,32 +39,37 @@ public class MediaConnectionListener implements MsConnectionListener{
 		} catch (IOException e) {
 			logger.error("An unexpected exception occured while sending the request", e);
 		}								
+		logger.info("Local Media Connection created " + event.getEventID());
 	}
 
 	public void connectionDeleted(MsConnectionEvent event) {
-		// TODO Auto-generated method stub
+		logger.info("Local Media Connection deleted " + event.getEventID());
 		
 	}
 
 	public void connectionModifed(MsConnectionEvent event) {
+		logger.info("Remote Media Connection created. Endpoints connected " + event.getEventID());
 		MsConnection connection = event.getConnection();
 		String endpoint = connection.getEndpoint();
-		MsSignalGenerator gen = connection.getSession().getProvider().getSignalGenerator(endpoint);
-		MsSignalDetector dtmfDetector = connection.getSession().getProvider().getSignalDetector(endpoint);
+		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);		
 		java.io.File speech = new File("speech.wav");
-		gen.apply(Announcement.PLAY, new String[]{
+		logger.info("Playing confirmation announcement");
+		generator.apply(Announcement.PLAY, new String[]{
 				"file://" + speech.getAbsolutePath()
 				//"http://www.geocities.com/v_ralev/RecordAfterTone.wav"
 				//"file:///home/vralev/mobicents/mobicents-google/examples/call-controller2/src/org/mobicents/slee/examples/callcontrol/voicemail/audiofiles/RecordAfterTone.wav"
-				});
+				});		
+		MsSignalDetector dtmfDetector = connection.getSession().getProvider().getSignalDetector(endpoint);
 		DTMFListener dtmfListener = new DTMFListener(dtmfDetector, connection);
 		dtmfDetector.addResourceListener(dtmfListener);
-		connection.getSession().getProvider().addResourceListener(dtmfListener);
-		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});		
+		generator.addResourceListener(dtmfListener);
+		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});
+		logger.info("announcement confirmation played. waiting for DTMF ");		
+		inviteRequest.getSession().setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STARTED);
 	}
 
-	public void txFailed(MsConnectionEvent arg0) {
-		// TODO Auto-generated method stub
+	public void txFailed(MsConnectionEvent event) {
+		logger.info("Transaction failed on event "+ event.getEventID() + "with message " + event.getMessage());
 		
 	}
 

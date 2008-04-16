@@ -193,6 +193,7 @@ public class CheckoutAction implements Checkout, Serializable {
 			connection.modify("$", null);
 			sipApplicationSession.setAttribute("customerName", customerName);
 			sipApplicationSession.setAttribute("amountOrder", amount);
+			sipApplicationSession.setAttribute("orderId", orderId);
 			sipApplicationSession.setAttribute("connection", connection);			
 		} catch (UnsupportedOperationException uoe) {
 			// TODO log exception

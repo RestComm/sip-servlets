@@ -16,6 +16,8 @@ To build:
         <attribute name="PortRange">1024-65535</attribute>
         <attribute name="PCMA">true</attribute>
     </mbean>
+2. Modify the context param audio.files.path yo map to your file system in 
+sip-servlets/sip-servlets-examples/shopping-demo/web/src/main/webapp/WEB-INF/sip.xml file.
     
 mvn clean install from shopping-demo dir
 
@@ -31,3 +33,5 @@ To use
 2. Go to http://localhost:8080/shopping-demo and follow instructions on how to play with the example at 
 http://groups.google.com/group/mobicents-public/web/converged-application-demo
 
+Note : Use DTMF INFO as a way for sending DTMF for now, 
+couldn't get media server to work with rfc2833 or inband currently

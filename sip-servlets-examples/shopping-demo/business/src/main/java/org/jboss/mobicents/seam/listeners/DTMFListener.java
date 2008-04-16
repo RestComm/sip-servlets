@@ -8,10 +8,14 @@ import org.mobicents.mscontrol.MsSignalDetector;
 import org.mobicents.mscontrol.signal.Basic;
 
 public class DTMFListener implements MsResourceListener{
+	public static final int DTMF_SESSION_STARTED = 1;
+	public static final int DTMF_SESSION_STOPPED = 2;
+	
 	private static Log logger = LogFactory.getLog(DTMFListener.class);
 	
 	MsSignalDetector dtmfDetector;
 	MsConnection connection;
+	javax.servlet.sip.SipSession session;
 	
 	public DTMFListener(MsSignalDetector detector, MsConnection connection) {
 		this.dtmfDetector = detector;

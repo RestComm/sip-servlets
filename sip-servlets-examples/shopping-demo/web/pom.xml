@@ -16,11 +16,23 @@
 	<url>http://sip-servlets.dev.java.net</url>
 	<dependencies>
 		<dependency>
+			<groupId>org.mobicents.servlet.sip.example</groupId>
+			<artifactId>shopping-demo-business</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-ejb_3.0_spec</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>		
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
@@ -47,21 +59,21 @@
 			<version>1.0-ALPHA</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- j2ee dependencies -->		
+		<!-- j2ee dependencies -->
 		<dependency>
 			<groupId>com.sun.facelets</groupId>
 			<artifactId>jsf-facelets</artifactId>
-			<version>1.1.11</version>			
+			<version>1.1.11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam-debug</artifactId>
 			<version>2.0.1.GA</version>
 			<exclusions>
-      				<exclusion>
-				        <groupId>org.jboss.seam</groupId>
+				<exclusion>
+					<groupId>org.jboss.seam</groupId>
 					<artifactId>jboss-seam</artifactId>
-			      	</exclusion>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -69,48 +81,65 @@
 			<artifactId>jboss-seam-ui</artifactId>
 			<version>2.0.1.GA</version>
 			<exclusions>
-      				<exclusion>
-				        <groupId>commons-beanutils</groupId>
-					<artifactId>commons-beanutils</artifactId>
-			      	</exclusion>	
 				<exclusion>
-				        <groupId>org.jboss.seam</groupId>
+					<groupId>commons-beanutils</groupId>
+					<artifactId>commons-beanutils</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.seam</groupId>
 					<artifactId>jboss-seam</artifactId>
-			      </exclusion>
+				</exclusion>
 			</exclusions>
 		</dependency>
 	</dependencies>
 	<build>
 		<!--plugins>
 			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<configuration>
-							<tasks>
-
-
-								<move
-									todir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/"
-									includeemptydirs="false" verbose="true">
-									<fileset
-										dir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/">
-										<include name="**/*-1.0.jar" />
-									</fileset>
-									<mapper type="glob" from="*-1.0.jar"
-										to="*.jar" />
-								</move>
-
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>		
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<filters>
+						<filter>configurations/convergeddemo.properties</filter>
+					</filters>
+					<webResources>
+						<resource>						
+							<directory>
+								src/main/webapp/WEB-INF
+							</directory>
+							<filtering>true</filtering>							
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
 		</plugins-->
+		<!--artifactId>maven-antrun-plugin</artifactId>
+			<executions>
+			<execution>
+			<phase>prepare-package</phase>
+			<configuration>
+			<tasks>
+			
+			
+			<move
+			todir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/"
+			includeemptydirs="false" verbose="true">
+			<fileset
+			dir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/">
+			<include name="**/*-1.0.jar" />
+			</fileset>
+			<mapper type="glob" from="*-1.0.jar"
+			to="*.jar" />
+			</move>
+			
+			</tasks>
+			</configuration>
+			<goals>
+			<goal>run</goal>
+			</goals>
+			</execution>
+			</executions>
+			</plugin>		
+			</plugins-->
 		<extensions>
 			<extension>
 				<groupId>org.jvnet.wagon-svn</groupId>
