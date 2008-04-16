@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<!-- Luis Barreiro - Mobicents QA team -->
+
+<scenario name="UAC for SIP-Servlets Tests - click2call">
+
+  <send retrans="5000">
+    <![CDATA[
+    
+      REGISTER sip:luis@mobicents.org SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: "Luis" <sip:luis@mobicents.org>;tag=[call_number][pid]
+      To: "SIP-Servlets" <sip:servlet@mobicents.org>
+      Call-ID: [call_id]
+      CSeq: 1 REGISTER
+      Contact: sip:luis@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Subject: Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+  
+  <recv response="200" optional="false" next="1" />
+  
+  <send>
+    <![CDATA[
+    
+      ACK sip:luis@mobicents.org SIP/2.0      
+      [last_Via:]
+      From: "Luis" <sip:luis@mobicents.org>;tag=[call_number][pid]
+      To: "SIP-Servlets" <sip:servlet@mobicents.org>
+      Call-ID: [call_id]
+      CSeq: 1 ACK
+      Contact: sip:luis@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Subject: Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+    
+  <nop>
+    <action>
+      <exec command="echo 'click2call-a: register fail' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+<label id="1"/>
+
+  <nop>
+    <action>
+      <exec command="echo 'click2call-a: register pass' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+</scenario>
+

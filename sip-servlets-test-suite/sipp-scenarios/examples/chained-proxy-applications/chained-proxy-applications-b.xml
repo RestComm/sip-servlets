@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<!-- Luis Barreiro - Mobicents QA team -->
+
+<scenario name="UAC for SIP-Servlets Tests - chained-proxy-applications-b">
+
+  <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1">  
+    <action>      
+      <ereg regexp=".*" search_in="hdr" header="Via:" check_it="true" assign_to="1" />
+      <ereg regexp=".*" search_in="hdr" header="CSeq:" check_it="true" assign_to="2" />      
+    </action>
+  </recv>
+
+  <send>
+    <![CDATA[
+    
+      SIP/2.0 180 Ringing
+      [last_Via:]
+      [last_From:]
+      [last_To:];tag=[call_number]
+      [last_Call-ID:]
+      [last_CSeq:]
+      [last_Record-Route:]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+      
+    ]]>
+  </send>
+  
+  <recv request="CANCEL" timeout="5000" ontimeout="2" />
+  
+  <send>
+    <![CDATA[
+    
+      SIP/2.0 487 Terminated
+      Via: [$1]
+      [last_From:]
+      [last_To:];tag=[call_number]
+      [last_Call-ID:]
+      CSeq: [$2]
+      [last_Record-Route:]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+      
+    ]]>
+  </send>
+  
+  <send>
+    <![CDATA[
+    
+      SIP/2.0 200 OK
+      [last_Via:]
+      [last_From:]
+      [last_To:];tag=[call_number]
+      [last_Call-ID:]
+      [last_CSeq:]
+      [last_Record-Route:]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+      
+    ]]>
+  </send>
+ 
+  <recv request="ACK" timeout="5000" ontimeout="3" />
+  
+  <nop>
+    <action>
+      <exec command="echo 'chained-proxy-applications-b: pass' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+<label id="1"/>
+
+  <nop>
+    <action>
+      <exec command="echo 'chained-proxy-applications-b: fail: no INVITE' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>  
+   
+<label id="2"/>
+
+  <nop>
+    <action>
+      <exec command="echo 'chained-proxy-applications-b: fail: no CANCEL' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+ 
+<label id="3"/>
+
+  <nop>
+    <action>
+      <exec command="echo 'chained-proxy-applications-b: fail: no ACK' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop> 
+  
+</scenario>
+

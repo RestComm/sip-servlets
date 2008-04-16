@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<!-- Luis Barreiro - Mobicents QA team -->
+
+<scenario name="UAC for SIP-Servlets Tests - chat-server-b">
+
+  <recv request="MESSAGE" timeout="5000" ontimeout="1" />
+
+  <send>
+    <![CDATA[
+    
+      SIP/2.0 200 OK
+      [last_Via:]
+      [last_From:]
+      [last_To:]
+      [last_Call-ID:]
+      [last_CSeq:]
+      [last_Record-Route:]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
+      Content-Length: 0
+      
+    ]]>
+  </send> 
+  
+  <nop>
+    <action>
+      <exec command="echo 'chat-server-b: pass' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+<label id="1"/>
+      
+  <nop>
+    <action>
+      <exec command="echo 'chat-server-ba: fail: timeout MESSAGE' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+</scenario>
+

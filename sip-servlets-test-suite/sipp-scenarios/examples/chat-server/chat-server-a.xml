@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<!-- Luis Barreiro - Mobicents QA team -->
+
+<scenario name="UAC for SIP-Servlets Tests - chat-server-a">
+
+  <send retrans="500" ontimeout="2" >
+    <![CDATA[
+
+      MESSAGE sip:just4fun@127.0.0.1:5080 SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: "Barreiro" <sip:barreiro@[local_ip]:[local_port]>;tag=[call_number][pid]
+      To: "Chat Server" <sip:chatserver@sip-servlets.com>
+      Call-ID: [call_id]
+      CSeq: 1 MESSAGE
+      Contact: sip:barreiro@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Subject: Test
+      Content-Type: plain/text
+      Content-Length: [len]
+
+      My strange join message
+    ]]>
+  </send>
+
+  <recv response="200" rrs="true" next="1" />
+
+  <send>
+    <![CDATA[
+    
+      ACK sip:just4fun@127.0.0.1:5080 SIP/2.0      
+      [last_Via:]
+      From: "Barreiro" <sip:barreiro@[local_ip]:[local_port]>;tag=[call_number][pid]
+      To: "Chat Server" <sip:chatserver@sip-servlets.com>
+      Call-ID: [call_id]
+      CSeq: 1 ACK
+      [routes]
+      Contact: sip:barreiro@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Subject: Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+  
+  <nop>
+    <action>
+      <exec command="echo 'chat-server-a: fail' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+<label id="1"/>
+        
+  <nop>
+    <action>
+      <exec command="echo 'chat-server-a: pass' >> results.txt"/>
+      <exec int_cmd="stop_now"/>
+    </action>
+  </nop>
+
+</scenario>
+
