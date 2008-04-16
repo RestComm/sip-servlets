@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<project name="Mobicents Sip Servlets" default="release" basedir=".">
+	<property file="build.properties" />
+
+	<target name="release" depends="">
+		<antcall target="extract"/>
+		
+		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${base.path}/apache-tomcat-${tomcat.version}"/>
+		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${base.path}/jboss-${jboss.version}"/>
+		
+		<mkdir dir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
+		<copy file="${base.path}/../src/site/resources/darfiles/click2call-dar.properties" 
+			todir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
+			
+		<mkdir dir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
+		<copy file="${base.path}/../src/site/resources/darfiles/click2call-dar.properties" 
+			todir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
+			
+		<copy file="${base.path}/server-tomcat-6.xml" tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/server.xml"/>
+		<copy file="${base.path}/server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/server.xml"/>
+		<copy file="${base.path}/context-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/context.xml"/>
+		<copy file="${base.path}/jboss-service.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>
+		<copy file="${base.path}/webserver-xmbean.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>						
+
+		<exec executable="${maven.home}/bin/mvn.bat" dir="${base.path}/..">
+			<arg line="clean install -DCATALINA_HOME=${base.path}/../sip-servlets-bootstrap/release/apache-tomcat-${tomcat.version}"/>
+		</exec>
+			 
+		<exec executable="${maven.home}/bin/mvn.bat" dir="${base.path}/..">
+			<arg line="clean install -P jboss -DJBOSS_HOME=${base.path}/../sip-servlets-bootstrap/release/jboss-${jboss.version}"/>
+		</exec>
+
+		<exec executable="${maven.home}/bin/mvn.bat" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install"/>
+		</exec>
+
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
+		
+		<!-- Create a source jar of the jbossweb/servlet classes >
+		<zip destfile="${tomcat.jars}/jbossweb-src.zip">
+			<fileset dir="${basedir}/java">
+				<include name="org/**" />
+				<exclude name="org/jboss/logging/**" />
+				<include name="javax/servlet/**" />
+				<include name="javax/el/**" />
+			</fileset>
+		</zip-->
+	</target>
+
+	<target name="clean">
+		<delete dir="${tomcat.classes}" />
+		<delete dir="${tomcat.build}" />
+		<delete dir="${tomcat.jars}" />
+	</target>
+
+	<!-- Download and dependency building -->
+	<target name="proxyflags">
+		<!-- check proxy parameters. -->
+		<condition property="useproxy">
+			<equals arg1="${proxy.use}" arg2="on" />
+		</condition>
+	</target>
+
+	<target name="setproxy" depends="proxyflags" if="useproxy">
+		<taskdef name="setproxy" classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
+		<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
+		<echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}" />
+	</target>
+
+	<target name="downloadgz" depends="setproxy">
+		<!-- Download and extract the package -->
+		<get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
+		<gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar" />
+		<untar src="${base.path}/file.tar" dest="${base.path}" />
+		<delete file="${base.path}/file.tar" />
+		<delete file="${base.path}/file.tar.gz" />
+	</target>
+
+	<target name="downloadzip" depends="setproxy">
+		<!-- Download and extract the package -->
+		<get src="${sourcefile}" dest="${base.path}/file.zip" />
+		<mkdir dir="${destdir}" />
+		<unzip src="${base.path}/file.zip" dest="${destdir}" />
+		<delete file="${base.path}/file.zip" />
+	</target>
+
+	<target name="downloadfile" depends="setproxy">
+		<!-- Download extract the file -->
+		<mkdir dir="${destdir}" />
+		<get src="${sourcefile}" dest="${destfile}" />
+	</target>		
+
+	<target name="extractzip" depends="setproxy">			
+		<mkdir dir="${destdir}" />
+		<unzip src="${sourcefile}" dest="${destdir}" />		
+	</target>
+
+	<target name="extract" description="Builds and download dependent components">		
+		<antcall target="extractzip">
+			<param name="sourcefile" value="${tomcat-path}" />			
+			<param name="destdir" value="${base.path}" />
+		</antcall>				
+		<antcall target="extractzip">
+			<param name="sourcefile" value="${jboss-path}" />			
+			<param name="destdir" value="${base.path}" />
+		</antcall>		
+	</target>
+</project>
