@@ -30,7 +30,6 @@ import javax.sip.TransactionTerminatedEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -41,10 +40,6 @@ public class AnnotationTest extends SipServletTestCase implements SipListener {
 	private static Log logger = LogFactory.getLog(AnnotationTest.class);
 
 	protected Hashtable providerTable = new Hashtable();
-
-	private SipStack sipStackTracker;
-
-	//private SipPhone sipPhoneTracker;
 	
 	private Tracker tracker;
 
@@ -77,6 +72,7 @@ public class AnnotationTest extends SipServletTestCase implements SipListener {
 
 	@Override
 	public void tearDown() throws Exception {
+		tracker.destroy();
 		super.tearDown();
 	}
 
