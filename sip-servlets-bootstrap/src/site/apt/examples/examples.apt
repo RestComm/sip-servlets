@@ -19,7 +19,7 @@ Examples
 	
 	* {{{chatserver.html}Chat Server}} : support for sip extension MESSAGE
 	
-	* {{{shopping-example.html}SEAM Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   
+	* {{{shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   
 
 	You can play with our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)
