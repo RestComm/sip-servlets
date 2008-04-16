@@ -50,7 +50,8 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 
 	private static Object[][] regions = new Object[][]{  
 		new Object[]{"TERMINATING"},  
-		new Object[]{"ORIGINATING"}  
+		new Object[]{"ORIGINATING"},
+		new Object[]{"NEUTRAL"}
 	};  
 
 	private static Object[][] routeModifiers = new Object[][]{  
@@ -108,11 +109,12 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		DARConfigurationService.Util.getInstance().getApplications(new AsyncCallback(){
 
 			public void onFailure(Throwable arg0) {
-				// TODO Auto-generated method stub
+				Console.error("Could not enumerate deployed applications.");
 				
 			}
 
 			public void onSuccess(Object appsObj) {
+				
 				String[] apps = (String[]) appsObj;
 				
 				Object[][] appsStoreArray = new Object[apps.length][1];
@@ -132,6 +134,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 				Store original = applicationName.getStore();
 				original.removeAll();
 				original.add(storeTemp.getRecords());
+				Console.info("Successfully enumerated deployed applications");
 			}
 			
 		});
@@ -182,14 +185,14 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		formPanel.setWidth(200);  
 		formPanel.setLabelWidth(75);   
 		
-		Panel collapsedPanel = formPanel; // collapsedPanel doesn't work. TODO: FIXME
+		final Panel collapsedPanel = formPanel; // collapsedPanel doesn't work. TODO: FIXME
 		addLabeledControl("Application Name", applicationName, formPanel);
 		addLabeledControl("Subscriber Identity", subscriberIdentity, collapsedPanel);
 		addLabeledControl("Routing region", routingRegion, collapsedPanel);
 		addLabeledControl("Route", route, collapsedPanel);
 		addLabeledControl("Route modifiers", routeModified, collapsedPanel);
 		addLabeledControl("Order", order, collapsedPanel);
-		
+
 		// Add delete button to remove this item from the app list
 		Button deleteButton = new Button("Delete");
 		final ApplicationRouteNodeEditor finalThis = this;

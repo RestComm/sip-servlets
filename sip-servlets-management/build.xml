@@ -99,7 +99,7 @@
 
 	<target name="compile" depends="init">
 		<javac destdir="${project.bin}" srcdir="${project.src}"
-			source="1.5" target="1.5">
+			source="1.5" target="1.5" debug="true">
 			<classpath>
 				<path refid="project.classpath" />
 			</classpath>

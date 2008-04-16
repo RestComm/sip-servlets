@@ -11,57 +11,77 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.mobicents.servlet.management.client.router.DARConfigurationService;
 import org.mobicents.servlet.management.client.router.DARRoute;
 import org.mobicents.servlet.management.client.router.DARRouteNode;
-import org.mobicents.servlet.sip.Constants;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.router.DefaultApplicationRouter;
 import org.mobicents.servlet.sip.router.DefaultApplicationRouterParser;
 import org.mobicents.servlet.sip.router.DefaultSipApplicationRouterInfo;
+import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import javax.management.MBeanServer;
 
 public class DARConfigurationServiceImpl extends RemoteServiceServlet implements DARConfigurationService {
-
+	
+	private static MBeanServer mserver = MBeanUtils.createServer();
+	
+	private ObjectName getApplicationDispatcher() {
+		try {
+			ObjectName dispatcherQuery = new ObjectName("*:type=SipApplicationDispatcher");
+			ObjectInstance dispatcherInstance = (ObjectInstance) 
+			mserver.queryMBeans(dispatcherQuery, null).iterator().next();
+			ObjectName dispatcherName = dispatcherInstance.getObjectName();
+			return dispatcherName;
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+	
 	public void configure(String config) {
 		try {
-			System.out.print(config);
-			DefaultApplicationRouter router = (DefaultApplicationRouter) 
-			getServletContext().getAttribute(Constants.APPLICATION_ROUTER);
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
 			Properties props = new Properties();
 			byte bytes[] = config.getBytes();
 			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 			props.load(byteArrayInputStream);
-			router.configure(props);
+			mserver.invoke(dispatcherName, "updateApplicationRouterConfiguration", new Object[]{props},
+					new String[]{Object.class.getName()});
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
 		}
 	}
 
 	public String[] getApplications() {
-		Object obj = getServletContext().getAttribute(Constants.APPLICATION_DISPATCHER);
-		SipApplicationDispatcherImpl dispatcher = (SipApplicationDispatcherImpl) obj;
-		Iterator iterator = dispatcher.findSipApplications();
-		ArrayList appList = new ArrayList();
-		while(iterator.hasNext()){
-			SipContext ctx = (SipContext)iterator.next();
-			appList.add(ctx.getApplicationName());
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			String[] applications = (String[]) mserver.invoke(dispatcherName, "findInstalledSipApplications", new Object[]{},
+					new String[]{});
+			
+			return applications;
+			
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
 		}
-		String[] ret = new String[appList.size()];
-		for(int q=0; q<appList.size(); q++) ret[q] = (String) appList.get(q);
-		
-		return ret;
 	}
 
 	public DARRoute[] getConfiguration() {
-		DefaultApplicationRouter router = (DefaultApplicationRouter) 
-			getServletContext().getAttribute(org.mobicents.servlet.sip.Constants.APPLICATION_ROUTER);
-		
-		Properties properties = (Properties) router.getCurrentConfiguration();
-		DefaultApplicationRouterParser parser = new DefaultApplicationRouterParser();
 		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Object configuration = (Object) mserver.invoke(dispatcherName, "retrieveApplicationRouterConfiguration", new Object[]{},
+					new String[]{});
+
+			Properties properties = (Properties) configuration;
+			DefaultApplicationRouterParser parser = new DefaultApplicationRouterParser();
+
 			Map<String, List<DefaultSipApplicationRouterInfo>> infos = parser.parse(properties);
 			Set<String> requests = infos.keySet();
 			ArrayList<DARRoute> allRoutes = new ArrayList<DARRoute>();
@@ -88,10 +108,8 @@ public class DARConfigurationServiceImpl extends RemoteServiceServlet implements
 			DARRoute[] result = new DARRoute[allRoutes.size()];
 			result = allRoutes.toArray(result);
 			return result;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 }

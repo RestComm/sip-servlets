@@ -1,6 +1,7 @@
 package org.mobicents.servlet.management.client.router;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.gwtext.client.core.EventObject;
@@ -11,6 +12,7 @@ import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.ToolbarTextItem;
 import com.gwtext.client.widgets.Window;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.layout.FitLayout;
 
 public class RouterToolbar extends Toolbar {
 	public RouterToolbar(final RequestColumnsContainer container) {
@@ -18,6 +20,7 @@ public class RouterToolbar extends Toolbar {
 		addSpacer();addSpacer();addSeparator();addSpacer();addSpacer();
 		
 		final Window sourceCodeWindow = new Window();
+		final Window helpWindow = new Window();
 
 		ToolbarButton showDARTextButton = new ToolbarButton("View source", new ButtonListenerAdapter() {
 			public void onClick(Button button, EventObject e) {
@@ -47,12 +50,11 @@ public class RouterToolbar extends Toolbar {
 				DARConfigurationService.Util.getInstance().configure(container.getDARText(), new AsyncCallback(){
 
 					public void onFailure(Throwable arg0) {
-						// TODO Auto-generated method stub
-						
+						Console.error("Could not save the AR data: " + arg0.getMessage());
 					}
 
 					public void onSuccess(Object arg0) {
-						// TODO Auto-generated method stub
+						Console.info("Successfully persisted new AR configuration.");
 						
 					}
 					
@@ -63,7 +65,25 @@ public class RouterToolbar extends Toolbar {
 		
 		ToolbarButton logErrorButton = new ToolbarButton("Log and errors", new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {
-				
+				Console.getInstance().show();
+			}
+			
+		});
+		
+		
+		ToolbarButton helpButton = new ToolbarButton("Help", new ButtonListenerAdapter() {  
+			public void onClick(Button button, EventObject e) {
+				Frame helpFrame = new Frame("help/index.html");
+				helpWindow.setTitle("Default Application Router Help");  
+				helpWindow.setClosable(true);  
+				helpWindow.setWidth(600);  
+				helpWindow.setHeight(350);  
+				helpWindow.setPlain(true);  
+				helpWindow.setAutoScroll(true);
+				helpWindow.setLayout(new FitLayout());
+				helpWindow.add(helpFrame);
+				helpWindow.setCloseAction(Window.HIDE);
+				helpWindow.show();
 			}
 			
 		});
@@ -73,6 +93,8 @@ public class RouterToolbar extends Toolbar {
 		addButton(saveButton);
 		addSeparator();
 		addButton(logErrorButton);
+		addSeparator();
+		addButton(helpButton);
 		
 	}
 }

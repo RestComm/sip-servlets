@@ -17,7 +17,7 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 
 public final class RequestColumnsContainer extends AbsolutePanel {
 
-	private static final String[] COLUMNS = new String[] {"INVITE", "REGISTER", "SUBSCRIBE", "NOTIFY"};
+	private static final String[] COLUMNS = new String[] {"INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE"};
 
 	private static final String CSS_SSM = "ssm";
 
@@ -159,13 +159,15 @@ public final class RequestColumnsContainer extends AbsolutePanel {
 		darConfigService.getConfiguration(new AsyncCallback() {
 
 			public void onFailure(Throwable arg0) {
-				// TODO Auto-generated method stub
+				Console.error("Failed to parse AR configuration");
 				
 			}
 
 			public void onSuccess(Object configObj) {
+				
 				DARRoute[] routes = (DARRoute[]) configObj;
 				populateRouterNodes(routes);
+				Console.info("AR configiuration parsed succesfully");
 			}
 			
 		});

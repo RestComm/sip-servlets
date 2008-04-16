@@ -1,8 +1,5 @@
 package org.mobicents.servlet.management.client.router;
 
-import java.util.HashMap;
-
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
