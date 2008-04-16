@@ -161,7 +161,7 @@ public class JainSipUtils {
 			host = globalIpAddress;
 			port = listeningPoint.getGlobalPort();
 		} else {
-			host = listeningPoint.getIpAddresses().get(0);
+			host = getMostOutboundAddress(listeningPoint.getIpAddresses());
 			port = listeningPoint.getPort();
 		}
 		
@@ -192,7 +192,14 @@ public class JainSipUtils {
 	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport) {		
 		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);							
 		try {
-			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, listeningPoint.getIpAddresses().get(0));
+			String host = null;
+			String globalIpAddress = listeningPoint.getGlobalIpAddress();
+			if(globalIpAddress != null) {
+				host = globalIpAddress;
+			} else {
+				host = getMostOutboundAddress(listeningPoint.getIpAddresses());
+			}
+			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
 			sipUri.setPort(listeningPoint.getPort());
 			sipUri.setTransportParam(listeningPoint.getTransport());
 			// Do we want to add an ID here?
