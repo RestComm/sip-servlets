@@ -97,7 +97,8 @@ Click To Call
 	admin=9640e13fedc736bdafa6b9007d965c56
 
 	The cryptic string here is the A1 value of the digest authentication algorithm and can be generated with the following command:\
-	<<<java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username "My Realm" password RFC2617 A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea>>>
+	<<<java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest username "My Realm" password RFC2617>>>\
+	<<<A1 hash: 9b47ec6f03603dd49863e7d58c4c49ea>>>
 
 	[[3]] In the file props/sip-servlets-roles.properties put this:\
 	# A sample roles.properties file for use with some roles\
