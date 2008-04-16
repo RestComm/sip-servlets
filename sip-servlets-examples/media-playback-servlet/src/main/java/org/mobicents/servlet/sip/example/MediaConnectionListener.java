@@ -3,6 +3,8 @@ package org.mobicents.servlet.sip.example;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
+import java.io.File;
+
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
@@ -34,8 +36,10 @@ public class MediaConnectionListener implements MsConnectionListener{
 		String endpoint = connection.getEndpoint();
 		MsSignalGenerator gen = connection.getSession().getProvider().getSignalGenerator(endpoint);
 		MsSignalDetector dtmfDetector = connection.getSession().getProvider().getSignalDetector(endpoint);
+		java.io.File speech = new File("speech.wav");
 		gen.apply(Announcement.PLAY, new String[]{
-				"http://www.geocities.com/v_ralev/RecordAfterTone.wav"
+				"file://" + speech.getAbsolutePath()
+				//"http://www.geocities.com/v_ralev/RecordAfterTone.wav"
 				//"file:///home/vralev/mobicents/mobicents-google/examples/call-controller2/src/org/mobicents/slee/examples/callcontrol/voicemail/audiofiles/RecordAfterTone.wav"
 				});
 		DTMFListener dtmfListener = new DTMFListener(dtmfDetector, connection);

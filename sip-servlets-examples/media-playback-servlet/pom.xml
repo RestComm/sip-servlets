@@ -33,10 +33,42 @@
 			<groupId>org.mobicents.media</groupId>
 			<artifactId>mscontrol</artifactId>
 			<version>1.0-ALPHA</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/mscontrol.jar</systemPath>
 		</dependency>
-
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>freetts</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>cmu_time_awb</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>cmu_us_kal</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>cmudict04</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>en_us</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>cmulex</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.external.freetts</groupId>
+			<artifactId>cmutimelex</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<!-- j2ee dependencies -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -69,7 +101,36 @@
 						${basedir}/src/main/sipapp
 					</warSourceDirectory>
 				</configuration>
-			</plugin>			
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<configuration>
+							<tasks>
+
+
+								<move
+									todir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/"
+									includeemptydirs="false" verbose="true">
+									<fileset
+										dir="${basedir}/target/media-playback-servlet-1.0-SNAPSHOT/WEB-INF/lib/">
+										<include name="**/*-1.0.jar" />
+									</fileset>
+									<mapper type="glob" from="*-1.0.jar"
+										to="*.jar" />
+								</move>
+
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 		<extensions>
 			<extension>
@@ -88,7 +149,7 @@
 			<layout>default</layout>
 		</repository>
 	</repositories>
-	
+
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>

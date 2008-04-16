@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.example;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -23,6 +24,10 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioSystem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +40,8 @@ import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.signal.Announcement;
-
+import com.sun.speech.freetts.*;
+import com.sun.speech.freetts.audio.*;
 /**
  * This example shows a simple User agent that can playback audio.
  * @author Vladimir Ralev
@@ -67,6 +73,9 @@ public class MediaPlaybackServlet extends SipServlet {
 		byte[] sdpBytes = (byte[]) sdpObj;
 		String sdp = new String(sdpBytes); 
 		try {
+			buildAudio("Hey " + request.getFrom().getDisplayName() +
+			". This is Mobicents Sip Servlets.", "speech.wav");
+			Thread.sleep(300);
 			MsPeer peer = MsPeerFactory.getPeer();
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
@@ -75,10 +84,55 @@ public class MediaPlaybackServlet extends SipServlet {
 			listener.setInviteRequest(request);
 			connection.addConnectionListener(listener);
 			connection.modify("$", sdp);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+	}
+	
+	private void buildAudio(String text, String filename) throws Exception {
+		VoiceManager mgr = VoiceManager.getInstance();
+		Voice voice = mgr.getVoice("kevin16");
+		voice.allocate();
+		File speech = new File(filename);
+		SingleFileAudioPlayer player = new SingleFileAudioPlayer(getBasename(speech.getAbsolutePath()), getAudioType(filename));
+		voice.setAudioPlayer(player);
+		voice.startBatch();
+		boolean ok = voice.speak(text);
+		voice.endBatch();
+		player.close();
+		voice.deallocate();
+	}
+	
+	private static String getBasename(String path) {
+		int index = path.lastIndexOf(".");
+		if (index == -1) {
+			return path;
+		} else {
+			return path.substring(0, index);
+		}
+	}
+	
+	private static String getExtension(String path) {
+		int index = path.lastIndexOf(".");
+		if (index == -1) {
+			return null;
+		} else {
+			return path.substring(index + 1);
+		}
+	}
+	
+	private static AudioFileFormat.Type getAudioType(String file) {
+		AudioFileFormat.Type[] types = AudioSystem.getAudioFileTypes();
+		String extension = getExtension(file);
+
+		for (int i = 0; i < types.length; i++) {
+			if (types[i].getExtension().equals(extension)) {
+				return types[i];
+			}
+		}
+		return null;
 	}
 
 	/**

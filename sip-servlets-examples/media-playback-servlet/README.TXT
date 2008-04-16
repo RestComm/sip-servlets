@@ -14,12 +14,18 @@ Instructions to build and deploy
         <attribute name="PCMA">true</attribute>
     </mbean>
     
-2. Add mscontrol.jar to JBOSS_HOME/server/default/lib (cant put it in the WEB-INF/lib because of some CL issue)
-3. mvn clean install war:inplace (or whatever)
-4. Deploy it as a sar2 in JBoss
+2. mvn clean install war:inplace.
+4. IMPORTANT: Don't deploy the packaged war file. Deploy the exploded directory 
+media-playback-servlet/target/media-playback-servlet-1.0-SNAPSHOT with .sar2 extension.
+This is needed because the packaged war file contains jar files in WEB-INF/lib that are
+renamed by maven to include version suffix, however this breaks FreeTTS. In the exploded
+directory, this is fixed.
 
 To use
 ------
 
 Just dial the servlet directly, without any proxy. Tested with Ekiga - there is some problem routing some ACK, but it works.
 
+What is included in the demo
+----------------------------
+Media playback, Text to Speech with FreeTTS and DTMF detection.
