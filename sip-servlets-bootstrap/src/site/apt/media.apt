@@ -2,28 +2,28 @@ Media Support
 
 * Description
 
-Mobicents Sip Servlets is providing support for applications to setup media session 
-through the {{{http://groups.google.com/group/mobicents-public/web/mobicents-media-server}Mobicents Media Server}}.
-
-The Mobicents Media Server is an implementation of the 
-{{{http://jcp.org/en/jsr/detail?id=309}JSR 309 specification}} 
-which is currently a work in progress.
+	Mobicents Sip Servlets is providing support for applications to setup media session 
+	through the {{{http://groups.google.com/group/mobicents-public/web/mobicents-media-server}Mobicents Media Server}}.
+	
+	The Mobicents Media Server is an implementation of the 
+	{{{http://jcp.org/en/jsr/detail?id=309}JSR 309 specification}} 
+	which is currently a work in progress.
   
 
 * Media Server Control API
 
-To setup and control media capabilities a "client side" API is provided as part of the JSR 309 specification.
-More details can be found on this {{{http://groups.google.com/group/mobicents-public/web/media-server-control-api}here}}.
-
-To see some sample code on how to use this API, you can check out the following examples that are making use of it :
+	To setup and control media capabilities a "client side" API is provided as part of the JSR 309 specification.
+	More details can be found on this {{{http://groups.google.com/group/mobicents-public/web/media-server-control-api}here}}.
 	
-	* {{{examples/media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
-	
-	* {{{examples/shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.			
+	To see some sample code on how to use this API, you can check out the following examples that are making use of it :
+		
+		* {{{examples/media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
+		
+		* {{{examples/shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.			
 
 
 * Limitations
 
-Support for Media is currently only available within the same VM and in the same server.\
-Moreover, as the Mobicents Media Server is Jboss dependent, Media support for Mobicents Sip Servlets 
-is thus only available on Jboss Containers.  
+	Support for Media is currently only available within the same VM and in the same server.\
+	Moreover, as the Mobicents Media Server is Jboss dependent, Media support for Mobicents Sip Servlets 
+	is thus only available on Jboss Containers.  

@@ -12,9 +12,6 @@
       	<item name="Tomcat Installation" href="installation-tomcat.html"/>
       	<item name="Jboss Installation" href="installation-jboss.html"/>
       </item>
-      <item name="Media support" href="media.html"/>
-      <item name="Security" href="security.html"/>      
-      <item name="STUN suport" href="stun.html"/>
       <item name="Examples" href="examples/examples.html" collapse="true">
       	<item name="Call Blocking" href="examples/call_blocking.html"/>
       	<item name="Call Forwarding" href="examples/call_forwarding.html"/>
@@ -27,8 +24,13 @@
       	<item name="Media Demo" href="examples/media-demo.html"/>
       	<item name="Shopping Demo" href="examples/shopping-demo.html"/>
       </item>
-      <item name="QA" href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/"/>
+      <item name="Media support" href="media.html"/>
+      <item name="Security" href="security.html"/>      
+      <item name="STUN suport" href="stun.html"/>      
       <item name="Roadmap" href="roadmap.html"/>
+      <item name="License" href="license.html"/>
+      <item name="QA" href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/"/>      
+      <item name="Feedback" href="feedback.html"/>
       
       <item name="Mailing lists" href="servlets/ProjectMailingListList"/>
       <item name="Source code" href="source/browse/sip-servlets/"/>
