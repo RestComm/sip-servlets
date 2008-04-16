@@ -120,8 +120,9 @@ public class DNSAddressResolver implements AddressResolver {
 				String hostAddress= InetAddress.getByName(resolvedName).getHostAddress();
 				if(logger.isDebugEnabled()) {
 					logger.debug("Did a successful DNS SRV lookup for host:transport " +
-							""+ host + "/" + transport + 
-							" , Host Address = " + hostAddress + 
+							""+ host + "/" + transport +
+							" , Host Name = " + resolvedName +
+							" , Host IP Address = " + hostAddress + 
 							", Host Port = " + recordPort);
 				}
 				return new HopImpl(hostAddress, recordPort, transport);
