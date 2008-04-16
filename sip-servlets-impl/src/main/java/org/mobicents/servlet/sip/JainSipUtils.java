@@ -72,6 +72,7 @@ public class JainSipUtils {
 		dialogTerminatingMethods.add(Request.BYE);
 	}
 
+	public static final int MAX_FORWARD_HEADER_VALUE = 70;
 	
 	public static ViaHeader createViaHeader(Set<SipProvider> sipProviders, String transport, String branch) {
 		Iterator<SipProvider> it = sipProviders.iterator();

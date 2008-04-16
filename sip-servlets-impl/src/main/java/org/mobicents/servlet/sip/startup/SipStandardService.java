@@ -17,16 +17,20 @@
 package org.mobicents.servlet.sip.startup;
 
 
+import gov.nist.javax.sip.SipStackImpl;
+
 import java.io.File;
 import java.util.TooManyListenersException;
 
 import javax.sip.SipProvider;
+import javax.sip.SipStack;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
@@ -53,17 +57,6 @@ public class SipStandardService extends StandardService implements SipService {
 	private String darConfigurationFileLocation;
 	//
 	private boolean connectorsStartedExternally = false;
-	/**
-	 * 
-	 */
-	public SipStandardService() {
-		super();
-	}
-	
-	@Override
-	public void init() {			
-		super.init();		
-	}
 	
 	@Override
 	public void addConnector(Connector connector) {
@@ -120,25 +113,32 @@ public class SipStandardService extends StandardService implements SipService {
 	public void start() throws LifecycleException {
 		super.start();		
 		synchronized (connectors) {
-			for (int i = 0; i < connectors.length; i++) {
+			for (Connector connector : connectors) {
 				//Jboss sepcific loading case
 				Boolean isSipConnector = (Boolean)
-					connectors[i].getProtocolHandler().getAttribute("isSipConnector");				
+					connector.getProtocolHandler().getAttribute("isSipConnector");				
 				if(isSipConnector != null && isSipConnector) {
 					logger.info("Attaching the sip application dispatcher " +
 							"as a sip listener to connector listening on port " + 
-							connectors[i].getPort());
-					connectors[i].getProtocolHandler().setAttribute("SipApplicationDispatcher", sipApplicationDispatcher);
+							connector.getPort());
+					connector.getProtocolHandler().setAttribute("SipApplicationDispatcher", sipApplicationDispatcher);
 					connectorsStartedExternally = true;
 				} 
 				//Tomcat specific loading case
 				SipProvider sipProvider = (SipProvider)
-					connectors[i].getProtocolHandler().getAttribute("sipProvider");
-				if(sipProvider != null) {
+					connector.getProtocolHandler().getAttribute("sipProvider");
+				SipStack sipStack = (SipStack)
+					connector.getProtocolHandler().getAttribute("sipStack");
+				if(sipProvider != null && sipStack != null) {
+					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
+					if(sipStack instanceof SipStackImpl) {
+						logger.info(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
+						((SipStackImpl) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
+					}
 					try {
 						sipProvider.addSipListener(sipApplicationDispatcher);
 						sipApplicationDispatcher.addSipProvider(sipProvider);
-						connectorsStartedExternally = false;
+						connectorsStartedExternally = false;											
 					} catch (TooManyListenersException e) {					
 						throw new LifecycleException(e);
 					}	
@@ -154,9 +154,9 @@ public class SipStandardService extends StandardService implements SipService {
 	public void stop() throws LifecycleException {
 		//Tomcat specific unloading case
 		synchronized (connectors) {
-			for (int i = 0; i < connectors.length; i++) {
+			for (Connector connector : connectors) {
 				SipProvider sipProvider = (SipProvider)
-					connectors[i].getProtocolHandler().getAttribute("sipProvider");
+					connector.getProtocolHandler().getAttribute("sipProvider");
 				if(sipProvider != null) {					
 					sipProvider.removeSipListener(sipApplicationDispatcher);
 					sipApplicationDispatcher.removeSipProvider(sipProvider);

@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import gov.nist.javax.sip.SipStackImpl;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
@@ -230,6 +233,11 @@ public class SipProtocolHandler implements ProtocolHandler {
 				logger.info("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
 				sipProvider.addSipListener(sipApplicationDispatcher);
 				sipApplicationDispatcher.addSipProvider(sipProvider);
+				// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
+				if(sipStack instanceof SipStackImpl) {
+					logger.info(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
+					((SipStackImpl) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
+				}
 			}
 			
 			logger.info("Sip stack started on ip address : " + ipAddress
@@ -239,8 +247,8 @@ public class SipProtocolHandler implements ProtocolHandler {
 					"Bad shit happened -- check server.xml for tomcat. ", ex);
 			throw ex;
 		}
-	}
-
+	}	
+	
 	/**
 	 * @return the retransmissionFilter
 	 */
