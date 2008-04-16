@@ -175,14 +175,14 @@
 								</a>
 							</li>
 							<li>
-								<img src="images/red.jpeg" />
+								<img src="images/green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=17">
 									B2BUAHelper removing SDP content
 								</a>
 							</li>
 							<li>
-								<img src="images/red.jpeg" />
+								<img src="images/green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=18">
 									Content-Encoding header abusely
