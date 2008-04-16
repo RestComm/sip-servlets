@@ -75,9 +75,11 @@ Shopping Demo
 
 	http://jboss bind address:8080/shopping-demo/
 
-	Start a Sip Phone, make it register to your server SIP Connector listening point (usually 127.0.0.1:5080).
+	Start a Sip Phone, make it register as a customer (let's say sip:jean@127.0.0.1:5050) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).
+	
+	Start another Sip Phone, make it register as admin (if you're using the binary or if you didn't change the sip.xml file it should be sip:admin@127.0.0.1:5055) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).
 
-	Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone
+	Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone (here sip:jean@127.0.0.1:5050)
 
 	For SIP Phone settings you can see examples at {{{http://groups.google.com/group/mobicents-public/web/sip-phone-settings-for-converged-demo?hl=en}SIP Phone Settings for Converged Demo}} 
 

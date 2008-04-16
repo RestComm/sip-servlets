@@ -240,8 +240,9 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 </div>
 <div class="section"><h3>How to play with it</h3>
 <p>http://jboss bind address:8080/shopping-demo/</p>
-<p>Start a Sip Phone, make it register to your server SIP Connector listening point (usually 127.0.0.1:5080).</p>
-<p>Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone</p>
+<p>Start a Sip Phone, make it register as a customer (let's say sip:jean@127.0.0.1:5050) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).</p>
+<p>Start another Sip Phone, make it register as admin (if you're using the binary or if you didn't change the sip.xml file it should be sip:admin@127.0.0.1:5055) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).</p>
+<p>Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone (here sip:jean@127.0.0.1:5050)</p>
 <p>For SIP Phone settings you can see examples at <a href="http://groups.google.com/group/mobicents-public/web/sip-phone-settings-for-converged-demo?hl=en" class="externalLink">SIP Phone Settings for Converged Demo</a>
  </p>
 <ul><li>After creation of account once you check out the cart a call will be received on SIP Phone for confirmation.</li>
@@ -265,7 +266,7 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 
   
   
-  &nbsp;| Last Published: 03/20/2008
+  &nbsp;| Last Published: 03/21/2008
   &nbsp;| Version: 0.3-SNAPSHOT
 </div>
       <div class="clear">
