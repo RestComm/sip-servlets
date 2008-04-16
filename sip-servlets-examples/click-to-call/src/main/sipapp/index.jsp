@@ -13,14 +13,14 @@ body { font-family: Tahoma, Geneva, 'Trebuchet MS', Arial, Helvetica, sans-serif
 	color: #555;
 }
 
-td, th {
-	padding: 4px;
-	border: 1px dotted black;
-}
-
 .headtable {
 	border: none;
 	width: 100%;
+}
+
+td.calltable, tr {
+	padding: 4px;
+border: 1px dotted black;
 }
 </style>
 </head>
@@ -44,7 +44,7 @@ if(users == null) {
 	
 	out.println("<table class=\"calltable\">");
 	out.println("<tr><td bgcolor=\"#DDDDDD\">From \\ To</td>");
-	for(String col:userArray) out.println("<td bgcolor=\"#EEEEEE\"><b>" + col + "</b></td>");
+	for(String col:userArray) out.println("<td class=\"calltable\" bgcolor=\"#EEEEEE\"><b>" + col + "</b></td>");
 	out.println("</tr>");
 	for(String fromAddr:userArray) {
 		out.println("<tr><td bgcolor=\"#EEEEEE\"><b>"+fromAddr +"</b></td>");
@@ -55,18 +55,18 @@ if(users == null) {
 				String status = calls==null? null:calls.getStatus(fromAddrV, toAddrV);
 				if(status == null) status = "FFFFFF"; // This is hex RGB color
 				if(status.equals("FFFFFF"))
-					out.println("<td bgcolor=\"#" + status 
+					out.println("<td class=\"calltable\" bgcolor=\"#" + status 
 						+ "\" align=\"center\"><a href=\"call?to="
 						+ users.get(toAddr) + "&from="
 						+ users.get(fromAddr) +"\"\">call</a></td>");
 				else
-					out.println("<td bgcolor=\"#" + status 
+					out.println("<td class=\"calltable\" bgcolor=\"#" + status 
 							+ "\" align=\"center\"><a>call in progress </a><a href=\"call?to="
 							+ users.get(toAddr) + "&bye=true&from="
 							+ users.get(fromAddr) +"\"\">end</a></td>");
 				
 			} else {
-				out.println("<td></td>");
+				out.println("<td class=\"calltable\" ></td>");
 			}
 		}
 		out.println("<tr>");
