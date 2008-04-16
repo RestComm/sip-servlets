@@ -708,9 +708,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// Create the contact name address.
 					contactHeader = 
 						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), transport, fromName);										
-
+					
 					request.addHeader(contactHeader);
-				}				
+				}	
+				
 				if(logger.isDebugEnabled()) {
 					logger.debug("Getting new Client Tx for request " + request);
 				}
@@ -935,7 +936,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			WWWAuthenticateHeader wwwAuthHeader = 
 				(WWWAuthenticateHeader) authHeaderIterator.next();
 			String uri = wwwAuthHeader.getParameter("uri");
-			addChallengeResponse(wwwAuthHeader, username, password, uri);
+			addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
 		}
 		
 		
@@ -946,6 +947,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			ProxyAuthenticateHeader wwwAuthHeader = 
 				(ProxyAuthenticateHeader) authHeaderIterator.next();
 			String uri = wwwAuthHeader.getParameter("uri");
+			if(uri == null) uri = this.getRequestURI().toString();
 			addChallengeResponse(wwwAuthHeader, username, password, uri);
 		}
 	}
