@@ -78,6 +78,7 @@ public abstract class SipServletTestCase extends TestCase {
 				File.separatorChar + "src" +
 				File.separatorChar + "test" + 
 				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
 		tomcat.startTomcat();
