@@ -50,6 +50,8 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 
 	public ParallelProxyWithRecordRouteTest(String name) {
 		super(name);
+
+		this.sipIpAddress="0.0.0.0";
 	}
 
 	@Override

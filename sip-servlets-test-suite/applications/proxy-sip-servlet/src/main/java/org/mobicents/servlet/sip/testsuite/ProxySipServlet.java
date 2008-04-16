@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -69,7 +70,18 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		uris.add(uri1);
 		uris.add(uri2);
 		Proxy proxy = request.getProxy();
-		proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
+		List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
+		
+		if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
+		
+		for(SipURI uri:outboundInterfaces) {
+			if(uri.toString().indexOf("127.0.0.1")>0) {
+				// pick the lo interface, since its universal on all machines
+				proxy.setOutboundInterface(uri);
+				break;
+			}
+		}
+		//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
 		proxy.setRecordRoute(true);
 		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
 		proxy.setParallel(true);
