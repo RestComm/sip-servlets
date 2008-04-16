@@ -277,7 +277,8 @@ public class SipProtocolHandler implements ProtocolHandler {
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
 			if(useStun) {
-				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
+//				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
+				listeningPoint.setSentBy(globalIpAddress + ":" + port);
 			}
 			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
 			sipStack.start();

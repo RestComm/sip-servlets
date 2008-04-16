@@ -27,16 +27,16 @@
 	
 	<context-param>
       <param-name>domain.name</param-name>
-      <param-value>callwithus.com</param-value>
+      <param-value>iptel.org</param-value>
     </context-param>
 	
 	<context-param>
       <param-name>user.name</param-name>
-      <param-value>650390127</param-value>
+      <param-value>jeand</param-value>
     </context-param>
     
     <context-param>
       <param-name>password</param-name>
-      <param-value>XXXXXX</param-value>
+      <param-value>adamjade</param-value>
     </context-param>
 </sip-app>

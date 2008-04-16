@@ -73,13 +73,21 @@ public class UACRegisterSipServlet extends SipServlet implements SipServletListe
 				SipServletRequest challengeRequest = response.getSession().createRequest(
 						response.getRequest().getMethod());
 				
-				challengeRequest.addAuthHeader(response, authInfo);				
-				challengeRequest.send();
+				challengeRequest.addAuthHeader(response, authInfo);
+				logger.info("Sending the challenge request " + challengeRequest);
+				challengeRequest.send();				
 			}
 		} else {					
 			super.doErrorResponse(response);
 		}
 		
+	}
+	
+	@Override
+	protected void doSuccessResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		
+		logger.info("GOT SUCESS RESPONSE HURRAH ! : " + resp);
 	}
 	
 	/*

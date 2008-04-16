@@ -169,7 +169,7 @@ public class SipNetworkInterfaceManager {
 		if((listeningPointAddresses.contains(ipAddress) &&					
 				listeningPoint.getPort() == portChecked) ||
 				(listeningPoint.getGlobalIpAddress() != null && listeningPoint.getGlobalIpAddress().equalsIgnoreCase(ipAddress) &&					
-				listeningPoint.getGlobalPort() == portChecked)){
+				(listeningPoint.getGlobalPort() == portChecked || listeningPoint.getPort() == portChecked))){
 			return true;
 		}
 		//resolving by hostname
@@ -179,7 +179,7 @@ public class SipNetworkInterfaceManager {
 				if((listeningPointAddresses.contains(inetAddress.getHostAddress())
 						&& listeningPoint.getPort() == portChecked) ||
 						(listeningPoint.getGlobalIpAddress() != null && listeningPoint.getGlobalIpAddress().equalsIgnoreCase(inetAddress.getHostAddress()) &&					
-						listeningPoint.getGlobalPort() == portChecked)) {
+						(listeningPoint.getGlobalPort() == portChecked || listeningPoint.getPort() == portChecked))){
 					return true;
 				}
 			}

@@ -122,7 +122,8 @@ public class JainSipUtils {
 		String globalIpAddress = listeningPoint.getGlobalIpAddress();
 		if(globalIpAddress != null) {
 			host = globalIpAddress;
-			port = listeningPoint.getGlobalPort();
+//			port = listeningPoint.getGlobalPort();
+			port = listeningPoint.getPort();
 		} else {
 			
 			host = getMostOutboundAddress(listeningPoint.getIpAddresses());
@@ -159,7 +160,8 @@ public class JainSipUtils {
 		String globalIpAddress = listeningPoint.getGlobalIpAddress();
 		if(globalIpAddress != null) {
 			host = globalIpAddress;
-			port = listeningPoint.getGlobalPort();
+//			port = listeningPoint.getGlobalPort();
+			port = listeningPoint.getPort();
 		} else {
 			host = getMostOutboundAddress(listeningPoint.getIpAddresses());
 			port = listeningPoint.getPort();
