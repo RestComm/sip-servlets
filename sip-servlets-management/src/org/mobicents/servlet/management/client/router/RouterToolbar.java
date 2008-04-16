@@ -21,7 +21,21 @@ public class RouterToolbar extends Toolbar {
 		
 		final Window sourceCodeWindow = new Window();
 		final Window helpWindow = new Window();
-
+		
+		// Initialize help window
+		Frame helpFrame = new Frame("help/index.html");
+		helpWindow.setTitle("Default Application Router Help");  
+		helpWindow.setClosable(true);  
+		helpWindow.setWidth(600);  
+		helpWindow.setHeight(350);  
+		helpWindow.setPlain(true);  
+		helpWindow.setAutoScroll(true);
+		helpWindow.setLayout(new FitLayout());
+		helpWindow.add(helpFrame);
+		helpWindow.setCloseAction(Window.HIDE);
+		
+		
+		//Set up the source code button - display DAR config
 		ToolbarButton showDARTextButton = new ToolbarButton("View source", new ButtonListenerAdapter() {
 			public void onClick(Button button, EventObject e) {
 				String sourceCode = container.getDARText();
@@ -38,6 +52,7 @@ public class RouterToolbar extends Toolbar {
 			
 		});
 		
+		// Set up the Save button - saves the DAR configuration
 		ToolbarButton saveButton = new ToolbarButton("Save", new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {
 				save();
@@ -63,6 +78,7 @@ public class RouterToolbar extends Toolbar {
 			
 		});
 		
+		// Pop the console window
 		ToolbarButton logErrorButton = new ToolbarButton("Log and errors", new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {
 				Console.getInstance().show();
@@ -70,19 +86,10 @@ public class RouterToolbar extends Toolbar {
 			
 		});
 		
-		
+		// Help button
 		ToolbarButton helpButton = new ToolbarButton("Help", new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {
-				Frame helpFrame = new Frame("help/index.html");
-				helpWindow.setTitle("Default Application Router Help");  
-				helpWindow.setClosable(true);  
-				helpWindow.setWidth(600);  
-				helpWindow.setHeight(350);  
-				helpWindow.setPlain(true);  
-				helpWindow.setAutoScroll(true);
-				helpWindow.setLayout(new FitLayout());
-				helpWindow.add(helpFrame);
-				helpWindow.setCloseAction(Window.HIDE);
+
 				helpWindow.show();
 			}
 			
