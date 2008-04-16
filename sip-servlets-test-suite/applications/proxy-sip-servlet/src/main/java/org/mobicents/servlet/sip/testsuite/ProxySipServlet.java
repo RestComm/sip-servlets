@@ -41,6 +41,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 
 	private static Log logger = LogFactory.getLog(ProxySipServlet.class);
 	
+	private static String USE_HOSTNAME= "useHostName";
+	
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public ProxySipServlet() {
@@ -64,8 +66,22 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		//This is a proxying sample.
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		
-		URI uri1 = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();
-		URI uri2 = sipFactory.createAddress("sip:cutme@127.0.0.1:5056").getURI();
+		boolean useHostName = false;
+		if(USE_HOSTNAME.equals(((SipURI)request.getFrom().getURI()).getUser())) {
+			useHostName = true;
+			logger.info("using Host Name for proxy test");
+		}
+		
+		URI uri1 = null;		
+		URI uri2 = null;
+		if(useHostName) {
+			uri1 = sipFactory.createAddress("sip:receiver@localhost:5057").getURI();
+			uri2 = sipFactory.createAddress("sip:cutme@localhost:5056").getURI();	
+		} else {
+			uri1 = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();
+			uri2 = sipFactory.createAddress("sip:cutme@127.0.0.1:5056").getURI();
+		}
+		
 		ArrayList uris = new ArrayList();
 		uris.add(uri1);
 		uris.add(uri2);

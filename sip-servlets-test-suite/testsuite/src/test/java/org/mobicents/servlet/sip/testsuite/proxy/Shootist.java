@@ -254,6 +254,10 @@ public class Shootist implements SipListener {
 	}
 
 	public void init() {
+		init("BigGuy");
+	}
+	
+	public void init(String fromName) {
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
@@ -306,8 +310,7 @@ public class Shootist implements SipListener {
 			sipProvider = sipStack.createSipProvider(udpListeningPoint);
 			Shootist listener = this;
 			sipProvider.addSipListener(listener);
-
-			String fromName = "BigGuy";
+			
 			String fromSipAddress = "here.com";
 			String fromDisplayName = "The Master Blaster";
 
