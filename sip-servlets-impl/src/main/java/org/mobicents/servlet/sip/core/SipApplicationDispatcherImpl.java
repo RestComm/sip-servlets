@@ -1451,11 +1451,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 								
 				// We can not use session.getProxyBranch() because all branches belong to the same session
-				// and the session.proxyBranch is overwritten each time there is activity on the branch.
-				ProxyBranchImpl proxyBranch = null;
-				if(applicationData != null) {
-					proxyBranch = applicationData.getProxyBranch();
-				}
+				// and the session.proxyBranch is overwritten each time there is activity on the branch.				
+				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
 				if(proxyBranch != null) {
 					sipServletResponse.setProxyBranch(proxyBranch);
 					// Update Session state
