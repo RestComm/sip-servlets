@@ -670,7 +670,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(request.getMethod())) {
-				if(getSipSession().getProxyBranch() == null) // If the app is proxying it already does that
+				// Additional checks for https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29
+				if(getSipSession().getProxyBranch() == null ||
+						(transactionApplicationData.getProxy() != null &&
+						transactionApplicationData.getProxy().getRecordRoute())) // If the app is proxying it already does that
 				{
 					//Add a record route header for app composition		
 					addAppCompositionRRHeader();	
