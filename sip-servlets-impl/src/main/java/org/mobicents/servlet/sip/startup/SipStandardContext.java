@@ -135,9 +135,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
 		sipSessionsUtil = new SipSessionsUtilImpl(((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()).getSessionManager(), applicationName);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
-				sipFactoryFacade);
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-				sipApplicationDispatcher.getOutboundInterfaces());
+				sipFactoryFacade);		
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
 				TimerServiceImpl.getInstance());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
