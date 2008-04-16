@@ -117,7 +117,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			Request newRequest = (Request) origRequestImpl.message.clone();
-			newRequest.removeContent();				
+			//content should be copied too, so commented out
+//		 	newRequest.removeContent();				
 			//removing the via header from original request
 			ViaHeader viaHeader = (ViaHeader) newRequest
 					.getHeader(ViaHeader.NAME);

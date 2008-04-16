@@ -299,14 +299,17 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		}
 		
 		// good behaviour, lets make some default
-		if (this.message.getContentEncoding() == null)
-			try {
-				this.message.addHeader(this.headerFactory
-						.createContentEncodingHeader(this.defaultEncoding));
-			} catch (ParseException e) {
-				logger.debug("Couldnt add deafualt enconding...");
-				e.printStackTrace();
-			}
+		//seems like bad behavior finally 
+		//check http://forums.java.net/jive/thread.jspa?messageID=260944
+		// => commented out
+//		if (this.message.getContentEncoding() == null)
+//			try {
+//				this.message.addHeader(this.headerFactory
+//						.createContentEncodingHeader(this.defaultEncoding));
+//			} catch (ParseException e) {
+//				logger.debug("Couldnt add deafualt enconding...");
+//				e.printStackTrace();
+//			}
 
 		if (transaction != null && transaction.getApplicationData() == null)
 			transaction.setApplicationData(transactionApplicationData);
