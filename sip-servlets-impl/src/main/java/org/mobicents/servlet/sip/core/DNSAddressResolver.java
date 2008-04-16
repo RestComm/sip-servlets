@@ -59,7 +59,7 @@ public class DNSAddressResolver implements AddressResolver {
 		// specified, it uses the default port for the particular transport
 		// protocol.numeric IP address, no DNS lookup to be done
 		if(Inet6Util.isValidIP6Address(hopHost) 
-				|| Inet6Util.isValidIP6Address(hopHost)) {
+				|| Inet6Util.isValidIPV4Address(hopHost)) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("host " + hopHost + " is a numeric IP address, " +
 						"no DNS SRV lookup to be done, using the hop given in param");
@@ -67,17 +67,21 @@ public class DNSAddressResolver implements AddressResolver {
 			return hop;
 		} 
 		
-		ListeningPoint listeningPoint = JainSipUtils.findMatchingListeningPoint(
-				sipApplicationDispatcher.getSipProviders(), hopHost, hopPort, hopTransport);
-		if(sipApplicationDispatcher.findHostNames().contains(hopHost) || listeningPoint != null) {
-			// if the host matches the container we don't do any dns lookup
-			return new HopImpl(listeningPoint.getIPAddress(), listeningPoint.getPort(), listeningPoint.getTransport());
-		} else {			
-			// As per rfc3263 Section 4.2
-			// If the TARGET was not a numeric IP address, and no port was present
-			// in the URI, the client performs an SRV query
-			return resolveHostByDnsSrvLookup(hop);
+		// if the host belong to the container, it tries to resolve the ip address		
+		if(sipApplicationDispatcher.findHostNames().contains(hopHost)) {
+			try {
+				InetAddress ipAddress = InetAddress.getByName(hopHost);
+				return new HopImpl(ipAddress.getHostAddress(), hopPort, hopTransport);
+			} catch (UnknownHostException e) {
+				logger.warn(hopHost + " belonging to the container cannoit be resolved");
+			}			
 		}
+				
+		// As per rfc3263 Section 4.2
+		// If the TARGET was not a numeric IP address, and no port was present
+		// in the URI, the client performs an SRV query
+		return resolveHostByDnsSrvLookup(hop);
+		
 	}
 	
 	/**

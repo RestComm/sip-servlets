@@ -31,7 +31,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  * 
  * @author Jean Deruelle
  */
-public interface SipService extends Service {
+public interface SipService extends Service {	
 	/**
 	 * Retrieve the sip application dispatcher associated with this service
 	 * @return the sip application dispatcher associated with this service

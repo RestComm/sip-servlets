@@ -18,10 +18,12 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
+import javax.sip.ListeningPoint;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -31,6 +33,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.security.SecurityUtil;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -138,9 +141,13 @@ public class ConvergedSession
 		if(sipApplicationSession == null) {
 			//however if no application session is associated it is created, 
 			//associated with the HttpSession and returned.
+			ExtendedListeningPoint listeningPoint = 
+				sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false);			
+			
 			SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
 					((SipContext)manager.getContainer()).getApplicationName(), 
-					JainSipUtils.findMatchingSipProvider(sipFactoryImpl.getSipProviders(), "udp").getNewCallId().getCallId());
+					listeningPoint.getSipProvider().getNewCallId().getCallId());
+			
 			sipApplicationSession = 
 				sipFactoryImpl.getSessionManager().getSipApplicationSession(sipApplicationSessionKey, true, (SipContext)manager.getContainer());			
 			sipApplicationSession.addHttpSession(this);

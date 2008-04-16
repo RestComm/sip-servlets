@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.startup;
 
 import gov.nist.javax.sip.SipStackImpl;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,12 +28,17 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
 
+import net.java.stun4j.StunAddress;
+import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
+import net.java.stun4j.client.StunDiscoveryReport;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
@@ -58,15 +64,10 @@ public class SipProtocolHandler implements ProtocolHandler {
 
 	private SipStack sipStack;
 
-	/**
-	 * the sip stack listening point that handles receiving messages.
+	/*
+	 * the extended listening point with global ip address and port for it
 	 */
-	public ListeningPoint listeningPoint;
-
-	/**
-	 * The sipProvider instance that handles sending messages.
-	 */
-	public SipProvider sipProvider;
+	public ExtendedListeningPoint extendedListeningPoint;
 
 	// sip stack attributes defined by the server.xml
 	/**
@@ -112,7 +113,20 @@ public class SipProtocolHandler implements ProtocolHandler {
 	/*
 	 * IP address for this protocol handler.
 	 */
-	private String ipAddress;
+	private String ipAddress;	
+	/*
+	 * use Stun
+	 */
+	private boolean useStun;
+	/*
+	 * Stun Server Address
+	 */
+	private String stunServerAddress;
+	/*
+	 * Stun Server Port
+	 */
+	private int stunServerPort;
+	
 
 	/**
 	 * {@inheritDoc}
@@ -121,16 +135,17 @@ public class SipProtocolHandler implements ProtocolHandler {
 		logger.info("Stopping the sip stack");
 		//Jboss specific unloading case
 		SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
-			getAttribute("SipApplicationDispatcher");
+			getAttribute(SipApplicationDispatcher.class.getSimpleName());
 		if(sipApplicationDispatcher != null) {
 			logger.info("Removing the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
-			sipProvider.removeSipListener(sipApplicationDispatcher);
-			sipApplicationDispatcher.removeSipProvider(sipProvider);
+			extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
+			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
 		//stopping the sip stack
-		sipStack.deleteSipProvider(sipProvider);
-		sipStack.deleteListeningPoint(listeningPoint);
+		sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
+		sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
 		sipStack.stop();
+		extendedListeningPoint = null;
 		logger.info("Sip stack stopped");
 	}
 
@@ -213,26 +228,62 @@ public class SipProtocolHandler implements ProtocolHandler {
 				
 			}
 			properties.setProperty("javax.sip.STACK_NAME", sipStackName);
-			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
-
+			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");			
+			
+			//checking the external ip address if stun enabled			
+			String globalIpAddress = null;			
+			int globalPort = -1;
+			if (useStun) {
+				if(InetAddress.getByName(ipAddress).isLoopbackAddress()) {
+					logger.warn("The Ip address provided is the loopback address, stun won't be enabled for it");
+				} else {
+					//TODO port should be chosen randomly
+					StunAddress localStunAddress = new StunAddress(ipAddress,
+							port);
+	
+					StunAddress serverStunAddress = new StunAddress(
+							stunServerAddress, stunServerPort);
+	
+					NetworkConfigurationDiscoveryProcess addressDiscovery = new NetworkConfigurationDiscoveryProcess(
+							localStunAddress, serverStunAddress);
+					addressDiscovery.start();
+					StunDiscoveryReport report = addressDiscovery
+							.determineAddress();				
+					globalIpAddress = report.getPublicAddress().getSocketAddress().getAddress().getHostAddress();
+					globalPort = report.getPublicAddress().getPort();
+					addressDiscovery.shutDown();
+					logger.info("Stun report = " + report);
+					//TODO set a timer to retry the binding and provide a callback to update the global ip address and port
+				}
+			}
+			
 			// Create SipStack object
 			sipStack = SipFactories.sipFactory.createSipStack(properties);
 
-			listeningPoint = sipStack.createListeningPoint(ipAddress,
+			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
-			sipProvider = sipStack.createSipProvider(listeningPoint);
+			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
 			sipStack.start();
-			//made the sip stack and the sipProvider available to the service implementation
-			setAttribute("sipStack", sipStack);
-			setAttribute("sipProvider", sipProvider);			
+			
+			//creating the extended listening point
+			extendedListeningPoint = new ExtendedListeningPoint(sipProvider, listeningPoint);
+			extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
+			extendedListeningPoint.setGlobalPort(globalPort);
+			//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
+			
+			logger.info("useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);						
+			
+			//made the sip stack and the extended listening Point available to the service implementation
+			setAttribute(SipStack.class.getSimpleName(), sipStack);					
+			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
 			
 			//Jboss specific loading case
 			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
-				getAttribute("SipApplicationDispatcher");
+				getAttribute(SipApplicationDispatcher.class.getSimpleName());
 			if(sipApplicationDispatcher != null) {
 				logger.info("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
 				sipProvider.addSipListener(sipApplicationDispatcher);
-				sipApplicationDispatcher.addSipProvider(sipProvider);
+				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
 				// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
 				if(sipStack instanceof SipStackImpl) {
 					logger.info(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
@@ -354,6 +405,48 @@ public class SipProtocolHandler implements ProtocolHandler {
 
 	public String getIpAddress() {
 		return ipAddress;
+	}
+
+	/**
+	 * @return the stunServerAddress
+	 */
+	public String getStunServerAddress() {
+		return stunServerAddress;
+	}
+
+	/**
+	 * @param stunServerAddress the stunServerAddress to set
+	 */
+	public void setStunServerAddress(String stunServerAddress) {
+		this.stunServerAddress = stunServerAddress;
+	}
+
+	/**
+	 * @return the stunServerPort
+	 */
+	public int getStunServerPort() {
+		return stunServerPort;
+	}
+
+	/**
+	 * @param stunServerPort the stunServerPort to set
+	 */
+	public void setStunServerPort(int stunServerPort) {
+		this.stunServerPort = stunServerPort;
+	}
+
+	/**
+	 * @return the useStun
+	 */
+	public boolean isUseStun() {
+		return useStun;
+	}
+
+	/**
+	 * @param useStun the useStun to set
+	 */
+	public void setUseStun(boolean useStun) {
+		this.useStun = useStun;
 	}
 
 }

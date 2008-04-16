@@ -159,8 +159,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {
 			Request request = (Request) super.message;
 			String transport = JainSipUtils.findTransport(request);
-			SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-					sipFactoryImpl.getSipProviders(), transport);
+			SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false).getSipProvider();					
 			
 			Request cancelRequest = ((ClientTransaction) getTransaction())
 					.createCancel();
@@ -225,7 +224,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							String transport = ((ViaHeader) request
 									.getHeader(ViaHeader.NAME)).getTransport();					
 							ContactHeader contactHeader = JainSipUtils
-									.createContactForProvider(super.sipFactoryImpl.getSipProviders(), transport);
+									.createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
 							response.setHeader(contactHeader);
 						}
 					}
@@ -258,8 +257,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					&& this.getTransaction().getDialog() == null) {
 				Request request = (Request) super.message;
 				String transport = JainSipUtils.findTransport(request);
-				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-						sipFactoryImpl.getSipProviders(), transport);
+				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();
 				
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
@@ -395,50 +394,56 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see javax.servlet.sip.SipServletRequest#pushRoute(javax.servlet.sip.Address)
 	 */
 	public void pushRoute(Address address) {
-		if (logger.isDebugEnabled())
-			logger.debug("Pushing route into message of value [" + address
-					+ "]");
-
+		
 		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) ((AddressImpl) address)
-				.getAddress().getURI();
-		sipUri.setLrParam();
-
-		try {
-			javax.sip.header.Header p = SipFactories.headerFactory
-					.createRouteHeader(SipFactories.addressFactory
-							.createAddress(sipUri));
-			this.message.addFirst(p);
-		} catch (Exception e) {
-			logger.error("Error while pushing route [" + address + "]");
-			throw new IllegalArgumentException("Error pushing route ", e);
-		}
-
+			.getAddress().getURI();
+		pushRoute(sipUri);
 	}
 
-	public void pushRoute(SipURI uri) {
-		if (logger.isDebugEnabled())
-			logger.debug("Pushing route into message of value [" + uri + "]");
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#pushRoute(javax.servlet.sip.SipURI)
+	 */
+	public void pushRoute(SipURI uri) {		
 		javax.sip.address.SipURI sipUri = ((SipURIImpl) uri).getSipURI();
-		sipUri.setLrParam();
-
-		try {
-			javax.sip.address.Address address = SipFactories.addressFactory
-					.createAddress(sipUri);
-			javax.sip.header.Header routeHeader = SipFactories.headerFactory
-					.createRouteHeader(address);
-			this.message.addFirst(routeHeader);
-		} catch (Exception e) {
-			logger.error("Error while pushing route [" + uri + "]");
-			throw new IllegalArgumentException("Error pushing route ", e);
-		}
-
+			sipUri.setLrParam();
+		pushRoute(sipUri);
 	}
 
+	/**
+	 * Pushes a route header on initial request based on the jain sip sipUri given on parameter
+	 * @param sipUri the jain sip sip uri to use to construct the route header to push on the request
+	 */
+	private void pushRoute(javax.sip.address.SipURI sipUri) {
+		if(isInitial()) {
+			if (logger.isDebugEnabled())
+				logger.debug("Pushing route into message of value [" + sipUri
+						+ "]");
+			
+			sipUri.setLrParam();
+	
+			try {
+				javax.sip.header.Header p = SipFactories.headerFactory
+						.createRouteHeader(SipFactories.addressFactory
+								.createAddress(sipUri));
+				this.message.addFirst(p);
+			} catch (SipException e) {
+				logger.error("Error while pushing route [" + sipUri + "]");
+				throw new IllegalArgumentException("Error pushing route ", e);
+			}
+		} else {
+			//as per JSR 289 Section 11.1.3 Pushing Route Header Field Values
+			// pushRoute can only be done on the initial requests. 
+			// Subsequent requests within a dialog follow the route set. 
+			// Any attempt to do a pushRoute on a subsequent request in a dialog 
+			// MUST throw and IllegalStateException.
+			throw new IllegalStateException("Cannot push route on subsequent requests, only intial ones");
+		}
+	}
+	
 	public void setMaxForwards(int n) {
 		MaxForwardsHeader mfh = (MaxForwardsHeader) this.message
 				.getHeader(MaxForwardsHeader.NAME);
@@ -690,8 +695,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			
 			if (super.getTransaction() == null) {
 
-				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-						super.sipFactoryImpl.getSipProviders(), transport);
+				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();
 				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null) {
@@ -797,7 +802,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void addInfoForRoutingBackToContainer(String applicationName) throws ParseException {		
 		Request request = (Request) super.message;
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
-				sipFactoryImpl.getSipProviders(), 
+				sipFactoryImpl.getSipNetworkInterfaceManager(), 
 				JainSipUtils.findTransport(request));
 		sipURI.setLrParam();
 		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_DIRECTIVE, 
@@ -822,7 +827,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		Request request = (Request) super.message;
 		
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
-				sipFactoryImpl.getSipProviders(), 
+				sipFactoryImpl.getSipNetworkInterfaceManager(), 
 				JainSipUtils.findTransport(request));
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());

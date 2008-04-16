@@ -22,13 +22,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -109,7 +105,6 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -173,6 +168,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private SessionManager sessionManager = null;
 	
 	private Boolean started = Boolean.FALSE;
+
+	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
 	/**
 	 * 
@@ -181,7 +178,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		sessionManager = new SessionManager();
 		sipFactoryImpl = new SipFactoryImpl(this);
-		hostNames = Collections.synchronizedList(new ArrayList<String>());		
+		hostNames = Collections.synchronizedList(new ArrayList<String>());
+		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
 	}
 	
 	/**
@@ -368,7 +366,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Request request = requestEvent.getRequest();
 		try {
 			logger.info("Got a request event "  + request.toString());			
-			if ( transaction == null ) {
+			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
 					transaction = sipProvider.getNewServerTransaction(request);
 				} catch ( TransactionUnavailableException tae) {
@@ -445,7 +443,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		//Add via header
 		String transport = JainSipUtils.findTransport(clonedRequest);		
 		ViaHeader viaHeader = JainSipUtils.createViaHeader(
-				sipFactoryImpl.getSipProviders(), transport, null);
+				sipNetworkInterfaceManager, transport, null);
 		String handlerName = sipServletRequest.getSipSession().getHandler();
 		
 		if(handlerName != null) { 
@@ -474,8 +472,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug("Routing Back to the container the following request " 
 					+ clonedRequest);
 		}	
-		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-				sipFactoryImpl.getSipProviders(), transport);
+		ExtendedListeningPoint extendedListeningPoint = 
+			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);		
+		SipProvider sipProvider = extendedListeningPoint.getSipProvider();
 		ServerTransaction serverTransaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Dialog dialog = sipServletRequest.getDialog();
 		if(dialog == null) {			
@@ -899,7 +898,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
             // Branch Id will be assigned by the stack.
 			String transport = JainSipUtils.findTransport(clonedRequest);		
 			ViaHeader viaHeader = JainSipUtils.createViaHeader(
-					sipFactoryImpl.getSipProviders(), transport, null);                                
+					sipNetworkInterfaceManager, transport, null);                                
         
             // Cancel is hop by hop so remove all other via headers.
             clonedRequest.removeHeader(ViaHeader.NAME);                
@@ -1235,9 +1234,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	private boolean isExternal(String host, int port, String transport) {
 		boolean isExternal = true;
-		ListeningPoint listeningPoint = JainSipUtils.findMatchingListeningPoint(
-				sipFactoryImpl.getSipProviders(), host, port, transport);
+		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
 		if(hostNames.contains(host) || listeningPoint != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("hostNames.contains(host)=" + 
+						hostNames.contains(host) +
+						" | listeningPoint found = " +
+						listeningPoint);
+			}
 			isExternal = false;
 		}		
 		if(logger.isDebugEnabled()) {
@@ -1623,33 +1627,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setSipApplicationRouter(SipApplicationRouter sipApplicationRouter) {
 		this.sipApplicationRouter = sipApplicationRouter;
 	}
+	
 	/*
 	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#addSipProvider(javax.sip.SipProvider)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipNetworkInterfaceManager()
 	 */
-	public void addSipProvider(SipProvider sipProvider) {
-		sipFactoryImpl.addSipProvider(sipProvider);
-		if(started) {
-			resetOutboundInterfaces();
-		}
+	public SipNetworkInterfaceManager getSipNetworkInterfaceManager() {
+		return this.sipNetworkInterfaceManager;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#removeSipProvider(javax.sip.SipProvider)
-	 */
-	public void removeSipProvider(SipProvider sipProvider) {
-		sipFactoryImpl.removeSipProvider(sipProvider);
-		if(started) {
-			resetOutboundInterfaces();
-		}
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipProviders()
-	 */
-	public Set<SipProvider> getSipProviders() {
-		return sipFactoryImpl.getSipProviders();
-	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipFactory()
@@ -1663,87 +1649,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getOutboundInterfaces()
 	 */
 	public List<SipURI> getOutboundInterfaces() {
-		List<SipURI> outboundInterfaces = new ArrayList<SipURI>();
-		Set<SipProvider> sipProviders = sipFactoryImpl.getSipProviders();
-		for (SipProvider sipProvider : sipProviders) {
-			ListeningPoint[] listeningPoints = sipProvider.getListeningPoints();
-			for (int i = 0; i < listeningPoints.length; i++) {
-				javax.sip.address.SipURI jainSipURI;
-				try {
-					String ipAddress = listeningPoints[i].getIPAddress();
-					// If we are binding to all adapters, add the actual IPs
-					if(JainSipUtils.GLOBAL_IPADDRESS.equals(ipAddress)) {
-						addAllLocalInterfaces(outboundInterfaces,
-								listeningPoints[i].getPort(),
-								listeningPoints[i].getTransport());
-					
-					// Else, we will add only the specified IP
-					} else {
-						jainSipURI = SipFactories.addressFactory.createSipURI(
-								null, listeningPoints[i].getIPAddress());
-						jainSipURI.setPort(listeningPoints[i].getPort());
-						jainSipURI.setTransportParam(listeningPoints[i].getTransport());
-						SipURI sipURI = new SipURIImpl(jainSipURI);
-						outboundInterfaces.add(sipURI);
-						logger.info("Added outbound interface: " + sipURI.toString());
-					}
-				} catch (ParseException e) {
-					logger.error("cannot add the following listening point "+
-							listeningPoints[i].getIPAddress()+":"+
-							listeningPoints[i].getPort()+";transport="+
-							listeningPoints[i].getTransport()+" to the outbound interfaces", e);
-				}				
-			}
-		}
-		
-		return Collections.unmodifiableList(outboundInterfaces);
-	}
-	
-	/**
-	 * This method will enumerate all network interfaces and add them to
-	 * the list of outbound interfaces. It should be used only when someone
-	 * is trying to bind to 0.0.0.0, which is equivalent to all interfaces.
-	 * @param list list of the outbound URIs
-	 * @param port
-	 * @param transport
-	 */
-	private void addAllLocalInterfaces(List<SipURI> list, int port, String transport) {
-		try {
-			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-			while(ifaces.hasMoreElements()) {
-				NetworkInterface ni = ifaces.nextElement();
-				Enumeration<InetAddress> bindings = ni.getInetAddresses();
-				while(bindings.hasMoreElements()) {
-					InetAddress addr = bindings.nextElement();
-					String ip = addr.getHostAddress();
-					try {
-
-						javax.sip.address.SipURI jainSipURI = 
-							SipFactories.addressFactory.createSipURI(
-								null, ip);
-						jainSipURI.setPort(port);
-						jainSipURI.setTransportParam(transport);
-						SipURIImpl uri = new SipURIImpl(jainSipURI);
-						if(!list.contains(uri)) {
-							list.add(uri);
-							logger.info("Added outbound interface: " + uri.toString());
-						}
-					} catch (ParseException e) {
-						logger.error("an unexpected exception has been thrown while adding outbound interfaces",e);
-					}
-				}
-			}
-		} catch (SocketException e) {
-			logger.warn("Unable to enumerate local interfaces. Binding to 0.0.0.0 may not work.",e);
-		}
-		
-	}
+		return sipNetworkInterfaceManager.getOutboundInterfaces();
+	}		
 	
 	/**
 	 * set the outbound interfaces on all servlet context of applications deployed
 	 */
 	private void resetOutboundInterfaces() {
-		List<SipURI> outboundInterfaces = getOutboundInterfaces();
+		List<SipURI> outboundInterfaces = sipNetworkInterfaceManager.getOutboundInterfaces();
 		for (SipContext sipContext : applicationDeployed.values()) {
 			sipContext.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 					outboundInterfaces);				

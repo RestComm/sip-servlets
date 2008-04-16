@@ -113,7 +113,7 @@ public class ProxyUtils {
 			ViaHeader viaHeader = null;
 			if(proxy.getOutboundInterface() == null) { 
 				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipProviders(), transport, generateBranchId());
+						sipFactoryImpl.getSipNetworkInterfaceManager(), transport, generateBranchId());
 			} else { //If outbound interface is specified use it
 				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
 				if(outboundTransport == null) outboundTransport = "udp";
@@ -135,7 +135,7 @@ public class ProxyUtils {
 			if(params.routeRecord != null) {
 				javax.sip.address.SipURI rrURI = null;
 				if(proxy.getOutboundInterface() == null) {
-					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipProviders(), transport);
+					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
 				} else {
 					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();
 				}
@@ -180,7 +180,7 @@ public class ProxyUtils {
 			// Add path header
 			if(params.path != null)
 			{
-				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipProviders(), transport);
+				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
 
 				Iterator<String> paramNames = params.path.getParameterNames();
 				

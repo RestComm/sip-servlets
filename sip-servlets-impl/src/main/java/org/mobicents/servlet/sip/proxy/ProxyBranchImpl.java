@@ -347,8 +347,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 		clonedRequest.removeFirst(RouteHeader.NAME);
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
-		SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-				sipFactoryImpl.getSipProviders(), transport);
+		SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				transport, false).getSipProvider();
 		
 		try {
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK)) {

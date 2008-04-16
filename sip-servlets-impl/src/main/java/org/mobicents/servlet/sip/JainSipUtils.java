@@ -17,16 +17,7 @@
 package org.mobicents.servlet.sip;
 
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.sip.InvalidArgumentException;
@@ -42,6 +33,8 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 
 /**
@@ -54,6 +47,18 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 public class JainSipUtils {
 	//TODO since listening points don't change often, use a cache system
 	//or hashmap with correct keys to improve performance
+	
+	/**
+     * The maximum int value that could correspond to a port nubmer.
+     */
+    public static final int    MAX_PORT_NUMBER = 65535;
+
+    /**
+     * The minimum int value that could correspond to a port nubmer bindable
+     * by the SIP Communicator.
+     */
+    public static final int    MIN_PORT_NUMBER = 1024;
+    
 	
 	private static Log logger = LogFactory.getLog(JainSipUtils.class);
 
@@ -74,211 +79,98 @@ public class JainSipUtils {
 
 	public static final int MAX_FORWARD_HEADER_VALUE = 70;
 	
-	public static ViaHeader createViaHeader(Set<SipProvider> sipProviders, String transport, String branch) {
-		Iterator<SipProvider> it = sipProviders.iterator();
-		ListeningPoint listeningPoint = null;
-		while (it.hasNext() && listeningPoint == null) {
-			SipProvider sipProvider = it.next();
-			listeningPoint = sipProvider.getListeningPoint(transport);
-		}		
-		if(listeningPoint == null) {
-			throw new RuntimeException("no connector have been found for transport "+ transport);
+	/**
+	 * 
+	 * @param sipNetworkInterfaceManager
+	 * @param transport
+	 * @param branch
+	 * @return
+	 */
+	public static ViaHeader createViaHeader(
+			SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport, String branch) {
+		
+		ExtendedListeningPoint listeningPoint = 
+			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		// Making use of the global ip address discovered by STUN if it is present
+		String host = null;
+		int port = -1;
+		String globalIpAddress = listeningPoint.getGlobalIpAddress();
+		if(globalIpAddress != null) {
+			host = globalIpAddress;
+			port = listeningPoint.getGlobalPort();
+		} else {
+			host = listeningPoint.getIpAddresses().get(0);
+			port = listeningPoint.getPort();
 		}
-	 	String host = listeningPoint.getIPAddress();
-	 	int port = listeningPoint.getPort();
 	 		 	
         try {
             ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, branch);
           
             return via;
-        } catch (Exception ex) {
-        	logger.fatal ("Unexpected error",ex);
-            throw new RuntimeException("Unexpected exception when creating via header ", ex);
-        }
+        } catch (ParseException ex) {
+        	logger.error ("Unexpected error while creating a via header",ex);
+            throw new IllegalArgumentException("Unexpected exception when creating via header ", ex);
+        } catch (InvalidArgumentException e) {
+        	logger.error ("Unexpected error while creating a via header",e);
+            throw new IllegalArgumentException("Unexpected exception when creating via header ", e);
+		}
     }
 	 
-	public static ContactHeader createContactForProvider(Set<SipProvider> sipProviders, String transport) {
-		Iterator<SipProvider> it = sipProviders.iterator();
-		ListeningPoint listeningPoint = null;
-		while (it.hasNext() && listeningPoint == null) {
-			SipProvider sipProvider = it.next();
-			listeningPoint = sipProvider.getListeningPoint(transport);
-		}		
-		if(listeningPoint == null) {
-			throw new RuntimeException("no connector have been found for transport "+ transport);
+	/**
+	 * 
+	 * @param sipNetworkInterfaceManager
+	 * @param transport
+	 * @return
+	 */
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport) {
+		
+		ExtendedListeningPoint listeningPoint = 
+			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);						
+		
+		// Making use of the global ip address discovered by STUN if it is present
+		String host = null;
+		int port = -1;
+		String globalIpAddress = listeningPoint.getGlobalIpAddress();
+		if(globalIpAddress != null) {
+			host = globalIpAddress;
+			port = listeningPoint.getGlobalPort();
+		} else {
+			host = listeningPoint.getIpAddresses().get(0);
+			port = listeningPoint.getPort();
 		}
 		
-		String ipAddress = listeningPoint.getIPAddress();
-		int port = listeningPoint.getPort();
 		try {
-			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, ipAddress);
-			sipURI.setHost(ipAddress);
+			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
+			sipURI.setHost(host);
 			sipURI.setPort(port);
 			sipURI.setTransportParam(transport);
 			ContactHeader contact = SipFactories.headerFactory.createContactHeader(SipFactories.addressFactory.createAddress(sipURI));
 		
 			return contact;
-		} catch (Exception ex) {
-			logger.fatal ("Unexpected error",ex);
-			throw new RuntimeException ("Unexpected error",ex);
-		}
+		} catch (ParseException ex) {
+        	logger.error ("Unexpected error while creating a sip URI",ex);
+            throw new IllegalArgumentException("Unexpected exception when creating a sip URI", ex);
+        }
 	}
 
-	public static javax.sip.address.SipURI createRecordRouteURI(Set<SipProvider> sipProviders, String transport) {
-		//FIXME defaulting to udp but an exception should be thrown instead 
-		if(transport == null) {
-			transport = ListeningPoint.UDP;
-		}
-		Iterator<SipProvider> it = sipProviders.iterator();
-		ListeningPoint listeningPoint = null;
-		while (it.hasNext() && listeningPoint == null) {
-			SipProvider sipProvider = it.next();
-			listeningPoint = sipProvider.getListeningPoint(transport);
-		}		
-		if(listeningPoint == null) {
-			throw new RuntimeException("no connector have been found for transport "+ transport);
-		}
+	/**
+	 * 
+	 * @param sipProviders
+	 * @param transport
+	 * @return
+	 */
+	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport) {		
+		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);							
 		try {
-			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, listeningPoint.getIPAddress());
+			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, listeningPoint.getIpAddresses().get(0));
 			sipUri.setPort(listeningPoint.getPort());
 			sipUri.setTransportParam(listeningPoint.getTransport());
 			// Do we want to add an ID here?
 			return sipUri;
-		} catch ( Exception ex) {
-			logger.fatal("Unexpected error", ex);
-			throw new RuntimeException("Container error", ex);
-		}	
-	}
-	
-	/**
-	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
-	 * @param sipProviders the set of sip providers to look into
-	 * @param transport the transport
-	 * @return Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
-	 * If none has been found, null is returned.
-	 */
-	public static SipProvider findMatchingSipProvider(Set<SipProvider> sipProviders, String transport) {		
-		Iterator<SipProvider> it = sipProviders.iterator();		 
-		while (it.hasNext()) {
-			SipProvider sipProvider = it.next();
-			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
-			if(listeningPoint != null) {
-				return sipProvider;
-			}
-		}					
-		return null; 
-	}
-	/**
-	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the 
-	 * ipAddress port and transport given in parameter.
-	 * @param sipProviders the set of sip providers to look into
-	 * @param ipAddress the ip address
-	 * @param port the port
-	 * @param transport the transport
-	 * @return Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
-	 * If none has been found, null is returned.
-	 */
-	public static ListeningPoint findMatchingListeningPoint(
-			Set<SipProvider> sipProviders, String ipAddress, int port, String transport) {		
-		Iterator<SipProvider> it = sipProviders.iterator();		 
-		while (it.hasNext()) {
-			SipProvider sipProvider = it.next();
-			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
-			
-			if(isListeningPointMatching(ipAddress, port, listeningPoint)) {
-				return listeningPoint;
-			}
-		}					
-		return null; 
-	}
-
-	/**
-	 * Check if the ipAddress and port is matching the listening point
-	 * @param ipAddress ipAddress to check the listening point against
-	 * @param port port to check the listening point against
-	 * @param listeningPoint the listening point to check if it matches the ipaddress and port 
-	 * @return true if the ipAddress and port is matching the listening point
-	 */
-	public static boolean isListeningPointMatching(String ipAddress, int port,
-			ListeningPoint listeningPoint) {
-		int portChecked = checkPortRange(port);
-		List<String> listeningPointAddresses = new ArrayList<String>();
-		listeningPointAddresses.add(listeningPoint.getIPAddress());
-		//if the listening point is bound to 0.0.0.0 then adding all corresponding IP address
-		if(GLOBAL_IPADDRESS.equals(listeningPoint.getIPAddress())) {
-			try {
-				Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-				while(networkInterfaces.hasMoreElements()) {
-					NetworkInterface networkInterface = networkInterfaces.nextElement();
-					Enumeration<InetAddress> bindings = networkInterface.getInetAddresses();
-					while(bindings.hasMoreElements()) {
-						InetAddress addr = bindings.nextElement();
-						String networkInterfaceIpAddress = addr.getHostAddress();
-						listeningPointAddresses.add(networkInterfaceIpAddress);
-					}
-				}
-			} catch (SocketException e) {
-				logger.warn("Unable to enumerate local interfaces. Binding to 0.0.0.0 may not work.",e);
-			}				
-		}
-		//resolving by ipaddress an port
-		if(listeningPointAddresses.contains(ipAddress) &&					
-				listeningPoint.getPort() == portChecked) {
-			return true;
-		}
-		//resolving by hostname
-		try {
-			InetAddress[] inetAddresses = InetAddress.getAllByName(ipAddress);				
-			for (int i = 0; i < inetAddresses.length; i++) {
-				if(listeningPointAddresses.contains(inetAddresses[i].getHostAddress())
-						&& listeningPoint.getPort() == portChecked) {
-					return true;
-				}
-			}
-		} catch (UnknownHostException e) {
-			//not important it can mean that the ipAddress provided is not a hostname
-			// but an ip address not found in the searched listening points above				
-		}
-		return false;
-	}		
-
-	/**
-	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the 
-	 * ipAddress and port given in parameter.
-	 * @param sipProviders the set of sip providers to look into
-	 * @param ipAddress the ip address
-	 * @param port the port
-	 * @return Retrieve the first matching sip Provider from the set of sip provider corresponding to the transport.
-	 * If none has been found, null is returned.
-	 */
-	public static ListeningPoint findMatchingListeningPoint(
-			Set<SipProvider> sipProviders, String ipAddress, int port) {		
-		Iterator<SipProvider> it = sipProviders.iterator();		 
-		while (it.hasNext()) {
-			SipProvider sipProvider = it.next();
-			ListeningPoint[] listeningPoints = sipProvider.getListeningPoints();
-			for (ListeningPoint listeningPoint : listeningPoints) {
-				if(isListeningPointMatching(ipAddress, port, listeningPoint)) {
-					return listeningPoint;
-				}
-			}			
-		}					
-		return null; 
-	}
-	
-	/**
-	 * Checks if the port is in the UDP-TCP port numbers (0-65355) range 
-	 * otherwise defaulting to 5060
-	 * @param port port to check
-	 * @return the smae port number if in range, 5060 otherwise
-	 */
-	public static int checkPortRange(int port) {
-		if(port < 0 && port > 65355) {		
-			return 5060;
-		}
-		else {
-			return port;
-		}
+		} catch (ParseException ex) {
+        	logger.error ("Unexpected error while creating a record route URI",ex);
+            throw new IllegalArgumentException("Unexpected exception when creating a record route URI", ex);
+        }	
 	}
 	
 	/**

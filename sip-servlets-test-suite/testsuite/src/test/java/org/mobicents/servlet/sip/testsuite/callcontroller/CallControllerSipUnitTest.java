@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Properties;
 
 import javax.sip.message.Response;
@@ -24,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
+import org.cafesip.sipunit.SipResponse;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipUnitServletTestCase;
 
@@ -52,7 +55,8 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	}
 
 	@Override
-	public void tearDown() throws Exception {		
+	public void tearDown() throws Exception {
+		Thread.sleep(1000);
 		sipPhoneSender.dispose();		
 		sipPhoneReceiver.dispose();		
 		sipStackSender.dispose();				
@@ -121,9 +125,9 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		deployCallBlocking();
 		setupPhone("sip:blocked-sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
 		SipCall sender = sipPhoneSender.createSipCall();
-		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
-		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT_FORBIDDEN));	
-		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));		
+		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));	
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));	
+		assertNotNull(findResponse(sender, Response.FORBIDDEN));		
 	}
 	
 	// 
@@ -184,6 +188,34 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		SipCall sender = sipPhoneSender.createSipCall();
 		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
 		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT_FORBIDDEN));
-		assertNotNull(sender.findMostRecentResponse(Response.FORBIDDEN));		
+		assertNotNull(findResponse(sender, Response.FORBIDDEN));		
 	}	
+	
+	 /**
+     * This method returns the last received response with status code matching
+     * the given parameter.
+     * 
+     * @param statusCode
+     *            Indicates the type of response to return.
+     * @return SipResponse object or null, if not found.
+     */
+    public SipResponse findResponse(SipCall sipCall, int statusCode) {
+        ArrayList responses = sipCall.getAllReceivedResponses();        
+        
+        ListIterator i = responses.listIterator(responses.size());
+        if(logger.isDebugEnabled()) {
+    		logger.debug("All responses received :");
+    	}
+        while (i.hasPrevious()) {        	
+            SipResponse resp = (SipResponse) i.previous();
+            if(logger.isDebugEnabled()) {
+        		logger.debug("response received : "+ resp.getStatusCode());
+        	}
+            if (resp.getStatusCode() == statusCode) {
+                return resp;
+            }
+        }
+
+        return null;
+    }
 }

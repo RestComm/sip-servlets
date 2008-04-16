@@ -22,7 +22,6 @@ import gov.nist.javax.sip.SipStackImpl;
 import java.io.File;
 import java.util.TooManyListenersException;
 
-import javax.sip.SipProvider;
 import javax.sip.SipStack;
 
 import org.apache.catalina.LifecycleException;
@@ -31,6 +30,7 @@ import org.apache.catalina.core.StandardService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
@@ -60,12 +60,12 @@ public class SipStandardService extends StandardService implements SipService {
 	
 	@Override
 	public void addConnector(Connector connector) {
-		SipProvider sipProvider = (SipProvider)
-		connector.getProtocolHandler().getAttribute("sipProvider");
-		if(sipProvider != null) {
+		ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+			connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+		if(extendedListeningPoint != null) {
 			try {
-				sipProvider.addSipListener(sipApplicationDispatcher);
-				sipApplicationDispatcher.addSipProvider(sipProvider);
+				extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
 			} catch (TooManyListenersException e) {
 				logger.error("Connector.initialize", e);
 			}			
@@ -75,11 +75,11 @@ public class SipStandardService extends StandardService implements SipService {
 	
 	@Override
 	public void removeConnector(Connector connector) {
-		SipProvider sipProvider = (SipProvider)
-		connector.getProtocolHandler().getAttribute("sipProvider");
-		if(sipProvider != null) {
-			sipProvider.removeSipListener(sipApplicationDispatcher);
-			sipApplicationDispatcher.removeSipProvider(sipProvider);
+		ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+			connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+		if(extendedListeningPoint != null) {
+			extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
+			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
 		super.removeConnector(connector);
 	}
@@ -90,7 +90,7 @@ public class SipStandardService extends StandardService implements SipService {
 		//and initializes it
 		try {
 			sipApplicationDispatcher = (SipApplicationDispatcher)
-				Class.forName(sipApplicationDispatcherClassName).newInstance();
+				Class.forName(sipApplicationDispatcherClassName).newInstance();					
 		} catch (InstantiationException e) {
 			throw new LifecycleException("Impossible to load the Sip Application Dispatcher",e);
 		} catch (IllegalAccessException e) {
@@ -121,23 +121,23 @@ public class SipStandardService extends StandardService implements SipService {
 					logger.info("Attaching the sip application dispatcher " +
 							"as a sip listener to connector listening on port " + 
 							connector.getPort());
-					connector.getProtocolHandler().setAttribute("SipApplicationDispatcher", sipApplicationDispatcher);
+					connector.getProtocolHandler().setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
 					connectorsStartedExternally = true;
 				} 
 				//Tomcat specific loading case
-				SipProvider sipProvider = (SipProvider)
-					connector.getProtocolHandler().getAttribute("sipProvider");
+				ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+					connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
 				SipStack sipStack = (SipStack)
-					connector.getProtocolHandler().getAttribute("sipStack");
-				if(sipProvider != null && sipStack != null) {
+					connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+				if(extendedListeningPoint != null && sipStack != null) {
 					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
 					if(sipStack instanceof SipStackImpl) {
 						logger.info(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
 						((SipStackImpl) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
 					}
 					try {
-						sipProvider.addSipListener(sipApplicationDispatcher);
-						sipApplicationDispatcher.addSipProvider(sipProvider);
+						extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+						sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
 						connectorsStartedExternally = false;											
 					} catch (TooManyListenersException e) {					
 						throw new LifecycleException(e);
@@ -155,11 +155,11 @@ public class SipStandardService extends StandardService implements SipService {
 		//Tomcat specific unloading case
 		synchronized (connectors) {
 			for (Connector connector : connectors) {
-				SipProvider sipProvider = (SipProvider)
-					connector.getProtocolHandler().getAttribute("sipProvider");
-				if(sipProvider != null) {					
-					sipProvider.removeSipListener(sipApplicationDispatcher);
-					sipApplicationDispatcher.removeSipProvider(sipProvider);
+				ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+					connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+				if(extendedListeningPoint != null) {					
+					extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
+					sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 				}
 			}
 		}

@@ -320,7 +320,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			if(response.getStatusCode() >= Response.OK && 
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE && session.getProxyBranch() == null) {
 				javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
-						sipFactoryImpl.getSipProviders(), 
+						sipFactoryImpl.getSipNetworkInterfaceManager(), 
 						JainSipUtils.findTransport((Request)originalRequest.getMessage()));
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
@@ -346,8 +346,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					&& getTransaction().getDialog() == null 
 					&& JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod())) {					
 				String transport = JainSipUtils.findTransport(st.getRequest());
-				SipProvider sipProvider = JainSipUtils.findMatchingSipProvider(
-						sipFactoryImpl.getSipProviders(), transport);
+				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());				
 				getSipSession().setSessionCreatingDialog(dialog);

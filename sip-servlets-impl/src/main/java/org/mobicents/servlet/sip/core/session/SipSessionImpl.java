@@ -234,7 +234,7 @@ public class SipSessionImpl implements SipSession {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
 				final String transport = JainSipUtils.findTransport(methodRequest);
 				
-				ViaHeader viaHeader = JainSipUtils.createViaHeader(sipFactory.getSipProviders(), transport,
+				ViaHeader viaHeader = JainSipUtils.createViaHeader(sipFactory.getSipNetworkInterfaceManager(), transport,
 						null);			
 				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
 						key.getApplicationName());
@@ -682,11 +682,7 @@ public class SipSessionImpl implements SipSession {
 
 	public SipURI getOutboundInterface() {
 		return outboundInterface;
-	}
-
-	public Set<SipProvider> getProviders() {		
-		return sipFactory.getSipProviders();
-	}
+	}	
 	
 	public void onDialogTimeout(Dialog dialog) {
 		if(hasOngoingTransaction()) {

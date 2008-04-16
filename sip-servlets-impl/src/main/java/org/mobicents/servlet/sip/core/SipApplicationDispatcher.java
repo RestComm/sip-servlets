@@ -88,20 +88,11 @@ public interface SipApplicationDispatcher extends SipListener {
 	SipContext findSipApplication(String applicationName);
 	
 	/**
-	 * Add a sip Provider to the current set of sip providers
-	 * @param sipProvider the sip provider to add
+	 * Retrieve the manager for the sip network interfaces for this application dispatcher
+	 * @return the manager for the sip network interfaces for this application dispatcher
 	 */
-	void addSipProvider(SipProvider sipProvider);
-	/**
-	 * remove the sip provider form the current set of sip providers
-	 * @param sipProvider the sip provider to remove
-	 */
-	void removeSipProvider(SipProvider sipProvider);
-	/**
-	 * This method returns a read only set of the sip providers 
-	 * @return read only set of the sip providers
-	 */
-	Set<SipProvider> getSipProviders();
+	SipNetworkInterfaceManager getSipNetworkInterfaceManager();
+
 	/**
 	 * retrieve the sip factory
 	 * @return the sip factory
@@ -148,5 +139,5 @@ public interface SipApplicationDispatcher extends SipListener {
 	
 	public String getDomain();
     
-    public void setDomain(String domain);
+    public void setDomain(String domain);	
 }

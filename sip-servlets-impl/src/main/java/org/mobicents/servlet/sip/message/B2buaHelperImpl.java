@@ -153,7 +153,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//since B2BUA is considered as an end point , it is normal to reinitialize 
 			//the via header chain
 			ViaHeader newViaHeader = JainSipUtils.createViaHeader(
-					sipFactoryImpl.getSipProviders(), viaHeader.getTransport(), null);
+					sipFactoryImpl.getSipNetworkInterfaceManager(), viaHeader.getTransport(), null);
 			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
 					session.getKey().getApplicationName());
 			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
@@ -317,7 +317,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			
 			if(status ==  Response.OK) {
 				ContactHeader contactHeader = 
-					JainSipUtils.createContactForProvider(sipFactoryImpl.getSipProviders(), JainSipUtils.findTransport(request));
+					JainSipUtils.createContactHeader(
+							sipFactoryImpl.getSipNetworkInterfaceManager(), JainSipUtils.findTransport(request));
 				response.addHeader(contactHeader);
 			}
 			

@@ -19,13 +19,10 @@ package org.mobicents.servlet.sip.message;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.sip.Address;
@@ -38,7 +35,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.SipProvider;
+import javax.sip.ListeningPoint;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -60,6 +57,7 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.SessionManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -83,17 +81,14 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 
 	static {
 		forbbidenToHeaderParams.add("tag");
-	}
-
-	private transient Set<SipProvider> sipProviders = null;
+	}	
 
 	private transient SipApplicationDispatcher sipApplicationDispatcher = null;
 	/**
 	 * Dafault constructor
 	 * @param sipApplicationDispatcher 
 	 */
-	public SipFactoryImpl(SipApplicationDispatcher sipApplicationDispatcher) {
-		this.sipProviders = new HashSet<SipProvider>();
+	public SipFactoryImpl(SipApplicationDispatcher sipApplicationDispatcher) {		
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
 
@@ -176,7 +171,8 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
-				JainSipUtils.findMatchingSipProvider(getSipProviders(), "udp").getNewCallId().getCallId());		
+				sipApplicationDispatcher.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false)
+					.getSipProvider().getNewCallId().getCallId());		
 		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
 				sipApplicationSessionKey, true, sipContext);		
 		return sipApplicationSession;
@@ -421,7 +417,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 				toHeader.setParameter(key, from.getParameter(key));
 			}
 			//This method acts as a UAC, setting the via header 
-			viaHeader = JainSipUtils.createViaHeader(getSipProviders(), transport,
+			viaHeader = JainSipUtils.createViaHeader(sipApplicationDispatcher.getSipNetworkInterfaceManager(), transport,
 					null);			
 			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
 					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName());
@@ -472,41 +468,6 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	public Parameterable createParameterable(String s) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Add a sip Provider to the current set of sip providers
-	 * 
-	 * @param sipProvider
-	 *            the sip provider to add
-	 */
-	public void addSipProvider(SipProvider sipProvider) {
-		synchronized (sipProviders) {
-			sipProviders.add(sipProvider);	
-		}		
-	}
-
-	/**
-	 * remove the sip provider form the current set of sip providers
-	 * 
-	 * @param sipProvider
-	 *            the sip provider to remove
-	 */
-	public void removeSipProvider(SipProvider sipProvider) {
-		synchronized (sipProviders) {
-			sipProviders.remove(sipProvider);
-		}
-	}
-
-	/**
-	 * This method returns a read only set of the sip providers
-	 * 
-	 * @return read only set of the sip providers
-	 */
-	public Set<SipProvider> getSipProviders() {
-		synchronized (sipProviders) {
-			return Collections.unmodifiableSet(sipProviders);
-		}
 	}
 
 	/**
@@ -586,5 +547,13 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	public void setSipApplicationDispatcher(
 			SipApplicationDispatcher sipApplicationDispatcher) {
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
+	}
+	
+	/**
+	 * Retrieve the manager for the sip network interfaces
+	 * @return the manager for the sip network interfaces
+	 */
+	public SipNetworkInterfaceManager getSipNetworkInterfaceManager() {
+		return sipApplicationDispatcher.getSipNetworkInterfaceManager();
 	}
 }
