@@ -22,15 +22,15 @@ Version 0.3 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
 		
-		* Management Console : {{{ssmc/sip-servlets-managment.htm}check this out}}
+		* {{{ssmc/sip-servlets-managment.htm}Management Console}}
 		
-		* Media Support : {{{media.html}check this out}} check the {{{examples/media-demo.html}media demo}} or the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
+		* {{{media.html}Media Support}} : check the {{{examples/media-demo.html}media demo}} or the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
 		
 		* JEE integration / JEE converged applications : check the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
 		
-		* STUN Support and DNS SRV lookups : {{{stun.html}check this out}}
+		* {{{stun.html}STUN Support}} and DNS SRV lookups
 		
-		* usual round of bug fixes : {{{roadmap.html}check this out}}
+		* {{{roadmap.html}usual round of bug fixes}}
 		
 	It is shipped with :		
 	
