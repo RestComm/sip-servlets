@@ -12,16 +12,21 @@ import java.sql.Timestamp;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.sip.ServletTimer;
 
 import org.jboss.mobicents.seam.model.Order;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.log.Log;
 
 @Stateless
+@Name("OrderManager")
 public class OrderManagerBean implements OrderManager, Serializable {
-
-	@PersistenceContext
-	EntityManager em;
-
+	@Logger private Log log;
+	
+	@PersistenceContext EntityManager em;
+	
 	@Override
 	public void cancelOrder(long orderId) {
 		Order order = (Order) em.createQuery(
@@ -29,6 +34,23 @@ public class OrderManagerBean implements OrderManager, Serializable {
 				.setParameter("orderId", orderId).getSingleResult();
 
 		order.setStatus(Order.Status.CANCELLED);
+		ServletTimer deliveryDateTimer = (ServletTimer) Contexts.getApplicationContext().get("deliveryDateTimer" + orderId);
+		ServletTimer adminTimer = (ServletTimer) Contexts.getApplicationContext().get("adminTimer" + orderId);
+		if(deliveryDateTimer!=null) {			
+			deliveryDateTimer.cancel();
+			Contexts.getApplicationContext().remove("deliveryDateTimer" + orderId);
+			log.info("Delivery Timer for order "+ orderId +" cancelled");
+		} else {
+			log.info("No Delivery Timer to cancel");
+		}
+		
+		if(adminTimer!=null) {
+			adminTimer.cancel();
+			Contexts.getApplicationContext().remove("adminTimer" + orderId);
+			log.info("Admin Timer for order "+ orderId +" cancelled");
+		} else {
+			log.info("No Admin Timer to cancel");
+		}
 	}
 
 	@Override
@@ -38,6 +60,9 @@ public class OrderManagerBean implements OrderManager, Serializable {
 				.setParameter("orderId", orderId).getSingleResult();
 
 		order.setStatus(Order.Status.OPEN);
+		
+		Contexts.getApplicationContext().remove("deliveryDateTimer" + orderId);
+		Contexts.getApplicationContext().remove("adminTimer" + orderId);
 	}
 
 	@Override

@@ -1,11 +1,20 @@
 package org.jboss.mobicents.seam.actions;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.naming.InitialContext;
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.TimerService;
 
 import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.log.Log;
 
 /**
  * Used for setting date and time for delivery
@@ -14,8 +23,11 @@ import org.jboss.seam.annotations.Name;
  * 
  */
 
+@Stateless
 @Name("afterOrderProcessed")
-public class AfterOrderProcessedAction {
+public class AfterOrderProcessedAction implements AfterOrderProcessed, Serializable {
+	@Logger private Log log;
+	
 	@In
 	String customerfullname;
 
@@ -27,41 +39,33 @@ public class AfterOrderProcessedAction {
 
 	@In
 	Long orderId;
+	
+    @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	@Resource(mappedName="java:/sip/shopping-demo/TimerService") TimerService timerService;
 
 	public void fireOrderProcessedEvent() {
-		System.out
-				.println("*************** Fire ORDER_PROCESSED  ***************************");
-		System.out.println("First Name = " + customerfullname);
-		System.out.println("Phone = " + cutomerphone);
-		System.out.println("orderId = " + orderId);
-
-		//TODO : replace by Sip Servlets Call
 		
-//		try {			
-//
-//			InitialContext ic = new InitialContext();
-//			
-//			SleeConnectionFactory factory = (SleeConnectionFactory) ic
-//					.lookup("java:/MobicentsConnectionFactory");
-//
-//			SleeConnection conn1 = null;
-//			conn1 = factory.getConnection();
-//
-//			ExternalActivityHandle handle = conn1.createActivityHandle();
-//
-//			EventTypeID requestType = conn1.getEventTypeID(
-//					"org.mobicents.slee.service.dvddemo.ORDER_PROCESSED",
-//					"org.mobicents", "1.0");
-//			CustomEvent customEvent = new CustomEvent(orderId, amount,
-//					customerfullname, cutomerphone);
-//
-//			conn1.fireEvent(customEvent, requestType, handle, null);
-//			conn1.close();
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		log.info("SipFactory " + sipFactory);
+		log.info("timerService " + timerService);
+		
+		log.info("*************** Fire ORDER_PROCESSED  ***************************");
+		log.info("First Name = " + customerfullname);
+		log.info("Phone = " + cutomerphone);
+		log.info("orderId = " + orderId);		
+        
+        SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+		sipApplicationSession.setAttribute("customerName", customerfullname);
+		sipApplicationSession.setAttribute("customerPhone", cutomerphone);
+		sipApplicationSession.setAttribute("amountOrder", amount);
+		sipApplicationSession.setAttribute("orderId", orderId);									
+		sipApplicationSession.setAttribute("deliveryDate", true);
+		sipApplicationSession.setAttribute("sipFactory", sipFactory);
+		ServletTimer servletTimer = timerService.createTimer(
+				sipApplicationSession, 
+				Integer.parseInt((String)Contexts.getApplicationContext().get("order.approval.waitingtime")), 
+				false, 
+				null);
+		Contexts.getApplicationContext().set("deliveryDateTimer" + orderId, servletTimer);
 	}
-
 
 }

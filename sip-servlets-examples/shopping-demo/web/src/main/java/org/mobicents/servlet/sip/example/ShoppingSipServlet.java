@@ -19,13 +19,13 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.TimerListener;
-import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
+import org.jboss.mobicents.seam.listeners.MediaResourceListener;
 import org.jboss.mobicents.seam.util.TTSUtils;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
@@ -42,7 +42,10 @@ import org.mobicents.mscontrol.signal.Basic;
  * @author Jean Deruelle
  *
  */
-public class ShoppingSipServlet extends SipServlet implements TimerListener {
+public class ShoppingSipServlet 
+	extends SipServlet  
+	implements TimerListener {
+	
 	public static final int DTMF_SESSION_STARTED = 1;
 	public static final int DTMF_SESSION_STOPPED = 2;
 	
@@ -73,6 +76,7 @@ public class ShoppingSipServlet extends SipServlet implements TimerListener {
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
 			String sdp = new String(sdpBytes);
+			sipServletResponse.getSession().getApplicationSession().setAttribute("audio.files.path", (String)getServletContext().getAttribute("audio.files.path"));
 			MsConnection connection = (MsConnection)sipServletResponse.getSession().getApplicationSession().getAttribute("connection");
 			connection.modify("$", sdp);			
 		}
@@ -97,18 +101,56 @@ public class ShoppingSipServlet extends SipServlet implements TimerListener {
 				logger.info("Signal received " + signal );													
 				
 				if(request.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
-					orderApproval(request, signal);
+					if(request.getSession().getApplicationSession().getAttribute("adminApproval") != null) {
+						logger.info("customer approval in progress.");
+						adminApproval(request, signal);
+					} else {
+						logger.info("customer approval in progress.");
+						orderApproval(request, signal);
+					}
 				} else if(request.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {
 					updateDeliveryDate(request, signal);
-				}
+				} 
 			}
 		} else {
 			logger.info("DTMF session in stopped state, not parsing message content");
 		}
 	}
 
+	private void adminApproval(SipServletRequest request, String signal) {
+		String pathToAudioDirectory = (String)getServletContext().getAttribute("audio.files.path");		
+		
+		if("1".equalsIgnoreCase(signal)) {
+			// Order Approved
+			logger.info("Order approved !");
+			String audioFile = pathToAudioDirectory + "OrderApproved.wav";					
+			
+			playFileInResponseToDTMFInfo(request.getSession(), audioFile);
+//			try {
+//				InitialContext ctx = new InitialContext();
+//				OrderApproval orderApproval = (OrderApproval) ctx.lookup("shopping-demo/OrderApprovalAction/remote");
+//				orderApproval.fireOrderApprovedEvent();
+//			} catch (NamingException e) {
+//				logger.error("An exception occured while retrieving the EJB OrderApproval",e);
+//			}					
+		} else if("2".equalsIgnoreCase(signal)) {
+			// Order Rejected
+			logger.info("Order rejected !");
+			String audioFile = pathToAudioDirectory + "OrderCancelled.wav";					
+			
+			playFileInResponseToDTMFInfo(request.getSession(), audioFile);
+//			try {
+//				InitialContext ctx = new InitialContext();
+//				OrderApproval orderApproval = (OrderApproval) ctx.lookup("shopping-demo/OrderApprovalAction/remote");
+//				orderApproval.fireOrderRejectedEvent();
+//			} catch (NamingException e) {
+//				logger.error("An exception occured while retrieving the EJB OrderApproval",e);
+//			}
+		}
+	}
+
 	private void orderApproval(SipServletRequest request, String signal) {
-		String pathToAudioDirectory = (String)getServletContext().getInitParameter("audio.files.path");
+		String pathToAudioDirectory = (String)getServletContext().getAttribute("audio.files.path");
 		long orderId = (Long) request.getSession().getApplicationSession().getAttribute("orderId");
 		
 		if("1".equalsIgnoreCase(signal)) {
@@ -308,23 +350,6 @@ public class ShoppingSipServlet extends SipServlet implements TimerListener {
 		generator.addResourceListener(mediaResourceListener);
 		generator.apply(Announcement.PLAY, new String[] { audioFile });
 		session.setAttribute("DTMFSession", DTMF_SESSION_STOPPED);
-		
-		//timer for calling the cusotmer for delivery date
-		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);		
-		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-		sipApplicationSession.setAttribute("customerName", session.getApplicationSession().getAttribute("customerName"));
-		sipApplicationSession.setAttribute("customerPhone", session.getApplicationSession().getAttribute("customerPhone"));
-		sipApplicationSession.setAttribute("amountOrder", session.getApplicationSession().getAttribute("amountOrder"));
-		sipApplicationSession.setAttribute("orderId", session.getApplicationSession().getAttribute("orderId"));		
-		sipApplicationSession.setAttribute("audio.files.path", (String)getServletContext().getInitParameter("audio.files.path"));
-		sipApplicationSession.setAttribute("deliveryDate", true);		
-		sipApplicationSession.setAttribute("sipFactory", sipFactory);
-		timerService.createTimer(
-				sipApplicationSession, 
-				Integer.parseInt(getServletContext().getInitParameter("order.approval.waitingtime")), 
-				false, 
-				null);
 	}
 	
 	@Override
@@ -363,11 +388,15 @@ public class ShoppingSipServlet extends SipServlet implements TimerListener {
 		SipFactory sipFactory = (SipFactory) sipApplicationSession.getAttribute("sipFactory");
 		try {
 			Address fromAddress = sipFactory.createAddress("sip:admin@sip-servlets.com");
-			String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");			
-			Address toAddress = sipFactory.createAddress(customerPhone);
+			String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");
+			if(sipApplicationSession.getAttribute("adminApproval") != null) {
+				customerPhone = (String) sipApplicationSession.getAttribute("adminAddress");
+			}			
+			Address toAddress = sipFactory.createAddress(customerPhone);									
+			logger.info("preparing to call : "+ toAddress);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
-			URI requestURI = sipFactory.createURI(customerPhone);
+			URI requestURI = sipFactory.createURI(customerPhone);			
 			sipServletRequest.setRequestURI(requestURI);
 														
 			//Media Server Control Creation

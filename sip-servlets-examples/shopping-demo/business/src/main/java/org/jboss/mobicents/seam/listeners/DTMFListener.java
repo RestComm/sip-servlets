@@ -24,7 +24,7 @@ public class DTMFListener implements MsResourceListener{
 	
 	public void update(MsNotifyEvent event) {
 		event = event;
-		System.out.println("DTMF: " + event.getMessage());
+		
 		logger.info("DTMF: " + event.getMessage());
 		/**
 		 * Concurency issue:

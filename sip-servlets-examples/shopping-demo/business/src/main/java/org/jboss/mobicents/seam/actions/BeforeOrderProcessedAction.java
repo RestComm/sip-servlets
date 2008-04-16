@@ -1,59 +1,57 @@
 package org.jboss.mobicents.seam.actions;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.naming.InitialContext;
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.TimerService;
 
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Out;
+import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.log.Log;
 
+@Stateless
 @Name("beforeOrderProcessed")
-public class BeforeOrderProcessedAction {
+public class BeforeOrderProcessedAction implements BeforeOrderProcessed, Serializable {
+	@Logger private Log log;
 	
     @In String  customerfullname;
     @In String  cutomerphone;
     @In BigDecimal amount;
-    @In Long orderId;	
+    @In Long orderId;	     
     
-	@Out(value = "adminExternalActivityHandle", scope = ScopeType.BUSINESS_PROCESS, required = false)
-//	ExternalActivityHandle handle;  
-    
+    @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	@Resource(mappedName="java:/sip/shopping-demo/TimerService") TimerService timerService;
+	
     public void fireBeforeOrderProcessedEvent()
     {
-        System.out.println( "***************Fire BEFORE_ORDER_PROCESSED . Custom event to call user to set date ***************************" );
-        System.out.println( "Customer Name = " + customerfullname);	
-        System.out.println( "Phone = " + cutomerphone);
-        System.out.println( "orderId = " + orderId);
-        System.out.println( "Amount = " + amount);
+        log.info( "***************Fire BEFORE_ORDER_PROCESSED . Custom event to call user to set date ***************************" );
+        log.info( "Customer Name = " + customerfullname);	
+        log.info( "Phone = " + cutomerphone);
+        log.info( "orderId = " + orderId);
+        log.info( "Amount = " + amount);
         
-        // TODO replace by Sip Servlets call
-		        
-//		try {
-//
-//			InitialContext ic = new InitialContext();
-//
-//			SleeConnectionFactory factory = (SleeConnectionFactory) ic
-//					.lookup("java:/MobicentsConnectionFactory");
-//
-//			SleeConnection conn1 = null;
-//			conn1 = factory.getConnection();
-//
-//			handle = conn1.createActivityHandle();
-//
-//			EventTypeID requestType = conn1.getEventTypeID(
-//					"org.mobicents.slee.service.dvddemo.BEFORE_ORDER_PROCESSED",
-//					"org.mobicents", "1.0");
-//			CustomEvent customEvent = new CustomEvent(orderId, amount,
-//					customerfullname, cutomerphone);
-//
-//			conn1.fireEvent(customEvent, requestType, handle, null);
-//			conn1.close();
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}        
+        SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+		sipApplicationSession.setAttribute("customerName", customerfullname);
+		sipApplicationSession.setAttribute("customerPhone", cutomerphone);
+		sipApplicationSession.setAttribute("amountOrder", amount);
+		sipApplicationSession.setAttribute("orderId", orderId);
+		sipApplicationSession.setAttribute("adminApproval", true);
+		sipApplicationSession.setAttribute("orderApproval", true);
+		sipApplicationSession.setAttribute("sipFactory", sipFactory);
+		sipApplicationSession.setAttribute("adminAddress", (String)Contexts.getApplicationContext().get("admin.sip"));
+		ServletTimer servletTimer = timerService.createTimer(
+				sipApplicationSession, 
+				Integer.parseInt((String)Contexts.getApplicationContext().get("order.approval.waitingtime")), 
+				false, 
+				null);
+		Contexts.getApplicationContext().set("adminTimer" + orderId, servletTimer);
     }     
 
 }

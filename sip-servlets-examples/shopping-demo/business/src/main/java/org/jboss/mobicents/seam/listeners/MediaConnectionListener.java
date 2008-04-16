@@ -51,19 +51,34 @@ public class MediaConnectionListener implements MsConnectionListener {
 		logger.info("Remote Media Connection created. Endpoints connected " + event.getEventID());
 		MsConnection connection = event.getConnection();
 		String endpoint = connection.getEndpoint();
+		
 		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);
 		if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
 			java.io.File speech = new File("speech.wav");
 			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
 			generator.apply(Announcement.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
 			logger.info("announcement confirmation played. waiting for DTMF ");
+			listenToDTMF(connection);
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
 			String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audio.files.path");
 			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
 			logger.info("Playing Delivery Date Announcement : " + announcementFile);
 			generator.apply(Announcement.PLAY, new String[]{announcementFile});
 			logger.info("Delivery Date Announcement played. waiting for DTMF ");
-		}
+			listenToDTMF(connection);
+		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
+			java.io.File speech = new File("shipping.wav");
+			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
+			MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
+			generator.addResourceListener(mediaResourceListener);
+			generator.apply(Announcement.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+			logger.info("shipping announcement played. tearing down the call");
+		}				
+	}
+
+	private void listenToDTMF(MsConnection connection) {
+		String endpoint = connection.getEndpoint();		
+		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);
 		MsSignalDetector dtmfDetector = connection.getSession().getProvider().getSignalDetector(endpoint);
 		DTMFListener dtmfListener = new DTMFListener(dtmfDetector, connection);
 		dtmfDetector.addResourceListener(dtmfListener);

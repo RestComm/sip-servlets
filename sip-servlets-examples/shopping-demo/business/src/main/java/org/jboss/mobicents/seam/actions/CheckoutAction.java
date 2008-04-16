@@ -6,7 +6,6 @@
  */
 package org.jboss.mobicents.seam.actions;
 
-import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,11 +24,7 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSessionsUtil;
-import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
 
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.model.Customer;
@@ -42,25 +37,25 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Begin;
 import org.jboss.seam.annotations.End;
 import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.bpm.CreateProcess;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.log.Log;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
 
-import com.sun.speech.freetts.Voice;
-import com.sun.speech.freetts.VoiceManager;
-import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
-
 @Stateful
 @Name("checkout")
 public class CheckoutAction implements Checkout, Serializable {
+	@Logger private Log log;
+	
 	private static final long serialVersionUID = -4651884454184474207L;
 
 	@PersistenceContext(type = PersistenceContextType.EXTENDED)
@@ -93,9 +88,7 @@ public class CheckoutAction implements Checkout, Serializable {
 	@Out(value = "cutomerphone", scope = ScopeType.BUSINESS_PROCESS, required = false)
 	String customerPhone;
 
-	@Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
-	@Resource(mappedName="java:/sip/shopping-demo/TimerService") TimerService sipTimerService;
-	@Resource(mappedName="java:/sip/shopping-demo/SipSessionsUtil") SipSessionsUtil sipSessionsUtil;
+	@Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;	
 	
 	@Begin(nested = true, pageflow = "checkout")
 	public void createOrder() {
@@ -162,13 +155,11 @@ public class CheckoutAction implements Checkout, Serializable {
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	private void fireEvent(long orderId, BigDecimal ammount,
 			String customerName, String customerPhone) {		
-		System.out.println("SIPTIMERSERVICE" + sipTimerService);
-		System.out.println("SIPFACTORY" + sipFactory);
-		System.out.println("SIPSESSIONUTIL" + sipSessionsUtil);		
-		//TODO remove hard coded uri from address header
+			
 		try {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			Address fromAddress = sipFactory.createAddress("sip:admin@sip-servlets.com");
+			String adminAddress = (String)Contexts.getApplicationContext().get("admin.sip");
+			Address fromAddress = sipFactory.createAddress(adminAddress);
 			Address toAddress = sipFactory.createAddress(customerPhone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
@@ -199,39 +190,10 @@ public class CheckoutAction implements Checkout, Serializable {
 			sipApplicationSession.setAttribute("connection", connection);
 			sipApplicationSession.setAttribute("orderApproval", true);
 		} catch (UnsupportedOperationException uoe) {
-			// TODO log exception
-			uoe.printStackTrace();
+			log.error("An unexpected exception occurred while trying to create the request for checkout confirmation", uoe);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("An unexpected exception occurred while trying to create the request for checkout confirmation", e);
 		}				
-		
-//		try {
-//
-//			InitialContext ic = new InitialContext();
-//
-//			SipFactory factory = (SipFactory) ic
-//					.lookup("java:/sip-servlets");
-//
-//			SleeConnection conn1 = null;
-//			conn1 = factory.getConnection();
-//
-//			ExternalActivityHandle handle = conn1.createActivityHandle();
-//
-//			EventTypeID requestType = conn1.getEventTypeID(
-//					"org.mobicents.slee.service.dvddemo.ORDER_PLACED",
-//					"org.mobicents", "1.0");
-//			CustomEvent customEvent = new CustomEvent(orderId, ammount,
-//					customerName, customerPhone);
-//
-//			conn1.fireEvent(customEvent, requestType, handle, null);
-//			conn1.close();
-//
-//		} catch (Exception e) {
-//
-//			e.printStackTrace();
-//
-//		}
 	}	
 	
 	@Remove
