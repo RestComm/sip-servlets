@@ -23,4 +23,15 @@
       <param-name>audio.files.path</param-name>
       <param-value>file:///home/dereuelle/workspaces/sip-servlets/sip-servlets-examples/shopping-demo/resources/audio/</param-value>
     </context-param>
+    
+    <context-param>
+      <param-name>order.approval.waitingtime</param-name>
+      <param-value>6000</param-value>
+    </context-param>
+    
+    <listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.ShoppingSipServlet
+		</listener-class>
+	</listener>
 </sip-app>

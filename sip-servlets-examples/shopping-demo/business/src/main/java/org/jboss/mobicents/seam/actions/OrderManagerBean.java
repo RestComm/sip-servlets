@@ -7,6 +7,7 @@
 package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -36,7 +37,16 @@ public class OrderManagerBean implements OrderManager, Serializable {
 				"select o from Order o where o.orderId = :orderId")
 				.setParameter("orderId", orderId).getSingleResult();
 
-		order.setStatus(Order.Status.OPEN);			
+		order.setStatus(Order.Status.OPEN);
+	}
+
+	@Override
+	public void setDeliveryDate(Object orderId, Timestamp deliveryDate) {
+		Order order = (Order) em.createQuery(
+				"select o from Order o where o.orderId = :orderId")
+				.setParameter("orderId", orderId).getSingleResult();
+
+		order.setDeliveryDate(deliveryDate);
 	}
 
 }

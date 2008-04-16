@@ -37,6 +37,7 @@ import org.jboss.mobicents.seam.model.Inventory;
 import org.jboss.mobicents.seam.model.Order;
 import org.jboss.mobicents.seam.model.OrderLine;
 import org.jboss.mobicents.seam.model.Product;
+import org.jboss.mobicents.seam.util.TTSUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Begin;
 import org.jboss.seam.annotations.End;
@@ -180,7 +181,7 @@ public class CheckoutAction implements Checkout, Serializable {
 			stringBuffer.append(ammount);
 			stringBuffer.append(". Press 1 to approve and 2 to reject.");				
 			
-			buildAudio(stringBuffer.toString(), "speech.wav");
+			TTSUtils.buildAudio(stringBuffer.toString(), "speech.wav");
 			Thread.sleep(300);
 			//Media Server Control Creation
 			MsPeer peer = MsPeerFactory.getPeer();
@@ -192,9 +193,11 @@ public class CheckoutAction implements Checkout, Serializable {
 			connection.addConnectionListener(listener);
 			connection.modify("$", null);
 			sipApplicationSession.setAttribute("customerName", customerName);
+			sipApplicationSession.setAttribute("customerPhone", customerPhone);
 			sipApplicationSession.setAttribute("amountOrder", amount);
 			sipApplicationSession.setAttribute("orderId", orderId);
-			sipApplicationSession.setAttribute("connection", connection);			
+			sipApplicationSession.setAttribute("connection", connection);
+			sipApplicationSession.setAttribute("orderApproval", true);
 		} catch (UnsupportedOperationException uoe) {
 			// TODO log exception
 			uoe.printStackTrace();
@@ -229,51 +232,7 @@ public class CheckoutAction implements Checkout, Serializable {
 //			e.printStackTrace();
 //
 //		}
-	}
-
-	private void buildAudio(String text, String filename) throws Exception {
-		VoiceManager mgr = VoiceManager.getInstance();
-		Voice voice = mgr.getVoice("kevin16");
-		voice.allocate();
-		File speech = new File(filename);
-		SingleFileAudioPlayer player = new SingleFileAudioPlayer(getBasename(speech.getAbsolutePath()), getAudioType(filename));
-		voice.setAudioPlayer(player);
-		voice.startBatch();
-		boolean ok = voice.speak(text);
-		voice.endBatch();
-		player.close();
-		voice.deallocate();
-	}
-	
-	private static String getBasename(String path) {
-		int index = path.lastIndexOf(".");
-		if (index == -1) {
-			return path;
-		} else {
-			return path.substring(0, index);
-		}
-	}
-	
-	private static String getExtension(String path) {
-		int index = path.lastIndexOf(".");
-		if (index == -1) {
-			return null;
-		} else {
-			return path.substring(index + 1);
-		}
-	}
-	
-	private static AudioFileFormat.Type getAudioType(String file) {
-		AudioFileFormat.Type[] types = AudioSystem.getAudioFileTypes();
-		String extension = getExtension(file);
-
-		for (int i = 0; i < types.length; i++) {
-			if (types[i].getExtension().equals(extension)) {
-				return types[i];
-			}
-		}
-		return null;
-	}
+	}	
 	
 	@Remove
 	public void destroy() {

@@ -57,12 +57,12 @@ public class MediaResourceListener implements MsResourceListener {
 		//  
 		if(session != null && connection != null && event.getEventID() == 101) {						
 			try {
-				SipServletRequest byeRequest = session.createRequest("BYE");
+				SipServletRequest byeRequest = session.createRequest("BYE");				
 				byeRequest.send();																	
 			} catch (IOException e) {
 				logger.error("Unexpected error while sending the BYE request", e);				
 			}
-			connection.release();
+			connection.release();			
 		}
 	}
 }

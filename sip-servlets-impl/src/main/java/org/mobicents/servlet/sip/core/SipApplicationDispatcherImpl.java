@@ -1428,6 +1428,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				inverted = true;
 			}
 			SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, inverted);
+			logger.info("route response on following session " + sessionKey);
 			SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl, null);									
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(

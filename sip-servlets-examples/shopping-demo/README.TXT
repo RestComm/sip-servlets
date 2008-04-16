@@ -18,6 +18,8 @@ To build:
     </mbean>
 2. Modify the context param audio.files.path yo map to your file system in 
 sip-servlets/sip-servlets-examples/shopping-demo/web/src/main/webapp/WEB-INF/sip.xml file.
+and the order.approval.waitingtime (the time between the moment the customer confirm 
+its order and the next phone cal made to ask for delivery date default to 6 sec) if needed
     
 mvn clean install from shopping-demo dir
 
