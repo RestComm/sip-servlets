@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app>
+	<app-name>org.mobicents.servlet.sip.example.MediaPlaybackServlet</app-name>
+	<display-name>MediaPlaybackServlet</display-name>
+	<description>Simple Media Servlet</description>
+</web-app>
