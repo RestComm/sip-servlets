@@ -44,7 +44,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 
 	protected Hashtable providerTable = new Hashtable();
 
-	private static final int timeout = 5000;
+	private static final int TIMEOUT = 5000;
 
 	private static final int receiversCount = 1;
 
@@ -69,7 +69,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -38,7 +38,7 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 	private SipPhone sipPhoneSender;
 	private SipPhone[] sipPhoneReceivers;
 
-	private static final int timeout = 5000;
+	private static final int TIMEOUT = 5000;
 
 	private static final int receiversCount = 1;
 
@@ -140,18 +140,18 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
 		sender.initiateOutgoingCall("sip:receiver@nist.gov", null);
 
-		receiverCalls[0].waitForIncomingCall(timeout);
+		receiverCalls[0].waitForIncomingCall(TIMEOUT);
 
 		receiverCalls[0].sendIncomingCallResponse(Response.RINGING,
 				"Ringing", 0);
-		assertTrue(sender.waitOutgoingCallResponse(30));
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
 
 		Thread.sleep(11000); // The built-in response wait doesnt work.
-		receiverCalls[0].waitForDisconnect(15);
+		receiverCalls[0].waitForDisconnect(TIMEOUT);
 
 		boolean code408received = false;
 		for (int q = 0; q < 5; q++) {
-			assertTrue(sender.waitOutgoingCallResponse(2));
+			assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
 			int responseCode = sender.getLastReceivedResponse()
 					.getStatusCode();
 			if (responseCode == 408) {
