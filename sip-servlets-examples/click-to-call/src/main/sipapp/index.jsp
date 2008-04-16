@@ -15,6 +15,7 @@ body { font-family: Tahoma, Geneva, 'Trebuchet MS', Arial, Helvetica, sans-serif
 
 td, th {
 	padding: 4px;
+	border: 1px dotted black;
 }
 
 .headtable {
