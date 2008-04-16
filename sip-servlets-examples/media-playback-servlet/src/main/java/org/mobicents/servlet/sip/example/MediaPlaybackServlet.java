@@ -26,10 +26,15 @@ import javax.servlet.sip.SipServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsConnectionEvent;
+import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.impl.MsProviderImpl;
+import org.mobicents.mscontrol.MsSignalGenerator;
+import org.mobicents.mscontrol.MsPeerFactory;
+import org.mobicents.mscontrol.MsProvider;
+import org.mobicents.mscontrol.MsPeer;
+import org.mobicents.mscontrol.signal.Announcement;
 
 /**
  * This example shows a simple User agent that can playback audio.
@@ -61,14 +66,18 @@ public class MediaPlaybackServlet extends SipServlet {
 		Object sdpObj = request.getContent();
 		byte[] sdpBytes = (byte[]) sdpObj;
 		String sdp = new String(sdpBytes); 
-	
-		MsProviderImpl provider = new MsProviderImpl();
-		MsSession session = provider.createSession();
-		MsConnection connection = session.createNetworkConnection("media/trunk/Announcement/$");
-		MediaConnectionListener listener = new MediaConnectionListener();
-		listener.setInviteRequest(request);
-		connection.addConnectionListener(listener);
-		connection.modify("$", sdp);
+		try {
+			MsPeer peer = MsPeerFactory.getPeer();
+			MsProvider provider = peer.getProvider();
+			MsSession session = provider.createSession();
+			MsConnection connection = session.createNetworkConnection("media/trunk/IVR/1");
+			MediaConnectionListener listener = new MediaConnectionListener();
+			listener.setInviteRequest(request);
+			connection.addConnectionListener(listener);
+			connection.modify("$", sdp);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
