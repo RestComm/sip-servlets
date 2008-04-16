@@ -128,7 +128,7 @@ public class ClassFileScanner {
 				processSipApplicationKeyAnnotation(clazz);
 			} catch (Throwable e) {
 				// e.printStackTrace();
-				logger.error("Failed to parse annotations for class " + classpath);
+				logger.warn("Failed to parse annotations for class " + classpath);
 			}
     	}
     }
@@ -155,7 +155,7 @@ public class ClassFileScanner {
     			}
     		}
     	} catch (Throwable e) {
-    		logger.error("Annotations not parsed. Error enumerating methods for class: " + clazz.toString());
+    		logger.warn("Annotations not parsed. Error enumerating methods for class: " + clazz.toString());
     	}
     }
     
