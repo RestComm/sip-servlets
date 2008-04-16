@@ -500,10 +500,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					+ clonedRequest);
 		}	
 		ExtendedListeningPoint extendedListeningPoint = 
-			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);		
-		SipProvider sipProvider = extendedListeningPoint.getSipProvider();
+			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Matching listening point found " 
+					+ extendedListeningPoint);
+		}
+		SipProvider sipProvider = extendedListeningPoint.getSipProvider();		
 		ServerTransaction serverTransaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Dialog dialog = sipServletRequest.getDialog();
+		if(logger.isDebugEnabled()) {
+			logger.debug("Dialog existing " 
+					+ dialog != null);
+		}
 		if(dialog == null) {			
 			Transaction transaction = ((TransactionApplicationData)
 					serverTransaction.getApplicationData()).getSipServletMessage().getTransaction();
@@ -515,12 +523,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				ctx.setApplicationData(appData);				
 				//keeping the client transaction in the server transaction's application data
 				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);											
-				logger.info("Sending the request " + clonedRequest);
+				logger.info("Sending the request through a new client transaction " + clonedRequest);
 				ctx.sendRequest();												
 			} else {
+				logger.info("Sending the request through the existing transaction " + clonedRequest);
 				((ClientTransaction)transaction).sendRequest();
 			}
 		} else if ( clonedRequest.getMethod().equals("ACK") ) {
+			logger.info("Sending the ACK through the dialog " + clonedRequest);
             dialog.sendAck(clonedRequest);
 		} else {
 			Request dialogRequest=
@@ -532,52 +542,53 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	            if (contentTypeHeader!=null) {
 	            	dialogRequest.setContent(content,contentTypeHeader);
 	        	}
+	        }
 	                     
-	            // Copy all the headers from the original request to the 
-	            // dialog created request:	            
-                ListIterator<String> headerNamesListIterator=clonedRequest.getHeaderNames();
-                while (headerNamesListIterator.hasNext()) {
-                     String name=headerNamesListIterator.next();
-                     Header header=dialogRequest.getHeader(name);
-                     if (header==null  ) {
-                        ListIterator<Header> li=clonedRequest.getHeaders(name);
-                        if (li!=null) {
-                            while (li.hasNext() ) {
-                                Header  h = li.next();
-                                dialogRequest.addHeader(h);
-                            }
+            // Copy all the headers from the original request to the 
+            // dialog created request:	            
+            ListIterator<String> headerNamesListIterator=clonedRequest.getHeaderNames();
+            while (headerNamesListIterator.hasNext()) {
+                 String name=headerNamesListIterator.next();
+                 Header header=dialogRequest.getHeader(name);
+                 if (header==null  ) {
+                    ListIterator<Header> li=clonedRequest.getHeaders(name);
+                    if (li!=null) {
+                        while (li.hasNext() ) {
+                            Header  h = li.next();
+                            dialogRequest.addHeader(h);
                         }
-                     }
-                     else {
-                         if ( header instanceof ViaHeader) {
-                             ListIterator<Header> li= clonedRequest.getHeaders(name);
-                             if (li!=null) {
-                                 dialogRequest.removeHeader(name);
-                                 Vector v=new Vector();
-                                 while (li.hasNext() ) {
-                                     Header  h=li.next();
-                                     v.addElement(h);
-                                 }
-                                 for (int k=(v.size()-1);k>=0;k--) {
-                                     Header  h=(Header)v.elementAt(k);
-                                     dialogRequest.addHeader(h);
-                                 }
+                    }
+                 }
+                 else {
+                     if ( header instanceof ViaHeader) {
+                         ListIterator<Header> li= clonedRequest.getHeaders(name);
+                         if (li!=null) {
+                             dialogRequest.removeHeader(name);
+                             Vector v=new Vector();
+                             while (li.hasNext() ) {
+                                 Header  h=li.next();
+                                 v.addElement(h);
+                             }
+                             for (int k=(v.size()-1);k>=0;k--) {
+                                 Header  h=(Header)v.elementAt(k);
+                                 dialogRequest.addHeader(h);
                              }
                          }
                      }
-                }       
-	            	                    
-	            ClientTransaction clientTransaction =
-				sipProvider.getNewClientTransaction(dialogRequest);
-	            //keeping the server transaction in the client transaction's application data
-				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
-				appData.setTransaction(serverTransaction);
-				clientTransaction.setApplicationData(appData);
-				//keeping the client transaction in the server transaction's application data
-				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(clientTransaction);
-				dialog.setApplicationData(appData);
-	            dialog.sendRequest(clientTransaction);
-	        }
+                 }
+            }       
+            	                    
+            ClientTransaction clientTransaction =
+			sipProvider.getNewClientTransaction(dialogRequest);
+            //keeping the server transaction in the client transaction's application data
+			TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
+			appData.setTransaction(serverTransaction);
+			clientTransaction.setApplicationData(appData);
+			//keeping the client transaction in the server transaction's application data
+			((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(clientTransaction);
+			dialog.setApplicationData(appData);
+			logger.info("Sending the request through the dialog " + clonedRequest);
+            dialog.sendRequest(clientTransaction);	        
 		}
 	}
 
