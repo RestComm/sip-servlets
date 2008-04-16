@@ -110,7 +110,7 @@
 		         eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}.zip" filesonly="false">
 			<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin"
-		            filemode="755" prefix="server/bin">
+		            filemode="755" prefix="bin">
 		            <include name="*.sh" />
 			</zipfileset>
          	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin"
