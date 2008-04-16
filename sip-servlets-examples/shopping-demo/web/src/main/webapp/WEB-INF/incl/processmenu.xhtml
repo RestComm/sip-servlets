@@ -1,0 +1,30 @@
+<f:subview rendered="#{s:hasRole('admin')}"
+           xmlns="http://www.w3.org/1999/xhtml"
+           xmlns:s="http://jboss.com/products/seam/taglib"
+           xmlns:ui="http://java.sun.com/jsf/facelets"
+           xmlns:f="http://java.sun.com/jsf/core"
+           xmlns:h="http://java.sun.com/jsf/html"
+           id="processmenu">
+    <div class="menu">
+        <dl>
+            <dt class="menuHeader">Admin Options</dt>
+            <dd class="menuForm"> 
+                <h:form>
+                    <dl>
+                        <dt>Process Management</dt>
+                        <dd>
+                            <h:selectOneMenu value="#{processDefinitionSwitcher.currentProcessDefinition}">
+                                <f:selectItems value="#{processDefinitionSwitcher.processDefinitions}"/>
+                            </h:selectOneMenu>
+                        </dd>
+                        <dd>
+                            <h:commandButton action="#{processDefinitionSwitcher.switchProcess}" 
+                                             value="Switch Order Process"
+                                             styleClass="formButton" style="width: 166px;"/>
+                        </dd>
+                    </dl>
+                </h:form>
+            </dd>
+        </dl>      
+    </div>
+</f:subview>

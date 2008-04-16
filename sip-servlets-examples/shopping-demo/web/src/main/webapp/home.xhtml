@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="home" />
+            </ui:include>
+        </ui:define> 
+           
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <h1>Welcome to the Furniture Store</h1>
+            
+            <p>
+                Welcome to the Mobicents Furniture Store Demo.  The Furniture Store is a simple storefront
+                application written using the latest JBoss technologies: EJB3, Seam and jBPM.
+            </p>
+
+            <h2>How to use the Furniture Store</h2>
+            <p>
+                You can enter the store immediately by clicking on
+                the shopping link below. However, in order to complete
+                a purchase, you'll need to first log in as a customer.
+                There are 5 customer accounts: <b>user1</b> through
+                <b>user5</b> (with password <b>password</b>).  You can
+                login using any of the customer accounts or create
+                your own customer account to browse the DVD Store and
+                make purchases.  Once an order is submitted, you can
+                check the status of the order from the <em>My
+                Orders</em> screen.  When the order is fulfilled by
+                the store manager, the status of the order will be
+                updated.
+            </p>
+
+            <p>
+                When a customer places an order, the application
+                starts a jBPM order management process.  Depending on
+                the version of the process deployed, the store manager
+                (username <b>manager</b>, password <b>password</b>)
+                will be presented with different fulfilment options.
+            </p> 
+
+
+            <s:button view="/browse.xhtml" value="Start Shopping" />
+
+        </ui:define>
+    </ui:composition> 
+</body> 
+</html>

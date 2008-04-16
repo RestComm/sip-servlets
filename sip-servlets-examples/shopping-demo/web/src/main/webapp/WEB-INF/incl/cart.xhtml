@@ -1,0 +1,46 @@
+<f:subview xmlns="http://www.w3.org/1999/xhtml"
+           xmlns:ui="http://java.sun.com/jsf/facelets"
+           xmlns:f="http://java.sun.com/jsf/core"
+           xmlns:h="http://java.sun.com/jsf/html"
+           xmlns:s="http://jboss.com/products/seam/taglib"
+           id="cartcontents"
+           rendered="#{!cart.isEmpty}">
+    <div class="menu">
+            <dl>
+                <dt class="menuHeader">#{messages.searchCartHeader}</dt>
+                <dd class="menuForm">
+                    <h:dataTable value="#{cart.cart}" var="item"
+                                 styleClass="dvdtable" 
+                                 headerClass="dvdtablehead"
+                                 rowClasses="dvdtableodd,dvdtableeven"
+                                 columnClasses="dvdtablecol">
+                        <h:column>
+                            #{item.quantity}
+                        </h:column>                        
+                        <h:column>
+                            #{item.product.title}
+                        </h:column>                        
+                        <!--
+                        <h:column>
+                            #{item.product.price}
+                        </h:column>
+                        -->
+                    </h:dataTable>
+                </dd>
+                
+                <dd>
+                    <h:outputText value="#{messages.checkoutTotal}" />
+                    <h:outputText value="#{cart.total}">
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </h:outputText>
+                </dd>
+
+                <h:form>
+                    <dd>
+                        <h:commandButton action="checkout" value="#{messages.checkoutButton}" 
+                                         styleClass="formButton" style="width: 166px;" />
+                    </dd>
+                </h:form>
+            </dl>
+    </div>
+</f:subview>

@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="cart" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+
+        <ui:define name="body">
+            <f:subview id="no_order" rendered="#{completedOrder == null}">
+                <p>Your order could not be completed.</p>
+
+                <h:form>
+                    <h:commandButton action="browse" value="Continue Shopping" />
+                </h:form>
+            </f:subview>
+            
+            <f:subview id="orderdetail" rendered="#{completedOrder != null}">
+                <h2>#{messages.checkoutCompleteHeader}</h2>
+                <h:form>
+                    <h:dataTable value="#{completedOrder.orderLines}" 
+                                 var="item"
+                                 styleClass="dvdtable" 
+                                 headerClass="dvdtablehead"
+                                 rowClasses="dvdtableodd,dvdtableeven"
+                                 columnClasses="dvdtablecol">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartItemColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.position}" />
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartQuantityColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.quantity}" />
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartTitleColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.title}" />
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartActorColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.actors[0].name}" />
+                        </h:column>                        
+                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartPriceColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.price}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </h:column>                        
+                    </h:dataTable>
+                </h:form>
+                
+
+                <div style="width: 100%;">
+                    <div class="cntInfo" style="float: right;">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="#{messages.checkoutSubtotal}" />
+                            <h:outputText value="#{completedOrder.netAmount}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            
+                            <h:outputText value="#{messages.checkoutTax}" />
+                            <h:outputText value="#{completedOrder.tax}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            
+                            <h:outputText value="#{messages.checkoutTotal}" />
+                            <h:outputText value="#{completedOrder.totalAmount}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </h:panelGrid>
+                    </div>
+                    
+                    <div style="float:clear">&#160;</div>
+                </div>
+                
+                
+                <p class="orderBox cntAlert">
+                    Thank you for ordering. 
+                    <h:outputText value="#{completedOrder.totalAmount}"> 
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </h:outputText>
+                    charged was to your <h:outputText value="#{completedOrder.customer.creditCardTypeString}" />.
+                    Your order number is 
+                    <h:outputText value="#{completedOrder.orderId}" />.
+                </p>
+            </f:subview>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

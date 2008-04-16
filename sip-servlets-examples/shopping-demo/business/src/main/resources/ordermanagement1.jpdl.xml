@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<process-definition 
+	name="OrderManagement"
+	xmlns="urn:jbpm.org:jpdl-3.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:jbpm.org:jpdl-3.1 http://jbpm.org/xsd/jpdl-3.1.xsd"
+	>
+
+    <start-state name="start">
+        <transition to="process"/>
+    </start-state>
+
+    <task-node name="process" end-tasks="true">
+        <task name="ship" description="Ship order">
+           <assignment pooled-actors="#{shipperAssignment.pooledActors}"/>
+        </task>
+        <transition name="shipped" to="complete">
+            <action expression="#{afterShipping.log}"/>
+        </transition>
+        <transition name="cancel" to="cancelled"/>
+    </task-node>
+
+    <end-state name="complete"/>
+    <end-state name="cancelled"/>
+    
+</process-definition>

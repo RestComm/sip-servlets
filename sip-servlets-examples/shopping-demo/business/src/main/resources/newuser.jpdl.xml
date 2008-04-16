@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<pageflow-definition
+	xmlns="http://jboss.com/products/seam/pageflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=
+	    "http://jboss.com/products/seam/pageflow http://jboss.com/products/seam/pageflow-2.0.xsd"
+ 	name="newuser">
+    <start-state name="start">
+        <transition to="account"/>
+    </start-state>
+    
+    <page name="account" view-id="/newuser/account.xhtml">
+        <redirect/>
+        <transition name="next" to="checkPassword" />
+    </page>
+
+    <decision name="checkPassword" expression="#{editCustomer.validNamePassword}">
+        <transition name="true" to="contact"/>
+        <transition name="false" to="account">
+            <!-- <action name="#{editCustomer.warnPassword}" /> action is never triggered -->
+        </transition>
+    </decision>
+
+
+    <page name="contact" view-id="/newuser/contact.xhtml"
+          no-conversation-view-id="/newuser/account.xhtml">
+        <redirect/>
+        <transition name="prev" to="account"/>
+        <transition name="next" to="card"/>
+    </page>
+
+    <page name="card" view-id="/newuser/card.xhtml"
+          no-conversation-view-id="/newuser/account.xhtml">
+        <redirect/>
+        <transition name="prev" to="contact"/>
+        <transition name="next" to="complete">
+            <action expression="#{editCustomer.saveUser}"/>
+        </transition>
+    </page>
+    
+    <page name="complete" view-id="/newuser/complete.xhtml"
+          no-conversation-view-id="/newuser/account.xhtml">
+        <end-conversation/>
+        <redirect/>
+    </page>
+    
+</pageflow-definition>

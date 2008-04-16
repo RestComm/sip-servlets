@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav"> 
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="cart" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+
+        <ui:define name="body">
+            <h1>Confirm Order</h1>
+            
+            <f:subview id="no_order" rendered="#{currentOrder==null}">
+                <p>You have no order.</p>
+            </f:subview>
+
+            <f:subview id="orderdetail" rendered="#{currentOrder != null}">
+                <h:form>
+                    <h:dataTable value="#{currentOrder.orderLines}" var="line"
+                                 styleClass="dvdtable" 
+                                 headerClass="dvdtablehead"
+                                 rowClasses="dvdtableodd,dvdtableeven"
+                                 columnClasses="dvdtablecol">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartTitleColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{line.product.title}" />
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartActorColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{line.product.actors[0].name}" />
+                        </h:column>                        
+                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartPriceColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{line.product.price}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartQuantityColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{line.quantity}"/>
+                        </h:column>                        
+                    </h:dataTable>
+                </h:form>
+                
+                <div style="width: 100%;">
+                    <div class="cntInfo" style="float:right;">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="#{messages.checkoutSubtotal}" />
+                            <h:outputText value="#{currentOrder.netAmount}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            
+                            <h:outputText value="#{messages.checkoutTax}" />
+                            <h:outputText value="#{currentOrder.tax}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            
+                            <h:outputText value="#{messages.checkoutTotal}" />
+                            <h:outputText value="#{currentOrder.totalAmount}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </h:panelGrid>
+                        
+                        <h:form>
+                            <h:commandButton action="purchase" value="Confirm" />
+                            &#160;
+                            <h:commandButton action="cancel" value="Cancel" />
+                        </h:form>
+                    </div>
+                </div>
+            </f:subview>            
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

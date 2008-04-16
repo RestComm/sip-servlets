@@ -1,0 +1,47 @@
+<div class="menu" 
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:s="http://jboss.com/products/seam/taglib"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html">
+
+    <h:form rendered="#{not identity.loggedIn}"> 
+        <dl>
+            <dt class="menuHeader">#{messages.loginPagePrompt}</dt>
+            <dd class="menuForm">
+                <dl>
+                    <dt><h:outputText value="#{messages.loginUser}" /></dt>
+                    <dd><h:inputText value="#{identity.username}" size="16" /></dd>
+                    <dt><h:outputText value="#{messages.loginPass}" /></dt>
+                    <dd><h:inputSecret value="#{identity.password}" size="16"/></dd>
+                    
+                    <dd>
+                        <h:commandButton action="#{identity.login}" value="#{messages.loginPrompt}"
+                                         styleClass="formButton" style="width: 166px;"/>
+                    </dd>
+                    
+                </dl>
+            </dd>
+        </dl>
+        <dl>
+            <dt class="menuFooter">
+                <h:commandLink action="#{editCustomer.startEdit}">Create Account</h:commandLink>
+            </dt>
+        </dl>
+    </h:form>
+    
+    <h:form rendered="#{identity.loggedIn}">
+        <dl>
+            <dt class="menuHeader">Welcome, #{currentUser.firstName}</dt>
+            <dd class="menuForm">
+                <dl>
+                    <dd>Thank you for choosing the Furniture Store</dd>
+                    <dd>
+                        <h:commandButton action="#{identity.logout}" value="Logout"
+                                         styleClass="formButton" style="width: 166px;"/>
+                    </dd>
+                </dl>
+            </dd>
+        </dl>
+    </h:form>
+</div>

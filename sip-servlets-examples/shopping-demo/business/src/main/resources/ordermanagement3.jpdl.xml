@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<process-definition 
+	name="OrderManagement"
+	xmlns="urn:jbpm.org:jpdl-3.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:jbpm.org:jpdl-3.1 http://jbpm.org/xsd/jpdl-3.1.xsd"
+	>
+
+    <start-state name="start">
+        <transition to="decide"/>
+    </start-state>
+    
+    <decision name="decide" expression="#{orderApproval.howLargeIsOrder}">
+        <transition name="large order" to="approval">
+			<action expression="#{beforeOrderProcessed.fireBeforeOrderProcessedEvent}"/>
+	</transition>        
+        <transition name="small order" to="process">
+			<action expression="#{afterOrderProcessed.fireOrderProcessedEvent}"/>
+	</transition>
+    </decision>
+
+    <task-node name="approval" end-tasks="true">
+        <task name="approve" description="Review order">
+           <assignment pooled-actors="reviewers"/>
+        </task>
+        <transition name="cancel"  to="cancelled">
+				<action expression="#{orderApprovalAction.fireOrderRejectedEvent}"/>
+	    </transition>           
+        <transition name="approve" to="process">
+				<action expression="#{orderApprovalAction.fireOrderApprovedEvent}"/>
+	    </transition>        
+        <transition name="reject"  to="cancelled">
+				<action expression="#{orderApprovalAction.fireOrderRejectedEvent}"/>
+	    </transition>          
+        
+    </task-node>
+    
+    <task-node name="process">
+        <task name="ship" description="Ship order">
+           <assignment pooled-actors="#{shipperAssignment.pooledActors}" />
+        </task>
+        <transition name="shipped" to="complete">
+            <action expression="#{afterShipping.orderShipped}"/>
+        </transition>
+    </task-node>
+    
+    <end-state name="complete"/>
+    <end-state name="cancelled"/>
+    
+</process-definition>
