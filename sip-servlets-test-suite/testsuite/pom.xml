@@ -5,7 +5,7 @@
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-test-suite</artifactId>
 	<packaging>jar</packaging>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.3-SNAPSHOT</version>
 	<name>sip-servlets-test-suite</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-impl</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- j2ee dependencies -->
