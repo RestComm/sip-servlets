@@ -159,4 +159,15 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 		responseToOriginalRequest.send();		
 	}
+	
+	@Override
+	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		SipSession originalSession =   
+		    helper.getLinkedSession(sipServletResponse.getSession());					
+		SipServletResponse responseToOriginalRequest = 
+			helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		responseToOriginalRequest.send();
+	}
 }
