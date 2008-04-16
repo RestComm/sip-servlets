@@ -52,8 +52,8 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 				
 		try {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			String adminAddress = (String)Contexts.getApplicationContext().get("admin.sip");
-			Address fromAddress = sipFactory.createAddress(adminAddress);
+			String callerAddress = (String)Contexts.getApplicationContext().get("caller.sip");
+			Address fromAddress = sipFactory.createAddress(callerAddress);
 			Address toAddress = sipFactory.createAddress(cutomerphone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);

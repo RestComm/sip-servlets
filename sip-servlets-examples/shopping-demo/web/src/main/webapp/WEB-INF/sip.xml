@@ -39,6 +39,16 @@
       <param-value>sip:admin@127.0.0.1:5055</param-value>
     </context-param>
     
+    <context-param>
+      <param-name>caller.sip</param-name>
+      <param-value>sip:650390127@callwithus.com</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>caller.password</param-name>
+      <param-value>XXXXXX</param-value>
+    </context-param>
+    
     <listener>
 		<listener-class>
 			org.mobicents.servlet.sip.example.ShoppingSipServlet

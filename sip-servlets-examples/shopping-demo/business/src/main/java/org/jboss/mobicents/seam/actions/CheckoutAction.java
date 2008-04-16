@@ -158,9 +158,9 @@ public class CheckoutAction implements Checkout, Serializable {
 			String customerName, String customerPhone) {		
 			
 		try {
-			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			String adminAddress = (String)Contexts.getApplicationContext().get("admin.sip");
-			Address fromAddress = sipFactory.createAddress(adminAddress);
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();			
+			String callerAddress = (String)Contexts.getApplicationContext().get("caller.sip");
+			Address fromAddress = sipFactory.createAddress(callerAddress);
 			Address toAddress = sipFactory.createAddress(customerPhone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);

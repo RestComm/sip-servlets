@@ -64,9 +64,9 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 		Timestamp orderDate = order.getDeliveryDate();
 		
 		try {
-			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			String adminAddress = (String)Contexts.getApplicationContext().get("admin.sip");
-			Address fromAddress = sipFactory.createAddress(adminAddress);
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();			
+			String callerAddress = (String)Contexts.getApplicationContext().get("caller.sip");
+			Address fromAddress = sipFactory.createAddress(callerAddress);
 			Address toAddress = sipFactory.createAddress(cutomerphone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);

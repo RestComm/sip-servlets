@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -72,6 +73,55 @@ public class ShoppingSipServlet
 			MsConnection connection = (MsConnection)sipServletResponse.getSession().getApplicationSession().getAttribute("connection");
 			connection.modify("$", sdp);			
 		}
+	}
+	
+	@Override
+	protected void doErrorResponse(SipServletResponse response)
+			throws ServletException, IOException {		
+			
+		logger.info("Got response: " + response);
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		if(response.getStatus() == SipServletResponse.SC_UNAUTHORIZED || 
+				response.getStatus() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
+			// Avoid re-sending if the auth repeatedly fails.
+			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
+			{
+				SipApplicationSession sipApplicationSession = response.getApplicationSession();
+				getServletContext().setAttribute("FirstResponseRecieved", "true");
+				AuthInfo authInfo = sipFactory.createAuthInfo();
+				authInfo.addAuthInfo(
+						response.getStatus(), 
+						response.getChallengeRealms().next(), 
+						(String) sipApplicationSession.getAttribute("caller"), 
+						(String) sipApplicationSession.getAttribute("callerPassword"));
+				Address fromAddress = sipFactory.createAddress((String) sipApplicationSession.getAttribute("caller"));
+				String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");
+				String customerContact = (String) sipApplicationSession.getAttribute("customerContact");
+				if(sipApplicationSession.getAttribute("adminApproval") != null) {
+					customerContact = (String) sipApplicationSession.getAttribute("adminContactAddress");					
+				}			
+				Address toAddress = sipFactory.createAddress(customerPhone);
+				SipServletRequest challengeRequest = 
+					sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
+				URI requestURI = sipFactory.createURI(customerContact);			
+				challengeRequest.setRequestURI(requestURI);				
+				challengeRequest.addAuthHeader(response, authInfo);
+				MsConnection connection =  (MsConnection) 
+					sipApplicationSession.getAttribute("connection");
+				String sdp = connection.getLocalDescriptor();
+				try {
+					challengeRequest.setContentLength(sdp.length());
+					challengeRequest.setContent(sdp.getBytes(), "application/sdp");
+					logger.info("sending challenge request " + challengeRequest);
+					challengeRequest.send();
+				} catch (IOException e) {
+					logger.error("An unexpected exception occured while sending the request", e);
+				}
+			}
+		} else {					
+			super.doErrorResponse(response);
+		}
+		
 	}
 
 	@Override
@@ -156,7 +206,7 @@ public class ShoppingSipServlet
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();		
 		SipFactory sipFactory = (SipFactory) sipApplicationSession.getAttribute("sipFactory");
 		try {			
-			Address fromAddress = sipFactory.createAddress((String) sipApplicationSession.getAttribute("adminAddress"));
+			Address fromAddress = sipFactory.createAddress((String) sipApplicationSession.getAttribute("caller"));
 			String customerName = (String) sipApplicationSession.getAttribute("customerName");
 			BigDecimal amount = (BigDecimal) sipApplicationSession.getAttribute("amountOrder");
 			String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");

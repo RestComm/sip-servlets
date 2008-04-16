@@ -55,6 +55,8 @@ public class BeforeOrderProcessedAction implements BeforeOrderProcessed, Seriali
 		sipApplicationSession.setAttribute("adminApproval", true);
 		sipApplicationSession.setAttribute("orderApproval", true);
 		sipApplicationSession.setAttribute("sipFactory", sipFactory);
+		sipApplicationSession.setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
+		sipApplicationSession.setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
 		sipApplicationSession.setAttribute("adminAddress", (String)Contexts.getApplicationContext().get("admin.sip"));
 		sipApplicationSession.setAttribute("adminContactAddress", (String)Contexts.getApplicationContext().get("admin.sip.default.contact"));
 		ServletTimer servletTimer = timerService.createTimer(
