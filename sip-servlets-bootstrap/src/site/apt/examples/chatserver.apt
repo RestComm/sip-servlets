@@ -33,7 +33,7 @@ Chat Server
  	Drop it in your <<<tomcat_home/conf/dars>>> directory or <<<jboss_home/server/default/conf/dars>>> directory.\
 	To use this dar file for this service, specify in the Service xml tag, 
 	darConfigurationFileLocation attribute of the <<<tomcat_home/conf/server.xml>>> file or <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\
-	<<<conf/dars/chatserver-dar.properties.properties>>>
+	<<<conf/dars/chatserver-dar.properties>>>
 
 	You can now run your container (Tomcat or Jboss).
 
@@ -51,7 +51,7 @@ Chat Server
 
 * How to play with it
 
-	Starts Two SIP Chat Clients. Point them to <<<sip:just4fun@127.0.0.1:5070>>>\
+	Starts Two SIP Chat Clients. Point them to <<<sip:just4fun@127.0.0.1:5080>>>\
 	Type your message and then click on the send button 
 	
 	You should see the messages in both clients once they are both in the chat server 
