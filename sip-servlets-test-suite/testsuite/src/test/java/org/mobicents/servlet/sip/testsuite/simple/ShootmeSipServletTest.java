@@ -75,6 +75,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 			
 			senderProtocolObjects.start();			
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			fail("unexpected exception ");
 		}
 	}
@@ -90,7 +91,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null);		
+		sender.sendInvite(fromAddress, toAddress, null, null);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());		
 	}

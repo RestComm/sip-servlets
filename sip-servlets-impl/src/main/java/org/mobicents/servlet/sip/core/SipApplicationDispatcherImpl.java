@@ -119,6 +119,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private static transient Log logger = LogFactory
 			.getLog(SipApplicationDispatcherImpl.class);
 	
+	private enum SipSessionRoutingType {
+		PREVIOUS_SESSION, CURRENT_SESSION;
+	}
+	
 	public static final String ROUTE_PARAM_DIRECTIVE = "directive";
 	
 	public static final String ROUTE_PARAM_PREV_APPLICATION_NAME = "previousappname";
@@ -135,6 +139,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * used so that the response doesn't try to call the app not deployed
 	 */
 	public static final String APP_NOT_DEPLOYED = "appnotdeployed";
+	/* 
+	 * This parameter is to know when no app was returned by the AR when doing the initial selection process
+	 * used so that the response is forwarded externally directly
+	 */
+	public static final String NO_APP_RETURNED = "noappreturned";
 	
 	public static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
@@ -427,15 +436,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * Forward statefully a request whether it is initial or subsequent
 	 * and keep track of the transactions used in application data of each transaction
-	 * @param sipProvider the sip provider used to get a new client Transaction
-	 * @param serverTransaction the server transaction on which we received the request
 	 * @param sipServletRequest the sip servlet request to forward statefully
 	 * @throws ParseException 
 	 * @throws TransactionUnavailableException
 	 * @throws SipException
 	 * @throws InvalidArgumentException 
 	 */
-	private void forwardStatefully(SipServletRequestImpl sipServletRequest) throws ParseException,
+	private void forwardStatefully(SipServletRequestImpl sipServletRequest, SipSessionRoutingType sipSessionRoutingType) throws ParseException,
 			TransactionUnavailableException, SipException, InvalidArgumentException {
 		
 		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();		
@@ -444,21 +451,40 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		String transport = JainSipUtils.findTransport(clonedRequest);		
 		ViaHeader viaHeader = JainSipUtils.createViaHeader(
 				sipNetworkInterfaceManager, transport, null);
-		String handlerName = sipServletRequest.getSipSession().getHandler();
+		SipSessionImpl session = sipServletRequest.getSipSession();
 		
-		if(handlerName != null) { 
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-					sipServletRequest.getSipSession().getKey().getApplicationName());
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-					sipServletRequest.getSipSession().getHandler());
-		} else {
+		if(session != null) {			
+			if(SipSessionRoutingType.CURRENT_SESSION.equals(sipSessionRoutingType)) {
+				//an app was found or an app was returned by the AR but not found
+				String handlerName = session.getHandler();
+				if(handlerName != null) { 
+					viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+							sipServletRequest.getSipSession().getKey().getApplicationName());
+					viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+							sipServletRequest.getSipSession().getHandler());					
+				} else {				
+					// if the handler name is null it means that the app returned by the AR was not deployed
+					// and couldn't be called, 
+					// we specify it so that on response handling this app can be skipped
+					viaHeader.setParameter(SipApplicationDispatcherImpl.APP_NOT_DEPLOYED,
+							sipServletRequest.getSipSession().getKey().getApplicationName());					
+				}			
+				clonedRequest.addHeader(viaHeader);
+			} else {
+				// no app was returned by the AR 				
+				viaHeader.setParameter(SipApplicationDispatcherImpl.NO_APP_RETURNED,
+						"noappreturned");
+				clonedRequest.addHeader(viaHeader);
+			}
+		} else {			
+			// no app was returned by the AR and no application was selected before
 			// if the handler name is null it means that the app returned by the AR was not deployed
 			// and couldn't be called, 
 			// we specify it so that on response handling this app can be skipped
-			viaHeader.setParameter(SipApplicationDispatcherImpl.APP_NOT_DEPLOYED,
-					sipServletRequest.getSipSession().getKey().getApplicationName());						
-		}					
-		clonedRequest.addHeader(viaHeader);
+			viaHeader.setParameter(SipApplicationDispatcherImpl.NO_APP_RETURNED,
+					"noappreturned");
+			clonedRequest.addHeader(viaHeader);	 
+		}		
 		//decrease the Max Forward Header
 		MaxForwardsHeader mf = (MaxForwardsHeader) clonedRequest
 			.getHeader(MaxForwardsHeader.NAME);
@@ -683,7 +709,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				return false;
 			} else {		
 				//route header is meant for the container hence we continue
-				forwardStatefully(sipServletRequest);
+				forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION);
 				return true;
 			}
 		}		
@@ -1062,13 +1088,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			boolean isAnotherDomain = isExternal(host, port, transport);			
 			ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
 			if(isAnotherDomain || routeHeaders.hasNext()) {
+				forwardStatefully(sipServletRequest, SipSessionRoutingType.PREVIOUS_SESSION);
 				// FIXME send it statefully
-				try{
-					sipProvider.sendRequest((Request)request.clone());						
-					logger.info("Subsequent Request dispatched outside the container" + request.toString());
-				} catch (Exception ex) {			
-					throw new IllegalStateException("Error sending request",ex);
-				}	
+//				try{					
+//					sipProvider.sendRequest((Request)request.clone());						
+//					logger.info("Initial Request dispatched outside the container" + request.toString());
+//				} catch (SipException ex) {			
+//					throw new IllegalStateException("Error sending request",ex);
+//				}	
 				return false;
 			} else {
 				// the Request-URI does not point to another domain, and there is no Route header, 
@@ -1116,7 +1143,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// that is not currently deployed we continue routing to see if 
 				// other apps are interested
 				sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
-				forwardStatefully(sipServletRequest);
+				forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION);
 				return true;
 			}
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
@@ -1183,7 +1210,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 									"since no more apps are is interested.");
 						}
 					}
-					forwardStatefully(sipServletRequest);
+					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION);
 					return true;
 				} catch (SipException e) {				
 					logger.error("an exception has occured when trying to forward statefully", e);
@@ -1428,6 +1455,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
 				return true;
 			}
+			String noAppReturned = viaHeader.getParameter(NO_APP_RETURNED);
+			if(noAppReturned != null && noAppReturned.length() > 0) {
+				return true;
+			}
 			String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
 			String handlerName = viaHeader.getParameter(RR_PARAM_HANDLER_NAME);
 			boolean inverted = false;
@@ -1608,10 +1639,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			transaction = transactionTerminatedEvent.getClientTransaction();
 		}
-		logger.info("transaction terminated => " + transaction.getRequest().toString());		
+		logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());		
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
-		tad.getSipServletMessage().getSipSession().removeOngoingTransaction(transaction);				
+		SipSessionImpl sipSessionImpl = tad.getSipServletMessage().getSipSession();
+		if(sipSessionImpl == null) {
+			logger.info("no app were returned for this transaction " + transaction);
+		} else {
+			sipSessionImpl.removeOngoingTransaction(transaction);
+		}
 	}
 
 	/**

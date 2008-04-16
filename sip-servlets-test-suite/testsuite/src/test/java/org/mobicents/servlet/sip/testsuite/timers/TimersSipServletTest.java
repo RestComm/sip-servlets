@@ -110,7 +110,7 @@ public class TimersSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null);	
+		sender.sendInvite(fromAddress, toAddress, null, null);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());			
 		Thread.sleep(APP_SESSION_TIMEOUT);

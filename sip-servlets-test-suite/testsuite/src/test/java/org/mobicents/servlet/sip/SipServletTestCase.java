@@ -38,6 +38,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected SipEmbedded tomcat;
 	protected String sipIpAddress = "127.0.0.1";
 	protected boolean autoDeployOnStartup = true;
+	protected boolean startTomcatOnStartup = true;
 		
 	public SipServletTestCase(String name) {
 		super(name);
@@ -81,8 +82,10 @@ public abstract class SipServletTestCase extends TestCase {
 				File.separatorChar + "resources" + File.separatorChar);
 		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
 		String darConfigurationFile = getDarConfigurationFile();
-		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
-		tomcat.startTomcat();
+		tomcat.setDarConfigurationFilePath(darConfigurationFile);
+		if(startTomcatOnStartup) {
+			tomcat.startTomcat();
+		}
 		if(autoDeployOnStartup) {
 			deployApplication();
 		}

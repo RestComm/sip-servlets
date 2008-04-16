@@ -100,10 +100,12 @@ public class SipStandardService extends StandardService implements SipService {
 		} catch (ClassCastException e) {
 			throw new LifecycleException("Sip Application Dispatcher defined does not implement " + SipApplicationDispatcher.class.getName(),e);
 		}
-		if(darConfigurationFileLocation != null && !darConfigurationFileLocation.startsWith("file:///")) {
-			darConfigurationFileLocation = "file:///" + System.getProperty("catalina.base").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
- 		}
-		System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);			
+		if(darConfigurationFileLocation != null) {
+			if(!darConfigurationFileLocation.startsWith("file:///")) {
+				darConfigurationFileLocation = "file:///" + System.getProperty("catalina.base").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
+			}
+			System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
+ 		}		
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.domain);
 		sipApplicationDispatcher.init(sipApplicationRouterClassName);

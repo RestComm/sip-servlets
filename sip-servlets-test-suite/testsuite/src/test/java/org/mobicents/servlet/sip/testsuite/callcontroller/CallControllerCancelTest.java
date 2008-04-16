@@ -105,7 +105,7 @@ public class CallControllerCancelTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null);
+		sender.sendInvite(fromAddress, toAddress, null, null);
 		Thread.sleep(200);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);

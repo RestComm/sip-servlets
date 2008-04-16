@@ -504,7 +504,7 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendInvite(SipURI fromURI, SipURI toURI, String messageContent) throws SipException, ParseException, InvalidArgumentException {
+	public void sendInvite(SipURI fromURI, SipURI toURI, String messageContent, SipURI route) throws SipException, ParseException, InvalidArgumentException {
 			// create >From Header
 			Address fromNameAddress = protocolObjects.addressFactory
 					.createAddress(fromURI);			
@@ -582,33 +582,15 @@ public class TestSipListener implements SipListener {
 			uri.setTransportParam(protocolObjects.transport);
 			uri.setPort(this.peerPort);
 			
-
-			Address address = protocolObjects.addressFactory.createAddress(uri);
-			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
-			request.addHeader(routeHeader);
-			// Add the extension header.
-//			Header extensionHeader = protocolObjects.headerFactory
-//					.createHeader("My-Header", "my header value");
-//			request.addHeader(extensionHeader);
-//
-//			String sdpData = "v=0\r\n"
-//					+ "o=4855 13760799956958020 13760799956958020"
-//					+ " IN IP4  129.6.55.78\r\n" + "s=mysession session\r\n"
-//					+ "p=+46 8 52018010\r\n" + "c=IN IP4  129.6.55.78\r\n"
-//					+ "t=0 0\r\n" + "m=audio 6022 RTP/AVP 0 4 18\r\n"
-//					+ "a=rtpmap:0 PCMU/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
-//					+ "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";
-//			byte[] contents = sdpData.getBytes();
-
-//			request.setContent(contents, contentTypeHeader);
-
-//			extensionHeader = protocolObjects.headerFactory.createHeader(
-//					"My-Other-Header", "my new header value ");
-//			request.addHeader(extensionHeader);
-
-//			Header callInfoHeader = protocolObjects.headerFactory.createHeader(
-//					"Call-Info", "<http://www.antd.nist.gov>");
-//			request.addHeader(callInfoHeader);
+			if(route != null) {
+				Address address = protocolObjects.addressFactory.createAddress(route);
+				RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
+				request.addHeader(routeHeader);
+			} else {
+				Address address = protocolObjects.addressFactory.createAddress(uri);
+				RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
+				request.addHeader(routeHeader);
+			}
 
 			// set the message content
 			if(messageContent != null) {
