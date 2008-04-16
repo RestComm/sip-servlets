@@ -200,6 +200,7 @@ public class JainSipUtils {
 	 */
 	public static boolean isListeningPointMatching(String ipAddress, int port,
 			ListeningPoint listeningPoint) {
+		int portChecked = checkPortRange(port);
 		List<String> listeningPointAddresses = new ArrayList<String>();
 		listeningPointAddresses.add(listeningPoint.getIPAddress());
 		//if the listening point is bound to 0.0.0.0 then adding all corresponding IP address
@@ -221,7 +222,7 @@ public class JainSipUtils {
 		}
 		//resolving by ipaddress an port
 		if(listeningPointAddresses.contains(ipAddress) &&					
-				listeningPoint.getPort() == port) {
+				listeningPoint.getPort() == portChecked) {
 			return true;
 		}
 		//resolving by hostname
@@ -229,7 +230,7 @@ public class JainSipUtils {
 			InetAddress[] inetAddresses = InetAddress.getAllByName(ipAddress);				
 			for (int i = 0; i < inetAddresses.length; i++) {
 				if(listeningPointAddresses.contains(inetAddresses[i].getHostAddress())
-						&& listeningPoint.getPort() == port) {
+						&& listeningPoint.getPort() == portChecked) {
 					return true;
 				}
 			}
@@ -238,8 +239,8 @@ public class JainSipUtils {
 			// but an ip address not found in the searched listening points above				
 		}
 		return false;
-	}
-	
+	}		
+
 	/**
 	 * Retrieve the first matching sip Provider from the set of sip provider corresponding to the 
 	 * ipAddress and port given in parameter.
@@ -262,6 +263,21 @@ public class JainSipUtils {
 			}			
 		}					
 		return null; 
+	}
+	
+	/**
+	 * Checks if the port is in the UDP-TCP port numbers (0-65355) range 
+	 * otherwise defaulting to 5060
+	 * @param port port to check
+	 * @return the smae port number if in range, 5060 otherwise
+	 */
+	public static int checkPortRange(int port) {
+		if(port < 0 && port > 65355) {		
+			return 5060;
+		}
+		else {
+			return port;
+		}
 	}
 	
 	/**
