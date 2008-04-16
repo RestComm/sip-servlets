@@ -228,7 +228,8 @@ public class JainSipUtils {
 		try {
 			InetAddress[] inetAddresses = InetAddress.getAllByName(ipAddress);				
 			for (int i = 0; i < inetAddresses.length; i++) {
-				if(listeningPointAddresses.contains(inetAddresses[i].getHostAddress())) {
+				if(listeningPointAddresses.contains(inetAddresses[i].getHostAddress())
+						&& listeningPoint.getPort() == port) {
 					return true;
 				}
 			}
