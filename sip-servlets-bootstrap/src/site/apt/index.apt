@@ -20,7 +20,7 @@ Goals
 
 Version 0.3 is out !
 
-	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :\
+	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
 		
 		* Management Console : {{{ssmc/sip-servlets-managment.htm}check this out}}
 		
@@ -30,13 +30,13 @@ Version 0.3 is out !
 		
 		* STUN Support and DNS SRV lookups
 		
-		* usual round of bug fixes : {{{roadmap.htm}check this out}}
+		* usual round of bug fixes : {{{roadmap.html}check this out}}
 		
 	It is shipped with :		
 	
 		* {{{ssmc/sip-servlets-managment.htm}Management Console}}
 	
-		* Educational converged example : {{{examples/click2call.html}Click To Call}}}
+		* Educational converged example : {{{examples/click2call.html}Click To Call}}
 	
 		* Mobicents Media Server 1.0-ALPHA2 (JBoss only)
 	
