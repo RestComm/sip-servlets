@@ -103,6 +103,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
+import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -1836,5 +1837,39 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
         mserver=server;
         domain=name.getDomain();
         return name;
+	}
+	
+	/* Exposed methods for the management console. Some of these duplicate existing methods, but
+	 * with JMX friendly types.
+	 */
+	
+	public String[] findInstalledSipApplications() {
+		Iterator<SipContext> apps = findSipApplications();
+		ArrayList<String> appList = new ArrayList<String>();
+		while(apps.hasNext()){
+			SipContext ctx = apps.next();
+			appList.add(ctx.getApplicationName());
+		}
+		String[] ret = new String[appList.size()];
+		for(int q=0; q<appList.size(); q++) ret[q] = appList.get(q);
+		return ret;
+	}
+	
+	public Object retrieveApplicationRouterConfiguration() {
+		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
+			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
+			return router.getCurrentConfiguration();
+		} else {
+			throw new RuntimeException("This application router is not manageable");
+		}
+	}
+	
+	public void updateApplicationRouterConfiguration(Object configuration) {
+		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
+			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
+			router.configure(configuration);
+		} else {
+			throw new RuntimeException("This application router is not manageable");
+		}
 	}
 }

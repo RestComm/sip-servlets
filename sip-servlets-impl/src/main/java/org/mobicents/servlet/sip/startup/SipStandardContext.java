@@ -144,10 +144,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				sipSessionsUtil);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 				sipApplicationDispatcher.getOutboundInterfaces());		
-		this.getServletContext().setAttribute(org.mobicents.servlet.sip.Constants.APPLICATION_DISPATCHER,
-				this.sipApplicationDispatcher);
-		this.getServletContext().setAttribute(org.mobicents.servlet.sip.Constants.APPLICATION_ROUTER,
-				((SipApplicationDispatcherImpl)this.sipApplicationDispatcher).getSipApplicationRouter());
 		logger.info("sip context Initialized");
 	}
 

@@ -10,6 +10,24 @@
 			description="The managed resource this MBean is associated with"
 			type="java.lang.Object" />
 
+		<operation name="findInstalledSipApplications"
+			description="Enumerate applications"
+			impact="ACTION" returnType="[Ljava.lang.String;">
+		</operation>
+		
+		<operation name="retrieveApplicationRouterConfiguration"
+			description="get router configuration"
+			impact="ACTION" returnType="java.lang.Object">
+		</operation>
+		
+		<operation name="updateApplicationRouterConfiguration"
+			description="set router configuration"
+			impact="ACTION" returnType="void">
+			<parameter name="configuration"
+				description="the configuration (AR specific)"
+				type="java.lang.Object" />
+		</operation>
+		
 		<operation name="init"
 			description="Initialize the sip application dispatcher and its associated sip application router implementation"
 			impact="ACTION" returnType="void">
