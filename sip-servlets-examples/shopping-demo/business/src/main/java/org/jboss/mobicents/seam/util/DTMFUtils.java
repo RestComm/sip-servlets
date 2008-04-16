@@ -76,7 +76,7 @@ public class DTMFUtils {
 		
 		if("1".equalsIgnoreCase(signal)) {
 			// Order Confirmed
-			logger.info("Order confirmed !");
+			logger.info("Order " + orderId + " confirmed !");
 			String audioFile = pathToAudioDirectory + "OrderApproved.wav";					
 			
 			playFileInResponseToDTMFInfo(session, audioFile);
@@ -89,7 +89,7 @@ public class DTMFUtils {
 			}					
 		} else if("2".equalsIgnoreCase(signal)) {
 			// Order cancelled
-			logger.info("Order cancelled !");
+			logger.info("Order " + orderId + " cancelled !");
 			String audioFile = pathToAudioDirectory + "OrderCancelled.wav";					
 			
 			playFileInResponseToDTMFInfo(session, audioFile);

@@ -240,14 +240,15 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 </div>
 <div class="section"><h3>How to play with it</h3>
 <p>http://jboss bind address:8080/shopping-demo/</p>
-<p>Start a Sip Phone, make it register as a customer (let's say sip:jean@127.0.0.1:5050) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).</p>
-<p>Start another Sip Phone, make it register as admin (if you're using the binary or if you didn't change the sip.xml file it should be sip:admin@127.0.0.1:5055) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).</p>
-<p>Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone (here sip:jean@127.0.0.1:5050)</p>
+<p>Start a Sip Phone, make it register as a customer (let's say sip:jean@shopping-demo.com) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).</p>
+<p>Start another Sip Phone, make it register as admin (if you're using the binary or if you didn't change the sip.xml file it should be sip:admin@shopping-demo.com) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).</p>
+<p>Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone (here sip:jean@shopping-demo.com)</p>
 <p>For SIP Phone settings you can see examples at <a href="http://groups.google.com/group/mobicents-public/web/sip-phone-settings-for-converged-demo?hl=en" class="externalLink">SIP Phone Settings for Converged Demo</a>
  </p>
-<ul><li>After creation of account once you check out the cart a call will be received on SIP Phone for confirmation.</li>
+<ul><li>After creation of account once you check out the cart a call will be received on the customer SIP Phone for confirmation.</li>
 <li>You can check your Order Status via 'My Orders' tab</li>
-<li>After 30000 milli secs ( value specified for order.approval.waitingtime in convergeddemo.properties) call is received by Admin to confirm the order for Shipping or Cancel if order is greater than 100$ or a call will be received on the sip phone for choosing delivery date if order is lower than 100$ </li>
+<li>After 30000 milli secs ( value specified for order.approval.waitingtime in convergeddemo.properties) call is received by Admin to confirm the order for Shipping or Cancel if order is greater than 100$ or a call will be received on the customer sip phone for choosing delivery date if order is lower than 100$</li>
+<li>You can check log out and relog in as manager to accept the order if it is greater than 100$, then a call will be received on the customer sip phone for choosing delivery date. You can also ship the orders that have been accepted and then a reminder call will be placed on the customer sip phone. </li>
 </ul>
 </div>
 </div>
@@ -266,7 +267,7 @@ To use this dar file for this service, specify in the Service xml tag, darConfig
 
   
   
-  &nbsp;| Last Published: 03/21/2008
+  &nbsp;| Last Published: 03/25/2008
   &nbsp;| Version: 0.3-SNAPSHOT
 </div>
       <div class="clear">

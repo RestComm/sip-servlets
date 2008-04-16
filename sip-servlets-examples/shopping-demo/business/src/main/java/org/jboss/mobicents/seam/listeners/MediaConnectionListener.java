@@ -56,6 +56,9 @@ public class MediaConnectionListener implements MsConnectionListener {
 		String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audioFilePath");
 		if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
 			java.io.File speech = new File("speech.wav");
+			if(inviteRequest.getSession().getApplicationSession().getAttribute("adminApproval") != null) {
+				speech = new File("adminspeech.wav");	
+			}			
 			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
 			generator.apply(Announcement.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
 			logger.info("announcement confirmation played. waiting for DTMF ");

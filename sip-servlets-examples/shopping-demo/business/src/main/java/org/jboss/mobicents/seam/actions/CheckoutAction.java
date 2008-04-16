@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.Remove;
@@ -163,8 +164,17 @@ public class CheckoutAction implements Checkout, Serializable {
 			Address toAddress = sipFactory.createAddress(customerPhone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
-			URI requestURI = sipFactory.createURI(customerPhone);
-			sipServletRequest.setRequestURI(requestURI);
+			// getting the contact address for the registered customer sip address
+			String userContact= ((Map<String, String>)Contexts.getApplicationContext().get("registeredUsersMap")).get(customerPhone);
+			if(userContact != null && userContact.length() > 0) {
+				// for customers using the registrar
+				URI requestURI = sipFactory.createURI(userContact);
+				sipServletRequest.setRequestURI(requestURI);
+			} else {
+				// for customers not using the registrar and registered directly their contact location
+				URI requestURI = sipFactory.createURI(customerPhone);
+				sipServletRequest.setRequestURI(requestURI);
+			}
 			//TTS file creation		
 			StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("Welcome ");

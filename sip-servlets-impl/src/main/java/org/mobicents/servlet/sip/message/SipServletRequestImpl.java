@@ -119,10 +119,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		/*
 		 * Contact is a system header field in messages other than REGISTER
 		 * requests and responses, 3xx and 485 responses, and 200/OPTIONS
-		 * responses.
+		 * responses so it is not contained in system headers and as such
+		 * as a special treatment
 		 */
-
-		// This doesnt contain contact!!!!
 		boolean isSystemHeader = systemHeaders.contains(hName);
 
 		if (isSystemHeader)

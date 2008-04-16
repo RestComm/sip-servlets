@@ -2,6 +2,7 @@ package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
@@ -56,8 +57,17 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 			Address toAddress = sipFactory.createAddress(cutomerphone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
-			URI requestURI = sipFactory.createURI(cutomerphone);
-			sipServletRequest.setRequestURI(requestURI);
+			// getting the contact address for the registered customer sip address
+			String userContact= ((Map<String, String>)Contexts.getApplicationContext().get("registeredUsersMap")).get(cutomerphone);
+			if(userContact != null && userContact.length() > 0) {
+				// for customers using the registrar
+				URI requestURI = sipFactory.createURI(userContact);
+				sipServletRequest.setRequestURI(requestURI);
+			} else {
+				// for customers not using the registrar and registered directly their contact location
+				URI requestURI = sipFactory.createURI(cutomerphone);
+				sipServletRequest.setRequestURI(requestURI);
+			}
 			
 			//Media Server Control Creation
 			MsPeer peer = MsPeerFactory.getPeer();

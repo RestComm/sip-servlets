@@ -33,6 +33,7 @@ public class OrderManagerBean implements OrderManager, Serializable {
 				.setParameter("orderId", orderId).getSingleResult();
 
 		order.setStatus(Order.Status.CANCELLED);
+		
 		ServletTimer deliveryDateTimer = (ServletTimer) Contexts.getApplicationContext().get("deliveryDateTimer" + orderId);
 		ServletTimer adminTimer = (ServletTimer) Contexts.getApplicationContext().get("adminTimer" + orderId);
 		if(deliveryDateTimer!=null) {			
@@ -49,7 +50,7 @@ public class OrderManagerBean implements OrderManager, Serializable {
 			log.info("Admin Timer for order "+ orderId +" cancelled");
 		} else {
 			log.info("No Admin Timer to cancel");
-		}
+		}				
 	}
 	
 	public void confirmOrder(long orderId) {
@@ -58,9 +59,9 @@ public class OrderManagerBean implements OrderManager, Serializable {
 				.setParameter("orderId", orderId).getSingleResult();
 
 		order.setStatus(Order.Status.OPEN);
-		
+
 		Contexts.getApplicationContext().remove("deliveryDateTimer" + orderId);
-		Contexts.getApplicationContext().remove("adminTimer" + orderId);
+		Contexts.getApplicationContext().remove("adminTimer" + orderId);						
 	}
 	
 	public void setDeliveryDate(Object orderId, Timestamp deliveryDate) {

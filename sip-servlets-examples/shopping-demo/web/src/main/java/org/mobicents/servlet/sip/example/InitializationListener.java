@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -83,6 +84,8 @@ public class InitializationListener implements ServletContextListener {
 			logger.info("Param key=" + initParamName + ", value = "
 					+ servletContext.getInitParameter(initParamName));
 		}
+		// map acting as a registrar
+		servletContext.setAttribute("registeredUsersMap", new HashMap<String, String>());
 	}
 
 	private void copyToTempDir(InputStream is, File tempWriteDir,

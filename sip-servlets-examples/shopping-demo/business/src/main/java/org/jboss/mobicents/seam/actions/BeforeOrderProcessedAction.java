@@ -2,6 +2,7 @@ package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
@@ -40,12 +41,22 @@ public class BeforeOrderProcessedAction implements BeforeOrderProcessed, Seriali
         SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		sipApplicationSession.setAttribute("customerName", customerfullname);
 		sipApplicationSession.setAttribute("customerPhone", cutomerphone);
+		// getting the contact address for the registered customer sip address
+		String userContact= ((Map<String, String>)Contexts.getApplicationContext().get("registeredUsersMap")).get(cutomerphone);
+		if(userContact != null && userContact.length() > 0) {
+			// for customers using the registrar
+			sipApplicationSession.setAttribute("customerContact", userContact);
+		} else {
+			// for customers not using the registrar and registered directly their contact location
+			sipApplicationSession.setAttribute("customerContact", cutomerphone);			
+		}
 		sipApplicationSession.setAttribute("amountOrder", amount);
 		sipApplicationSession.setAttribute("orderId", orderId);
 		sipApplicationSession.setAttribute("adminApproval", true);
 		sipApplicationSession.setAttribute("orderApproval", true);
 		sipApplicationSession.setAttribute("sipFactory", sipFactory);
 		sipApplicationSession.setAttribute("adminAddress", (String)Contexts.getApplicationContext().get("admin.sip"));
+		sipApplicationSession.setAttribute("adminContactAddress", (String)Contexts.getApplicationContext().get("admin.sip.default.contact"));
 		ServletTimer servletTimer = timerService.createTimer(
 				sipApplicationSession, 
 				Integer.parseInt((String)Contexts.getApplicationContext().get("order.approval.waitingtime")), 

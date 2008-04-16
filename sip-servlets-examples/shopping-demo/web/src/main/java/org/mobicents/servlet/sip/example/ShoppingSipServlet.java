@@ -4,6 +4,8 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -120,18 +122,29 @@ public class ShoppingSipServlet
 	@Override	
 	protected void doRegister(SipServletRequest req) throws ServletException, IOException {
 		logger.info("Received register request: " + req.getTo());
+		Map<String, String> users = (Map<String, String>) getServletContext().getAttribute("registeredUsersMap");
+			
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);				
 		Address address = req.getAddressHeader(CONTACT_HEADER);
 		String fromURI = req.getFrom().getURI().toString();
+
 		if(address.getExpires() == 0) {			
+			users.remove(fromURI);
 			logger.info("User " + fromURI + " unregistered");
-		} else {
-			resp.setAddressHeader(CONTACT_HEADER, address);			
+		} else {			
+			resp.setAddressHeader(CONTACT_HEADER, address);
+			users.put(fromURI, address.getURI().toString());
+			//updating the default contact address for the admin
+			String adminAddress = (String) getServletContext().getAttribute("admin.sip");
+			if(fromURI.equalsIgnoreCase(adminAddress)) {
+				getServletContext().setAttribute("admin.sip.default.contact", address.getURI().toString());
+			}
 			logger.info("User " + fromURI + 
-					" registered with an Expire time of " + address.getExpires());
-		}				
-						
+					" registered this contact address " + address + 
+					" with an Expire time of " + address.getExpires());
+		}							
+		
 		resp.send();
 	}
 
@@ -142,17 +155,29 @@ public class ShoppingSipServlet
 	public void timeout(ServletTimer timer) {
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();		
 		SipFactory sipFactory = (SipFactory) sipApplicationSession.getAttribute("sipFactory");
-		try {
-			Address fromAddress = sipFactory.createAddress("sip:admin@sip-servlets.com");
+		try {			
+			Address fromAddress = sipFactory.createAddress((String) sipApplicationSession.getAttribute("adminAddress"));
+			String customerName = (String) sipApplicationSession.getAttribute("customerName");
+			BigDecimal amount = (BigDecimal) sipApplicationSession.getAttribute("amountOrder");
 			String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");
+			String customerContact = (String) sipApplicationSession.getAttribute("customerContact");
 			if(sipApplicationSession.getAttribute("adminApproval") != null) {
-				customerPhone = (String) sipApplicationSession.getAttribute("adminAddress");
+				customerContact = (String) sipApplicationSession.getAttribute("adminContactAddress");
+				//TTS file creation		
+				StringBuffer stringBuffer = new StringBuffer();
+				stringBuffer.append(customerName);
+				stringBuffer.append(" has placed an order of $");
+				stringBuffer.append(amount);
+				stringBuffer.append(". Press 1 to approve and 2 to reject.");				
+				
+				TTSUtils.buildAudio(stringBuffer.toString(), "adminspeech.wav");
+				Thread.sleep(300);
 			}			
 			Address toAddress = sipFactory.createAddress(customerPhone);									
 			logger.info("preparing to call : "+ toAddress);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
-			URI requestURI = sipFactory.createURI(customerPhone);			
+			URI requestURI = sipFactory.createURI(customerContact);			
 			sipServletRequest.setRequestURI(requestURI);
 														
 			//Media Server Control Creation
