@@ -1417,7 +1417,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private boolean routeResponse(ResponseEvent responseEvent) {
 		Response response = responseEvent.getResponse();
 		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
-		ViaHeader viaHeader = (ViaHeader) viaHeaders.next();
+		ViaHeader viaHeader = viaHeaders.next();
 		logger.info("viaHeader = " + viaHeader.toString());
 		//response meant for the container
 		if(!isViaHeaderExternal(viaHeader)) {

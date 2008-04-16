@@ -31,6 +31,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
+import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -420,13 +421,16 @@ public class ProxyImpl implements Proxy {
 			SipServletResponse response = pb.getResponse();
 			
 			// The unstarted branches still haven't got a chance to get response
-			if(!pbi.isStarted()) return false;
+			if(!pbi.isStarted()) { 
+				return false;
+			}
 			
 			if(pbi.isStarted() && !pbi.isTimedOut() && !pbi.isCanceled())
 			{
-				if(    response == null 			// if there is no response yet
-					|| response.getStatus() < 200) 	// or if the response if not final
-					return false;					// then we should wait more
+				if(response == null || 						// if there is no response yet
+					response.getStatus() < Response.OK) {	// or if the response if not final
+					return false;							// then we should wait more
+				}
 			}
 		}
 		return true;
@@ -438,7 +442,7 @@ public class ProxyImpl implements Proxy {
 		// If we didn't get any response and only a timeout just return a timeout
 		if(proxyBranch.isTimedOut()) {
 			try {
-				originalRequest.createResponse(408).send();
+				originalRequest.createResponse(Response.REQUEST_TIMEOUT).send();
 				return;
 			} catch (IOException e1) {
 				throw new IllegalStateException("Faild to send a timeout response");
@@ -449,8 +453,9 @@ public class ProxyImpl implements Proxy {
 		SipServletResponse proxiedResponse = 
 			proxyUtils.createProxiedResponse(response, proxyBranch);
 		
-		if(proxiedResponse == null) 
+		if(proxiedResponse == null) {
 			return; // this response was addressed to this proxy
+		}
 
 		try {
 			proxiedResponse.send();

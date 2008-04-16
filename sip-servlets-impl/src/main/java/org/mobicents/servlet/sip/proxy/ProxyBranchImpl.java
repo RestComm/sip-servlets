@@ -234,19 +234,20 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @param request
 	 * @param subsequent Set to false if the the method is initial
 	 */
-	private void forwardRequest(Request request, boolean subsequent) 
-	{
+	private void forwardRequest(Request request, boolean subsequent) {
 
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating cloned Request for proxybranch " + request);
 		}
-		SipServletRequestImpl clonedRequest = new	SipServletRequestImpl(
+		SipServletRequestImpl clonedRequest = new SipServletRequestImpl(
 				request,
 				sipFactoryImpl,
 				null,
 				null, null, false);
 		
-		if(subsequent) clonedRequest.setRoutingState(RoutingState.SUBSEQUENT);
+		if(subsequent) {
+			clonedRequest.setRoutingState(RoutingState.SUBSEQUENT);
+		}
 		
 		this.outgoingRequest = clonedRequest;
 		
@@ -261,8 +262,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 		newSession.setProxyBranch(this);
 				
 		//JSR 289 Section 15.1.6
-		if(!subsequent) // Subsequent requests can't have a routing directive?
+		if(!subsequent) {
+			// Subsequent requests can't have a routing directive?
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
+		}			
 		clonedRequest.getTransactionApplicationData().setProxyBranch(this);
 		clonedRequest.send();
 	}

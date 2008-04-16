@@ -229,21 +229,22 @@ public class ProxyUtils {
 		Response clonedResponse = (Response)  response.clone();
 
 		// 1. Update timer C for provisional responses
-		if(sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE))
-			if(100<response.getStatusCode() && response.getStatusCode()<200)
-			{
+		if(sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE)) {
+			if(Response.TRYING < response.getStatusCode() && response.getStatusCode() < Response.OK) {
 				proxyBranch.updateTimer();
-			} else if(response.getStatusCode()>=200)
-			{//remove it if response is final
+			} else if(response.getStatusCode() >= Response.OK) {
+				//remove it if response is final
 				proxyBranch.cancelTimer();
 			}
+		}
 			
 		// 2. Remove topmost via
-		Iterator viaHeaderIt = clonedResponse.getHeaders(ViaHeader.NAME);
+		Iterator<ViaHeader> viaHeaderIt = clonedResponse.getHeaders(ViaHeader.NAME);
 		viaHeaderIt.next();
 		viaHeaderIt.remove();
-		if (!viaHeaderIt.hasNext())
+		if (!viaHeaderIt.hasNext()) {
 			return null; // response was meant for this proxy
+		}
 		
 		SipServletRequestImpl originalRequest =
 			(SipServletRequestImpl) this.proxy.getOriginalRequest();
@@ -252,7 +253,7 @@ public class ProxyUtils {
 				sipFactoryImpl,
 				originalRequest.getTransaction(),
 				originalRequest.getSipSession(),
-				null,
+				sipServetResponse.getDialog(),
 				originalRequest);
 
 
