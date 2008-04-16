@@ -14,6 +14,10 @@
 			https://sip-servlets.dev.java.net/servlets/ProjectIssues
 		</url>
 	</issueManagement>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>https://hudson.jboss.org/hudson/job/MobicentsSipServlets/</url>
+	</ciManagement>
 	<mailingLists>
 		<mailingList>
 			<name>dev</name>

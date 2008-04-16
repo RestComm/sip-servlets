@@ -22,6 +22,7 @@
       	<item name="Click to Call" href="examples/click2call.html"/>
       	<item name="Chat Server" href="examples/chatserver.html"/>
       </item>
+      <item name="QA" href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/"/>
       <item name="Roadmap" href="roadmap.html"/>
       
       <item name="Mailing lists" href="servlets/ProjectMailingListList"/>
