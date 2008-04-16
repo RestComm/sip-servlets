@@ -24,24 +24,20 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-
-
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsConnectionEvent;
-import org.mobicents.mscontrol.MsConnectionListener;
-import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.MsSignalGenerator;
+import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
-import org.mobicents.mscontrol.MsPeer;
-import org.mobicents.mscontrol.signal.Announcement;
-import com.sun.speech.freetts.*;
-import com.sun.speech.freetts.audio.*;
+import org.mobicents.mscontrol.MsSession;
+
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
+import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
 /**
  * This example shows a simple User agent that can playback audio.
  * @author Vladimir Ralev
