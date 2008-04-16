@@ -119,11 +119,11 @@
 						Real world Application Router
 						<br />
 						<img src="images/red.jpeg" />
-						Merge SIP Session Management with HTTP Session Management
+						STUN support
 						<br />
 						<img src="images/red.jpeg" />
-						Distributable applications
-						<br />						
+						Merge SIP Session Management with HTTP Session Management
+						<br />					
 						<img src="images/red.jpeg" />
 						Test framework able to deploy on any container
 						<br />						
@@ -158,7 +158,10 @@
 						Failover support
 						<br />
 						<img src="images/red.jpeg" />
-						Maven 2 sar/war plugin 
+						Distributable applications
+						<br />	
+						<img src="images/red.jpeg" />
+						Maven 2 sar plugin 
 						<br />
 						<img src="images/red.jpeg" />
 						More Extensions : SUBSCRIBE/NOTIFY
