@@ -124,10 +124,10 @@ public class ProxyUtils {
 						generateBranchId());
 			}
 					
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-					originalRequest.getSipSession().getKey().getApplicationName());
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-					originalRequest.getSipSession().getHandler());
+//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+//					originalRequest.getSipSession().getKey().getApplicationName());
+//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+//					originalRequest.getSipSession().getHandler());
 			clonedRequest.addHeader(viaHeader);				
 			
 			

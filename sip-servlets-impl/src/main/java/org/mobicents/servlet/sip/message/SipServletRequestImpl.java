@@ -74,6 +74,7 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
@@ -769,6 +770,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			// Update Session state
 			super.session.updateStateOnSubsequentRequest(this, false);
+			
+			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+					session.getKey().getApplicationName());
+			if(session.getHandler() != null && session.getHandler().length() > 0) {
+				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+					session.getHandler());
+			} else {
+				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+						session.getSipApplicationSession().getSipContext().getMainServlet());
+			}
 			
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null

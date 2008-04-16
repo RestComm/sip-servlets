@@ -813,7 +813,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		Header h = this.message.getHeader(nameToSearch);
 
-		return createParameterable(h.toString(), getFullHeaderName(name));
+		return createParameterable(h, getFullHeaderName(name));
 	}
 
 	/*
@@ -829,7 +829,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		ArrayList<Parameterable> result = new ArrayList<Parameterable>();
 
 		while (headers.hasNext())
-			result.add(createParameterable(headers.next().toString(),
+			result.add(createParameterable(headers.next(),
 					getFullHeaderName(name)));
 
 		return result.listIterator();
@@ -1422,8 +1422,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.transport = transport;
 	}
 
-	private Parameterable createParameterable(String whole, String hName)
+	private Parameterable createParameterable(Header header, String hName)
 			throws ServletParseException {
+		String whole = header.toString();
 		// FIXME: Not sure if this is correct ;/ Ranga?
 		if (logger.isDebugEnabled())
 			logger.debug("Creating parametrable for [" + hName + "] from ["
@@ -1465,7 +1466,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		}
 
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
-				value, paramMap);
+				header, value, paramMap);
 		return parameterable;
 	}
 

@@ -154,10 +154,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//the via header chain
 			ViaHeader newViaHeader = JainSipUtils.createViaHeader(
 					sipFactoryImpl.getSipNetworkInterfaceManager(), viaHeader.getTransport(), null);
-			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-					session.getKey().getApplicationName());
-			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-					session.getHandler());
+//			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+//					session.getKey().getApplicationName());
+//			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+//					session.getHandler());
 			newRequest.setHeader(newViaHeader);
 			
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(

@@ -244,10 +244,10 @@ public class SipSessionImpl implements SipSession {
 				
 				ViaHeader viaHeader = JainSipUtils.createViaHeader(sipFactory.getSipNetworkInterfaceManager(), transport,
 						null);			
-				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-						key.getApplicationName());
-				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-						handlerServlet);				
+//				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+//						key.getApplicationName());
+//				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+//						handlerServlet);				
 				methodRequest.setHeader(viaHeader);
 				
 				//FIXME can it be dialog creating if a SUBSCRIBE is sent for exemple ?
@@ -257,10 +257,11 @@ public class SipSessionImpl implements SipSession {
 			} catch (SipException e) {
 				logger.error("Cannot create the bye request form the dialog",e);
 				throw new IllegalArgumentException("Cannot create the bye request",e);
-			} catch (ParseException e) {
-				logger.error("Cannot add the via header to the bye request form the dialog",e);
-				throw new IllegalArgumentException("Cannot create the bye request",e);
-			}			
+			} 
+//			catch (ParseException e) {
+//				logger.error("Cannot add the via header to the bye request form the dialog",e);
+//				throw new IllegalArgumentException("Cannot create the bye request",e);
+//			}			
 		} else {
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)) {

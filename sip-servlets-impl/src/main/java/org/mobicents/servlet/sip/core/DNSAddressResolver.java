@@ -4,12 +4,13 @@ import gov.nist.core.net.AddressResolver;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.sip.ListeningPoint;
 import javax.sip.address.Hop;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.utils.Inet6Util;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
@@ -33,12 +34,15 @@ public class DNSAddressResolver implements AddressResolver {
 	//the sip factory implementation to be able
 	SipApplicationDispatcher sipApplicationDispatcher;
 	
+	Map<String, Map<String, String>> cachedLookup = null;
+	
 	/**
 	 * @param sipApplicationDispatcherImpl
 	 */
 	public DNSAddressResolver(
 			SipApplicationDispatcher sipApplicationDispatcher) {		
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
+		cachedLookup = Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
 	}
 
 	/*
@@ -112,26 +116,76 @@ public class DNSAddressResolver implements AddressResolver {
 							"-- we are going to just use the domain name directly");
 			}
 			return hop;
-		} else {			
-			SRVRecord record = (SRVRecord) records[0];
-			int recordPort = record.getPort();						
-			String resolvedName = record.getTarget().toString();
-			try {
-				String hostAddress= InetAddress.getByName(resolvedName).getHostAddress();
-				if(logger.isDebugEnabled()) {
-					logger.debug("Did a successful DNS SRV lookup for host:transport " +
-							""+ host + "/" + transport +
-							" , Host Name = " + resolvedName +
-							" , Host IP Address = " + hostAddress + 
-							", Host Port = " + recordPort);
+		} else {	
+			Map<String, String> cachedEntry = foundCachedEntry(host, transport, (Record[]) records);
+			if(cachedEntry == null) {
+				SRVRecord record = (SRVRecord) records[0];
+				int recordPort = record.getPort();						
+				String resolvedName = record.getTarget().toString();
+				try {
+					String hostAddress= InetAddress.getByName(resolvedName).getHostAddress();
+					if(logger.isDebugEnabled()) {
+						logger.debug("Did a successful DNS SRV lookup for host:transport " +
+								""+ host + "/" + transport +
+								" , Host Name = " + resolvedName +
+								" , Host IP Address = " + hostAddress + 
+								", Host Port = " + recordPort);
+					}				
+					Map<String, String> entry = new HashMap<String, String>();
+					entry.put("hostName", resolvedName);
+					entry.put("hostAddress", hostAddress);
+					entry.put("hostPort", ""+recordPort);
+					cachedLookup.put(host + transport, entry);
+					return new HopImpl(hostAddress, recordPort, transport);
+				} catch (UnknownHostException e) {
+					logger.error("Impossible to get the host address of the resolved name, " +
+							"we are going to just use the domain name directly" + resolvedName, e);
+					return hop;
 				}
-				return new HopImpl(hostAddress, recordPort, transport);
-			} catch (UnknownHostException e) {
-				logger.error("Impossible to get the host address of the resolved name, " +
-						"we are going to just use the domain name directly" + resolvedName, e);
-				return hop;
+			} else {
+				String entryResolvedName = cachedEntry.get("hostName");
+				String hostAddress = cachedEntry.get("hostAddress");
+				String hostPort = cachedEntry.get("hostPort");
+				if(logger.isDebugEnabled()) {
+					logger.debug("Reusing a previous DNS SRV lookup for host:transport " +
+							""+ host + "/" + transport +
+							" , Host Name = " + entryResolvedName +
+							" , Host IP Address = " + hostAddress + 
+							", Host Port = " + hostPort);
+				}
+				return new HopImpl(hostAddress, Integer.parseInt(hostPort), transport);
 			}
 		}
 				
+	}
+
+	private Map<String, String> foundCachedEntry(String host, String transport, Record[] records) {
+		Map<String, String> entry = cachedLookup.get(host+transport);
+		if(entry == null) {
+			return null;
+		}
+		String entryResolvedName = entry.get("hostName");
+		String hostAddress = entry.get("hostAddress");
+		String hostPort = entry.get("hostPort");
+		for (Record record : records) {
+			if(record instanceof SRVRecord) {
+				SRVRecord srvRecord = (SRVRecord) record;
+				String resolvedName = srvRecord.getTarget().toString();
+				String resolvedHostAddress;
+				try {
+					resolvedHostAddress = InetAddress.getByName(resolvedName).getHostAddress();
+					int recordPort = srvRecord.getPort();
+					if(entryResolvedName.equalsIgnoreCase(resolvedName) 
+							&& hostAddress.equalsIgnoreCase(resolvedHostAddress)
+							&& hostPort.equalsIgnoreCase("" + recordPort)) {
+						return entry;
+					}
+				} catch (UnknownHostException e) {
+					logger.warn("Couldn't resolve address " + resolvedName);
+				}				
+			}
+			
+		}
+		return null;
 	}
 }

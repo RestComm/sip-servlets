@@ -18,6 +18,8 @@ package org.mobicents.servlet.sip.address;
 
 import java.util.Map;
 
+import javax.sip.header.Header;
+
 import gov.nist.core.NameValueList;
 
 /**
@@ -34,10 +36,10 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		super();
 	}
 
-	public ParameterableHeaderImpl(String value, Map<String, String> params) {
+	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params) {
 		// General form of parametrable header
-		super(params);
-		this.value = value;
+		super(header, params);
+		this.value = value;		
 	}
 
 	@Override

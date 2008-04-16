@@ -418,10 +418,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			//This method acts as a UAC, setting the via header 
 			viaHeader = JainSipUtils.createViaHeader(sipApplicationDispatcher.getSipNetworkInterfaceManager(), transport,
 					null);			
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName());
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-					((SipApplicationSessionImpl)sipAppSession).getSipContext().getMainServlet());
+//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+//					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName());
+//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+//					((SipApplicationSessionImpl)sipAppSession).getSipContext().getMainServlet());
 			List<Header> viaHeaders = new ArrayList<Header>();
 			viaHeaders.add(viaHeader);
 			
