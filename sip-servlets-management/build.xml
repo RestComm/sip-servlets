@@ -37,7 +37,13 @@
 				</not>
 			</condition>
 		</fail>
-
+		<fail message="M2_REPO environment variable is not set. ">
+			<condition>
+				<not>
+					<isset property="system.M2_REPO" />
+				</not>
+			</condition>
+		</fail>
 		<path id="project.classpath">
 			<pathelement path="${project.modified.lib}/gwt-user.jar" />
 			<pathelement path="${project.modified.lib}/servlet-api.jar" />
