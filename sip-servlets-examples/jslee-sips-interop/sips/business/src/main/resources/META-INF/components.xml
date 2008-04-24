@@ -1,0 +1,4 @@
+<components xmlns="http://jboss.com/products/seam/components" 
+            xmlns:core="http://jboss.com/products/seam/core">
+	<core:init jndi-name="jslee-sips/#{ejbName}/local" debug="true"/>
+</components>

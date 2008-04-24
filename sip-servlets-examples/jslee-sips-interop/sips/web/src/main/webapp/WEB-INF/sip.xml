@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>jslee-sip-interop-demo</app-name>
+	<display-name>JSLEE-SIPS Interop Demo Sip Servlet</display-name>
+	<description>JSLEE-SIPS Interop Demo Sip Servlet</description>
+	
+	<main-servlet>
+		JSleeSipsInteropServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>JSleeSipsInteropServlet</servlet-name>
+		<display-name>JSleeSipsInteropServlet</display-name>
+		<description>JSLEE-SIPS Interop servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.JSleeSipsInteropServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>    
+</sip-app>

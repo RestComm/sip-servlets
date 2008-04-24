@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.0//EN" "http://java.sun.com/dtd/slee-sbb-jar_1_0.dtd">
+
+<sbb-jar>
+	<sbb id="InteropSbb-sbb">
+		<description>JSLEE Sips Interop SBB</description>
+
+		<sbb-name>InteropSbb</sbb-name>
+		<sbb-vendor>org.mobicents</sbb-vendor>
+		<sbb-version>1.0</sbb-version>
+
+		<!-- JSLEE v1.1 Specification, Early Draft Review Page 23 -->
+		<sbb-classes>
+			<sbb-abstract-class>
+				<sbb-abstract-class-name>
+					org.mobicents.slee.service.interop.InteropSbb
+				</sbb-abstract-class-name>
+				<cmp-field>
+					<cmp-field-name>interopCustomEvent</cmp-field-name>
+				</cmp-field>
+			</sbb-abstract-class>
+		</sbb-classes>
+
+		<event event-direction="Receive" initial-event="True">
+			<event-name>InitMedia</event-name>
+			<event-type-ref>
+				<event-type-name>
+					org.mobicents.slee.service.interopdemo.INIT_MEDIA
+				</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>PlayOpeningAnnouncement</event-name>
+			<event-type-ref>
+				<event-type-name>
+					org.mobicents.slee.service.interopdemo.PLAY_ANN_OPENING
+				</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>			
+		</event>				
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>PlayConfirmationAnnouncement</event-name>
+			<event-type-ref>
+				<event-type-name>
+					org.mobicents.slee.service.interopdemo.PLAY_ANN_CONFIRM
+				</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>			
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>ConnectionCreated</event-name>
+			<event-type-ref>
+				<event-type-name>
+					org.mobicents.slee.media.CONNECTION_CREATED
+				</event-type-name>
+				<event-type-vendor>
+					org.mobicents.media
+				</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>ConnectionModified</event-name>
+			<event-type-ref>
+				<event-type-name>
+					org.mobicents.slee.media.CONNECTION_MODIFIED
+				</event-type-name>
+				<event-type-vendor>
+					org.mobicents.media
+				</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>AnnouncementComplete</event-name>
+			<event-type-ref>
+				<event-type-name>
+					org.mobicents.slee.media.announcement.COMPLETE
+				</event-type-name>
+				<event-type-vendor>
+					org.mobicents.media
+				</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+		
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>
+					media_ratype
+				</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>
+					org.mobicents.media
+				</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>
+					1.0
+				</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<activity-context-interface-factory-name>
+				slee/resources/media/1.0/acifactory
+			</activity-context-interface-factory-name>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>
+					slee/resources/media/1.0/provider
+				</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>
+					LocalMs
+				</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>
+					TTSAdaptorType
+				</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>
+					org.mobicents
+				</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>
+					0.1
+				</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<activity-context-interface-factory-name>
+				slee/resources/ttsRA/0.1/acifactory
+			</activity-context-interface-factory-name>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>
+					slee/resources/ttsRA/0.1/provider
+				</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>
+					ttsRA
+				</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+	</sbb>
+
+</sbb-jar>
