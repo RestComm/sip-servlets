@@ -88,6 +88,7 @@
 			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
 	</target>
 	
+	
 	<target name="deploy-media">
 		<copy todir="${base.path}/jboss-${jboss.version}/server/default/deploy">
 			<fileset dir="${sys.JBOSS_HOME}/server/default/deploy" includes="mediaserver.sar/**"/>
@@ -140,15 +141,15 @@
 	<target name="release-mc-distro" depends="checks">
 		<echo>Base path: ${this.path}</echo>
 		<mkdir dir="${jboss.dir}/server/default/conf/dars"/>
-		<copy file="${this.path}/../src/site/resources/darfiles/click2call-dar.properties" 
+		<copy verbose="true" failonerror="true" file="${this.path}/../src/site/resources/darfiles/click2call-dar.properties" 
 			todir="${jboss.dir}/server/default/conf/dars"/>
 			
-		<copy file="${this.path}/server-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/server.xml"/>
-		<copy file="${this.path}/context-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/context.xml"/>
-		<copy file="${this.path}/jboss-service.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>
-		<copy file="${this.path}/webserver-xmbean.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>						
-
-		<exec executable="${mvn.executable}" dir="${base.path}/..">
+		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/server-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/server.xml"/>
+		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/context-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/context.xml"/>
+		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/jboss-service.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>
+		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/webserver-xmbean.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>						
+		<echo>Done copying.</echo>
+		<exec executable="${mvn.executable}" dir="${this.path}/..">
 			<arg line="clean install -P jboss -DJBOSS_HOME=${jboss.dir}"/>
 		</exec>
 
@@ -158,6 +159,11 @@
 		
 		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" 
 			tofile="${jboss.dir}/server/default/deploy/click2call.war" />
+		
+		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
+		</ant>
+		<copy file="${this.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
+			tofile="${jboss.dir}/server/default/deploy/sip-servlets-management.war"/>
 		
 	</target>
 
