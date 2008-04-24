@@ -610,7 +610,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
 				
 		if(poppedAddress==null){
-			throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
+			if(Request.ACK.equals(request.getMethod())) {
+				//Means that this is an ACK to a container generated error response, so we can drop it
+				if(logger.isDebugEnabled()) {
+					logger.debug("The popped route is null for an ACK, this is an ACK to a container generated error response, so it is dropped");
+				}
+				return false;
+			} else {
+				throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
+			}
 		}
 		//Extract information from the Record Route Header		
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
