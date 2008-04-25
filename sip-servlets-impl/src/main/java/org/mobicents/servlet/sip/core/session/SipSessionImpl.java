@@ -236,18 +236,12 @@ public class SipSessionImpl implements SipSession {
 					sessionCreatingDialog);
 		}
 		SipServletRequestImpl sipServletRequest = null;
-		if(this.sessionCreatingDialog != null && !JainSipUtils.dialogCreatingMethods.contains(method)) {			
+		if(this.sessionCreatingDialog != null && !JainSipUtils.dialogCreatingMethods.contains(method)) {
 			try {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
-				final String transport = JainSipUtils.findTransport(methodRequest);
 				
-				ViaHeader viaHeader = JainSipUtils.createViaHeader(sipFactory.getSipNetworkInterfaceManager(), transport,
-						null);			
-//				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-//						key.getApplicationName());
-//				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-//						handlerServlet);				
-				methodRequest.setHeader(viaHeader);
+				//Issue 112 fix by folsson
+				methodRequest.removeHeader(ViaHeader.NAME);
 				
 				//FIXME can it be dialog creating if a SUBSCRIBE is sent for exemple ?
 				sipServletRequest = new SipServletRequestImpl(
@@ -262,6 +256,9 @@ public class SipSessionImpl implements SipSession {
 //				throw new IllegalArgumentException("Cannot create the bye request",e);
 //			}			
 		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("The new request for the session is dialog creating (" + method + ")");
+			}
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)) {
 				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(

@@ -356,7 +356,6 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		ToHeader toHeader = null;
 		FromHeader fromHeader = null;
 		CSeqHeader cseqHeader = null;
-		ViaHeader viaHeader = null;
 		CallIdHeader callIdHeader = null;
 		MaxForwardsHeader maxForwardsHeader = null;		
 
@@ -415,16 +414,9 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 
 				toHeader.setParameter(key, from.getParameter(key));
 			}
-			//This method acts as a UAC, setting the via header 
-			viaHeader = JainSipUtils.createViaHeader(sipApplicationDispatcher.getSipNetworkInterfaceManager(), transport,
-					null);			
-//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-//					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName());
-//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-//					((SipApplicationSessionImpl)sipAppSession).getSipContext().getMainServlet());
+			//Issue 112 by folsson : no via header to add will be added when the request will be sent out
 			List<Header> viaHeaders = new ArrayList<Header>();
-			viaHeaders.add(viaHeader);
-			
+						 			
 			requestToWrap = SipFactories.messageFactory.createRequest(
 					requestURI.getSipURI(), 
 					method, 

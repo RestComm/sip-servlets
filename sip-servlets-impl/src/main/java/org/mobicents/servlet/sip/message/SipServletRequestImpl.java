@@ -74,7 +74,6 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
@@ -198,8 +197,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(reasonPhrase!=null) {
 				response.setReasonPhrase(reasonPhrase);
 			}
-			//add a To tag for all responses except Trying
-			if(statusCode > Response.TRYING && statusCode <= Response.SESSION_NOT_ACCEPTABLE) {
+			//add a To tag for all responses except Trying (or trying too if it's a subsequent request)
+			if((statusCode > Response.TRYING || !isInitial()) && statusCode <= Response.SESSION_NOT_ACCEPTABLE) {
 				ToHeader toHeader = (ToHeader) response
 					.getHeader(ToHeader.NAME);
 				// If we already have a to tag, dont create new
@@ -217,17 +216,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					} else {
 						toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 					}
-					if (statusCode == Response.OK ) {
-						//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
-						if(!Request.REGISTER.equals(request.getMethod()) && !Request.OPTIONS.equals(request.getMethod())) { 
-							// Add the contact header for the dialog.
-							String transport = ((ViaHeader) request
-									.getHeader(ViaHeader.NAME)).getTransport();					
-							ContactHeader contactHeader = JainSipUtils
-									.createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
-							response.setHeader(contactHeader);
-						}
-					}
+				}
+				if (statusCode == Response.OK ) {
+					//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
+					if(!Request.REGISTER.equals(request.getMethod()) && !Request.OPTIONS.equals(request.getMethod())) { 
+					    // Add the contact header for the dialog.
+					    String transport = ((ViaHeader) request
+						    .getHeader(ViaHeader.NAME)).getTransport();					
+					    ContactHeader contactHeader = JainSipUtils
+					    .createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
+					    if(logger.isDebugEnabled()) {
+					    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + transport);
+					    }
+					    response.setHeader(contactHeader);
+				    }
 				}
 			}
 			//Application Routing : Adding the recorded route headers as route headers, should it be Via Headers ?
@@ -269,7 +271,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			return this.b2buahelper;
 		} catch (SipException ex) {
-			throw new IllegalStateException("Cannot get B2BUAHelper");
+			throw new IllegalStateException("Cannot get B2BUAHelper", ex);
 		}
 	}
 
@@ -662,9 +664,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 		try {
 			Request request = (Request) super.message;
-
 			String transport = JainSipUtils.findTransport(request);
-					
+			//Issue 112 fix by folsson
+		    if(!request.getMethod().equalsIgnoreCase(Request.CANCEL) && (getSipSession().getProxyBranch() == null
+			    || (transactionApplicationData.getProxy() != null && transactionApplicationData.getProxy().getRecordRoute()))){
+
+				ViaHeader viaHeader = JainSipUtils.createViaHeader(
+					sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
+				message.addHeader(viaHeader);
+		    }
+			
+		    if(logger.isDebugEnabled()) {
+		    	logger.debug("The found transport for sending request is '" + transport + "'");
+		    }
 			if(Request.ACK.equals(request.getMethod())) {
 				super.session.getSessionCreatingDialog().sendAck(request);
 				return;
@@ -711,7 +723,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), transport, fromName);										
 					
 					request.addHeader(contactHeader);
-				}	
+				}
 				
 				if(logger.isDebugEnabled()) {
 					logger.debug("Getting new Client Tx for request " + request);

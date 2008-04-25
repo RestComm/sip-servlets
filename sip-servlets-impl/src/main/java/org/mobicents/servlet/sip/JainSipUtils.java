@@ -203,7 +203,7 @@ public class JainSipUtils {
 			}
 			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
 			sipUri.setPort(listeningPoint.getPort());
-			sipUri.setTransportParam(listeningPoint.getTransport());
+			sipUri.setTransportParam(transport!=null?transport:listeningPoint.getTransport());
 			// Do we want to add an ID here?
 			return sipUri;
 		} catch (ParseException ex) {

@@ -119,8 +119,6 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//content should be copied too, so commented out
 //		 	newRequest.removeContent();				
 			//removing the via header from original request
-			ViaHeader viaHeader = (ViaHeader) newRequest
-					.getHeader(ViaHeader.NAME);
 			newRequest.removeHeader(ViaHeader.NAME);	
 			
 			((FromHeader) newRequest.getHeader(FromHeader.NAME))
@@ -148,18 +146,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipSessionKey key = SessionManager.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
 			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
-//			appSession.setSipContext(session.getSipApplicationSession().getSipContext());
-			
-			//since B2BUA is considered as an end point , it is normal to reinitialize 
-			//the via header chain
-			ViaHeader newViaHeader = JainSipUtils.createViaHeader(
-					sipFactoryImpl.getSipNetworkInterfaceManager(), viaHeader.getTransport(), null);
-//			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-//					session.getKey().getApplicationName());
-//			newViaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-//					session.getHandler());
-			newRequest.setHeader(newViaHeader);
-			
+						
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,					
@@ -316,9 +303,18 @@ public class B2buaHelperImpl implements B2buaHelper {
 			}			
 			
 			if(status ==  Response.OK) {
+				String transport = null;
+				ViaHeader viaHeader = ((ViaHeader) request.getHeader(ViaHeader.NAME));
+				if(viaHeader != null) {
+					transport = viaHeader.getTransport();
+				}
+				if(transport == null || transport.length() <1) {
+					transport = JainSipUtils.findTransport(request);
+				}
+					
 				ContactHeader contactHeader = 
 					JainSipUtils.createContactHeader(
-							sipFactoryImpl.getSipNetworkInterfaceManager(), JainSipUtils.findTransport(request), null);
+							sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
 				response.addHeader(contactHeader);
 			}
 			

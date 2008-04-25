@@ -26,6 +26,7 @@ import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.RouteHeader;
@@ -73,8 +74,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.pathURI = proxy.getPathURI();
 		this.outboundInterface = proxy.getOutboundInterface();
 		this.sipFactoryImpl = sipFactoryImpl;
-		if(recordRouteURI != null)
-			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();
+		if(recordRouteURI != null) {
+			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();			
+		}
 		this.proxyUtils = proxy.getProxyUtils();
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
 		this.canceled = false;

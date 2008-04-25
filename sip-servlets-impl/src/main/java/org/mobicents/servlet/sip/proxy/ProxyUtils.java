@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import javax.sip.ListeningPoint;
 import javax.sip.address.Address;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -114,9 +115,12 @@ public class ProxyUtils {
 			if(proxy.getOutboundInterface() == null) { 
 				viaHeader = JainSipUtils.createViaHeader(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), transport, generateBranchId());
-			} else { //If outbound interface is specified use it
+			} else { 
+				//If outbound interface is specified use it
 				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
-				if(outboundTransport == null) outboundTransport = "udp";
+				if(outboundTransport == null) {
+					outboundTransport = ListeningPoint.UDP;
+				}
 				viaHeader = SipFactories.headerFactory.createViaHeader(
 						proxy.getOutboundInterface().getHost(),
 						proxy.getOutboundInterface().getPort(),
@@ -124,10 +128,6 @@ public class ProxyUtils {
 						generateBranchId());
 			}
 					
-//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
-//					originalRequest.getSipSession().getKey().getApplicationName());
-//			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
-//					originalRequest.getSipSession().getHandler());
 			clonedRequest.addHeader(viaHeader);				
 			
 			

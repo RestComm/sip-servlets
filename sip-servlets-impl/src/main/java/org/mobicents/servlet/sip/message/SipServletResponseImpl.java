@@ -44,6 +44,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -319,12 +320,22 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			//if this is a final response
 			if(response.getStatusCode() >= Response.OK && 
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE && session.getProxyBranch() == null) {
+				//Issue 112 fix by folsson: use the viaheader transport
+				String transport = null;
+				ViaHeader viaHeader = ((ViaHeader) originalRequest.getMessage().getHeader(ViaHeader.NAME));
+				if(viaHeader != null) {
+					transport = viaHeader.getTransport();
+				}
+				if(transport == null || transport.length() <1) {
+					transport = JainSipUtils.findTransport((Request)originalRequest.getMessage());
+				}			     
 				javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
-						JainSipUtils.findTransport((Request)originalRequest.getMessage()));
+						transport
+						);
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
-				sipURI.setLrParam();
+				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);
 				RecordRouteHeader recordRouteHeader = 

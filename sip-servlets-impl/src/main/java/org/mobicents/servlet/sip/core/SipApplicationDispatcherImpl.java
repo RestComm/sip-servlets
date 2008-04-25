@@ -378,6 +378,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.info("Got a request event "  + request.toString());			
 			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
+					//folsson fix : Workaround broken Cisco 7940/7912
+				    	if(request.getHeader(MaxForwardsHeader.NAME)==null){
+					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
+					}
 					transaction = sipProvider.getNewServerTransaction(request);
 				} catch ( TransactionUnavailableException tae) {
 					// Sends a 500 Internal server error and stops processing.				
