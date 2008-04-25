@@ -19,6 +19,9 @@
 				<cmp-field>
 					<cmp-field-name>interopCustomEvent</cmp-field-name>
 				</cmp-field>
+				<cmp-field>
+					<cmp-field-name>boothNumber</cmp-field-name>
+				</cmp-field>
 			</sbb-abstract-class>
 		</sbb-classes>
 
@@ -94,6 +97,15 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+            <event-name>Dtmf</event-name>
+            <event-type-ref>
+                <event-type-name>org.mobicents.slee.media.dtmf.DTMF</event-type-name>
+                <event-type-vendor>org.mobicents.media</event-type-vendor>
+                <event-type-version>1.0</event-type-version>
+            </event-type-ref>
+        </event>   
 		
 		<resource-adaptor-type-binding>
 			<resource-adaptor-type-ref>

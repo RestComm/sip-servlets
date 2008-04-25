@@ -20,6 +20,7 @@ import javax.slee.connection.SleeConnectionFactory;
 import org.jboss.seam.annotations.JndiName;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Synchronized;
 import org.jboss.seam.log.Log;
 import org.mobicents.slee.service.events.InteropCustomEvent;
 
@@ -27,6 +28,7 @@ import org.mobicents.slee.service.events.InteropCustomEvent;
 @Stateful
 @Name("CallManagerBean")
 @JndiName("jslee-sips/#{ejbName}/local")
+@Synchronized
 public class CallManagerBean implements CallManager, Serializable {
 	@Logger private Log log;	
 	
