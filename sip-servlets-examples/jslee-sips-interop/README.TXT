@@ -34,7 +34,5 @@ To use
 1. Start Jboss
 2. Call your server (you can use a sip address of the foolowing form sip:javaone@127.0.0.1:5080) 
 
-Note : Use DTMF INFO as a way for sending DTMF for now.
-
 working nicely on linphone and twinkle on linux for SIP info
 working nicely with wengo for inband
