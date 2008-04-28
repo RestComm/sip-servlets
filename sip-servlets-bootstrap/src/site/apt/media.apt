@@ -17,9 +17,9 @@ Media Support
 	
 	To see some sample code on how to use this API, you can check out the following examples that are making use of it :
 		
-		* {{{examples/media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
+		* {{{media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
 		
-		* {{{examples/shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.			
+		* {{{shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.			
 
 
 * Limitations

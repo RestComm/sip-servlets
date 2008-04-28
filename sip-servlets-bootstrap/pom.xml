@@ -11,97 +11,18 @@
 	<issueManagement>
 		<system>Bugzilla</system>
 		<url>
-			https://sip-servlets.dev.java.net/servlets/ProjectIssues
+			http://code.google.com/p/mobicents/issues/list
 		</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Hudson</system>
 		<url>https://hudson.jboss.org/hudson/job/MobicentsSipServlets/</url>
 	</ciManagement>
-	<mailingLists>
-		<mailingList>
-			<name>dev</name>
-						<subscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</subscribe>
-			<unsubscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</unsubscribe>
-			<archive>
-				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=dev
-			</archive>
-			<post>dev@sip-servlets.dev.java.net</post>
-		</mailingList>
-		<mailingList>
-			<name>cvs</name>
-			<subscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</subscribe>
-			<unsubscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</unsubscribe>
-			<archive>
-				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=cvs
-			</archive>
-			<post>cvs@sip-servlets.dev.java.net</post>
-		</mailingList>
-		<mailingList>
-			<name>commits</name>
-			<subscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</subscribe>
-			<unsubscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</unsubscribe>
-			<archive>
-				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=commits
-			</archive>
-			<post>commits@sip-servlets.dev.java.net</post>
-		</mailingList>
-		<mailingList>
-			<name>announce</name>
-			<subscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</subscribe>
-			<unsubscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</unsubscribe>
-			<archive>
-				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=announce
-			</archive>
-			<post>announce@sip-servlets.dev.java.net</post>
-		</mailingList>
-		<mailingList>
-			<name>issues</name>
-			<subscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</subscribe>
-			<unsubscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</unsubscribe>
-			<archive>
-				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=issues
-			</archive>
-			<post>issues@sip-servlets.dev.java.net</post>
-		</mailingList>
-		<mailingList>
-			<name>users</name>
-			<subscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</subscribe>
-			<unsubscribe>
-				https://sip-servlets.dev.java.net/servlets/ProjectMailingListList
-			</unsubscribe>
-			<archive>
-				https://sip-servlets.dev.java.net/servlets/SummarizeList?listName=users
-			</archive>
-			<post>users@sip-servlets.dev.java.net</post>
-		</mailingList>
-	</mailingLists>
 	<developers>
 		<developer>
-			<id>deruelle_jean</id>
-			<email>deruelle_jean@dev.java.net</email>
+			<id>jean.deruelle</id>
+			<name>Jean Deruelle</name>
+			<email>jean.deruelle@gmail.com</email>
 			<organization>JBoss/Red Hat</organization>
 			<organizationUrl>http://www.redhat.com/</organizationUrl>
 			<roles>
@@ -111,21 +32,33 @@
 		</developer>
 		<developer>
 			<id>vralev</id>
-			<email>vralev@dev.java.net</email>
+			<name>Vladimir Ralev</name>
+			<email>vladimir.ralev@gmail.com</email>
 			<organization>JBoss/Red Hat</organization>
 			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<roles>
+				<role>Active Developer</role>
+			</roles>
 			<timezone>+1</timezone>
 		</developer>
 		<developer>
 			<id>baranowb</id>
-			<email>baranowb@dev.java.net</email>
+			<name>Bartosz Baranowski</name>
+			<email>baranowb@gmail.com</email>
 			<organization>JBoss/Red Hat</organization>
 			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
 			<timezone>+1</timezone>
 		</developer>
 		<developer>
 			<id>mranga</id>
+			<name>Neo Ranga</name>
 			<email>mranga@dev.java.net</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
 			<timezone>-5</timezone>
 		</developer>
 	</developers>
@@ -140,7 +73,7 @@
 		<site>
 			<id>sip-servlets-www</id>
 			<url>
-				svn:https://svn.dev.java.net/svn/sip-servlets/trunk/www/
+				svn:https://https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/www/
 			</url>
 		</site>
 		<repository>
@@ -152,13 +85,13 @@
 	</distributionManagement>
 	<scm>
 		<connection>
-			scm:svn:https://svn.dev.java.net/svn/sip-servlets/trunk/
+			scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets
 		</connection>
 		<developerConnection>
-			scm:svn:https://svn.dev.java.net/svn/sip-servlets/trunk/
+			scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets
 		</developerConnection>
 		<url>
-			https://sip-servlets.dev.java.net/source/browse/sip-servlets/trunk/
+			http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets
 		</url>
 	</scm>
 	<modules>
@@ -193,6 +126,24 @@
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>site</phase>
+						<configuration>
+							<tasks>
+								<copy verbose="true" file="${project.build.directory}/site/index.html" tofile="${project.build.directory}/site/products_sip_servlets.html"/>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

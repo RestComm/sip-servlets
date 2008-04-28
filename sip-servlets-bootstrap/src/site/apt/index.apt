@@ -4,7 +4,8 @@
                                     ------
                                     ------                                    	
 	
-	<<Team>> : check out the {{{team-list.html}team members}} making this possible
+	<<Team>> : check out the {{{team-list.html}team members}} making this possible	
+
 
 Goals  
 
@@ -12,7 +13,7 @@ Goals
   on top of Tomcat and to develop interoperability standards between SIP Servlet and JAIN-SLEE 
   so that applications may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} will be leveraged 
-  as the SIP stack and {{{http://mobicents.dev.java.net}Mobicents}} will be used as the SLEE implementation.
+  as the SIP stack and {{{http://mobicents.org}Mobicents}} will be used as the SLEE implementation.
 
   Flexibility is the goal. We want to develop an implementation that runs 
   standalone with the Tomcat HTTP server as well as in an application server 
@@ -22,11 +23,11 @@ Version 0.3 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
 		
-		* {{{ssmc/sip-servlets-managment.htm}Management Console}}
+		* {{{sip-servlets-managment.htm}Management Console}}
 		
-		* {{{media.html}Media Support}} : check the {{{examples/media-demo.html}media demo}} or the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
+		* {{{media.html}Media Support}} : check the {{{media-demo.html}media demo}} or the {{{shopping-demo.html}shopping demo}} (only for Jboss)
 		
-		* JEE integration / JEE converged applications : check the {{{examples/shopping-demo.html}shopping demo}} (only for Jboss)
+		* JEE integration / JEE converged applications : check the {{{shopping-demo.html}shopping demo}} (only for Jboss)
 		
 		* {{{stun.html}STUN Support}} and DNS SRV lookups
 		
@@ -34,9 +35,9 @@ Version 0.3 is out !
 		
 	It is shipped with :		
 	
-		* {{{ssmc/sip-servlets-managment.htm}Management Console}}
+		* {{{sip-servlets-managment.htm}Management Console}}
 	
-		* Educational converged example : {{{examples/click2call.html}Click To Call}}
+		* Educational converged example : {{{click2call.html}Click To Call}}
 	
 		* Mobicents Media Server 1.0-ALPHA2 (JBoss only)
 	
@@ -57,7 +58,7 @@ Try it !
 
 	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or Jboss 4.2.2.GA to become a sip-servlet converged container.
 	
-	Then have fun with the {{{examples/examples.html}different examples}} provided with this distribution.
+	Then have fun with the {{{examples.html}different examples}} provided with this distribution.
 	
 License
 
@@ -66,4 +67,4 @@ License
 	
 Feedback
 
-	To provide any kind of feedback (bad or good), please feel free to post a mail on the {{{dev@sip-servlets.dev.java.net}dev list}}, {{{servlets/ProjectIssues}post an issue}} in the bugtracker, mail one of the {{{team-list.html}team members}} or join the project.	 
+	To provide any kind of feedback (bad or good), please feel free to post a mail on the {{{mobicents-public@googlegroups.com}mailing list of Mobicents public google group}}, {{{http://code.google.com/p/mobicents/issues/list}post an issue on google code}}, or mail one of the {{{team-list.html}team members}} or join the project.	 

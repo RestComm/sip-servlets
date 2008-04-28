@@ -4,51 +4,55 @@
 	</properties>
 	<body>
 		<section name="Roadmap">
+			<p>
+				If you would like to propose any kind of features that you would like to see supported,  
+				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
+			</p>		
 			<subsection name="Released Versions">
 				<subsection name="Version 0.3 - 04/14/2008">
 					<p>
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7">
 							J2EE integration/J2EE converged applications
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=19">
 							Media Server Control Connector (JSR 309)
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=21">
 							Mobicents Sip Servlets Management Application
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=20">
 							STUN support
 						</a>
 						<br />						
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=28">
 							DNS NAPTR and SRV resolver
 						</a>
 						<br />												
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes :
 						<ul>							
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=17">
 									B2BUAHelper removing SDP content
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=18">
 									Content-Encoding header abusely
@@ -56,49 +60,49 @@
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=24">
 									Annotations parser Refactoring
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=26">
 									DNS resolution and 0.0.0.0 binding problems
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=27">
 									REGISTER problem
 								</a>
 							</li>							
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29">
 									Record-routes by default unless proxyTo() called
 								</a>							
 							</li>	
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=31">
 									Bug on 2xx final responses received causing NPE
 								</a>							
 							</li>												
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=32">
 									Via header missing for requests not handled by any servlets
 								</a>							
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=33">
 									SipServlet.doRequest() doesn't delegate to doRefer(), doUpdate() and doPublish()
@@ -117,68 +121,68 @@
 						</i>
 					</p>
 					<p>
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=12">
 							Listeners
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=2">
 							Security
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=6">
 							Servlet 2.5 Alignement and Annotations
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=4">
 							Running on top of Tomcat 6
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=5">
 							Running on top of Jboss AS
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=17">
 							support for MESSAGE sip extension
 						</a>
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes :
 						<ul>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=14">
 									Application Session Expiration
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=15">
 									Sip Session State
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=3">
 									JSR 289 Public Review API Alignement
 								</a>
 							</li>
 							<li>
-								<img src="images/green.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=8">
 									More sip phones interoperability
@@ -190,25 +194,25 @@
 				</subsection>
 				<subsection name="Version 0.1 - 01/01/2008">
 					<p>
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Servlet Loading
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Application Routing
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Proxying
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						B2BUA
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Http Converged Applications
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Sessions
 						<br />
-						<img src="images/green.jpeg" />
+						<img src="green.jpeg" />
 						Timers
 					</p>
 				</subsection>
@@ -216,58 +220,217 @@
 			<subsection name="Planned Versions">				
 				<subsection name="Version 0.4 - 06/01/2008">
 					<p>
-						<img src="images/red.jpeg" />
+						<img src="red.jpeg" />
 						<a
-							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=23">
+							href="http://code.google.com/p/mobicents/issues/detail?id=111">
 							Merge SIP Session Management with HTTP Session Management
 						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=113">
 						Failover support
-						<br />
-						<img src="images/red.jpeg" />
-						Distributable applications
-						<br />
-						<img src="images/red.jpeg" />
-						Maven 2 sar plugin
-						<br />
-						<img src="images/orange.jpeg" />
-						<a href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=22">
-							Refactor Test framework
 						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=114">
+						Distributable applications
+						</a>
+						<br />										
+						<img src="orange.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
+							Refactor Test framework, Performance improvement/Performance apps
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=115">
+						JSLEE/SIPS interop app
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=116">
 						JSR 289 Proposed Final Draft API Alignement
+						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=118">
 						More Extensions : SUBSCRIBE/NOTIFY
+						</a>
 						<br />
-						<img src="images/red.jpeg" />
+						<img src="red.jpeg" />
 						Various Enhancements and Bug fixes :
 						<ul>
 							<li>
-								<img src="images/red.jpeg" />
+								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=16">
+									href="http://code.google.com/p/mobicents/issues/detail?id=117">
 									Derived Sip Sessions
 								</a>
 							</li>
 							<li>
-								<img src="images/red.jpeg" />
+								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=13">
-									Servlet-mapping still supported in
-									1.1
+									href="http://code.google.com/p/mobicents/issues/detail?id=108">
+									Servlet-mapping still supported in 1.1
 								</a>
 							</li>
 							<li>
-								<img src="images/red.jpeg" />
+								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=10">
+									href="http://code.google.com/p/mobicents/issues/detail?id=107">
 									New Cancel methods on Proxy feature
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=112">
+									Move adding of Via header to send() instead of B2buaHelper.createRequest
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=138">
+									Routing to external application server 
+								</a>
+							</li>
 						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.5 - 07/01/2008">
+					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=121">
+						15.11 Encode URI and Session Targeting
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=134">
+						4.2.2 TelURL
+						</a>
+						<br />						
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=122">
+						Basic IPBX
+						</a>
+						<br />				
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=133">
+						Concurrency Control
+						</a>
+						<br />
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=123">
+						Open IMS integration example
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=124">
+						JSR 289 Proposed Final Draft-2  API Alignement
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=125">
+						JBON Integration
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=126">
+						More Extensions : REFER/PUBLISH/UPDATE
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						Various Enhancements and Bug fixes
+						<!--ul>
+							<li>								
+							</li>
+						</ul-->
+					</p>
+				</subsection>
+				<subsection name="Version 0.6 - 08/01/2008">
+					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=119">
+						Diameter support
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=130">						
+						User Guide with DocBook Documentation
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=120">
+						TCK compliance
+						</a>
+						<br />				
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=129">
+						Eclipse plugin
+						</a>
+						<br />
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=128">
+						Maven 2 sar plugin
+						</a>
+						<br />						
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=127">
+						More Extensions : PRACK, OPTIONS, INFO
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						Various Enhancements and Bug fixes
+						<!--ul>
+							<li>								
+							</li>
+						</ul-->
+					</p>
+				</subsection>
+				<subsection name="Version 0.7 - 09/01/2008">
+					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=131">
+						XMPP support
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=132">
+						Parlay X support
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=109">
+						Mobicents Application Router
+						</a>
+						<br />						
+						<img src="red.jpeg" />
+						Various Enhancements and Bug fixes
+						<!--ul>
+							<li>								
+							</li>
+						</ul-->
 					</p>
 				</subsection>
 			</subsection>

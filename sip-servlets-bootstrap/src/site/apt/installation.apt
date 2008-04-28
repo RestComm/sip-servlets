@@ -12,9 +12,9 @@ Installation Instructions
 	
 	You should see a bunch of stuff on the console saying that some sip servlet applications have been added.
 	
-	You can now play with the {{{examples/click2call.html}click to call sample application}} bundled with the release.
+	You can now play with the {{{click2call.html}click to call sample application}} bundled with the release.
 	
-	Alternatively, you can play with the {{{examples/examples.html}other different examples}} that we provide.
+	Alternatively, you can play with the {{{examples.html}other different examples}} that we provide.
 
 *** What is different from Tomcat standard version
 
@@ -48,9 +48,9 @@ Installation Instructions
 	
 	You should see a bunch of stuff on the console saying that some sip servlet applications have been added.
 	
-	You can now play with the {{{examples/click2call.html}click to call sample application}} bundled with the release.
+	You can now play with the {{{click2call.html}click to call sample application}} bundled with the release.
 	
-	Alternatively, you can play with the {{{examples/examples.html}other different examples}} that we provide.
+	Alternatively, you can play with the {{{examples.html}other different examples}} that we provide.
 
 *** What is different from Jboss standard version
 
