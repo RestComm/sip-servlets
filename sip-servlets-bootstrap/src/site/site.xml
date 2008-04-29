@@ -13,6 +13,7 @@
       	<item name="Tomcat Installation" href="installation-tomcat.html"/>
       	<item name="Jboss Installation" href="installation-jboss.html"/>
       </item>
+      <item name="Configuration" href="configuration.html"/>
       <item name="Examples" href="examples.html" collapse="true">
       	<item name="Call Blocking" href="call_blocking.html"/>
       	<item name="Call Forwarding" href="call_forwarding.html"/>

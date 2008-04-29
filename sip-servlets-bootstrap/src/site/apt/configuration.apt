@@ -1,0 +1,85 @@
+Configuration
+
+	Here is the few things you can configure in the Mobicents Sip Servlets container :
+	
+* Connectors
+	
+	Just as http connectors you can add sip connectors the same way, in adding Connector tag under the Service Tag in the container server.xml configuration file.\
+	By example, to add a sip connector on ip address 127.0.0.1, port 5080 on udp transport use the following :
+	
+    <<<<Connector>>>\
+    <<<port="5080">>>\
+    <<<ipAddress = "127.0.0.1">>>\
+	<<<protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler">>>\
+	<<<signalingTransport="udp">>>\
+	<<<useStun="false">>>\
+	<<<stunServerAddress="stun01.sipphone.com">>>\
+	<<<stunServerPort="3478">>>\
+    <<<logLevel="DEBUG">>>\
+	<<<debugLog = "logs/debuglog.txt">>>\ 
+	<<<serverLog = "logs/serverlog.txt">>>\
+	<<<sipStackName="SIP-Servlet-Tomcat-Server">>>\ 
+	<<<sipPathName="gov.nist"/>>>>\
+	
+	Here is a description of the sip Connector tag's attributes :
+		
+	* <<<port>>> : the port number on which the container will be able to receive SIP messages.
+		
+	* <<<ipAddress>>> : The ip address on which the container will be able to receive SIP messages.
+		
+	* <<<protocol>>> : This  attribute specifies that this is a Sip Connector and not an http one. There is no need to change this property.
+	
+	* <<<signalingTransport>>> : the transport on which the container will be able to receive SIP messages
+		
+	* <<<useStun>>> : Set to true to enable STUN for this connector. (Default to false)
+		
+	* <<<stunServerAddress>>> : The STUN server address that will be used for discovering the public IP address of this SIP connector (only needed if useStun="true")
+		
+	* <<<stunServerPort>>> : The STUN server port of the STUN server used in the previous property (will rarely be changed if ever and only needed if useStun="true")
+	
+	* <<<logLevel>>> : the log level of the underlying JAIN SIP Stack
+	
+	* <<<debugLog>>> : the debug log location of the underlying JAIN SIP Stack
+	
+	* <<<serverLog>>> : the server log location of the underlying JAIN SIP Stack
+	
+	* <<<sipStackName>>> : the name of the underlying JAIN SIP Stack
+	
+	* <<<sipPathName>>> : the JAIN SIP Stack implementation to use (will rarely be changed if ever, default is the most famous nist sip stack lead by Neo-Ranga. If it is changed, don't forget to to put the jain sip jar implementation in the lib directory of the container)
+	
+	
+* Application Router Configuration
+
+	The application router is called by the container to select a SIP servlet application to service an initial request. 
+	It embodies the logic used to choose which applications to invoke. 
+	An application router is required for a container to function, but it is a separate logical entity from the container. 
+	The application router is solely responsible for application selection and must not implement application logic. 
+	For example, the application router cannot modify a request or send a response.
+
+	(For more information regarding the Application Router, check the JSR 289 specification Section 15.1 Application Selection Process and Appendix C)\
+	To configure it, you need to configure the Service Tag in the container server.xml configuration file :
+	
+	<<<<Service name="Sip-Servlets">>>/
+  	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>/
+  	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>/
+  	<<<sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">>>/
+  	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/reinvite-demo/reinvite-dar.properties">>>>/
+  	
+  	Here is a description of the sip Service tag's attributes :
+  	
+  	* <<<className>>> : This attribute specifies that the servlet container will be a converged (sip + http) servlet container.
+  	
+  	* <<<sipApplicationDispatcherClassName>>> : This attribute specifies the class name of the <<<org.mobicents.servlet.sip.core.SipApplicationDispatcher>>> implementation to use. The routing algorithm and application selection process is done in that class.
+  	
+  	* <<<sipApplicationRouterClassName>>> : This attribute specifies the class name of the <<<javax.servlet.sip.SipApplicationRouter>>> implementation. This allows to plug any Application Router to change the application selection logic.
+  	
+  	* <<<darConfigurationFileLocation>>> : The default application router file location. Used by our default application router to know the application selection logic. Check JSR 289 Spec Appendix C.
+  	
+  	
+* Logging
+
+	This is a part that is a little tricky since there are 2 level of logging :
+	 
+		* The container level which is configured by the log4j.xml file usually located in the lib directory of the container.
+		
+		* The nist sip stack which is configured by the above Connector tag.
