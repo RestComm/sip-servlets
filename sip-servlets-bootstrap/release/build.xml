@@ -141,7 +141,7 @@
 	<target name="release-mc-distro" depends="checks">
 		<echo>Base path: ${this.path}</echo>
 		<mkdir dir="${jboss.dir}/server/default/conf/dars"/>
-		<copy verbose="true" failonerror="true" file="${this.path}/../src/site/click2call-dar.properties" 
+		<copy verbose="true" failonerror="true" file="${this.path}/../src/site/resources/click2call-dar.properties" 
 			todir="${jboss.dir}/server/default/conf/dars"/>
 			
 		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/server-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/server.xml"/>
