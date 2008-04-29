@@ -165,20 +165,35 @@ public class SipEmbedded {
 		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
 		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 		 */
-		Connector sipConnector = new Connector(
+		Connector udpSipConnector = new Connector(
 				SipProtocolHandler.class.getName());
-		SipProtocolHandler ph = (SipProtocolHandler) sipConnector
+		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
 				.getProtocolHandler();
-		ph.setPort(5070);
-		ph.setDebugLog("../logs/debuglog.txt");
-		ph.setIpAddress(sipIPAdress);
-		ph.setLogLevel("DEBUG");
-		ph.setServerLog("../logs/serverlog.xml");
-		ph.setSignalingTransport("udp");
-		ph.setSipPathName("gov.nist");
-		ph.setSipStackName("SIP-Servlet-Tomcat-Server");
+		udpProtocolHandler.setPort(5070);
+		udpProtocolHandler.setDebugLog("../logs/debuglog.txt");
+		udpProtocolHandler.setIpAddress(sipIPAdress);
+		udpProtocolHandler.setLogLevel("DEBUG");
+		udpProtocolHandler.setServerLog("../logs/serverlog.xml");
+		udpProtocolHandler.setSignalingTransport("udp");
+		udpProtocolHandler.setSipPathName("gov.nist");
+		udpProtocolHandler.setSipStackName("SIP-Servlet-Tomcat-Server");
 
-		sipStandardService.addConnector(sipConnector);
+		sipStandardService.addConnector(udpSipConnector);
+		//Filip Olsson : Issue 112, Adding tcp protocol
+		Connector tcpSipConnector = new Connector(
+			SipProtocolHandler.class.getName());
+		SipProtocolHandler tcpProtocolHandler = (SipProtocolHandler) tcpSipConnector
+			.getProtocolHandler();
+		tcpProtocolHandler.setPort(5070);
+		tcpProtocolHandler.setDebugLog("../logs/debuglog.txt");
+		tcpProtocolHandler.setIpAddress(sipIPAdress);
+		tcpProtocolHandler.setLogLevel("DEBUG");
+		tcpProtocolHandler.setServerLog("../logs/serverlog.xml");
+		tcpProtocolHandler.setSignalingTransport("tcp");
+		tcpProtocolHandler.setSipPathName("gov.nist");
+		tcpProtocolHandler.setSipStackName("SIP-Servlet-Tomcat-Server");
+
+		sipStandardService.addConnector(tcpSipConnector);
 		
 		//HTTP connector
 		Connector httpConnector = new Connector(
@@ -201,6 +216,7 @@ public class SipEmbedded {
 	 * This method Stops the Tomcat server.
 	 */
 	public void stopTomcat() throws Exception {
+	 		
 		// Stop the embedded server
 		sipStandardService.stop();
 	}

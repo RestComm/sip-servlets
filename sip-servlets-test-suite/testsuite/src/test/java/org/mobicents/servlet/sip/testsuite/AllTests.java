@@ -21,6 +21,7 @@ import junit.framework.TestSuite;
 
 import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASipUnitTest;
+import org.mobicents.servlet.sip.testsuite.b2bua.B2BUATcpUdpTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallBlockingTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallControllerCancelTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallControllerSipUnitTest;
@@ -31,9 +32,9 @@ import org.mobicents.servlet.sip.testsuite.click2call.Click2CallBasicTest;
 import org.mobicents.servlet.sip.testsuite.composition.NoApplicationDeployedJunitTest;
 import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJunitTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
+import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteUseHostNameTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
-import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
@@ -49,6 +50,7 @@ public class AllTests {
 		suite.addTestSuite(ShootmeSipServletTest.class);
 		suite.addTestSuite(ShootistSipServletTest.class);
 		suite.addTestSuite(B2BUASipUnitTest.class);
+		suite.addTestSuite(B2BUATcpUdpTest.class);
 		suite.addTestSuite(CallBlockingTest.class);
 		suite.addTestSuite(CallForwardingJunitTest.class);
 		suite.addTestSuite(CallForwardingSipUnitTest.class);

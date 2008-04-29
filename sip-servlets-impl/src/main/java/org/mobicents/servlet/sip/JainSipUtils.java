@@ -226,9 +226,13 @@ public class JainSipUtils {
 		if (transportParam != null
 				&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
 			transport = ListeningPoint.TLS;
-		} else if (request.getContentLength().getContentLength() > 4096) {
-			transport = ListeningPoint.TCP;
 		}
+		//Fix by Filip Olsson for Issue 112
+		else if ((transportParam != null
+			&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+			request.getContentLength().getContentLength() > 4096) {
+			transport = ListeningPoint.TCP;
+		} 
 		return transport;
 	}
 	/**

@@ -141,21 +141,27 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 * {@inheritDoc}
 	 */
 	public void destroy() throws Exception {
-		logger.info("Stopping the sip stack");
+		logger.info("Stopping a sip protocol handler");
 		//Jboss specific unloading case
 		SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
 			getAttribute(SipApplicationDispatcher.class.getSimpleName());
 		if(sipApplicationDispatcher != null) {
-			logger.info("Removing the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
+			logger.info("Removing the Sip Application Dispatcher as a sip listener for listening point " + extendedListeningPoint);
 			extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
 			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
-		//stopping the sip stack
+		// removing listening point and sip provider
+		logger.info("Removing the following Listening Point " + extendedListeningPoint);
 		sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
+		logger.info("Removing the sip provider");
 		sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
-		sipStack.stop();
 		extendedListeningPoint = null;
-		logger.info("Sip stack stopped");
+		// stopping the sip stack
+		if(!sipStack.getListeningPoints().hasNext() && !sipStack.getSipProviders().hasNext()) {
+			sipStack.stop();
+			sipStack = null;
+			logger.info("Sip stack stopped");
+		}				
 	}
 
 	public Adapter getAdapter() {		
@@ -208,7 +214,7 @@ public class SipProtocolHandler implements ProtocolHandler {
 	
 	public void start() throws Exception {
 		try {
-			logger.info("Starting the sip stack");
+			logger.info("Starting a sip protocol handler");
 
 			
 			String catalinaHome = System.getProperty("catalina.home");

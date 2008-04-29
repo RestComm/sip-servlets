@@ -63,6 +63,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:blocked-sender@127.0.0.1", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-tcp-sender@sip-servlets.com", 
+			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090;transport=tcp"});
 	}
 	
 	@Override
@@ -99,7 +101,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			
 			SipServletRequest forkedRequest = helper.createRequest(request, true,
 					headers);
-			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
+			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
 			forkedRequest.setRequestURI(sipUri);						
 			
 			logger.info("forkedRequest = " + forkedRequest);
