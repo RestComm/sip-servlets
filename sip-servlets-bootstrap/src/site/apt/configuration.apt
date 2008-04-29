@@ -19,7 +19,7 @@ Configuration
 	<<<debugLog = "logs/debuglog.txt">>>\ 
 	<<<serverLog = "logs/serverlog.txt">>>\
 	<<<sipStackName="SIP-Servlet-Tomcat-Server">>>\ 
-	<<<sipPathName="gov.nist"/>>>>\
+	<<<sipPathName="gov.nist"/>>>>
 	
 	Here is a description of the sip Connector tag's attributes :
 		
@@ -59,11 +59,11 @@ Configuration
 	(For more information regarding the Application Router, check the JSR 289 specification Section 15.1 Application Selection Process and Appendix C)\
 	To configure it, you need to configure the Service Tag in the container server.xml configuration file :
 	
-	<<<<Service name="Sip-Servlets">>>/
-  	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>/
-  	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>/
-  	<<<sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">>>/
-  	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/reinvite-demo/reinvite-dar.properties">>>>/
+	<<<<Service name="Sip-Servlets">>>\
+  	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>\
+  	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>\
+  	<<<sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">>>\
+  	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/reinvite-demo/reinvite-dar.properties">>>>
   	
   	Here is a description of the sip Service tag's attributes :
   	

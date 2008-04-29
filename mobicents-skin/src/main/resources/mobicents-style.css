@@ -185,6 +185,10 @@ input.login {
 	margin: 0 0 10px 0;
 }
 
+.left tt {	
+	font-size : 11px;
+}
+
 .left h3 {
 	clear: both;
 	background: #A9C0CE url(corner.gif) no-repeat top right;
