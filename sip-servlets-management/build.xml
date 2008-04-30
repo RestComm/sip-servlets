@@ -22,7 +22,7 @@
 	<property name="jboss.deploy" value="${jboss.home}/server/default/deploy" />
 	
 	
-	<target name="init">
+	<target name="requires-jboss">
 		<fail message="JBOSS_HOME environment variable is not set.">
 			<condition>
 				<not>
@@ -30,6 +30,9 @@
 				</not>
 			</condition>
 		</fail>
+	</target>
+		
+	<target name="init">
 		<fail message="GWT_HOME environment variable is not set. YOU MUST USE GWT 1.4">
 			<condition>
 				<not>
@@ -130,11 +133,11 @@
 		</jar>
 	</target>
 
-	<target name="deploy" depends="war">
+	<target name="deploy" depends="requires-jboss, war">
 		<copy todir="${jboss.deploy}" file="${project.build.tmp}/${war-name}" />
 	</target>
 
-	<target name="undeploy">
+	<target name="undeploy" depends="requires-jboss">
 		<delete file="${jboss.deploy}/${war-name}" />
 	</target>
 
