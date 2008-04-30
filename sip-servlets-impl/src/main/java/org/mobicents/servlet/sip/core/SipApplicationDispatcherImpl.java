@@ -264,6 +264,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug(children.length + " container to notify of servlet initialization");
 		}
 		for (Container container : children) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
+			}
 			if(container instanceof Wrapper) {			
 				Wrapper wrapper = (Wrapper) container;
 				try {
@@ -334,6 +337,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		List<String> applicationsUndeployed = new ArrayList<String>();
 		applicationsUndeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
+		sessionManager.removeSipContextSessions(sipContext);
 		logger.info("the following sip servlet application has been removed : " + sipApplicationName);
 		return sipContext;
 	}
@@ -1580,8 +1584,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	}
 	
 	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {
-		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
-		Wrapper sipServletImpl = (Wrapper) container;
+		String sessionHandler = session.getHandler();
+		SipApplicationSessionImpl sipApplicationSessionImpl = session.getSipApplicationSession();
+		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
+		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		Servlet servlet = sipServletImpl.allocate();
 		
 		// JBoss-specific CL issue:

@@ -17,8 +17,10 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -280,5 +282,30 @@ public class SessionManager {
 		String applicationName = sipApplicationKey.substring(indexOfComma + 1, indexOfRightParenthesis);
 		
 		return getSipApplicationSessionKey(applicationName, callId);			
+	}
+
+	/**
+	 * Remove the sip sessions and sip application sessions of the corresponding sip context
+	 * @param sipContext the context whose the sessions should be removed
+	 */
+	public void removeSipContextSessions(SipContext sipContext) {
+		List<SipSessionKey> sipSessionsToRemove = new ArrayList<SipSessionKey>(); 
+		for (SipSessionKey sipSessionKey : sipSessions.keySet()) {
+			if(sipSessionKey.getApplicationName().equals(sipContext.getApplicationName())) {
+				sipSessionsToRemove.add(sipSessionKey);
+			}
+		}
+		for (SipSessionKey sipSessionKey : sipSessionsToRemove) {
+			removeSipSession(sipSessionKey);
+		}
+		List<SipApplicationSessionKey> sipApplicationSessionsToRemove = new ArrayList<SipApplicationSessionKey>(); 
+		for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessions.keySet()) {
+			if(sipApplicationSessionKey.getApplicationName().equals(sipContext.getApplicationName())) {
+				sipApplicationSessionsToRemove.add(sipApplicationSessionKey);
+			}
+		}
+		for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessionsToRemove) {
+			removeSipApplicationSession(sipApplicationSessionKey);
+		}				
 	}
 }
