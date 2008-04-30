@@ -184,7 +184,8 @@ public class SipHostConfig extends HostConfig {
 	 */
 	private boolean isSipServletDirectory(File dir) {
 		 if(dir.isDirectory()) {
-			File sipXmlFile = new File(dir.getAbsoluteFile() + SipContext.APPLICATION_SIP_XML);
+			 //Fix provided by Thomas Lenesey for exploded directory deployments
+			File sipXmlFile = new File(dir.getAbsoluteFile(), SipContext.APPLICATION_SIP_XML);
 			if(sipXmlFile.exists()) {
 				return true;
 			}
