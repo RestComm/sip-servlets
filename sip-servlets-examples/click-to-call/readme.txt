@@ -1,3 +1,8 @@
+Building and Deployment
+-----------------------
+
+(you can skip this step if you already have click2call deployed)
+
 To build run:
 mvn clean compile war:war
 
@@ -16,7 +21,10 @@ Alternatively you can add a context entry in the tomcat's server.xml like this
 	</Context> 
 Note that path="/click2call" is important. 
 
-To use:
+
+Usage
+-----
+
 You can now run Tomcat or JBoss and navigate to http://localhost:8080/click2call/.
 If you have no registered SIp clients you will be asked to register at least two.
 Configure your SIP clients to use the sip servlets server as a register and proxy.
