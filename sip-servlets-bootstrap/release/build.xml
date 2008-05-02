@@ -152,7 +152,11 @@
 		<exec executable="${mvn.executable}" dir="${this.path}/..">
 			<arg line="clean install -P jboss -DJBOSS_HOME=${jboss.dir}"/>
 		</exec>
-
+		
+		<exec executable="${mvn.executable}" dir="${this.path}/..">
+			<arg line="dependency:copy-dependencies -DoutputDirectory=${jboss.dir}/server/default/lib -DincludeArtifactIds=jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j"/>
+		</exec>
+		
 		<exec executable="${mvn.executable}" dir="${this.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install"/>
 		</exec>
