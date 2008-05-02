@@ -52,6 +52,7 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
@@ -186,8 +187,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
-		sessionManager = new SessionManager();
 		sipFactoryImpl = new SipFactoryImpl(this);
+		sessionManager = new SessionManager(sipFactoryImpl);
 		hostNames = Collections.synchronizedList(new ArrayList<String>());
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
 	}
@@ -1548,6 +1549,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					sipServletResponse.setProxyBranch(proxyBranch);
 					// Update Session state
 					session.updateStateOnResponse(sipServletResponse, true);
+					
 					// Handle it at the branch
 					proxyBranch.onResponse(sipServletResponse); 
 					
@@ -1560,7 +1562,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				else {
 					// Update Session state
 					session.updateStateOnResponse(sipServletResponse, true);
-					
+
 					callServlet(sipServletResponse, session);
 				}
 			} catch (ServletException e) {				
@@ -1578,7 +1580,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
-			}		
+			} 
 		}
 		return true;		
 	}

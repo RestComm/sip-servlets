@@ -531,6 +531,11 @@ public class SipSessionImpl implements SipSession {
 		valid = false;				
 		notifySipSessionListeners(SipSessionEventType.DELETION);
 		sipFactory.getSessionManager().removeSipSession(key);
+		sipSessionAttributeMap = null;
+		proxyBranch = null;
+		key = null;
+		sessionCreatingDialog = null;
+		sessionCreatingTransaction = null;
 	}
 	
 	/**
@@ -879,7 +884,7 @@ public class SipSessionImpl implements SipSession {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
 				}
 			}						
-		}								 				
+		}				
 	}
 	
 	/**

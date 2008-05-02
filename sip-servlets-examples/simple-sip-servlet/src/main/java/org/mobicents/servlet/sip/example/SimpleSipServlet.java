@@ -22,6 +22,7 @@ import java.io.Serializable;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -100,7 +101,14 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 			throws ServletException, IOException {
 
 		logger.info("SimpleProxyServlet: Got response:\n" + response);
-		super.doResponse(response);
+		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
+			SipSession sipSession = response.getSession(false);
+			if(sipSession != null) {
+				SipApplicationSession sipApplicationSession = sipSession.getApplicationSession();
+				sipSession.invalidate();
+				sipApplicationSession.invalidate();
+			}			
+		}
 	}
 
 	/*
@@ -113,6 +121,6 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 			sipSession.createRequest("BYE").send();
 		} catch (IOException e) {
 			logger.error("An unexpected exception occured while sending the BYE", e);
-		}		
+		}				
 	}
 }

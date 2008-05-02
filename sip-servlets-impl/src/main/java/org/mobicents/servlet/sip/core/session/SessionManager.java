@@ -66,6 +66,16 @@ public class SessionManager {
 	private Object sipSessionLock = new Object();
 	
 	private Object sipApplicationSessionLock = new Object();
+
+	private SipFactoryImpl sipFactoryImpl;
+	
+	/**
+	 * 
+	 * @param sipFactoryImpl
+	 */
+	public SessionManager(SipFactoryImpl sipFactoryImpl) {
+		this.sipFactoryImpl = sipFactoryImpl;
+	}
 	
 	/**
 	 * Computes the sip session key from the input parameters. The sip session
@@ -159,7 +169,8 @@ public class SessionManager {
 		synchronized (sipApplicationSessionLock) {
 			sipApplicationSessionImpl = sipApplicationSessions.get(key);
 			if(sipApplicationSessionImpl == null && create) {
-				sipApplicationSessionImpl = new SipApplicationSessionImpl(key, sipContext);
+				// TODO the sipFactory should be removed when refactored to Tomcat Manager
+				sipApplicationSessionImpl = new SipApplicationSessionImpl(key, sipContext, sipFactoryImpl);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Adding a sip application session with the key : " + key);
 				}			

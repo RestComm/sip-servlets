@@ -32,6 +32,7 @@ import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
@@ -342,10 +343,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
 				response.addLast(recordRouteHeader);
 			}
-			// Update Session state
-			session.updateStateOnResponse(this, false);
-			
 			ServerTransaction st = (ServerTransaction) getTransaction();
+			// Update Session state
+			session.updateStateOnResponse(this, false);						
 						
 			logger.info("sending response "+ this.message);
 			//if a response is sent for an initial request, it means that the application
@@ -382,6 +382,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
 			}
+			
 			st.sendResponse( (Response)this.message );
 			//updating the last accessed times 
 			getSipSession().setLastAccessedTime(System.currentTimeMillis());

@@ -40,6 +40,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -75,6 +76,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		public void run() {
 			sipApplicationSessionImpl.notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
 			sipApplicationSessionImpl.expired = true;
+			sipApplicationSessionImpl.invalidate();
 		}
 		
 	}
@@ -110,14 +112,16 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 	private SipContext sipContext;
 	
+	private SipFactoryImpl sipFactory;
 	
-	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
+	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext, SipFactoryImpl sipFactoryImpl) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
 		this.sipContext = sipContext;
+		this.sipFactory = sipFactoryImpl;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expired = false;
 		expirationTimer =  new Timer();
@@ -383,9 +387,20 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			servletTimerEntry.getValue().cancel();
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
-		// FIXME get rid of the reference in the session manager (refactor session manager
+		if(!expired) {
+			expirationTimerTask.cancel();
+			expirationTimer.cancel();
+		}
+		// FIXME (refactor session manager
 		// to map to tomcat session management)
-//		sipContext.getSessionManager().removeSipApplicationSession(key);
+		sipFactory.getSessionManager().removeSipApplicationSession(key);
+		expirationTimer=null;
+		expirationTimerTask=null;
+		httpSessions = null;
+		key = null;
+		servletTimers = null;
+		sipApplicationSessionAttributeMap = null;
+		sipSessions = null;			
 	}
 
 	/*
