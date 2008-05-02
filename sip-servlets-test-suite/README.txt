@@ -27,9 +27,5 @@ Add a test case for the newly created application :
 	
 	
 To run the test suite :
-	go to sip-servlets-test-suite\testsuite and modify the M2_REPO property in the build.xml file
-	and then do ant in a shell/command line, it should run the testsuite.
-	
-	Maven is not working right now due to classloaders issues 
-	but you can still try it out with a mvn test in directory sip-servlets-test-suite
-	
+	go to sip-servlets-test-suite\applications and run mvn clean install war:inplace
+	go to sip-servlets-test-suite\testsuite and run mvn clean install	

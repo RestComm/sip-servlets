@@ -509,7 +509,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		String hName = getFullHeaderName(name);
 
-		// Fix from Thomas Lenesey from Nexcom systems
+		// Fix from Thomas Leseney from Nexcom systems
 		if (!isAddressTypeHeader(hName)) {
 			throw new ServletParseException(
 					"Header [" + hName + "] is not address type header");

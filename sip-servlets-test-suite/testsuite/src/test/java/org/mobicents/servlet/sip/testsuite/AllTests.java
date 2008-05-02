@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.mobicents.servlet.sip.testsuite.address.SipURITest;
 import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASipUnitTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUATcpUdpTest;
@@ -68,6 +69,7 @@ public class AllTests {
 		suite.addTestSuite(SessionStateUACSipServletTest.class);
 		suite.addTestSuite(AnnotationTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
+		suite.addTestSuite(SipURITest.class);
 		//$JUnit-END$
 		return suite;
 	}

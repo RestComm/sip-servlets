@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.javax.sip.address.SipUri;
-
 import java.text.ParseException;
 import java.util.Iterator;
 
