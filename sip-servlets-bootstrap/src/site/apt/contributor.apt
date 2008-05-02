@@ -1,0 +1,31 @@
+Contribute
+
+	You can contribute to this project by :
+
+	    * Using it in your product or project and providing feedback.
+	    
+	    * Fixing Bugs : export a diff listing from svn trunk, open an Issue as defined in the section below and attach your suggested solution there. You can discuss your bug on the {{{mobicents-public@googlegroups.com}mailing list of Mobicents public google group}}.
+	    
+	    * Reporting Bugs : To report a bug provide, if possible, provide a small example that illustrates the bug. 
+	    You can pattern the test case usually along the lines of sip-servlets-test-suite/testsuite/src/test/java/org/mobicents/servlet/sip/testsuite/simple/. 
+	    Having a test case handy speeds up the bug fix. 
+	    Your test case will be included in the project as a test case. 
+	    open an Issue as defined in the section below so other users can know about the issue and its status. 
+	    Please attach your test case or bug description with debug log files there.
+	    
+	    * Contributing Extensions and enhancements (i.e. support for Sip extension RFCs and drafts that are not covered by Mobicents-Sip-Servlets) or Contributing code snippets and examples or Contributing test cases to be included with the distribution: 
+	    For this you need to discuss to open an Issue as defined in the section below or take on {{{one the open Issues}http://code.google.com/p/mobicents/issues/list?q=label%3Acomponent%20label%3Asip-servlets&amp;can=2}} so that you can discuss it with the Mobicents Team and also open a thread on the {{{mobicents-public@googlegroups.com}mailing list of Mobicents public google group}}.
+	    	
+	Your contributions will be acknowledged individually in the code (as a comment) and in the acknowledgement page. 
+	
+Opening an Issue
+
+	{{{Open an issue here}http://code.google.com/p/mobicents/issues/entry}}, label it with Component-Sip-Servlets, the version the bug was found in and the SubComponent if applicable
+	
+Becoming a Developer
+	
+	In order to become a contributor with write access to the code, you will need to have demonstrated an understanding of the codebase and testsuite by participating in the design discussions and submitting patches for bugs/enchancements before we will grant developer access.\
+	Developer role requires you to accept via email the following contributor agreement: {{{Mobicents Individual Contributor Agreement}http://www.jboss.org/community/agreements/corporate.html}}.\
+	Before requesting developer access, send the full text of the agreement with an indication of acceptance to the email address specified at the end of the agreement document.\
+	Next, apply for Developer role in mailing one of the project owners with your google account email address. 
+	One of the project owners must use the project administration page to add your Google account email address to the {{{Mobicents Project}http://code.google.com/p/mobicents/}}. 
