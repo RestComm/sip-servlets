@@ -298,6 +298,13 @@
 									Routing to external application server 
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=160">
+									Application Redeployment Bug
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>
