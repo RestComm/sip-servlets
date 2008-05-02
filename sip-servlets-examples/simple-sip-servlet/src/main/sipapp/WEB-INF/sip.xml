@@ -18,4 +18,15 @@
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<context-param>
+      <param-name>bye.delay</param-name>
+      <param-value>60000</param-value>
+    </context-param>
+    
+    <listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.SimpleSipServlet
+		</listener-class>
+	</listener>
 </sip-app>
