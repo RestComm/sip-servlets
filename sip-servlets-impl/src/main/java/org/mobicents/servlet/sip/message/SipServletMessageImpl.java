@@ -509,9 +509,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		String hName = getFullHeaderName(name);
 
-		if (isAddressTypeHeader(hName)) {
-			throw new IllegalArgumentException(
-					"Header is not address type header");
+		if (!isAddressTypeHeader(hName)) {
+			throw new ServletParseException(
+					"Header [" + hName + "] is not address type header");
 		}
 		LinkedList<Address> retval = new LinkedList<Address>();
 		String nameToSearch = getCorrectHeaderName(hName);
