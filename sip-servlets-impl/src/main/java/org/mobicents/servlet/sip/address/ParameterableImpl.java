@@ -61,7 +61,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 		this.header = (Parameters) header;
 		 if(params!=null) {			 
 			 Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
-			 while(entries.hasNext()) {
+			 while (entries.hasNext()) {
 				 Map.Entry<String, String> e=entries.next();
 				 parameters.put(e.getKey(), new NameValue(e.getKey(),e.getValue()));
 			 }

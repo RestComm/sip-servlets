@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -216,15 +217,16 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
 				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());
 			if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
-				int previousAppOrder = -1; 
+				int previousAppOrder = 0; 
 				if(stateInfo != null) {					
 					previousAppOrder = (Integer) stateInfo;				
 				}
-				for (DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo : defaultSipApplicationRouterInfoList) {
-					if(defaultSipApplicationRouterInfo.getOrder() > previousAppOrder &&
-							(initialRequest.getSession(false) == null || 
+				ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
+				while (defaultSipApplicationRouterInfoIt.hasNext() ) {
+					DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = defaultSipApplicationRouterInfoIt.next();
+					if(initialRequest.getSession(false) == null || 
 									!defaultSipApplicationRouterInfo.getApplicationName().equals(
-											initialRequest.getSession(false).getApplicationSession().getApplicationName()))) {
+											initialRequest.getSession(false).getApplicationSession().getApplicationName())) {
 						String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
 						if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
 							String headerName = subscriberIdentity.substring(

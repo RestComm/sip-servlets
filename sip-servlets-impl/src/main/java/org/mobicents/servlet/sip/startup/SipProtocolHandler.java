@@ -108,6 +108,11 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 * The log level
 	 */
 	private String logLevel;
+	
+	/*
+	 * The log level
+	 */
+	private String logMessageContent;
 
 	/*
 	 * The debug log file. TODO -- integrate this with log4j.
@@ -229,15 +234,26 @@ public class SipProtocolHandler implements ProtocolHandler {
 			
 		
 			if (this.logLevel != null) {
-				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
-				"true");
+				if(logMessageContent == null) {
+					properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+						"true");
+				} else {
+					properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+						logMessageContent);
+				}
 
-				properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+				if(logLevel != null && logLevel.length() > 0) {
+					properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 						this.logLevel);
-				properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+				}
+				if(debugLog != null && debugLog.length() > 0) {
+					properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 						catalinaHome + "/" + this.debugLog);
-				properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+				}
+				if(serverLog != null && serverLog.length() > 0) {
+					properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
 						catalinaHome + "/" + this.serverLog);
+				}
 				
 				logger.info(properties.toString());
 				
@@ -521,6 +537,20 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 */
 	public void setUseStun(boolean useStun) {
 		this.useStun = useStun;
+	}
+
+	/**
+	 * @return the logMessageContent
+	 */
+	public String getLogMessageContent() {
+		return logMessageContent;
+	}
+
+	/**
+	 * @param logMessageContent the logMessageContent to set
+	 */
+	public void setLogMessageContent(String logMessageContent) {
+		this.logMessageContent = logMessageContent;
 	}
 
 }

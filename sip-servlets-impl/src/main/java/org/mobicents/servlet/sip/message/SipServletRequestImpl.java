@@ -232,7 +232,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    }
 				}
 			}
-			//Application Routing : Adding the recorded route headers as route headers, should it be Via Headers ?
+			// Application Routing : Adding the recorded route headers as route headers
 			ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
 			while (recordRouteHeaders.hasNext()) {
 				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
