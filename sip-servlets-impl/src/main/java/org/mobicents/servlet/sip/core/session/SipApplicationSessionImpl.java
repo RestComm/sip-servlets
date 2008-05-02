@@ -83,7 +83,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private Map<String, Object> sipApplicationSessionAttributeMap;
 
-	private Map<SipSessionKey,SipSessionImpl> sipSessions;
+	private Map<String,SipSessionImpl> sipSessions;
 	
 	private Map<String, HttpSession> httpSessions;
 	
@@ -113,7 +113,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
-		sipSessions = new ConcurrentHashMap<SipSessionKey,SipSessionImpl>();
+		sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
@@ -175,12 +175,12 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	}
 	
 	protected void addSipSession( SipSessionImpl sipSessionImpl) {
-		this.sipSessions.put(sipSessionImpl.getKey(), sipSessionImpl);
+		this.sipSessions.put(sipSessionImpl.getKey().toString(), sipSessionImpl);
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
 	protected SipSessionImpl removeSipSession (SipSessionImpl sipSessionImpl) {
-		return this.sipSessions.remove(sipSessionImpl.getKey());
+		return this.sipSessions.remove(sipSessionImpl.getKey().toString());
 	}
 	
 	public void addHttpSession( HttpSession httpSession) {
