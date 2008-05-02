@@ -150,11 +150,7 @@
 		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/webserver-xmbean.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 		<echo>Done copying.</echo>
 		<exec executable="${mvn.executable}" dir="${this.path}/..">
-			<arg line="clean install -P jboss -DJBOSS_HOME=${jboss.dir}"/>
-		</exec>
-		
-		<exec executable="${mvn.executable}" dir="${this.path}/..">
-			<arg line="dependency:copy-dependencies -DoutputDirectory=${jboss.dir}/server/default/lib -DincludeArtifactIds=jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j"/>
+			<arg line="clean install -Pjboss-distro -DJBOSS_HOME=${jboss.dir}"/>
 		</exec>
 		
 		<exec executable="${mvn.executable}" dir="${this.path}/../../sip-servlets-examples/click-to-call">

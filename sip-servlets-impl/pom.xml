@@ -228,5 +228,47 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>		
+			<id>jboss-distro</id>			
+			<build>			
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<configuration>
+									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/lib"/>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+		 	        	<groupId>org.apache.maven.plugins</groupId>
+		 	        	<artifactId>maven-dependency-plugin</artifactId>
+		 	        	<executions>		 	          		
+		 	          		<execution>
+		 	            			<id>copy-to-jboss-lib</id>
+		 	            			<phase>package</phase>
+		 	            			<goals>
+										<goal> copy-dependencies </goal>
+		 	            			</goals>
+		 	            			<configuration>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j</includeArtifactIds>
+					    			<outputDirectory>${JBOSS_HOME}/server/default/lib</outputDirectory>
+		 	            			</configuration>
+		 	          		</execution>
+		 	        	</executions>
+		 	      	</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>
