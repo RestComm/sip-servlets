@@ -241,7 +241,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/lib"/>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/default/lib"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -262,7 +262,7 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j</includeArtifactIds>
-					    			<outputDirectory>${JBOSS_HOME}/server/default/lib</outputDirectory>
+					    			<outputDirectory>${JBOSS_HOME}/server/default/lib/</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
 		 	        	</executions>
