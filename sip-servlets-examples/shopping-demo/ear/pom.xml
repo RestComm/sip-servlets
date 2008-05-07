@@ -119,12 +119,24 @@
 			</exclusions>
 			<type>jar</type>
 		</dependency>		
-		<dependency>
-			<groupId>org.mobicents.media</groupId>
-			<artifactId>mscontrol</artifactId>
-			<version>1.0-ALPHA</version>
-			<type>jar</type>
+		<!--dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-mscontrol</artifactId>
+			<version>1.0.0.BETA1</version>			
+			<type>jar</type>			
 		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-jar</artifactId>
+			<version>1.0.0.BETA1</version>			
+			<type>jar</type>			
+		</dependency>
+		<dependency>		
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-constants</artifactId>
+			<version>1.0.0.BETA1</version>			
+			<type>jar</type>
+		</dependency-->
 		<dependency>
 			<groupId>org.mobicents.external.freetts</groupId>
 			<artifactId>freetts</artifactId>
@@ -182,11 +194,21 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
 					<modules>
-						<jarModule>
-							<groupId>org.mobicents.media</groupId>
-							<artifactId>mscontrol</artifactId>
+						<!--jarModule>
+							<groupId>org.mobicents.servers.media</groupId>
+							<artifactId>mobicents-server-media-mscontrol</artifactId>
 							<bundleDir>lib</bundleDir>														
 						</jarModule>
+						<jarModule>		
+							<groupId>org.mobicents.servers.media</groupId>
+							<artifactId>mobicents-server-media-constants</artifactId>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>
+							<groupId>org.mobicents.servers.media</groupId>
+							<artifactId>mobicents-server-media-jar</artifactId>
+							<bundleDir>lib</bundleDir>			
+						</jarModule-->
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>freetts</artifactId>

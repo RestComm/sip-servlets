@@ -7,13 +7,12 @@ import javax.servlet.sip.SipServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsSignalDetector;
 import org.mobicents.mscontrol.MsSignalGenerator;
-import org.mobicents.mscontrol.signal.Announcement;
-import org.mobicents.mscontrol.signal.Basic;
 
 /**
  * This class is registered in the media server to be notified on media connection
@@ -60,13 +59,13 @@ public class MediaConnectionListener implements MsConnectionListener {
 				speech = new File("adminspeech.wav");	
 			}			
 			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
-			generator.apply(Announcement.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+			generator.apply(EventID.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
 			logger.info("announcement confirmation played. waiting for DTMF ");
 			listenToDTMF(connection, pathToAudioDirectory);
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
 			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
 			logger.info("Playing Delivery Date Announcement : " + announcementFile);
-			generator.apply(Announcement.PLAY, new String[]{announcementFile});
+			generator.apply(EventID.PLAY, new String[]{announcementFile});
 			logger.info("Delivery Date Announcement played. waiting for DTMF ");
 			listenToDTMF(connection, pathToAudioDirectory);
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
@@ -74,7 +73,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
 			MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
 			generator.addResourceListener(mediaResourceListener);
-			generator.apply(Announcement.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+			generator.apply(EventID.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
 			logger.info("shipping announcement played. tearing down the call");
 		}				
 	}
@@ -86,7 +85,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 		DTMFListener dtmfListener = new DTMFListener(dtmfDetector, connection, inviteRequest.getSession(), pathToAudioDirectory);
 		dtmfDetector.addResourceListener(dtmfListener);
 		generator.addResourceListener(dtmfListener);
-		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});			
+		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});			
 		inviteRequest.getSession().setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STARTED);
 	}
 

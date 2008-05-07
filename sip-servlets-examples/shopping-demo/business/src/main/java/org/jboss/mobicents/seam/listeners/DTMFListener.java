@@ -4,11 +4,11 @@ import javax.servlet.sip.SipSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.mobicents.seam.util.DTMFUtils;
+import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.MsResourceListener;
 import org.mobicents.mscontrol.MsSignalDetector;
-import org.mobicents.mscontrol.signal.Basic;
 
 public class DTMFListener implements MsResourceListener{
 	public static final int DTMF_SESSION_STARTED = 1;
@@ -29,7 +29,7 @@ public class DTMFListener implements MsResourceListener{
 	}
 	
 	public void update(MsNotifyEvent event) {
-		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});
+		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
 		logger.info("DTMF: " + event.getMessage());
 		String signal = event.getMessage();		
 		/**

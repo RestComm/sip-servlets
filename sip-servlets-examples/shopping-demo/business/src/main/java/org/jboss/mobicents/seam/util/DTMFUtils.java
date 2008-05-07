@@ -27,10 +27,9 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaResourceListener;
+import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsSignalGenerator;
-import org.mobicents.mscontrol.signal.Announcement;
-import org.mobicents.mscontrol.signal.Basic;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
@@ -118,34 +117,34 @@ public class DTMFUtils {
 			}
 	
 			switch (cause) {
-			case Basic.CAUSE_DIGIT_0:
+			case 0:
 				dateAndTime = dateAndTime + "0";
 				break;
-			case Basic.CAUSE_DIGIT_1:
+			case 1:
 				dateAndTime = dateAndTime + "1";
 				break;
-			case Basic.CAUSE_DIGIT_2:
+			case 2:
 				dateAndTime = dateAndTime + "2";
 				break;
-			case Basic.CAUSE_DIGIT_3:
+			case 3:
 				dateAndTime = dateAndTime + "3";
 				break;
-			case Basic.CAUSE_DIGIT_4:
+			case 4:
 				dateAndTime = dateAndTime + "4";
 				break;
-			case Basic.CAUSE_DIGIT_5:
+			case 5:
 				dateAndTime = dateAndTime + "5";
 				break;
-			case Basic.CAUSE_DIGIT_6:
+			case 6:
 				dateAndTime = dateAndTime + "6";
 				break;
-			case Basic.CAUSE_DIGIT_7:
+			case 7:
 				dateAndTime = dateAndTime + "7";
 				break;
-			case Basic.CAUSE_DIGIT_8:
+			case 8:
 				dateAndTime = dateAndTime + "8";
 				break;
-			case Basic.CAUSE_DIGIT_9:
+			case 9:
 				dateAndTime = dateAndTime + "9";
 				break;
 			default:
@@ -248,7 +247,7 @@ public class DTMFUtils {
 					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
 					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
 					generator.addResourceListener(mediaResourceListener);
-					generator.apply(Announcement.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+					generator.apply(EventID.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
 					logger.info("delivery Date summary played. waiting for DTMF ");
 				} catch (Exception e) {
 					logger.error("An unexpected exception occured while generating the deliveryDate tts file");
@@ -272,7 +271,7 @@ public class DTMFUtils {
 		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);		
 		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
 		generator.addResourceListener(mediaResourceListener);
-		generator.apply(Announcement.PLAY, new String[] { audioFile });
+		generator.apply(EventID.PLAY, new String[] { audioFile });
 		session.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STOPPED);
 	}
 }
