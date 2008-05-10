@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sip.ListeningPoint;
 import javax.sip.address.Hop;
 
 import org.apache.log4j.Logger;
@@ -98,6 +99,10 @@ public class DNSAddressResolver implements AddressResolver {
 	protected Hop resolveHostByDnsSrvLookup(Hop hop) {
 		String host = hop.getHost();
 		String transport = hop.getTransport();
+		if(transport==null) {
+			transport = ListeningPoint.UDP;
+		}
+		transport = transport.toLowerCase();
 
 		Record[] records = null;
 		try {

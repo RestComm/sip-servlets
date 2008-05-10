@@ -359,9 +359,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			Although the jsip stacktransaction might have ended, the message that ended it
 			is not yet delivered to the container and the servlet at this time.
         */
-		if(!sipSessionImpl.hasOngoingTransaction()) {
-			sessionManager.removeSipSession(sipSessionImpl.getKey());
-		}
+//		if(!sipSessionImpl.hasOngoingTransaction()) {
+//			sessionManager.removeSipSession(sipSessionImpl.getKey());
+//		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -1566,17 +1566,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					callServlet(sipServletResponse, session);
 				}
 			} catch (ServletException e) {				
-				logger.error("Unexpected servlet exception while processing the response", e);
+				logger.error("Unexpected servlet exception while processing the response : " + response, e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
 			} catch (IOException e) {				
-				logger.error("Unexpected io exception while processing the response",e);
+				logger.error("Unexpected io exception while processing the response : " + response, e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
 			} catch (Throwable e) {				
-				logger.error("Unexpected exception while processing response",e);
+				logger.error("Unexpected exception while processing response : " + response, e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;

@@ -669,9 +669,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    if(!request.getMethod().equalsIgnoreCase(Request.CANCEL) && (getSipSession().getProxyBranch() == null
 			    || (transactionApplicationData.getProxy() != null && transactionApplicationData.getProxy().getRecordRoute()))){
 
-				ViaHeader viaHeader = JainSipUtils.createViaHeader(
-					sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
-				message.addHeader(viaHeader);
+		    	if(message.getHeader(ViaHeader.NAME) == null) {
+		    		ViaHeader viaHeader = JainSipUtils.createViaHeader(
+		    				sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
+		    		message.addHeader(viaHeader);
+		    	}
 		    }
 			
 		    if(logger.isDebugEnabled()) {
