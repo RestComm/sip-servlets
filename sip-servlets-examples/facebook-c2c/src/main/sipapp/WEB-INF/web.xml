@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	version="2.4">
+	<display-name>FacebookClickToCallSip</display-name>
+	<description>Call initiation web application</description>
+	<servlet>
+		<servlet-name>CallInitiationServlet</servlet-name>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.HttpCallInitiationServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CallInitiationServlet</servlet-name>
+		<url-pattern>/call</url-pattern>
+	</servlet-mapping>
+	
+	<context-param>
+		<param-name>apikey</param-name>
+		<param-value>1ef4389e2341209d5f42e6f39f319fe2</param-value>
+	</context-param>
+	<context-param>
+		<param-name>secret</param-name>
+		<param-value>49c4b71e3df42f6c1d2c661c5a319aa3</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>domain.name</param-name>
+		<param-value>callwithus.com</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>user1</param-name>
+		<param-value>189964505</param-value>
+	</context-param>
+	<context-param>
+		<param-name>pass1</param-name>
+		<param-value>PASSWORD</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>user2</param-name>
+		<param-value>650390127</param-value>
+	</context-param>
+	<context-param>
+		<param-name>pass2</param-name>
+		<param-value>PASSWORD</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>user3</param-name>
+		<param-value>807612864</param-value>
+	</context-param>
+	<context-param>
+		<param-name>pass3</param-name>
+		<param-value>PASSWORD</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>call.code</param-name>
+		<param-value>test</param-value>
+	</context-param>
+</web-app>
