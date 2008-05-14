@@ -104,6 +104,16 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 */
 	private int port;
 
+	/**
+	 * the sip stack thread pool size
+	 */
+	private String threadPoolSize;
+	
+	/**
+	 * Tells if the listener is reentrant
+	 */
+	private String isReentrantListener;
+	
 	/*
 	 * The log level
 	 */
@@ -229,18 +239,16 @@ public class SipProtocolHandler implements ProtocolHandler {
 			// defining sip stack properties
 			Properties properties = new Properties();
 			
-			
+			if(logMessageContent == null) {
+				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+					"true");
+			} else {
+				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+					logMessageContent);
+			}
 			logger.info("logLevel = " + this.logLevel);
 			
-		
-			if (this.logLevel != null) {
-				if(logMessageContent == null) {
-					properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
-						"true");
-				} else {
-					properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
-						logMessageContent);
-				}
+			if (this.logLevel != null) {				
 
 				if(logLevel != null && logLevel.length() > 0) {
 					properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
@@ -260,7 +268,18 @@ public class SipProtocolHandler implements ProtocolHandler {
 			}
 			properties.setProperty("javax.sip.STACK_NAME", sipStackName);
 			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");			
-			
+			if(threadPoolSize != null && threadPoolSize.length() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("The size of the nist sip stack's thread pool will be " + threadPoolSize);
+				}
+				properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", threadPoolSize);
+			}
+			if(isReentrantListener != null && isReentrantListener.length() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("nist sip stack's listener reentrancy : " + isReentrantListener);
+				}
+				properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", isReentrantListener);
+			}
 			//checking the external ip address if stun enabled			
 			String globalIpAddress = null;			
 			int globalPort = -1;
@@ -551,6 +570,34 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 */
 	public void setLogMessageContent(String logMessageContent) {
 		this.logMessageContent = logMessageContent;
+	}
+
+	/**
+	 * @return the threadPoolSize
+	 */
+	public String getThreadPoolSize() {
+		return threadPoolSize;
+	}
+
+	/**
+	 * @param threadPoolSize the threadPoolSize to set
+	 */
+	public void setThreadPoolSize(String threadPoolSize) {
+		this.threadPoolSize = threadPoolSize;
+	}
+
+	/**
+	 * @return the isReentrantListener
+	 */
+	public String getIsReentrantListener() {
+		return isReentrantListener;
+	}
+
+	/**
+	 * @param isReentrantListener the isReentrantListener to set
+	 */
+	public void setIsReentrantListener(String isReentrantListener) {
+		this.isReentrantListener = isReentrantListener;
 	}
 
 }

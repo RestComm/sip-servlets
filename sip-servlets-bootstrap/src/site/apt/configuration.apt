@@ -12,6 +12,8 @@ Configuration
     <<<ipAddress = "127.0.0.1">>>\
 	<<<protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler">>>\
 	<<<signalingTransport="udp">>>\
+	<<<threadPoolSize="64">>>\
+	<<<isReentrantListener="true">>>\
 	<<<useStun="false">>>\
 	<<<stunServerAddress="stun01.sipphone.com">>>\
 	<<<stunServerPort="3478">>>\
@@ -30,6 +32,10 @@ Configuration
 	* <<<protocol>>> : This  attribute specifies that this is a Sip Connector and not an http one. There is no need to change this property.
 	
 	* <<<signalingTransport>>> : the transport on which the container will be able to receive SIP messages
+	
+	* <<<threadPoolSize>>> : Concurrency control for number of simultaneous active threads in the nist sip stack. Check the nist sip stack javadoc for more information.
+	
+	* <<<isReentrantListener>>> : If the listener is re-entrant then the stack manages a thread pool and synchronously calls the listener from the same thread which read the message. Check the nist sip stack javadoc for more information.
 		
 	* <<<useStun>>> : Set to true to enable STUN for this connector. (Default to false)
 		

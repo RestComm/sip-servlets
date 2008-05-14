@@ -177,6 +177,8 @@ public class SipEmbedded {
 		udpProtocolHandler.setSignalingTransport("udp");
 		udpProtocolHandler.setSipPathName("gov.nist");
 		udpProtocolHandler.setSipStackName("SIP-Servlet-Tomcat-Server");
+		udpProtocolHandler.setThreadPoolSize("64");
+		udpProtocolHandler.setIsReentrantListener("true");
 
 		sipStandardService.addConnector(udpSipConnector);
 		//Filip Olsson : Issue 112, Adding tcp protocol
@@ -192,6 +194,8 @@ public class SipEmbedded {
 		tcpProtocolHandler.setSignalingTransport("tcp");
 		tcpProtocolHandler.setSipPathName("gov.nist");
 		tcpProtocolHandler.setSipStackName("SIP-Servlet-Tomcat-Server");
+		tcpProtocolHandler.setThreadPoolSize("64");
+		tcpProtocolHandler.setIsReentrantListener("true");
 
 		sipStandardService.addConnector(tcpSipConnector);
 		
