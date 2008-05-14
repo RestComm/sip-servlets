@@ -16,11 +16,11 @@
  */
 package org.mobicents.servlet.sip.core.timers;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 
 public class ExecutorServiceWrapper {	
 	private static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
@@ -68,6 +68,11 @@ public class ExecutorServiceWrapper {
 	public ScheduledFuture<?> schedule(Runnable command, long delay,
 			TimeUnit unit) {
 		return myThreadPool.schedule(new MyRunnable(command), delay, unit);
+	}
+	
+	public ScheduledFuture<?> schedule(Callable<?> command, long delay,
+			TimeUnit unit) {
+		return myThreadPool.schedule(command, delay, unit);
 	}
 
 	public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,

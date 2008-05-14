@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
@@ -40,6 +41,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -61,7 +63,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * Timer task that will notify the listeners that the sip application session has expired 
 	 * @author Jean Deruelle
 	 */
-	private class SipApplicationSessionTimerTask extends TimerTask {		
+	private class SipApplicationSessionTimerTask implements Callable<SipApplicationSession> {		
 		private SipApplicationSessionImpl sipApplicationSessionImpl;
 		
 		/**
@@ -70,13 +72,16 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		 */
 		public SipApplicationSessionTimerTask(SipApplicationSessionImpl sipApplicationSessionImpl) {
 			this.sipApplicationSessionImpl = sipApplicationSessionImpl;
-		}
-		
-		@Override
-		public void run() {
+		}		
+
+		public SipApplicationSession call() throws Exception {
+			if(logger.isDebugEnabled()) {
+				logger.debug("SipApplicationSessionTimerTask now running for sip application session " + sipApplicationSessionImpl.getId());
+			}
 			sipApplicationSessionImpl.notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
 			sipApplicationSessionImpl.expired = true;
 			sipApplicationSessionImpl.invalidate();
+			return sipApplicationSessionImpl;
 		}
 		
 	}
@@ -99,9 +104,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private boolean expired;
 	
-	private Timer expirationTimer;
+	private SipApplicationSessionTimerTask expirationTimerTask;
 	
-	private TimerTask expirationTimerTask;
+	private ScheduledFuture<SipApplicationSession> expirationTimerFuture;
 	
 	private Map<String, ServletTimer> servletTimers;
 	
@@ -123,8 +128,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		this.sipContext = sipContext;
 		this.sipFactory = sipFactoryImpl;
 		lastAccessTime = creationTime = System.currentTimeMillis();
-		expired = false;
-		expirationTimer =  new Timer();
+		expired = false;		
 		valid = true;
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
@@ -135,7 +139,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
 				}
-				expirationTimer.schedule(expirationTimerTask, expirationTime);
+				expirationTimerFuture = (ScheduledFuture<SipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
@@ -147,7 +151,6 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			}
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
 		}
-		//FIXME create and start a timer for session expiration
 	}
 	
 	/**
@@ -388,14 +391,13 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		if(!expired) {
-			expirationTimerTask.cancel();
-			expirationTimer.cancel();
+			expirationTimerFuture.cancel(false);			
 		}
 		// FIXME (refactor session manager
 		// to map to tomcat session management)
-		sipFactory.getSessionManager().removeSipApplicationSession(key);
-		expirationTimer=null;
-		expirationTimerTask=null;
+		sipFactory.getSessionManager().removeSipApplicationSession(key);		
+		expirationTimerTask = null;
+		expirationTimerFuture = null;
 		httpSessions = null;
 		key = null;
 		servletTimers = null;
@@ -537,19 +539,19 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			// never starts for the SipApplicationSession object and the container 
 			// does not consider the object to ever have expired
 			this.expirationTime = -1;
-			if(expirationTimerTask != null) {
-				expirationTimerTask.cancel();								
+			if(expirationTimerFuture != null) {
+				expirationTimerFuture.cancel(false);								
 			}		
 			return Integer.MAX_VALUE;
 		} else {
-			this.expirationTime = (expirationTimerTask.scheduledExecutionTime() - expirationTime) + deltaMinutes * 1000 * 60;
-			if(expirationTimerTask != null) {
+			this.expirationTime = (expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) - expirationTime) + deltaMinutes * 1000 * 60;
+			if(expirationTimerFuture != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60)+ " minutes");
 				}
-				expirationTimerTask.cancel();
+				expirationTimerFuture.cancel(false);
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
-				expirationTimer.schedule(expirationTimerTask, expirationTime);
+				expirationTimerFuture = (ScheduledFuture<SipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
 			}
 			return deltaMinutes;
 		}				
