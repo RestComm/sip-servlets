@@ -12,7 +12,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 public class SipURITest extends junit.framework.TestCase {
 
 	static String[][] equal = {
-			// should be escaped {"sip:%61lice@atlanta.com;transport=TCP", "sip:alice@AtlanTa.CoM;Transport=tcp"},
+//			{"sip:%61lice@atlanta.com;transport=TCP", "sip:alice@AtlanTa.CoM;Transport=tcp"},
 			{"sip:carol@chicago.com", "sip:carol@chicago.com;newparam=5"},
 			{"sip:carol@chicago.com", "sip:carol@chicago.com;lr"},
 			{"sip:carol@chicago.com;security=on", "sip:carol@chicago.com;newparam=5"},
@@ -24,9 +24,9 @@ public class SipURITest extends junit.framework.TestCase {
 	static String[][] different = {
 			{"sip:alice@atlanta.com", "sip:ALICE@atlanta.com"},
 			{"sip:bob@biloxi.com", "sip:bob@biloxi.com:5060"},
-			// should be different {"sip:bob@biloxi.com", "sip:bob@biloxi.com;transport=tcp"},
+//			{"sip:bob@biloxi.com", "sip:bob@biloxi.com;transport=tcp"},
 			{"sip:carol@chicago.com;newparam=6", "sip:carol@chicago.com;newparam=5"},
-			//should be different {"sip:carol@chicago.com", "sip:carol@chicago.com?Subject=next%20meeting"},
+//			{"sip:carol@chicago.com", "sip:carol@chicago.com?Subject=next%20meeting"},
 			{"sip:carol@chicago.com?Subject=next%20meeting", "sip:carol@chicago.com?Subject=another%20meeting"},
 			{"sip:carol@chicago.com;security=off", "sip:carol@chicago.com;security=on"}
 	};
@@ -46,17 +46,29 @@ public class SipURITest extends junit.framework.TestCase {
 		for (int i = 0; i < equal.length; i++) {
 			SipURI uri1 = sipUri(equal[i][0]);
 			SipURI uri2 = sipUri(equal[i][1]);
-			assertTrue(uri1.equals(uri2));
-			assertTrue(uri2.equals(uri1));
-		}
+			assertTrue(uri1 + " is different as " + uri2, uri1.equals(uri2));
+			assertTrue(uri2 + " is different as " + uri1, uri2.equals(uri1));
+		}		
 	}
 	
 	public void testDifferent() throws Exception {
 		for (int i = 0; i < different.length; i++) {
 			SipURI uri1 = sipUri(different[i][0]);
 			SipURI uri2 = sipUri(different[i][1]);
-			assertFalse(uri1.equals(uri2));
-			assertFalse(uri2.equals(uri1));
+			assertFalse(uri1 + " is the same as " + uri2, uri1.equals(uri2));
+			assertFalse(uri2 + " is the same as " + uri1, uri2.equals(uri1));
 		}
 	}
+	
+	public void testEscaping() throws Exception {
+		SipURI uri1 = sipUri("sip:%61lice@atlanta.com;transport=TCP");
+		assertTrue(uri1.getUser() + " is different as alice" , uri1.getUser().equals("alice"));
+		assertTrue(uri1.toString() + " is different as sip:alice@atlanta.com;transport=TCP" , uri1.toString().equals("sip:alice@atlanta.com;transport=TCP"));		
+		uri1 = sipUri("sip:alice@example.com;transport=tcp?Subject=SIP%20Servlets");
+		assertTrue(uri1.getHeader("Subject") + " is different as SIP Servlets" , uri1.getHeader("Subject").equals("SIP Servlets"));		
+		assertTrue(uri1.toString() + " is different as sip:alice@example.com;transport=tcp?Subject=SIP Servlets" , uri1.toString().equals("sip:alice@example.com;transport=tcp?Subject=SIP Servlets"));
+		uri1 = sipUri("sip:annc@ms.example.net;play=file://fs.example.net//clips/my-intro.dvi;content-type=video/mpeg%3bencode%3d314M-25/625-50");
+		assertTrue(uri1.getParameter("content-type") + " is different as video/mpeg;encode=314M-25/625-50" , uri1.getParameter("content-type").equals("video/mpeg;encode=314M-25/625-50"));
+		assertTrue(uri1.toString() + " is different as sip:annc@ms.example.net;play=file://fs.example.net//clips/my-intro.dvi;content-type=video/mpeg%3bencode%3d314M-25/625-50" , uri1.toString().equals("sip:annc@ms.example.net;play=file://fs.example.net//clips/my-intro.dvi;content-type=video/mpeg;encode=314M-25/625-50"));
+	}	
 }

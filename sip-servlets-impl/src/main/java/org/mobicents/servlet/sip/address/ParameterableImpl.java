@@ -74,7 +74,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 */
 	public String getParameter(String name) {
 		return this.parameters.get(name) != null ?
-				this.parameters.get(name).getValue(): null	;
+				RFC2396UrlDecoder.decode(this.parameters.get(name).getValue()): null	;
 	}
 
 	/*
@@ -117,7 +117,10 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 */
 	public Set<Entry<String, String>> getParameters() {
 		HashSet<Entry<String,String>> retval = new HashSet<Entry<String,String>> ();
-		retval.addAll(this.parameters.values());
+		for(NameValue nameValue : this.parameters.values()) {
+			nameValue.setValue(RFC2396UrlDecoder.decode(nameValue.getValue()));
+			retval.add(nameValue);
+		}
 		return retval;
 	}
 

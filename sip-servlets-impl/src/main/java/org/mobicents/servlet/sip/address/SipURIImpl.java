@@ -53,7 +53,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getHeader(java.lang.String)
 	 */
 	public String getHeader(String name) {
-		return ((SipURI) super.uri).getHeader(name);
+		return RFC2396UrlDecoder.decode(((javax.sip.address.SipURI) super.uri).getHeader(name));
 	}
 
 	/*
@@ -110,7 +110,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getUser()
 	 */
 	public String getUser() {
-		return getSipURI().getUser();
+		return RFC2396UrlDecoder.decode(getSipURI().getUser());
 	}
 
 	/*
@@ -118,7 +118,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getUserParam()
 	 */
 	public String getUserParam() {
-		return getSipURI().getUserParam();
+		return RFC2396UrlDecoder.decode(getSipURI().getUserParam());
 	}
 
 	/*
@@ -126,7 +126,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getUserPassword()
 	 */
 	public String getUserPassword() {
-		return getSipURI().getUserPassword();
+		return RFC2396UrlDecoder.decode(getSipURI().getUserPassword());
 	}
 
 	/*
@@ -291,7 +291,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getMethodParam()
 	 */
 	public String getMethodParam() {
-		return getSipURI().getMethodParam();
+		return RFC2396UrlDecoder.decode(getSipURI().getMethodParam());
 	}
 
 	/*
@@ -299,11 +299,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see org.mobicents.servlet.sip.address.URIImpl#toString()
 	 */
 	public String toString() {
-		// URI scheme ->
-		// sip:alice@atlanta.com?subject=project%20x&priority=urgent
-		// But this is madness, when creating uri from uri or address fom uri we
-		// would have uri escaped multpile times...
-		return getSipURI().toString();
+		return RFC2396UrlDecoder.decode(getSipURI().toString());
 	}
 
 	/*
@@ -326,7 +322,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.Parameterable#getValue()
 	 */
 	public String getValue() {
-		return this.uri.toString();
+		return RFC2396UrlDecoder.decode(this.uri.toString());
 	}
 
 	/*
