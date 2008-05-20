@@ -18,7 +18,8 @@ public class SipURITest extends junit.framework.TestCase {
 			{"sip:carol@chicago.com;security=on", "sip:carol@chicago.com;newparam=5"},
 			{"sip:alice@atlanta.com?subject=project%20x&priority=urgent", "sip:alice@atlanta.com?priority=urgent&subject=project%20x"},
 			{"sip:carol@chicago.com", "sip:carol@chicago.com;security=on"},
-			{"sip:carol@chicago.com;security=on", "sip:carol@chicago.com"}
+			{"sip:carol@chicago.com;security=on", "sip:carol@chicago.com"},
+			{"sip:[0:0:0:0:0:0:0:1%1]:5070;transport=udp", "sip:[0:0:0:0:0:0:0:1%1]:5070;transport=udp"}
 	};
 	
 	static String[][] different = {

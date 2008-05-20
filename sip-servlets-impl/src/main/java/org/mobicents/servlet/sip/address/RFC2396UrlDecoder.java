@@ -64,12 +64,14 @@ public class RFC2396UrlDecoder {
                             byte x = (byte)Integer.parseInt(uri.substring(i + 1, i + 3), 16);
                             encodedchars[encodedcharsLength] = x;
                         } catch (NumberFormatException e) {
-                            throw new IllegalArgumentException("Illegal hex characters in pattern %" + uri.substring(i + 1, i + 3));
+                        	// do not throw exception, a % could be part of a IPv6 address and still be valid
+//                            throw new IllegalArgumentException("Illegal hex characters in pattern %" + uri.substring(i + 1, i + 3));
                         }
                         encodedcharsLength++;
                         i += 3;
                     } else {
-                        throw new IllegalArgumentException("% character should be followed by 2 hexadecimal characters.");
+                    	// do not throw exception, a % could be part of a IPv6 address and still be valid
+//                        throw new IllegalArgumentException("% character should be followed by 2 hexadecimal characters.");
                     }
                 }
                 try {
