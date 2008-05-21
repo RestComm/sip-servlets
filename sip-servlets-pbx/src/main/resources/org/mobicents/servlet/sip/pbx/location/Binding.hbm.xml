@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="org.mobicents.servlet.sip.pbx.location.Binding" table="BINDINGS">
+		<id name="id" column="BINDING_ID">
+			<generator class="native"/>
+		</id>
+		<property name="aor"/>
+		<property name="contact"/>
+		<property name="callId"/>
+		<property name="cseq"/>
+		<property name="expirationTime"/>
+	</class>
+</hibernate-mapping>

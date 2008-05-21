@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.pbx</app-name>
+	<display-name>Pbx Sip Servlet</display-name>
+	<description>Pbx Sip Servlet</description>
+	
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.pbx.PbxListener
+		</listener-class>
+	</listener>
+	
+	<main-servlet>pbx</main-servlet>
+
+	<servlet>
+		<servlet-name>pbx</servlet-name>
+		<display-name>pbx</display-name>
+		<description>Pbx SIP servlet</description>
+		<servlet-class>org.mobicents.servlet.sip.pbx.PbxServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+
+
+</sip-app>
