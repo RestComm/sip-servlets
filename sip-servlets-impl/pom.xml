@@ -11,7 +11,7 @@
 	<artifactId>sip-servlets-impl</artifactId>
 	<packaging>jar</packaging>
 	<name>Sip Servlets</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<dependencies>
 		<!-- sip servlet spec dependency -->
 		<dependency>
