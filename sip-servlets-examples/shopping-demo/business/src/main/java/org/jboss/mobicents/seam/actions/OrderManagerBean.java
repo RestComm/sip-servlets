@@ -58,7 +58,7 @@ public class OrderManagerBean implements OrderManager, Serializable {
 				"select o from Order o where o.orderId = :orderId")
 				.setParameter("orderId", orderId).getSingleResult();
 
-		order.setStatus(Order.Status.OPEN);
+		order.setStatus(Order.Status.PROCESSING);
 
 		Contexts.getApplicationContext().remove("deliveryDateTimer" + orderId);
 		Contexts.getApplicationContext().remove("adminTimer" + orderId);						
