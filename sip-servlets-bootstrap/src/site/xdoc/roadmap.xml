@@ -220,7 +220,7 @@
 			<subsection name="Planned Versions">				
 				<subsection name="Version 0.4 - 06/01/2008">
 					<p>
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=111">
 							Merge SIP Session Management with HTTP Session Management
@@ -305,6 +305,13 @@
 									Application Redeployment Bug
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=171">
+									Escaped characters not supported in SIP URI
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>
@@ -322,7 +329,7 @@
 						4.2.2 TelURL
 						</a>
 						<br />						
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=122">
 						Basic IPBX
@@ -334,7 +341,7 @@
 						Concurrency Control
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=123">
 						Open IMS integration example
@@ -392,7 +399,7 @@
 						Eclipse plugin
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=128">
 						Maven 2 sar plugin
