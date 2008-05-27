@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<version>1.0</version>
 	<name>JSLEE Parent part of the JSLEE-SIPS Demo</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<modules>
 		<module>events</module>
 		<module>events-du</module>		

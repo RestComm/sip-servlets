@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 	<version>1.0</version>
 	<name>Shopping Demo Business</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>

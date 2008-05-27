@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<version>1.0</version>
 	<name>JAIN SLEE - SIPS Interoperability Demo Parent</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<modules>		
 		<module>common</module>
 		<module>jslee-events</module>

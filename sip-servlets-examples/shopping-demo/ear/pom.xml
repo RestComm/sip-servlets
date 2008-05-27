@@ -13,7 +13,7 @@
 	<packaging>ear</packaging>
 	<version>1.0</version>
 	<name>Shopping Demo EAR</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<dependencies>
 		<!-- j2ee dependencies -->
 		<dependency>

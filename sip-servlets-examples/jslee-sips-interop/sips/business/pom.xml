@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 	<version>1.0</version>
 	<name>SIPS Business part of the JSLEE-SIPS Demo</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<dependencies>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
@@ -32,6 +32,12 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>		
 		<dependency>
 			<groupId>javax.slee</groupId>
 			<artifactId>jain-slee</artifactId>
