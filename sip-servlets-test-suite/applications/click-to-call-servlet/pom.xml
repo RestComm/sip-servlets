@@ -8,7 +8,7 @@
     <packaging>war</packaging>
     <version>1.0</version>
     <name>Click To Call</name>
-    <url>http://sip-servlets.dev.java.net</url>
+    <url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
     <dependencies>
         <!-- test dependencies -->
         <dependency>

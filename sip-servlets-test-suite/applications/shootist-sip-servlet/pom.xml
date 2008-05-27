@@ -12,7 +12,7 @@
 	<packaging>war</packaging>
 	<version>1.0</version>
 	<name>Shootist Sip Servlet Example</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<build>
 		<plugins>
 			<plugin>

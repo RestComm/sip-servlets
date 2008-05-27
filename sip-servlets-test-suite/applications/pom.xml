@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<version>0.3</version>
 	<name>Sip Servlets Test Suite Applications Parent Pom</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<modules>
 		<module>simple-sip-servlet</module>
 		<module>shootist-sip-servlet</module>
