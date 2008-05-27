@@ -11,3 +11,5 @@ Acknowledgements
 		* Fix for SipServletMessageImpl.getAddressHeaders()
 		
 		* Fix for equals on URI
+		
+		* IPBX : {{{http://code.google.com/p/mobicents/issues/detail?id=122}issue 122}}

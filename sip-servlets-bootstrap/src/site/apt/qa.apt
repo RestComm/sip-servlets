@@ -1,0 +1,21 @@
+Quality Assurance
+
+* Continuous Integration TestSuite
+
+	The {{{https://hudson.jboss.org/hudson/job/MobicentsSipServlets}Continuous Integration TestSuite}} displays the results of the latest run of the lastest hudson job running the Mobicents Sip servlets testsuite
+	against the latest piece of committed code
+	
+* Continous Integration Soak Tests
+
+	The {{{http://hudson.jboss.com/hudson/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
+	The Load Test is using a simple call flow : 
+	
+	* sipP sends INVITE
+	
+	* Sip Servlet application sends OK and create a Timer to fire the BYE in 60 seconds
+	
+	* sipP sends ACK
+	
+	* Sip Servlet application Timer expires and BYE is sent
+	
+	* sipP replies OK to BYE

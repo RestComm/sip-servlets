@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<project name="Mobicents">
+<project name="Mobicents Sip Servlets">
   <skin>
     <groupId>org.mobicents</groupId>
     <artifactId>mobicents-skin</artifactId>
@@ -40,7 +40,7 @@
       <item name="Write a Test/Run the Testsuite" href="tests.html"/>
       <item name="Acknowledgements" href="acknowledgements.html"/>
       <item name="License" href="license.html"/>
-      <item name="QA" href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/"/>      
+      <item name="QA" href="qa.html"/>      
       
       <item name="Feedback" href="feedback.html"/>           
       <item name="User Forum" href="http://forums.java.net/jive/forum.jspa?forumID=55"/>

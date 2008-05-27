@@ -6,8 +6,8 @@
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<packaging>pom</packaging>
 	<version>0.3</version>
-	<name>Sip Servlets Parent Pom</name>
-	<url>http://sip-servlets.dev.java.net</url>
+	<name>Mobicents Sip Servlets</name>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<issueManagement>
 		<system>Bugzilla</system>
 		<url>
@@ -130,7 +130,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>2.0-beta-6</version>				
+				<version>2.0-beta-6</version>									
 			</plugin>
 		</plugins>
 		<extensions>

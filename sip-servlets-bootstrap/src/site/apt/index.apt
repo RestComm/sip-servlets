@@ -9,16 +9,14 @@
 
 Goals  
 
-  The purpose of this project is to develop a SIP Servlet v1.1 (JSR 289 Spec) Implementation 
-  on top of Tomcat and to develop interoperability standards between SIP Servlet and JAIN-SLEE 
-  so that applications may exploit the strengths of both. 
-  {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} will be leveraged 
-  as the SIP stack and {{{http://mobicents.org}Mobicents}} will be used as the SLEE implementation.
-
-  Flexibility is the goal. We want to develop an implementation that runs 
-  standalone with the Tomcat HTTP server as well as in an application server 
-  integrated with JSLEE. Many interesting hacks in progress folks!
-
+  Mobicents Sip Servlets delivers a consistent, open platform on which to develop and deploy portable 
+  and distributable SIP and Converged JEE services. 
+  It is an implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss and 
+  strive to develop interoperability standards between Sip Servlets and JAIN-SLEE so that applications 
+  may exploit the strengths of both. 
+  {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
+  Mobicents JAIN SLEE is be used as the SLEE implementation.
+  
 Version 0.3 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
