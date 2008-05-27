@@ -16,6 +16,13 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.util.Iterator;
+
+import javax.servlet.http.HttpSession;
+
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
+
+
 /**
  * A <b>SipManager</b> manages the Sip Sessions that are associated with a
  * particular Container.  Different Manager implementations may support
@@ -32,10 +39,74 @@ package org.mobicents.servlet.sip.core.session;
  *     <code>start()</code> on the same <code>SipManager</code> instance.
  * </ul>
  * 
- * @author Jean Deruelle
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public interface SipManager {
+public interface SipManager extends org.apache.catalina.Manager {
 
+	/**
+	 * Removes a sip session from the manager by its key
+	 * @param key the identifier for this session
+	 * @return the sip session that had just been removed, null otherwise
+	 */
+	public SipSessionImpl removeSipSession(final SipSessionKey key);
+	/**
+	 * Removes a sip application session from the manager by its key
+	 * @param key the identifier for this session
+	 * @return the sip application session that had just been removed, null otherwise
+	 */
+	public SipApplicationSessionImpl removeSipApplicationSession(final SipApplicationSessionKey key);
 	
+	/**
+	 * Retrieve a sip application session from its key. If none exists, one can enforce
+	 * the creation through the create parameter to true.
+	 * @param key the key identifying the sip application session to retrieve 
+	 * @param create if set to true, if no session has been found one will be created
+	 * @return the sip application session matching the key
+	 */
+	public SipApplicationSessionImpl getSipApplicationSession(final SipApplicationSessionKey key, final boolean create);
+
+	/**
+	 * Retrieve a sip session from its key. If none exists, one can enforce
+	 * the creation through the create parameter to true. the sip factory cannot be null
+	 * if create is set to true.
+	 * @param key the key identifying the sip session to retrieve 
+	 * @param create if set to true, if no session has been found one will be created
+	 * @param sipFactoryImpl needed only for sip session creation.
+	 * @param sipApplicationSessionImpl to associate the SipSession with if create is set to true, if false it won't be used
+	 * @return the sip session matching the key
+	 * @throws IllegalArgumentException if create is set to true and sip Factory is null
+	 */
+	public SipSessionImpl getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final SipApplicationSessionImpl sipApplicationSessionImpl);
+	
+	/**
+	 * Retrieve all sip sessions currently hold by the session manager
+	 * @return an iterator on the sip sessions
+	 */
+	public Iterator<SipSessionImpl> getAllSipSessions();
+
+	/**
+	 * Retrieve all sip application sessions currently hold by the session manager
+	 * @return an iterator on the sip sessions
+	 */
+	public Iterator<SipApplicationSessionImpl> getAllSipApplicationSessions();
+	
+	/**
+	 * Retrieves the sip application session holding the converged http session in parameter
+	 * @param convergedHttpSession the converged session to look up
+	 * @return the sip application session holding a reference to it or null if none references it
+	 */
+	public SipApplicationSessionImpl findSipApplicationSession(HttpSession httpSession);
+	/**
+	 * 
+	 */
+	public void dumpSipSessions();
+	/**
+	 * 
+	 */
+	public void dumpSipApplicationSessions();
+	/**
+	 * Remove the sip sessions and sip application sessions 
+	 */
+	public void removeAllSessions();
 }

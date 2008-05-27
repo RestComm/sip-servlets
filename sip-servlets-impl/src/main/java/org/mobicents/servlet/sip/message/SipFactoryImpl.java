@@ -42,9 +42,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
-import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
@@ -56,11 +54,11 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
-import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
@@ -169,12 +167,12 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating new application session for sip context "+ sipContext.getApplicationName());
 		}
-		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
 				sipApplicationDispatcher.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false)
 					.getSipProvider().getNewCallId().getCallId());		
-		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
-				sipApplicationSessionKey, true, sipContext);		
+		SipApplicationSessionImpl sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
+				sipApplicationSessionKey, true);		
 		return sipApplicationSession;
 	}
 
@@ -348,6 +346,8 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			SipApplicationSession sipAppSession, String method, Address from,
 			Address to) {
 		
+		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl) sipAppSession;
+		
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
 		Request requestToWrap = null;
@@ -383,7 +383,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
 					+ new Random().nextInt() );
 			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
-					((SipApplicationSessionImpl)sipAppSession).getKey().getCallId());
+					sipApplicationSessionImpl.getKey().getCallId());
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 
@@ -443,9 +443,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 //				requestToWrap.addHeader(routeHeader);
 //			}
 
-			SipSessionKey key = SessionManager.getSipSessionKey(
-					((SipApplicationSessionImpl)sipAppSession).getKey().getApplicationName(), requestToWrap, false);
-			SipSessionImpl session = sipApplicationDispatcher.getSessionManager().getSipSession(key, true, this, (SipApplicationSessionImpl)sipAppSession);
+			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
+					sipApplicationSessionImpl.getKey().getApplicationName(), requestToWrap, false);
+			SipSessionImpl session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).
+				getSipSession(key, true, this, sipApplicationSessionImpl);
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,
@@ -471,7 +472,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	/**
 	 * @return the sessionManager
 	 */
-	public SessionManager getSessionManager() {
+	public SessionManagerUtil getSessionManager() {
 		return sipApplicationDispatcher.getSessionManager();
 	}	
 	
@@ -509,7 +510,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = null;
 		try {
-			sipApplicationSessionKey = SessionManager.parseSipApplicationSessionKey(
+			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(
 					sipApplicationKey);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(sipApplicationKey + " is not a valid sip application session key", e);
@@ -518,8 +519,8 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		if(sipContext == null) {
 			throw new IllegalArgumentException("The specified application "+sipApplicationSessionKey.getApplicationName()+" is not currently deployed");
 		}
-		SipApplicationSessionImpl sipApplicationSession = sipApplicationDispatcher.getSessionManager().getSipApplicationSession(
-				sipApplicationSessionKey, true, sipContext);		
+		SipApplicationSessionImpl sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
+				sipApplicationSessionKey, true);		
 		return sipApplicationSession;
 	}
 

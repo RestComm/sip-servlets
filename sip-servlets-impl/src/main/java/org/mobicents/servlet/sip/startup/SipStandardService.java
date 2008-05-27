@@ -47,6 +47,11 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
 	private static Log logger = LogFactory.getLog(SipStandardService.class);
+	/**
+     * The descriptive information string for this implementation.
+     */
+    private static final String info =
+        "org.mobicents.servlet.sip.startup.SipStandardService/1.0";
 	//the sip application dispatcher class name defined in the server.xml
 	private String sipApplicationDispatcherClassName;
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 

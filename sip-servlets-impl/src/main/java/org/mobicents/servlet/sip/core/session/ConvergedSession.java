@@ -34,6 +34,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.security.SecurityUtil;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -48,7 +49,7 @@ public class ConvergedSession
 		extends org.apache.catalina.session.StandardSession 
 		implements ConvergedHttpSession {
 
-	protected SipFactoryImpl sipFactoryImpl;		
+	protected SipNetworkInterfaceManager sipNetworkInterfaceManager;		
 	
 	/**
      * The facade associated with this session.  NOTE:  This value is not
@@ -59,9 +60,9 @@ public class ConvergedSession
 	 * 
 	 * @param sessionManager
 	 */
-	public ConvergedSession(Manager manager, SipFactoryImpl sipFactoryImpl) {
+	public ConvergedSession(SipManager manager, SipNetworkInterfaceManager sipNetworkInterfaceManager) {
 		super(manager);
-		this.sipFactoryImpl = sipFactoryImpl;
+		this.sipNetworkInterfaceManager = sipNetworkInterfaceManager;
 	}
 	
 	@Override
@@ -137,19 +138,19 @@ public class ConvergedSession
 	public SipApplicationSession getApplicationSession() {		
 		//the application session if currently associated is returned, 
 		SipApplicationSessionImpl sipApplicationSession =
-			sipFactoryImpl.getSessionManager().findSipApplicationSession(this);
+			((SipManager)manager).findSipApplicationSession(this);
 		if(sipApplicationSession == null) {
 			//however if no application session is associated it is created, 
 			//associated with the HttpSession and returned.
 			ExtendedListeningPoint listeningPoint = 
-				sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false);			
+				sipNetworkInterfaceManager.findMatchingListeningPoint(ListeningPoint.UDP, false);			
 			
-			SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+			SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					((SipContext)manager.getContainer()).getApplicationName(), 
 					listeningPoint.getSipProvider().getNewCallId().getCallId());
 			
 			sipApplicationSession = 
-				sipFactoryImpl.getSessionManager().getSipApplicationSession(sipApplicationSessionKey, true, (SipContext)manager.getContainer());			
+				((SipManager)manager).getSipApplicationSession(sipApplicationSessionKey, true);			
 			sipApplicationSession.addHttpSession(this);
 		}
 		return sipApplicationSession;

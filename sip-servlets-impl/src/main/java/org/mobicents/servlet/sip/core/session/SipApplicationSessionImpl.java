@@ -116,17 +116,14 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * The first sip application for subsequent requests.
 	 */
 	private SipContext sipContext;
-	
-	private SipFactoryImpl sipFactory;
-	
-	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext, SipFactoryImpl sipFactoryImpl) {
+		
+	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
 		this.sipContext = sipContext;
-		this.sipFactory = sipFactoryImpl;
 		lastAccessTime = creationTime = System.currentTimeMillis();
 		expired = false;		
 		valid = true;
@@ -395,7 +392,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		}
 		// FIXME (refactor session manager
 		// to map to tomcat session management)
-		sipFactory.getSessionManager().removeSipApplicationSession(key);		
+		((SipManager)sipContext.getManager()).removeSipApplicationSession(key);		
 		expirationTimerTask = null;
 		expirationTimerFuture = null;
 		httpSessions = null;

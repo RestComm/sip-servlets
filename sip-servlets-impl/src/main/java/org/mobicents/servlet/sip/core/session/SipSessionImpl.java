@@ -530,7 +530,7 @@ public class SipSessionImpl implements SipSession {
 		}
 		valid = false;				
 		notifySipSessionListeners(SipSessionEventType.DELETION);
-		sipFactory.getSessionManager().removeSipSession(key);
+		((SipManager)getSipApplicationSession().getSipContext().getManager()).removeSipSession(key);
 		sipSessionAttributeMap = null;
 		proxyBranch = null;
 		key = null;

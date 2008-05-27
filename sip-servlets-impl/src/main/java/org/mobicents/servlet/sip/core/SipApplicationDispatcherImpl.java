@@ -92,10 +92,11 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
-import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -176,7 +177,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	//application chains
 //	private Map<String, SipContext> applicationChains = null;
 	
-	private SessionManager sessionManager = null;
+	private SessionManagerUtil sessionManager = null;
 	
 	private Boolean started = Boolean.FALSE;
 
@@ -188,7 +189,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		sipFactoryImpl = new SipFactoryImpl(this);
-		sessionManager = new SessionManager(sipFactoryImpl);
+		sessionManager = new SessionManagerUtil();
 		hostNames = Collections.synchronizedList(new ArrayList<String>());
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
 	}
@@ -302,8 +303,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			started = Boolean.FALSE;
 		}
-		sessionManager.dumpSipSessions();
-		sessionManager.dumpSipApplicationSessions();		
 		sipApplicationRouter.destroy();		
 		if(oname != null) {
 			Registry.getRegistry(null, null).unregisterComponent(oname);
@@ -338,7 +337,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		List<String> applicationsUndeployed = new ArrayList<String>();
 		applicationsUndeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
-		sessionManager.removeSipContextSessions(sipContext);
+		((SipManager)sipContext.getManager()).removeAllSessions();
 		logger.info("the following sip servlet application has been removed : " + sipApplicationName);
 		return sipContext;
 	}
@@ -643,31 +642,32 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		
 		SipContext sipContext = this.applicationDeployed.get(applicationName);
+		SipManager sipManager = (SipManager)sipContext.getManager();
 		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
-		SipApplicationSessionImpl sipApplicationSession = sessionManager.getSipApplicationSession(sipApplicationSessionKey, false, null);
+		SipApplicationSessionImpl sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
 			logger.error("Cannot find the corresponding sip application session to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
-			sessionManager.dumpSipApplicationSessions();
+			sipManager.dumpSipApplicationSessions();
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
 		}
 		
-		SipSessionKey key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage(), inverted);
-		SipSessionImpl sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, sipServletRequest.getMessage(), inverted);
+		SipSessionImpl sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		
 		// Added by Vladimir because the inversion detection on proxied requests doesn't work
 		if(sipSession == null) {
-			key = SessionManager.getSipSessionKey(applicationName, sipServletRequest.getMessage(), !inverted);
-			sipSession = sessionManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+			key = SessionManagerUtil.getSipSessionKey(applicationName, sipServletRequest.getMessage(), !inverted);
+			sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		}
 		
 		if(sipSession == null) {			
 			logger.error("Cannot find the corresponding sip session to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
-			sessionManager.dumpSipSessions();
+			sipManager.dumpSipSessions();
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
@@ -679,25 +679,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		// the service() method of any SipServlet to handle the incoming message.
 		sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
 		
-		Wrapper servletWrapper = (Wrapper) applicationDeployed.get(applicationName).findChild(handlerName);
 		try {
-			
-			// See if the response should go directly to the proxy
-			if(sipServletRequest.getSipSession().getProxyBranch() != null)
-			{
+			// See if the subsequent request should go directly to the proxy
+			if(sipServletRequest.getSipSession().getProxyBranch() != null) {
 				ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
-				if(proxyBranch.getProxy().getSupervised())
-				{
-					Servlet servlet = servletWrapper.allocate();
-					servlet.service(sipServletRequest, null);
+				if(proxyBranch.getProxy().getSupervised()) {
+					callServlet(sipServletRequest);
 				}
 				proxyBranch.proxySubsequentRequest(sipServletRequest);
 			}
 			// If it's not for a proxy then it's just an AR, so go to the next application
-			else
-			{
-				Servlet servlet = servletWrapper.allocate();
-				servlet.service(sipServletRequest, null);				
+			else {
+				callServlet(sipServletRequest);				
 			}
 		} catch (ServletException e) {				
 			logger.error("An unexpected servlet exception occured while processing a subsequent request", e);
@@ -992,7 +985,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			callId = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 		}
-		SipApplicationSessionKey sipApplicationSessionKey = SessionManager.getSipApplicationSessionKey(
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
 				callId);
 		return sipApplicationSessionKey;
@@ -1028,9 +1021,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				sipApplicationRoutingDirective = SipApplicationRoutingDirective.valueOf(
 						SipApplicationRoutingDirective.class, directive);
 				String previousAppName = poppedAddress.getParameter(ROUTE_PARAM_PREV_APPLICATION_NAME);
-				logger.info("application name before the request has been routed back to container : " + previousAppName);		
-				SipSessionKey sipSessionKey = SessionManager.getSipSessionKey(previousAppName, request, false);
-				SipSessionImpl sipSession = sessionManager.getSipSession(sipSessionKey, false, sipFactoryImpl, null);
+				logger.info("application name before the request has been routed back to container : " + previousAppName);
+				SipContext sipContext = applicationDeployed.get(previousAppName);				
+				SipSessionKey sipSessionKey = SessionManagerUtil.getSipSessionKey(previousAppName, request, false);
+				SipSessionImpl sipSession = ((SipManager)sipContext.getManager()).getSipSession(sipSessionKey, false, sipFactoryImpl, null);
 				stateInfo = sipSession.getStateInfo();
 				sipServletRequest.setSipSession(sipSession);
 				logger.info("state info before the request has been routed back to container : " + stateInfo);
@@ -1136,15 +1130,27 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
-			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());			
+			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
+			// follow the procedures of Chapter 16 to select a servlet from the application.									
+			//no matching deployed apps
+			if(sipContext == null) {
+				logger.error("No matching deployed application has been found !");
+				// the app returned by the Application Router returned an app
+				// that is not currently deployed, sends a 500 error response as was discussed 
+				// in the JSR 289 EG, (for reference thread "Questions regarding AR" initiated by Uri Segev)
+				// and stops processing.				
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				return false;
+			}
+			SipManager sipManager = (SipManager)sipContext.getManager();
 			//sip appliation session association
 			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
-			SipApplicationSessionImpl appSession = sessionManager.getSipApplicationSession(
-					sipApplicationSessionKey, true, sipContext);
+			SipApplicationSessionImpl appSession = sipManager.getSipApplicationSession(
+					sipApplicationSessionKey, true);
 			//sip session association
-			SipSessionKey sessionKey = SessionManager.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
-			SipSessionImpl sipSession = sessionManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
+			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
+			SipSessionImpl sipSession = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
 			sipSession.setSessionCreatingTransaction(transaction);
 			sipServletRequest.setSipSession(sipSession);						
 			
@@ -1163,18 +1169,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;
-			}						
-			// follow the procedures of Chapter 16 to select a servlet from the application.									
-			//no matching deployed apps
-			if(sipContext == null) {
-				logger.error("No matching deployed application has been found !");
-				// the app returned by the Application Router returned an app
-				// that is not currently deployed we continue routing to see if 
-				// other apps are interested
-				sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
-				forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION);
-				return true;
-			}
+			}									
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
 			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 				String mainServlet = sipContext.getMainServlet();
@@ -1190,7 +1185,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				} 
 			}
 			try {
-				callServlet(sipServletRequest, sipServletRequest.getSipSession());
+				callServlet(sipServletRequest);
 				logger.info("Request event dispatched to " + sipContext.getApplicationName());				
 			} catch (ServletException e) {				
 				logger.error("An unexpected servlet exception occured while routing an initial request", e);
@@ -1504,13 +1499,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(dialog != null && dialog.isServer()) {
 				inverted = true;
 			}
-			SipSessionKey sessionKey = SessionManager.getSipSessionKey(appName, response, inverted);
+			SipContext sipContext = applicationDeployed.get(appName);
+			SipManager sipManager = (SipManager)sipContext.getManager();
+			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, inverted);
 			logger.info("route response on following session " + sessionKey);
-			SipSessionImpl session = sessionManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+			SipSessionImpl session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
 			if(logger.isDebugEnabled()) {
 				logger.debug("session found is " + session);
 				if(session == null) {
-					sessionManager.dumpSipSessions();
+					sipManager.dumpSipSessions();
 				}
 			}
 			
@@ -1521,6 +1518,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 				}
+			} //there is no client transaction associated with it, it means that this is a retransmission
+			else if(dialog != null){	
+				applicationData = (TransactionApplicationData)dialog.getApplicationData();
 			}
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
@@ -1537,10 +1537,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(originalRequest != null) {				
 						originalRequest.setLastFinalResponse(sipServletResponse);					
 				}
-				//there is no client transaction associated with it, it means that this is a retransmission
-				else if(dialog != null){	
-					applicationData = (TransactionApplicationData)dialog.getApplicationData();
-				}
+				
 								
 				// We can not use session.getProxyBranch() because all branches belong to the same session
 				// and the session.proxyBranch is overwritten each time there is activity on the branch.				
@@ -1555,7 +1552,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					
 					// Notfiy the servlet
 					if(proxyBranch.getProxy().getSupervised()) {
-						callServlet(sipServletResponse, session);
+						callServlet(sipServletResponse);
 					}
 					return false;
 				}
@@ -1563,7 +1560,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					// Update Session state
 					session.updateStateOnResponse(sipServletResponse, true);
 
-					callServlet(sipServletResponse, session);
+					callServlet(sipServletResponse);
 				}
 			} catch (ServletException e) {				
 				logger.error("Unexpected servlet exception while processing the response : " + response, e);
@@ -1585,12 +1582,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		return true;		
 	}
 	
-	public static void callServlet(SipServletRequestImpl request, SipSessionImpl session) throws ServletException, IOException {
+	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
+		SipSessionImpl session = request.getSipSession();
+		logger.info("Dispatching request " + request.toString() + 
+				" to following App/servlet => " + session.getKey().getApplicationName()+ 
+				"/" + session.getHandler());
 		String sessionHandler = session.getHandler();
 		SipApplicationSessionImpl sipApplicationSessionImpl = session.getSipApplicationSession();
 		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
 		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
-		Servlet servlet = sipServletImpl.allocate();
+		Servlet servlet = sipServletImpl.allocate();		
 		
 		// JBoss-specific CL issue:
 		// This is needed because usually the classloader here is some UnifiedClassLoader3,
@@ -1605,7 +1606,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		servlet.service(request, null);		
 	}
 	
-	public static void callServlet(SipServletResponseImpl response, SipSessionImpl session) throws ServletException, IOException {
+	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
+		SipSessionImpl session = response.getSipSession();
 		logger.info("Dispatching response " + response.toString() + 
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
@@ -1781,7 +1783,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * @return the sessionManager
 	 */
-	public SessionManager getSessionManager() {
+	public SessionManagerUtil getSessionManager() {
 		return sessionManager;
 	}
 
@@ -1790,11 +1792,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public SipApplicationRouterInfo getNextInterestedApplication(
 			SipServletRequestImpl sipServletRequest) {
+		SipApplicationRoutingRegion routingRegion = null;
+		Serializable stateInfo = null;
+		if(sipServletRequest.getSipSession() != null) {
+			routingRegion = sipServletRequest.getSipSession().getRegion();
+			stateInfo =sipServletRequest.getSipSession().getStateInfo(); 
+		}
+		
 		SipApplicationRouterInfo applicationRouterInfo = sipApplicationRouter.getNextApplication(
 			sipServletRequest, 
-			sipServletRequest.getSession().getRegion(), 
+			routingRegion, 
 			sipServletRequest.getRoutingDirective(), 
-			sipServletRequest.getSipSession().getStateInfo());
+			stateInfo);
 		// 15.4.1 Procedure : point 2
 		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 		// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,

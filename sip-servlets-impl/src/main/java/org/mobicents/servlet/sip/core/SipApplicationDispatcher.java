@@ -27,7 +27,7 @@ import javax.sip.SipListener;
 import javax.sip.SipProvider;
 
 import org.apache.catalina.LifecycleException;
-import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -128,7 +128,7 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * Retrieve the session manager associated with this application disptacher 
 	 * @return the session manager associated with this application disptacher
 	 */
-	SessionManager getSessionManager();
+	SessionManagerUtil getSessionManager();
 	
 	/**
 	 * 

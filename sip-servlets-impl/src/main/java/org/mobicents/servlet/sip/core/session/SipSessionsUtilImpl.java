@@ -24,6 +24,7 @@ import javax.servlet.sip.SipSessionsUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * @author Jean Deruelle
@@ -32,11 +33,11 @@ import org.apache.commons.logging.LogFactory;
 public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	private static transient Log logger = LogFactory.getLog(SipSessionsUtilImpl.class);
 	
-	private transient SessionManager sessionManager;
+	private transient SipContext sipContext;
 	private String applicationName;
 
-	public SipSessionsUtilImpl(SessionManager sessionManager, String applicationName) {
-		this.sessionManager = sessionManager;
+	public SipSessionsUtilImpl(SipContext sipContext, String applicationName) {
+		this.sipContext = sipContext;
 		this.applicationName = applicationName;
 	}
 	
@@ -49,14 +50,14 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		}
 		SipApplicationSessionKey applicationSessionKey;
 		try {
-			applicationSessionKey = SessionManager.parseSipApplicationSessionKey(applicationSessionId);
+			applicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(applicationSessionId);
 		} catch (ParseException e) {
 			logger.error("the given application session id : " + applicationSessionId + 
 					" couldn't be parsed correctly ",e);
 			return null;
 		}
 		if(applicationSessionKey.getApplicationName().equals(applicationName)) {
-			return sessionManager.getSipApplicationSession(applicationSessionKey, false, null);
+			return ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, false);
 		} else {
 			logger.warn("the given application session id : " + applicationSessionId + 
 					" tried to be retrieved from incorret application " + applicationName);

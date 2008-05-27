@@ -338,8 +338,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * 
 	 * @param request
 	 */
-	public void proxySubsequentRequest(SipServletRequestImpl request)
-	{
+	public void proxySubsequentRequest(SipServletRequestImpl request) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Proxying subsequent request " + request);
+		}
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
 		proxy.setOriginalRequest(request);

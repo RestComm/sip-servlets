@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -168,7 +170,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	//the parser for the properties file
 	private DefaultApplicationRouterParser defaultApplicationRouterParser;
 	//Applications deployed within the container
-//	List<String> containerDeployedApplicationNames = null;
+	List<String> containerDeployedApplicationNames = null;
 	//List of applications defined in the defautl application router properties file
 	Map<String, List<DefaultSipApplicationRouterInfo>> defaultSipApplicationRouterInfos;
 	
@@ -176,7 +178,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 * Default Constructor
 	 */
 	public DefaultApplicationRouter() {
-//		containerDeployedApplicationNames = Collections.synchronizedList(new ArrayList<String>());
+		containerDeployedApplicationNames = new ArrayList<String>();
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
 		defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<DefaultSipApplicationRouterInfo>>();
 	}
@@ -186,7 +188,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 */
 	public void applicationDeployed(List<String> newlyDeployedApplicationNames) {
 		init();
-//		containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
+		synchronized (containerDeployedApplicationNames) {
+			containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);	
+		}		
 	}
 
 	/**
@@ -194,14 +198,18 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 */
 	public void applicationUndeployed(List<String> undeployedApplicationNames) {
 		init();
-//		containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
+		synchronized (containerDeployedApplicationNames) {
+			containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void destroy() {
-//		containerDeployedApplicationNames.clear();			
+		synchronized (containerDeployedApplicationNames) {
+			containerDeployedApplicationNames.clear();			
+		}
 	}
 
 	/**
@@ -224,22 +232,30 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 				ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
 				while (defaultSipApplicationRouterInfoIt.hasNext() ) {
 					DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = defaultSipApplicationRouterInfoIt.next();
-					if(initialRequest.getSession(false) == null || 
-									!defaultSipApplicationRouterInfo.getApplicationName().equals(
-											initialRequest.getSession(false).getApplicationSession().getApplicationName())) {
-						String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
-						if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
-							String headerName = subscriberIdentity.substring(
-									DAR_SUSCRIBER_PREFIX_LENGTH);
-							subscriberIdentity = initialRequest.getHeader(headerName);
+					boolean isApplicationPresentInContainer = false;
+					synchronized (containerDeployedApplicationNames) {
+						if(containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {
+							isApplicationPresentInContainer = true;
 						}
-						return new SipApplicationRouterInfo(
-								defaultSipApplicationRouterInfo.getApplicationName(),
-								defaultSipApplicationRouterInfo.getRoutingRegion(), 
-								subscriberIdentity,
-								defaultSipApplicationRouterInfo.getRoute(),
-								defaultSipApplicationRouterInfo.getRouteModifier(),
-								defaultSipApplicationRouterInfo.getOrder());					
+					}
+					if(isApplicationPresentInContainer) {
+						if(initialRequest.getSession(false) == null || 
+										!defaultSipApplicationRouterInfo.getApplicationName().equals(
+												initialRequest.getSession(false).getApplicationSession().getApplicationName())) {
+							String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
+							if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
+								String headerName = subscriberIdentity.substring(
+										DAR_SUSCRIBER_PREFIX_LENGTH);
+								subscriberIdentity = initialRequest.getHeader(headerName);
+							}
+							return new SipApplicationRouterInfo(
+									defaultSipApplicationRouterInfo.getApplicationName(),
+									defaultSipApplicationRouterInfo.getRoutingRegion(), 
+									subscriberIdentity,
+									defaultSipApplicationRouterInfo.getRoute(),
+									defaultSipApplicationRouterInfo.getRouteModifier(),
+									defaultSipApplicationRouterInfo.getOrder());					
+						}
 					}
 				}
 			}
@@ -265,7 +281,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 */
 	public void init(List<String> deployedApplicationNames) {
 		init();
-//		this.containerDeployedApplicationNames.addAll(deployedApplicationNames);
+		synchronized (containerDeployedApplicationNames) {
+			this.containerDeployedApplicationNames.addAll(deployedApplicationNames);
+		}
 	}
 	
 	/* (non-Javadoc)

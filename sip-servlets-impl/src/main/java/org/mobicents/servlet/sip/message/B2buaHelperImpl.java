@@ -58,9 +58,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
@@ -143,8 +143,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipApplicationSessionImpl appSession = originalSession
 					.getSipApplicationSession();				
 			
-			SipSessionKey key = SessionManager.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			SipSessionImpl session = sipFactoryImpl.getSessionManager().getSipSession(key, true, sipFactoryImpl, appSession);			
+			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
+			SipSessionImpl session = ((SipManager)appSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 						
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(

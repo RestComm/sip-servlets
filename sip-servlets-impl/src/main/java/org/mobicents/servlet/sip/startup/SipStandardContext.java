@@ -43,8 +43,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
@@ -67,6 +67,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	private static transient Log logger = LogFactory
 			.getLog(SipStandardContext.class);
 
+	/**
+     * The descriptive information string for this implementation.
+     */
+    private static final String info =
+        "org.mobicents.servlet.sip.startup.SipStandardContext/1.0";
+    
 	// as mentionned per JSR 289 Section 6.1.2.1 default lifetime for an 
 	// application session is 3 minutes
 	private static int DEFAULT_LIFETIME = 3;
@@ -133,7 +139,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 		
 		sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
-		sipSessionsUtil = new SipSessionsUtilImpl(((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()).getSessionManager(), applicationName);
+		sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipFactoryFacade);		
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
@@ -222,7 +228,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}						
 			}			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
-			//FIXME the session manager should be refactored and made part of the sipstandardmanager
 			if(getManager() instanceof SipStandardManager) {
 				((SipStandardManager)getManager()).setSipFactoryImpl(
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
@@ -348,12 +353,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	@Override
 	public synchronized void stop() throws LifecycleException {
-		logger.info("Stopping the sip context");		
+		logger.info("Stopping the sip context");
+		((SipManager)manager).dumpSipSessions();
+		((SipManager)manager).dumpSipApplicationSessions();		
 		super.stop();
 		// this should happen after so that applications can still do some processing
 		// in destroy methods to notify that context is getting destroyed and app removed
-		if(sipApplicationDispatcher != null) {				
-			sipApplicationDispatcher.removeSipApplication(applicationName);		
+		if(sipApplicationDispatcher != null) {
+			if(applicationName != null) {
+				sipApplicationDispatcher.removeSipApplication(applicationName);
+			} else {
+				logger.error("the application name is null for the following context : " + name);
+			}
 		}	
 		// not needed since the JNDI will be destroyed automatically
 //		if(isUseNaming()) {

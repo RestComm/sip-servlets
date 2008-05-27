@@ -30,6 +30,13 @@ import org.apache.catalina.core.StandardEngine;
  * @author Jean Deruelle
  */
 public class SipStandardEngine extends StandardEngine implements Engine {
+	
+	/**
+     * The descriptive information string for this implementation.
+     */
+    private static final String info =
+        "org.mobicents.servlet.sip.startup.SipStandardEngine/1.0";
+	
 	@Override
 	public void addChild(Container child) {				
 		if(child instanceof Host) {

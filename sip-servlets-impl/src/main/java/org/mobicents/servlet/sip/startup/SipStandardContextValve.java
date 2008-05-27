@@ -36,9 +36,10 @@ import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 
@@ -186,10 +187,9 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 			if(sipApplicationKey != null && sipApplicationKey.length() > 0) {
 				try {
 					SipApplicationSessionKey sipApplicationSessionKey = 
-						SessionManager.parseSipApplicationSessionKey(sipApplicationKey);
+						SessionManagerUtil.parseSipApplicationSessionKey(sipApplicationKey);
 					SipApplicationSessionImpl sipApplicationSessionImpl = 
-						((SipFactoryImpl)context.getSipApplicationDispatcher().getSipFactory()).
-							getSessionManager().getSipApplicationSession(sipApplicationSessionKey, false, context);
+						((SipManager)context.getManager()).getSipApplicationSession(sipApplicationSessionKey, false);
 					sipApplicationSessionImpl.addHttpSession(request.getSession());
 				} catch (ParseException pe) {
 					logger.error(pe);

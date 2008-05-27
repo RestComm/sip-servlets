@@ -247,7 +247,9 @@ public class SipNetworkInterfaceManager {
 	 * Compute all the outbound interfaces for this manager 
 	 */
 	protected void computeOutboundInterfaces() {
-		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Outbound Interface List : ");
+		}
 		List<SipURI> newlyComputedOutboundInterfaces = new ArrayList<SipURI>();
 		Iterator<ExtendedListeningPoint> it = getExtendedListeningPoints();
 		while (it.hasNext()) {
@@ -262,6 +264,9 @@ public class SipNetworkInterfaceManager {
 					jainSipURI.setTransportParam(extendedListeningPoint.getTransport());
 					SipURI sipURI = new SipURIImpl(jainSipURI);
 					newlyComputedOutboundInterfaces.add(sipURI);
+					if(logger.isDebugEnabled()) {
+						logger.debug("Outbound Interface : " + jainSipURI);
+					}
 				} catch (ParseException e) {
 					logger.error("cannot add the following listening point " +
 							ipAddress + ":" +

@@ -82,9 +82,10 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
-import org.mobicents.servlet.sip.core.session.SessionManager;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -553,17 +554,23 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if (this.session != null
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
-		} else if (create) {			
-			SipContext sipContext = 
-				sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(currentApplicationName);
-			SipApplicationSessionKey key = SessionManager.getSipApplicationSessionKey(
+		} else if (create) {						
+			SipApplicationSessionKey key = SessionManagerUtil.getSipApplicationSessionKey(
 					currentApplicationName, 
 					((CallIdHeader)message.getHeader((CallIdHeader.NAME))).getCallId());
-			SipApplicationSessionImpl applicationSession = 
-				sipFactoryImpl.getSessionManager().getSipApplicationSession(key, create, sipContext);
 			if(this.session == null) {
-				SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message, false);
-				this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
+				if(logger.isDebugEnabled()) {
+					logger.debug("Tryin to create a new sip application session with key = " + key);
+				}
+				SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(currentApplicationName, message, false);
+				SipContext sipContext = 
+					sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(currentApplicationName);				
+				SipApplicationSessionImpl applicationSession = 
+					((SipManager)sipContext.getManager()).getSipApplicationSession(key, create);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Tryin to create a new sip session with key = " + sessionKey);
+				}
+				this.session = ((SipManager)sipContext.getManager()).getSipSession(sessionKey, create,
 						sipFactoryImpl, applicationSession);
 				this.session.setSessionCreatingTransaction(transaction);				
 			} 
@@ -926,9 +933,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public SipSession getSession(boolean create) {
 		if (this.session == null && create) {
-			SipSessionKey sessionKey = SessionManager.getSipSessionKey(currentApplicationName, message, false);
-			this.session = sipFactoryImpl.getSessionManager().getSipSession(sessionKey, create,
-					sipFactoryImpl, (SipApplicationSessionImpl)getApplicationSession(create));
+			SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl)getApplicationSession(create);
+			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(currentApplicationName, message, false);
+			this.session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
+					sipFactoryImpl, sipApplicationSessionImpl);
 			this.session.setSessionCreatingTransaction(transaction);
 		}
 		return this.session;
