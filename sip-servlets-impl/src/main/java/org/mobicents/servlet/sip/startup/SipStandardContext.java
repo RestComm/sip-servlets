@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
@@ -145,7 +146,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
 				TimerServiceImpl.getInstance());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
-				SipApplicationDispatcher.EXTENSIONS_SUPPORTED);
+				Arrays.asList(SipApplicationDispatcher.EXTENSIONS_SUPPORTED));
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
+				Arrays.asList(SipApplicationDispatcher.RFC_SUPPORTED));
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
 				sipSessionsUtil);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,

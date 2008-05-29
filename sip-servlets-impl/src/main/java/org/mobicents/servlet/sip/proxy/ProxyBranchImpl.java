@@ -56,6 +56,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private SipURI targetURI;
 	private SipURI outboundInterface;
 	private SipURI recordRouteURI;
+	private boolean recordRoutingEnabled;
+	private boolean recurse;
 	private SipURI pathURI;
 	private boolean started;
 	private SipFactoryImpl sipFactoryImpl;
@@ -65,6 +67,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private Timer proxyBranchTimer;
 	private ProxyBranchTimerTask proxyTimeoutTask;
 	private boolean canceled;
+	private boolean isAddToPath;
+	private List<ProxyBranch> recursedBranches;
+	
 	
 	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
 	{
@@ -87,24 +92,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#cancel()
 	 */
 	public void cancel() {		
-		try
-		{			
-			cancelTimer();
-			if(this.isStarted() && !canceled && !timedOut &&
-				outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
-					outgoingRequest.createCancel().send();
-				canceled = true;
-			}
-			if(!this.isStarted() &&
-					outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
-				canceled = true;	
-			}
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException("Failed canceling proxy branch", e);
-		}
-
+		cancel(null, null, null);
 	}
 
 	/*
@@ -112,8 +100,29 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#cancel(java.lang.String[], int[], java.lang.String[])
 	 */
 	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
-		//TODO refactor to be able to pass those informations
-		cancel();
+		try {			
+			cancelTimer();
+			if(this.isStarted() && !canceled && !timedOut &&
+				outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+					SipServletRequest cancelRequest = outgoingRequest.createCancel();
+					//Adding reason headers if needed
+					if(protocol != null && reasonCode != null && reasonText != null
+						&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
+						for (int i = 0; i < protocol.length; i++) {
+							cancelRequest.addHeader("Reason", protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"");
+						}
+					}
+					cancelRequest.send();
+				canceled = true;
+			}
+			if(!this.isStarted() &&
+					outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+				canceled = true;	
+			}
+		}
+		catch(Exception e) {
+			throw new RuntimeException("Failed canceling proxy branch", e);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -141,8 +150,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#getRecursedProxyBranches()
 	 */
 	public List<ProxyBranch> getRecursedProxyBranches() {
-		// TODO Auto-generated method stub
-		return null;
+		return recursedBranches;
+	}
+	
+	public void addRecursedBranch(ProxyBranchImpl branch) {
+		recursedBranches.add(branch);
 	}
 
 	/* (non-Javadoc)
@@ -167,33 +179,26 @@ public class ProxyBranchImpl implements ProxyBranch {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.servlet.sip.ProxyBranch#setOutboundInterface(javax.servlet.sip.SipURI)
-	 */
-	public void setOutboundInterface(SipURI uri) {
-		outboundInterface = uri;
-
-	}
-
-	/* (non-Javadoc)
 	 * @see javax.servlet.sip.ProxyBranch#setProxyBranchTimeout(int)
 	 */
 	public void setProxyBranchTimeout(int seconds) {
 		this.proxyBranchTimeout = seconds;
-
 	}
 	
 	/**
 	 * After the branch is initialized, this method proxies the initial request to the
 	 * specified destination. Subsequent requests are proxied through proxySubsequentRequest
 	 */
-	public void start()
-	{
-		if(started)
+	public void start()	{
+		if(started) {
 			throw new IllegalStateException("Proxy branch alredy started!");
-		if(canceled)
+		}
+		if(canceled) {
 			throw new IllegalStateException("Proxy branch was cancelled, you must create a new branch!");
-		if(timedOut)
+		}
+		if(timedOut) {
 			throw new IllegalStateException("Proxy brnach has timed out!");
+		}
 		
 		// Initialize these here for efficiency.
 		updateTimer();
@@ -280,6 +285,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 */
 	public void onResponse(SipServletResponseImpl response)
 	{
+		response.setIsBranchResponse(true);
 		lastResponse = response;
 		
 		// We have already sent TRYING, don't send another one
@@ -310,7 +316,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		cancelTimer();
 		
 		if(response.getStatus() >= 600) // Cancel all 10.2.4
-			this.proxy.cancelAllExcept(this);
+			this.proxy.cancelAllExcept(this, null, null, null);
 		
 		// FYI: ACK is sent automatically by jsip when needed
 		
@@ -417,48 +423,74 @@ public class ProxyBranchImpl implements ProxyBranch {
 		return canceled;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean getAddToPath() {
-		// TODO Auto-generated method stub
-		return false;
+		return isAddToPath;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public SipURI getPathURI() {
-		// TODO Auto-generated method stub
-		return null;
+		if(isAddToPath) {
+			throw new IllegalStateException("addToPath is not enabled!");
+		}
+		throw new UnsupportedOperationException("the path extension is not yet supported");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean getRecordRoute() {
-		// TODO Auto-generated method stub
-		return false;
+		return recordRoutingEnabled;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean getRecurse() {
-		// TODO Auto-generated method stub
-		return false;
+		return recurse;
 	}
 
-	public void setAddToPath(boolean arg0) {
-		// TODO Auto-generated method stub
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setAddToPath(boolean isAddToPath) {
+		this.isAddToPath = isAddToPath;
 		
 	}
 
-	public void setOutboundInterface(InetAddress arg0) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setOutboundInterface(InetAddress inetAddress) {
+		//TODO check against our defined outbound interfaces		
+		String address = inetAddress.getHostAddress();
+		outboundInterface = sipFactoryImpl.createSipURI(null, address);		
 	}
 
-	public void setOutboundInterface(InetSocketAddress arg0) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
+		//TODO check against our defined outbound interfaces		
+		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+		outboundInterface = sipFactoryImpl.createSipURI(null, address);		
 	}
 
-	public void setRecordRoute(boolean arg0) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setRecordRoute(boolean isRecordRoute) {
+		recordRoutingEnabled = isRecordRoute;
 	}
 
-	public void setRecurse(boolean arg0) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setRecurse(boolean isRecurse) {
+		recurse = isRecurse;
 	}	
 }

@@ -342,23 +342,18 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					+ first + "] value [" + addr + "]");
 
 		if (!isAddressTypeHeader(hName)) {
-
 			logger.error("Header [" + hName + "] is nto address type header");
-
 			throw new IllegalArgumentException("Header[" + hName
 					+ "] is not of an address type");
 		}
 
 		if (isSystemHeader(hName)) {
-
 			logger.error("Error, cant add ssytem header [" + hName + "]");
-
 			throw new IllegalArgumentException("Header[" + hName
 					+ "] is system header, cant add, modify it!!!");
 		}
 
 		try {
-
 			String nameToAdd = getCorrectHeaderName(hName);
 			Header h = headerFactory.createHeader(nameToAdd, addr.toString());
 
@@ -853,38 +848,49 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			return null;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getInitialRemoteAddr() {
+		return remoteAddr.getHostAddress();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getInitialRemotePort() {
+		return remotePort;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getInitialTransport() {		
+		return transport;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getRemoteAddr()
 	 */
 	public String getRemoteAddr() {
-		// FIXME: Ambigious description!!!!
-		// But: that originated the message from the message Via header fields.
-		// or we have to play in proxy stuff - but thats insane!!!! - we will
-		// stick to Via only... ;/
 		// So for reqeust it will be top via
 		// For response Via ontop of local host ?
-		if (this.remoteAddr == null) {
-			// If its null it means that transport level info has not been
-			// set... ;/
-			if (this.message instanceof Response) {
-				// FIXME:....
-				return null;
-			} else {
-				// isntanceof Reqeust
-				ListIterator<ViaHeader> vias = this.message
-						.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
-				if (vias.hasNext()) {
-					ViaHeader via = vias.next();
-					return via.getHost();
-				} else {
-					// those ethods
-					return null;
-				}
-
-			}
+		if (this.message instanceof Response) {
+			// FIXME:....
+			return null;
 		} else {
-			return this.remoteAddr.getHostAddress();
+			// isntanceof Reqeust
+			ListIterator<ViaHeader> vias = this.message
+					.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
+			if (vias.hasNext()) {
+				ViaHeader via = vias.next();
+				return via.getHost();
+			} else {
+				// those ethods
+				return null;
+			}
+
 		}
 	}
 
@@ -893,7 +899,24 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getRemotePort()
 	 */
 	public int getRemotePort() {
-		return this.remotePort;
+		// So for reqeust it will be top via
+		// For response Via ontop of local host ?
+		if (this.message instanceof Response) {
+			// FIXME:....
+			return -1;
+		} else {
+			// isntanceof Reqeust
+			ListIterator<ViaHeader> vias = this.message
+					.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
+			if (vias.hasNext()) {
+				ViaHeader via = vias.next();
+				return via.getPort();
+			} else {
+				// those ethods
+				return -1;
+			}
+
+		}
 	}
 
 	/*
@@ -961,7 +984,24 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getTransport()
 	 */
 	public String getTransport() {
-		return this.transport;
+		// So for reqeust it will be top via
+		// For response Via ontop of local host ?
+		if (this.message instanceof Response) {
+			// FIXME:....
+			return null;
+		} else {
+			// isntanceof Reqeust
+			ListIterator<ViaHeader> vias = this.message
+					.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
+			if (vias.hasNext()) {
+				ViaHeader via = vias.next();
+				return via.getTransport();
+			} else {
+				// those ethods
+				return null;
+			}
+
+		}
 	}
 
 	/*
@@ -1487,5 +1527,5 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setCurrentApplicationName(String currentApplicationName) {
 		this.currentApplicationName = currentApplicationName;
-	}
+	}	
 }

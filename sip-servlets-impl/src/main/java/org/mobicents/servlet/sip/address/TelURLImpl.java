@@ -69,7 +69,7 @@ public class TelURLImpl extends URIImpl implements TelURL {
 			telUrl.setPhoneNumber(number);
 		} catch (ParseException ex) {
 			logger.error("Error setting phone number " + number);
-			throw new java.lang.IllegalArgumentException(ex);
+			throw new java.lang.IllegalArgumentException("phone number " + number + " is invalid", ex);
 		}
 	}
 
@@ -163,13 +163,23 @@ public class TelURLImpl extends URIImpl implements TelURL {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getPhoneContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return telUrl.getPhoneContext();
 	}
 
-	public void setPhoneNumber(String arg0, String arg1) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setPhoneNumber(String number, String phoneContext) {
+		try {
+			telUrl.setPhoneNumber(number);
+			telUrl.setPhoneContext(phoneContext);
+		} catch (ParseException ex) {
+			logger.error("Error setting phone number " + number);
+			throw new java.lang.IllegalArgumentException("phone number " + number + " is invalid", ex);
+		}
 	}
 }

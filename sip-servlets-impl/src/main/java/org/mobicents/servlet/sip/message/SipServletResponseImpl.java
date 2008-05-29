@@ -67,6 +67,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	Response response;
 	SipServletRequestImpl originalRequest;
 	ProxyBranch proxyBranch;
+
+	private boolean isBranchResponse;
 	/**
 	 * Constructor
 	 * @param response
@@ -427,26 +429,20 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 
-	public boolean isBranchResponse() {
-		// TODO Auto-generated method stub
-		return false;
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isBranchResponse() {		
+		return isBranchResponse;
 	}
 
 
-	public String getInitialRemoteAddr() {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * @param isBranchResponse the isBranchResponse to set
+	 */
+	public void setIsBranchResponse(boolean isBranchResponse) {
+		this.isBranchResponse = isBranchResponse;
 	}
-
-
-	public int getInitialRemotePort() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public String getInitialTransport() {
-		// TODO Auto-generated method stub
-		return null;
-	}	
+	
+	
 }

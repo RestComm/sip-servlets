@@ -248,7 +248,7 @@
 						JSLEE/SIPS interop app
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=116">
 						JSR 289 Proposed Final Draft API Alignement
@@ -347,7 +347,7 @@
 						Open IMS integration example
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=124">
 						JSR 289 Proposed Final Draft-2  API Alignement
@@ -367,10 +367,29 @@
 						<br />
 						<img src="red.jpeg" />
 						Various Enhancements and Bug fixes
-						<!--ul>
-							<li>								
+						<ul>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=199">
+									New Application Router Packaging and Deployment
+								</a>
 							</li>
-						</ul-->
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=200">
+									Implement the new Session invalidation methods from JSR 289 PFD
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=202">
+									Implement the doBranchResponse callback
+								</a>
+							</li>
+						</ul>
 					</p>
 				</subsection>
 				<subsection name="Version 0.6 - 08/01/2008">

@@ -65,10 +65,12 @@ public class ProxyImpl implements Proxy {
 	private SipURI recordRouteURI;
 	private SipURI outboundInterface;
 	private SipFactoryImpl sipFactoryImpl;
+	private boolean isNoCancel;
 	
 	private ProxyUtils proxyUtils;
 	
 	private Map<URI, ProxyBranch> proxyBranches;
+	private boolean started; 
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
@@ -85,7 +87,7 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#cancel()
 	 */
 	public void cancel() {
-		cancelAllExcept(null);
+		cancelAllExcept(null, null, null, null);
 	}
 	
 	/*
@@ -93,20 +95,10 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#cancel(java.lang.String[], int[], java.lang.String[])
 	 */
 	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
-		// TODO vlad can you check this ?
 		cancelAllExcept(null, protocol, reasonCode, reasonText);
-	}
-	
-	public void cancelAllExcept(ProxyBranch except) {
-		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
-			if(!proxyBranch.equals(except)) {
-				proxyBranch.cancel();
-			}
-		}
 	}
 
 	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText) {
-		//TODO vlad can you check this ?
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
 				proxyBranch.cancel(protocol, reasonCode, reasonText);
@@ -122,6 +114,8 @@ public class ProxyImpl implements Proxy {
 		for(URI target: targets)
 		{
 			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, sipFactoryImpl, this.recordRouteURI);
+			branch.setRecordRoute(recordRoutingEnabled);
+			branch.setRecurse(recurse);
 			list.add(branch);
 		}
 		return list;
@@ -224,8 +218,10 @@ public class ProxyImpl implements Proxy {
 	public void proxyTo(List<? extends URI> uris) {
 		for (URI uri : uris)
 		{
-			ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
-			this.proxyBranches.put(uri, pbi);
+			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
+			branch.setRecordRoute(recordRoutingEnabled);
+			branch.setRecurse(recurse);
+			this.proxyBranches.put(uri, branch);
 		}
 		startProxy();
 	}
@@ -235,8 +231,10 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void proxyTo(URI uri) {
 		
-		ProxyBranchImpl pbi = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
-		this.proxyBranches.put(uri, pbi);
+		ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
+		branch.setRecordRoute(recordRoutingEnabled);
+		branch.setRecurse(recurse);
+		this.proxyBranches.put(uri, branch);
 		startProxy();
 
 	}
@@ -269,7 +267,9 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#setRecordRoute(boolean)
 	 */
 	public void setRecordRoute(boolean rr) {
-		
+		if(started) {
+			throw new IllegalStateException("Cannot set a record route on an already started proxy");
+		}
 		this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null));
 		this.recordRoutingEnabled = rr;
 
@@ -311,6 +311,7 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#startProxy()
 	 */
 	public void startProxy() {
+		started = true;
 		if(this.parallel) {
 			for (ProxyBranch pb : this.proxyBranches.values()) {
 				((ProxyBranchImpl)pb).start();
@@ -324,16 +325,17 @@ public class ProxyImpl implements Proxy {
 		return outboundInterface;
 	}
 	
-	public void onFinalResponse(ProxyBranchImpl branch)
-	{
+	public void onFinalResponse(ProxyBranchImpl branch) {
 		//Get the final response
 		SipServletResponseImpl response = (SipServletResponseImpl) branch.getResponse();
 		
 		// Cancel all others if 2xx or 6xx 10.2.4
-		if( (response.getStatus() >= 200 && response.getStatus() < 300) 
-				|| (response.getStatus() >= 600 && response.getStatus() < 700) ) 
-			cancelAllExcept(branch);
-		
+		if(!isNoCancel) {
+			if( (response.getStatus() >= 200 && response.getStatus() < 300) 
+					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
+				cancelAllExcept(branch, null, null, null);
+			}
+		}
 		// Recurse if allowed
 		if(response.getStatus() >= 300 && response.getStatus() < 400
 				&& getRecurse())
@@ -341,14 +343,16 @@ public class ProxyImpl implements Proxy {
 			// We may want to store these for "moved permanently" and others
 			ListIterator<Header> headers = 
 				response.getMessage().getHeaders(ContactHeader.NAME);
-			while(headers.hasNext())
-			{
+			while(headers.hasNext()) {
 				ContactHeader contactHeader = (ContactHeader) headers.next();
 				SipURIImpl sipUri = new SipURIImpl(
 						(javax.sip.address.SipURI)contactHeader.getAddress().getURI());
-				ProxyBranchImpl pb = new ProxyBranchImpl(sipUri, this, sipFactoryImpl, this.recordRouteURI);
-				this.proxyBranches.put(sipUri, pb);
-				if(parallel) pb.start();
+				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(sipUri, this, sipFactoryImpl, this.recordRouteURI);
+				recurseBranch.setRecordRoute(recordRoutingEnabled);
+				recurseBranch.setRecurse(recurse);
+				this.proxyBranches.put(sipUri, recurseBranch);
+				branch.addRecursedBranch(branch);
+				if(parallel) recurseBranch.start();
 				// if not parallel, just adding it to the list is enough
 			}
 		}
@@ -469,14 +473,18 @@ public class ProxyImpl implements Proxy {
 		this.originalRequest = originalRequest;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean getNoCancel() {
-		// TODO Auto-generated method stub
-		return false;
+		return isNoCancel;
 	}
 
-	public void setNoCancel(boolean arg0) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setNoCancel(boolean isNoCancel) {
+		this.isNoCancel = isNoCancel;
 	}
 
 	/**

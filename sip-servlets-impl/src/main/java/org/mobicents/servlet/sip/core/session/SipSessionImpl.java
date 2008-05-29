@@ -70,7 +70,9 @@ import org.apache.catalina.Container;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -231,9 +233,19 @@ public class SipSessionImpl implements SipSession {
 	 */
 	public SipServletRequest createRequest(final String method) {
 		if(method.equals(Request.ACK)
-				||method.equals(Request.CANCEL))
+				|| method.equals(Request.CANCEL)) {
 			throw new IllegalArgumentException(
-					"Can not create ACK or CANCEL requests with this method");				
+					"Can not create ACK or CANCEL requests with this method");
+		}
+		if(!isValid()) {
+			throw new IllegalStateException("cannot create a request because the session is invalid");
+		}
+		if(State.TERMINATED.equals(state)) {
+			throw new IllegalStateException("cannot create a request because the session is in TERMINATED state");
+		}
+		if((State.INITIAL.equals(state) && hasOngoingTransaction())) {
+			throw new IllegalStateException("cannot create a request because the session is in INITIAL state with ongoing transactions");
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("dialog associated with this session to create the new request within that dialog "+
 					sessionCreatingDialog);
@@ -449,11 +461,13 @@ public class SipSessionImpl implements SipSession {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSession#getRegion()
+	/**
+	 * {@inheritDoc}
 	 */
 	public SipApplicationRoutingRegion getRegion() {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
 		return routingRegion;
 	}
 
@@ -507,11 +521,13 @@ public class SipSessionImpl implements SipSession {
 		return this.state;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSession#getSubscriberURI()
+	/**
+	 * {@inheritDoc}
 	 */
 	public URI getSubscriberURI() {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
 		if (this.subscriberURI == null)
 			throw new IllegalStateException("Subscriber URI is only available for outbound sessions.");
 		else 
@@ -716,15 +732,6 @@ public class SipSessionImpl implements SipSession {
 	public String getHandler() {
 		return handlerServlet;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSession#setOutboundInterface(javax.servlet.sip.SipURI)
-	 */
-	public void setOutboundInterface(SipURI uri) {
-		// TODO: validate from the list in servlet context
-		this.outboundInterface = uri;
-	}	
 
 	/**
 	 * @param dialog the dialog to set
@@ -995,13 +1002,34 @@ public class SipSessionImpl implements SipSession {
 		// TODO Auto-generated method stub
 		
 	}
-	public void setOutboundInterface(InetAddress arg0) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setOutboundInterface(InetAddress inetAddress) {
+		//TODO check against our defined outbound interfaces
+		String address = inetAddress.getHostAddress();
+		try {
+			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address));
+		} catch (ParseException e) {
+			logger.error("couldn't parse the SipURI from USER[" + null
+					+ "] HOST[" + address + "]", e);
+			throw new IllegalArgumentException("Could not create SIP URI user = " + null + " host = " + address);
+		}
 	}
-	public void setOutboundInterface(InetSocketAddress arg0) {
-		// TODO Auto-generated method stub
-		
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
+		//TODO check against our defined outbound interfaces		
+		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+		try {
+			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address));
+		} catch (ParseException e) {
+			logger.error("couldn't parse the SipURI from USER[" + null
+					+ "] HOST[" + address + "]", e);
+			throw new IllegalArgumentException("Could not create SIP URI user = " + null + " host = " + address);
+		}
 	}
 	
 	/**

@@ -42,8 +42,8 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		this.applicationName = applicationName;
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.servlet.sip.SipSessionsUtil#getApplicationSessionById(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
 	public SipApplicationSession getApplicationSessionById(String applicationSessionId) {
 		if(applicationSessionId == null) {
@@ -66,15 +66,36 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		}
 	}
 
-	public SipApplicationSession getApplicationSessionByKey(String arg0,
-			boolean arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipApplicationSession getApplicationSessionByKey(String applicationSessionId,
+			boolean create) {
+		if(applicationSessionId == null) {
+			throw new NullPointerException("the given key is null !");
+		}
+		SipApplicationSessionKey applicationSessionKey;
+		try {
+			applicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(applicationSessionId);
+		} catch (ParseException e) {
+			logger.error("the given application session id : " + applicationSessionId + 
+					" couldn't be parsed correctly ",e);
+			return null;
+		}
+		if(applicationSessionKey.getApplicationName().equals(applicationName)) {
+			return ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, create);
+		} else {
+			logger.warn("the given application session id : " + applicationSessionId + 
+					" tried to be retrieved from incorret application " + applicationName);
+			return null;
+		}
 	}
 
-	public SipSession getCorrespondingSipSession(SipSession arg0, String arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipSession getCorrespondingSipSession(SipSession sipSession, String headerName) {
+		throw new UnsupportedOperationException("RFC 3911 and RFC 3891 are not currently supported");
 	}
 
 }

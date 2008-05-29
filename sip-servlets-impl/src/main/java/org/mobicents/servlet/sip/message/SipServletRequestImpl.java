@@ -109,6 +109,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	private SipApplicationRoutingRegion routingRegion;
 
 	private URI subscriberURI;
+
+	private Address initialPoppedRoute;
 	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			SipSession sipSession, Transaction transaction, Dialog dialog,
@@ -1019,24 +1021,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Address getInitialPoppedRoute() {
-		// TODO Auto-generated method stub
-		return null;
+		return initialPoppedRoute;
 	}
-
-	public String getInitialRemoteAddr() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public int getInitialRemotePort() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public String getInitialTransport() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setInitialPoppedRoute(Address address) {
+		this.initialPoppedRoute = address;;
 	}
 
 	/**

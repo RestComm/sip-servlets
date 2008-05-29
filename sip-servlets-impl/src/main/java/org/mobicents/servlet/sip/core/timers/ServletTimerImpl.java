@@ -309,8 +309,9 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 * {@inheritDoc}
 	 */
 	public long getTimeRemaining() {
-		// TODO Auto-generated method stub
-		return 0;
+		synchronized (TIMER_LOCK) {
+			return scheduledExecutionTime - System.currentTimeMillis();
+		}
 	}
 
 }

@@ -266,6 +266,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#getExpirationTime()
 	 */
 	public long getExpirationTime() {
+		if(!isValid()) {
+			throw new IllegalStateException("this sip application session " + getId() + " is not valid anymore");
+		}
 		if(expirationTime <= 0) {
 			return 0;
 		}
@@ -308,11 +311,11 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions(java.lang.String)
 	 */
 	public Iterator<?> getSessions(String protocol) {
-		if("SIP".equalsIgnoreCase(protocol))
+		if("SIP".equalsIgnoreCase(protocol)) {
 			return sipSessions.values().iterator();
-		else 
-			//sipContext.getManager().findSessions()
-			return null;
+		} else {			
+			return httpSessions.values().iterator();
+		}
 	}
 
 	/*
@@ -647,8 +650,19 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return false;
 	}
 
-	public Object getSession(String arg0, Protocol arg1) {
-		// TODO Auto-generated method stub
+	/**
+	 * {@inheritDoc}
+	 */
+	public Object getSession(String id, Protocol protocol) {
+		switch (protocol) {
+			case SIP :
+				sipSessions.get(id);
+				break;
+				
+			case HTTP :
+				httpSessions.get(id);
+				break;
+		}
 		return null;
 	}
 
