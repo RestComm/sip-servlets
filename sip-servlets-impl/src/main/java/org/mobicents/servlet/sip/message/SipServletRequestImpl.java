@@ -35,8 +35,6 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
-import javax.servlet.sip.SipApplicationRouterInfo;
-import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -44,6 +42,9 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.SipSession.State;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
@@ -101,6 +102,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	private B2buaHelper b2buahelper;
 	
 	private SipServletResponse lastFinalResponse;
+	
+	/**
+	 * Routing region.
+	 */
+	private SipApplicationRoutingRegion routingRegion;
+
+	private URI subscriberURI;
 	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			SipSession sipSession, Transaction transaction, Dialog dialog,
@@ -1009,6 +1017,53 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				(lastFinalResponse == null || lastFinalResponse.getStatus() < finalResponse.getStatus())) {
 			this.lastFinalResponse = finalResponse;
 		}
+	}
+
+	public Address getInitialPoppedRoute() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getInitialRemoteAddr() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getInitialRemotePort() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public String getInitialTransport() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipApplicationRoutingRegion getRegion() {
+		return routingRegion;
+	}
+	
+	/**
+	 * This method allows the application to set the region that the application 
+	 * is in with respect to this SipSession
+	 * @param routingRegion the region that the application is in  
+	 */
+	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
+		this.routingRegion = routingRegion;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public URI getSubscriberURI() {		
+		return subscriberURI;
 	}	
+	
+	public void setSubscriberURI(URI uri) {		
+		this.subscriberURI = uri;
+	}
 	
 }

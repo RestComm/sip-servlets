@@ -23,6 +23,16 @@ import java.util.Iterator;
  * Represents application instances. The SipApplicationSession interface acts as a store for application data and provides access to contained protocol sessions, e.g. SipSession and HttpSession objects representing point-to-point signaling relationships.
  */
 public interface SipApplicationSession{
+	
+	/**
+	 * Possible protocols to which sessions contained in the SipApplicationSession belong to.
+	 *
+	 * @since 1.1
+	 */
+	public enum Protocol {
+		HTTP, SIP;
+	}
+	
     /**
      * @deprecated
      * Encodes the ID of this SipApplicationSession into the specified URI. The container must then be prepared to associate this application session with an incoming request which was triggered by activating the encoded URI.
@@ -33,7 +43,19 @@ public interface SipApplicationSession{
     void encodeURI(javax.servlet.sip.URI uri);
 
     /**
-     * Encode specified URL to include the application session ID in a way such that the parameter used to encode the application session ID should be unique across implementations. The recommended way is to use the java package name of the implementation, like com.acme.appsession. This mechanism can be used by the applications to encode the HTTP URL with the application session Id. This URL can then be sent out through some of out of band mechanism. When the HTTP Request comes back to the converged container with this request, the container must associate the new HttpSession with the encoded Application Session. In case the HTTP request is not a new request but a follow on request already associated with a HTTP Session then the converged containers must use the HTTP session association mechanism to route the request to the right HTTP Session and must ignore the encoded SipApplicationSession. This new mechanism is similar to how the current encodeURI() operates only for SIP.
+     * Encode specified URL to include the application session ID in a way such that 
+     * the parameter used to encode the application session ID should be unique across implementations. 
+     * The recommended way is to use the java package name of the implementation, like com.acme.appsession. 
+     * This mechanism can be used by the applications to encode the HTTP URL with the application session Id. 
+     * This URL can then be sent out through some of out of band mechanism. 
+     * When the HTTP Request comes back to the converged container with this request, 
+     * the container must associate the new HttpSession with the encoded Application Session. 
+     * In case the HTTP request is not a new request but a follow on request already 
+     * associated with a HTTP Session then the converged containers must use the HTTP session 
+     * association mechanism to route the request to the right HTTP Session. 
+     * If that HTTP Session was not associated with the encoded SipApplicationSession in the 
+     * request then that association MUST occur. This mechanism is similar to how 
+     * the (deprecated) encodeURI() operates for SIP.
      */
     java.net.URL encodeURL(java.net.URL url);
 
@@ -62,6 +84,7 @@ public interface SipApplicationSession{
     /**
      * Returns the time in future when this SipApplicationSession will expire. This would be the time of session creation + the expiration time set in milliseconds. For sessions that are set never to expire, this returns 0. For sessions that have already expired this returns
      * The time is returned as the number of milliseconds since midnight January 1, 1970 GMT.
+     * @throws IllegalStateException if this application session is not valid
      */
     long getExpirationTime();
 
@@ -70,6 +93,27 @@ public interface SipApplicationSession{
      */
     java.lang.String getId();
 
+    /**
+     * Returns true if the container will notify the application when this SipApplicationSession is in the ready-to-invalidate state. 
+     * @return value of the invalidateWhenReady flag 
+     * @throws IllegalStateException if this application session is not valid
+     */
+    boolean getInvalidateWhenReady();
+    
+    /**
+     * Specifies whether the container should notify the application when the SipApplicationSession 
+     * is in the ready-to-invalidate state as defined above. 
+     * 
+     * The container notifies the application using the SipApplicationSessionListener.sessionReadyToInvalidate  callback.
+     *  
+     * @param invalidateWhenReady if true, the container will observe this application session 
+     * and notify the application when it is in the ready-to-invalidate state. 
+     * The application session is not observed if the flag is false. 
+     * The default is true for v1.1 applications and false for v1.0 applications.
+     * @throws IllegalStateException if this application session is not valid 
+     */
+    void setInvalidateWhenReady(boolean invalidateWhenReady);
+    
     /**
      * Returns the last time an event occurred on this application session. For SIP, incoming and outgoing requests and incoming responses are considered events. The time is returned as the number of milliseconds since midnight January 1, 1970 GMT.
      * Actions that applications take, such as getting or setting a value associated with the session, do not affect the access time.
@@ -93,6 +137,16 @@ public interface SipApplicationSession{
     javax.servlet.sip.SipSession getSipSession(java.lang.String id);
 
     /**
+     * Returns the session object with the specified id associated with the specified protocol belonging to this application session, or null if not found.
+     * @param id the session id
+     * @param protocol an Enum identifying the protocol 
+     * @return the corresponding session object or null if none is found. 
+     * @throws NullPointerException on null id or protocol
+     * @throws IllegalStateException if this application session is not valid
+     */
+    java.lang.Object getSession(java.lang.String id, SipApplicationSession.Protocol protocol);
+
+    /**
      * Returns the active timer identified by a specific id that is associated with this application session.
      * @param id 
      * @return the ServletTimer object identified by the id belonging to this application session
@@ -106,10 +160,20 @@ public interface SipApplicationSession{
     Collection<ServletTimer> getTimers();
 
     /**
-     * Invalidates this application session. This will cause any timers associated with this application session to be cancelled.
+     * Invalidates this application session and unbinds any objects bound to it. 
+     * The invalidation will cause any timers associated with this application session to be cancelled. 
      */
     void invalidate();
 
+    /**
+     * Returns true if this application session is in a ready-to-invalidate state. A SipApplicationSession is in the ready-to-invalidate state if the following conditions are met:
+     * 1. All the contained SipSessions are in the ready-to-invalidate state.
+     * 2. None of the ServletTimers associated with the SipApplicationSession are active. 
+     * @return true if the application session is in ready-to-invalidate state, false otherwise 
+     * @throws IllegalStateException if this application session is not valid
+     */
+    boolean isReadyToInvalidate();
+    
     /**
      * Returns if this SipApplicationSession is valid, false otherwise. The SipSession can be invalidated by calling the method
      * on it. Also the SipSession can be invalidated by the container when either the associated

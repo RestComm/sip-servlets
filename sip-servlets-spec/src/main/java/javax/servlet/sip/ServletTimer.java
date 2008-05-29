@@ -52,4 +52,11 @@ public interface ServletTimer{
      */
     long scheduledExecutionTime();
 
+    /**
+     * Get the number of milliseconds that will elapse before the next scheduled timer expiration.
+     * For a one-time timer that has already expired (i.e., current time > scheduled expiry time) 
+     * this method will return the time remaining as a negative value. 
+     * @return the number of milliseconds that will elapse before the next scheduled timer expiration. 
+     */
+    long getTimeRemaining();
 }

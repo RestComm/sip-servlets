@@ -34,4 +34,15 @@ public interface SipApplicationSessionListener extends java.util.EventListener{
      * .
      */
     void sessionExpired(javax.servlet.sip.SipApplicationSessionEvent ev);
+    
+    /**
+     * Notification that a SipApplicationSession is in the ready-to-invalidate state. 
+     * The container will invalidate this session upon completion of this callback 
+     * unless the listener implementation calls 
+     * SipApplicationSessionEvent.getApplicationSession().setInvalidateWhenReady(false)
+     * 
+     * @param ev the notification event
+     * @since 1.1
+     */
+    void sessionReadyToInvalidate(SipApplicationSessionEvent ev);
 }

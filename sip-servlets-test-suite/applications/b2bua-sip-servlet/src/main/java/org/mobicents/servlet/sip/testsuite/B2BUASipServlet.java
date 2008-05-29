@@ -17,10 +17,10 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -48,10 +48,10 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got request:\n" + request);
-		Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
-		Set<String> toHeaderSet = new HashSet<String>();
-		toHeaderSet.add("sip:aa@sip-servlets.com");
-		headers.put("To", toHeaderSet);
+		Map<String, List<String>> headers=new HashMap<String, List<String>>();
+		List<String> toHeaderList = new ArrayList<String>();
+		toHeaderList.add("sip:aa@sip-servlets.com");
+		headers.put("To", toHeaderList);
 		
 		helper = request.getB2buaHelper();
 		SipServletRequest forkedRequest = helper.createRequest(request, true,

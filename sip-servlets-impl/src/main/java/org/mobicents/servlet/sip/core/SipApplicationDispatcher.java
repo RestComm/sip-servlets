@@ -18,13 +18,11 @@ package org.mobicents.servlet.sip.core;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import javax.servlet.sip.SipApplicationRouterInfo;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.sip.SipListener;
-import javax.sip.SipProvider;
 
 import org.apache.catalina.LifecycleException;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;

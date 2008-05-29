@@ -19,7 +19,9 @@ package org.mobicents.servlet.sip.annotations;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 
+import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.annotation.SipApplication;
 import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
@@ -67,37 +69,42 @@ public class ClassFileScanner {
 		this.sipContext = ctx;
 	}
 	
-	public void scan() {
+	/**
+	 * Scan the application for annotations with the contextconfig classloader.
+	 * It scans in the following locations :
+	 * WEB-INF/classes
+	 * WEB-INF/lib
+	 * ../APP-INF/lib
+	 * ../APP-INF/classes
+	 * 
+	 * @throws AnnotationVerificationException thrown if some annotations doesn't follow the restrictions given by the annotation contract
+	 */
+	public void scan() throws AnnotationVerificationException {
 		ClassLoader cl = this.sipContext.getClass().getClassLoader();
-		try {
-			this.classLoader = new AnnotationsClassLoader(
-					cl);
-			this.classLoader.setResources(this.sipContext.getResources());
-			this.classLoader.setAntiJARLocking(true);
-			this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
+		this.classLoader = new AnnotationsClassLoader(
+				cl);
+		this.classLoader.setResources(this.sipContext.getResources());
+		this.classLoader.setAntiJARLocking(true);
+		this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
+		
+		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib
+		this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
+		this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
+		
+		// Try to add the EAR binaries as repositories
+		File earJarDir = new File(this.docbase + "/../APP-INF/lib");
+		File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
+		if(earJarDir.exists())
+			this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
+		if(earClassesDir.exists())
+			this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
+		
+		// TODO: Add META-INF classpath
 			
-			// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib
-			this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
-			this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
-			
-			// Try to add the EAR binaries as repositories
-			File earJarDir = new File(this.docbase + "/../APP-INF/lib");
-			File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
-			if(earJarDir.exists())
-				this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
-			if(earClassesDir.exists())
-				this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
-			
-			// TODO: Add META-INF classpath
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-		}
 		_scan(new File(this.docbase));
 	}
 	
-    private void _scan(File folder) {
+    private void _scan(File folder) throws AnnotationVerificationException {
         File[] files = folder.listFiles();
         if(files != null) {
 	        for(int j = 0; j < files.length; j++) {
@@ -109,7 +116,7 @@ public class ClassFileScanner {
         }
     }
     
-    private void analyzeClass(String path) {
+    private void analyzeClass(String path) throws AnnotationVerificationException {
     	
     	// TODO: must check if there are extra /// or \\\ or /./ in the path after classes/
     	int classesIndex = path.toLowerCase().lastIndexOf("classes/");
@@ -126,9 +133,8 @@ public class ClassFileScanner {
 				processListenerAnnotation(clazz);
 				processServletAnnotation(clazz);
 				processSipApplicationKeyAnnotation(clazz);
-			} catch (Throwable e) {
-				// e.printStackTrace();
-				logger.warn("Failed to parse annotations for class " + classpath);
+			} catch (ClassNotFoundException e) {
+				logger.error("Failed to parse annotations for class " + classpath);
 			}
     	}
     }
@@ -139,24 +145,31 @@ public class ClassFileScanner {
     		sipContext.addSipApplicationListener(clazz.getCanonicalName());
     }
     
-    private void processSipApplicationKeyAnnotation(Class<?> clazz) {
-    	try {
-    		Method[] methods = clazz.getMethods();
-    		for(Method method:methods) {
-    			if(method.getAnnotation(SipApplicationKey.class)!=null &&
-    					Modifier.isStatic(method.getModifiers())) {
-    				//if(!method.getGenericReturnType().equals(String.class.)) continue;
-    				//Type[] types = method.getGenericParameterTypes();
-    				//if(!types[0].equals(SipServletRequest.class)) continue;
-    				if(this.sipAppKey != null) throw new IllegalStateException(
-    				"More than one SipApplicationKey annotated method is not allowed.");
-    				this.sipAppKey = method;
-    				sipContext.setSipApplicationKeyMethod(method);
-    			}
-    		}
-    	} catch (Throwable e) {
-    		logger.warn("Annotations not parsed. Error enumerating methods for class: " + clazz.toString());
-    	}
+    private void processSipApplicationKeyAnnotation(Class<?> clazz) throws AnnotationVerificationException {
+		Method[] methods = clazz.getMethods();
+		for(Method method:methods) {
+			if(method.getAnnotation(SipApplicationKey.class)!=null) {
+				if(!Modifier.isStatic(method.getModifiers()) || Modifier.isPublic(method.getModifiers())) {
+					throw new AnnotationVerificationException(
+							"A method annotated with the @SipApplicationKey annotation MUST be public and static");
+				}
+				if(!method.getGenericReturnType().equals(String.class)) {
+					throw new AnnotationVerificationException(
+							"A method annotated with the @SipApplicationKey annotation MUST return a String");
+				}
+				Type[] types = method.getGenericParameterTypes();
+				if(types.length != 1 || !types[0].equals(SipServletRequest.class)) {
+					throw new AnnotationVerificationException(
+							"A method annotated with the @SipApplicationKey annotation MUST have a single argument of type SipServletRequest");
+				}
+				if(this.sipAppKey != null) {
+					throw new IllegalStateException(
+						"More than one SipApplicationKey annotated method is not allowed.");
+				}
+				this.sipAppKey = method;
+				sipContext.setSipApplicationKeyMethod(method);
+			}
+		}    	
     }
     
     

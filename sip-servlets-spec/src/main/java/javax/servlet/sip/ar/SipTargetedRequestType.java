@@ -14,24 +14,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package javax.servlet.sip;
+package javax.servlet.sip.ar;
 
 /**
- * Routing regions used in the application selection process.
+ * Type of targeted request
+ *  
  * @since 1.1
- *
  */
-public enum SipApplicationRoutingRegionType{
+public enum SipTargetedRequestType {
+
 	/**
-	 * The NEUTRAL region contains applications that do not service a specific subscriber.
+	 * The request contains a Request-URI that contains an encoded URI 
 	 */
-	NEUTRAL, 
+	ENCODED_URI,
 	/**
-	 * The ORIGINATING region contains applications that service the caller.
+	 * The request contains a Join header (RFC 3911) 
 	 */
-	ORIGINATING, 
+	JOIN,
 	/**
-	 * The TERMINATING region contains applications that service the callee.
+	 * The request contains a Replaces header (RFC 3891) 
 	 */
-	TERMINATING;
+	REPLACES;
 }

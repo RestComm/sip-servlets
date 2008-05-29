@@ -305,4 +305,12 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 		return id;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public long getTimeRemaining() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

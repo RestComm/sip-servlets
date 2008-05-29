@@ -23,9 +23,35 @@ import java.util.Locale;
 
 /**
  * Defines common aspects of SIP requests and responses.
- * The Servlet API is defined with an implicit assumption that servlets receives requests from clients, inspects various aspects of the corresponding ServletRequest object, and generates a response by setting various attributes of a ServletResponse object. This model fits HTTP well, because HTTP servlets always execute origin servers; they execute only to process incoming requests and never initiates HTTP requests of their own.
- * SIP services, on the other hand, does need to be able to initiate requests of their own. This implies that SIP request and response classes are more symmetric, that is, requests must be writable as well as readable, and likewise, responses must be readable as well as writable.
- * The SipServletMessage interface defines a number of methods which are common to SipServletRequest and SipServletResponse, for example setters and getters for message headers and content. System Headers Applications must not add, delete, or modify so-called "system" headers. These are header fields that the servlet container manages: From, To, Call-ID, CSeq, Via, Route (except through pushRoute), Record-Route. Contact is a system header field in messages other than REGISTER requests and responses, 3xx and 485 responses, and 200/OPTIONS responses. Additionally, for containers implementing the reliable provisional responses extension, RAck and RSeq are considered system headers also. Implicit Transaction State SipServletMessage objects always implicitly belong to a SIP transaction, and the transaction state machine (as defined by the SIP specification) constrains what messages can legally be sent at various points of processing. If a servlet attempts to send a message which would violate the SIP specification (for example, the transaction state machine), the container throws an IllegalStateException.
+ * The Servlet API is defined with an implicit assumption that servlets receives requests from clients, 
+ * inspects various aspects of the corresponding ServletRequest object, and generates a response by setting various attributes 
+ * of a ServletResponse object. 
+ * This model fits HTTP well, because HTTP servlets always execute origin servers; 
+ * they execute only to process incoming requests and never initiates HTTP requests of their own.
+ * SIP services, on the other hand, does need to be able to initiate requests of their own. 
+ * This implies that SIP request and response classes are more symmetric, that is, 
+ * requests must be writable as well as readable, and likewise, responses must be readable as well as writable.
+ * The SipServletMessage interface defines a number of methods which are common to SipServletRequest and SipServletResponse, 
+ * for example setters and getters for message headers and content. 
+ * System Headers 
+ * 
+ * Applications must not add, delete, or modify so-called "system" headers. 
+ * These are header fields that the servlet container manages: 
+ * From, To, Call-ID, CSeq, Via, Route (except through pushRoute), Record-Route. 
+ * Contact is a system header field in messages other than REGISTER requests 
+ * and responses, 3xx and 485 responses, and 200/OPTIONS responses. 
+ * Additionally, for containers implementing the reliable provisional responses extension, 
+ * RAck and RSeq are considered system headers also. Note that From and To are system header 
+ * fields only with respect to their tags (i.e., tag parameters on these headers 
+ * are not allowed to be modified but modifications are allowed to the other parts).  
+ * 
+ * Implicit Transaction State 
+ * 
+ * SipServletMessage objects always implicitly belong to a SIP transaction, 
+ * and the transaction state machine (as defined by the SIP specification) constrains what 
+ * messages can legally be sent at various points of processing. 
+ * If a servlet attempts to send a message which would violate the SIP specification 
+ * (for example, the transaction state machine), the container throws an IllegalStateException.
  */
 public interface SipServletMessage extends java.lang.Cloneable{
     /**
@@ -133,13 +159,6 @@ public interface SipServletMessage extends java.lang.Cloneable{
     java.lang.Object getContent() throws java.io.IOException, java.io.UnsupportedEncodingException;
 
     /**
-     * Returns the content as a Java object. The actual type of the returned object depends on the MIME type of the content itself (the Content-Type) and on the list of classes requested. The object fetched is the first match of the type specified in the classes array, or null if none of the requested types are supported. The instanceof operator should be used to determine the specific kind of object returned.
-     * The message's character encoding is used when the MIME type indicates that the content consists of character data.
-     * For example, to fetch the contents as character data first and if that fails, to fetch the content bytes instead: Object c = msg.getContent(new Class[] { String.class, byte[].class }); if (c instanceof String) { System.out.println("Content is string"); } else if (c instanceof byte[]) { System.out.println("Content is bytes"); }
-     */
-    java.lang.Object getContent(java.lang.Class[] classes) throws java.io.IOException, java.io.UnsupportedEncodingException;
-
-    /**
      * Returns the locale of this message. This method returns the Locale identified by the Content-Language header of the message, or null if the Content-Language header is not present.
      */
     java.util.Locale getContentLanguage();
@@ -165,7 +184,7 @@ public interface SipServletMessage extends java.lang.Cloneable{
     javax.servlet.sip.Address getFrom();
 
     /**
-     * Returns the value of the specified request header as a String. If the request did not include a header of the specified name, this method returns null. If multiple headers exist, the first one is returned. The header name is case insensitive.
+     * Returns the value of the specified header as a String. If the request did not include a header of the specified name, this method returns null. If multiple headers exist, the first one is returned. The header name is case insensitive.
      * Either the long or compact name can be used to access the header field, as both are treated as equivalent. The list of assigned compact form is available in the IANA registry at http://www.isi.edu/in-notes/iana/assignments/sip-parameters
      * For example, getHeader("Content-Type"); getHeader("c"); will both return the same value.
      */
@@ -174,7 +193,7 @@ public interface SipServletMessage extends java.lang.Cloneable{
     javax.servlet.sip.SipServletMessage.HeaderForm getHeaderForm();
 
     /**
-     * Returns an Iterator over all the header names this request contains. If the request has no headers, this method returns an empty Iterator.
+     * Returns an Iterator over all the header names this message contains. If the message has no headers, this method returns an empty Iterator.
      * Note: This is a fail-fast iterator and can throw ConcurrentModificationException if the underlying implementation does not allow modification after the iterator is created.
      * Some servlet containers do not allow servlets to access headers using this method, in which case this method returns null.
      */
@@ -190,6 +209,32 @@ public interface SipServletMessage extends java.lang.Cloneable{
      */
     ListIterator<String> getHeaders(java.lang.String name);
 
+    /**
+     * Returns the IP address of the upstream/downstream hop from which this message was initially received by the container.
+     * Unlike getRemoteAddr(), this method returns the same value regardless of which application 
+     * invokes it in the same application composition chain of a specific application router. 
+     * @return a String containing the IP address of the sender of this message, or null if it was locally generated
+     * @since 1.1
+     */
+    java.lang.String getInitialRemoteAddr();
+    
+    /**
+     * Returns the port number of the upstream/downstream hop from which this message initially received by the container.
+     * Unlike getRemotePort(), this method returns the same value regardless of which application 
+     * invokes it in the same application composition chain of a specific application router. 
+     * @return the port number of the sender of this message, or -1 if it was locally generated.
+     * @since 1.1
+     */
+    int getInitialRemotePort();
+
+    /**
+     * Returns the name of the protocol with which this message was initially received by the container, e.g. "UDP", "TCP", "TLS", or "SCTP". 
+     * 
+     * @return name of the protocol this message was initially received with, or null if it was locally generated.
+     * @since 1.1
+     */
+    java.lang.String getInitialTransport();
+    
     /**
      * Returns the IP address of the interface this message was received on.
      */
@@ -220,7 +265,7 @@ public interface SipServletMessage extends java.lang.Cloneable{
      * Attempts to modify the specified header field through the returned list iterator must fail with an IllegalStateException if the header field is a system header.
      * Note: This is a fail-fast iterator and can throw ConcurrentModificationException if the underlying implementation does not allow modification after the iterator is created.
      */
-    ListIterator<Parameterable> getParameterableHeaders(java.lang.String name) throws javax.servlet.sip.ServletParseException;
+    ListIterator<? extends Parameterable> getParameterableHeaders(java.lang.String name) throws javax.servlet.sip.ServletParseException;
 
     /**
      * Returns the name and version of the protocol of this message. This is in the form
@@ -237,12 +282,22 @@ public interface SipServletMessage extends java.lang.Cloneable{
     byte[] getRawContent() throws java.io.IOException;
 
     /**
-     * Returns the IP address of the next upstream/downstream hop from which this message was received. Applications can determine the actual IP address of the UA that originated the message from the message Via header fields.
+     * Returns the IP address of the next upstream/downstream hop from which this message was received. 
+     * Applications can determine the actual IP address of the UA that originated 
+     * the message from the message Via header fields.
+     * 
+     *  <br/>
+     *  If the message was internally routed (from one application to the
+     *  next within the same container), then this method returns the address
+     *  of the container's SIP interface.
      */
     java.lang.String getRemoteAddr();
 
     /**
-     * Returns the port number of the sender of this message.
+     * Returns the port number of the next upstream/downstream hop from which this message was received. <br/>
+     * If the message was internally routed (from one application to the next within 
+     * the same container), then this method returns a valid port number chosen 
+     * by the container or the host TCP/IP stack.
      */
     int getRemotePort();
 
@@ -321,12 +376,21 @@ public interface SipServletMessage extends java.lang.Cloneable{
      * Sets the header with the specified name to have the value specified by the address argument.
      * This method can be used with headers which are defined to contain one or more entries matching (name-addr | addr-spec) *(SEMI generic-param) as defined in RFC 3261. This includes, for example, Contact and Route.
      * Either the long or compact name can be used to access the header field, as both are treated as equivalent.
+     * 
+     *  <p>If the message did not include any headers of the specified name,
+     *   this method returns an empty Iterator. If the message included headers of
+     *   the specified name with no values, this method returns an Iterator over empty <code>String</code>s.
+     * 
+     * @throws IllegalArgumentException if the specified header isn't defined to hold address values or if the specified header field is a system header
      */
     void setAddressHeader(java.lang.String name, javax.servlet.sip.Address addr);
 
     /**
-     * Stores an attribute in this message. Attributes are reset between messages. This method is most often used in conjunction with RequestDispatcher.
-     * Attribute names should follow the same conventions as package names. Names beginning with javax.servlet.sip.* are reserved for definition by the SIP Servlet API.
+     * Stores an attribute in this message. Attributes are reset between messages. 
+     * This method is most often used in conjunction with RequestDispatcher.
+     * Attribute names should follow the same conventions as package names. 
+     * Names beginning with javax.servlet.sip.* are reserved for definition by the SIP Servlet API.
+     *
      */
     void setAttribute(java.lang.String name, java.lang.Object o);
 
@@ -386,6 +450,12 @@ public interface SipServletMessage extends java.lang.Cloneable{
      * Sets the header with the specified name to have the value specified by the address argument.
      * This method can be used with headers which are defined to contain one or more entries matching field-value *(;parameter-name=parameter-value) as defined in RFC 3261. This includes, for example, Event and Via.
      * Either the long or compact name can be used to access the header field, as both are treated as equivalent.
+     * 
+     *  <p>If the message did not include any headers of the specified name,
+     *   this method returns an empty Iterator. If the message included headers of
+     *   the specified name with no values, this method returns an Iterator over empty <code>String</code>s.
+     * 
+     * @throws IllegalArgumentException if the specified header isn't defined to hold address values or if the specified header field is a system header
      */
     void setParameterableHeader(java.lang.String name, javax.servlet.sip.Parameterable param);
 

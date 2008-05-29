@@ -173,4 +173,9 @@ public class TimersSipServlet
 		}
 	}
 
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

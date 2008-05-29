@@ -22,17 +22,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.B2buaHelper;
-import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.UAMode;
 import javax.servlet.sip.SipSession.State;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
@@ -111,7 +110,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipServletRequest, boolean, java.util.Map)
 	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest,
-			boolean linked, Map<String, Set<String>> headerMap) {
+			boolean linked, Map<String, List<String>> headerMap) {
 
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
@@ -137,7 +136,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//but is populated by the container as usual
 			newRequest.removeHeader(ContactHeader.NAME);
 
-			Set<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);			
 			SipSessionImpl originalSession = origRequestImpl.getSipSession();
 			SipApplicationSessionImpl appSession = originalSession
@@ -181,7 +180,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipSession, javax.servlet.sip.SipServletRequest, java.util.Map)
 	 */
 	public SipServletRequest createRequest(SipSession session,
-			SipServletRequest origRequest, Map<String, Set<String>> headerMap) {
+			SipServletRequest origRequest, Map<String, List<String>> headerMap) {
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			SipSessionImpl sessionImpl = (SipSessionImpl) session;
@@ -202,7 +201,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			//They will be added later after the sip servlet request has been created
-			Set<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);
 			
 			//we already have a dialog since it is a subsequent request			
@@ -243,10 +242,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 * @return
 	 * @throws ParseException
 	 */
-	private static Set<String> retrieveContactHeaders(
-			Map<String, Set<String>> headerMap, Request newRequest)
+	private static List<String> retrieveContactHeaders(
+			Map<String, List<String>> headerMap, Request newRequest)
 			throws ParseException {
-		Set<String> contactHeaderSet = new HashSet<String>();
+		List<String> contactHeaderList = new ArrayList<String>();
 		if(headerMap != null) {
 			for (String headerName : headerMap.keySet()) {
 				if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
@@ -260,11 +259,11 @@ public class B2buaHelperImpl implements B2buaHelper {
 						}
 					}
 				} else {
-					contactHeaderSet = headerMap.get(headerName);
+					contactHeaderList = headerMap.get(headerName);
 				}
 			}
 		}
-		return contactHeaderSet;
+		return contactHeaderList;
 	}
 
 	/*
@@ -423,6 +422,22 @@ public class B2buaHelperImpl implements B2buaHelper {
 			this.sessionMap.remove(value);
 		}
 		this.sessionMap.remove(key);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipServletRequest createRequest(SipServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipServletRequest createCancel(SipSession session) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

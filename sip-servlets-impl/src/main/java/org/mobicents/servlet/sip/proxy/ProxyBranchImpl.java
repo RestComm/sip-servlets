@@ -17,16 +17,17 @@
 package org.mobicents.servlet.sip.proxy;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Timer;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
-import javax.servlet.sip.SipApplicationRoutingDirective;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
-import javax.sip.ListeningPoint;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.RouteHeader;
@@ -414,5 +415,50 @@ public class ProxyBranchImpl implements ProxyBranch {
 
 	public boolean isCanceled() {
 		return canceled;
+	}
+
+	public boolean getAddToPath() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public SipURI getPathURI() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean getRecordRoute() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean getRecurse() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void setAddToPath(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutboundInterface(InetAddress arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutboundInterface(InetSocketAddress arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setRecordRoute(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setRecurse(boolean arg0) {
+		// TODO Auto-generated method stub
+		
 	}	
 }

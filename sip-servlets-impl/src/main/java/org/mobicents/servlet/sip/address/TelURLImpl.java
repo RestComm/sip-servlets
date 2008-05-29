@@ -162,4 +162,14 @@ public class TelURLImpl extends URIImpl implements TelURL {
 			throw new IllegalArgumentException("Bad url string " + value);
 		}
 	}
+
+	public String getPhoneContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setPhoneNumber(String arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -15,6 +15,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package javax.servlet.sip;
+
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+
 /**
  * Represents SIP request messages. When receiving an incoming SIP request the container creates a SipServletRequest and passes it to the handling servlet. For outgoing, locally initiated requests, applications call SipFactory.createRequest to obtain a SipServletRequest that can then be modified and sent.
  */
@@ -63,6 +67,22 @@ public interface SipServletRequest extends javax.servlet.sip.SipServletMessage, 
     javax.servlet.sip.B2buaHelper getB2buaHelper();
 
     /**
+     * If a top route header had been removed by the container upon initially receiving this request, 
+     * then this method can be used to retrieve it. 
+     * Otherwise, if no route header had been popped then this method will return null.
+     * 
+     * Unlike getPoppedRoute(), this method returns the same value regardless of 
+     * which application invokes it in the same application composition chain.
+     * 
+     * Note that the URI parameters added to the Record-Route header using Proxy.getRecordRouteURI() 
+     * should be retrieved from the URI of the popped route Address using initialPoppedRoute.getURI().getParameter() 
+     * and not using initialPoppedRoute.getParameter().
+     * @return the popped top route header, or null if none
+     * @since 1.1
+     */
+    Address getInitialPoppedRoute();
+    
+    /**
      * Always returns null. SIP is not a content transfer protocol and having stream based content accessors is of little utility.
      * Message content can be retrieved using SipServletMessage.getContent() and SipServletMessage.getRawContent().
      */
@@ -83,6 +103,12 @@ public interface SipServletRequest extends javax.servlet.sip.SipServletMessage, 
      * Note that the container must return the same Proxy instance whenever a servlet invokes getProxy on messages belonging to the same transaction. In particular, a response to a proxied request is associated with the same Proxy object as is the original request.
      * This method throws an IllegalStateException if the Proxy object didn't already exist and the transaction underlying this SIP message is in a state which doesn't allow proxying, for example if this is a SipServletRequest for which a final response has already been generated.
      * If the request contains a Max-Forwards header field value of 0, then this method will generate a 483 (Too many hops) error response and throw TooManyHopsException.
+     * 
+     * <p>Note that the URI parameters added to the Record-Route header using
+     * <A HREF="../../../javax/servlet/sip/Proxy.html#getRecordRouteURI()"><CODE>Proxy.getRecordRouteURI()</CODE></A> should be retrieved from the URI of
+     * the popped route Address using
+     * <code>poppedRoute.getURI().getParameter()</code> and not using
+     * <code>poppedRoute.getParameter()</code>.</p>
      */
     javax.servlet.sip.Proxy getProxy() throws javax.servlet.sip.TooManyHopsException;
 
@@ -98,6 +124,29 @@ public interface SipServletRequest extends javax.servlet.sip.SipServletMessage, 
      */
     java.io.BufferedReader getReader() throws java.io.IOException;
 
+    /**
+     * This method allows the application to obtain the region it was invoked in for this SipServletRequest. 
+     * This information helps the application to determine the location of the subscriber 
+     * returned by SipServletRequest.getSubscriberURI().
+     * 
+     * If this SipServletRequest is an initial request, this method returns 
+     * the region in which this servlet is invoked. 
+     * The SipApplicationRoutingRegion is only available for initial requests. 
+     * For all other requests, this method throws IllegalStateException. 
+     * @return The routing region (ORIGINATING, NEUTRAL, TERMINATING or their sub-regions) 
+     * @throws IllegalStateException if this method is called on a request that is not initial.
+     * @since 1.1
+     */
+    SipApplicationRoutingRegion getRegion();
+    
+    /**
+     * Returns the URI of the subscriber for which this application is invoked to serve. 
+     * This is only available if this SipServletRequest received is an initial request. 
+     * For all other requests, this method throws IllegalStateException. 
+     * @return URI of the subscriber 
+     * @throws IllegalStateException if this method is called on a request that is not initial.
+     */
+    URI getSubscriberURI();
     /**
      * Returns the SipApplicationRoutingDirective associated with this request.
      * @return SipApplicationRoutingDirective associated with this request.
@@ -157,6 +206,6 @@ public interface SipServletRequest extends javax.servlet.sip.SipServletMessage, 
      * If directive is NEW, origRequest parameter is ignored. If directive is CONTINUE or REVERSE, the parameter origRequest must be an initial request dispatched by the container to this application, i.e. origRequest.isInitial() must be true. This request must be a request created in a new SipSession or from an initial request, and must not have been sent. If any one of these preconditions are not met, the method throws an IllegalStateException.
      * Note that when a servlet acts as a proxy and calls Proxy.proxyTo() to proxy a request, the request is always a continuation.
      */
-    void setRoutingDirective(javax.servlet.sip.SipApplicationRoutingDirective directive, javax.servlet.sip.SipServletRequest origRequest) throws java.lang.IllegalStateException;
+    void setRoutingDirective(javax.servlet.sip.ar.SipApplicationRoutingDirective directive, javax.servlet.sip.SipServletRequest origRequest) throws java.lang.IllegalStateException;
 
 }

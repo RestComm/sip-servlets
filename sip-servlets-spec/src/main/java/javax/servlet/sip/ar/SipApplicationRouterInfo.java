@@ -14,7 +14,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package javax.servlet.sip;
+package javax.servlet.sip.ar;
 
 import java.io.Serializable;
 
@@ -64,7 +64,7 @@ public class SipApplicationRouterInfo {
 			SipApplicationRoutingRegion routingRegion,
 			java.lang.String subscriberURI, 
 			java.lang.String route,
-			javax.servlet.sip.SipRouteModifier mod,
+			javax.servlet.sip.ar.SipRouteModifier mod,
 			java.io.Serializable stateInfo) {
 		this.nextApplicationName = nextApplicationName;
 		this.routingRegion = routingRegion;
@@ -89,11 +89,11 @@ public class SipApplicationRouterInfo {
 		return route;
 	}
 
-	public javax.servlet.sip.SipRouteModifier getRouteModifier() {
+	public javax.servlet.sip.ar.SipRouteModifier getRouteModifier() {
 		return mod;
 	}
 
-	public javax.servlet.sip.SipApplicationRoutingRegion getRoutingRegion() {
+	public javax.servlet.sip.ar.SipApplicationRoutingRegion getRoutingRegion() {
 		return routingRegion;
 	}
 

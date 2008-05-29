@@ -14,7 +14,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package javax.servlet.sip;
+package javax.servlet.sip.ar;
 
 import java.io.Serializable;
 
@@ -28,22 +28,22 @@ public class SipApplicationRoutingRegion implements Serializable {
     /**
      * The NEUTRAL region contains applications that do not service a specific subscriber.
      */
-    public static final javax.servlet.sip.SipApplicationRoutingRegion NEUTRAL_REGION = new SipApplicationRoutingRegion("NEUTRAL", SipApplicationRoutingRegionType.NEUTRAL);
+    public static final javax.servlet.sip.ar.SipApplicationRoutingRegion NEUTRAL_REGION = new SipApplicationRoutingRegion("NEUTRAL", SipApplicationRoutingRegionType.NEUTRAL);
 
     /**
      * The ORIGINATING region contains applications that service the caller.
      */
-    public static final javax.servlet.sip.SipApplicationRoutingRegion ORIGINATING_REGION= new SipApplicationRoutingRegion("ORIGINATING", SipApplicationRoutingRegionType.ORIGINATING);
+    public static final javax.servlet.sip.ar.SipApplicationRoutingRegion ORIGINATING_REGION= new SipApplicationRoutingRegion("ORIGINATING", SipApplicationRoutingRegionType.ORIGINATING);
 
     /**
      * The TERMINATING region contains applications that service the callee.
      */
-    public static final javax.servlet.sip.SipApplicationRoutingRegion TERMINATING_REGION=new SipApplicationRoutingRegion("TERMINATING", SipApplicationRoutingRegionType.TERMINATING);
+    public static final javax.servlet.sip.ar.SipApplicationRoutingRegion TERMINATING_REGION=new SipApplicationRoutingRegion("TERMINATING", SipApplicationRoutingRegionType.TERMINATING);
 
     /**
      * Deployer may define new routing region by constructing a new SipApplicationRoutingRegion object. The SipApplicationRoutingRegionType may be null in cases when a custom region is defined.
      */
-    public SipApplicationRoutingRegion(java.lang.String label, javax.servlet.sip.SipApplicationRoutingRegionType type){
+    public SipApplicationRoutingRegion(java.lang.String label, javax.servlet.sip.ar.SipApplicationRoutingRegionType type){
          this.label = label;
          this.sipApplicationRoutingRegionType = type;
     }
@@ -58,7 +58,7 @@ public class SipApplicationRoutingRegion implements Serializable {
     /**
      * Each routing region is either ORIGINATING, TERMINATING, or NEUTRAL type.
      */
-    public javax.servlet.sip.SipApplicationRoutingRegionType getType(){
+    public javax.servlet.sip.ar.SipApplicationRoutingRegionType getType(){
         return sipApplicationRoutingRegionType;
     }
 

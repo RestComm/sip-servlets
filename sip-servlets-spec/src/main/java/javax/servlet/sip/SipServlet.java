@@ -49,7 +49,22 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
      * See Also:Constant Field Values
      */
     public static final java.lang.String SUPPORTED="javax.servlet.sip.supported";
+    
+    /**
+     * The string "javax.servlet.sip.supportedRfcs". 
+     * This is the name of the ServletContext attribute whose value is a List 
+     * containing the RFC numbers represented as Strings of SIP RFCs supported by the container. 
+     * For e.g., if the container supports RFC 3261, RFC 3262 and RFC 3265, 
+     * the List associated with this attribute should contain the Strings "3261", "3262" and "3265".
+     */
+    public static final java.lang.String SUPPORTED_RFCs="javax.servlet.sip.supportedRfcs";
 
+    /**
+     * @deprecated in favor of using the "javax.servlet.sip.supported" attribute
+     * The string "javax.servlet.sip.100rel". This is the name of the ServletContext attribute whose value suggests whether the container supports the 100rel extension i.e. RFC 3262. 
+     */
+    public static final java.lang.String PRACK_SUPPORTED="javax.servlet.sip.100rel";
+    
     /**
      * The string "javax.servlet.sip.TimerService". This is the name of the ServletContext attribute whose value is an instance of the TimerService interface.
      * See Also:TimerService, Constant Field Values
@@ -68,6 +83,17 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
         
     }
 
+    /**
+     * Invoked by the server to handle intermediate final responses only if this Servlet behaves as a proxy.
+     * The default implementation is empty and must be overridden by subclasses to handle intermediate final responses received on a ProxyBranch. 
+     * @param resp the response object 
+     * @throws javax.servlet.ServletException if an exception occurs that interferes with the servlet's normal operation 
+     * @throws java.io.IOException if an input or output exception occurs
+     */
+    protected void doBranchResponse(SipServletResponse resp) throws javax.servlet.ServletException, java.io.IOException {
+    	
+    }
+    
     /**
      * Invoked by the server (via the service method) to handle incoming BYE requests.
      * The default implementation is empty and must be overridden by subclasses to do something useful.

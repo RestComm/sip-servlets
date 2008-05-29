@@ -36,13 +36,31 @@ public interface TelURL extends javax.servlet.sip.URI{
     boolean isGlobal();
 
     /**
-     * Sets the phone number of this TelURL. The specified number must be a valid global or local phone number for the "tel" scheme as described in RFC3966 (URLs for Telephone Calls).
+     * Sets the (global) phone number of this TelURL. The specified number must be a valid global number for the "tel" scheme as described in RFC3966 (URLs for Telephone Calls). The following usage of this method will result in valid global phone number: setPhoneNumber("+1-201-555-0123")
+     * @param number the new global phone number 
+     * @throws IllegalArgumentException if the phone number was invalid according to validation rules specified in RFC3966
+     * @since 1.1 
      */
     void setPhoneNumber(java.lang.String number);
 
+    /**
+     * Sets the (local) phone number of this TelURL. The specified number must be a local phone number for the "tel" scheme as described in RFC3966 (URLs for Telephone Calls). The following usage of this method will result in a valid local phone number: setPhoneNumber("7042","example.com")
+     * @param number the new local phone number
+     * @param phoneContext the phone-context parameter of this TelURI 
+     * @throws IllegalArgumentException if the phone number was invalid according to validation rules specified in RFC3966
+     * @since 1.1
+     */
+    void setPhoneNumber(java.lang.String number, java.lang.String phoneContext);
+    
     /**
      * Returns the String representation of this TelURL. Any reserved characters will be properly escaped according to RFC2396.
      */
     java.lang.String toString();
 
+    /**
+     * Returns the phone context of this TelURL for local numbers or null if the phone number is global 
+     * @return the phone-context of this TelURL for local numbers or null if the phone number is global
+     * @since 1.1
+     */
+    java.lang.String getPhoneContext();
 }

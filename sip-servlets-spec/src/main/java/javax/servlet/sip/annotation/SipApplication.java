@@ -22,8 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The @SipApplicationKey annotation is used when the application wants to associate 
- * the incoming request (and SipSession) with a certain SipApplicationSession
+ * The @SipApplication annotation is used to create an application level annotation for a collection of SipServlets 
  *
  * @since 1.1
  */

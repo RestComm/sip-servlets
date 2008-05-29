@@ -16,8 +16,8 @@
  */
 package org.mobicents.servlet.sip.router;
 
-import javax.servlet.sip.SipApplicationRoutingRegion;
-import javax.servlet.sip.SipRouteModifier;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.servlet.sip.ar.SipRouteModifier;
 
 /**
  * This class contains one information parsed in the dar configuration file.

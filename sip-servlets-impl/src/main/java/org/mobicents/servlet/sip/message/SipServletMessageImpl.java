@@ -647,16 +647,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	/*
 	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletMessage#getContent(java.lang.Class[])
-	 */
-	public Object getContent(Class[] classes) throws IOException,
-			UnsupportedEncodingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getContentLanguage()
 	 */
 	public Locale getContentLanguage() {

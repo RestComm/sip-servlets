@@ -71,6 +71,11 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
     static final int SC_BAD_GATEWAY=502;
 
     /**
+     * Status code (436) indicating that the Identity-Info header contains a URI that cannot be dereferenced by the verifier (either the URI scheme is unsupported by the verifier, or the resource designated by the URI is otherwise unavailable). 
+     */
+    static final int SC_BAD_IDENTITY_INFO=436;
+    
+    /**
      * Status code (400) indicating Bad Request.
      * See Also:Constant Field Values
      */
@@ -149,6 +154,11 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
      */
     static final int SC_INTERVAL_TOO_BRIEF=423;
 
+    /**
+     * Status code (438) indicating that the verifier receives a message with an Identity signature that does not correspond to the digest-string calculated by the verifier. 
+     */
+    static final int SC_INVALID_IDENTITY_HEADER=438;
+    
     /**
      * Status code (482) indicating that the server received a request with a Via (Section 6.40) path containing itself.
      * See Also:Constant Field Values
@@ -351,6 +361,11 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
     static final int SC_UNDECIPHERABLE=493;
 
     /**
+     * Status code (437) indicating that the verifier cannot validate the certificate referenced by the URI of the Identity-Info header, because, for example, the certificate is self-signed, or signed by a root certificate authority for whom the verifier does not possess a root certificate. 
+     */
+    static final int SC_UNSUPPORTED_CERTIFICATE=437;
+    
+    /**
      * Status code (415) indicating that the server is refusing to service the request because the message body of the request is in a format not supported by the requested resource for the requested method. The server SHOULD return a list of acceptable formats using the Accept, Accept-Encoding and Accept-Language header fields.
      * See Also:Constant Field Values
      */
@@ -362,6 +377,11 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
      */
     static final int SC_UNSUPPORTED_URI_SCHEME=416;
 
+    /**
+     * Status code (428) indicating that the request should be re-sent with an Identity header. 
+     */
+    static final int SC_USE_IDENTITY_HEADER=428;
+    
     /**
      * Status code (305) indicating that he call can be better handled by the specified proxy server.
      * See Also:Constant Field Values
@@ -381,7 +401,12 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
     javax.servlet.sip.SipServletRequest createAck();
 
     /**
-     * Creates a PRACK request object corresponding to this response. This method is used by servlets acting as UACs in order to acknowledge reliable provisional responses to INVITE requests with PRACK (RFC 3262).
+     * Creates a PRACK request object corresponding to this response. 
+     * This method is used by servlets acting as UACs in order to acknowledge reliable provisional responses 
+     * to INVITE requests with PRACK (RFC 3262).
+     * @return PRACK request corresponding to this response 
+     * @throws IllegalStateException if the transaction state is such that it doesn't allow a PRACK to be sent now, e.g. if a PRACK has already been generated.
+     * @throws Rel100Exception if the response is not a reliable provisional response or if the original request was not an INVITE.
      */
     javax.servlet.sip.SipServletRequest createPrack() throws Rel100Exception;
 
@@ -403,6 +428,21 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
      */
     javax.servlet.sip.Proxy getProxy();
 
+    /**
+     * Retruns the ProxyBranch object associated with the transaction of this SIP response object. 
+     * Such a ProxyBranch object exists if this is a response for a previously proxied request. 
+     * Otherwise, a ProxyBranch  object does not exist, and null is returned.
+     * 
+     * Note that the container must return the same ProxyBranch instance whenever 
+     * a servlet invokes getProxyBranch on messages belonging to the same transaction. 
+     * In particular, a response to a proxied request is associated with the same ProxyBranch object 
+     * as was the request sent on that branch.
+     *  
+     * @return the ProxyBranch object associated with this response's transaction, 
+     * or null if this response was not received for a previously proxied request.
+     */
+    ProxyBranch getProxyBranch();
+    
     /**
      * Returns the reason phrase for this response object.
      */
@@ -433,7 +473,10 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
 
     /**
      * Requests that this response be sent reliably using the 100rel extension defined in RFC 3262. This method must only be invoked for 1xx response other than 100, and only if the UAC indicated support for the 100rel extension in the request and the container supports it.
-     * Applications can test whether the container supports the 100rel extension by checking whether an attribute with name "javax.servlet.sip.100rel" exists in the ServletContext and has a value which equals Boolean.TRUE.
+     * <p>Applications can also test the same using the v1.0 mechanism by 
+     * checking whether an attribute with name "javax.servlet.sip.100rel" 
+     * exists in the <code>ServletContext</code> and has a value which equals Boolean.TRUE. 
+     * However, the v1.0 mechanism is being deprecated in this version in favor of checking using the "javax.servlet.sip.supported" attribute.
      */
     void sendReliably() throws javax.servlet.sip.Rel100Exception;
 
@@ -447,4 +490,11 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
      */
     void setStatus(int statusCode, java.lang.String reasonPhrase);
 
+    /**
+     * Returns true if this is an intermediate final response that arrived on a ProxyBranch.
+     * This method is used by SipServlet.doResponse() to delegate handling of any intermediate final responses 
+     * received on the ProxyBranch to the SipServlet.doBranchResponse() method. 
+     * @return true if the response arrived on a ProxyBranch, false otherwise. The method will also return false for a best final response chosen by the Proxy.
+     */
+    boolean isBranchResponse();
 }

@@ -21,18 +21,17 @@ import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.sip.SipApplicationRouter;
-import javax.servlet.sip.SipApplicationRouterInfo;
-import javax.servlet.sip.SipApplicationRoutingDirective;
-import javax.servlet.sip.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.ar.SipApplicationRouter;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

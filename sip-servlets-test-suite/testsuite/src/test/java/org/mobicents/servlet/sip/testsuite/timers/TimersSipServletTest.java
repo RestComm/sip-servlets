@@ -40,9 +40,9 @@ public class TimersSipServletTest extends SipServletTestCase {
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	//1 sec
-	private static final int TIMEOUT = 1000;
+	private static final int TIMEOUT = 1500;
 	//1 minute and 10 sec
-	private static final int APP_SESSION_TIMEOUT = 1000 * 60 + 10000;	
+	private static final int APP_SESSION_TIMEOUT = 70000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	private static final String OK = "OK";

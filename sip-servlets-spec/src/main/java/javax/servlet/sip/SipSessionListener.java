@@ -29,4 +29,11 @@ public interface SipSessionListener extends java.util.EventListener{
      */
     void sessionDestroyed(javax.servlet.sip.SipSessionEvent se);
 
+    /**
+     * Notification that a SipSession is in the ready-to-invalidate state. 
+     * The container will invalidate this session upon completion of this callback 
+     * unless the listener implementation calls SipSessionEvent.getSession().setInvalidateWhenReady(false)
+     * @param se the notification event
+     */
+    void sessionReadyToInvalidate(SipSessionEvent se);
 }

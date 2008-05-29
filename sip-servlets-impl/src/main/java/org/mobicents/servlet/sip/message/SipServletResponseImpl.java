@@ -32,7 +32,6 @@ import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
@@ -413,7 +412,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 
 
 	/**
-	 * @return the proxyBranch
+	 * {@inheritDoc}
 	 */
 	public ProxyBranch getProxyBranch() {
 		return proxyBranch;
@@ -425,5 +424,29 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setProxyBranch(ProxyBranch proxyBranch) {
 		this.proxyBranch = proxyBranch;
+	}
+
+
+	public boolean isBranchResponse() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	public String getInitialRemoteAddr() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public int getInitialRemotePort() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	public String getInitialTransport() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }

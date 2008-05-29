@@ -39,20 +39,20 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipApplicationRouter;
-import javax.servlet.sip.SipApplicationRouterInfo;
-import javax.servlet.sip.SipApplicationRoutingDirective;
-import javax.servlet.sip.SipApplicationRoutingRegion;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
-import javax.servlet.sip.SipRouteModifier;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
-import javax.servlet.sip.SipSession.State;
+import javax.servlet.sip.ar.SipApplicationRouter;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
@@ -271,15 +271,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			if(container instanceof Wrapper) {			
 				Wrapper wrapper = (Wrapper) container;
+				Servlet sipServlet = null;
 				try {
-					Servlet sipServlet = wrapper.allocate();
+					sipServlet = wrapper.allocate();
 					if(sipServlet instanceof SipServlet) {
 						SipServletContextEvent sipServletContextEvent = 
 							new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
 						for (SipServletListener sipServletListener : sipServletListeners) {					
 							sipServletListener.servletInitialized(sipServletContextEvent);					
 						}
-					}
+					}					
 				} catch (ServletException e) {
 					logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
 							"that it has been initialized", e);
@@ -287,7 +288,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				} catch (Throwable e) {
 					logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
 					ok = false; 
-				}					
+				} 
+				try {
+					if(sipServlet != null) {
+						wrapper.deallocate(sipServlet);
+					}
+				} catch (ServletException e) {
+		            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+		            ok = false;
+				} catch (Throwable e) {
+					logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+		            ok = false;
+				}
 			}
 		}			
 		return ok;
@@ -1157,19 +1169,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
 			sipServletRequest.getSipSession().setStateInfo(applicationRouterInfo.getStateInfo());
 			sipServletRequest.getSipSession().setRoutingRegion(applicationRouterInfo.getRoutingRegion());
+			sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
 			try {
 				URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
 				if(subscriberUri instanceof javax.sip.address.SipURI) {
-					sipServletRequest.setRequestURI(new SipURIImpl((javax.sip.address.SipURI)subscriberUri));
+					javax.servlet.sip.URI uri = new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
+					sipServletRequest.setRequestURI(uri);
+					sipServletRequest.setSubscriberURI(uri);
 				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
-					sipServletRequest.setRequestURI(new TelURLImpl((javax.sip.address.TelURL)subscriberUri));
+					javax.servlet.sip.URI uri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
+					sipServletRequest.setRequestURI(uri);
+					sipServletRequest.setSubscriberURI(uri);
 				}
 			} catch (ParseException pe) {					
 				logger.error("An unexpected parse exception occured ", pe);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;
-			}									
+			} 									
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
 			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 				String mainServlet = sipContext.getMainServlet();
@@ -1603,7 +1620,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		
 		if(!securityCheck(request)) return;
 	        
-		servlet.service(request, null);		
+		servlet.service(request, null);
+		
+		sipServletImpl.deallocate(servlet);
 	}
 	
 	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
@@ -1618,6 +1637,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			Servlet servlet = sipServletImpl.allocate();	        
 			servlet.service(null, response);
+			sipServletImpl.deallocate(servlet);
 		}
 				
 	}

@@ -14,9 +14,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package javax.servlet.sip;
+package javax.servlet.sip.ar;
 
 import java.util.List;
+
+import javax.servlet.sip.SipServletRequest;
 
 /**
  * This interface class specifies the API between the container and the application router.
@@ -41,7 +43,7 @@ public interface SipApplicationRouter{
     /**
      * This method is called by the container when a servlet sends or proxies an initial SipServletRequest. The application router returns a set of information. See @{link SipApplicationRouterInfo} for details.
      */
-    javax.servlet.sip.SipApplicationRouterInfo getNextApplication(javax.servlet.sip.SipServletRequest initialRequest, javax.servlet.sip.SipApplicationRoutingRegion region, javax.servlet.sip.SipApplicationRoutingDirective directive, java.io.Serializable stateInfo);
+    javax.servlet.sip.ar.SipApplicationRouterInfo getNextApplication(javax.servlet.sip.SipServletRequest initialRequest, javax.servlet.sip.ar.SipApplicationRoutingRegion region, javax.servlet.sip.ar.SipApplicationRoutingDirective directive, java.io.Serializable stateInfo);
 
     /**
      * Initializes the SipApplicationRouter.

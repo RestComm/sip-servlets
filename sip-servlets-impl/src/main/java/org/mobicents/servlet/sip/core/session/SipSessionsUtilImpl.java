@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionsUtil;
 
 import org.apache.commons.logging.Log;
@@ -42,9 +43,9 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	}
 	
 	/* (non-Javadoc)
-	 * @see javax.servlet.sip.SipSessionsUtil#getApplicationSession(java.lang.String)
+	 * @see javax.servlet.sip.SipSessionsUtil#getApplicationSessionById(java.lang.String)
 	 */
-	public SipApplicationSession getApplicationSession(String applicationSessionId) {
+	public SipApplicationSession getApplicationSessionById(String applicationSessionId) {
 		if(applicationSessionId == null) {
 			throw new NullPointerException("the given id is null !");
 		}
@@ -63,6 +64,17 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 					" tried to be retrieved from incorret application " + applicationName);
 			return null;
 		}
+	}
+
+	public SipApplicationSession getApplicationSessionByKey(String arg0,
+			boolean arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SipSession getCorrespondingSipSession(SipSession arg0, String arg1) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

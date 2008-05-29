@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
 import org.jboss.web.tomcat.security.config.JBossContextConfig;
+import org.mobicents.servlet.sip.annotations.AnnotationVerificationException;
 import org.mobicents.servlet.sip.annotations.ClassFileScanner;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -94,7 +95,13 @@ public class SipJBossContextConfig extends JBossContextConfig
 			//annotations scanning
 			SipStandardContext sipctx = (SipStandardContext) context;
 			ClassFileScanner scanner = new ClassFileScanner(sipctx.getJbossBasePath(), sipctx);
-			scanner.scan();
+			try {
+				scanner.scan();
+			} catch (AnnotationVerificationException ave) {
+				logger.error("An annotation didn't follow its annotation contract",
+						ave);
+				ok = false;
+			}
 			
 			InputStream sipXmlInputStream = servletContext
 					.getResourceAsStream(SipContext.APPLICATION_SIP_XML);

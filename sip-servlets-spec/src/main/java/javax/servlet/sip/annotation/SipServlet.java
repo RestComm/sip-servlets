@@ -38,4 +38,6 @@ public @interface SipServlet {
 	int loadOnStartup() default -1;
 	
 	String name() default "";
+	
+	String description() default "";
 }

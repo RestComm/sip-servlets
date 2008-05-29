@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +84,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 			uri2 = sipFactory.createAddress("sip:cutme@127.0.0.1:5056").getURI();
 		}
 		
-		ArrayList uris = new ArrayList();
+		ArrayList<URI> uris = new ArrayList<URI>();
 		uris.add(uri1);
 		uris.add(uri2);
 		Proxy proxy = request.getProxy();
@@ -95,7 +97,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		for(SipURI uri:outboundInterfaces) {
 			if(uri.toString().indexOf("127.0.0.1")>0) {
 				// pick the lo interface, since its universal on all machines
-				proxy.setOutboundInterface(uri);
+				proxy.setOutboundInterface(new InetSocketAddress(InetAddress.getByName(uri.getHost()),uri.getPort()));
 				obi = uri;
 				break;
 			}

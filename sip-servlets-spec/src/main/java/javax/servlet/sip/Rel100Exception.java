@@ -16,9 +16,16 @@
  */
 package javax.servlet.sip;
 /**
- * Indicates that a provisional response cannot be sent reliably or PRACK was attempted to be created on a non reliable provisional response.
- * This is thrown by the container when an application requested that a provisional response be sent reliably (using the 100rel extension defined in RFC 3262) but one or more of the conditions for using 100rel is not satisfied: the status code of the response is not in the range 101-199 the request was not an INVITE the UAC did not indicate support for the 100rel extension in the request the container doesn't support the 100rel extension This exception is also thrown when SipServletResponse.createPrack() is called for non-reliable provisional response or a final response.
- * The actual reason why SipServletResponse.sendReliably() failed can be discovered through getReason().
+ * Indicates that a provisional response cannot be sent reliably or PRACK was attempted 
+ * to be created on a non reliable provisional response.
+ * This is thrown by the container when an application requested that a provisional response be sent reliably 
+ * (using the 100rel extension defined in RFC 3262) but one or more of the conditions for using 100rel is not satisfied: 
+ * the status code of the response is not in the range 101-199 
+ * the request was not an INVITE the UAC did not indicate support for the 100rel extension 
+ * in the request the container doesn't support the 100rel extension 
+ * This exception is also thrown when SipServletResponse.createPrack() is called for 
+ * non-reliable provisional response or a final response or if the original request was not an INVITE. .
+ * The actual reason why SipServletResponse.sendReliably() or SipServletResponse.createPrack() failed can be discovered through getReason(). 
  */
 public class Rel100Exception extends javax.servlet.ServletException{
 	private int reason;
@@ -36,15 +43,19 @@ public class Rel100Exception extends javax.servlet.ServletException{
     /**
      * Reason code indicating that the UAC didn't indicate support for the reliable responses extension in the request.
      */
-    public static final int NO_UAC_SUPPORT=2;
+    public static final int NO_REQ_SUPPORT=2;
     /**
      * Reason code indicating that the container does not support reliable provisional response.
      */
     public static final int NOT_SUPPORTED=3;
+    /**
+     * Reason code indicating that SipServletResponse.createPrack()  was invoked on a provisional response that is not reliable. 
+     */
+    public static final int NOT_100rel=4;
 
     /**
      * Constructs a new Rel100Exception with the specified error reason.
-     * @param reason - one of NOT_1XX, NOT_INVITE, NO_UAC_SUPPORT, NOT_SUPPORTED
+     * @param reason - one of NOT_1XX, NOT_INVITE, NO_REQ_SUPPORT, NOT_SUPPORTED, NOT_100rel 
      */
     public Rel100Exception(int reason){
          this.reason = reason;
@@ -66,6 +77,9 @@ public class Rel100Exception extends javax.servlet.ServletException{
 
 		case 3: 
 			return "100rel not supported by the container";
+			
+		case 4:
+			return "SipServletResponse.createPrack()  was invoked on a provisional response that is not reliable.";
 		}
 		return "Failed to send response reliably";
     }

@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.proxy;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -248,14 +250,6 @@ public class ProxyImpl implements Proxy {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.servlet.sip.Proxy#setOutboundInterface(javax.servlet.sip.SipURI)
-	 */
-	public void setOutboundInterface(SipURI uri) {
-		outboundInterface = uri;
-
-	}
-
-	/* (non-Javadoc)
 	 * @see javax.servlet.sip.Proxy#setParallel(boolean)
 	 */
 	public void setParallel(boolean parallel) {
@@ -473,5 +467,33 @@ public class ProxyImpl implements Proxy {
 
 	void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
+	}
+
+	public boolean getNoCancel() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void setNoCancel(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setOutboundInterface(InetAddress inetAddress) {
+		//TODO check against our defined outbound interfaces
+		String address = inetAddress.getHostAddress();
+		outboundInterface = sipFactoryImpl.createSipURI(null, address);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
+		//TODO check against our defined outbound interfaces		
+		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+		outboundInterface = sipFactoryImpl.createSipURI(null, address);
 	}	
 }

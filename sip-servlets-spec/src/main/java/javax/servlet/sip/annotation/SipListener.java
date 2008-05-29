@@ -34,4 +34,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface SipListener {
 	String applicationName() default "";
+
+	String description() default "";
 }

@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import javax.servlet.sip.SipApplicationRoutingRegion;
-import javax.servlet.sip.SipApplicationRoutingRegionType;
-import javax.servlet.sip.SipRouteModifier;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.servlet.sip.ar.SipApplicationRoutingRegionType;
+import javax.servlet.sip.ar.SipRouteModifier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

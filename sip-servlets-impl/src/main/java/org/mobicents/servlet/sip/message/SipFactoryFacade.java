@@ -199,21 +199,8 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 		return threadLocalHttpSession.get();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipFactory#createApplicationSessionByAppName(java.lang.String)
-	 */
-	public SipApplicationSession createApplicationSessionByAppName(
-			String sipAppName) {
-		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl)
-			sipFactoryImpl.createApplicationSessionByAppName(sipAppName);
-		associateHttpSession(sipApplicationSessionImpl);
-		return sipApplicationSessionImpl;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipFactory#createApplicationSessionByKey(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
 	public SipApplicationSession createApplicationSessionByKey(
 			String sipApplicationKey) {
@@ -223,11 +210,18 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 		return sipApplicationSessionImpl;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipFactory#createAuthInfo()
+	/**
+	 * {@inheritDoc}
 	 */
 	public AuthInfo createAuthInfo() {		
 		return sipFactoryImpl.createAuthInfo();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipApplicationSession createApplicationSessionByAppName(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

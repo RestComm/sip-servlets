@@ -26,7 +26,11 @@ import java.util.Enumeration;
 public interface SipSession{
     /**
      * Returns a new request object. This method is used by user agents only.
-     * Note that this method must not be used to create ACK or CANCEL requests. User agents create ACKs by calling SipServletResponse.createAck() and CANCELs are created by calling SipServletRequest.createCancel().
+     * Note that this method must not be used to create ACK or CANCEL requests. 
+     * User agents create ACKs by calling SipServletResponse.createAck() and CANCELs are created by calling SipServletRequest.createCancel().
+     * 
+     * @throws IllegalArgumentException if method is not a syntactically valid SIP method or if it's "ACK" or "CANCEL" 
+     * @throws IllegalStateException if this SipSession has been invalidated or if this SipSession is in the INITIAL state and there is an ongoing transaction or if this SipSession is in the TERMINATED state
      */
     javax.servlet.sip.SipServletRequest createRequest(java.lang.String method);
 
@@ -59,6 +63,27 @@ public interface SipSession{
      * Returns a string containing the unique identifier assigned to this session. The identifier is assigned by the servlet container and is implementation dependent.
      */
     java.lang.String getId();
+    
+    /**
+     * Returns true if the container will notify the application when this SipSession is in the ready-to-invalidate state. 
+     * @return value of the invalidateWhenReady flag 
+     * @throws IllegalStateException if this method is called on an invalidated session
+     * @since 1.1
+     */
+    boolean getInvalidateWhenReady();
+    
+    /**
+     * Specifies whether the container should notify the application when the SipSession 
+     * is in the ready-to-invalidate state as defined above. 
+     * The container notifies the application using the SipSessionListener.sessionReadyToInvalidate callback. 
+     * @param invalidateWhenReady if true, the container will observe this session and 
+     * notify the application when it is in the ready-to-invalidate state. 
+     * The session is not observed if the flag is false. 
+     * The default is true for v1.1 applications and false for v1.0 applications.
+     * @throws IllegalStateException if this method is called on an invalidated session
+     * @since 1.1
+     */
+    void setInvalidateWhenReady(boolean invalidateWhenReady);
 
     /**
      * Returns the last time the client sent a request associated with this session, as the number of milliseconds since midnight January 1, 1970 GMT. Actions that your application takes, such as getting or setting a value associated with the session, do not affect the access time.
@@ -71,11 +96,19 @@ public interface SipSession{
     javax.servlet.sip.Address getLocalParty();
 
     /**
-     * This method allows the application to obtain the region that the application is in with respect to this SipSession. It indicates where the subscriber whom the application is invoked to serve is. If region is ORIGINATING, the subscriber is the caller. If region is TERMINATING, the subscriber is the callee.
-     * If this SipSession is created when this servlet receives an initial request, this method returns the region in which this servlet is invoked.
-     * If this SipSession is created by this servlet, the region depends on the routing directive used when creating the outgoing intial request. If NEW directive is used, region is ORIGINATING. If CONTINUE directive is used to proxy or relay an origRequest, the region is the same as that of the SipSession of origRequest. If REVERSE directive is used to relay an origRequest, the region is the opposite of that of the SipSession of origRequest.
+     * This method allows the application to obtain the region it was invoked in for this SipSession. 
+     * This information helps the application to determine the location of the subscriber 
+     * returned by <code>SipSession.getSubscriberURI()</code>
+     * <p> If this SipSession is created when this servlet receives an initial request, 
+     * this method returns the region in which this servlet is invoked.
+     *  The <code>SipApplicationRoutingRegion</code> is only available if this SipSession received an initial request. 
+     *  Otherwise, this method throws IllegalStateException.<P>
+     * 
+     * @return The routing region (ORIGINATING, NEUTRAL, TERMINATING or their sub-regions)
+     * @throws IllegalStateException     if this method is called on an invalidated session
+     * @since 1.1
      */
-    javax.servlet.sip.SipApplicationRoutingRegion getRegion();
+    javax.servlet.sip.ar.SipApplicationRoutingRegion getRegion();
 
     /**
      * Returns the Address identifying the remote party. This is the value of the To header of locally initiated requests in this leg.
@@ -83,12 +116,25 @@ public interface SipSession{
     javax.servlet.sip.Address getRemoteParty();
 
     /**
+     * Returns the ServletContext to which this session belongs. 
+     * By definition, there is one ServletContext per sip (or web) module per JVM. 
+     * Though, a SipSession belonging to a distributed application deployed 
+     * to a distributed container may be available across JVMs, 
+     * this method returns the context that is local to the JVM on which it was invoked.
+     *  
+     * @return ServletContext object for the sip application
+     * @since 1.1
+     */
+    javax.servlet.ServletContext getServletContext();
+    
+    /**
      * Returns the current SIP dialog state, which is one of INITIAL, EARLY, CONFIRMED, or TERMINATED. These states are defined in RFC3261.
      */
     javax.servlet.sip.SipSession.State getState();
 
     /**
      * Returns the URI of the subscriber for which this application is invoked to serve. This is only available if this SipSession received an initial request. Otherwise, this method throws IllegalStateException.
+     * @throws IllegalStateException if this method is called on an invalidated session
      */
     javax.servlet.sip.URI getSubscriberURI();
 
@@ -98,11 +144,6 @@ public interface SipSession{
     void invalidate();
 
     /**
-     * Returns true if this SipSession has one or more ongoing transactions. An ongoing transaction will exist if either of the following is true: if a request has been created and sent with this SipSession but but no final response has been received. if a request has been received on this SipSession but no final response has been sent in response to it. However, the above behavior is overridden if the servlet has operated as an unsupervised proxy. Once the servlet has issues proxy.setSupervised(false) for a request associated with this SipSession, then this method will return false regardless of whether there are in fact any ongoing transactions.
-     */
-    boolean hasOngoingTransaction();
-
-    /**
      * Returns true if this SipSession is valid, false otherwise. The SipSession can be invalidated by calling the method
      * on it. Also the SipSession can be invalidated by the container when either the associated
      * times out or
@@ -110,6 +151,19 @@ public interface SipSession{
      */
     boolean isValid();
 
+    /**
+     * Returns true if this session is in a ready-to-invalidate state. A SipSession is in the ready-to-invalidate state under any of the following conditions:
+     * 
+     * 1. The SipSession transitions to the TERMINATED state.
+     * 2. The SipSession transitions to the COMPLETED state when it is acting as a non-record-routing proxy.
+     * 3. The SipSession acting as a UAC transitions from the EARLY state back to the INITIAL state on account of receiving a non-2xx final response and has not initiated any new requests (does not have any pending transactions).
+     *  
+     * @return if the session is in ready-to-invalidate state, false otherwise 
+     * @throws IllegalStateException if this method is called on an invalidated session
+     * @since 1.1
+     */
+    boolean isReadyToInvalidate();
+    
     /**
      * Removes the object bound with the specified name from this session. If the session does not have an object bound with the specified name, this method does nothing.
      */
@@ -121,14 +175,53 @@ public interface SipSession{
     void setAttribute(java.lang.String name, java.lang.Object attribute);
 
     /**
-     * Sets the handler for this SipSession. This method can be used to explicitly specify the name of the servlet which should handle all subsequently received messages for this SipSession. The servlet must belong to the same application (i.e. same ServletContext) as the caller.
+     * Sets the handler for this SipSession. 
+     * This method can be used to explicitly specify the name of the servlet which 
+     * should handle all subsequently received messages for this SipSession. 
+     * The servlet must belong to the same application (i.e. same ServletContext) as the caller.
+     * 
+     * 
      */
     void setHandler(java.lang.String name) throws javax.servlet.ServletException;
 
     /**
-     * If multihoming is supported, then this method can be used to select the outbound interface to use when sending requests for this SipSession. The specified address must be the address of one of the configured outbound interfaces. The set of SipURI objects which represent the supported outbound interfaces can be obtained from the servlet context attribute named javax.servlet.sip.outboundInterfaces.
+     * In multi-homed environment this method can be used to select the outbound interface 
+     * and port number to use for proxy branches. 
+     * The specified address must be the address of one of the configured outbound interfaces. 
+     * The set of SipURI objects which represent the supported outbound interfaces can be obtained from the servlet context attribute named javax.servlet.sip.outboundInterfaces.
+     * 
+     * The port is interpreted as an advice by the app to the container. 
+     * If the port of the socket address has a non-zero value, 
+     * the container will make a best-effort attempt to use it as the source port number for UDP packets, 
+     * or as a source port number for TCP connections it originates. 
+     * If the port is not available, the container will use its default port allocation scheme.
+     * 
+     * Invocation of this method also impacts the system headers generated by the container for this Proxy, 
+     * such as the Record-Route header (getRecordRouteURI()), 
+     * the Via and the Contact header. 
+     * The IP address part of the socket address is used to construct these system headers.
+     * @param address the socket address representing the outbound interface to use when forwarding requests with this proxy 
+     * @throws NullPointerException on null address
+     * @throws IllegalArgumentException if the address is not understood by the container as one of its outbound interface 
      */
-    void setOutboundInterface(javax.servlet.sip.SipURI uri);
+    void setOutboundInterface(java.net.InetAddress address);
+    
+    /**
+     * In multi-homed environment this method can be used to select the outbound interface 
+     * and port number to use for proxy branches. 
+     * The specified address must be the address of one of the configured outbound interfaces. 
+     * The set of SipURI objects which represent the supported outbound interfaces can be obtained from the servlet context attribute named javax.servlet.sip.outboundInterfaces.
+     * 
+     * Invocation of this method also impacts the system headers generated by the container for this Proxy, 
+     * such as the Record-Route header (getRecordRouteURI()), 
+     * the Via and the Contact header. 
+     * The IP address part of the socket address is used to construct these system headers.
+     * @param address the address which represents the outbound interface  
+     * @throws NullPointerException on null address
+     * @throws IllegalArgumentException if the address is not understood by the container as one of its outbound interface
+     * @throws IllegalStateException if this method is called on an invalidated session  
+     */
+    void setOutboundInterface(java.net.InetSocketAddress address);
 
     /**
      * Possible SIP dialog states from SipSession FSM.

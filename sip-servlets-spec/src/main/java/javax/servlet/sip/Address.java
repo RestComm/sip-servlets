@@ -53,10 +53,16 @@ public interface Address extends javax.servlet.sip.Parameterable {
 	java.lang.Object clone();
 
 	/**
-	 * Compares the given Address with this one. The comparison rules to be used
-	 * are as specified in RFC 3261, specific rules for comparison should be
-	 * used for various headers for Address type as specified for them in their
-	 * specifications.
+	 * Compares the given Address with this one. 
+	 * <p>As Addresses consist of a URI, an optional display name, and an optional set
+	 * of name-value parameters, the following rules should be used for
+	 * comparing them:
+	 * <ol>
+	 * 	<li> URI (SipURI, TelURL, etc.) within the Address should be compared based on their respective equals() methods.
+	 * 	<li> Address parameters should be compared in the same way as URI parameters 
+	 *  (as specified in RFC 3261 Section 19.1.4) with no restrictions for well-known URI params.
+	 *  <li> display-names should be ignored in the comparison.
+	 * </ol>
 	 * 
 	 * @param o given Parameterable to be compared with this.
 	 * @return true if the two Addresses are equal.

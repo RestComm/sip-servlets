@@ -17,10 +17,10 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -82,8 +82,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 					SIP_FACTORY);
 			
-			Map<String, Set<String>> headers=new HashMap<String, Set<String>>();
-			Set<String> toHeaderSet = new HashSet<String>();
+			Map<String, List<String>> headers=new HashMap<String, List<String>>();
+			List<String> toHeaderSet = new ArrayList<String>();
 			toHeaderSet.add(forwardingUri[0]);
 			headers.put("To", toHeaderSet);
 			

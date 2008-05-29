@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.Collections;
@@ -29,9 +31,10 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
-import javax.servlet.sip.SipApplicationRoutingRegion;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
@@ -562,11 +565,12 @@ public class SipSessionImpl implements SipSession {
 			}
 		}
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSession#isOngoingTransaction()
+
+	/**
+	 * Removed from the interface in PFD stage
+	 * so making it protected
 	 */
-	public boolean hasOngoingTransaction() {
+	protected boolean hasOngoingTransaction() {
 		if(!isSupervisedMode()) {
 			return false;
 		} else {
@@ -978,5 +982,32 @@ public class SipSessionImpl implements SipSession {
 	
 	public void setUserPrincipal(Principal userPrincipal) {
 		this.userPrincipal = userPrincipal;
+	}
+	public boolean getInvalidateWhenReady() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	public boolean isReadyToInvalidate() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	public void setInvalidateWhenReady(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setOutboundInterface(InetAddress arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setOutboundInterface(InetSocketAddress arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public ServletContext getServletContext() {
+		return sipApplicationSession.getSipContext().getServletContext();
 	}	    
 }

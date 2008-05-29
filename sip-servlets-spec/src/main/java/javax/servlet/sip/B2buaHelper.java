@@ -17,7 +17,6 @@
 package javax.servlet.sip;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Helper class providing support for B2BUA applications. An instance of this
@@ -28,10 +27,36 @@ import java.util.Set;
  */
 public interface B2buaHelper {
 	/**
+	 * Creates a new CANCEL request to cancel the initial request sent on the other leg. 
+	 * The CANCEL is created by the container using the initial request stored in the session corresponding to the other leg. 
+	 * @param session the session whose initial request is to be cancelled. 
+	 * @return the new CANCEL request to be sent on the other leg 
+	 * @throws NullPointerException if the session is null
+	 */
+	SipServletRequest createCancel(SipSession session);
+	/**
+	 * Creates a new request object belonging to a new SipSession. The new request is similar to the specified origRequest  in that the method and the majority of header fields are copied from origRequest to the new request. The SipSession created for the new request also shares the same SipApplicationSession associated with the original request.
+	 * 
+	 * This method satisfies the following rules:
+	 * 
+	 *     * The From header field of the new request has a new tag chosen by the container.
+	 *     * The To header field of the new request has no tag.
+	 *     * The new request (and the corresponding SipSession)is assigned a new Call-ID.
+	 *     * Record-Route and Via header fields are not copied. As usual, the container will add its own Via header field to the request when it's actually sent outside the application server.
+	 *     * For non-REGISTER requests, the Contact header field is not copied but is populated by the container as usual. 
+	 *     
+	 *     This method provides a convenient and efficient way of constructing a new "leg" of a B2BUA application. It is used only for the initial request. Subsequent requests in either leg must be created using SipSession.createRequest(java.lang.String) or createRequest(SipSession, SipServletRequest, java.util.Map) as usual. 
+	 *     
+	 * @param origRequest request to be "copied" 
+	 * @return the "copied" request object
+	 */
+	SipServletRequest createRequest(SipServletRequest origRequest);
+	
+	/**
 	 * Creates a new request object belonging to a new SipSession. The new
 	 * request is similar to the specified origRequest in that the method and
 	 * the majority of header fields are copied from origRequest to the new
-	 * request. The headerMap parameter can contain From and To headers and any
+	 * request. The headerMap parameter can contain From, To, Contact, Route headers and any
 	 * non system header. The header field map is then used to override the
 	 * headers in the newly created request. The SipSession created for the new
 	 * request also shares the same SipApplicationSession associated with the
@@ -49,7 +74,7 @@ public interface B2buaHelper {
 	 * the request created, in accordance with section 4.1.3 of the
 	 * specification. This method provides a convenient and efficient way of
 	 * constructing the second "leg" of a B2BUA application, giving the
-	 * additional flexibility of changing the headers including To and From.
+	 * additional flexibility of changing the headers including To, From, Contact, Route.
 	 * This method will also perform loop detection. If the value of the
 	 * original request's Max-Forwards header field is 0, then
 	 * TooManyHopsException is thrown and a 483 (Too many hops) response is sent
@@ -61,7 +86,7 @@ public interface B2buaHelper {
 	 */
 	javax.servlet.sip.SipServletRequest createRequest(
 			javax.servlet.sip.SipServletRequest origRequest, boolean linked,
-			java.util.Map<java.lang.String, Set<java.lang.String>> headerMap)
+			java.util.Map<java.lang.String, List<java.lang.String>> headerMap)
 			throws java.lang.IllegalArgumentException;
 
 	/**
@@ -75,14 +100,29 @@ public interface B2buaHelper {
 	 * the system headers are created based on the session that this request is
 	 * created on. Further the Route headers are set as based on the session
 	 * route set. The method of the new request is same as that of the
-	 * origRequest. If Contact header is present in the headerMap then relevant
-	 * portions of Contact header is to be used in the request created, in
-	 * accordance with section 4.1.3 of the specification.
+	 * origRequest. IIf Contact header is present in the headerMap then relevant portions 
+	 * of the Contact header are to be used in the request created, in accordance with section 4.1.3 of the specification.
+	 * If From and To headers are present in the headerMap then all parts of
+	 * those headers except the tag parameter are to be used in the request 
+	 * created, in accordance with section 4.1.2 of the specification.
+	 * @throws IllegalArgumentException if the header map contains a system header other than Contact (see section 4.1.3 of specification document)
+	 * or other header which does not makes sense in the context, 
+	 * or in case when the <code>session</code> does not belong to the same 
+	 * SipApplicationSession as the <code>origRequest</code>, or the original request or session is 
+	 * already linked with some other request/session,
+	 * or if the <code>origRequest</code> is not initial
+	 * @throws IllegalArgumentException     
+	 * 	if the header map contains a system header other than Contact, From or To (see sections 4.1.2 and 4.1.3 of specification document) 
+	 *  or other header which does not makes sense in the context, or in case when 
+	 *  the session does not belong to the same SipApplicationSession as the origRequest, 
+	 *  or the original request or session is already linked with some other request/session, 
+	 *  or if the origRequest is not initial 
+	 *  @throws java.lang.NullPointerException - if the original request or the session is null
 	 */
 	javax.servlet.sip.SipServletRequest createRequest(
 			javax.servlet.sip.SipSession session,
 			javax.servlet.sip.SipServletRequest origRequest,
-			java.util.Map<java.lang.String, Set<java.lang.String>> headerMap)
+			java.util.Map<java.lang.String, List<java.lang.String>> headerMap)
 			throws java.lang.IllegalArgumentException;
 
 	/**
@@ -94,13 +134,13 @@ public interface B2buaHelper {
 	 * request. For example when a downstream proxy forked and more than one
 	 * success responses are to be forwarded upstream. This can only be required
 	 * on initial requests, as only original requests shall need such multiple
-	 * responses. The response thus generated must have a different “To�? tag
+	 * responses. The response thus generated must have a different “To�? tag
 	 * from the other responses generated to the Request and must result in a
 	 * different SipSession. In this (and similar) cases the container clones
 	 * the original SipSession for the second and subsequentdialogs, as detailed
 	 * above. The cloned session object will contain the same application data
 	 * but its createRequest method will create requests belonging to that
-	 * second or subsequent dialog, that is, with a “To�? tag specific to
+	 * second or subsequent dialog, that is, with a “To�? tag specific to
 	 * that dialog.
 	 */
 	javax.servlet.sip.SipServletResponse createResponseToOriginalRequest(

@@ -642,4 +642,24 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		}
     }
 
+	public boolean getInvalidateWhenReady() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Object getSession(String arg0, Protocol arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean isReadyToInvalidate() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void setInvalidateWhenReady(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

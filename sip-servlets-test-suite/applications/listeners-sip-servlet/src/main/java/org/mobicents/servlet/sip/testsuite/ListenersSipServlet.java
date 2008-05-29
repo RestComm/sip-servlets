@@ -558,4 +558,14 @@ public class ListenersSipServlet
 		}		
 		sipApplicationSession.invalidate();		
 	}
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
 }
