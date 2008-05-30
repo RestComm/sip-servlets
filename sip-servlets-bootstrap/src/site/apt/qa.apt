@@ -9,7 +9,7 @@ Quality Assurance
 
 	{{{http://groups.google.com/group/mobicents-public/browse_thread/thread/9002afc3ef00c08}Report of a Mobicents Sip Servlets Soak Test}} on a Jboss Labs server 
 
-	The {{{http://hudson.jboss.com/hudson/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
+	The {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
 	
 	The Load Test is using a simple call flow : 
 	
