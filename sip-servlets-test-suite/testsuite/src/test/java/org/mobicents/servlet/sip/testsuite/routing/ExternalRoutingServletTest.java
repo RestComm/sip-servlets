@@ -28,6 +28,17 @@ import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipUnitServletTestCase;
 
+/**
+ * This test starts 2 sip servlets container 
+ * one on 5069 that has the AR setup to ROUTE to the other server
+ * on port 5070 that has the LocationServiceSipServlet application installed.
+ * 
+ * Then the test sends a REGISTER that goes through server 1 that routes it to server 2
+ * Location Service sends back OK and it is routed back to UAC => test green
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
+ */
 public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 	
 	private static Log logger = LogFactory.getLog(ExternalRoutingServletTest.class);
