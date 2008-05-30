@@ -93,6 +93,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			forkedRequest.setRequestURI(sipUri);						
 			
 			logger.info("forkedRequest = " + forkedRequest);
+			forkedRequest.getSession().setAttribute("originalRequest", request);
 			
 			forkedRequest.send();
 		} else {
@@ -136,8 +137,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Sending " +  ackRequest);
 			ackRequest.send();
 			//create and sends OK for the first call leg							
-			SipServletResponse responseToOriginalRequest = 
-				helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
 			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
 			responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
@@ -152,10 +153,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 				+ sipServletResponse.getReasonPhrase());		
 						
 		//create and sends the error response for the first call leg
-		SipSession originalSession =   
-		    helper.getLinkedSession(sipServletResponse.getSession());					
-		SipServletResponse responseToOriginalRequest = 
-			helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 		responseToOriginalRequest.send();		
 	}
@@ -163,10 +162,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 	@Override
 	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		SipSession originalSession =   
-		    helper.getLinkedSession(sipServletResponse.getSession());					
-		SipServletResponse responseToOriginalRequest = 
-			helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 		responseToOriginalRequest.send();
 	}

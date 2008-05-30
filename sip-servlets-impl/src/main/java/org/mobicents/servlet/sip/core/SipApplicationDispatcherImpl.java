@@ -448,8 +448,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 		} catch (Throwable e) {
 			logger.error("Unexpected exception while processing request",e);
-			// Sends a 500 Internal server error and stops processing.				
-			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+			if(Request.ACK.equalsIgnoreCase(request.getMethod())) {
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			}
 			return;
 		}
 	}
@@ -654,6 +656,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		
 		SipContext sipContext = this.applicationDeployed.get(applicationName);
+		if(sipContext == null) {
+			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
+					"in this popped routed header " + poppedAddress);
+		}
 		SipManager sipManager = (SipManager)sipContext.getManager();
 		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
@@ -705,14 +711,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				callServlet(sipServletRequest);				
 			}
 		} catch (ServletException e) {				
-			logger.error("An unexpected servlet exception occured while processing a subsequent request", e);
-			// Sends a 500 Internal server error and stops processing.				
-			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			logger.error("An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+			if(Request.ACK.equalsIgnoreCase(request.getMethod())) {
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			}
 			return false;
 		} catch (IOException e) {				
-			logger.error("An unexpected IO exception occured while processing a subsequent request", e);
-			// Sends a 500 Internal server error and stops processing.				
-			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			logger.error("An unexpected IO exception occured while processing the following subsequent request " + request, e);
+			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+			if(Request.ACK.equalsIgnoreCase(request.getMethod())) {
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			}
 			return false;
 		} 
 		//if a final response has been sent, or if the request has 
