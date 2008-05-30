@@ -36,6 +36,7 @@ import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteUseHostNameTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
+import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
@@ -69,6 +70,7 @@ public class AllTests {
 		suite.addTestSuite(SessionStateUACSipServletTest.class);
 		suite.addTestSuite(AnnotationTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
+		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(SipURITest.class);
 		//$JUnit-END$
 		return suite;

@@ -1357,13 +1357,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public String getCorrectHeaderName(String name) {
-		// Mostly irritating - why this doesnt work?
-		// switch(this._headerForm)
-		// {
-		// case HeaderForm.DEFAULT:
-		// return name;
-		// break;;
-		// }
 		return this.getCorrectHeaderName(name, this.headerForm);
 
 	}

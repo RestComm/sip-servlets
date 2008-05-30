@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.sip.ListeningPoint;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,6 +39,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String projectHome;
 	protected SipEmbedded tomcat;
 	protected String sipIpAddress = "127.0.0.1";
+	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected boolean autoDeployOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
 		
@@ -72,8 +75,6 @@ public abstract class SipServletTestCase extends TestCase {
 		logger.info("Project Home is : " + projectHome);
 		//starting tomcat
 		tomcat = new SipEmbedded();
-		tomcat.setPath(tomcatBasePath);		
-		tomcat.setSipIPAdress(sipIpAddress);
 		tomcat.setLoggingFilePath(				
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
@@ -83,6 +84,18 @@ public abstract class SipServletTestCase extends TestCase {
 		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);
+		tomcat.initTomcat(tomcatBasePath);
+		tomcat.addHttpConnector(8080);
+		/*
+		 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
+		 * logLevel="DEBUG" port="5070"
+		 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
+		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
+		 */
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.UDP);
+		//Filip Olsson : Issue 112, Adding tcp protocol
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);				
 		if(startTomcatOnStartup) {
 			tomcat.startTomcat();
 		}

@@ -211,7 +211,7 @@ public class DefaultApplicationRouterParser {
 						SipApplicationRoutingRegionType.valueOf(
 								SipApplicationRoutingRegionType.class,sipApplicationRouterInfoParameters[2])),
 				//route
-				sipApplicationRouterInfoParameters[3],
+				new String[]{sipApplicationRouterInfoParameters[3]},
 				//sip route modifier
 				SipRouteModifier.valueOf(SipRouteModifier.class,sipApplicationRouterInfoParameters[4]),
 				//stateinfo

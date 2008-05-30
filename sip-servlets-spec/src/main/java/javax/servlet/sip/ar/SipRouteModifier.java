@@ -23,9 +23,9 @@ package javax.servlet.sip.ar;
  */
 public enum SipRouteModifier{
 	/**
-	 * Indicates to the container to clear any popped route so far, such that SipServletRequest.getPoppedRoute() should now return null.
+	 * Tells the container to push a route back to itself before pusing the external routes specified by SipApplicationRouterInfo.getRoutes().
 	 */
-	CLEAR_ROUTE,
+	ROUTE_BACK,
 	/**
 	 * Indicates that SipApplicationRouterInfo.getRoute() does not contain any valid route.
 	 */	

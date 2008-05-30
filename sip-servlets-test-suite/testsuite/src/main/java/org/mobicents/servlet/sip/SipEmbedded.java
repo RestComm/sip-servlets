@@ -70,8 +70,6 @@ public class SipEmbedded {
 
 	private StandardHost host = null;
 
-	private String sipIPAdress = "127.0.0.1";
-
 	/**
 	 * Default Constructor
 	 * 
@@ -101,10 +99,12 @@ public class SipEmbedded {
 	}		
 
 	/**
-	 * This method Starts the Tomcat server.
+	 * Init the tomcat server
+	 * @param tomcatBasePath the base path of the server
+	 * @throws Exception
 	 */
-	public void startTomcat() throws Exception {
-		
+	public void initTomcat(String tomcatBasePath) throws Exception {
+		setPath(tomcatBasePath);
 		// Set the home directory
 		System.setProperty("CATALINA_HOME", getPath());
 		System.setProperty("CATALINA_BASE", getPath());
@@ -157,54 +157,17 @@ public class SipEmbedded {
 		host.setAutoDeploy(false);
 		host.setDeployOnStartup(false);
 		engine.addChild(host);		
+	}
 
-		/*
-		 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
-		 * logLevel="DEBUG" port="5070"
-		 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
-		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
-		 */
-		Connector udpSipConnector = new Connector(
-				SipProtocolHandler.class.getName());
-		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
-				.getProtocolHandler();
-		udpProtocolHandler.setPort(5070);
-		udpProtocolHandler.setDebugLog("../logs/debuglog.txt");
-		udpProtocolHandler.setIpAddress(sipIPAdress);
-		udpProtocolHandler.setLogLevel("DEBUG");
-		udpProtocolHandler.setServerLog("../logs/serverlog.xml");
-		udpProtocolHandler.setSignalingTransport("udp");
-		udpProtocolHandler.setSipPathName("gov.nist");
-		udpProtocolHandler.setSipStackName("SIP-Servlet-Tomcat-Server");
-		udpProtocolHandler.setThreadPoolSize("64");
-		udpProtocolHandler.setIsReentrantListener("true");
-
-		sipStandardService.addConnector(udpSipConnector);
-		//Filip Olsson : Issue 112, Adding tcp protocol
-		Connector tcpSipConnector = new Connector(
-			SipProtocolHandler.class.getName());
-		SipProtocolHandler tcpProtocolHandler = (SipProtocolHandler) tcpSipConnector
-			.getProtocolHandler();
-		tcpProtocolHandler.setPort(5070);
-		tcpProtocolHandler.setDebugLog("../logs/debuglog.txt");
-		tcpProtocolHandler.setIpAddress(sipIPAdress);
-		tcpProtocolHandler.setLogLevel("DEBUG");
-		tcpProtocolHandler.setServerLog("../logs/serverlog.xml");
-		tcpProtocolHandler.setSignalingTransport("tcp");
-		tcpProtocolHandler.setSipPathName("gov.nist");
-		tcpProtocolHandler.setSipStackName("SIP-Servlet-Tomcat-Server");
-		tcpProtocolHandler.setThreadPoolSize("64");
-		tcpProtocolHandler.setIsReentrantListener("true");
-
-		sipStandardService.addConnector(tcpSipConnector);
-		
-		//HTTP connector
+	/**
+	 * @throws Exception
+	 */
+	public void addHttpConnector(int port) throws Exception {
 		Connector httpConnector = new Connector(
 				Http11Protocol.class.getName());
 		Http11Protocol httpProtocolHandler = (Http11Protocol) httpConnector
 				.getProtocolHandler();		
-		httpProtocolHandler.setPort(8080);		
+		httpProtocolHandler.setPort(port);		
 		httpProtocolHandler.setDisableUploadTimeout(true);
 		httpProtocolHandler.setMaxHttpHeaderSize(8192);
 //		httpProtocolHandler.setMaxSpareThreads(75);
@@ -212,8 +175,36 @@ public class SipEmbedded {
 		httpProtocolHandler.setMaxThreads(150);		
 
 		sipStandardService.addConnector(httpConnector);
+	}
+	
+	/**
+	 * This method Starts the Tomcat server.
+	 */
+	public void startTomcat() throws Exception {
 		// Start the embedded server
 		sipStandardService.start();				
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public void addSipConnector(String connectorName, String ipAddress, int port, String transport) throws Exception {
+		Connector udpSipConnector = new Connector(
+				SipProtocolHandler.class.getName());
+		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
+				.getProtocolHandler();
+		udpProtocolHandler.setPort(port);
+		udpProtocolHandler.setDebugLog("../logs/debuglog.txt");
+		udpProtocolHandler.setIpAddress(ipAddress);
+		udpProtocolHandler.setLogLevel("DEBUG");
+		udpProtocolHandler.setServerLog("../logs/serverlog.xml");
+		udpProtocolHandler.setSignalingTransport(transport);
+		udpProtocolHandler.setSipPathName("gov.nist");
+		udpProtocolHandler.setSipStackName(connectorName);
+		udpProtocolHandler.setThreadPoolSize("64");
+		udpProtocolHandler.setIsReentrantListener("true");
+
+		sipStandardService.addConnector(udpSipConnector);
 	}
 
 	/**
@@ -605,12 +596,4 @@ public class SipEmbedded {
         }
 
     }
-
-	public String getSipIPAdress() {
-		return sipIPAdress;
-	}
-
-	public void setSipIPAdress(String sipIPAdress) {
-		this.sipIPAdress = sipIPAdress;
-	}
 }

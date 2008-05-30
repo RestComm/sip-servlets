@@ -18,10 +18,16 @@ package org.mobicents.servlet.sip;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Properties;
+
+import javax.sip.ListeningPoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cafesip.sipunit.SipCall;
+import org.cafesip.sipunit.SipResponse;
 import org.cafesip.sipunit.SipTestCase;
 
 /**
@@ -36,7 +42,9 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 	protected String projectHome;
 	protected SipEmbedded tomcat;
 	protected String sipIpAddress = "127.0.0.1";
+	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected boolean autoDeployOnStartup = true;
+	protected boolean startTomcatOnStartup = true;
 	
 	public SipUnitServletTestCase(String name) {
 		super(name);
@@ -69,8 +77,6 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 		logger.info("Project Home is : " + projectHome);
 		//starting tomcat
 		tomcat = new SipEmbedded();
-		tomcat.setPath(tomcatBasePath);		
-		tomcat.setSipIPAdress(sipIpAddress);
 		tomcat.setLoggingFilePath(  
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
@@ -79,8 +85,24 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 				File.separatorChar + "resources" + File.separatorChar);
 		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
 		String darConfigurationFile = getDarConfigurationFile();
-		tomcat.setDarConfigurationFilePath(darConfigurationFile);		
-		tomcat.startTomcat();
+		tomcat.setDarConfigurationFilePath(darConfigurationFile);	
+		tomcat.initTomcat(tomcatBasePath);
+		//HTTP connector
+		tomcat.addHttpConnector(8080);
+		/*
+		 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
+		 * logLevel="DEBUG" port="5070"
+		 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
+		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
+		 */
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.UDP);
+		//Filip Olsson : Issue 112, Adding tcp protocol
+		tomcat.addSipConnector(serverName , sipIpAddress, 5070, ListeningPoint.TCP);
+		
+		if(startTomcatOnStartup) {
+			tomcat.startTomcat();
+		}
 		if(autoDeployOnStartup) {
 			deployApplication();
 		}
@@ -102,4 +124,32 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 	 * configuration file to use to the test case
 	 */
 	protected abstract String getDarConfigurationFile();
+	
+	/**
+     * This method returns the last received response with status code matching
+     * the given parameter.
+     * 
+     * @param statusCode
+     *            Indicates the type of response to return.
+     * @return SipResponse object or null, if not found.
+     */
+    protected SipResponse findResponse(SipCall sipCall, int statusCode) {
+        ArrayList responses = sipCall.getAllReceivedResponses();        
+        
+        ListIterator i = responses.listIterator(responses.size());
+        if(logger.isDebugEnabled()) {
+    		logger.debug("All responses received :");
+    	}
+        while (i.hasPrevious()) {        	
+            SipResponse resp = (SipResponse) i.previous();
+            if(logger.isDebugEnabled()) {
+        		logger.debug("response received : "+ resp.getStatusCode());
+        	}
+            if (resp.getStatusCode() == statusCode) {
+                return resp;
+            }
+        }
+
+        return null;
+    }
 }

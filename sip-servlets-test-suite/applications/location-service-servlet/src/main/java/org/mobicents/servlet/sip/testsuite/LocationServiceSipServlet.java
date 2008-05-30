@@ -88,13 +88,12 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 		logger.info("Received register request: " + req.getTo());
 		
 		//Storing the registration 
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		Address toAddress = req.getTo();
-		ListIterator<String> contactAddresses = req.getHeaders("Contact");
+		ListIterator<Address> contactAddresses = req.getAddressHeaders("Contact");
 		List<URI> contactUris = new ArrayList<URI>();
 		while (contactAddresses.hasNext()) {
-			String contactAddress = (String) contactAddresses.next();
-			contactUris.add(sipFactory.createURI(contactAddress));
+			Address contactAddress = contactAddresses.next();
+			contactUris.add(contactAddress.getURI());
 		}
 		//FIXME handle the expires to add or remove the user
 		registeredUsers.put(toAddress.toString(), contactUris);

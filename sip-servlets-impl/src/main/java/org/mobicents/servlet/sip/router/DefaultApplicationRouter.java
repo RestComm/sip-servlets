@@ -32,6 +32,7 @@ import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.servlet.sip.ar.SipRouteModifier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -237,7 +238,10 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 							isApplicationPresentInContainer = true;
 						}
 					}
-					if(isApplicationPresentInContainer) {
+					if(log.isDebugEnabled()) {
+						log.debug("Route Modifier : " + defaultSipApplicationRouterInfo.getRouteModifier());
+					}
+					if(isApplicationPresentInContainer || !SipRouteModifier.NO_ROUTE.equals(defaultSipApplicationRouterInfo.getRouteModifier())) {
 						if(initialRequest.getSession(false) == null || 
 										!defaultSipApplicationRouterInfo.getApplicationName().equals(
 												initialRequest.getSession(false).getApplicationSession().getApplicationName())) {
@@ -251,7 +255,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 									defaultSipApplicationRouterInfo.getApplicationName(),
 									defaultSipApplicationRouterInfo.getRoutingRegion(), 
 									subscriberIdentity,
-									defaultSipApplicationRouterInfo.getRoute(),
+									defaultSipApplicationRouterInfo.getRoutes(),
 									defaultSipApplicationRouterInfo.getRouteModifier(),
 									defaultSipApplicationRouterInfo.getOrder());					
 						}

@@ -32,7 +32,7 @@ public class SipApplicationRouterInfo {
 	
 	private String subscriberURI = null;
 
-	private String route = null;
+	private String[] routes = null;
 
 	private SipRouteModifier mod = null;
 
@@ -63,13 +63,13 @@ public class SipApplicationRouterInfo {
 			java.lang.String nextApplicationName,
 			SipApplicationRoutingRegion routingRegion,
 			java.lang.String subscriberURI, 
-			java.lang.String route,
+			java.lang.String[] routes,
 			javax.servlet.sip.ar.SipRouteModifier mod,
 			java.io.Serializable stateInfo) {
 		this.nextApplicationName = nextApplicationName;
 		this.routingRegion = routingRegion;
 		this.subscriberURI = subscriberURI;
-		this.route = route;
+		this.routes = routes;
 		this.mod = mod;
 		this.stateInfo = stateInfo;
 	}
@@ -79,14 +79,18 @@ public class SipApplicationRouterInfo {
 	}
 
 	/**
-	 * A SIP Route, if external is to be used by the container to route the
-	 * request to the external entity. The internal route indicates the route
-	 * which led the request to the container. This internal route is not used
-	 * for any routing purposes but to let application router potentially modify
-	 * the route popped by the container.
+	 * An array of SIP routes of the same type (internal or external). 
+	 * If the top (first) is external, they are to be used by the container to route the request to the external entities. 
+	 * The container pushes the external routes onto the request by iterating over 
+	 * the array starting with the last element until the top (first) element, inclusive.
+	 * If the top (first) route is internal, it indicates the route which led the request to the container. 
+	 * This internal route is not used for any routing purposes but to let application router 
+	 * potentially modify the route popped by the container. 
+	 * Only the first internal route from the array is used for this purpose, the rest (if any) are ignored by the container.
+	 * @return  The SIP route headers which could be internal or external. An empty array is returned when no routes are present. 
 	 */
-	public java.lang.String getRoute() {
-		return route;
+	public java.lang.String[] getRoutes() {
+		return routes;
 	}
 
 	public javax.servlet.sip.ar.SipRouteModifier getRouteModifier() {

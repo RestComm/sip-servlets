@@ -1,12 +1,8 @@
 package org.mobicents.servlet.management.server.router;
 
 import java.io.ByteArrayInputStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -19,15 +15,10 @@ import org.apache.catalina.mbeans.MBeanUtils;
 import org.mobicents.servlet.management.client.router.DARConfigurationService;
 import org.mobicents.servlet.management.client.router.DARRoute;
 import org.mobicents.servlet.management.client.router.DARRouteNode;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.router.DefaultApplicationRouter;
 import org.mobicents.servlet.sip.router.DefaultApplicationRouterParser;
 import org.mobicents.servlet.sip.router.DefaultSipApplicationRouterInfo;
-import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import javax.management.MBeanServer;
 
 public class DARConfigurationServiceImpl extends RemoteServiceServlet implements DARConfigurationService {
 	
@@ -94,7 +85,7 @@ public class DARConfigurationServiceImpl extends RemoteServiceServlet implements
 					DARRouteNode clientNode = new DARRouteNode();
 					clientNode.setApplication(routeNode.getApplicationName());
 					clientNode.setOrder(new Integer(routeNode.getOrder()).toString());
-					clientNode.setRoute(routeNode.getRoute());
+					clientNode.setRoute(routeNode.getRoutes()[0]);
 					clientNode.setSubscriber(routeNode.getSubscriberIdentity());
 					clientNode.setRouteModifier(routeNode.getRouteModifier().toString());
 					clientNode.setRoutingRegion(routeNode.getRoutingRegion().toString());

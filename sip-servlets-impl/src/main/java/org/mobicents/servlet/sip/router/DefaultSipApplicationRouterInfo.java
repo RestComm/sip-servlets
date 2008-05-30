@@ -29,7 +29,7 @@ public class DefaultSipApplicationRouterInfo {
 	private String applicationName;
 	private String subscriberIdentity;
 	private SipApplicationRoutingRegion routingRegion;
-	private String route;
+	private String[] routes;
 	private SipRouteModifier routeModifier;
 	private int order;
 			
@@ -49,13 +49,13 @@ public class DefaultSipApplicationRouterInfo {
 	 */
 	public DefaultSipApplicationRouterInfo(String applicationName,
 			String subscriberIdentity,
-			SipApplicationRoutingRegion routingRegion, String route,
+			SipApplicationRoutingRegion routingRegion, String[] routes,
 			SipRouteModifier routeModifier, int order) {
 		super();
 		this.applicationName = applicationName;
 		this.subscriberIdentity = subscriberIdentity;
 		this.routingRegion = routingRegion;
-		this.route = route;
+		this.routes = routes;
 		this.routeModifier = routeModifier;
 		this.order = order;
 	}
@@ -99,14 +99,14 @@ public class DefaultSipApplicationRouterInfo {
 	/**
 	 * @return the route
 	 */
-	public String getRoute() {
-		return route;
+	public String[] getRoutes() {
+		return routes;
 	}
 	/**
 	 * @param route the route to set
 	 */
-	public void setRoute(String route) {
-		this.route = route;
+	public void setRoutes(String[] routes) {
+		this.routes = routes;
 	}
 	/**
 	 * @return the routeModifier
