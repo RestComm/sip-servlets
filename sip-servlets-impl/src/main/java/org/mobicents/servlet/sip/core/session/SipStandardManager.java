@@ -45,7 +45,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	
 	private Map<SipApplicationSessionKey, SipApplicationSessionImpl> sipApplicationSessions = 
 		new HashMap<SipApplicationSessionKey, SipApplicationSessionImpl>();
-	//FIXME if it's never cleaned up a memory leak will occur
+	//if it's never cleaned up a memory leak will occur
 	//Shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	//=> after a chat with ranga the better way to go for now is removing on processDialogTerminated
 	private Map<SipSessionKey, SipSessionImpl> sipSessions = 
@@ -161,6 +161,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
 			throw new IllegalArgumentException("the sip factory should not be null");
 		}
 		SipSessionImpl sipSessionImpl = null;
+		//TODO check if a reentrant lock would be more efficient
 		synchronized (sipSessionLock) {
 			sipSessionImpl = sipSessions.get(key);
 			if(sipSessionImpl == null && create) {
@@ -169,7 +170,28 @@ public class SipStandardManager extends StandardManager implements SipManager {
 					logger.debug("Adding a sip session with the key : " + key);
 				}
 				sipSessions.put(key, sipSessionImpl);					
-			}		
+			}
+			// check if this session key has a to tag.
+			String toTag = sipSessionImpl.getKey().getToTag();
+			if(toTag == null && key.getToTag() != null) {
+				sipSessionImpl.getKey().setToTag(key.getToTag());
+			} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
+				SipSessionImpl derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
+				if(derivedSipSession == null) {
+					// if the to tag is different a sip session is created
+					if(logger.isDebugEnabled()) {
+						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
+								" creates new derived session with following to Tag " + key.getToTag());
+					}
+					derivedSipSession = sipSessionImpl.createDerivedSipSession(key);
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
+								" already has a derived session with following to Tag " + key.getToTag() + " - reusing it");
+					}
+				}
+				return derivedSipSession;	
+			}
 		}
 		return sipSessionImpl;
 	}

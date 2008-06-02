@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
-import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
@@ -46,6 +45,7 @@ import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
@@ -88,9 +88,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  * to constrain the creation of sip session and to make sure that all sessions created
  * can be retrieved only through the session manager 
  *
- *@author vralev
- *@author mranga
- *
+ * @author vralev
+ * @author mranga
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class SipSessionImpl implements SipSession {
 	
@@ -178,6 +178,7 @@ public class SipSessionImpl implements SipSession {
 	
 	private boolean supervisedMode;
 
+	private Map<String, SipSessionImpl> derivedSipSessions;
 
 	/*
 	 * The almighty provider
@@ -193,11 +194,11 @@ public class SipSessionImpl implements SipSession {
 		this.valid = true;
 		this.supervisedMode = true;
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
+		this.derivedSipSessions = new ConcurrentHashMap<String, SipSessionImpl>();
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipApplicationSessionImpl.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
 		}
-		//FIXME create and start a timer for session expiration
 	}
 	/**
 	 * Notifies the listeners that a lifecycle event occured on that sip session 
@@ -549,12 +550,18 @@ public class SipSessionImpl implements SipSession {
 		}
 		valid = false;				
 		notifySipSessionListeners(SipSessionEventType.DELETION);
+		for (SipSessionImpl sipSessionImpl : derivedSipSessions.values()) {
+			sipSessionImpl.invalidate();
+		}
+		derivedSipSessions.clear();
+		derivedSipSessions = null;
 		((SipManager)getSipApplicationSession().getSipContext().getManager()).removeSipSession(key);
 		sipSessionAttributeMap = null;
 		proxyBranch = null;
 		key = null;
 		sessionCreatingDialog = null;
 		sessionCreatingTransaction = null;
+		
 	}
 	
 	/**
@@ -1037,5 +1044,53 @@ public class SipSessionImpl implements SipSession {
 	 */
 	public ServletContext getServletContext() {
 		return sipApplicationSession.getSipContext().getServletContext();
-	}	    
+	}
+	
+	/**
+	 * clone the current sip session except its attributes (they will be shared) 
+	 * and add it to the internal map of derived sessions identifying it by its ToTag
+	 * @param toTag the to tag identifying the derived sip session to create
+	 * @return the newly created sip session
+	 */
+	public SipSessionImpl createDerivedSipSession(SipSessionKey sessionKey) {
+		// clone the session and add it to the map of derived sessions
+		SipSessionImpl sipSessionImpl = new SipSessionImpl(sessionKey, sipFactory, sipApplicationSession);
+		sipSessionImpl.sipSessionAttributeMap = sipSessionAttributeMap;
+		sipSessionImpl.supervisedMode = supervisedMode;
+		sipSessionImpl.handlerServlet = new String(handlerServlet);
+		sipSessionImpl.routingRegion = routingRegion;
+		// dialog will be set when the response will be associated with this session
+//		sipSessionImpl.sessionCreatingDialog = dialog;
+		sipSessionImpl.state = state;
+		sipSessionImpl.stateInfo = stateInfo;
+		sipSessionImpl.supervisedMode = supervisedMode;
+		if(subscriberURI != null) {
+			sipSessionImpl.subscriberURI = subscriberURI.clone();
+		}
+		sipSessionImpl.userPrincipal = userPrincipal;
+		
+		derivedSipSessions.put(sessionKey.getToTag(), sipSessionImpl);
+		
+		return sipSessionImpl;
+	}
+	
+	/**
+	 * Removes the derived sip session identified by the To tag in parameter
+	 * @param toTag the to Tag identifying the sip session to remove
+	 * @return the removed derived sip session
+	 */
+	public SipSessionImpl removeDerivedSipSession(String toTag) {
+		return derivedSipSessions.remove(toTag);
+	}
+	
+	/**
+	 * Find the derived sip session identified by its to tag
+	 * @param toTag the to Tag identifying the sip session to remove
+	 * @return the derived sip session identified by its to tag or null if none has been found
+	 */
+	public SipSessionImpl findDerivedSipSession(String toTag) {
+		return derivedSipSessions.get(toTag);
+	}
+	
+	
 }

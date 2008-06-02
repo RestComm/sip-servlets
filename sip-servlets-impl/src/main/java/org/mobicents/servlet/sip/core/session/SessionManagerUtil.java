@@ -59,6 +59,7 @@ public class SessionManagerUtil {
 					((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
 					((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 					((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
+					((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 					((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 					applicationName);
 		} else {
@@ -66,6 +67,7 @@ public class SessionManagerUtil {
 				((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
 				((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 				((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
+				((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 				applicationName);
 		}

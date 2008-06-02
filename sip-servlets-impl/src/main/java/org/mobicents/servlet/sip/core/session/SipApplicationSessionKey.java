@@ -19,7 +19,12 @@ package org.mobicents.servlet.sip.core.session;
 import java.io.Serializable;
 
 /**
- * @author Jean Deruelle
+ * <p>
+ * Class representing the key (which will also be its id) for a sip application session.<br/>
+ * It is composed of the Call-Id and the application Name.
+ * </p>
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
 public class SipApplicationSessionKey implements Serializable {

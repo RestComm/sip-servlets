@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -58,9 +57,13 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 public class Shootist implements SipListener {
-
+	private static Log logger = LogFactory.getLog(Shootist.class);
+	
 	private static SipProvider sipProvider;
 
 	private static AddressFactory addressFactory;
@@ -82,6 +85,10 @@ public class Shootist implements SipListener {
 	private boolean byeTaskRunning;
 	
 	public boolean ended = false;
+	
+	int count = 0;
+	
+	private boolean forkingProxy = false;
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -105,6 +112,12 @@ public class Shootist implements SipListener {
 	private static final String usageString = "java "
 			+ "examples.shootist.Shootist \n"
 			+ ">>>> is your class path set to the root?";
+
+	
+	public Shootist(boolean forkingProxy) {
+		this.forkingProxy = forkingProxy;
+	}
+
 
 	private static void usage() {
 		System.out.println(usageString);
@@ -172,11 +185,12 @@ public class Shootist implements SipListener {
 		Response response = (Response) responseReceivedEvent.getResponse();
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
-
+		Dialog dialog = responseReceivedEvent.getDialog();
+		
 		System.out.println("Response received : Status Code = "
 				+ response.getStatusCode() + " " + cseq);
 		
-			
+		
 		if (tid == null) {
 			
 			// RFC3261: MUST respond to every 2xx
@@ -187,9 +201,9 @@ public class Shootist implements SipListener {
 			   } catch (SipException se) {
 			      se.printStackTrace(); 
 			   }
-			}			
+			}	
 			return;
-		}
+		}		
 		// If the caller is supposed to send the bye
 		if ( !byeTaskRunning) {
 			byeTaskRunning = true;
@@ -202,15 +216,34 @@ public class Shootist implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					System.out.println("Dialog after 200 OK  " + dialog);
-					System.out.println("Dialog State after 200 OK  " + dialog.getState());
 					ackRequest = dialog.createAck(cseq.getSeqNumber());
-					System.out.println("Sending ACK");
-					dialog.sendAck(ackRequest);
-					
-					// JvB: test REFER, reported bug in tag handling
-					//dialog.sendRequest(  sipProvider.getNewClientTransaction( dialog.createRequest("REFER") )); 
-					
+					if(forkingProxy) {
+						logger.info("dialog = " + dialog);
+						// Proxy will fork. I will accept the second dialog
+						// but not the first. 
+						logger.info("count = " + count);
+//						if (count == 1) {
+							//assertTrue(dialog != this.dialog);
+							logger.info("Sending ACK");
+							dialog.sendAck(ackRequest);							
+							
+//						} else {
+//							// Kill the first dialog by sending a bye.
+//							//assertTrue (dialog == this.dialog);
+//							count++;
+//							logger.info("count = " + count);
+//							dialog.sendAck(ackRequest);
+//							SipProvider sipProvider = (SipProvider) responseReceivedEvent.getSource();
+//							Request byeRequest = dialog.createRequest(Request.BYE);
+//							ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+//							dialog.sendRequest(ct);	
+//						}
+					} else {
+						System.out.println("Dialog after 200 OK  " + dialog);
+						System.out.println("Dialog State after 200 OK  " + dialog.getState());
+						System.out.println("Sending ACK");
+						dialog.sendAck(ackRequest);
+					}
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (dialog.getState() == DialogState.CONFIRMED) {
 						// oops cancel went in too late. Need to hang up the
@@ -221,12 +254,10 @@ public class Shootist implements SipListener {
 						ClientTransaction ct = sipProvider
 								.getNewClientTransaction(byeRequest);
 						dialog.sendRequest(ct);
-
 					}
 
 				} else if(cseq.getMethod().equals(Request.BYE)) {
-
-					   ended = true;
+					ended = true;
 				}
 			}
 		} catch (Exception ex) {
@@ -277,9 +308,9 @@ public class Shootist implements SipListener {
 		// You can set a max message size for tcp transport to
 		// guard against denial of service attack.
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"shootistdebug.txt");
+				"logs/shootistdebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"shootistlog.txt");
+				"logs/shootistlog.txt");
 
 		// Drop the client connection after we are done with the transaction.
 		//properties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS",
@@ -432,11 +463,6 @@ public class Shootist implements SipListener {
 		}
 	}
 
-	public static void main(String args[]) {
-		new Shootist().init();
-
-	}
-
 	public void processIOException(IOExceptionEvent exceptionEvent) {
 		System.out.println("IOException happened for "
 				+ exceptionEvent.getHost() + " port = "
@@ -456,17 +482,14 @@ public class Shootist implements SipListener {
 	}
 	
 	public void destroy() {
-		HashSet hashSet = new HashSet();
+		logger.info("Destroying following sip stack " + sipStack.getStackName());
+		HashSet<SipProvider> hashSet = new HashSet<SipProvider>();
 
-		for (Iterator it = sipStack.getSipProviders(); it.hasNext();) {
-
-			SipProvider sipProvider = (SipProvider) it.next();
+		for (SipProvider sipProvider : hashSet) {
 			hashSet.add(sipProvider);
 		}
 
-		for (Iterator it = hashSet.iterator(); it.hasNext();) {
-			SipProvider sipProvider = (SipProvider) it.next();
-
+		for (SipProvider sipProvider : hashSet) {
 			for (int j = 0; j < 5; j++) {
 				try {
 					sipStack.deleteSipProvider(sipProvider);

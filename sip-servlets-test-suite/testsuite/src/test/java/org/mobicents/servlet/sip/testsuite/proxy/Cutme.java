@@ -43,6 +43,7 @@ import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
+import javax.sip.header.ToHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -164,6 +165,10 @@ public class Cutme implements SipListener {
 			// System.out.println("cutme: " + request);
 			Response response = messageFactory.createResponse(Response.RINGING,
 					request);
+			String toTag = Integer.toString((int) (Math.random()*10000000));
+			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+			toHeader.setTag(toTag); // Application is supposed to set.
+			
 			ServerTransaction st = requestEvent.getServerTransaction();
 
 			if (st == null) {

@@ -57,13 +57,13 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.shootist = new Shootist();
-		this.shootme = new Shootme();
+		this.shootist = new Shootist(false);
+		this.shootme = new Shootme(5057);
 		this.cutme = new Cutme();
 	}
 
 	public void testProxy() {
-		this.shootme.init();
+		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init("useHostName");
 		for (int q = 0; q < 20; q++) {

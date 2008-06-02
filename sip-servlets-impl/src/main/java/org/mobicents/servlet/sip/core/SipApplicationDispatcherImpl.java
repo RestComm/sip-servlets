@@ -107,7 +107,6 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.utils.Inet6Util;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.

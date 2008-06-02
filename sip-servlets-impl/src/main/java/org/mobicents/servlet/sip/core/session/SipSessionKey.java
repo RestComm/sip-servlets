@@ -19,28 +19,42 @@ package org.mobicents.servlet.sip.core.session;
 import java.io.Serializable;
 
 /**
- * @author Jean Deruelle
+ * <p>
+ * Class representing the key (which will also be its id) for a sip session.<br/>
+ * It is composed of the From Header Address, the From Header parameter Tag, the To Header Address,
+ * the To Header parameter tag, the Call-Id and the application Name.
+ * </p>
+ * 
+ * <p>
+ * It is to be noted that the To Header parameter Tag will not be used in SipSessionKey comparison (equals() and hashcode() methods).<br/>
+ * It will only be used to check if a new derived sip session needs to be created.
+ * </p>
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
 public class SipSessionKey implements Serializable {
 	String fromAddress;
 	String fromTag;
 	String toAddress;
+	String toTag;
 	String callId; 
 	String applicationName;
 	/**
 	 * @param fromAddress
 	 * @param fromTag
 	 * @param toAddress
+	 * @param toTag
 	 * @param callId
 	 * @param applicationName
 	 */
 	protected SipSessionKey(String fromAddress, String fromTag, String toAddress,
-			String callId, String applicationName) {
+			String toTag, String callId, String applicationName) {
 		super();
 		this.fromAddress = fromAddress;
 		this.fromTag = fromTag;
 		this.toAddress = toAddress;
+		this.toTag = toTag;
 		this.callId = callId;
 		this.applicationName = applicationName;
 	}
@@ -55,6 +69,12 @@ public class SipSessionKey implements Serializable {
 	 */
 	public String getFromTag() {
 		return fromTag;
+	}
+	/**
+	 * @return the toTag
+	 */
+	public String getToTag() {
+		return toTag;
 	}
 	/**
 	 * @return the toAddress
@@ -147,4 +167,11 @@ public class SipSessionKey implements Serializable {
 		value = value.append(")");
 		return value.toString();
 	}
+	/**
+	 * @param toTag the toTag to set
+	 */
+	public void setToTag(String toTag) {
+		this.toTag = toTag;
+	}
+	
 }

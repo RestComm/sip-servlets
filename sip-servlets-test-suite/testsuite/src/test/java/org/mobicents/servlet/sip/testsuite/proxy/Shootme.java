@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.text.ParseException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,8 +51,11 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-public class Shootme implements SipListener {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+public class Shootme implements SipListener {
+	private static Log logger = LogFactory.getLog(Shootme.class);
 	private static AddressFactory addressFactory;
 
 	private static MessageFactory messageFactory;
@@ -64,7 +66,7 @@ public class Shootme implements SipListener {
 
 	private static final String myAddress = "127.0.0.1";
 
-	private static final int myPort = 5057;
+	private int myPort = 5057;
 
 	protected ServerTransaction inviteTid;
 
@@ -74,6 +76,10 @@ public class Shootme implements SipListener {
 
 	private Dialog dialog;
 
+	public boolean ended = false;
+	
+	public boolean cancelled = false;
+	
 	public static final boolean callerSendsBye = true;
 
 	class MyTimerTask extends TimerTask {
@@ -93,6 +99,10 @@ public class Shootme implements SipListener {
 	protected static final String usageString = "java "
 			+ "examples.shootist.Shootist \n"
 			+ ">>>> is your class path set to the root?";
+
+	public Shootme(int port) {
+		myPort = port;
+	}
 
 	private static void usage() {
 		System.out.println(usageString);
@@ -176,6 +186,9 @@ public class Shootme implements SipListener {
 			// System.out.println("shootme: " + request);
 			Response response = messageFactory.createResponse(Response.RINGING,
 					request);
+			String toTag = Integer.toString((int) (Math.random()*10000000));
+			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+			toHeader.setTag(toTag); // Application is supposed to set.
 			ServerTransaction st = requestEvent.getServerTransaction();
 
 			if (st == null) {
@@ -192,21 +205,21 @@ public class Shootme implements SipListener {
 			ContactHeader contactHeader = headerFactory
 					.createContactHeader(address);
 			response.addHeader(contactHeader);
-			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
-			toHeader.setTag("4321"); // Application is supposed to set.
+			toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
+			toHeader.setTag(toTag); // Application is supposed to set.
 			okResponse.addHeader(contactHeader);
 			this.inviteTid = st;
 			// Defer sending the OK to simulate the phone ringing.
 			// Answered in 1 second ( this guy is fast at taking calls)
 			this.inviteRequest = request;
-
+	
 			new Timer().schedule(new MyTimerTask(this), 1000);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
 		}
 	}
-
+ 
 	private void sendInviteOK() {
 		try {
 			if (inviteTid.getState() != TransactionState.COMPLETED) {
@@ -228,6 +241,7 @@ public class Shootme implements SipListener {
 	 */
 	public void processBye(RequestEvent requestEvent,
 			ServerTransaction serverTransactionId) {
+		ended = true;
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
 		Dialog dialog = requestEvent.getDialog();
@@ -247,7 +261,7 @@ public class Shootme implements SipListener {
 	}
 
 	public void processCancel(RequestEvent requestEvent,
-			ServerTransaction serverTransactionId) {
+			ServerTransaction serverTransactionId) {		
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
 		try {
@@ -258,6 +272,7 @@ public class Shootme implements SipListener {
 			}
 			Response response = messageFactory.createResponse(200, request);
 			serverTransactionId.sendResponse(response);
+			cancelled = true;
 			if (dialog.getState() != DialogState.CONFIRMED) {
 				response = messageFactory.createResponse(
 						Response.REQUEST_TERMINATED, inviteRequest);
@@ -285,20 +300,20 @@ public class Shootme implements SipListener {
 		System.out.println("Transaction Time out");
 	}
 
-	public void init() {
+	public void init(String stackName) {
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
 		sipFactory.setPathName("gov.nist");
 		Properties properties = new Properties();
-		properties.setProperty("javax.sip.STACK_NAME", "shootme");
+		properties.setProperty("javax.sip.STACK_NAME", stackName);
 		// You need 16 for logging traces. 32 for debug + traces.
 		// Your code will limp at 32 but it is best for debugging.
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/shootmedebug.txt");
+				"logs/debug"+stackName+".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/shootmelog.txt");
+				"logs/" + stackName + ".txt");
 
 		try {
 			// Create SipStack object
@@ -336,10 +351,6 @@ public class Shootme implements SipListener {
 
 	}
 
-	public static void main(String args[]) {
-		new Shootme().init();
-	}
-
 	public void processIOException(IOExceptionEvent exceptionEvent) {
 		System.out.println("IOException");
 
@@ -365,30 +376,30 @@ public class Shootme implements SipListener {
 	}
 
 	public void destroy() {
-		HashSet hashSet = new HashSet();
-
-		for (Iterator it = sipStack.getSipProviders(); it.hasNext();) {
-
-			SipProvider sipProvider = (SipProvider) it.next();
+		logger.info("Destroying following sip stack " + sipStack.getStackName());
+		HashSet<SipProvider> hashSet = new HashSet<SipProvider>();
+		
+		for (SipProvider sipProvider : hashSet) {
 			hashSet.add(sipProvider);
 		}
-
-		for (Iterator it = hashSet.iterator(); it.hasNext();) {
-			SipProvider sipProvider = (SipProvider) it.next();
-
-			for (int j = 0; j < 5; j++) {
-				try {
-					sipStack.deleteSipProvider(sipProvider);
-				} catch (ObjectInUseException ex) {
+		try {
+			for (SipProvider sipProvider : hashSet) {
+				for (int j = 0; j < 5; j++) {
 					try {
-						Thread.sleep(1000);
-					} catch (Exception e) {
+						sipStack.deleteSipProvider(sipProvider);
+					} catch (ObjectInUseException ex) {
+						try {
+							Thread.sleep(1000);
+						} catch (Exception e) {
+						}
+	
 					}
-
 				}
 			}
+		
+			sipStack.stop();
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
-
-		sipStack.stop();
 	}
 }
