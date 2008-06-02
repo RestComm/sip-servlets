@@ -1620,6 +1620,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					proxyBranch.onResponse(sipServletResponse); 
 					
 					// Notfiy the servlet
+					if(logger.isDebugEnabled()) {
+						logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
+					}
 					if(proxyBranch.getProxy().getSupervised()) {
 						callServlet(sipServletResponse);
 					}

@@ -108,6 +108,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		
 		//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
 		proxy.setRecordRoute(true);
+		proxy.setSupervised(true);
 		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
 		proxy.setParallel(true);
 		proxy.proxyTo(uris);
@@ -131,6 +132,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 			throws ServletException, IOException {
 
 		logger.info("Got response: " + response);
+		logger.info("Sip Session is :" + response.getSession(false));
+		logger.info("Original Sip Session is :" + response.getProxy().getOriginalRequest().getSession(false));
 		super.doResponse(response);
 	}
 
