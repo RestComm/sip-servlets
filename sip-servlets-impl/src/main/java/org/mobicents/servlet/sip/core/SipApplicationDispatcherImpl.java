@@ -137,6 +137,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public static final String RR_PARAM_HANDLER_NAME = "handler";
 	/* 
+	 * This parameter is to know if a servlet application sent a final response
+	 */
+	public static final String FINAL_RESPONSE = "final_response";
+	/* 
 	 * This parameter is to know when an app was not deployed and couldn't handle the request
 	 * used so that the response doesn't try to call the app not deployed
 	 */
@@ -498,9 +502,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}			
 				clonedRequest.addHeader(viaHeader);
 			} else {				
-				// no app was returned by the AR 				
-				viaHeader.setParameter(SipApplicationDispatcherImpl.NO_APP_RETURNED,
+				if(SipRouteModifier.NO_ROUTE.equals(sipRouteModifier)) {
+					// no app was returned by the AR 				
+					viaHeader.setParameter(SipApplicationDispatcherImpl.NO_APP_RETURNED,
 						"noappreturned");
+				} else {
+					viaHeader.setParameter(SipApplicationDispatcherImpl.MODIFIER,
+							sipRouteModifier.toString());
+				}
 				clonedRequest.addHeader(viaHeader);
 			}
 		} else {
@@ -660,6 +669,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		//Extract information from the Record Route Header		
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
+		String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
 		if(applicationName == null || applicationName.length() < 1 || 
 				handlerName == null || handlerName.length() < 1) {
 			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
@@ -752,19 +762,29 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						"The Container hence stops routing the initial request.");
 			}
 			return false;
-		} else {		
+		} 
+		else {					
+			if(finalResponse != null && finalResponse.length() > 0) {
+				logger.info("Subsequent Request reached the servlet application " +
+						"that sent a final response, stop routing the subsequent request " + request.toString());
+				return false;
+			}
 			// Check if the request is meant for me. 
 			RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
 			if(routeHeader == null || isRouteExternal(routeHeader)) {
 				// no route header or external, send outside the container
 				// FIXME send it statefully
-				try{
-					sipProvider.sendRequest((Request)request.clone());						
-					logger.info("Subsequent Request dispatched outside the container" + request.toString());
-				} catch (Exception ex) {			
-					throw new IllegalStateException("Error sending request",ex);
-				}	
+				if(dialog == null && transaction == null) {
+					try{
+						sipProvider.sendRequest((Request)request.clone());						
+						logger.info("Subsequent Request dispatched outside the container" + request.toString());
+					} catch (Exception ex) {			
+						throw new IllegalStateException("Error sending request",ex);
+					}	
+				} else {
+					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);	
+				}
 				return false;
 			} else {		
 				//route header is meant for the container hence we continue

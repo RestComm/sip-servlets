@@ -131,7 +131,11 @@ public class TestSipListener implements SipListener {
 	
 	private int finalResponseToSend;
 	
+	public int ackCount = 0;
+	
 	private List<Integer> provisionalResponsesToSend;
+
+	private boolean useToURIasRequestUri;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 	
@@ -323,6 +327,7 @@ public class TestSipListener implements SipListener {
 			logger.info("shootist:  got a " + request);
 			logger.info("shootist:  got an ACK. ServerTxId = " + serverTransactionId);
 			ackReceived = true;
+			ackCount ++;
 			if(sendBye) {											
 				Thread.sleep(1000);
 				Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
@@ -360,6 +365,9 @@ public class TestSipListener implements SipListener {
 				logger.info("response = " + response);
 				if (cseq.getMethod().equals(Request.INVITE)) {
 					Request ackRequest = dialog.createAck(cseq.getSeqNumber());
+					if (useToURIasRequestUri) {
+						ackRequest.setRequestURI(requestURI);	
+					}
 					logger.info("Sending ACK");
 					dialog.sendAck(ackRequest);
 					ackSent = true;
@@ -417,9 +425,9 @@ public class TestSipListener implements SipListener {
 					MaxForwardsHeader maxForwardsHeader = protocolObjects.headerFactory
 							.createMaxForwardsHeader(10);
 					// create invite Request
-					SipURI newUri = (SipURI)this.requestURI.clone();
+					SipURI newUri = (SipURI)this.requestURI.clone();					
 					newUri.setParameter("redirection", "true");
-				
+					requestURI = newUri;
 					Request invRequest = protocolObjects.messageFactory
 							.createRequest(newUri,
 									"INVITE", callID, cseqNew, from, to,
@@ -504,7 +512,8 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendInvite(SipURI fromURI, SipURI toURI, String messageContent, SipURI route) throws SipException, ParseException, InvalidArgumentException {
+	public void sendInvite(SipURI fromURI, SipURI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
+			this.useToURIasRequestUri = useToURIasRequestUri;
 			// create >From Header
 			Address fromNameAddress = protocolObjects.addressFactory
 					.createAddress(fromURI);			
@@ -521,6 +530,9 @@ public class TestSipListener implements SipListener {
 			this.requestURI = protocolObjects.addressFactory.createSipURI(
 					toURI.getUser(), peerHostPort);
 			this.requestURI.setPort(peerPort);
+			if(useToURIasRequestUri) {
+				this.requestURI = toURI;
+			}
 			
 			// Create ViaHeaders
 

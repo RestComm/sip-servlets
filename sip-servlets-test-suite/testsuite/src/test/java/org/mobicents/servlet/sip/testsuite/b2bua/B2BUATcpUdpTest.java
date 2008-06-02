@@ -100,7 +100,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null);		
+		sender.sendInvite(fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -129,7 +129,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null);		
+		sender.sendInvite(fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		
@@ -158,7 +158,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null);
+		sender.sendInvite(fromAddress, toAddress, null, null, false);
 		Thread.sleep(200);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);

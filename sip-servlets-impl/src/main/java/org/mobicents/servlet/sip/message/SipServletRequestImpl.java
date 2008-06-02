@@ -728,7 +728,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null) {
 					FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
-					//TODO what about other schemes ?
+					//FIXME what about other schemes ?
 					String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();										
 					// Create the contact name address.
 					contactHeader = 

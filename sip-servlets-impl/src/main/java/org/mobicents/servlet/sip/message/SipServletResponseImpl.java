@@ -337,6 +337,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						);
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
+				sipURI.setParameter(SipApplicationDispatcherImpl.FINAL_RESPONSE, "true");
 				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);

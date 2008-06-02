@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
 
 import javax.sip.ObjectInUseException;
@@ -112,18 +111,13 @@ public class ProtocolObjects {
 	}
 
 	public synchronized void destroy() {
-
-		HashSet hashSet = new HashSet();
-
-		for (Iterator it = sipStack.getSipProviders(); it.hasNext();) {
-
-			SipProvider sipProvider = (SipProvider) it.next();
+		HashSet<SipProvider> hashSet = new HashSet<SipProvider>();
+		
+		for (SipProvider sipProvider : hashSet) {
 			hashSet.add(sipProvider);
 		}
 
-		for (Iterator it = hashSet.iterator(); it.hasNext();) {
-			SipProvider sipProvider = (SipProvider) it.next();
-
+		for (SipProvider sipProvider : hashSet) {
 			for (int j = 0; j < 5; j++) {
 				try {
 					sipStack.deleteSipProvider(sipProvider);
