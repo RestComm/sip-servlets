@@ -35,9 +35,8 @@ public class Tel implements Extractor {
 		if (uri.isSipURI()) {
 	        SipURI sipuri = (SipURI) uri;
 	        if ("phone".equals(sipuri.getParameter("user"))) {
-	        	
-	        }
-	        return stripVisuals(sipuri.getUser()); 
+	        	return stripVisuals(sipuri.getUser()); 	
+	        }	        
 	    } else if ("tel".equals(uri.getScheme())) {
 	        return stripVisuals(((TelURL) uri).getPhoneNumber());
 	    }

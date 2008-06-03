@@ -12,4 +12,6 @@ Acknowledgements
 		
 		* Fix for equals on URI
 		
+		* servlet-mapping rules parsing : {{{http://code.google.com/p/mobicents/issues/detail?id=108}issue 108}}
+		
 		* IPBX : {{{http://code.google.com/p/mobicents/issues/detail?id=122}issue 122}}

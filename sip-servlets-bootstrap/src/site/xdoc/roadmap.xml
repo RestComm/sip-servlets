@@ -260,7 +260,7 @@
 						More Extensions : SUBSCRIBE/NOTIFY
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes :
 						<ul>
 							<li>
@@ -271,7 +271,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=108">
 									Servlet-mapping still supported in 1.1
