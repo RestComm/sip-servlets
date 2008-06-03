@@ -198,8 +198,7 @@ public class ClassFileScanner {
 									+ packageName + " and "
 									+ this.parsedAnnotatedPackage);
 				}
-
-				this.applicationParsed = true;
+				
 				if (this.parsedAnnotatedPackage == null) {
 					this.parsedAnnotatedPackage = packageName;
 					parseSipApplication(sipContext, appData, packageName);
@@ -232,7 +231,7 @@ public class ClassFileScanner {
 		parsedServletData.setServletClass(clazz.getCanonicalName());
 		parsedServletData.setLoadOnStartup(1);
 		parsedServletData.setParent(sipContext);
-
+		this.applicationParsed = true;
 	}
     
     public void loadParsedDataInServlet() {

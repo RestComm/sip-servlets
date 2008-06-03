@@ -107,6 +107,7 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -1258,7 +1259,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			String sipSessionHandlerName = sipServletRequest.getSipSession().getHandler();						
 			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 				String mainServlet = sipContext.getMainServlet();
-				sipSessionHandlerName = mainServlet;					
+				if(mainServlet != null && mainServlet.length() > 0) {
+					sipSessionHandlerName = mainServlet;				
+				} else {
+					SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
+					if(sipServletMapping == null) {
+						logger.error("Sending 404 because no matching servlet found for this request " + request);
+						// Sends a 404 and stops processing.				
+						JainSipUtils.sendErrorResponse(Response.NOT_FOUND, transaction, request, sipProvider);
+						return false;
+					} else {
+						sipSessionHandlerName = sipServletMapping.getServletName();
+					}
+				}
 				try {
 					sipServletRequest.getSipSession().setHandler(sipSessionHandlerName);
 				} catch (ServletException e) {

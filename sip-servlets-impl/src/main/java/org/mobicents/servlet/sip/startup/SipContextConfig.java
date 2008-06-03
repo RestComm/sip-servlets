@@ -137,7 +137,7 @@ public class SipContextConfig extends ContextConfig implements
 				ok = false;
 			}	
 			
-			// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
+			// Use description from the annotations no matter if sip.xml parsing failed.
 			if(scanner.isApplicationParsed()) { 
 				ok = true;
 			}
@@ -149,8 +149,8 @@ public class SipContextConfig extends ContextConfig implements
 				}
 				context.setConfigured(true);						
 			} else {
-				logger.warn("contextConfig.unavailable");
-				context.setAvailable(false);
+				logger.warn("sipContextConfig didn't start properly");
+				context.setConfigured(false);
 			}			
 		} else {
 			super.start();

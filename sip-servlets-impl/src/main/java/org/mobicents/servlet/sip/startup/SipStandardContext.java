@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
@@ -27,6 +28,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
@@ -54,6 +56,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
+import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
  * Sip implementation of the <b>Context</b> interface extending the standard
@@ -99,6 +102,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
      * application, in the order they were encountered in the sip.xml file.
      */
     protected String sipApplicationListeners[] = new String[0];
+    
+    /**
+     * The set of sip servlet mapping configured for this
+     * application.
+     */
+    protected List<SipServletMapping> sipServletMappings = new ArrayList<SipServletMapping>();
     
     protected SipApplicationDispatcher sipApplicationDispatcher = null;    
 	/**
@@ -704,5 +713,44 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	public String getJbossBasePath() {
 		return getBasePath();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addSipServletMapping(SipServletMapping sipServletMapping) {
+		sipServletMappings.add(sipServletMapping);
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<SipServletMapping> findSipServletMappings() {
+		return sipServletMappings;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipServletMapping findSipServletMappings(SipServletRequest sipServletRequest) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Checking sip Servlet Mapping for following request : " + sipServletRequest);
+		}
+		for (SipServletMapping sipServletMapping : sipServletMappings) {
+			if(sipServletMapping.getMatchingRule().matches(sipServletRequest)) {
+				return sipServletMapping;
+			} else {
+				logger.debug("Following mapping rule didn't match : servletName => " + 
+						sipServletMapping.getServletName() + " | expression = "+ 
+						sipServletMapping.getMatchingRule().getExpression());
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeSipServletMapping(SipServletMapping sipServletMapping) {
+		sipServletMappings.remove(sipServletMapping);
 	}
 }

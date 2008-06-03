@@ -24,8 +24,15 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.SetNextNamingRule;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.digester.NodeCreateRule;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSetBase;
+import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
+import org.mobicents.servlet.sip.startup.loading.rules.MatchingRule;
+import org.mobicents.servlet.sip.startup.loading.rules.MatchingRuleParser;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 
 
@@ -47,20 +54,24 @@ public class SipRuleSet extends RuleSetBase {
     
     
     /**
-     * The <code>SetSessionConfig</code> rule used to parse the web.xml
+     * The <code>SetSessionConfig</code> rule used to parse the sip.xml
      */
     protected SetSessionConfig sessionConfig;
     
     /**
-     * The <code>SetProxyConfig</code> rule used to parse the web.xml
+     * The <code>SetProxyConfig</code> rule used to parse the sip.xml
      */
     protected SetProxyConfig proxyConfig;
     
     /**
-     * The <code>SetLoginConfig</code> rule used to parse the web.xml
+     * The <code>SetLoginConfig</code> rule used to parse the sip.xml
      */
     protected SetLoginConfig loginConfig;
 
+    /**
+     * The <code>SetServletSelection</code> rule used to parse the sip.xml
+     */
+    protected SetServletSelection servletSelection;
 
     // ------------------------------------------------------------ Constructor
 
@@ -108,6 +119,7 @@ public class SipRuleSet extends RuleSetBase {
         sessionConfig = new SetSessionConfig();
         proxyConfig = new SetProxyConfig();
         loginConfig = new SetLoginConfig();
+        servletSelection = new SetServletSelection();
         
         //Handles basic application attributes  
         digester.addRule(prefix + "sip-app",
@@ -136,8 +148,10 @@ public class SipRuleSet extends RuleSetBase {
                                 "addSipApplicationListener", 0);
          
         //Handles Main Servlet
+        digester.addRule(prefix + "sip-app/main-servlet",
+                servletSelection);
         digester.addCallMethod(prefix + "sip-app/main-servlet",
-                "setMainServlet", 0);
+                "setMainServlet", 0);        
         //Handles Servlets
         digester.addRule(prefix + "sip-app/servlet",
                          new WrapperCreateRule());
@@ -177,6 +191,27 @@ public class SipRuleSet extends RuleSetBase {
         digester.addCallParam(prefix + "sip-app/servlet/security-role-ref/role-name", 0);
         digester.addCallParam(prefix + "sip-app/servlet/security-role-ref/role-link", 1);
 //        digester.addCallParam(prefix + "sip-app/servlet/security-role-ref/description", 2);
+        
+        //Handles servlet mapping rules
+        digester.addRule(prefix + "sip-app/servlet-mapping",
+                servletSelection);
+        digester.addObjectCreate(prefix + "sip-app/servlet-mapping",        		
+        	"org.mobicents.servlet.sip.startup.loading.SipServletMapping");
+        digester.addSetNext(prefix + "sip-app/servlet-mapping",        		
+        	"addSipServletMapping");
+        digester.addCallMethod(prefix + "sip-app/servlet-mapping/servlet-name",
+        		"setServletName", 0);
+        try {
+			digester.addRule("sip-app/servlet-mapping/pattern",
+			        new PatternRule());
+		} catch (Throwable e) {
+			throw new IllegalArgumentException("Impossible to parse the pattern", e);
+		}
+//		digester.addSetNext(prefix + "sip-app/servlet-mapping/pattern",        		
+//    		"setMatchingRule");
+//		digester.addCallMethod(prefix + "sip-app/servlet-mapping/pattern",
+//		        "setMatchingRule");
+        
         //Handles Proxy Config
         digester.addRule(prefix + "sip-app/proxy-config",
                 proxyConfig);        
@@ -328,6 +363,7 @@ public class SipRuleSet extends RuleSetBase {
         proxyConfig.isProxyConfigSet = false;
         sessionConfig.isSessionConfigSet = false;
         loginConfig.isLoginConfigSet = false;
+        servletSelection.isServletSelectionSet = false;
     }
 }
 
@@ -395,6 +431,25 @@ final class SetProxyConfig extends Rule {
 
 }
 
+/**
+ * Rule to check that only one of the <code>servlet-mapping</code> or <code>main-servlet</code> is occuring 
+ * within the sip.xml
+ */
+final class SetServletSelection extends Rule {
+    protected boolean isServletSelectionSet = false;
+    public SetServletSelection() {
+    }
+
+    public void begin(String namespace, String name, Attributes attributes)
+        throws Exception {
+        if (isServletSelectionSet){
+            throw new IllegalArgumentException(
+            "only one of the <servlet-mapping> or <main-servlet> can be present in the sip.xml");
+        }
+        isServletSelectionSet = true;
+    }
+
+}
 /**
  * A Rule that calls the <code>setAuthConstraint(true)</code> method of
  * the top item on the stack, which must be of type
@@ -512,4 +567,30 @@ final class WrapperCreateRule extends Rule {
 //            digester.getLogger().debug("pop " + wrapper.getClass().getName());
     }
 
+}
+
+final class PatternRule extends NodeCreateRule {
+	
+	
+	public PatternRule() throws Exception {
+		super();
+	}
+	
+	
+	public void end() throws Exception {	    
+	    Element e = (Element) super.digester.pop();
+		Node pattern = (Node) e;
+
+		NodeList list = pattern.getChildNodes();
+	   
+		MatchingRule rule = MatchingRuleParser.buildRule((Element) list.item(0));
+		SipServletMapping sipServletMapping = (SipServletMapping) digester.peek();
+	    sipServletMapping.setMatchingRule(rule);
+	//    if (digester.getLogger().isDebugEnabled())
+	//        digester.getLogger().debug("pop " + wrapper.getClass().getName());
+	}
+	
+//	@Override
+//	public void end() throws Exception { Object top = digester.pop(); } 
+	
 }

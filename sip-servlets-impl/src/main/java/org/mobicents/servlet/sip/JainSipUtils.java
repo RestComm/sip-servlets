@@ -237,7 +237,7 @@ public class JainSipUtils {
 	}
 	/**
 	 * 
-	 * @param serverInternalError
+	 * @param errorCode
 	 * @param transaction
 	 * @param request
 	 * @param sipProvider
@@ -245,12 +245,12 @@ public class JainSipUtils {
 	 * @throws SipException
 	 * @throws InvalidArgumentException
 	 */
-	public static void sendErrorResponse(int serverInternalError,
+	public static void sendErrorResponse(int errorCode,
 			ServerTransaction transaction, Request request,
 			SipProvider sipProvider) {
 		try{
 			Response response=SipFactories.messageFactory.createResponse
-	        	(Response.SERVER_INTERNAL_ERROR,request);			
+	        	(errorCode,request);			
 	        if (transaction!=null) {
 	        	transaction.sendResponse(response);
 	        } else { 

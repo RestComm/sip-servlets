@@ -25,6 +25,7 @@
 		<module>session-state-uac</module>
 		<module>secure-servlet</module>
 		<module>annotated-servlet</module>
+		<module>servlet-mapping-sip-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
