@@ -24,35 +24,35 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
+			<version>${log4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
-			<version>1.1</version>
+			<version>${commons-logging.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.sip</groupId>
 			<artifactId>jain-sip-api</artifactId>
-			<version>1.2.1</version>
+			<version>${jain-sip.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.sip</groupId>
 			<artifactId>jain-sip-ri</artifactId>
-			<version>1.2.1</version>
+			<version>${jain-sip.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>concurrent</groupId>
 			<artifactId>concurrent</artifactId>
-			<version>1.3.4</version>
+			<version>${concurrent.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -136,7 +136,21 @@
 			<version>1.0-rc4</version>
 		</dependency>
 	</dependencies>
-	<build>		
+	<build>
+		<plugins>		
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+   				<groupId>org.mobicents.tools</groupId>
+    			<version>${mobicents.tools.mavenplugin.eclipse.version}</version>
+				<inherited>false</inherited>
+				<executions />
+				<configuration>
+					<generateProjectsForModules>true</generateProjectsForModules>
+					<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
+					<eclipseProjectName>sip-servlets-impl</eclipseProjectName>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 	<profiles>
 		<profile>			
@@ -270,5 +284,5 @@
 				</plugins>
 			</build>
 		</profile>
-	</profiles>
+	</profiles>	
 </project>

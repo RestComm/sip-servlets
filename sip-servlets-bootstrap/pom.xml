@@ -2,6 +2,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+        <artifactId>mobicents</artifactId>
+        <groupId>org.mobicents</groupId>
+        <version>1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<packaging>pom</packaging>
@@ -98,6 +104,12 @@
 		<module>../sip-servlets-spec</module>
 		<module>../sip-servlets-impl</module>
 	</modules>
+	
+	<properties>
+		<!-- MOBICENTS TOOL VERSIONS -->
+		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA1-SNAPSHOT</mobicents.tools.mavenplugin.eclipse.version>
+	</properties>
+	
 	<dependencies>
 		<!-- test dependencies -->
 		<dependency>
@@ -131,6 +143,18 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
 				<version>2.0-beta-6</version>									
+			</plugin>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+   				<groupId>org.mobicents.tools</groupId>
+    			<version>${mobicents.tools.mavenplugin.eclipse.version}</version>
+				<inherited>false</inherited>
+				<executions />
+				<configuration>				
+					<!--generateProjectsForModules>true</generateProjectsForModules-->	
+					<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
+					<eclipseProjectName>sip-servlets-bootstrap</eclipseProjectName>
+				</configuration>
 			</plugin>
 		</plugins>
 		<extensions>
@@ -176,21 +200,27 @@
 			<url>http://download.java.net/maven/2/</url>
 			<layout>default</layout>
 		</repository>
-		<repository>
+		<repository>			
+			<id>JbossRepository</id>
+			<name>Jboss Repository</name>
+			<url>http://repository.jboss.org/maven2</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
-			<id>JbossRepository</id>
-			<name>Jboss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
+		</repository>
+		<repository>
+			<id>jboss-snapshots</id>
+			<name>JBoss Snapshot Repository</name>
+			<url>http://snapshots.jboss.org/maven2</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
-
-	<!-- the tomcat location where the generated artifacts will be copied -->
-	<properties>		
-		<jboss.version>4.2.2.GA</jboss.version>
-	</properties>
 </project>

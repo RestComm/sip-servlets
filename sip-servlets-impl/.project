@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>sip-servlets-impl</name>
   <comment/>
@@ -5,6 +6,7 @@
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
+      <arguments/>
     </buildCommand>
   </buildSpec>
   <natures>
