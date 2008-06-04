@@ -14,12 +14,6 @@
 	<version>0.3</version>
 	<name>Mobicents Sip Servlets</name>
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
-	<issueManagement>
-		<system>Bugzilla</system>
-		<url>
-			http://code.google.com/p/mobicents/issues/list
-		</url>
-	</issueManagement>
 	<ciManagement>
 		<system>Hudson</system>
 		<url>https://hudson.jboss.org/hudson/job/MobicentsSipServlets/</url>
@@ -75,20 +69,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<distributionManagement>
-		<site>
-			<id>sip-servlets-www</id>
-			<url>
-				svn:https://https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/www/
-			</url>
-		</site>
-		<repository>
-			<id>java.net-repository</id>
-			<url>
-				svn:https://svn.dev.java.net/svn/maven2-repository/trunk/www/repository/
-			</url>
-		</repository>
-	</distributionManagement>
 	<scm>
 		<connection>
 			scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets
