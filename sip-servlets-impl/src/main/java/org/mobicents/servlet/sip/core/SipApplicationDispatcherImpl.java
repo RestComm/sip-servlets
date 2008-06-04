@@ -1251,7 +1251,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					sipServletRequest.setSubscriberURI(uri);
 				}
 			} catch (ParseException pe) {					
-				logger.error("An unexpected parse exception occured ", pe);
+				logger.error("Impossible to parse the subscriber URI returned by the Application Router " 
+						+ applicationRouterInfo.getSubscriberURI() +
+						", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
 				// Sends a 500 Internal server error and stops processing.				
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 				return false;
