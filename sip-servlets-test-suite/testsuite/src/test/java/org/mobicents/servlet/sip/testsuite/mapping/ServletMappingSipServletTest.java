@@ -86,7 +86,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		toAddress.setParameter("foo", "fighter");
-		sender.sendInvite(fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());		
 	}
@@ -102,7 +102,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		toAddress.setParameter("foo", "fighter");
-		sender.sendInvite(fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());		
 	}
@@ -118,7 +118,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		toAddress.setParameter("foo", "fighter");
-		sender.sendInvite(fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());		
 	}
@@ -133,7 +133,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		String toSipAddress = "mobicents.sip-servlets.com";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		sender.sendInvite(fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());		
 	}

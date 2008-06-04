@@ -26,6 +26,8 @@
 		<module>secure-servlet</module>
 		<module>annotated-servlet</module>
 		<module>servlet-mapping-sip-servlet</module>
+		<module>notifier-sip-servlet</module>
+		<module>subscriber-sip-servlet</module>		
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->

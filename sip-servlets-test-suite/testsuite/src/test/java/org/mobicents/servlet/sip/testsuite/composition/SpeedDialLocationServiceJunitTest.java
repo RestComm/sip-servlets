@@ -104,7 +104,7 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -133,7 +133,7 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		
@@ -163,7 +163,7 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(200);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);

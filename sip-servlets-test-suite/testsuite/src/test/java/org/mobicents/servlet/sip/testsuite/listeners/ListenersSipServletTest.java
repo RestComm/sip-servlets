@@ -118,7 +118,7 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, false);	
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		for (int i = 0; i < LISTENERS_TO_TEST.length; i++) {

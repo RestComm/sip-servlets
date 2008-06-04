@@ -43,6 +43,8 @@ import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
+import org.mobicents.servlet.sip.testsuite.subsnotify.NotifierSipServletTest;
+import org.mobicents.servlet.sip.testsuite.subsnotify.SubscriberSipServletTest;
 import org.mobicents.servlet.sip.testsuite.timers.TimersSipServletTest;
 
 public class AllTests {
@@ -73,6 +75,8 @@ public class AllTests {
 		suite.addTestSuite(SessionStateUACSipServletTest.class);
 		suite.addTestSuite(AnnotationTest.class);
 		suite.addTestSuite(ServletMappingSipServletTest.class);
+		suite.addTestSuite(SubscriberSipServletTest.class);
+		suite.addTestSuite(NotifierSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(SipURITest.class);

@@ -43,9 +43,12 @@ import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.EventHeader;
+import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -126,6 +129,8 @@ public class TestSipListener implements SipListener {
 	private String lastMessageContent;
 	
 	private List<String> allMessagesContent;
+	
+	private List<String> allSubscriptionStates;
 
 	private boolean finalResponseReceived;
 	
@@ -133,12 +138,50 @@ public class TestSipListener implements SipListener {
 	
 	public int ackCount = 0;
 	
+	public int notifyCount = 0;
+	
 	private List<Integer> provisionalResponsesToSend;
 
 	private boolean useToURIasRequestUri;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
-	
+
+	class MyEventSource implements Runnable {
+		private TestSipListener notifier;
+		private EventHeader eventHeader;
+
+		public MyEventSource(TestSipListener notifier, EventHeader eventHeader ) {
+			this.notifier = notifier;
+			this.eventHeader = eventHeader;
+		}
+
+		public void run() {
+			try {
+				for (int i = 0; i < 1; i++) {
+
+					Thread.sleep(1000);
+					Request request = this.notifier.dialog.createRequest(Request.NOTIFY);
+					SubscriptionStateHeader subscriptionState = protocolObjects.headerFactory
+							.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE);
+					request.addHeader(subscriptionState);
+					request.addHeader(eventHeader);
+										
+					allSubscriptionStates.add(subscriptionState.getState().toLowerCase());
+					// Lets mark our Contact
+//					((SipURI)dialog.getLocalParty().getURI()).setParameter("id","not2");
+					
+					ClientTransaction ct = sipProvider.getNewClientTransaction(request);
+					logger.info("NOTIFY Branch ID " +
+						((ViaHeader)request.getHeader(ViaHeader.NAME)).getParameter("branch"));
+					this.notifier.dialog.sendRequest(ct);
+					logger.info("Dialog " + dialog);
+					logger.info("Dialog state after active NOTIFY: " + dialog.getState());
+				}
+			} catch (Throwable ex) {
+				logger.info(ex.getMessage(), ex);
+			}
+		}
+	}
 
 	public void processRequest(RequestEvent requestReceivedEvent) {
 		Request request = requestReceivedEvent.getRequest();
@@ -167,6 +210,195 @@ public class TestSipListener implements SipListener {
 		
 		if (request.getMethod().equals(Request.MESSAGE)) {
 			processMessage(request, serverTransactionId);
+		}
+		
+		if (request.getMethod().equals(Request.NOTIFY)) {
+			processNotify(requestReceivedEvent, serverTransactionId);
+		}
+		
+		if (request.getMethod().equals(Request.SUBSCRIBE)) {
+			processSubscribe(requestReceivedEvent, serverTransactionId);
+		}
+	}
+	
+	/**
+	 * Process the invite request.
+	 */
+	public void processSubscribe(RequestEvent requestEvent,
+			ServerTransaction serverTransaction) {
+		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+		Request request = requestEvent.getRequest();
+		try {
+			logger.info("notifier: got an Subscribe sending OK");
+			logger.info("notifier:  " + request);
+			logger.info("notifier : dialog = " + requestEvent.getDialog());
+			EventHeader eventHeader = (EventHeader) request.getHeader(EventHeader.NAME);
+//			this.gotSubscribeRequest = true;
+			
+			// Always create a ServerTransaction, best as early as possible in the code
+			Response response = null;
+			ServerTransaction st = requestEvent.getServerTransaction();			
+			if (st == null) {
+				st = sipProvider.getNewServerTransaction(request);
+			}
+			
+			// Check if it is an initial SUBSCRIBE or a refresh / unsubscribe
+			boolean isInitial = requestEvent.getDialog() == null;
+			if ( isInitial ) {
+				// JvB: need random tags to test forking
+				String toTag = Integer.toHexString( (int) (Math.random() * Integer.MAX_VALUE) );
+				response = protocolObjects.messageFactory.createResponse(202, request);
+				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+				
+				// Sanity check: to header should not ahve a tag. Else the dialog 
+				// should have matched
+				toHeader.setTag(toTag); // Application is supposed to set.
+				
+				this.dialog = st.getDialog();
+				// subscribe dialogs do not terminate on bye.
+				this.dialog.terminateOnBye(false);
+			} else {
+				response = protocolObjects.messageFactory.createResponse(200, request);
+			}
+
+			// Both 2xx response to SUBSCRIBE and NOTIFY need a Contact
+			Address address = protocolObjects.addressFactory.createAddress("Notifier <sip:127.0.0.1>");
+			((SipURI)address.getURI()).setPort( sipProvider.getListeningPoint(ListeningPoint.UDP).getPort() );				
+			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);			
+			response.addHeader(contactHeader);
+			
+			// Expires header is mandatory in 2xx responses to SUBSCRIBE
+			ExpiresHeader expires = (ExpiresHeader) request.getHeader( ExpiresHeader.NAME );
+			if (expires==null) {
+				expires = protocolObjects.headerFactory.createExpiresHeader(30);	// rather short
+			}
+			response.addHeader( expires );
+			
+			/*
+			 * JvB: The SUBSCRIBE MUST be answered first. See RFC3265 3.1.6.2: 
+			 * "[...] a NOTIFY message is always sent immediately after any 200-
+			 * class response to a SUBSCRIBE request"
+			 * 
+			 *  Do this before creating the NOTIFY request below
+			 */
+			st.sendResponse(response);
+			//Thread.sleep(1000); // Be kind to implementations
+						
+			/*
+			 * NOTIFY requests MUST contain a "Subscription-State" header with a
+			 * value of "active", "pending", or "terminated". The "active" value
+			 * indicates that the subscription has been accepted and has been
+			 * authorized (in most cases; see section 5.2.). The "pending" value
+			 * indicates that the subscription has been received, but that
+			 * policy information is insufficient to accept or deny the
+			 * subscription at this time. The "terminated" value indicates that
+			 * the subscription is not active.
+			 */
+		
+			Request notifyRequest = dialog.createRequest( "NOTIFY" );
+			
+			
+			// Mark the contact header, to check that the remote contact is updated
+//			((SipURI)contactHeader.getAddress().getURI()).setParameter("id","not");
+			
+			// Initial state is pending, second time we assume terminated (Expires==0)		
+			SubscriptionStateHeader sstate = protocolObjects.headerFactory.createSubscriptionStateHeader(
+					expires.getExpires() != 0 ? SubscriptionStateHeader.PENDING : SubscriptionStateHeader.TERMINATED );
+			allSubscriptionStates.add(sstate.getState().toLowerCase());
+			
+			
+			// Need a reason for terminated
+			if ( sstate.getState().equalsIgnoreCase("terminated") ) {
+				sstate.setReasonCode( "deactivated" );
+			}
+			
+			notifyRequest.addHeader(sstate);
+			notifyRequest.setHeader(eventHeader);
+			notifyRequest.setHeader(contactHeader);
+			// notifyRequest.setHeader(routeHeader);
+			ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);
+
+			// Let the other side know that the tx is pending acceptance
+			//
+			dialog.sendRequest(ct);
+			logger.info("NOTIFY Branch ID " +
+				((ViaHeader)request.getHeader(ViaHeader.NAME)).getParameter("branch"));
+			logger.info("Dialog " + dialog);
+			logger.info("Dialog state after pending NOTIFY: " + dialog.getState());
+			
+			if (expires.getExpires() != 0) {
+				Thread myEventSource = new Thread(new MyEventSource(this,eventHeader));
+				myEventSource.start();
+			}
+		} catch (Throwable ex) {
+			logger.info(ex.getMessage(), ex);
+		}
+	}
+	
+	public void processNotify(RequestEvent requestEvent,
+			ServerTransaction serverTransactionId) {
+		SipProvider provider = (SipProvider) requestEvent.getSource();
+		Request notify = requestEvent.getRequest();
+		try {
+			logger.info("subscriber:  got a notify count  " + this.notifyCount++ );
+			if (serverTransactionId == null) {
+				logger.info("subscriber:  null TID.");
+				serverTransactionId = provider.getNewServerTransaction(notify);
+			}
+			Dialog dialog = serverTransactionId.getDialog();
+//			if ( dialog != subscriberDialog ) {
+//				if (forkedDialog == null) {
+//					forkedDialog = dialog;
+//				} else  {
+//					AbstractSubsnotifyTestCase.assertTrue("Dialog should be either the subscriber dialog ", 
+//							forkedDialog  == dialog);
+//				}
+//			}
+//			
+//			this.dialogs.add(dialog);
+			logger.info("Dialog State = " + dialog.getState());
+			
+			Response response = protocolObjects.messageFactory.createResponse(200, notify);
+			// SHOULD add a Contact
+			ContactHeader contact = (ContactHeader) contactHeader.clone();
+			((SipURI)contact.getAddress().getURI()).setParameter( "id", "sub" );
+			response.addHeader( contact );
+			logger.info("Transaction State = " + serverTransactionId.getState());
+			serverTransactionId.sendResponse(response);
+			logger.info("Dialog State = " + dialog.getState());
+			SubscriptionStateHeader subscriptionState = (SubscriptionStateHeader) notify
+					.getHeader(SubscriptionStateHeader.NAME);
+
+			// Subscription is terminated?
+			String state = subscriptionState.getState();
+			allSubscriptionStates.add(state.toLowerCase());
+			if (state.equalsIgnoreCase(SubscriptionStateHeader.TERMINATED)) {
+				dialog.delete();
+			} else if (state.equalsIgnoreCase(SubscriptionStateHeader.ACTIVE)) {
+				logger.info("Subscriber: sending unSUBSCRIBE");
+
+				// Else we end it ourselves
+				Request unsubscribe = dialog.createRequest(Request.SUBSCRIBE);
+				
+				logger.info( "dialog created:" + unsubscribe );
+				// SHOULD add a Contact (done by dialog), lets mark it to test updates
+//				((SipURI) dialog.getLocalParty().getURI()).setParameter( "id", "unsub" );
+				ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(0);
+				unsubscribe.addHeader(expires);
+				// JvB note : stack should do this!
+				unsubscribe.addHeader(notify.getHeader(EventHeader.NAME)); // copy
+											// event
+											// header
+				logger.info("Sending Unsubscribe : " + unsubscribe);
+				logger.info("unsubscribe dialog  " + dialog);
+				ClientTransaction ct = sipProvider.getNewClientTransaction(unsubscribe);
+				dialog.sendRequest(ct);
+			} else {
+				logger.info("Subscriber: state now " + state);// pending
+			}
+
+		} catch (Exception ex) {
+			logger.error("Unexpected exception",ex);
 		}
 	}
 	
@@ -512,7 +744,7 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendInvite(SipURI fromURI, SipURI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
+	public void sendSipRequest(String method, SipURI fromURI, SipURI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
 			this.useToURIasRequestUri = useToURIasRequestUri;
 			// create >From Header
 			Address fromNameAddress = protocolObjects.addressFactory
@@ -554,7 +786,7 @@ public class TestSipListener implements SipListener {
 
 			// Create a new Cseq header
 			CSeqHeader cSeqHeader = protocolObjects.headerFactory
-					.createCSeqHeader(1L, Request.INVITE);
+					.createCSeqHeader(1L, method);
 
 			// Create a new MaxForwardsHeader
 			MaxForwardsHeader maxForwards = protocolObjects.headerFactory
@@ -562,7 +794,7 @@ public class TestSipListener implements SipListener {
 
 			// Create the request.
 			Request request = protocolObjects.messageFactory.createRequest(
-					requestURI, Request.INVITE, callIdHeader, cSeqHeader,
+					requestURI, method, callIdHeader, cSeqHeader,
 					fromHeader, toHeader, viaHeaders, maxForwards);
 			// Create contact headers
 			String host = "127.0.0.1";
@@ -614,6 +846,13 @@ public class TestSipListener implements SipListener {
 				request.setContent(contents, contentTypeHeader);
 				request.setContentLength(contentLengthHeader);
 			}
+			if(Request.SUBSCRIBE.equals(method)) {
+				// Create an event header for the subscription.
+				EventHeader eventHeader = protocolObjects.headerFactory.createEventHeader("reg");				
+				request.addHeader(eventHeader);
+				ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(200);
+				request.addHeader(expires);
+			}
 			// Create the client transaction.
 			inviteClientTid = sipProvider.getNewClientTransaction(request);
 			// send the request out.
@@ -635,6 +874,7 @@ public class TestSipListener implements SipListener {
 		}
 		this.sendBye = callerSendBye;
 		allMessagesContent = new ArrayList<String>();
+		allSubscriptionStates = new ArrayList<String>();
 		finalResponseToSend = Response.OK;
 		provisionalResponsesToSend = new ArrayList<Integer>();
 		provisionalResponsesToSend.add(Response.TRYING);
@@ -823,5 +1063,12 @@ public class TestSipListener implements SipListener {
 	public void setProvisionalResponsesToSend(
 			List<Integer> provisionalResponsesToSend) {
 		this.provisionalResponsesToSend = provisionalResponsesToSend;
+	}
+
+	/**
+	 * @return the allSubscriptionState
+	 */
+	public List<String> getAllSubscriptionState() {
+		return allSubscriptionStates;
 	}	
 }

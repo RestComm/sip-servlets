@@ -190,7 +190,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, messageContent, null, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, messageContent, null, false);		
 		Thread.sleep(TIMEOUT);				
 		if(sendBye) {
 			assertTrue(sender.isAckSent());

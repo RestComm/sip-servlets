@@ -172,25 +172,27 @@ public class SipStandardManager extends StandardManager implements SipManager {
 				sipSessions.put(key, sipSessionImpl);					
 			}
 			// check if this session key has a to tag.
-			String toTag = sipSessionImpl.getKey().getToTag();
-			if(toTag == null && key.getToTag() != null) {
-				sipSessionImpl.getKey().setToTag(key.getToTag());
-			} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
-				SipSessionImpl derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
-				if(derivedSipSession == null) {
-					// if the to tag is different a sip session is created
-					if(logger.isDebugEnabled()) {
-						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
-								" creates new derived session with following to Tag " + key.getToTag());
+			if(sipSessionImpl != null) {
+				String toTag = sipSessionImpl.getKey().getToTag();
+				if(toTag == null && key.getToTag() != null) {
+					sipSessionImpl.getKey().setToTag(key.getToTag());
+				} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
+					SipSessionImpl derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
+					if(derivedSipSession == null) {
+						// if the to tag is different a sip session is created
+						if(logger.isDebugEnabled()) {
+							logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
+									" creates new derived session with following to Tag " + key.getToTag());
+						}
+						derivedSipSession = sipSessionImpl.createDerivedSipSession(key);
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
+									" already has a derived session with following to Tag " + key.getToTag() + " - reusing it");
+						}
 					}
-					derivedSipSession = sipSessionImpl.createDerivedSipSession(key);
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
-								" already has a derived session with following to Tag " + key.getToTag() + " - reusing it");
-					}
+					return derivedSipSession;	
 				}
-				return derivedSipSession;	
 			}
 		}
 		return sipSessionImpl;

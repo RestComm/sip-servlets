@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public class ServletMappingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Log logger = LogFactory.getLog(ServletMappingSipServlet.class);
 	
 	
 	/** Creates a new instance of ServletMappingSipServlet */

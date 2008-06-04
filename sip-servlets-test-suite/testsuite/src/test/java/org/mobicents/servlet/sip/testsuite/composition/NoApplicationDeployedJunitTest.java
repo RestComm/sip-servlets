@@ -106,7 +106,7 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 		routeAddress.setLrParam();
 		routeAddress.setTransportParam(senderProtocolObjects.transport);
 		
-		sender.sendInvite(fromAddress, toAddress, null, routeAddress, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, routeAddress, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -147,7 +147,7 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 		routeAddress.setLrParam();
 		routeAddress.setTransportParam(senderProtocolObjects.transport);
 		
-		sender.sendInvite(fromAddress, toAddress, null, routeAddress, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, routeAddress, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());

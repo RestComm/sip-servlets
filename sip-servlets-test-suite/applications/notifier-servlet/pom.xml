@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-test-suite-applications</artifactId>
+		<version>0.3</version>
+	</parent>
+	<groupId>org.mobicents.servlet.sip.example</groupId>
+	<artifactId>simple-sip-servlet</artifactId>
+	<packaging>war</packaging>
+	<version>1.0</version>
+	<name>Simple Sip Servlet Example</name>
+	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webXml>
+						${basedir}/src/main/sipapp/WEB-INF/sip.xml
+					</webXml>
+					<warSourceDirectory>
+						${basedir}/src/main/sipapp
+					</warSourceDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
+</project>

@@ -54,7 +54,6 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.InvalidArgumentException;
@@ -438,10 +437,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				sipServletRequest.setPoppedRoute(routeHeader);
 			}							
 						
-			//check if the request is initial
-			RoutingState routingState = checkRoutingState(sipServletRequest, requestEvent.getDialog());				
-			sipServletRequest.setRoutingState(routingState);					
-			logger.info("Routing State " + routingState);			
+			logger.info("Routing State " + sipServletRequest.getRoutingState());			
 										
 			if(sipServletRequest.isInitial()) {
 				logger.info("Routing of Initial Request " + request);
@@ -704,12 +700,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		
 		// Added by Vladimir because the inversion detection on proxied requests doesn't work
 		if(sipSession == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
+						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
+			}
 			key = SessionManagerUtil.getSipSessionKey(applicationName, sipServletRequest.getMessage(), !inverted);
 			sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		}
 		
 		if(sipSession == null) {			
-			logger.error("Cannot find the corresponding sip session to this subsequent request " + request +
+			logger.error("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 			sipManager.dumpSipSessions();
 			// Sends a 500 Internal server error and stops processing.				
@@ -760,7 +760,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				RoutingState.CANCELLED.equals(routingState)) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-						"The Container hence stops routing the initial request.");
+						"The Container hence stops routing the subsequent request.");
 			}
 			return false;
 		} 
@@ -1411,86 +1411,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		return isExternal;
 	}
-	
-	/**
-	 * Method checking whether or not the sip servlet request in parameter is initial
-	 * according to algorithm defined in JSR289 Appendix B
-	 * @param sipServletRequest the sip servlet request to check
-	 * @param dialog the dialog associated with this request
-	 * @return true if the request is initial false otherwise
-	 */
-	private RoutingState checkRoutingState(SipServletRequestImpl sipServletRequest, Dialog dialog) {
-		// 2. Ongoing Transaction Detection - Employ methods of Section 17.2.3 in RFC 3261 
-		//to see if the request matches an existing transaction. 
-		//If it does, stop. The request is not an initial request.
-		if(dialog != null && DialogState.CONFIRMED.equals(dialog.getState())) {
-			return RoutingState.SUBSEQUENT;
-		}		
-		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
-		//The request is not an initial request for which application selection occurs.
-		if(nonInitialSipRequestMethods.contains(sipServletRequest.getMethod())) {
-			return RoutingState.SUBSEQUENT;
-		}
-		// 4. Existing Dialog Detection - If the request has a tag in the To header field, 
-		// the container computes the dialog identifier (as specified in section 12 of RFC 3261) 
-		// corresponding to the request and compares it with existing dialogs. 
-		// If it matches an existing dialog, stop. The request is not an initial request. 
-		// The request is a subsequent request and must be routed to the application path 
-		// associated with the existing dialog. 
-		// If the request has a tag in the To header field, 
-		// but the dialog identifier does not match any existing dialogs, 
-		// the container must reject the request with a 481 (Call/Transaction Does Not Exist). 
-		// Note: When this occurs, RFC 3261 says either the UAS has crashed or the request was misrouted. 
-		// In the latter case, the misrouted request is best handled by rejecting the request. 
-		// For the Sip Servlet environment, a UAS crash may mean either an application crashed 
-		// or the container itself crashed. In either case, it is impossible to route the request 
-		// as a subsequent request and it is inappropriate to route it as an initial request. 
-		// Therefore, the only viable approach is to reject the request.
-		if(dialog != null && !DialogState.EARLY.equals(dialog.getState())) {
-			return RoutingState.SUBSEQUENT;
-		}
-		// 5. Detection of Merged Requests - If the From tag, Call-ID, and CSeq exactly 
-		// match those associated with an ongoing transaction, 
-		// the request has arrived more than once across different paths, most likely due to forking. 
-		// Such requests represent merged requests and MUST NOT be treated as initial requests. 
-		// Refer to section 11.3 for more information on container treatment of merged requests.
-		
-		// The jain sip stack will send the 482 for us, in the other case the app will see the merged request 
-		// and be able to proxy it. Jain sip rocks and rolls !
-//		Iterator<SipSessionImpl> sipSessionIterator = sessionManager.getAllSipSessions();
-//		while (sipSessionIterator.hasNext()) {
-//			SipSessionImpl sipSessionImpl = (SipSessionImpl) sipSessionIterator
-//					.next();				
-//			Set<Transaction> transactions = sipSessionImpl.getOngoingTransactions();		
-//			for (Transaction transaction : transactions) {
-//				Request onGoingRequest = transaction.getRequest();
-//				Request currentRequest = (Request) sipServletRequest.getMessage();
-//				//Get the from headers
-//				FromHeader onGoingFromHeader = (FromHeader) onGoingRequest.getHeader(FromHeader.NAME);
-//				FromHeader currentFromHeader = (FromHeader) currentRequest.getHeader(FromHeader.NAME);
-//				//Get the CallId headers
-//				CallIdHeader onGoingCallIdHeader = (CallIdHeader) onGoingRequest.getHeader(CallIdHeader.NAME);
-//				CallIdHeader currentCallIdHeader = (CallIdHeader) currentRequest.getHeader(CallIdHeader.NAME);
-//				//Get the CSeq headers
-//				CSeqHeader onGoingCSeqHeader = (CSeqHeader) onGoingRequest.getHeader(CSeqHeader.NAME);
-//				CSeqHeader currentCSeqHeader = (CSeqHeader) currentRequest.getHeader(CSeqHeader.NAME);
-//				if(onGoingCSeqHeader.equals(currentCSeqHeader) &&
-//						onGoingCallIdHeader.equals(currentCallIdHeader) &&
-//						onGoingFromHeader.equals(currentFromHeader)) {
-//					return RoutingState.MERGED;
-//				}
-//			}
-//		}
-		
-		// TODO 6. Detection of Requests Sent to Encoded URIs - 
-		// Requests may be sent to a container instance addressed to a URI obtained by calling 
-		// the encodeURI() method of a SipApplicationSession managed by this container instance. 
-		// When a container receives such a request, stop. This request is not an initial request. 
-		// Refer to section 15.9.2 Simple call with no modifications of requests 
-		// for more information on how a request sent to an encoded URI is handled by the container.
-		
-		return RoutingState.INITIAL;		
-	}	
 	
 	/*
 	 * (non-Javadoc)

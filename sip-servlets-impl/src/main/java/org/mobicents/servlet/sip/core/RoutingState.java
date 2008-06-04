@@ -27,8 +27,6 @@ public enum RoutingState {
 	INITIAL,	
 	// subsequent request being routed
 	SUBSEQUENT,
-	// merged request being routed
-	MERGED,
 	//final response sent for this request, stop routing
 	FINAL_RESPONSE_SENT,
 	// request has been proxied, stop routing

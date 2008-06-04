@@ -114,7 +114,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		//checking numbers of ACK received see http://forums.java.net/jive/thread.jspa?messageID=277840
 		assertEquals(1,receiver.ackCount);
@@ -147,7 +147,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		
@@ -178,7 +178,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendInvite(fromAddress, toAddress, null, null, true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
 		Thread.sleep(200);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
