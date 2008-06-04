@@ -8,7 +8,7 @@
 		<version>0.3</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
-	<artifactId>servlet-mmaping-sip-servlet</artifactId>
+	<artifactId>servlet-mapping-sip-servlet</artifactId>
 	<packaging>war</packaging>
 	<version>1.0</version>
 	<name>Servlet Mapping Sip Servlet Example</name>

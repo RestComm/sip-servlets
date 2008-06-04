@@ -8,8 +8,7 @@ Installation Instructions
 	
 	Check out the sip-servlets project at {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets}http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets}} 
 	
-	Open up the pom.xml from sip-servlets-bootstrap project and change the following property jboss.home at the end of the file.\
-	Make it the same as your jboss root installation by example E:\servers\jboss-4.2.2.GA 
+	Set the JBOSS_HOME environment variable to the same as your jboss root installation by example E:\servers\jboss-4.2.2.GA 
 	
 	Run <<<mvn clean install -P jboss>>> (-P jboss is to activate the jboss profile) from the project root (sip-servlets-bootstrap)
 	
@@ -51,15 +50,22 @@ Installation Instructions
 	
 	In your jboss_home\server\default\deploy\jboss-web.deployer\context.xml \
 	Add this attribute to the manager xml tag, \
-	<<<className="org.mobicents.servlet.sip.core.session.SipStandardManager">>>
+	<<<className="org.mobicents.servlet.sip.core.session.SipStandardManager">>> or 
+	Make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/context.xml file\
+	Copy the jboss-context.xml located in docs to jboss_home/server/default/deploy/jboss-web.deployer and rename it to context.xml
+	
 	
 	In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\jboss-service.xml :\
 	Modify the code attribute of the mbean tag so that it become \
-	<<<code="org.mobicents.servlet.sip.startup.jboss.JBossSip">>>
+	<<<code="org.mobicents.servlet.sip.startup.jboss.JBossSip">>> or
+	Make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml file\
+	Copy the jboss-service.xml located in docs to jboss_home/server/default/deploy/jboss-web.deployer/META-INF/
 	
 	In your jboss_home\server\default\deploy\jboss-web.deployer\META-INF\webserver-xmbean.xml :\
 	Modify the class xml tag of the mbean tag so that it become \
-	<<<\<class\>org.mobicents.servlet.sip.startup.jboss.JBossSip\</class\>>>>
+	<<<\<class\>org.mobicents.servlet.sip.startup.jboss.JBossSip\</class\>>>> or 
+	Make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml file\
+	Copy the jboss-service.xml located in docs to jboss_home/server/default/deploy/jboss-web.deployer/META-INF/
 	
 	You're all set !	
     	

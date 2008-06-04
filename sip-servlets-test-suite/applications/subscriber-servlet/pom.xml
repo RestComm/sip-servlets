@@ -8,10 +8,10 @@
 		<version>0.3</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
-	<artifactId>shootist-sip-servlet</artifactId>
+	<artifactId>subscriber-sip-servlet</artifactId>
 	<packaging>war</packaging>
 	<version>1.0</version>
-	<name>Shootist Sip Servlet Example</name>
+	<name>Subscriber Sip Servlet Example</name>
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<build>
 		<plugins>
