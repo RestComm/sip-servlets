@@ -135,6 +135,12 @@
 			<artifactId>geronimo-spec-j2ee-jacc</artifactId>
 			<version>1.0-rc4</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.tools</groupId>
+			<artifactId>sip-balancer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>		
@@ -214,6 +220,7 @@
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/lib"/>
+										<copy verbose="true" file="docs/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/default/conf"/>
 									</tasks>
 								</configuration>
 								<goals>

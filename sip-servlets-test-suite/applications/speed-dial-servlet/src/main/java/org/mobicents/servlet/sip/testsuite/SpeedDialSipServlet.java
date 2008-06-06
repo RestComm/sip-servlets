@@ -55,6 +55,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		dialNumberToSipUriMapping.put("3", "sip:vlad@sip-servlets.com");
 		dialNumberToSipUriMapping.put("4", "sip:bartek@sip-servlets.com");
 		dialNumberToSipUriMapping.put("5", "sip:jeand@sip-servlets.com");
+		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 	}
 
 	@Override

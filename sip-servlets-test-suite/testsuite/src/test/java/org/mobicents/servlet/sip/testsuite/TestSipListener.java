@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -47,6 +48,7 @@ import javax.sip.header.EventHeader;
 import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
@@ -55,6 +57,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.SipFactories;
 
 /**
  * This class is a UAC template. Shootist is the guy that shoots and shootme is
@@ -515,7 +518,14 @@ public class TestSipListener implements SipListener {
 				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
 				toHeader.setTag(TO_TAG); // Application is supposed to set.
 				finalResponse.addHeader(contactHeader);			
-					
+				ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
+				while (recordRouteHeaders.hasNext()) {
+					RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+							.next();
+					RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
+					finalResponse.addHeader(routeHeader);
+				}
+				
 				st.sendResponse(finalResponse);
 			} else {
 				logger.info("Waiting for CANCEL, stopping the INVITE processing ");
@@ -745,124 +755,124 @@ public class TestSipListener implements SipListener {
 	}
 
 	public void sendSipRequest(String method, SipURI fromURI, SipURI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
-			this.useToURIasRequestUri = useToURIasRequestUri;
-			// create >From Header
-			Address fromNameAddress = protocolObjects.addressFactory
-					.createAddress(fromURI);			
-			FromHeader fromHeader = protocolObjects.headerFactory
-					.createFromHeader(fromNameAddress, Integer.toString((int) (Math.random()*10000000)));
+		this.useToURIasRequestUri = useToURIasRequestUri;
+		// create >From Header
+		Address fromNameAddress = protocolObjects.addressFactory
+				.createAddress(fromURI);			
+		FromHeader fromHeader = protocolObjects.headerFactory
+				.createFromHeader(fromNameAddress, Integer.toString((int) (Math.random()*10000000)));
 
-			// create To Header			
-			Address toNameAddress = protocolObjects.addressFactory
-					.createAddress(toURI);			
-			ToHeader toHeader = protocolObjects.headerFactory.createToHeader(
-					toNameAddress, null);
+		// create To Header			
+		Address toNameAddress = protocolObjects.addressFactory
+				.createAddress(toURI);			
+		ToHeader toHeader = protocolObjects.headerFactory.createToHeader(
+				toNameAddress, null);
 
-			// create Request URI
-			this.requestURI = protocolObjects.addressFactory.createSipURI(
-					toURI.getUser(), peerHostPort);
-			this.requestURI.setPort(peerPort);
-			if(useToURIasRequestUri) {
-				this.requestURI = toURI;
-			}
-			
-			// Create ViaHeaders
+		// create Request URI
+		this.requestURI = protocolObjects.addressFactory.createSipURI(
+				toURI.getUser(), peerHostPort);
+		this.requestURI.setPort(peerPort);
+		if(useToURIasRequestUri) {
+			this.requestURI = toURI;
+		}
+		
+		// Create ViaHeaders
 
-			List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
-			ViaHeader viaHeader = protocolObjects.headerFactory
-					.createViaHeader("127.0.0.1", sipProvider
-							.getListeningPoint(protocolObjects.transport).getPort(), protocolObjects.transport,
-							null);
+		List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
+		ViaHeader viaHeader = protocolObjects.headerFactory
+				.createViaHeader("127.0.0.1", sipProvider
+						.getListeningPoint(protocolObjects.transport).getPort(), protocolObjects.transport,
+						null);
 
-			// add via headers
-			viaHeaders.add(viaHeader);
+		// add via headers
+		viaHeaders.add(viaHeader);
 
-			// Create ContentTypeHeader
+		// Create ContentTypeHeader
 //			ContentTypeHeader contentTypeHeader = protocolObjects.headerFactory
 //					.createContentTypeHeader("application", "sdp");
 
-			// Create a new CallId header
-			CallIdHeader callIdHeader = sipProvider.getNewCallId();
+		// Create a new CallId header
+		CallIdHeader callIdHeader = sipProvider.getNewCallId();
 
-			// Create a new Cseq header
-			CSeqHeader cSeqHeader = protocolObjects.headerFactory
-					.createCSeqHeader(1L, method);
+		// Create a new Cseq header
+		CSeqHeader cSeqHeader = protocolObjects.headerFactory
+				.createCSeqHeader(1L, method);
 
-			// Create a new MaxForwardsHeader
-			MaxForwardsHeader maxForwards = protocolObjects.headerFactory
-					.createMaxForwardsHeader(70);
+		// Create a new MaxForwardsHeader
+		MaxForwardsHeader maxForwards = protocolObjects.headerFactory
+				.createMaxForwardsHeader(70);
 
-			// Create the request.
-			Request request = protocolObjects.messageFactory.createRequest(
-					requestURI, method, callIdHeader, cSeqHeader,
-					fromHeader, toHeader, viaHeaders, maxForwards);
-			// Create contact headers
-			String host = "127.0.0.1";
+		// Create the request.
+		Request request = protocolObjects.messageFactory.createRequest(
+				requestURI, method, callIdHeader, cSeqHeader,
+				fromHeader, toHeader, viaHeaders, maxForwards);
+		// Create contact headers
+		String host = "127.0.0.1";
 
-			SipURI contactUrl = protocolObjects.addressFactory.createSipURI(
-					fromURI.getUser(), host);
-			/**
-			 * either use tcp or udp
-			 */
-			contactUrl.setPort(listeningPoint.getPort());
+		SipURI contactUrl = protocolObjects.addressFactory.createSipURI(
+				fromURI.getUser(), host);
+		/**
+		 * either use tcp or udp
+		 */
+		contactUrl.setPort(listeningPoint.getPort());
 //			contactUrl.setTransportParam(protocolObjects.transport);
+	
+		// Create the contact name address.
 		
-			// Create the contact name address.
-			
-			Address contactAddress = protocolObjects.addressFactory
-					.createAddress(contactUrl);
-			contactUrl.setLrParam();
+		Address contactAddress = protocolObjects.addressFactory
+				.createAddress(contactUrl);
+		contactUrl.setLrParam();
 
-			// Add the contact address.
+		// Add the contact address.
 //			contactAddress.setDisplayName(fromName);
 
-			contactHeader = protocolObjects.headerFactory
-					.createContactHeader(contactAddress);
-			request.addHeader(contactHeader);
-			
-			SipURI uri = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
-			
-			uri.setLrParam();
-			uri.setTransportParam(protocolObjects.transport);
-			uri.setPort(this.peerPort);
-			
-			if(route != null) {
-				Address address = protocolObjects.addressFactory.createAddress(route);
-				RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
-				request.addHeader(routeHeader);
-			} else {
-				Address address = protocolObjects.addressFactory.createAddress(uri);
-				RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
-				request.addHeader(routeHeader);
-			}
+		contactHeader = protocolObjects.headerFactory
+				.createContactHeader(contactAddress);
+		request.addHeader(contactHeader);
+		
+		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
+		
+		uri.setLrParam();
+		uri.setTransportParam(protocolObjects.transport);
+		uri.setPort(this.peerPort);
+		
+		if(route != null) {
+			Address address = protocolObjects.addressFactory.createAddress(route);
+			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
+			request.addHeader(routeHeader);
+		} else {
+			Address address = protocolObjects.addressFactory.createAddress(uri);
+			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
+			request.addHeader(routeHeader);
+		}
 
-			// set the message content
-			if(messageContent != null) {
-				ContentLengthHeader contentLengthHeader = 
-					protocolObjects.headerFactory.createContentLengthHeader(messageContent.length());
-				ContentTypeHeader contentTypeHeader = 
-					protocolObjects.headerFactory.createContentTypeHeader(TEXT_CONTENT_TYPE,PLAIN_UTF8_CONTENT_SUBTYPE);
-				byte[] contents = messageContent.getBytes();
-				request.setContent(contents, contentTypeHeader);
-				request.setContentLength(contentLengthHeader);
-			}
-			if(Request.SUBSCRIBE.equals(method)) {
-				// Create an event header for the subscription.
-				EventHeader eventHeader = protocolObjects.headerFactory.createEventHeader("reg");				
-				request.addHeader(eventHeader);
-				ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(200);
-				request.addHeader(expires);
-			}
-			// Create the client transaction.
-			inviteClientTid = sipProvider.getNewClientTransaction(request);
-			// send the request out.
-			inviteClientTid.sendRequest();
+		// set the message content
+		if(messageContent != null) {
+			ContentLengthHeader contentLengthHeader = 
+				protocolObjects.headerFactory.createContentLengthHeader(messageContent.length());
+			ContentTypeHeader contentTypeHeader = 
+				protocolObjects.headerFactory.createContentTypeHeader(TEXT_CONTENT_TYPE,PLAIN_UTF8_CONTENT_SUBTYPE);
+			byte[] contents = messageContent.getBytes();
+			request.setContent(contents, contentTypeHeader);
+			request.setContentLength(contentLengthHeader);
+		}
+		if(Request.SUBSCRIBE.equals(method)) {
+			// Create an event header for the subscription.
+			EventHeader eventHeader = protocolObjects.headerFactory.createEventHeader("reg");				
+			request.addHeader(eventHeader);
+			ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(200);
+			request.addHeader(expires);
+		}
+		// Create the client transaction.
+		inviteClientTid = sipProvider.getNewClientTransaction(request);
+		// send the request out.
+		inviteClientTid.sendRequest();
 
-			this.transactionCount ++;
-			
-			logger.info("client tx = " + inviteClientTid);
-			dialog = inviteClientTid.getDialog();
-			this.dialogCount++;
+		this.transactionCount ++;
+		
+		logger.info("client tx = " + inviteClientTid);
+		dialog = inviteClientTid.getDialog();
+		this.dialogCount++;
 	}
 	
 	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects, boolean callerSendBye) {
@@ -1070,5 +1080,19 @@ public class TestSipListener implements SipListener {
 	 */
 	public List<String> getAllSubscriptionState() {
 		return allSubscriptionStates;
+	}
+
+	/**
+	 * @param byeReceived the byeReceived to set
+	 */
+	public void setByeReceived(boolean byeReceived) {
+		this.byeReceived = byeReceived;
+	}
+
+	/**
+	 * @param okToByeReceived the okToByeReceived to set
+	 */
+	public void setOkToByeReceived(boolean okToByeReceived) {
+		this.okToByeReceived = okToByeReceived;
 	}	
 }
