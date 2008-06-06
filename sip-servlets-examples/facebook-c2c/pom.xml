@@ -54,6 +54,23 @@
 	<build>
 		<plugins>
 			<plugin>
+ 	        	<groupId>org.apache.maven.plugins</groupId>
+ 	        	<artifactId>maven-dependency-plugin</artifactId>
+ 	        	<executions>
+ 	          		<execution>
+ 	            			<id>copy-to-jboss-webapp-lib</id>
+ 	            			<phase>package</phase>
+ 	            			<goals>
+								<goal>copy-dependencies</goal>
+ 	            			</goals>
+ 	            			<configuration>
+							<includeArtifactIds>JSON-transport</includeArtifactIds>
+			    			<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib/</outputDirectory>
+ 	            			</configuration>
+ 	          		</execution>
+ 	        	</executions>
+ 	      	</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.1</version>
@@ -65,7 +82,7 @@
 								<copy verbose="true" overwrite="true"
 									todir="${env.JBOSS_HOME}/server/default/deploy/click-to-call-servlet-1.0.war" >
 									<fileset dir="${project.build.directory}/${project.build.finalName}/" />
-								</copy>
+								</copy>								
 							</tasks>
 						</configuration>
 						<goals>
@@ -73,7 +90,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>			
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
