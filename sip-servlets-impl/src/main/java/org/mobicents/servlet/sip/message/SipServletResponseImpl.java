@@ -343,7 +343,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					SipFactories.addressFactory.createAddress(sipURI);
 				RecordRouteHeader recordRouteHeader = 
 					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
-				response.addLast(recordRouteHeader);
+				response.addFirst(recordRouteHeader);
 			}
 			ServerTransaction st = (ServerTransaction) getTransaction();
 			// Update Session state

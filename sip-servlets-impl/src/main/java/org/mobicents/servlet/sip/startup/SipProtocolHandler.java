@@ -230,11 +230,13 @@ public class SipProtocolHandler implements ProtocolHandler {
 	public void start() throws Exception {
 		try {
 			logger.info("Starting a sip protocol handler");
-
 			
 			String catalinaHome = System.getProperty("catalina.home");
 	        if (catalinaHome == null) {
 	        	catalinaHome = System.getProperty("catalina.base");
+	        }
+	        if(catalinaHome == null) {
+	        	catalinaHome = ".";
 	        }
 			// defining sip stack properties
 			Properties properties = new Properties();

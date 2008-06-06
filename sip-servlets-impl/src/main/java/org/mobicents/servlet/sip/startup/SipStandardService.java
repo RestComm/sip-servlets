@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
- * Sip Servlet implementation of the <code>Service</code> interface.  
+ * Sip Servlet implementation of the <code>SipService</code> interface.  
  * This class inherits from the Tomcat StandardService. It adds a SipApplicationDispatcher
  * that will be listen for sip messages received by the sip stacks started by 
  * the sip connectors associated with this context.
@@ -42,7 +42,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  * to specify the class name of the sipApplicationDispacther to easily replace
  * the default sipApplicationDispatcher with a custom one.
  *
- * @author Jean Deruelle
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  */
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
@@ -62,6 +62,12 @@ public class SipStandardService extends StandardService implements SipService {
 	private String darConfigurationFileLocation;
 	//
 	private boolean connectorsStartedExternally = false;
+	
+	@Override
+    public String getInfo() {
+        return (info);
+    }
+
 	
 	@Override
 	public void addConnector(Connector connector) {

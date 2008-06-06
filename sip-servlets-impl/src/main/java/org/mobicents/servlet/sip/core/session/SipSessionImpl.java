@@ -83,10 +83,17 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * 
- * Implementation of the SipSession interface.
+ * <p>Implementation of the SipSession interface.
  * An instance of this sip session can only be retrieved through the Session Manager
+ * (extended class from Tomcat's manager classes implementing the <code>Manager</code> interface)
  * to constrain the creation of sip session and to make sure that all sessions created
- * can be retrieved only through the session manager 
+ * can be retrieved only through the session manager</p> 
+ *
+ * <p>
+ * As a SipApplicationSession represents a dialog, 
+ * the call id and from header URI, from tag, to Header (and to Tag to identify forked requests) 
+ * are used as a unique key for a given SipSession instance. 
+ * </p>
  *
  * @author vralev
  * @author mranga

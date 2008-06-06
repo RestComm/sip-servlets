@@ -42,16 +42,21 @@ import javax.servlet.sip.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
- * 
- * Implementation of the SipApplicationSession interface.
- * An instance of this sip application session can only be retrieved through the Session Manager
+ * <p>Implementation of the SipApplicationSession interface.
+ * An instance of this sip application session can only be retrieved through the Session Manager 
+ * (extended class from Tomcat's manager classes implementing the <code>Manager</code> interface)
  * to constrain the creation of sip application session and to make sure that all sessions created
- * can be retrieved only through the session manager 
- *
+ * can be retrieved only through the session manager<p/> 
+ * 
+ * <p>
+ * As a SipApplicationSession represents a call (that can contain multiple call legs, in the B2BUA case by example),
+ * the call id and the app name are used as a unique key for a given SipApplicationSession instance. 
+ * </p>
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  */
 public class SipApplicationSessionImpl implements SipApplicationSession {
 	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
