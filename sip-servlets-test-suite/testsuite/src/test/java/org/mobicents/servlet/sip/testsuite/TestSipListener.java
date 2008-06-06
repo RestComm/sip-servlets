@@ -750,7 +750,7 @@ public class TestSipListener implements SipListener {
 			Address fromNameAddress = protocolObjects.addressFactory
 					.createAddress(fromURI);			
 			FromHeader fromHeader = protocolObjects.headerFactory
-					.createFromHeader(fromNameAddress, "12345");
+					.createFromHeader(fromNameAddress, Integer.toString((int) (Math.random()*10000000)));
 
 			// create To Header			
 			Address toNameAddress = protocolObjects.addressFactory

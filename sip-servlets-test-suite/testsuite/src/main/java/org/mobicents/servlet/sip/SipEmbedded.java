@@ -27,7 +27,6 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Engine;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -66,15 +65,21 @@ public class SipEmbedded {
 	
 	private String path = null;
 
-	private SipStandardService sipStandardService = null;
+	private SipStandardService sipService = null;
 
 	private StandardHost host = null;
+
+	private String serviceFullClassName;
+	
+	private String serverName;
 
 	/**
 	 * Default Constructor
 	 * 
 	 */
-	public SipEmbedded() {		
+	public SipEmbedded(String serverName, String serviceFullClassName) {
+		this.serviceFullClassName = serviceFullClassName;
+		this.serverName = serverName;
 	}
 
 	/**
@@ -106,10 +111,10 @@ public class SipEmbedded {
 	public void initTomcat(String tomcatBasePath) throws Exception {
 		setPath(tomcatBasePath);
 		// Set the home directory
-		System.setProperty("CATALINA_HOME", getPath());
-		System.setProperty("CATALINA_BASE", getPath());
-		System.setProperty("catalina.home", getPath());
-		System.setProperty("catalina.base", getPath());		
+//		System.setProperty("CATALINA_HOME", getPath());
+//		System.setProperty("CATALINA_BASE", getPath());
+//		System.setProperty("catalina.home", getPath());
+//		System.setProperty("catalina.base", getPath());		
 		//logging configuration
 		System.setProperty("java.util.logging.config.file", loggingFilePath + "logging.properties");
 		DOMConfigurator.configure(loggingFilePath + "log4j.xml");		
@@ -133,19 +138,20 @@ public class SipEmbedded {
 		 * sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">
 		 */		
 		// Create an embedded server		
-		sipStandardService = new SipStandardService();
-		sipStandardService.setName("Catalina");		
-		sipStandardService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
-		sipStandardService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
-		sipStandardService.setDarConfigurationFileLocation(darConfigurationFilePath);
+		sipService = (SipStandardService) Class.forName(serviceFullClassName).newInstance();
+		sipService.setName(serverName);
+		sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
+		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
+		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		// Create an engine		
-		Engine engine = new SipStandardEngine();
-		engine.setName("Catalina");
+		SipStandardEngine engine = new SipStandardEngine();
+		engine.setName(serverName);
+		engine.setBaseDir(getPath());
 		engine.setDefaultHost("localhost");
-		engine.setService(sipStandardService);
+		engine.setService(sipService);
 		// Install the assembled container hierarchy
-		sipStandardService.setContainer(engine);
-		sipStandardService.init();
+		sipService.setContainer(engine);
+		sipService.init();
 		// Create a default virtual host
 //		host = (StandardHost) embedded.createHost("localhost", getPath() + "/webapps");
 		host = new StandardHost();
@@ -174,7 +180,7 @@ public class SipEmbedded {
 //		httpProtocolHandler.setMinSpareThreads(75);
 		httpProtocolHandler.setMaxThreads(150);		
 
-		sipStandardService.addConnector(httpConnector);
+		sipService.addConnector(httpConnector);
 	}
 	
 	/**
@@ -182,7 +188,7 @@ public class SipEmbedded {
 	 */
 	public void startTomcat() throws Exception {
 		// Start the embedded server
-		sipStandardService.start();				
+		sipService.start();		
 	}
 
 	/**
@@ -204,16 +210,31 @@ public class SipEmbedded {
 		udpProtocolHandler.setThreadPoolSize("64");
 		udpProtocolHandler.setIsReentrantListener("true");
 
-		sipStandardService.addConnector(udpSipConnector);
+		sipService.addConnector(udpSipConnector);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public Connector[] findConnectors() {
+		return sipService.findConnectors();
+	}
+	
+	/**
+	 * 
+	 * @param connector
+	 */
+	public void removeConnector(Connector connector) {
+		sipService.removeConnector(connector);
+	}
+	
 	/**
 	 * This method Stops the Tomcat server.
 	 */
 	public void stopTomcat() throws Exception {
-	 		
 		// Stop the embedded server
-		sipStandardService.stop();
+		sipService.stop();		
 	}
 
 	/**
@@ -277,13 +298,13 @@ public class SipEmbedded {
 	
 	private void initClassLoaders() throws Exception {
         
-            commonLoader = createClassLoader("common", null);
+            commonLoader = createClassLoader(serverName + "common", null);
             if( commonLoader == null ) {
                 // no config file, default to this loader - we might be in a 'single' env.
                 commonLoader=this.getClass().getClassLoader();
             }
-            catalinaLoader = createClassLoader("server", commonLoader);
-            sharedLoader = createClassLoader("shared", commonLoader);        
+            catalinaLoader = createClassLoader(serverName + "server", commonLoader);
+            sharedLoader = createClassLoader(serverName + "shared", commonLoader);        
     }
 
 
@@ -369,7 +390,7 @@ public class SipEmbedded {
 
         // Register the server classloader
         ObjectName objectName =
-            new ObjectName("Catalina:type=ServerClassLoader,name=" + name);
+            new ObjectName(serverName+ ":type=ServerClassLoader,name=" + name);
         if(!mBeanServer.isRegistered(objectName))
         	mBeanServer.registerMBean(classLoader, objectName);
 
@@ -380,17 +401,19 @@ public class SipEmbedded {
     /**
      * Get the value of the catalina.home environment variable.
      */
-    public static String getCatalinaHome() {
-        return System.getProperty("catalina.home",
-                                  System.getProperty("user.dir"));
+    public String getCatalinaHome() {
+//        return System.getProperty("catalina.home",
+//                                  System.getProperty("user.dir"));
+    	return getPath();
     }
 
 
     /**
      * Get the value of the catalina.base environment variable.
      */
-    public static String getCatalinaBase() {
-        return System.getProperty("catalina.base", getCatalinaHome());
+    public String getCatalinaBase() {
+//        return System.getProperty("catalina.base", getCatalinaHome());
+    	return getPath();
     }
 	
     
@@ -539,7 +562,7 @@ public class SipEmbedded {
 
     protected void initDirs() {
 
-        String catalinaHome = System.getProperty("catalina.home");
+        String catalinaHome = getPath();//System.getProperty("catalina.home");
         if (catalinaHome == null) {
             // Backwards compatibility patch for J2EE RI 1.3
             String j2eeHome = System.getProperty("com.sun.enterprise.home");
@@ -596,4 +619,11 @@ public class SipEmbedded {
         }
 
     }
+
+	/**
+	 * @return the sipService
+	 */
+	public SipStandardService getSipService() {
+		return sipService;
+	}
 }

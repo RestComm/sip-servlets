@@ -47,10 +47,12 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 	
 	private SipStack sipStackSender;
 	private SipPhone sipPhoneSender;	
+	SipEmbedded closestTomcat;
 	
 	public ExternalRoutingServletTest(String name) {
 		super(name);
 		autoDeployOnStartup = false;
+		startTomcatOnStartup = false;
 	}
 
 	@Override
@@ -107,7 +109,7 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 	public void testExternalRouting() throws Exception {		
 		//create and start the closest server
 		//starting tomcat
-		SipEmbedded closestTomcat = new SipEmbedded();
+		closestTomcat = new SipEmbedded(serverName, serviceFullClassName);
 		closestTomcat.setLoggingFilePath(  
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
@@ -137,6 +139,8 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 		if(sipStackSender != null) {
 			sipStackSender.dispose();	
 		}
+		closestTomcat.stopTomcat();
+		super.tearDown();
 	}
 
 

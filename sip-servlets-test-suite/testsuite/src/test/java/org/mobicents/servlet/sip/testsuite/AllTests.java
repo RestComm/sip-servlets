@@ -33,6 +33,7 @@ import org.mobicents.servlet.sip.testsuite.callcontroller.CallForwardingSipUnitT
 import org.mobicents.servlet.sip.testsuite.click2call.Click2CallBasicTest;
 import org.mobicents.servlet.sip.testsuite.composition.NoApplicationDeployedJunitTest;
 import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJunitTest;
+import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
@@ -79,6 +80,7 @@ public class AllTests {
 		suite.addTestSuite(NotifierSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
+		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);
 		//$JUnit-END$
 		return suite;

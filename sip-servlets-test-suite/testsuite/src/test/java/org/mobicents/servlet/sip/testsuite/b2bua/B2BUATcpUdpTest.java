@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite.b2bua;
 
+import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -48,6 +49,8 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 
 	public B2BUATcpUdpTest(String name) {
 		super(name);
+		startTomcatOnStartup = false;
+		autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -70,6 +73,10 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 	protected void setUp() throws Exception {		
 		super.setUp();
 
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.startTomcat();
+		deployApplication();
+		
 		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",

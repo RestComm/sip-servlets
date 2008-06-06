@@ -39,6 +39,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String projectHome;
 	protected SipEmbedded tomcat;
 	protected String sipIpAddress = "127.0.0.1";
+	protected String serviceFullClassName = "org.mobicents.servlet.sip.startup.SipStandardService";
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected boolean autoDeployOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
@@ -74,7 +75,7 @@ public abstract class SipServletTestCase extends TestCase {
 		logger.info("Tomcat base Path is : " + tomcatBasePath);
 		logger.info("Project Home is : " + projectHome);
 		//starting tomcat
-		tomcat = new SipEmbedded();
+		tomcat = new SipEmbedded(serverName, serviceFullClassName);
 		tomcat.setLoggingFilePath(				
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
@@ -94,8 +95,6 @@ public abstract class SipServletTestCase extends TestCase {
 		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 		 */
 		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.UDP);
-		//Filip Olsson : Issue 112, Adding tcp protocol
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);				
 		if(startTomcatOnStartup) {
 			tomcat.startTomcat();
 		}

@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class NotifierSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Log logger = LogFactory.getLog(NotifierSipServlet.class);
 	
 	
 	/** Creates a new instance of SimpleProxyServlet */
