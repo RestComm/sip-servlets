@@ -1,6 +1,9 @@
 package org.mobicents.servlet.sip.example;
-import org.mobicents.mscontrol.*;
-import org.mobicents.mscontrol.signal.Basic;
+import org.mobicents.media.server.impl.common.events.EventID;
+import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsNotifyEvent;
+import org.mobicents.mscontrol.MsResourceListener;
+import org.mobicents.mscontrol.MsSignalDetector;
 
 public class DTMFListener implements MsResourceListener{
 
@@ -29,7 +32,7 @@ public class DTMFListener implements MsResourceListener{
 20:56:33,020 ERROR [STDERR] 	at org.mobicents.media.server.impl.rtp.ReceiveStream.run(ReceiveStream.java:127)
 20:56:33,020 ERROR [STDERR] 	at java.lang.Thread.run(Thread.java:619)
 		 */
-		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});
+		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
 	}
 
 }

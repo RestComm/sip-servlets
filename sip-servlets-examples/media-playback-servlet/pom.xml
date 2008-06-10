@@ -30,9 +30,16 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mobicents.media</groupId>
-			<artifactId>mscontrol</artifactId>
-			<version>1.0-ALPHA3</version>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-mscontrol</artifactId>
+			<version>1.0.0.BETA1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>		
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-constants</artifactId>
+			<version>1.0.0.BETA1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.external.freetts</groupId>

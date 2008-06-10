@@ -1,17 +1,16 @@
 package org.mobicents.servlet.sip.example;
 
+import java.io.File;
+
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import java.io.File;
-
+import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsSignalDetector;
 import org.mobicents.mscontrol.MsSignalGenerator;
-import org.mobicents.mscontrol.signal.Announcement;
-import org.mobicents.mscontrol.signal.Basic;
 
 /**
  * This class is registered in the media server to be notified on media connection
@@ -37,7 +36,7 @@ public class MediaConnectionListener implements MsConnectionListener{
 		MsSignalGenerator gen = connection.getSession().getProvider().getSignalGenerator(endpoint);
 		MsSignalDetector dtmfDetector = connection.getSession().getProvider().getSignalDetector(endpoint);
 		java.io.File speech = new File("speech.wav");
-		gen.apply(Announcement.PLAY, new String[]{
+		gen.apply(EventID.PLAY, new String[]{
 				"file://" + speech.getAbsolutePath()
 				//"http://www.geocities.com/v_ralev/RecordAfterTone.wav"
 				//"file:///home/vralev/mobicents/mobicents-google/examples/call-controller2/src/org/mobicents/slee/examples/callcontrol/voicemail/audiofiles/RecordAfterTone.wav"
@@ -45,7 +44,7 @@ public class MediaConnectionListener implements MsConnectionListener{
 		DTMFListener dtmfListener = new DTMFListener(dtmfDetector, connection);
 		dtmfDetector.addResourceListener(dtmfListener);
 		connection.getSession().getProvider().addResourceListener(dtmfListener);
-		dtmfDetector.receive(Basic.DTMF, connection, new String[] {});
+		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
 		
 	}
 
