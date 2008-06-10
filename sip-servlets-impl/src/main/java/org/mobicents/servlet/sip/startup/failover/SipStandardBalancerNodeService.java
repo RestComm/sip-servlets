@@ -87,7 +87,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				for (String balancerAddress : balancerAddresses) {
 					if(Inet6Util.isValidIP6Address(balancerAddress) || Inet6Util.isValidIPV4Address(balancerAddress)) {
 						try {
-							this.addBalancerAddress(InetAddress.getByName(balancerAddress).getAddress());
+							this.addBalancerAddress(InetAddress.getByName(balancerAddress).getHostAddress());
 						} catch (UnknownHostException e) {
 							throw new LifecycleException("Impossible to parse the following sip balancer address " + balancerAddress, e);
 						}
@@ -98,13 +98,15 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			}		
 			started = true;
 		}
-
-		logger.debug("[Bean] creating tasks");
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("[Bean] creating tasks");
+    	}
 		this.hearBeatTaskToRun = new BalancerPingTimerTask();
 		this.heartBeatTimer.scheduleAtFixedRate(this.hearBeatTaskToRun, 0,
 				this.heartBeatInterval);
-
-		logger.debug("[Bean] Created and scheduled tasks."); 
+		if(logger.isDebugEnabled()) {
+			logger.debug("[Bean] Created and scheduled tasks.");
+		}
     }
     
     @Override
@@ -115,10 +117,15 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     	super.stop();    	
     }
 	
+    /**
+     * {@inheritDoc}
+     */
 	public long getHeartBeatInterval() {
 		return heartBeatInterval;
 	}
-
+	/**
+     * {@inheritDoc}
+     */
 	public void setHeartBeatInterval(long heartBeatInterval) {
 		if (heartBeatInterval < 100)
 			return;
@@ -130,6 +137,12 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 
 	}
 
+	/**
+	 * 
+	 * @param hostName
+	 * @param index
+	 * @return
+	 */
 	private InetAddress fetchHostAddress(String hostName, int index) {
 		if (hostName == null)
 			throw new NullPointerException("Host name cant be null!!!");
@@ -153,15 +166,21 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		return address;
 	}
 
-	public List<String> getBalancers() {
-		return new ArrayList<String>(this.balancerNames);
+	/**
+     * {@inheritDoc}
+     */
+	public String[] getBalancers() {
+		return this.balancerNames.toArray(new String[balancerNames.size()]);
 	}
 
+	/**
+     * {@inheritDoc}
+     */
 	public void removeBalancerAddress(int index)
 			throws IllegalArgumentException {
-
-		logger.debug("[removeBalancerAddress]");
-
+		if(logger.isDebugEnabled()) {
+			logger.debug("[removeBalancerAddress]");
+		}
 		if (index < 0 || index >= this.balancerNames.size())
 			throw new IllegalArgumentException(
 					"Index is wrong, it should be [0]<x<["
@@ -182,20 +201,21 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		register.remove(balancerName);
 
 		// balancerInfoSources.remove(balancerName);
-		
-		logger.debug("[removeBalancerAddress] END");
+		if(logger.isDebugEnabled()) {
+			logger.debug("[removeBalancerAddress] END");
+		}
 	}
 
-	public boolean addBalancerAddress(byte[] addr) {
+	/**
+     * {@inheritDoc}
+     */
+	public boolean addBalancerAddress(String addr) {
 		if (addr == null)
 			throw new NullPointerException("addr cant be null!!!");
 
-		if (addr.length != 4)
-			throw new IllegalArgumentException("addr.length!=4");
-
 		InetAddress address = null;
 		try {
-			address = InetAddress.getByAddress(addr);
+			address = InetAddress.getByName(addr);
 		} catch (UnknownHostException e) {
 			throw new IllegalArgumentException(
 					"Somethign wrong with host creation.", e);
@@ -215,21 +235,24 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		return true;
 	}
 
+	/**
+     * {@inheritDoc}
+     */
 	public boolean addBalancerAddress(String hostName, int index) {
 		return this.addBalancerAddress(fetchHostAddress(hostName, index)
-				.getAddress());
+				.getHostAddress());
 	}
 
-	public boolean removeBalancerAddress(byte[] addr) {
+	/**
+     * {@inheritDoc}
+     */
+	public boolean removeBalancerAddress(String addr) {
 		if (addr == null)
 			throw new NullPointerException("addr cant be null!!!");
 
-		if (addr.length != 4)
-			throw new IllegalArgumentException("addr.length!=4");
-
 		InetAddress address = null;
 		try {
-			address = InetAddress.getByAddress(addr);
+			address = InetAddress.getByName(addr);
 		} catch (UnknownHostException e) {
 			throw new IllegalArgumentException(
 					"Something wrong with host creation.", e);
@@ -248,6 +271,9 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		return true;
 	}
 
+	/**
+     * {@inheritDoc}
+     */
 	public boolean removeBalancerAddress(String hostName, int index) {
 		InetAddress[] hostAddr = null;
 		try {
@@ -266,16 +292,22 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 
 		InetAddress address = hostAddr[index];
 
-		return this.removeBalancerAddress(address.getAddress());
+		return this.removeBalancerAddress(address.getHostAddress());
 	}
 
+	/**
+	 * 
+	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+	 *
+	 */
 	class BalancerPingTimerTask extends TimerTask {
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public void run() {
-
-			logger.debug("[BalancerPingTimerTask] Start");
+			if(logger.isDebugEnabled()) {
+				logger.debug("[BalancerPingTimerTask] Start");
+			}
 			ArrayList<SIPNode> info = new ArrayList<SIPNode>();
 			// Gathering info about server' sip listening points
 			for (Connector connector : connectors) {
@@ -317,9 +349,10 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 					logger.error("Cannot acces the sip load balancer RMI registry", e);
 				}
 			}
-			
-			logger.debug("[BalancerPingTimerTask] Finished gathering");
-			logger.debug("[BalancerPingTimerTask] Gathered info[" + info + "]");
+			if(logger.isDebugEnabled()) {
+				logger.debug("[BalancerPingTimerTask] Finished gathering");
+				logger.debug("[BalancerPingTimerTask] Gathered info[" + info + "]");
+			}
 		}
 	}
 

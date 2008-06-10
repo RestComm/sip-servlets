@@ -27,6 +27,7 @@
       	<item name="Shopping Demo" href="shopping-demo.html"/>
       	<item name="JAIN-SLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html"/>
       </item>
+      <item name="Fail-over support" href="failover.html"/>
       <item name="Media support" href="media.html"/>
       <item name="Security" href="security.html"/>      
       <item name="STUN suport" href="stun.html"/>

@@ -218,7 +218,7 @@
 				</subsection>
 			</subsection>
 			<subsection name="Planned Versions">				
-				<subsection name="Version 0.4 - 06/10/2008">
+				<subsection name="Version 0.4 - 06/14/2008">
 					<p>
 						<img src="green.jpeg" />
 						<a
@@ -226,7 +226,7 @@
 							Merge SIP Session Management with HTTP Session Management
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=113">
 						Failover support
@@ -238,7 +238,7 @@
 						Distributable applications
 						</a>
 						<br />										
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
 							Refactor Test framework, Performance improvement/Performance apps
 						</a>
@@ -315,7 +315,7 @@
 						</ul>
 					</p>
 				</subsection>
-				<subsection name="Version 0.5 - 07/01/2008">
+				<subsection name="Version 0.5 - 08/01/2008">
 					<p>
 						<img src="red.jpeg" />
 						<a
@@ -392,7 +392,7 @@
 						</ul>
 					</p>
 				</subsection>
-				<subsection name="Version 0.6 - 08/01/2008">
+				<subsection name="Version 0.6 - 09/01/2008">
 					<p>
 						<img src="red.jpeg" />
 						<a
@@ -438,7 +438,7 @@
 						</ul-->
 					</p>
 				</subsection>
-				<subsection name="Version 0.7 - 09/01/2008">
+				<subsection name="Version 0.7 - 10/01/2008">
 					<p>
 						<img src="red.jpeg" />
 						<a

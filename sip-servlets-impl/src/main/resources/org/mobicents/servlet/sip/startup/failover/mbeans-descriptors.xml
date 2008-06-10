@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean name="StandardBalancerNodeService"
+         description="Standard Node Balancer Service Component"
+         domain="Catalina"
+         group="Service"
+         type="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService">
+    
+    <attribute name="managedResource"
+               description="The managed resource this MBean is associated with"
+               type="java.lang.Object"/>
+      
+    <attribute name="name"
+               description="Unique name of this Service"
+               type="java.lang.String"/>
+      
+    <attribute name="connectorNames"
+               description="ObjectNames of the connectors"
+               type="[Ljavax.management.ObjectName;"
+               writeable="false" />
+               
+    <attribute name="balancers"
+               description="sip balancer names"
+               type="java.lang.String[]"
+               writeable="false" />
+    
+    <attribute name="heartBeatInterval"
+               description="interval in milliseconds to send heartbeat to sip balancer adresses"
+               type="long"/>
+      
+    <attribute name="container"
+               description="Servlet engine that will process the requests"
+               type="org.apache.catalina.Container" />
+
+    <attribute name="containerName"
+               description="ObjectNames of the engine"
+               type="javax.management.ObjectName"
+               writeable="false" />
+
+    <operation name="addConnector"
+               description="Add a new connector"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="connector"
+                 description="Connector object"
+                 type="org.apache.catalina.connector.Connector"/>
+    </operation>
+    
+    <operation name="addBalancerAddress"
+               description="Add a new sip balancer address"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="balancerAddress"
+                 description="sip balancer address"
+                 type="java.lang.String"/>
+    </operation>
+    
+    <operation name="removeBalancerAddress"
+               description="Remove a new sip balancer address"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="balancerAddress"
+                 description="sip balancer address"
+                 type="java.lang.String"/>
+    </operation>
+    
+    <operation name="findConnectors"
+    			type="org.apache.catalina.connector.Connector[]">
+    </operation>
+    
+    <operation name="start" description="Start" impact="ACTION" returnType="void" />
+    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
+  </mbean>
+</mbeans-descriptors>

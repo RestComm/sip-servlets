@@ -197,7 +197,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j</includeArtifactIds>
 					    			<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -237,10 +237,10 @@
 		 	            			<id>copy-to-jboss-lib</id>
 		 	            			<phase>package</phase>
 		 	            			<goals>
-										<goal> copy-dependencies </goal>
+										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/default/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>

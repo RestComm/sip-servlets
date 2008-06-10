@@ -61,6 +61,9 @@ public class LocationServiceSipServlet extends SipServlet {
 		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:5090"));
 		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:6090"));
 		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
+		List<URI> perfUriList  = new ArrayList<URI>();
+		perfUriList.add(sipFactory.createURI("sip:perf-receiver@127.0.0.1:5090"));
+		registeredUsers.put("sip:perf-receiver@sip-servlets.com", perfUriList);
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class LocationServiceSipServlet extends SipServlet {
 		List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
 		if(contactAddresses != null && contactAddresses.size() > 0) {			
 			Proxy proxy = request.getProxy();
-			proxy.setRecordRoute(false);
+			proxy.setRecordRoute(true);
 			proxy.setParallel(true);
 			proxy.setSupervised(false);
 			proxy.proxyTo(contactAddresses);		
