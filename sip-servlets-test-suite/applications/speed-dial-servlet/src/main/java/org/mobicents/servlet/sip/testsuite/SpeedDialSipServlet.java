@@ -70,7 +70,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		if(mappedUri != null) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Proxy proxy = request.getProxy();
-			proxy.setRecordRoute(false);
+			proxy.setRecordRoute(true);
 			proxy.setParallel(false);
 			proxy.setSupervised(false);
 			logger.info("proxying to " + mappedUri);

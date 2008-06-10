@@ -61,7 +61,6 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
 		uriList  = new ArrayList<URI>();
 		uriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:5090"));
-		uriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:6090"));
 		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
 	}
 

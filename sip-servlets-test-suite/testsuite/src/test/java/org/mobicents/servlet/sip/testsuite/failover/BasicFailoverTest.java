@@ -251,8 +251,8 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
 				
-		String toUser = "1";
-		String toSipAddress = "sip-servlets.com";
+		String toUser = "6";
+		String toSipAddress = "127.0.0.1:5090";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
@@ -267,10 +267,81 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		sender.setOkToByeReceived(false);
+		receiver.setByeReceived(false);
+		secondTomcatServer.stopTomcat();
+	}
+	
+	public void testBasicFailoverSpeedDialLocationServiceCalleeSendsBye() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);
+		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		senderProvider.addSipListener(sender);
+		senderProtocolObjects.start();	
+		receiverProtocolObjects = new ProtocolObjects("sdls-failover-receiver",
+				"gov.nist", TRANSPORT, AUTODIALOG);			
+		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, true);
+		SipProvider receiverProvider = receiver.createProvider();
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		//start the sip balancer
+		startSipBalancer();				
+		//starts the first server
+		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		tomcat.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
+		tomcat.initTomcat(tomcatBasePath);
+		tomcat.startTomcat();
+		deployLocationServiceApplication(tomcat);
+		deploySpeedDialApplication(tomcat);
+		//starts the second server
+		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
+		secondTomcatServer.setLoggingFilePath(  
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
+		secondTomcatServer.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
+		getTomcatBackupHomePath();
+		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
+		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
+		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		secondTomcatServer.startTomcat();
+		deployLocationServiceApplication(secondTomcatServer);
+		deploySpeedDialApplication(secondTomcatServer);
+		//first test
+		Thread.sleep(TIMEOUT);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "6";
+		String toSipHost = "127.0.0.1:5090";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipHost);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getByeReceived());
+		assertTrue(receiver.getOkToByeReceived());
+		sender.setOkToByeReceived(false);
+		receiver.setByeReceived(false);
+		tomcat.stopTomcat();
+		Thread.sleep(TIMEOUT);
+		toUser = "6";
+		toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipHost);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getByeReceived());
+		assertTrue(receiver.getOkToByeReceived());
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		secondTomcatServer.stopTomcat();
