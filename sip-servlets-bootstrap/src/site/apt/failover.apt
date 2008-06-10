@@ -15,46 +15,45 @@ Fail-Over Support
 	The different nodes are responsible for contacting the Mobicents Sip Balancer and 
 	sending to it liveness heartbeats and status health.\
 	For Mobicents Sip Servlets this is done in extending the 
-	SipStandardService class which already extends the Tomcat StandardService class implementing the Tomcat Service interface.\
-	In Tomcat's Architecture, a Service is an intermediate component which lives inside a Server and 
+	<<<SipStandardService>>> class which already extends the Tomcat <<<StandardService>>> class implementing the Tomcat <<<Service>>> interface.\
+	In Tomcat's Architecture, a <<<Service>>> is an intermediate component which lives inside a Server and 
 	ties one or more Connectors to exactly one Engine.\
-	So when the service is started the new SipStandardBalancerNodeService looks up its configuration and gather the address(es) of the Sip Balancer(s) and
-	sends a heartbeat and health status to it(them) to make themselves known as an available node of the cluster.\
+	So when the service is started the new <<<SipStandardBalancerNodeService>>> looks up its configuration and gather the address(es) of the Sip Balancer(s) and
+	sends a heartbeat and health status to it(them) to make it(them)selves known as an available node of the cluster.\
 	The different parameters of the node are configurable through its MBean interface, see Section below for more information on configuration.
 	
 * Installation & Configuration
 
 	* To be able to start a tomcat instance as a client node of the sip balancer(s),
-	 you need to follow first the instructions on how to setup your server so that it 
-	 becomes a converged container (if that is not already done) and then modify your container's server.xml so that the 
-	 Service tag class Name is equals to <<<org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService>>> instead of 
-	 <<<org.mobicents.servlet.sip.startup.SipStandardService>>> and add an attribute called balancers with the ip address(es) of the sip balancer you want to send heartbeats to.
+	 you need to follow first the {{{./installation-jboss.html}instructions on how to setup your converged server}} (if that is not already done) and then modify your container's server.xml so that the 
+	 <<<Service>>> tag attribute <<<className>>> is equals to <<<org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService>>> instead of 
+	 <<<org.mobicents.servlet.sip.startup.SipStandardService>>> and add an attribute called <<<balancers>>> with the ip address(es) of the sip balancer you want to send heartbeats to.
 
 	* As seen above, each node has a JMX interface to be easily configurable. It is available under <<<serviceName=jboss.web,type=Service>>> in the jmx-console and provides the following configurable properties :
 	
-		* balancers : the sip balancer(s) host names with the corresponding addBalancerAddress and removeBalancerAddress methods.
+		* balancers : the sip balancer(s) host names with the corresponding <<<addBalancerAddress>>> and <<<removeBalancerAddress>>> methods.
 	
 		* heartBeatInterval : the interval at which each heartbeat is sent to the sip balancer(s)
 	
 
 * Step-By-Step Example
 
-	* Download {{{sip-balancer jar with its dependencies}http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080610.092844-3-jar-with-dependencies.jar}}
+	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080610.110913-4-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
 	
-	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080610.092844-3-jar-with-dependencies.jar 127.0.0.1 5060 5065 (if you need to stop it just do Ctrl+C)
+	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080610.110913-4-jar-with-dependencies.jar 127.0.0.1 5065 5060 (if you need to stop it just do Ctrl+C)
 	
-	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{here}http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}} and one for jboss {{{here}http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}}
+	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}
 	(make sure they don't listen on same port for http or sip connectors)
 	
-	* Deploy the same application, let's say {{{speed dial}./speed-dial.html}} on both nodes (don't forget to setup the dar file in the server.xml on both nodes)
+	* Deploy the same application, let's say {{{./location_service.html}location service}} on both nodes (don't forget to setup the dar file in the server.xml on both nodes)
 	
 	* Start a sip client with following sip address sip:sender@sip-servlets-com on port 5055, with outbound proxy the sip-balancer 127.0.0.1:5060, no need to register
 	
-	* Start a second sip client with following sip address sip:receiver@sip-servlets.com on port 5090, no need to register
+	* Start a second sip client with following sip address sip:receiver-failover@sip-servlets.com on port 5090, no need to register
 	
-	* From first sip client, start a call to sip:9@sip-servlets.com. Tear down the call when you're done
+	* From first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done
 	
-	* Now stop one of the 2 nodes, wait a bit like 5 seconds and try again : From first sip client, start a call to sip:9@sip-servlets.com. Tear down the call when you're done 
+	* Now stop one of the 2 nodes, wait a bit like 5 seconds and try again : From first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done 
 	
 * Limitations
 
