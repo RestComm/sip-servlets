@@ -61,7 +61,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;
+	private static final int TIMEOUT = 10000;
 	InetAddress balancerAddress = null;
 	private final static int BALANCER_EXTERNAL_PORT = 5060;
 	private final static int BALANCER_INTERNAL_PORT = 5065;
@@ -202,7 +202,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		sender.setOkToByeReceived(false);
-		secondTomcatServer.startTomcat();
+		secondTomcatServer.stopTomcat();
 	}
 	
 	public void testBasicFailoverSpeedDialLocationService() throws Exception {
@@ -415,6 +415,32 @@ public class BasicFailoverTest extends SipServletTestCase {
 		receiver.setByeReceived(false);
 		secondTomcatServer.stopTomcat();
 	}
+	
+	public void testFailoverNoNodeStarted() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);
+		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();			
+		senderProvider.addSipListener(sender);
+		senderProtocolObjects.start();	
+		//start the sip balancer
+		startSipBalancer();				
+		//first test
+		Thread.sleep(TIMEOUT);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isFinalResponseReceived());
+	}
 
 	private String getTomcatBackupHomePath() throws IOException {
 		//Reading properties
@@ -472,12 +498,15 @@ public class BasicFailoverTest extends SipServletTestCase {
 	@Override
 	public void tearDown() throws Exception {
 		logger.info("Stopping BasicFailoverTest");
-		Thread.sleep(1000);
+		Thread.sleep(5000);
 		fwd.stop();
+		fwd = null;
 		undoRegister(reg);
+		reg =null;
 		senderProtocolObjects.destroy();
 		if(receiverProtocolObjects != null) {
 			receiverProtocolObjects.destroy();
 		}
+//		super.tearDown();
 	}
 }
