@@ -8,12 +8,9 @@
 		<artifactId>jslee-sips-interop-demo-parent</artifactId>
 		<version>1.0</version>
 	</parent>
-	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>jslee-sips-interop-demo-jslee-events-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0</version>
 	<name>JSLEE Parent part of the JSLEE-SIPS Demo</name>
-	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<modules>
 		<module>events</module>
 		<module>events-du</module>		
@@ -28,40 +25,5 @@
 				</configuration>
 			</plugin>			
 		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.jvnet.wagon-svn</groupId>
-				<artifactId>wagon-svn</artifactId>
-				<version>RELEASE</version>
-			</extension>
-		</extensions>
 	</build>
-	<!-- repositories -->
-	<repositories>
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<id>JbossRepository</id>
-			<name>Jboss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
-		</repository>
-	</repositories>
-
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>maven2-repository</id>
-			<url>java-net:/maven2-repository/trunk/www/repository/</url>
-		</repository>
-	</distributionManagement>
 </project>

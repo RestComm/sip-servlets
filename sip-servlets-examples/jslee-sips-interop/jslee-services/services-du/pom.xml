@@ -12,8 +12,6 @@
 	</parent>
 	
 	<artifactId>jslee-sips-interop-demo-jslee-interop-services-DU</artifactId>
-	<groupId>org.mobicents.servlet.sip.example</groupId>
-	<version>1.0</version>
 	
 	<dependencies>
 		<dependency>
@@ -21,11 +19,6 @@
 			<artifactId>jslee-sips-interop-demo-jslee-interop-sbb</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<!--dependency>
-			<groupId>org.mobicents.servlet.sip.example</groupId>
-			<artifactId>jslee-sips-interop-demo-sips-business</artifactId>	
-			<version>1.0</version>
-		</dependency-->			
 	</dependencies>
 	
 	<build>
