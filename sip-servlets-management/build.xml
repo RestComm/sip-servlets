@@ -52,8 +52,8 @@
 			<pathelement path="${project.modified.lib}/servlet-api.jar" />
 			<pathelement path="${project.public.lib}/gwt-dnd-2.0.7.jar"/>
 			<pathelement path="${project.public.lib}/gwtext.jar"/>
-			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/0.3/sip-servlets-impl-0.3.jar"/>
-			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/1.1.3/sip-servlets-spec-1.1.3.jar"/>
+			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/0.4/sip-servlets-impl-0.4.jar"/>
+			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/1.1.4/sip-servlets-spec-1.1.4.jar"/>
 			<pathelement path="${system.M2_REPO}/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar"/>
 			<pathelement path="${system.M2_REPO}/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
 		</path>
