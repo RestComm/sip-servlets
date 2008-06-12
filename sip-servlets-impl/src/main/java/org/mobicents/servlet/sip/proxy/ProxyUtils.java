@@ -22,8 +22,6 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Vector;
 
 import javax.sip.ListeningPoint;
 import javax.sip.address.Address;
@@ -159,22 +157,7 @@ public class ProxyUtils {
 				RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
 				.createRecordRouteHeader(rraddress);
 				
-				ListIterator recordRouteHeaders = clonedRequest
-				.getHeaders(RecordRouteHeader.NAME);
-				clonedRequest.removeHeader(RecordRouteHeader.NAME);
-				Vector v = new Vector();
-				v.addElement(recordRouteHeader);
-				// add the other record route headers.
-				while (recordRouteHeaders != null
-						&& recordRouteHeaders.hasNext()) {
-					recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
-					.next();
-					v.addElement(recordRouteHeader);
-				}
-				for (int j = 0; j < v.size(); j++) {
-					recordRouteHeader = (RecordRouteHeader) v.elementAt(j);
-					clonedRequest.addHeader(recordRouteHeader);
-				}
+				clonedRequest.addFirst(recordRouteHeader);
 			}
 			
 			// Add path header
@@ -198,22 +181,7 @@ public class ProxyUtils {
 				PathHeader pathHeader = ((HeaderFactoryImpl)SipFactories.headerFactory)
 					.createPathHeader(pathAddress);
 				
-				ListIterator pathHeaders = clonedRequest
-					.getHeaders(PathHeader.NAME);
-				clonedRequest.removeHeader(PathHeader.NAME);
-				Vector v = new Vector();
-				v.addElement(pathHeader);
-				// add the other record route headers.
-				while (pathHeaders != null
-						&& pathHeaders.hasNext()) {
-					pathHeader = (PathHeader) pathHeaders
-					.next();
-					v.addElement(pathHeader);
-				}
-				for (int j = 0; j < v.size(); j++) {
-					pathHeader = (PathHeader) v.elementAt(j);
-					clonedRequest.addHeader(pathHeader);
-				}
+				clonedRequest.addFirst(pathHeader);
 			}
 			
 			return clonedRequest;

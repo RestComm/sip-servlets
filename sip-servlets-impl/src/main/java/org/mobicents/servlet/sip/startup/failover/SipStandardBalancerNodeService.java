@@ -98,19 +98,18 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			}		
 			started = true;
 		}
-    	if(logger.isDebugEnabled()) {
-    		logger.debug("[Bean] creating tasks");
-    	}
 		this.hearBeatTaskToRun = new BalancerPingTimerTask();
 		this.heartBeatTimer.scheduleAtFixedRate(this.hearBeatTaskToRun, 0,
 				this.heartBeatInterval);
 		if(logger.isDebugEnabled()) {
-			logger.debug("[Bean] Created and scheduled tasks.");
+			logger.debug("Created and scheduled tasks for sending heartbeats to the sip balancer.");
 		}
     }
     
     @Override
     public void stop() throws LifecycleException {
+    	balancerNames.clear();
+    	register.clear();
     	this.hearBeatTaskToRun.cancel();
 		this.hearBeatTaskToRun = null;
 		started = false;
@@ -306,7 +305,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		@Override
 		public void run() {
 			if(logger.isDebugEnabled()) {
-				logger.debug("[BalancerPingTimerTask] Start");
+				logger.debug("Start");
 			}
 			ArrayList<SIPNode> info = new ArrayList<SIPNode>();
 			// Gathering info about server' sip listening points
@@ -350,8 +349,8 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				}
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("[BalancerPingTimerTask] Finished gathering");
-				logger.debug("[BalancerPingTimerTask] Gathered info[" + info + "]");
+				logger.debug("Finished gathering");
+				logger.debug("Gathered info[" + info + "]");
 			}
 		}
 	}

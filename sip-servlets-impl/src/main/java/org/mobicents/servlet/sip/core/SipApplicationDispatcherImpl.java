@@ -1360,7 +1360,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param routeHeader the route to check 
 	 * @return true if the route is external, false otherwise
 	 */
-	private boolean isRouteExternal(RouteHeader routeHeader) {
+	public boolean isRouteExternal(RouteHeader routeHeader) {
 		if (routeHeader != null) {
 			javax.sip.address.SipURI routeUri = (javax.sip.address.SipURI) routeHeader.getAddress().getURI();
 
@@ -1378,7 +1378,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param viaHeader the via header to check 
 	 * @return true if the via header is external, false otherwise
 	 */
-	private boolean isViaHeaderExternal(ViaHeader viaHeader) {
+	public boolean isViaHeaderExternal(ViaHeader viaHeader) {
 		if (viaHeader != null) {			
 			return isExternal(viaHeader.getHost(), viaHeader.getPort(), viaHeader.getTransport());
 		}
@@ -1435,6 +1435,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isDebugEnabled()) {
 				logger.debug("the response is dropped accordingly to JSR 289 " +
 						"since this a 100");
+			}
+			return;
+		}
+		if(responseEvent.getClientTransaction() == null && responseEvent.getDialog() == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("the following response is dropped since there is no client transaction nor dialog for it : " + response);	
 			}
 			return;
 		}

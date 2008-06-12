@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -358,7 +359,12 @@ public class ProxyBranchImpl implements ProxyBranch {
 		Request clonedRequest = 
 			proxyUtils.createProxiedRequest(request, this, params);
 
-		clonedRequest.removeFirst(RouteHeader.NAME);
+		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
+		if(routeHeader != null) {
+			if(!((SipApplicationDispatcherImpl)sipFactoryImpl.getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
+				clonedRequest.removeFirst(RouteHeader.NAME);	
+			}
+		}		
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
