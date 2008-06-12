@@ -231,13 +231,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=113">
 						Failover support
 						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=114">
-						Distributable applications
-						</a>
-						<br />										
+						<br />															
 						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
 							Refactor Test framework, Performance improvement/Performance apps
@@ -339,6 +333,12 @@
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=133">
 						Concurrency Control
+						</a>						
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=114">
+						Distributable applications
 						</a>
 						<br />
 						<img src="red.jpeg" />
