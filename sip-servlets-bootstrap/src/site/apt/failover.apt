@@ -9,15 +9,29 @@ Fail-Over Support
 	
 * Implementation
 
-	As in Mobicents JAIN-SLEE, the Mobicents Sip Balancer will be re-used as the man in the middle, 
-	forwarding statelessly requests to the different nodes of the cluster.
+	As in Mobicents JAIN-SLEE, Mobicents Sip Servlets uses no standby nodes, so typically in this configuration
+	 proxies/registrars will need to share the user location table by using a database cluster.    
+	
+	The Mobicents Sip Balancer (Sip Call-Id aware load-balancer) will be used as the man in the middle, forwarding statelessly requests to any of the different nodes of the cluster.
+	
+	This implementation has many pros :
+	
+		* No need for standby nodes, because the remaining nodes take over the load of the failed node
+		
+		* No need to make sure requests are directed to the right node, as all nodes can serve requests to any users
+		
+		* All hardware is in use, reducing costs
+		
+		* Maintenance is easier, as all nodes have equal configurations	
 	
 	The different nodes are responsible for contacting the Mobicents Sip Balancer and 
-	sending to it liveness heartbeats and status health.\
+	sending to it liveness heartbeats and status health.
+	
 	For Mobicents Sip Servlets this is done in extending the 
 	<<<SipStandardService>>> class which already extends the Tomcat <<<StandardService>>> class implementing the Tomcat <<<Service>>> interface.\
 	In Tomcat's Architecture, a <<<Service>>> is an intermediate component which lives inside a Server and 
-	ties one or more Connectors to exactly one Engine.\
+	ties one or more Connectors to exactly one Engine.
+	
 	So when the service is started the new <<<SipStandardBalancerNodeService>>> looks up its configuration and gather the address(es) of the Sip Balancer(s) and
 	sends a heartbeat and health status to it(them) to make it(them)selves known as an available node of the cluster.\
 	The different parameters of the node are configurable through its MBean interface, see Section below for more information on configuration.
@@ -38,9 +52,9 @@ Fail-Over Support
 
 * Step-By-Step Example
 
-	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080610.154258-5-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
+	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080612.105011-6-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
 	
-	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080610.154258-5-jar-with-dependencies.jar 127.0.0.1 5065 5060 (if you need to stop it just do Ctrl+C)
+	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080612.105011-6-jar-with-dependencies.jar 127.0.0.1 5065 5060 (if you need to stop it just do Ctrl+C)
 	
 	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}
 	(make sure they don't listen on same port for http or sip connectors)
