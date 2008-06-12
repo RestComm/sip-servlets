@@ -1,8 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.ServletMappingSipServlet</app-name>
+<sip-app>
+	<app-name>
+		org.mobicents.servlet.sip.testsuite.ServletMappingSipServlet
+	</app-name>
 	<display-name>Servlet MappingServlet</display-name>
 	<description>Servlet MappingServlet</description>
-		
-</web-app>
+
+	<servlet-mapping>
+		<servlet-name>ServletMappingSipServlet</servlet-name>
+		<pattern>
+			<and>
+				<equal>
+					<var>request.method</var>
+					<value>INVITE</value>
+				</equal>
+				<or>
+					<equal>
+						<var>request.uri.scheme</var>
+						<value>sips</value>
+					</equal>
+					<equal>
+						<var>request.uri.scheme</var>
+						<value>sip</value>
+					</equal>
+				</or>
+				<equal>
+					<var>request.uri.user</var>
+					<value>servlet-mapping</value>
+				</equal>
+				<subdomain-of>
+					<var>request.uri.host</var>
+					<value>sip-servlets.com</value>
+				</subdomain-of>
+				<equal>
+					<var>request.uri.host</var>
+					<value>mobicents.sip-servlets.com</value>
+				</equal>				
+				<exists>
+					<var>request.uri.param.foo</var>
+				</exists>				
+			</and>
+		</pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ServletMappingSipServlet</servlet-name>
+		<display-name>ServletMappingSipServlet</display-name>
+		<description>Servlet Mappingservlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.ServletMappingSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.ServletMappingSipServlet
+		</listener-class>
+	</listener>
+</sip-app>
