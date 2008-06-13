@@ -1,0 +1,48 @@
+	<<Important Note :>> <This example is a modified version of the click to call example, which itself is a modified version of the click to dial example from the {{{https://sailfin.dev.java.net/}sailfin project}} 
+	and is originally available at {{{http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}}.
+>
+
+Facebook Click To Call
+
+* Service Description
+
+	This example shows how SIP Servlets can be used along with HTTP servlets to create a Facebook plugin that allows users to
+	call real phones through a SIP-PSTN gateway provider. It stores the current user's phones number in Facebook application
+	store together with the user's profile. It doesn't use the phone numbers already entered in the user profile because of
+	Facebook API security restrictions.
+	
+	 This example consists of the following steps:
+   
+   [[1]]Alice and Bob each register at Facebook
+   
+   [[2]]Alice navigates to the application and enters her number and Bob's number. Then click "Dial"
+   
+   [[3]]Bob's phone rings
+   
+   [[4]]When Bob picks up his phone, Allice's phone rings
+   
+   [[5]]When Allice answers his phone, the call is connected and they both can hear each other
+   
+   [[6]]When one of them hangs up, the other one is also disconnected 	
+	 
+* How to activate it
+
+   As this application is a Facebook plugin, it requires some additional steps to configure it.
+   [[1]]Put the necessary passwords or ompletely override the settings in web.xml
+   [[2]]When registering the plugin in Facebook choose "iframe application" since it will load in it's own frame.
+
+** From the source
+
+    We do not provide a binary for this application and the only way to use it is to customize it and build from source code.
+
+	Please check out the example at this 
+	{{{http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/facebook-c2c}location}} 
+	from the svn repository.
+	Follow the instructions in the README.txt to build and run the example.
+	
+	You don't need to modify your DAR file in order to use this application since it does not receive any dialog-creating requests
+
+* How to play with it
+
+	Just have the phones ready and dial. Note that certain PSTN gatewat service providers can have problems with certain networks.
+	For example we have noticed that international calls between two mobile phones do not always work.

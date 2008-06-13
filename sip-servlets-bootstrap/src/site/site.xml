@@ -26,6 +26,7 @@
       	<item name="Media Demo" href="media-demo.html"/>
       	<item name="Shopping Demo" href="shopping-demo.html"/>
       	<item name="JAIN-SLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html"/>
+      	<item name="Facebook Click To Call Plugin" href="facebook-c2c.html"/>
       </item>
       <item name="Fail-over support" href="failover.html"/>
       <item name="Media support" href="media.html"/>

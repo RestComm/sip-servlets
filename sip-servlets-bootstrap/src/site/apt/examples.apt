@@ -25,7 +25,9 @@ Examples
 	
 	* {{{jslee-sips-interop-demo.html}JAIN-SLEE/Sip servlets Interoperability Demo}} : a Converged JEE/Sip-Servlets/JAIN-SLEE Application showing how Sip Servlets and JAIN-SLEE can play along together to leverage standards everywhere
 
-	You can play with our examples in 2 differents ways. 
+	* {{{facebook-c2c.html}Facebook Click To Call}} : a Facebook plugin application that makes calls between real phones through a PSTN gateway
+
+	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)
 	
 	For testing against the examples you'll need to use some SIP softphones.
