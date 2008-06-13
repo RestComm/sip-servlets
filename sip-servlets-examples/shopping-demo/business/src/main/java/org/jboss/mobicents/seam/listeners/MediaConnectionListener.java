@@ -102,4 +102,9 @@ public class MediaConnectionListener implements MsConnectionListener {
 		this.inviteRequest = inviteRequest;
 	}
 
+	public void connectionInitialized(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

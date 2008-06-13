@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -46,6 +45,7 @@ import org.apache.commons.logging.LogFactory;
 public class LocationServiceSipServlet extends SipServlet {
 
 	private static Log logger = LogFactory.getLog(LocationServiceSipServlet.class);
+	private static final String CONTACT_HEADER = "Contact";
 	Map<String, List<URI>> registeredUsers = null;
 	
 	/** Creates a new instance of SpeedDialSipServlet */
@@ -94,20 +94,29 @@ public class LocationServiceSipServlet extends SipServlet {
 	protected void doRegister(SipServletRequest req) throws ServletException,
 			IOException {
 		logger.info("Received register request: " + req.getTo());
-		
-		//Storing the registration 
-		Address toAddress = req.getTo();
-		ListIterator<Address> contactAddresses = req.getAddressHeaders("Contact");
-		List<URI> contactUris = new ArrayList<URI>();
-		while (contactAddresses.hasNext()) {
-			Address contactAddress = contactAddresses.next();
-			contactUris.add(contactAddress.getURI());
-		}
-		//FIXME handle the expires to add or remove the user
-		registeredUsers.put(toAddress.toString(), contactUris);
-		//answering OK to REGISTER
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);
+		HashMap<String, String> users = (HashMap<String, String>) getServletContext().getAttribute("registeredUsersMap");
+		if(users == null) users = new HashMap<String, String>();
+		getServletContext().setAttribute("registeredUsersMap", users);
+		
+		Address address = req.getAddressHeader(CONTACT_HEADER);
+		String fromURI = req.getFrom().getURI().toString();
+		
+		int expires = address.getExpires();
+		if(expires < 0) {
+			expires = req.getExpires();
+		}
+		if(expires == 0) {
+			users.remove(fromURI);
+			logger.info("User " + fromURI + " unregistered");
+		} else {
+			resp.setAddressHeader(CONTACT_HEADER, address);
+			users.put(fromURI, address.getURI().toString());
+			logger.info("User " + fromURI + 
+					" registered with an Expire time of " + expires);
+		}				
+						
 		resp.send();
 	}
 
