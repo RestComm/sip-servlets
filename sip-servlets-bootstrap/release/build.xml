@@ -2,6 +2,7 @@
 <project name="MobicentsSipServlets" default="release" basedir=".">
 	<property environment="sys"/>
 	<property name="this.path" value="${ant.file.MobicentsSipServlets}/../"></property>
+	<property name="base.path" value="${ant.file.MobicentsSipServlets}/../"></property>
 	<property file="build.properties" />
 	<condition property="jboss.dir" value="${jboss.home}" else="${sys.JBOSS_HOME}">
 		<isset property="jboss.home" />
@@ -33,11 +34,11 @@
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${base.path}/jboss-${jboss.version}"/>
 		
 		<mkdir dir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
-		<copy file="${base.path}/../src/site/click2call-dar.properties" 
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
 			todir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
 			
 		<mkdir dir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
-		<copy file="${base.path}/../src/site/click2call-dar.properties" 
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
 			todir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
 			
 		<copy file="${base.path}/server-tomcat-6.xml" tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/server.xml"/>
@@ -47,11 +48,11 @@
 		<copy file="${base.path}/webserver-xmbean.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 
 		<exec executable="${mvn.executable}" dir="${base.path}/..">
-			<arg line="clean install -DCATALINA_HOME=${base.path}/../sip-servlets-bootstrap/release/apache-tomcat-${tomcat.version}"/>
+			<arg line="clean install -DCATALINA_HOME=${base.path}/../release/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
 		<exec executable="${mvn.executable}" dir="${base.path}/..">
-			<arg line="clean install -P jboss -DJBOSS_HOME=${base.path}/../sip-servlets-bootstrap/release/jboss-${jboss.version}"/>
+			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/../release/jboss-${jboss.version}"/>
 		</exec>
 
 		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
@@ -61,8 +62,8 @@
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/all"/>
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
 		
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
 		<ant target="deploy-mgmnt"/>
 		
@@ -90,8 +91,8 @@
 	
 	
 	<target name="deploy-media">
-		<copy todir="${base.path}/jboss-${jboss.version}/server/default/deploy">
-			<fileset dir="${sys.JBOSS_HOME}/server/default/deploy" includes="mediaserver.sar/**"/>
+		<copy verbose="true" todir="${base.path}/jboss-${jboss.version}/server/default/deploy">
+			<fileset dir="${sys.JBOSS_HOME}/server/default/deploy" includes="*media*server*.sar/**"/>
 		</copy>
 	</target>
 	

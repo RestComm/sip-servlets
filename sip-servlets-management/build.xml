@@ -122,6 +122,7 @@
 		</copy>
 		<copy verbose="true" todir="${project.war}/WEB-INF/lib/">
 			<fileset dir="${project.modified.lib}/" includes="gwt-servlet*"/>
+			<fileset dir="${project.gwt}/lib" includes="*.jar"/>
 		</copy>
 		<copy todir="${project.war.classes}">
 			<fileset dir="${project.bin}" includes="**/*.class" />
