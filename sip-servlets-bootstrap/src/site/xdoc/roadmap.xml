@@ -432,10 +432,15 @@
 						<br />
 						<img src="red.jpeg" />
 						Various Enhancements and Bug fixes
-						<!--ul>
-							<li>								
+						<ul>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=227">
+									Fix location where Facilities are stored in JNDI
+								</a>
 							</li>
-						</ul-->
+						</ul>
 					</p>
 				</subsection>
 				<subsection name="Version 0.7 - 10/01/2008">
