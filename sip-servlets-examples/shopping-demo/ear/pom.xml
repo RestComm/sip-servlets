@@ -158,6 +158,25 @@
 			<version>1.0</version>
 			<type>jar</type>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-mscontrol</artifactId>
+			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mobicents.servers.media</groupId>
+					<artifactId>mobicents-server-media-jar</artifactId>
+				</exclusion>
+			</exclusions>
+			<type>jar</type>
+		</dependency>
+		<dependency>		
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-server-media-constants</artifactId>
+			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>shopping-demo</finalName>
@@ -172,7 +191,17 @@
 			<plugin>
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
-					<modules>						
+					<modules>	
+						<jarModule>
+							<groupId>org.mobicents.servers.media</groupId>
+							<artifactId>mobicents-server-media-mscontrol</artifactId>
+							<bundleDir>lib</bundleDir>
+						</jarModule>
+						<jarModule>		
+							<groupId>org.mobicents.servers.media</groupId>
+							<artifactId>mobicents-server-media-constants</artifactId>
+							<bundleDir>lib</bundleDir>
+						</jarModule>					
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>freetts</artifactId>
