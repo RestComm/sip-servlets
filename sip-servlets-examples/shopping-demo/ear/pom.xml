@@ -196,12 +196,7 @@
 							<groupId>org.mobicents.servers.media</groupId>
 							<artifactId>mobicents-server-media-mscontrol</artifactId>
 							<bundleDir>lib</bundleDir>
-						</jarModule>
-						<jarModule>		
-							<groupId>org.mobicents.servers.media</groupId>
-							<artifactId>mobicents-server-media-constants</artifactId>
-							<bundleDir>lib</bundleDir>
-						</jarModule>					
+						</jarModule>			
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>freetts</artifactId>
