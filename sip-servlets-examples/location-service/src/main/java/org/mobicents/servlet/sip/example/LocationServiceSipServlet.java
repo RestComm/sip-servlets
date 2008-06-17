@@ -26,10 +26,12 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
@@ -120,4 +122,21 @@ public class LocationServiceSipServlet extends SipServlet {
 		resp.send();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void doResponse(SipServletResponse response)
+			throws ServletException, IOException {
+
+		logger.info("SimpleProxyServlet: Got response:\n" + response);
+		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
+			SipSession sipSession = response.getSession(false);
+			if(sipSession != null) {
+				SipApplicationSession sipApplicationSession = sipSession.getApplicationSession();
+				sipSession.invalidate();
+				sipApplicationSession.invalidate();
+			}			
+		}
+	}
+	
 }

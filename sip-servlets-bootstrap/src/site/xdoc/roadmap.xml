@@ -234,7 +234,7 @@
 						<br />															
 						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
-							Refactor Test framework, Performance improvement/Performance apps
+							Performance improvement/Performance apps
 						</a>
 						<br />
 						<img src="green.jpeg" />
@@ -461,6 +461,12 @@
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
 						Mobicents Application Router
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=229">
+						More Extensions : JOIN/Replaces
 						</a>
 						<br />						
 						<img src="red.jpeg" />

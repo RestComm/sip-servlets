@@ -240,8 +240,8 @@ public class SipSessionImpl implements SipSession {
 	 * @see javax.servlet.sip.SipSession#createRequest(java.lang.String)
 	 */
 	public SipServletRequest createRequest(final String method) {
-		if(method.equals(Request.ACK)
-				|| method.equals(Request.CANCEL)) {
+		if(method.equalsIgnoreCase(Request.ACK)
+				|| method.equalsIgnoreCase(Request.CANCEL)) {
 			throw new IllegalArgumentException(
 					"Can not create ACK or CANCEL requests with this method");
 		}

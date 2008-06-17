@@ -1,7 +1,3 @@
-	<<Important Note :>> <This example is a modified version of the click to call example, which itself is a modified version of the click to dial example from the {{{https://sailfin.dev.java.net/}sailfin project}} 
-	and is originally available at {{{http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}http://wiki.glassfish.java.net/Wiki.jsp?page=SipClickToDialExample2}}.
->
-
 Facebook Click To Call
 
 * Service Description
@@ -28,7 +24,9 @@ Facebook Click To Call
 * How to activate it
 
    As this application is a Facebook plugin, it requires some additional steps to configure it.
+   
    [[1]]Put the necessary passwords or ompletely override the settings in web.xml
+   
    [[2]]When registering the plugin in Facebook choose "iframe application" since it will load in it's own frame.
 
 ** From the source

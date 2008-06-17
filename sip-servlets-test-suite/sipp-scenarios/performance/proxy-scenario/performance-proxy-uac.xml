@@ -65,10 +65,10 @@
   <send>
     <![CDATA[
 
-      ACK sip:perf-receiver@sip-servlets.com SIP/2.0      
+      ACK sip:perf-receiver@127.0.0.1:5090 SIP/2.0      
       [last_Via:]
-      From: "Barreiro" <sip:barreiro@sip-servlets.com>;tag=[call_number][pid]
-      To: "Receiver" <sip:perf-receiver@sip-servlets.com>
+      [last_From:]
+      [last_To:]
       Call-ID: [call_id]
       CSeq: 1 ACK
       [routes]
@@ -80,9 +80,7 @@
     ]]>
   </send>
 
-<pause milliseconds="58000"/>
-  
- <recv request="BYE"/>
+ <recv request="BYE" timeout="10000"/>
 <send retrans="2000">
 
 <![CDATA[

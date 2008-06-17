@@ -715,7 +715,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			// Sends a 500 Internal server error and stops processing.				
 			JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			return false;
-		}		
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
+			}
+		}
 		sipServletRequest.setSipSession(sipSession);			
 		// JSR 289 Section 6.2.1 :
 		// any state transition caused by the reception of a SIP message, 

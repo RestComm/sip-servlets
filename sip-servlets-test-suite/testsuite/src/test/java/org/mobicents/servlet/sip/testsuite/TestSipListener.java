@@ -517,15 +517,7 @@ public class TestSipListener implements SipListener {
 						.createResponse(finalResponseToSend, request);
 				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
 				toHeader.setTag(TO_TAG); // Application is supposed to set.
-				finalResponse.addHeader(contactHeader);			
-				ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
-				while (recordRouteHeaders.hasNext()) {
-					RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
-							.next();
-					RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
-					finalResponse.addHeader(routeHeader);
-				}
-				
+				finalResponse.addHeader(contactHeader);				
 				st.sendResponse(finalResponse);
 			} else {
 				logger.info("Waiting for CANCEL, stopping the INVITE processing ");

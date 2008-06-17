@@ -62,7 +62,7 @@
   <send>
     <![CDATA[
     
-      BYE sip:barreiro@[remote_ip]:[remote_port] SIP/2.0      
+      BYE sip:barreiro@127.0.0.1:5055 SIP/2.0      
       [last_Via:]
       From: [$2]
       To: [$1]
@@ -78,7 +78,7 @@
   </send>
 
   
-  <recv response="200" optional="false" next="3">
+  <recv response="200" optional="false"/>
 
 </scenario>
 

@@ -1,6 +1,6 @@
 Acknowledgements
 
-	Bug Reports and enhancements for Mobicents Sip Servlets were contributed by the following people:
+	Bug Reports, enhancements or features for Mobicents Sip Servlets were contributed by the following people/companies:
 	
 	* Filip Olsson from {{{http://www.telavox.se}Telavox}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=112}issue 112}} and contributed fix + test case for it 
 	

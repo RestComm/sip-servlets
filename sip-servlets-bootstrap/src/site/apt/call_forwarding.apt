@@ -29,7 +29,7 @@ Call Forwarding
  	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.0/call-forwarding-1.0.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
- 	Get the corresponding {{{/call-forwarding-b2bua-servlet-dar.properties}dar configuration file}}.\
+ 	Get the corresponding {{{/call-forwarding-servlet-dar.properties}dar configuration file}}.\
  	Drop it in your <<<tomcat_home/conf/dars>>> directory or <<<jboss_home/server/default/conf/dars>>> directory.\
 	To use this dar file for this service, specify in the Service xml tag, 
 	darConfigurationFileLocation attribute of the <<<tomcat_home/conf/server.xml>>> file or <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\
