@@ -174,7 +174,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		addressHeadersNames.add(AlertInfoHeader.NAME);
 		addressHeadersNames.add(CallInfoHeader.NAME);
 		addressHeadersNames.add(ErrorInfoHeader.NAME);
-
+		addressHeadersNames.add(ReferToHeader.NAME);
+			
 	}
 
 	protected static final HashMap<String, String> headerCompact2FullNamesMappings = new HashMap<String, String>();
