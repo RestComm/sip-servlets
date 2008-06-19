@@ -28,8 +28,7 @@ public class DTMFListener implements MsResourceListener{
 		this.session = session;
 	}
 	
-	public void update(MsNotifyEvent event) {
-		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
+	public void update(MsNotifyEvent event) {		
 		logger.info("DTMF: " + event.getMessage());
 		String signal = event.getMessage();		
 		/**
@@ -57,7 +56,8 @@ public class DTMFListener implements MsResourceListener{
 		} else if(session.getApplicationSession().getAttribute("deliveryDate") != null) {
 			logger.info("delivery date update in progress.");
 			DTMFUtils.updateDeliveryDate(session, signal);
-		}				
+		}		
+		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
 	}
 
 }

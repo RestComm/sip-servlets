@@ -168,15 +168,13 @@
 					<groupId>org.mobicents.servers.media</groupId>
 					<artifactId>mobicents-server-media-jar</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.mobicents.servers.media</groupId>
+					<artifactId>mobicents-server-media-constants</artifactId>
+				</exclusion>
 			</exclusions>
 			<type>jar</type>
-		</dependency>
-		<dependency>		
-			<groupId>org.mobicents.servers.media</groupId>
-			<artifactId>mobicents-server-media-constants</artifactId>
-			<version>1.0.0.BETA2-SNAPSHOT</version>
-			<type>jar</type>
-		</dependency>
+		</dependency>		
 	</dependencies>
 	<build>
 		<finalName>shopping-demo</finalName>
@@ -195,81 +193,95 @@
 						<jarModule>
 							<groupId>org.mobicents.servers.media</groupId>
 							<artifactId>mobicents-server-media-mscontrol</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>			
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>freetts</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>freetts.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>cmu_time_awb</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>cmu_time_awb.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>cmu_us_kal</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>cmu_us_kal.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>cmudict04</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>cmudict04.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>en_us</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>en_us.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>cmulex</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>cmulex.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>cmutimelex</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
 							<bundleFileName>cmutimelex.jar</bundleFileName>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.hibernate</groupId>
 							<artifactId>
 								hibernate-commons-annotations
 							</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.hibernate</groupId>
 							<artifactId>hibernate-search</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.jbpm</groupId>
 							<artifactId>jbpm-jpdl</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.jboss.seam</groupId>
 							<artifactId>jboss-el</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>commons-beanutils</groupId>
 							<artifactId>commons-beanutils</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>org.apache.lucene</groupId>
 							<artifactId>lucene-core</artifactId>
-							<bundleDir>lib</bundleDir>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<webModule>
 							<groupId>
