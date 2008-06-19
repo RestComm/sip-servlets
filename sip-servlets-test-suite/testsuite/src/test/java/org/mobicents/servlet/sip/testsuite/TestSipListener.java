@@ -499,7 +499,7 @@ public class TestSipListener implements SipListener {
 						provisionalResponseToSend, request);
 				if(provisionalResponseToSend >= Response.TRYING && provisionalResponseToSend < Response.OK) {
 					ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-					if(provisionalResponseToSend != Response.TRYING) {
+					if(provisionalResponseToSend != Response.TRYING && toHeader.getTag() == null) {
 						toHeader.setTag(TO_TAG); // Application is supposed to set.
 					}
 					st.sendResponse(response);
@@ -516,7 +516,9 @@ public class TestSipListener implements SipListener {
 				Response finalResponse = protocolObjects.messageFactory
 						.createResponse(finalResponseToSend, request);
 				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
-				toHeader.setTag(TO_TAG); // Application is supposed to set.
+				if(toHeader.getTag() == null) {
+					toHeader.setTag(TO_TAG); // Application is supposed to set.
+				}
 				finalResponse.addHeader(contactHeader);				
 				st.sendResponse(finalResponse);
 			} else {

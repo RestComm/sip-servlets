@@ -48,6 +48,7 @@ import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.DialogState;
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -57,12 +58,9 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
-import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
-import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
@@ -259,82 +257,46 @@ public class SipSessionImpl implements SipSession {
 					sessionCreatingDialog);
 		}
 		SipServletRequestImpl sipServletRequest = null;
-		if(this.sessionCreatingDialog != null && !JainSipUtils.dialogCreatingMethods.contains(method)) {
+		if(this.sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
 			try {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
 				
 				//Issue 112 fix by folsson
 				methodRequest.removeHeader(ViaHeader.NAME);
 				
-				//FIXME can it be dialog creating if a SUBSCRIBE is sent for exemple ?
+				//if a SUBSCRIBE is sent for exemple, it will reuse the prexisiting dialog
 				sipServletRequest = new SipServletRequestImpl(
-						methodRequest, this.sipFactory, this, null, null,
+						methodRequest, this.sipFactory, this, null, sessionCreatingDialog,
 						false);
 			} catch (SipException e) {
-				logger.error("Cannot create the bye request form the dialog",e);
-				throw new IllegalArgumentException("Cannot create the bye request",e);
-			} 
-//			catch (ParseException e) {
-//				logger.error("Cannot add the via header to the bye request form the dialog",e);
-//				throw new IllegalArgumentException("Cannot create the bye request",e);
-//			}			
+				logger.error("Cannot create the " + method + " request from the dialog",e);
+				throw new IllegalArgumentException("Cannot create the " + method + " request",e);
+			} 	
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("The new request for the session is dialog creating (" + method + ")");
 			}
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)) {
-				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
-						this.sipApplicationSession,
-						method,
-						this.getLocalParty(),
-						this.getRemoteParty());
+				Request request = (Request) sessionCreatingTransaction.getRequest().clone();
+				sipServletRequest = new SipServletRequestImpl(
+						request, this.sipFactory, this, null, null,
+						false);
 				
-				CSeqHeader cSeq = (CSeqHeader) sessionCreatingTransaction.getRequest().getHeader((CSeqHeader.NAME));
+				CSeqHeader cSeq = (CSeqHeader) request.getHeader((CSeqHeader.NAME));
 				try {
 					cSeq.setSeqNumber(cSeq.getSeqNumber() + 1l);
 				} catch (InvalidArgumentException e) {
-					logger.error("Cannot increment the Cseq header to the new REGISTER request",e);
-					throw new IllegalArgumentException("Cannot create the REGISTER request",e);				
+					logger.error("Cannot increment the Cseq header to the new " + method + " request",e);
+					throw new IllegalArgumentException("Cannot create the " + method + " request",e);				
 				}
-				sipServletRequest.getMessage().setHeader(cSeq);
-				((Request)sipServletRequest.getMessage()).setRequestURI(sessionCreatingTransaction.getRequest().getRequestURI());
-				
-				//TODO Fix this to copy all headers 
-				
-				sipServletRequest.getMessage().removeHeader(ContactHeader.NAME);
-				ListIterator<ContactHeader> contactsHeaders = sessionCreatingTransaction.getRequest().getHeaders(ContactHeader.NAME);
-				while (contactsHeaders.hasNext()) {
-					ContactHeader contactHeader = contactsHeaders.next();
-					sipServletRequest.getMessage().addHeader(contactHeader);
-				}
-				ListIterator<RecordRouteHeader> recordRouteHeaders = sessionCreatingTransaction.getRequest().getHeaders(RecordRouteHeader.NAME);
-				while (recordRouteHeaders.hasNext()) {
-					RecordRouteHeader recordRouteHeader = recordRouteHeaders.next();
-					sipServletRequest.getMessage().addHeader(recordRouteHeader);
-				}
-				ExpiresHeader expiresHeader = (ExpiresHeader) sessionCreatingTransaction.getRequest().getHeader(ExpiresHeader.NAME);
-				if(expiresHeader != null) {
-					sipServletRequest.getMessage().addHeader(expiresHeader);
-				}
-				UserAgentHeader userAgentHeader = (UserAgentHeader) sessionCreatingTransaction.getRequest().getHeader(UserAgentHeader.NAME);
-				if(userAgentHeader != null) {
-					sipServletRequest.getMessage().addHeader(userAgentHeader);
-				}				
-				
+				request.setHeader(cSeq);
+				request.removeHeader(ViaHeader.NAME);
 				SipProvider sipProvider = sipFactory.getSipNetworkInterfaceManager().findMatchingListeningPoint(
-						JainSipUtils.findTransport((Request)sipServletRequest.getMessage()), false).getSipProvider();
-				FromHeader originalFromHeader = (FromHeader) sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-				FromHeader newFromHeader = (FromHeader) sipServletRequest.getMessage().getHeader(FromHeader.NAME);
-				try {
-					newFromHeader.setTag(originalFromHeader.getTag());
-				} catch (ParseException e1) {
-					logger.error("Cannot set the from tag to the one of the previous " + method +" request",e1);
-					throw new IllegalArgumentException("Cannot set the from tag to the one of the previous " + method +" request",e1);
-				}				
+						JainSipUtils.findTransport(request), false).getSipProvider();
 				try {
 					ClientTransaction retryTran = sipProvider
-						.getNewClientTransaction((Request)sipServletRequest.getMessage());
+						.getNewClientTransaction(request);
 					sessionCreatingTransaction = retryTran;				
 					// SIP Request is ALWAYS pointed to by the client tx.
 					// Notice that the tx appplication data is cached in the request
@@ -354,11 +316,11 @@ public class SipSessionImpl implements SipSession {
 															
 					sipServletRequest.setTransaction(retryTran);					
 				} catch (TransactionUnavailableException e) {
-					logger.error("Cannot get a new transaction for the new " + method +" request",e);
-					throw new IllegalArgumentException("Cannot get a new transaction for the " + method +" request",e);
+					logger.error("Cannot get a new transaction for the request " + sipServletRequest,e);
+					throw new IllegalArgumentException("Cannot get a new transaction for the request " + sipServletRequest,e);
 				} catch (SipException e) {
-					logger.error("Cannot get a new dialog for the new " + method +" request",e);
-					throw new IllegalArgumentException("Cannot get a new dialog for the " + method +" request",e);
+					logger.error("Cannot get a new dialog for the new request " + sipServletRequest,e);
+					throw new IllegalArgumentException("Cannot get a new dialog for the request " + sipServletRequest,e);
 				}
 				
 				return sipServletRequest;

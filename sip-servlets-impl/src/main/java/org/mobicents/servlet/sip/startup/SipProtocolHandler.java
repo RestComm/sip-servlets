@@ -305,12 +305,17 @@ public class SipProtocolHandler implements ProtocolHandler {
 							localStunAddress, serverStunAddress);
 					addressDiscovery.start();
 					StunDiscoveryReport report = addressDiscovery
-							.determineAddress();				
-					globalIpAddress = report.getPublicAddress().getSocketAddress().getAddress().getHostAddress();
-					globalPort = report.getPublicAddress().getPort();
-					addressDiscovery.shutDown();
+							.determineAddress();
+					if(report.getPublicAddress() != null) {
+						globalIpAddress = report.getPublicAddress().getSocketAddress().getAddress().getHostAddress();
+						globalPort = report.getPublicAddress().getPort();
+						//TODO set a timer to retry the binding and provide a callback to update the global ip address and port
+					} else {
+						useStun = false;
+						logger.error("Stun discovery failed to find a valid public ip address, disabling stun !");
+					}
 					logger.info("Stun report = " + report);
-					//TODO set a timer to retry the binding and provide a callback to update the global ip address and port
+					addressDiscovery.shutDown();
 				}
 			}
 			

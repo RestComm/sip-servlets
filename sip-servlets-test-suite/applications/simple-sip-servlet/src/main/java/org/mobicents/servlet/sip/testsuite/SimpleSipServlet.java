@@ -26,6 +26,7 @@ import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +36,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
-	
+	private static String TEST_REINVITE_USERNAME = "reinvite";
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public SimpleSipServlet() {
@@ -59,6 +60,29 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		sipServletResponse.send();
 		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
+	}
+	
+	@Override
+	protected void doAck(SipServletRequest req) throws ServletException,
+			IOException {
+		if(TEST_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
+			SipServletRequest reInvite = req.getSession(false).createRequest("INVITE");
+			if(req.getSession(false) == reInvite.getSession(false)) {
+				reInvite.send();
+			} else {
+				logger.error("the newly created subsequent request doesn't have " +
+						"the same session instance as the one it has been created from");
+			}
+		}
+	}
+	
+	@Override
+	protected void doSuccessResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		if(!"BYE".equalsIgnoreCase(resp.getMethod())) {
+			resp.createAck().send();
+			resp.getSession(false).createRequest("BYE").send();
+		}
 	}
 
 	/**

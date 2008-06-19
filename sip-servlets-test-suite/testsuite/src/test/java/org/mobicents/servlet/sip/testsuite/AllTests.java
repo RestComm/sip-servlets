@@ -39,6 +39,7 @@ import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteUseHostNameTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
+import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
@@ -78,6 +79,7 @@ public class AllTests {
 		suite.addTestSuite(ServletMappingSipServletTest.class);
 		suite.addTestSuite(SubscriberSipServletTest.class);
 		suite.addTestSuite(NotifierSipServletTest.class);
+		suite.addTestSuite(ReInviteSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);

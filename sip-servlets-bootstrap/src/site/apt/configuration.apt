@@ -37,7 +37,7 @@ Configuration
 	
 	* <<<isReentrantListener>>> : If the listener is re-entrant then the stack manages a thread pool and synchronously calls the listener from the same thread which read the message. Check the nist sip stack javadoc for more information.
 		
-	* <<<useStun>>> : Set to true to enable STUN for this connector. (Default to false)
+	* <<<useStun>>> : Set to true to enable STUN for this connector and make sure <<<ipAddress>>> is different from 127.0.0.1. (Default to false)
 		
 	* <<<stunServerAddress>>> : The STUN server address that will be used for discovering the public IP address of this SIP connector (only needed if useStun="true")
 		

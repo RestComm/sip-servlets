@@ -1536,15 +1536,25 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			SipContext sipContext = applicationDeployed.get(appName);
 			SipManager sipManager = (SipManager)sipContext.getManager();
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, inverted);
-			logger.info("route response on following session " + sessionKey);
+			if(logger.isDebugEnabled()) {
+				logger.debug("Trying to find session with following session key " + sessionKey);
+			}
 			SipSessionImpl session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+			//needed in the case of RE-INVITE by example
+			if(session == null) {
+				sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, !inverted);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Trying to find session with following session key " + sessionKey);
+				}
+				session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);				
+			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("session found is " + session);
 				if(session == null) {
 					sipManager.dumpSipSessions();
 				}
-			}
-			
+			}	
+			logger.info("route response on following session " + sessionKey);
 			TransactionApplicationData applicationData = null;
 			SipServletRequestImpl originalRequest = null;
 			if(clientTransaction != null) {

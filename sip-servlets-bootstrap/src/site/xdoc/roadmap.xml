@@ -306,6 +306,13 @@
 									Escaped characters not supported in SIP URI
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=232">
+									sipSession.createRequest() can result in a different Session object for the new request
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>
