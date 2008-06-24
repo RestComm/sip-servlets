@@ -1,19 +1,19 @@
-JAIN-SLEE/Sip servlets Interoperability Demo
+JSLEE/Sip servlets Interoperability Demo
 
 * Service Goals & Description
 
 ** Goals
 
-	This converged application leverages the power of the Mobicents Platform and shows how JAIN-SLEE and Sip Servlets
- 	can be used together to leverage standards for protocols outside of the scope of JSR 289 specification in using JAIN-SLEE.\
+	This converged application leverages the power of the Mobicents Platform and shows how JSLEE and Sip Servlets
+ 	can be used together to leverage standards for protocols outside of the scope of JSR 289 specification in using JSLEE.\
 	This example is built using Seam, Mobicents Sip Servlets, Mobicents Media Server and
-	Mobicents JAIN SLEE with Media and Text To Speech Resource Adaptors and deployed on Jboss AS.\
-	In this example, Sip Servlets is used to handle the SIP protocol, JEE is used as a gateway between Sip Servlets and JAIN SLEE worlds,
-	JAIN-SLEE is used to control Media through Media and Text to Speech Resource Adaptors and Media Server is used to handle Media and DTMF signals.
+	Mobicents JSLEE with Media and Text To Speech Resource Adaptors and deployed on Jboss AS.\
+	In this example, Sip Servlets is used to handle the SIP protocol, JEE is used as a gateway between Sip Servlets and JSLEE worlds,
+	JSLEE is used to control Media through Media and Text to Speech Resource Adaptors and Media Server is used to handle Media and DTMF signals.
 	
 	Media has been used here as a proof of concept of a typical need for sip servlets applications 
 	that is outside of the Sip servlets Spec and support for it is up to vendors thus the application, if built using only Sip Servlets, would be non portable between vendors and application servers.\
-	The same kind of application could be built for accessing other standards (such as Diameter) or legacy protocols through JAIN-SLEE in a PORTABLE way without to resort to vendor proprietary extensions.	
+	The same kind of application could be built for accessing other standards (such as Diameter) or legacy protocols through JSLEE in a PORTABLE way without to resort to vendor proprietary extensions.	
    
 ** Description
    
@@ -29,16 +29,16 @@ JAIN-SLEE/Sip servlets Interoperability Demo
 
     UA calls (send INVITE) to an information number (sip:freebeers@127.0.0.1:5080) on Mobicents Sip Servlets container
 
-	Mobicents Sip Servlets container initiates the Media Connection by firing up an event into the Mobicents JAIN-SLEE through a stateful CallManager EJB
+	Mobicents Sip Servlets container initiates the Media Connection by firing up an event into the Mobicents JSLEE through a stateful CallManager EJB
 
-	When the Media connection has been initiated, Mobicents JAIN-SLEE notifies back the stateful CallManager EJB with the SDP provided by the Mobicents Media Server
+	When the Media connection has been initiated, Mobicents JSLEE notifies back the stateful CallManager EJB with the SDP provided by the Mobicents Media Server
 
 	CallManager EJB send the OK response with SDP from Mobicents Media Server to UA
 
-	When ACK request is received from UA, Mobicents Sip Servlets container notifies Mobicents JAIN-SLEE 
+	When ACK request is received from UA, Mobicents Sip Servlets container notifies Mobicents JSLEE 
 	through the CallManager EJB that the Mobicents Media Server should play announcement and listen for DTMF
 
-	When the UA has entered its booth number followed by the pound sign. A confirmation announcement is played and Mobicents JAIN-SLEE tear down the call by calling back the CallManager EJB that will send the BYE request
+	When the UA has entered its booth number followed by the pound sign. A confirmation announcement is played and Mobicents JSLEE tear down the call by calling back the CallManager EJB that will send the BYE request
        
 	 
 * How to activate it

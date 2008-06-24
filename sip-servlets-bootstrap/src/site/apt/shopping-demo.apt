@@ -1,4 +1,4 @@
-	<<Important Note :>> <This example is a modified version of the Mobicents JAIN-SLEE Converged Demo available at 
+	<<Important Note :>> <This example is a modified version of the Mobicents JSLEE Converged Demo available at 
 	{{{http://groups.google.com/group/mobicents-public/web/converged-application-demo?hl=en}http://groups.google.com/group/mobicents-public/web/converged-application-demo?hl=en}}.\
 	It is has been modified to fit to Sip Servlets v 1.1 specification.
 	The purpose here is to demonstrate integration with more technologies and protocols than just SIP and HTTP.\

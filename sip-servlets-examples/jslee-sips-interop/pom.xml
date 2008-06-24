@@ -13,7 +13,7 @@
 	<artifactId>jslee-sips-interop-demo-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0</version>
-	<name>JAIN SLEE - SIPS Interoperability Demo Parent</name>
+	<name>JSLEE - SIPS Interoperability Demo Parent</name>
 	<url>http://www.mobicents.org/jslee-sips-interop-demo.html</url>
 	<modules>		
 		<module>common</module>

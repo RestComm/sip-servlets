@@ -4,12 +4,12 @@ Fail-Over Support
 	
 	For a good description of Mobicents fail-over system (and even give us some feeback about it), I invite to read the 
 	{{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}.\
-	You can only read Section 1 and 2 since following sections are for jain-slee.\
+	You can only read Section 1 and 2 since following sections are for jslee.\
 	We will cover the Mobicents Sip Servlets specific failover implementation, configuration and an example below.
 	
 * Implementation
 
-	As in Mobicents JAIN-SLEE, Mobicents Sip Servlets uses no standby nodes, so typically in this configuration
+	As in Mobicents JSLEE, Mobicents Sip Servlets uses no standby nodes, so typically in this configuration
 	 proxies/registrars will need to share the user location table by using a database cluster.    
 	
 	The Mobicents Sip Balancer (Sip Call-Id aware load-balancer) will be used as the man in the middle, forwarding statelessly requests to any of the different nodes of the cluster.
@@ -54,12 +54,18 @@ Fail-Over Support
 
 	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080612.105011-6-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
 	
-	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080612.105011-6-jar-with-dependencies.jar 127.0.0.1 5065 5060 (if you need to stop it just do Ctrl+C)
+	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080612.105011-6-jar-with-dependencies.jar 127.0.0.1 5065 5060 (if you need to stop it just do Ctrl+C) :
+	
+		* The first argument is the IP Address where the Sip Balancer will listen for incoming requests
+		
+		* The second argument is the port from where the Sip Balancer will forward incoming requests to different nodes of the cluster. (local port)
+		
+		* The third  argument is the port where the Sip Balancer will listen for incoming requests from UA sip clients. (external port)
 	
 	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}
 	(make sure they don't listen on same port for http or sip connectors)
 	
-	* Deploy the same application, let's say {{{./location_service.html}location service}} on both nodes (don't forget to setup the dar file in the server.xml on both nodes)
+	* Deploy the same application, let's say {{{./location_service.html}location service}} on both nodes (you need to deploy the application manually on both nodes, when deployed on one node it won't deploy automatically in the whole cluster for now and don't forget to setup the dar file in the server.xml on both nodes neither)
 	
 	* Start a sip client with following sip address sip:sender@sip-servlets-com on port 5055, with outbound proxy the sip-balancer 127.0.0.1:5060
 	

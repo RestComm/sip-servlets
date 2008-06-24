@@ -23,7 +23,7 @@ Examples
 	
 	* {{{shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   
 	
-	* {{{jslee-sips-interop-demo.html}JAIN-SLEE/Sip servlets Interoperability Demo}} : a Converged JEE/Sip-Servlets/JAIN-SLEE Application showing how Sip Servlets and JAIN-SLEE can play along together to leverage standards everywhere
+	* {{{jslee-sips-interop-demo.html}JSLEE/Sip servlets Interoperability Demo}} : a Converged JEE/Sip-Servlets/JSLEE Application showing how Sip Servlets and JSLEE can play along together to leverage standards everywhere
 
 	* {{{facebook-c2c.html}Facebook Click To Call}} : a Facebook plugin application that makes calls between real phones through a PSTN gateway
 

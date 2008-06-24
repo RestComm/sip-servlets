@@ -9,6 +9,104 @@
 				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
 			</p>		
 			<subsection name="Released Versions">
+				<subsection name="Version 0.4 - 06/24/2008">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=111">
+							Merge SIP Session Management with HTTP Session Management
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=113">
+						Failover support
+						</a>
+						<br />															
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
+							Performance improvement/Performance apps
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=115">
+						JSLEE/SIPS interop app
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=116">
+						JSR 289 Proposed Final Draft API Alignement
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=118">
+						More Extensions : SUBSCRIBE/NOTIFY
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes :
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=117">
+									Derived Sip Sessions
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=108">
+									Servlet-mapping still supported in 1.1
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=107">
+									New Cancel methods on Proxy feature
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=112">
+									Move adding of Via header to send() instead of B2buaHelper.createRequest
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=138">
+									Routing to external application server 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=160">
+									Application Redeployment Bug
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=171">
+									Escaped characters not supported in SIP URI
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=232">
+									sipSession.createRequest() can result in a different Session object for the new request
+								</a>
+							</li>
+						</ul>
+					</p>
+				</subsection>
 				<subsection name="Version 0.3 - 04/14/2008">
 					<p>
 						<img src="green.jpeg" />
@@ -217,105 +315,7 @@
 					</p>
 				</subsection>
 			</subsection>
-			<subsection name="Planned Versions">				
-				<subsection name="Version 0.4 - 06/14/2008">
-					<p>
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=111">
-							Merge SIP Session Management with HTTP Session Management
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=113">
-						Failover support
-						</a>
-						<br />															
-						<img src="green.jpeg" />
-						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
-							Performance improvement/Performance apps
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a href="http://code.google.com/p/mobicents/issues/detail?id=115">
-						JSLEE/SIPS interop app
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=116">
-						JSR 289 Proposed Final Draft API Alignement
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=118">
-						More Extensions : SUBSCRIBE/NOTIFY
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						Various Enhancements and Bug fixes :
-						<ul>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=117">
-									Derived Sip Sessions
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=108">
-									Servlet-mapping still supported in 1.1
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=107">
-									New Cancel methods on Proxy feature
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=112">
-									Move adding of Via header to send() instead of B2buaHelper.createRequest
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=138">
-									Routing to external application server 
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=160">
-									Application Redeployment Bug
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=171">
-									Escaped characters not supported in SIP URI
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=232">
-									sipSession.createRequest() can result in a different Session object for the new request
-								</a>
-							</li>
-						</ul>
-					</p>
-				</subsection>
+			<subsection name="Planned Versions">								
 				<subsection name="Version 0.5 - 08/01/2008">
 					<p>
 						<img src="red.jpeg" />

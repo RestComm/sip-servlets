@@ -12,22 +12,26 @@ Goals
   Mobicents Sip Servlets delivers a consistent, open platform on which to develop and deploy portable 
   and distributable SIP and Converged JEE services. 
   It is an implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss and 
-  strive to develop interoperability standards between Sip Servlets and JAIN-SLEE so that applications 
+  strive to develop interoperability standards between Sip Servlets and JSLEE so that applications 
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
-  Mobicents JAIN SLEE is be used as the SLEE implementation.
+  Mobicents JSLEE is be used as the SLEE implementation.
   
-Version 0.3 is out !
+Version 0.4 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
 		
-		* {{{sip-servlets-managment.htm}Management Console}}
+		* {{{failover.html}Failover support}}
 		
-		* {{{media.html}Media Support}} : check the {{{media-demo.html}media demo}} or the {{{shopping-demo.html}shopping demo}} (only for Jboss)
+		* {{{http://groups.google.com/group/mobicents-public/browse_thread/thread/9002afc3ef00c08}Performance improvement/Performance apps}} : Tomcat 6.0.14, JDK 1.5 : Call rate was 100 calls/sec for 24h, for a total of 8.640.000 calls.
 		
-		* JEE integration / JEE converged applications : check the {{{shopping-demo.html}shopping demo}} (only for Jboss)
+		* {{{http://www.mobicents.org/jslee-sips-interop-demo.html}JSLEE/SIPS interop app}}
 		
-		* {{{stun.html}STUN Support}} and DNS SRV lookups
+		* More Extensions : SUBSCRIBE/NOTIFY
+		
+		* JSR 289 Proposed Final Draft API Alignement
+		
+		* Merge SIP Session Management with HTTP Session Management
 		
 		* {{{roadmap.html}usual round of bug fixes}}
 		
@@ -37,11 +41,11 @@ Version 0.3 is out !
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
 	
-		* Mobicents Media Server 1.0-ALPHA2 (JBoss only)
+		* Mobicents Media Server 1.0.0-BETA2-SNAPSHOT (JBoss only)
 	
 	To download this release and try it out, follow the following link : 
 
-	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.3 downloads}}
+	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.4 downloads}}
 
 Roadmap
 
@@ -65,4 +69,4 @@ License
 	
 Feedback
 
-	To provide any kind of feedback (bad or good), please feel free to post a mail on the {{{mobicents-public@googlegroups.com}mailing list of Mobicents public google group}}, {{{http://code.google.com/p/mobicents/issues/list}post an issue on google code}}, or mail one of the {{{team-list.html}team members}} or join the project.	 
+	To provide any kind of feedback (bad or good), please feel free to post a mail on the {{{mailto:mobicents-public@googlegroups.com}mailing list of Mobicents public google group}}, {{{http://code.google.com/p/mobicents/issues/list}post an issue on google code}}, or mail one of the {{{team-list.html}team members}} or join the project.	 
