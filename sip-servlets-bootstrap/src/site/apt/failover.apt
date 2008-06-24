@@ -56,7 +56,7 @@ Fail-Over Support
 	
 	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080612.105011-6-jar-with-dependencies.jar 127.0.0.1 5065 5060 (if you need to stop it just do Ctrl+C) :
 	
-		* The first argument is the IP Address where the Sip Balancer will listen for incoming requests
+		* The first argument is the local IP Address (interface) where the Sip Balancer will listen for incoming requests
 		
 		* The second argument is the port from where the Sip Balancer will forward incoming requests to different nodes of the cluster. (local port)
 		
