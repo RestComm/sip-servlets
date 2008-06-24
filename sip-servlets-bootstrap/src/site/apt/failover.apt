@@ -62,7 +62,7 @@ Fail-Over Support
 		
 		* The third  argument is the port where the Sip Balancer will listen for incoming requests from UA sip clients. (external port)
 	
-	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}
+	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}; only the Service tag has been modified as compared to a standard version of Mobicents Sip Servlets.
 	(make sure they don't listen on same port for http or sip connectors)
 	
 	* Deploy the same application, let's say {{{./location_service.html}location service}} on both nodes (you need to deploy the application manually on both nodes, when deployed on one node it won't deploy automatically in the whole cluster for now and don't forget to setup the dar file in the server.xml on both nodes neither)
