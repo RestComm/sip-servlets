@@ -30,13 +30,8 @@
               pathname="conf/tomcat-users.xml" />
   </GlobalNamingResources>
 
-  <!-- A "Service" is a collection of one or more "Connectors" that share
-       a single "Container" (and therefore the web applications visible
-       within that Container).  Normally, that Container is an "Engine",
-       but this is not required.
-
-       Note:  A "Service" is not itself a "Container", so you may not
-       define subcomponents such as "Valves" or "Loggers" at this level.
+  <!-- 
+	This custom service allows for sip/web connectors and it will ping the balancer(s) defined in its balancers attribute
    -->
 
   <!-- Define the Tomcat Stand-Alone Service -->
@@ -45,7 +40,7 @@
   		balancers="127.0.0.1" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
+  		darConfigurationFileLocation="conf/docs/locationservice-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
   		<!--darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"-->

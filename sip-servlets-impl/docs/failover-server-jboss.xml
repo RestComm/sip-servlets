@@ -5,17 +5,15 @@
   <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html -->
   <Listener className="org.apache.catalina.core.JasperListener" />
 
-   <!-- Use a custom version of StandardService that allows the
-   connectors to be started independent of the normal lifecycle
-   start to allow web apps to be deployed before starting the
-   connectors.
+   <!--
+	This custom service allows for sip/web connectors and it will ping the balancer(s) defined in its balancers attribute
    -->
    <Service name="jboss.web" 
       	className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
   		balancers="127.0.0.1"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
+  		darConfigurationFileLocation="conf/docs/locationservice-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
