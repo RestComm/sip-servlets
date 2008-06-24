@@ -30,9 +30,9 @@ Installation Instructions
 	To run the sip servlet container :
 	check that the following files have been copied during the mvn clean install
 	
-		* in tomcat_home/lib directory, there should be a sip-servlets-impl-0.3.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-impl-0.4.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-servlets-spec-1.1.3.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-spec-1.1.4.jar
 		
 		* in tomcat_home/lib directory, there should be a jain-sip-api-1.2.1.jar
 		
