@@ -2,41 +2,40 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+        <artifactId>mobicents</artifactId>
+        <groupId>org.mobicents</groupId>
+        <version>1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 	<groupId>org.mobicents</groupId>
 	<artifactId>mobicents-skin</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>Skin for generating Mobicents.org site</name>
 	<url>http://mobicents.org</url>
-	<distributionManagement>
-		<site>
-			<id>sip-servlets-www</id>
-			<url>
-				svn:https://https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/www/
-			</url>
-		</site>
-		<repository>
-			<id>java.net-repository</id>
-			<url>
-				svn:https://svn.dev.java.net/svn/maven2-repository/trunk/www/repository/
-			</url>
-		</repository>
-	</distributionManagement>
-	<build>
-		<extensions>
-			<extension>
-				<groupId>org.jvnet.wagon-svn</groupId>
-				<artifactId>wagon-svn</artifactId>
-				<version>RELEASE</version>
-			</extension>
-		</extensions>
-	</build>
 	<repositories>
+		<repository>			
+			<id>JbossRepository</id>
+			<name>Jboss Repository</name>
+			<url>http://repository.jboss.org/maven2</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
+			<id>jboss-snapshots</id>
+			<name>JBoss Snapshot Repository</name>
+			<url>http://snapshots.jboss.org/maven2</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 </project>

@@ -1,0 +1,1124 @@
+#container {
+	margin: 0px auto;
+	width: 969px;
+	text-align: left;
+}
+
+#ORGheader {
+	margin: 0px auto;
+	width: 974px;
+	height:65px;
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/bkgheader_noleft.gif);
+	background-repeat:repeat-x;
+	background-color:#3b4f66;
+}
+
+#contentcontainer {
+	clear:both;
+	margin: 0px auto;
+	background-color:#FFFFFF;
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/bkgblur_right.gif);
+	background-repeat:repeat-y;
+	background-position:right;
+	width: 980px;
+	text-align: left;
+}
+
+#ORGLogo {
+	float:left;
+}
+
+#ORGLogo img {
+	display:block;
+}
+
+/* --------------------- common elements -------------------------------------------- */
+a {
+	color:#4a5d75;
+}
+
+pre {
+  margin: 0px;
+  padding: 10px;
+  overflow:auto;
+  border: 1px solid #e6e7e8;
+ }
+
+.clear { clear:both;}
+
+.floatright {
+	float:right;
+}
+.floatleft {
+	float:left;
+}
+
+#majorsectiontitle{
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/hdr_border_gradient.gif);
+	background-repeat:repeat-x;
+	background-position:bottom;
+	color: #CC0000;
+	font-size:16px;
+	margin: 0px 7px 20px 0px;
+	padding:20px 0px 10px 15px;
+}
+
+.nomargin {
+	margin: 0px;
+}
+
+.greyHR {
+	border-top:1px solid #a1a1a1; 
+	background-color:#ffffff;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px; 
+}
+.dashedHR {
+   border-top: 1px dashed #d5d5d5;
+   border-bottom: 0px;
+   border-left: 0px;
+   border-right: 0px;
+}
+
+/* ---------------- Multicolumn layout and specs  -----------------------------------  */
+
+
+#ORGContentHome {
+	overflow:hidden;
+}
+
+
+/* ----------------    Primary Navigation (Tabbed Nav)  ----------------------------  */
+
+#primarynav {
+	clear:right;
+	float:right;
+	margin-top:14px;
+}
+
+#primarynav ul {
+	margin: 0px;
+	padding:0px;
+}
+
+#primarynav ul li {
+	display: inline;
+	list-style: none;
+	text-align:center;
+	float:left;
+	background-image: url(http://labs.jboss.com/file-access/default/theme/images/common/navtabsbkg_norm.gif);
+	background-repeat: repeat-x;
+	background-position: right top;
+
+}
+
+#primarynav ul a {
+	display: inline;
+	float: left;
+	text-decoration: none;
+	font-size:12px;
+	font-weight:bold;
+	color: white;
+	padding: 5px 15px 3px 15px;
+	background-repeat: no-repeat;
+	background-position: top left;
+	border:1px solid #4a5d75;
+
+}
+
+#primarynav ul a:hover {
+	text-decoration: underline;
+	color: white;
+	background-image: url(http://labs.jboss.com/file-access/default/theme/images/common/navtabsbkg_hover.gif);
+	background-repeat: repeat-x;
+	background-position: top left;
+}
+
+#primarynav #current {
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#primarynav #current a, #primarynav a:hover {
+	background-image:none;
+	background-color: white;
+	color: #636464;
+
+}
+
+/* --------  Utility Navigation  --------------------  */
+
+#utilitynav {
+	padding-top:6px;
+	height:20px;
+}
+
+#utilitynav ul {
+	float: right;
+	margin:0px;
+	padding: 0px;
+	font-size: 10px;
+	color: #8c8f91;
+}
+
+#utilitynav li {
+	display: inline;
+	list-style: none;
+}
+
+#utilitynav li a {
+	font-weight:bold;
+	color: #FFFFFF;
+}
+
+#utilitynav input {
+	padding:0px;
+	vertical-align:middle;
+}
+
+/* ----------------------- subheadnavigaton ----------------- */
+/* this navigation is used inside a page where a "tabbed" approach is necessary. */
+.subheadnavigaton {
+	margin: 0px 20px;
+	border-bottom: 1px solid #a1a1a1;
+	text-align:right;
+}
+
+.subheadnavigaton ul {
+	margin-bottom: 4px;
+}
+
+.subheadnavigaton li {
+	display:inline;
+	color: #656565;
+	font-size:11px;
+	font-weight:bold;
+}
+
+.subheadnavigaton a {
+	color:#4a5d75;
+}
+
+
+/* -------------------- Footer  ----------------------------  */
+.footer {
+	clear:both;
+	text-align:center;
+	color:#a1a1a1;
+	font-size:10px;
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/bkgblur_bottom.gif);
+	background-repeat:no-repeat;
+	background-position:top center;
+	background-color:#e6e7e8;
+	padding:6px 0px;
+
+}
+.footer a {
+	color:#a1a1a1;
+}
+.footer p {
+	margin:0px;
+	padding:1px;
+}
+
+/* ----------------------- Home Page Specific Styles -------------------------  */
+
+
+#columnleftHOME {
+	float: left;
+	padding-left: 12px;
+	width:646px;
+}
+
+#columnrightHOME {
+	float:left;
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/bkg_home_2ndcol.gif);
+	background-repeat:repeat-y;
+	background-position:right;
+}
+
+#columnleftHOME, #columnrightHOME {
+	padding-bottom: 30005px;
+	margin-bottom: -30000px;
+}
+
+
+.knowledgebaseHome {
+	margin:0px;
+	padding:0px;
+	font-size:12px;
+}
+
+.knowledgebaseHome h3 {
+	font-size:16px;
+	font-weight:bold;
+	color:#CC0000;
+	margin:15px 0px 5px 0px;
+	padding:0px;
+}
+.knowledgebaseHome hr {
+	border-top:1px solid #a1a1a1; 
+	background-color:#ffffff;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px; 
+}
+
+.homespot { 
+	border: 1px solid #94aebd; 
+	background-color: #e1eef4;
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/portlethdr_home.gif);
+	background-repeat:repeat-x;
+	background-position:top;
+	padding:0px 12px 12px 12px;
+	margin:10px;
+	width:265px; 
+}
+
+.homespot h3 { 
+	font-weight:bold;
+	font-size: 14px;
+	color: white;
+	margin: 0px;
+	padding:6px 0px;
+}
+.homespot h4 { 
+	font-weight:bold;
+	font-size: 12px;
+	margin: 0px;
+	padding-top: 6px;
+}
+
+.homespot hr {
+	border-top:1px dashed #94aebd; 
+	color: #e1eef4;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px;
+}
+		
+.homespot p { margin: 3px;}
+
+.homeOrgAnnounce { 
+	border: 1px solid #655050; 
+	background-color: #faf8ed;
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/portlethdr_homeAnnounce.gif);
+	background-repeat: repeat-x;
+	background-position:top;
+	padding:0px 12px 12px 12px; 
+	font-size: 12px;
+	margin:10px;
+	width:265px; 
+}
+
+.homeOrgAnnounce h3 { 
+	font-weight:bold;
+	font-size: 14px;
+	color: white;
+	margin: 0px;
+	padding:6px 0px;
+}
+.homeOrgAnnounce h4 { 
+	font-weight:bold;
+	font-size: 12px;
+	margin: 0px;
+	padding-top: 6px;
+}
+
+.homeOrgAnnounce hr {
+	border-top:1px dashed #655050; 
+	color: #faf8ed;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px; 
+}
+		
+.homeOrgAnnounce p { 
+	margin: 3px;
+	padding: 6px 0px 3px 0px;
+}
+
+
+.podcast{ 
+	border:1px solid #646666;
+	margin-top: 12px;
+}	
+.podcastfeed { margin: 0px; padding-right: 0px; padding-top:6px;}
+
+.podcastfeed img { 
+	border:1px solid #94aebd;
+	vertical-align:middle;
+}
+
+/* ---------------------  Projects Main Page Specific Styles : 3 Column layout ------------------------ */
+
+.projectsmainlayout {
+	margin:15px;}
+
+.projectsmainlayout h3 {
+	font-size:12px;
+	font-weight: bold;
+	margin:9px auto 9px auto;
+}
+.projectsmainlayout p {
+	margin:0px auto;
+	padding-bottom:1em;
+	}
+
+.projectsmainlayout dl {
+	margin-right:20px;
+}
+
+.projectsmainlayout dt {
+	font-size:12px;
+	font-weight:bold;
+	color:#CC0000;
+	margin:12px 0px 1px 0px;
+	padding:0px; 
+}
+
+.projectsmainlayout dd { 
+	margin:0px 0px 3px 0px;
+}
+.projectsmainlayout dt a { 
+	color:#CC0000;
+	text-decoration:none;
+	background-image:none;
+	padding-left:0px;
+}
+
+.projectsmainlayout dd a {
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/ico_linkarrow_blue.gif);
+	background-repeat: no-repeat; 
+	background-position: 3px 3px;
+	padding-left: 12px; 
+	white-space:nowrap;
+}
+.projectsmainlayout hr { 
+	margin:0px 0px 3px 0px;
+	border-top:1px dashed #d5d5d5;
+	color: #ffffff;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px;
+	margin-bottom:6px;
+}
+
+.projectsmainlayout .projectsmaintextcol {
+	padding-right:30px;
+}
+
+
+.projectsmainlinkcol {
+	width:200px;
+}
+
+/* -----------------------  Base Single Column layout ---------------------------------- */
+
+
+.OneColumnContent {
+	margin: 0px 20px 15px 20px;
+}
+.OneColumnContent h1 {
+	font-size:14px;
+	font-weight: bold;
+}
+.OneColumnContent h2 {
+	font-size:13px;
+	font-weight: bold;
+}
+.OneColumnContent h3 {
+	font-size:12px;
+	font-weight: bold;
+}
+
+/* -----------------------  Project Two Column ---------------------------------- */
+
+
+.TwoColumnContent {
+	padding: 0px 25px 15px 200px;
+}
+
+.TwoColumnContent h1 {
+	font-size:14px;
+	font-weight: bold;
+}
+
+.TwoColumnContent h2 {
+	font-size:13px;
+	font-weight: bold;
+}
+.TwoColumnContent h3 {
+	font-size:12px;
+	font-weight: bold;
+}
+
+
+/* ------------------ Sub Navigation style ---------------------------------------- */
+
+.TwoColumnSubnav {
+	float:left;
+	padding: 0px 0px 15px 10px;
+	/*padding: 0px;*/
+	width: 175px;
+	/*margin: 0px 0px 0px 10px;*/
+}
+
+.TwoColumnSubnav dl {
+	background-color:#b9cae1;
+	margin-top: 0px;
+	margin-bottom:10px;
+}
+
+.TwoColumnSubnav dt {
+	background-color:#3b4e64;
+	padding:5px 0px;
+}
+
+.TwoColumnSubnav dt a { 
+	color:#FFFFFF;
+	font-weight:bold;
+	text-decoration:none;
+	background-image:none;
+	margin-left:10px;
+}
+
+.TwoColumnSubnav dd {
+	margin-left:0px;
+	padding:3px 0px 5px 10px;
+}
+
+.TwoColumnSubnav dd a {
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/ico_linkarrow_blue.gif);
+	color: #233446;
+	text-decoration:none;
+	background-repeat: no-repeat; 
+	background-position: 3px 3px;
+	padding-left: 12px; 
+}
+
+.TwoColumnSubnav ul {
+	width: 155px;
+	list-style: none;
+	padding-left: 0px;
+	margin-left: 0px;
+	display: block;
+} 
+
+.TwoColumnSubnav ul li {
+	list-style: none;
+	display: block;
+	padding: 5px 10px 2px 10px;
+	text-indent: -12px;
+}
+
+
+/* -------------------  Forms ------------------------------- */
+
+.adminforms {
+	margin:0px 20px 10px 20px;
+}
+
+.adminforms h4 {
+	font-weight:bold;
+	font-size:12px;
+	margin:20px auto 20px auto;
+	border-bottom:1px solid #e6e7e8;
+}
+
+.adminforms label{
+ 	float: left;
+	margin: 0px auto 3px auto;
+	padding-right:10px;
+	white-space:nowrap;
+}
+
+.adminforms input, textarea, select {
+	margin-bottom: 8px;
+}
+
+.adminforms .radios {
+	width: 14px;
+	margin-bottom: -1px;
+}
+.adminforms .selectnarrow {
+	width:80px;
+	margin-bottom: 8px;
+}
+.adminforms .selectmedium {
+	width:160px;
+	margin-bottom: 8px;
+}
+
+.adminforms br {
+	clear: both;
+}
+
+.adminforms hr {
+	border-top:1px dashed #d5d5d5; 
+	border-bottom:0px;
+	color: #ffffff;
+	border-left:0px;
+	border-right:0px;
+}
+
+/* -------------------- Buttons ------------------------------ */
+
+.adminforms .submit {
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #4a5d75;
+	border-top: 1px solid #94aebd;
+	border-left: 1px solid #94aebd;
+	border-right: 1px solid #233345;
+	border-bottom: 1px solid #233345;
+	height:20px;
+	padding:0px 10px 0px 10px;
+}
+
+.formbuttons {
+	margin: 10px auto 15px auto;
+	padding-top: 5px ;
+	border-top: 1px solid #4a5d75;
+}
+
+.formbuttons ul {
+	padding-left: 0px;
+	margin-left: 0px;
+	display: inline;
+} 
+
+.formbuttons ul li {
+	list-style: none;
+	display: inline;
+	padding-right: 4px;
+}
+
+.formbuttons .submit {
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #4a5d75;
+	border-top: 1px solid #94aebd;
+	border-left: 1px solid #94aebd;
+	border-right: 1px solid #233345;
+	border-bottom: 1px solid #233345;
+	height:20px;
+}
+
+.singlecolumn .submit {
+ 	width:80px;
+}
+.singlecolumn label {
+	width: 170px;
+}
+
+.singlecolumn input, select {
+	width: 300px;
+}
+.adminforms .contentarrows ul {
+	padding-left: 0px;
+	margin-left: 0px;
+	display: block;
+} 
+
+.adminforms .contentarrows ul li {
+	list-style: none;
+	display: block;	
+	padding: 0px 16px 6px 16px;
+	margin-top: 30px;
+
+}
+.adminforms .contentarrows ul li.last {
+	margin-top: 0px;
+}
+
+#propertiesbox {
+	margin-top: 20px;
+	padding: 0px 10px 10px 10px;
+	background-color: #ececec;
+	border: 1px solid #d5d5d5;
+}
+
+/* -------------------- Info table Style --------------------------------------- */
+
+.basetablestyle, .bodyTable {
+	margin:0px;
+}
+
+.basetablestyle img {
+	border:0px;
+}
+
+.basetablestyle td {
+	height:3em;
+	padding-left: 6px;
+	padding-right: 30px;
+}
+
+.basetablestyle .header {
+	background-color: #233345;
+	font-size:10px;
+	font-weight:bold;
+	color:#94aebd;
+	text-align:left;
+}
+
+.basetablestyle .header a {
+	color:#94aebd;
+}
+
+.basetablestyle .tableheaderfirst {
+	border-bottom:1px solid #233345;
+	height:2em;
+}
+
+.basetablestyle .tableheader {
+	border-left:1px solid #94aebd;
+	border-bottom:1px solid #233345;
+	height:2em;
+}
+
+.basetablestyle .subheader {
+	background-color: #e6e7e8;
+	font-size:10px;
+	font-weight:bold;
+	color:#000000;
+	text-align:left;
+}
+
+.basetablestyle .subheader .tableheaderfirst {
+	height:2em;
+	border-bottom: 0px;
+}
+
+.basetablestyle .subheader .tableheader {
+	height:2em;
+	border-left:1px solid #e6e7e8;
+	border-bottom:0px;
+}
+
+
+
+
+.basetablestyle .rowlinefirst {
+	border-bottom:1px solid #e6e7e8;
+}
+
+.basetablestyle .rowline {
+	border-left:1px solid #e6e7e8;
+	border-bottom:1px solid #e6e7e8;
+}
+
+.basetablestyle .categoryRow {
+    background-color: #dcdedf;
+	font-weight:bold;
+	padding-left: 6px;
+}
+
+.basetablestyle .oddRow, .a {
+    background-color: #f4f3f3;
+	padding-left: 6px;
+}
+
+.basetablestyle .evenRow, .b {
+    background-color: #ffffff;
+}
+
+.basetablestyle .footerrow {
+	background-color:#656565;
+}
+
+.basetablestyle .bottomline {
+	border-bottom:1px solid #656565;
+}
+
+.basetablestyle .topline {
+	border-top:1px solid #656565;
+}
+
+/* ------------------------------------ Project Definitions -------------------------------------- */
+
+.deftable { 
+	width: 100%; 
+	text-align: left; 
+	line-height: 150%;
+	margin-bottom:20px;
+}
+
+.deftable .term { 
+	border-top: 1px dotted #cccccc; 
+	vertical-align: top;
+	padding: 10px;
+	background-color: #f8f9fb; 
+	color: #cc0000; 
+	font-weight: bold;
+}
+
+.deftable .termFirst {
+	border-top: 1px dotted black;
+	vertical-align: top;
+	padding: 10px; 
+	background-color: #f8f9fb;
+	color: #cc0000;
+	font-weight: bold;
+}
+
+.deftable .termLast { 
+	border-top: 1px dotted #cccccc; 
+	border-bottom: 1px dotted black; 
+	vertical-align: top; 
+	padding: 10px; 
+	background-color: #f8f9fb; 
+	color: #cc0000; 
+	font-weight: bold;
+}
+.deftable .def { 
+	border-top: 1px dotted #cccccc; 
+	vertical-align: top; 
+	padding: 10px; 
+	color: #000000;
+}
+
+.deftable .defFirst { 
+	border-top: 1px dotted black; 
+	vertical-align: top; 
+	padding: 10px;
+	color: #000000;
+}
+
+.deftable .defLast { 
+	border-top: 1px dotted #cccccc; 
+	border-bottom: 1px dotted black; 
+	vertical-align: top; 
+	padding: 10px; 
+	color: #000000;
+}
+.deftable .def ul { 
+	margin-left: 1em; 
+	padding-left: 0px; 
+	margin-top: 0px; 
+	margin-bottom: 0px;
+}
+.deftable .def ol { 
+	margin-top: 0px; 
+	margin-bottom: 0px;
+}
+
+.standardLinkArrow {
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/ico_linkarrow_blue.gif);
+	background-repeat: no-repeat; 
+	background-position: 3px 3px;
+	padding: 2px 0px 2px 12px; 
+	white-space:nowrap;
+}
+.standardLinkArrowLeft {
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/ico_linkarrow_left_blue.gif);
+	background-repeat: no-repeat; 
+	background-position: 3px 3px;
+	padding: 2px 0px 2px 12px; 
+	white-space:nowrap;
+}
+.standardFeedLink {
+	background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/ico_12x_feed.gif);
+	background-repeat: no-repeat; 
+	background-position: 0px 3px;
+	padding: 2px 0px 2px 15px; 
+	white-space:nowrap;
+}	
+
+/* ------------  style for tabled blocks with backgrounds (main Resources page) -----  */
+
+.shadedblocktable {
+	background-color:#f4f3f3;
+	border-spacing: 20px;
+	border:1px solid #e6e7e8;
+}
+/* QUICKSTART BOX: From the project pages -----------------------------------------*/
+
+.QuickstartMargin { margin: 0px 0px 30px 30px; float: right; }
+#QuickStart { width: 225px; background-color:#e6e7e8; background-image:url(http://labs.jboss.com/file-access/default/theme/images/common/proj_QuickStart_header.gif); background-repeat:no-repeat; background-position: 15px 10px; border:1px solid #656565; }
+#QuickStart ul { padding: 5px 15px; margin-top: 30px; }
+#QuickStart ul li { border-bottom: 1px solid #656565; list-style: none; font: 11px Verdana, Helvetica, Arial, sans-serif; font-weight:bold; }
+#QuickStart ul li a { padding: 4px 0px 4px 8px; display: block; text-decoration: none; color: #656565;}
+#QuickStart ul li a:hover { background-color: #f4f3f3; color: #000000; }
+#QuickStart img { padding-bottom: 10px; }
+
+/* ----- Feed links  ------ */
+.FeedNav {
+	margin-top: 1em;
+	padding-top: .5em;
+	border-top: 1px solid #8c8f91;
+}
+
+.FeedNav ul {
+	padding-left: 0px;
+	margin-left: 0px;
+	display: inline;
+}
+
+.FeedNav li {
+	list-style: none;
+	display: inline;
+	padding-right: 6px;
+}
+/* --------------------  Login -------------------- */
+
+.logincontainer  {
+	border:1px solid #a1a1a1;
+	padding: 20px 20px 10px 20px;
+	margin: 30px auto 200px auto;
+	width:250px;
+}
+
+.logincontainer p {
+	margin: 3px auto;
+} 
+.logincontainer h4 {
+	font-weight:normal;
+	font-size: 12px;
+	color:#343434;
+	margin: 0px auto 8px auto;
+}
+.failedlogin {
+	font-weight:bold;
+	font-size: 12px;
+	color:#cc0000;
+	padding-top: 20px;
+}
+
+.buttonMed {
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #4a5d75;
+	border-top: 1px solid #94aebd;
+	border-left: 1px solid #94aebd;
+	border-right: 1px solid #233345;
+	border-bottom: 1px solid #233345;
+	height: 20px;
+}
+/* ---------------------  Code quotation styles ----------------------------- */
+
+.codeQuoteInline {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 10px;
+	padding: auto 6px;
+}
+
+.codeQuoteBlock {
+	background-color:#e6e7e8;
+	font-family: "Courier New", Courier, monospace;
+	font-size:10px;
+	padding:20px;
+	margin: 5px;
+	line-height:150%;
+}
+
+/*  ----------------- Podcast transcript styles  ----------------------------- */
+
+.podcast_transcript {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.podcast_transcript th {
+  vertical-align: top;
+  padding: 1ex;
+  border-bottom: 1px dotted #ccc;
+}
+
+.podcast_transcript td {
+  vertical-align: top;
+  padding: 1ex;
+  border-bottom: 1px dotted #ccc;
+  line-height: 1.6em;
+}
+.podcast_transcript .First {
+  border-top: 1px dotted #ccc;
+}
+
+.podcast_transcript .Last {
+  border-bottom: 1px dotted #ccc;
+}
+
+.podcast_transcript .interviewer {
+  background-color: #f9f9f9;
+}
+
+#podcastTranscriptContainer h2 {
+	padding-bottom: 3px;
+	padding-top:0px;
+	margin:0px;
+}
+
+#podcastTranscriptContainer h3 {
+	font-size:13px;
+	padding-bottom: 3px;
+	padding-top:0px;
+	margin:0px;
+}
+
+#podcastTranscriptContainer h4 {
+	font-size:11px;
+	font-weight:normal;
+	padding-top:0px;
+	padding-bottom:3px;
+	margin:0px;
+}
+
+
+/* -------------------------- Maven Specific Support ----------------------------------- */
+
+.section {
+  padding: 4px;
+}
+
+.section dl {
+  margin: 12px;
+}
+.section dt {
+  margin:0px;
+  font-weight: bold;
+}
+.section dd {
+	margin: 0px;
+	padding-top:2px;
+	padding-bottom: 8px;
+}
+
+.source {
+  padding: 12px;
+  margin: 1em 7px 1em 7px;
+}
+.source pre {
+  margin: 0px;
+  padding: 10px;
+  overflow:auto;
+  border: 1px solid gray;
+ }
+ 
+.bodyTable {
+	margin: 0px;
+	padding: 0px;
+	border-spacing: 0px;
+}
+
+.bodyTable img {
+	border:0px;
+}
+
+.bodyTable td {
+	height:3em;
+	padding-left: 6px;
+	padding-right: 30px;
+}
+
+.bodyTable th {
+	background-color: #233345;
+	font-size:10px;
+	font-weight:bold;
+	color:#94aebd;
+	text-align:left;
+	padding: 3px;
+}
+
+.bodyTable th a {
+	color:#94aebd;
+}
+
+.bodyTable .a {
+    background-color: #ffffff;
+}
+
+.bodyTable .a td {
+    padding-top: 6px;
+	padding-bottom: 6px;
+	border-bottom:1px solid #e6e7e8;
+}
+
+.bodyTable .b {
+    background-color: #f4f3f3;
+}
+
+.bodyTable .b  td {
+    padding-top: 6px;
+	padding-bottom: 6px;
+	border-bottom:1px solid #e6e7e8;
+}
+
+/* ---------------------------- Warning and Info Styles --------------------------------- */
+
+.messages_info {
+    margin:0 20px 12px -20px;
+    padding:15px;
+    background-color:#fef9e6;
+    border: 1px solid #f9ba82;
+    list-style:none;
+}
+
+.messages_warn {
+    margin:0 20px 12px -20px;
+    padding:15px;
+    background-color: #CC3333;
+    border: 1px solid #7B1E1E; 
+    list-style: none;
+}
+
+/* ---------------------------------- Orange Callout Box -------------------------------------- */
+
+
+.CalloutBox { 
+	clear:both;
+	border: 1px solid #ffcf82; 
+	background-color: #faf8ed;
+	margin-top:60px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+
+.CalloutBox h4 { 
+	font-weight:bold;
+	font-size: 12px;
+	margin: 0px;
+	padding-top: 6px;
+}
+
+.CalloutBox hr {
+	border-top:1px dashed #ffcf82; 
+	color: #faf8ed;
+	border-bottom:0px;
+	border-left:0px;
+	border-right:0px; 
+}
+		
+.CalloutBox p { 
+}
+
+
+/* --------------------   Rounded box styles (blue) ------------------------------------------ */
+.roundbox { 
+  background: #4A5D75; 
+}
+.roundboxtop { 
+  background: url(/file-access/default/theme/images/common/boxcorner_ne.gif) no-repeat top right; 
+}
+.roundboxtop div { 
+  font-size: 0;
+  height: 10px; 
+  background: url(/file-access/default/theme/images/common/boxcorner_nw.gif) no-repeat top left; 
+}
+.roundboxbottom { 
+  background: url(/file-access/default/theme/images/common/boxcorner_se.gif) no-repeat bottom right; 
+}
+.roundboxbottom div { 
+  font-size: 0;
+  height: 10px; 
+  background: url(/file-access/default/theme/images/common/boxcorner_sw.gif) no-repeat bottom left; 
+}
+.roundboxcontent {
+  padding: 0px 10px 0px 10px;
+}
