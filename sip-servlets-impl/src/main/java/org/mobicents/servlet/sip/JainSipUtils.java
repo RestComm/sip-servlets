@@ -79,6 +79,11 @@ public class JainSipUtils {
 	}
 
 	public static final int MAX_FORWARD_HEADER_VALUE = 70;
+
+	// never instantiate a utility class : Enforce noninstantiability with private constructor
+    private JainSipUtils() {
+    	throw new AssertionError();    	
+    }
 	
 	// RFC 1918 address spaces
 	private static int getAddressOutboundness(String address) {
