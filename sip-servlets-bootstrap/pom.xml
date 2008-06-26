@@ -83,6 +83,7 @@
 	<modules>
 		<module>../sip-servlets-spec</module>
 		<module>../sip-servlets-impl</module>
+		<module>../sip-servlets-application-router</module>
 	</modules>
 	
 	<properties>

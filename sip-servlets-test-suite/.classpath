@@ -44,5 +44,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.5-SNAPSHOT/sip-servlets-impl-0.5-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.5-SNAPSHOT/sip-servlets-spec-1.1.5-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-SNAPSHOT.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/0.5-SNAPSHOT/sip-servlets-application-router-0.5-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>

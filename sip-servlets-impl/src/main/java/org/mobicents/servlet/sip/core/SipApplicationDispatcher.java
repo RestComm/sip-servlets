@@ -44,12 +44,16 @@ public interface SipApplicationDispatcher extends SipListener {
 	public static final String[] RFC_SUPPORTED = new String[] {"3261", "3428", "2976", "3265"};
 	
 	/**
-	 * Initialize the sip application dispatcher and its associated sip application router implementation
-	 * @param sipApplicationRouterClassName the class name of the sip application router
-	 * to load and initialize at the initializaton
+	 * Initialize the sip application dispatcher. <br/>
+	 * It will look for the first implementation of an application routerand 
+	 * packaged in accordance with the rules specified by the Java SE Service Provider framework.<br/>
+	 * It will first look for the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property 
+	 * since it can be used to override loading behavior. 
+	 * See JSR 289 Section 15.4.2 Application Router Packaging and Deployment for more information 
+	 * 
 	 * @throws LifecycleException The Sip Application Router cannot be initialized correctly
 	 */
-	void init(String sipApplicationRouterClassName) throws LifecycleException;
+	void init() throws LifecycleException;
 	
 	/**
 	 * Start the sip application dispatcher

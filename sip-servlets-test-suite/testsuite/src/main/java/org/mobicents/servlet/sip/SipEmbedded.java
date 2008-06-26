@@ -41,7 +41,6 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
-import org.mobicents.servlet.sip.router.DefaultApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
@@ -141,7 +140,7 @@ public class SipEmbedded {
 		sipService = (SipStandardService) Class.forName(serviceFullClassName).newInstance();
 		sipService.setName(serverName);
 		sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
-		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
+//		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		// Create an engine		
 		SipStandardEngine engine = new SipStandardEngine();

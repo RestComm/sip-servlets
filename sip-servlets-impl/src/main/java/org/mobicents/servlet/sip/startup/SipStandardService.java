@@ -57,7 +57,7 @@ public class SipStandardService extends StandardService implements SipService {
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 
 	private SipApplicationDispatcher sipApplicationDispatcher;
 	//the sip application router class name defined in the server.xml
-	private String sipApplicationRouterClassName;
+//	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
 	private String darConfigurationFileLocation;
 	//
@@ -119,7 +119,7 @@ public class SipStandardService extends StandardService implements SipService {
  		}		
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.domain);
-		sipApplicationDispatcher.init(sipApplicationRouterClassName);
+		sipApplicationDispatcher.init();
 	}
 	
 	@Override
@@ -213,20 +213,20 @@ public class SipStandardService extends StandardService implements SipService {
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
 
-	/**
-	 * @return the sipApplicationRouterClassName
-	 */
-	public String getSipApplicationRouterClassName() {
-		return sipApplicationRouterClassName;
-	}
-
-	/**
-	 * @param sipApplicationRouterClassName the sipApplicationRouterClassName to set
-	 */
-	public void setSipApplicationRouterClassName(
-			String sipApplicationRouterClassName) {
-		this.sipApplicationRouterClassName = sipApplicationRouterClassName;
-	}
+//	/**
+//	 * @return the sipApplicationRouterClassName
+//	 */
+//	public String getSipApplicationRouterClassName() {
+//		return sipApplicationRouterClassName;
+//	}
+//
+//	/**
+//	 * @param sipApplicationRouterClassName the sipApplicationRouterClassName to set
+//	 */
+//	public void setSipApplicationRouterClassName(
+//			String sipApplicationRouterClassName) {
+//		this.sipApplicationRouterClassName = sipApplicationRouterClassName;
+//	}
 
 	/**
 	 * @return the darConfigurationFileLocation

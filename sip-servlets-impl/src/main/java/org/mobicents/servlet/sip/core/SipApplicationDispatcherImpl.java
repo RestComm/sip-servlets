@@ -52,6 +52,7 @@ import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
+import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogTerminatedEvent;
@@ -107,6 +108,8 @@ import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
+
+import sun.misc.Service;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -204,21 +207,37 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * {@inheritDoc} 
 	 */
-	public void init(String sipApplicationRouterClassName) throws LifecycleException {
-		//load the sip application router from the class name specified in the server.xml file
-		//and initializes it
-		try {
-			sipApplicationRouter = (SipApplicationRouter)
-				Class.forName(sipApplicationRouterClassName).newInstance();
-		} catch (InstantiationException e) {
-			throw new LifecycleException("Impossible to load the Sip Application Router",e);
-		} catch (IllegalAccessException e) {
-			throw new LifecycleException("Impossible to load the Sip Application Router",e);
-		} catch (ClassNotFoundException e) {
-			throw new LifecycleException("Impossible to load the Sip Application Router",e);
-		} catch (ClassCastException e) {
-			throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
-		}		
+	public void init() throws LifecycleException {
+		//load the sip application router from the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property
+		//and initializes it if present
+		String sipApplicationRouterProviderClassName = System.getProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider");
+		if(sipApplicationRouterProviderClassName != null && sipApplicationRouterProviderClassName.length() > 0) {
+			logger.info("Using the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property to load the application router provider");
+			try {
+				sipApplicationRouter = (SipApplicationRouter)
+					Class.forName(sipApplicationRouterProviderClassName).newInstance();
+			} catch (InstantiationException e) {
+				throw new LifecycleException("Impossible to load the Sip Application Router",e);
+			} catch (IllegalAccessException e) {
+				throw new LifecycleException("Impossible to load the Sip Application Router",e);
+			} catch (ClassNotFoundException e) {
+				throw new LifecycleException("Impossible to load the Sip Application Router",e);
+			} catch (ClassCastException e) {
+				throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
+			}		
+		} else {
+			logger.info("Using the Service Provider Framework to load the application router provider");
+			Iterator<SipApplicationRouterProvider> providers = Service.providers(SipApplicationRouterProvider.class);
+			if(providers.hasNext()) {
+				sipApplicationRouter = providers.next().getSipApplicationRouter();
+			}
+		}
+		if(sipApplicationRouter == null) {
+			throw new LifecycleException("No Sip Application Router Provider could be loaded. " +
+					"No jar compliant with JSR 289 Section Section 15.4.2 could be found on the classpath " +
+					"and no javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property set");
+		}
+		logger.info("Using the following Application Router : " + sipApplicationRouter.getClass().getName());
 		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));
 		
 		if( oname == null ) {
