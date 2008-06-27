@@ -4,21 +4,12 @@
 	<property name="this.path" value="${ant.file.MobicentsSipServlets}/../"></property>
 	<property name="base.path" value="${ant.file.MobicentsSipServlets}/../"></property>
 	<property file="build.properties" />
-	<condition property="jboss.dir" value="${jboss.home}" else="${sys.JBOSS_HOME}">
-		<isset property="jboss.home" />
-	</condition>
-	<property name="jboss.home" value="${sys.JBOSS_HOME}"/>
+
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
 	    <os family="windows"/>
 	</condition>
+	
 	<target name="checks">
-		<fail message="M2_HOME environment variable is not set">
-			<condition>
-				<not>
-					<isset property="sys.M2_HOME" />
-				</not>
-			</condition>
-		</fail>
 		<fail message="GWT_HOME environment variable is not set. GWT 1.4 is required.">
 			<condition>
 				<not>
@@ -66,13 +57,15 @@
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
 		<ant target="deploy-mgmnt"/>
-		
-		<!-- Media server is taken from JBOSS_HOME, assuming you have run the media server
-		build prior to running this release scripts. This will be fixed soon. -->
 		<ant target="deploy-media"/>
-		
+
+        <delete dir="." includes="mss-${mss.release.version}-*.zip"/>
+        <tstamp>
+            <format property="time.stamp" pattern="yyMMddHHmm" />
+        </tstamp>
 		<ant target="make-final-zip-jboss"></ant>
 		<ant target="make-final-zip-tomcat"></ant>
+        <ant target="make-src-zip"></ant>
 		
 		<!--
 		<zip destfile="${base.path}/mss-0.3-apache-tomcat-${tomcat.version}.zip" basedir="${base.path}/apache-tomcat-${tomcat.version}"/>
@@ -89,27 +82,33 @@
 			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
 	</target>
 	
-	
-	<target name="deploy-media">
-		<copy verbose="true" todir="${base.path}/jboss-${jboss.version}/server/default/deploy">
-			<fileset dir="${sys.JBOSS_HOME}/server/default/deploy" includes="*media*server*.sar/**"/>
-		</copy>
+	<available file="${ant.file.mobicents.release}/../mobicents-media-server" property="mobicents.media.server.checked.out"/>
+	<target name="get-mobicents-media-server" unless="mobicents.media.server.checked.out">
+        <echo>Checking out Mobicents JAIN-SLEE</echo>
+		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
+            <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mobicents-media-server"/>
+        </exec>
 	</target>
 	
+	<target name="build-mobicents-media-server">
+        <echo>Building Mobicents Media Server</echo>
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mobicents-media-server">
+            <arg line="install -Djboss.home=${base.path}/jboss-${jboss.version}" />
+        </exec>
+	</target>
+		
+	<target name="deploy-media" depends="get-mobicents-media-server,build-mobicents-media-server" />
+	
 	<target name="make-final-zip-jboss">
-		<fixcrlf srcdir="${base.path}/jboss-${jboss.version}/bin" includes="*.sh"
-		         eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}.zip" filesonly="false">
-			<zipfileset dir="${base.path}/jboss-${jboss.version}/bin"
-		            filemode="755" prefix="bin">
-		            <include name="*.sh" />
+		<fixcrlf srcdir="${base.path}/jboss-${jboss.version}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${base.path}/jboss-${jboss.version}/bin" filemode="755" prefix="bin">
+		        <include name="*.sh" />
 			</zipfileset>
-         	<zipfileset dir="${base.path}/jboss-${jboss.version}/bin"
-         		prefix="bin">
+         	<zipfileset dir="${base.path}/jboss-${jboss.version}/bin" prefix="bin">
             	<exclude name="*.sh" />
          	</zipfileset>
-         	<zipfileset dir="${base.path}/jboss-${jboss.version}"
-            	prefix="">
+         	<zipfileset dir="${base.path}/jboss-${jboss.version}" prefix="">
             	<exclude name="bin/**"/>
             	<exclude name="server/*/data/**"/>
             	<exclude name="server/*/log/**"/>
@@ -121,19 +120,15 @@
 	</target>
 
 	<target name="make-final-zip-tomcat">
-		<fixcrlf srcdir="${base.path}/apache-tomcat-${tomcat.version}/bin" includes="*.sh"
-		         eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}.zip" filesonly="false">
-			<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin"
-		            filemode="755" prefix="bin">
-		            <include name="*.sh" />
+		<fixcrlf srcdir="${base.path}/apache-tomcat-${tomcat.version}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin" filemode="755" prefix="bin">
+		        <include name="*.sh" />
 			</zipfileset>
-         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin"
-         		prefix="bin">
+         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin" prefix="bin">
             	<exclude name="*.sh" />
          	</zipfileset>
-         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}"
-            	prefix="">
+         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}" prefix="">
             	<exclude name="bin/**"/>
          	</zipfileset>
 		</zip>
@@ -167,6 +162,40 @@
 			tofile="${jboss.dir}/server/default/deploy/sip-servlets-management.war"/>
 		
 	</target>
+	
+	<target name="set-src-excludes">
+        <defaultexcludes add="**/target/**"/>
+        <defaultexcludes add="**/docs/**"/>
+        <defaultexcludes add="**/legacy/**"/>
+        <defaultexcludes add="**/release/**"/>
+        <defaultexcludes add="**/logs/**"/>
+        <defaultexcludes add="**/tests/**"/>
+        <defaultexcludes add="**/build/**"/>
+        <defaultexcludes add="**/GWT/**"/>
+        <defaultexcludes add="**/${*}/**"/>
+        <defaultexcludes add="**/*JBOSS_HOME*/**"/>
+        <defaultexcludes add="**/*CATALINA_HOME*/**"/>
+        <defaultexcludes add="**/.gwt-cache/**"/>
+        <defaultexcludes add="**/.settings/**"/>
+        <defaultexcludes add="**/.project"/>
+        <defaultexcludes add="**/.classpath"/>
+        <defaultexcludes add="**/*.class" echo="true"/>
+    </target>
+    
+    <target name="make-src-zip" depends="set-src-excludes">
+        <property name="zip.filename" value="mss-${mss.release.version}-${time.stamp}-src.zip" />
+        
+        <copy todir="${base.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
+            <fileset dir="${ant.file.mobicents.release}/../../.." 
+            	     includes="**/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/click-to-call/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
+                     excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**"/>
+        </copy>
+        
+        <zip destfile="${ant.file.mobicents.release}/../${zip.filename}" basedir="${base.path}/src"/>
+        <delete dir="${base.path}/src"/>
+        
+        <defaultexcludes default="true"/>
+    </target>
 
 	<target name="clean">
 		<delete dir="${tomcat.classes}" />
