@@ -108,14 +108,8 @@
          	<zipfileset dir="${base.path}/jboss-${jboss.version}/bin" prefix="bin">
             	<exclude name="*.sh" />
          	</zipfileset>
-         	<zipfileset dir="${base.path}/jboss-${jboss.version}" prefix="">
-            	<exclude name="bin/**"/>
-            	<exclude name="server/*/data/**"/>
-            	<exclude name="server/*/log/**"/>
-            	<exclude name="server/*/tmp/**"/>
-            	<exclude name="server/*/work/**"/>
-            	<exclude name="server/tmp/**"/>
-         	</zipfileset>
+         	<zipfileset dir="${base.path}/jboss-${jboss.version}" prefix="" 
+                excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
 		</zip>
 	</target>
 
