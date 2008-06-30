@@ -47,6 +47,7 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TelURL;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
@@ -1260,8 +1261,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			logger.info("Dispatching the request event outside the container");
 			//check if the request point to another domain
-			
+			if(request.getRequestURI() instanceof TelURL) {
+				logger.error("cannot dispatch a request with a tel url request uri outside the container ");
+				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+			}
 			javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+			
 			String host = sipRequestUri.getHost();
 			int port = sipRequestUri.getPort();
 			String transport = JainSipUtils.findTransport(request);

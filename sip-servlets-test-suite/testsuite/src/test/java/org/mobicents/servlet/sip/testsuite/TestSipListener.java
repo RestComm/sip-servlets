@@ -39,6 +39,7 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
+import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -121,7 +122,7 @@ public class TestSipListener implements SipListener {
 
 	private boolean okToByeReceived;
 	
-	private SipURI requestURI;
+	private URI requestURI;
 	
 	private Request inviteRequest;
 	
@@ -748,7 +749,7 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendSipRequest(String method, SipURI fromURI, SipURI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
+	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
 		this.useToURIasRequestUri = useToURIasRequestUri;
 		// create >From Header
 		Address fromNameAddress = protocolObjects.addressFactory
@@ -762,10 +763,13 @@ public class TestSipListener implements SipListener {
 		ToHeader toHeader = protocolObjects.headerFactory.createToHeader(
 				toNameAddress, null);
 
-		// create Request URI
-		this.requestURI = protocolObjects.addressFactory.createSipURI(
-				toURI.getUser(), peerHostPort);
-		this.requestURI.setPort(peerPort);
+		if(toURI instanceof SipURI) {
+			SipURI toSipUri = (SipURI) toURI;
+			// create Request URI
+			this.requestURI = protocolObjects.addressFactory.createSipURI(
+					toSipUri.getUser(), peerHostPort);
+			((SipURI)this.requestURI).setPort(peerPort);
+		}
 		if(useToURIasRequestUri) {
 			this.requestURI = toURI;
 		}
@@ -803,19 +807,23 @@ public class TestSipListener implements SipListener {
 		// Create contact headers
 		String host = "127.0.0.1";
 
-		SipURI contactUrl = protocolObjects.addressFactory.createSipURI(
-				fromURI.getUser(), host);
-		/**
-		 * either use tcp or udp
-		 */
-		contactUrl.setPort(listeningPoint.getPort());
-//			contactUrl.setTransportParam(protocolObjects.transport);
-	
-		// Create the contact name address.
+		URI contactUrl = null;
+		if(fromURI instanceof SipURI) {
+			contactUrl = protocolObjects.addressFactory.createSipURI(
+				((SipURI)fromURI).getUser(), host);
+			/**
+			 * either use tcp or udp
+			 */
+			((SipURI)contactUrl).setPort(listeningPoint.getPort());
+//				contactUrl.setTransportParam(protocolObjects.transport);		
+			((SipURI)contactUrl).setLrParam();
+		} else {
+			contactUrl = fromURI;
+		}
 		
+		// Create the contact name address.	
 		Address contactAddress = protocolObjects.addressFactory
 				.createAddress(contactUrl);
-		contactUrl.setLrParam();
 
 		// Add the contact address.
 //			contactAddress.setDisplayName(fromName);

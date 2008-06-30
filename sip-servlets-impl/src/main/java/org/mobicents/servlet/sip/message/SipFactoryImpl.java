@@ -430,8 +430,10 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 
 			//Adding default contact header for register
 			if(Request.REGISTER.equalsIgnoreCase(method)) {				
-				//TODO what about other schemes ?
-				String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();										
+				String fromName = null;
+				if(fromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
+					fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();
+				}										
 				// Create the contact name address.
 				contactHeader = 
 					JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);														

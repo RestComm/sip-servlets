@@ -225,19 +225,22 @@ public class JainSipUtils {
 	public static String findTransport(Request request) {
 		String transport = ListeningPoint.UDP;
 
-		String transportParam = ((javax.sip.address.SipURI) request
+		if(request.getRequestURI() instanceof SipURI) {
+			String transportParam = ((javax.sip.address.SipURI) request
 				.getRequestURI()).getTransportParam();
-
-		if (transportParam != null
-				&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
-			transport = ListeningPoint.TLS;
+			
+			if (transportParam != null
+					&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
+				transport = ListeningPoint.TLS;
+			}
+			//Fix by Filip Olsson for Issue 112
+			else if ((transportParam != null
+				&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+				request.getContentLength().getContentLength() > 4096) {
+				transport = ListeningPoint.TCP;
+			}
 		}
-		//Fix by Filip Olsson for Issue 112
-		else if ((transportParam != null
-			&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
-			request.getContentLength().getContentLength() > 4096) {
-			transport = ListeningPoint.TCP;
-		} 
+		 
 		return transport;
 	}
 	/**

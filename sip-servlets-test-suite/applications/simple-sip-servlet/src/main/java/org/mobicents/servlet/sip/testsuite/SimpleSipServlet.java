@@ -53,7 +53,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-
+		logger.info("from : " + request.getFrom());
 		logger.info("Got request: "
 				+ request.getMethod());
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
@@ -65,13 +65,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	@Override
 	protected void doAck(SipServletRequest req) throws ServletException,
 			IOException {
-		if(TEST_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
-			SipServletRequest reInvite = req.getSession(false).createRequest("INVITE");
-			if(req.getSession(false) == reInvite.getSession(false)) {
-				reInvite.send();
-			} else {
-				logger.error("the newly created subsequent request doesn't have " +
-						"the same session instance as the one it has been created from");
+		if(req.getFrom().getURI() instanceof SipURI) {
+			if(TEST_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
+				SipServletRequest reInvite = req.getSession(false).createRequest("INVITE");
+				if(req.getSession(false) == reInvite.getSession(false)) {
+					reInvite.send();
+				} else {
+					logger.error("the newly created subsequent request doesn't have " +
+							"the same session instance as the one it has been created from");
+				}
 			}
 		}
 	}

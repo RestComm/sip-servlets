@@ -28,6 +28,7 @@ import javax.servlet.sip.URI;
 import javax.sip.address.SipURI;
 import javax.sip.header.FromHeader;
 import javax.sip.header.HeaderFactory;
+import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.SipFactories;
 
@@ -46,14 +47,6 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	private javax.sip.address.Address address;	
 
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
-
-	private SipURI getUriAsSipUri() {
-		if (this.address.getURI() instanceof SipURI) {
-			return (SipURI) this.address.getURI();	
-		} else {
-			throw new UnsupportedOperationException("Cannot return as SipURI");
-		}
-	}
 	
 	public javax.sip.address.Address getAddress() {
 		return address;
@@ -64,11 +57,11 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	@SuppressWarnings("unchecked")
 	public AddressImpl (javax.sip.address.Address address) {
 		this.address = address;				
-		SipURI sipURI = getUriAsSipUri();
-		Iterator<String> parameterNames = sipURI.getParameterNames();
+		Parameters uri = (Parameters) this.address.getURI();
+		Iterator<String> parameterNames = uri.getParameterNames();
 		while (parameterNames.hasNext()) {
 			String parameterName = (String) parameterNames.next();
-			parameters.set(parameterName, sipURI.getParameter(parameterName));		
+			parameters.set(parameterName, uri.getParameter(parameterName));		
 		}
 	}
 
@@ -184,8 +177,8 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 */
 	public void setQ(float q) {
 		try {
-			SipURI sipUri = getUriAsSipUri();
-			sipUri.setParameter("q", Float.toString(q));
+			Parameters uri = (Parameters) this.address.getURI();
+			uri.setParameter("q", Float.toString(q));
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad parameter", ex);
 		}
@@ -244,9 +237,9 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	@Override
 	public void setParameter(String name, String value) {		
 		super.setParameter(name, value);
-		SipURI sipUri = getUriAsSipUri();
+		Parameters uri = (Parameters) this.address.getURI();
 		try {
-			sipUri.setParameter(name, value);
+			uri.setParameter(name, value);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Problem setting parameter",e);
 		}

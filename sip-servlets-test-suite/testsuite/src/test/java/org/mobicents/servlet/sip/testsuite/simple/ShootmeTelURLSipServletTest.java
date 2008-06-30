@@ -22,6 +22,7 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.address.TelURL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,9 +30,10 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class ShootmeSipServletTest extends SipServletTestCase {
+
+public class ShootmeTelURLSipServletTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(ShootmeSipServletTest.class);
+	private static Log logger = LogFactory.getLog(ShootmeTelURLSipServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
@@ -43,7 +45,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	ProtocolObjects senderProtocolObjects;	
 
 	
-	public ShootmeSipServletTest(String name) {
+	public ShootmeTelURLSipServletTest(String name) {
 		super(name);
 	}
 
@@ -85,13 +87,11 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-				
-		String toUser = "receiver";
-		String toSipAddress = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		TelURL toAddress = senderProtocolObjects.addressFactory.createTelURL("+358-555-1234567");
+		
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		

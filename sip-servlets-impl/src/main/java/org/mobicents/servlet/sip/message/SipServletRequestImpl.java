@@ -52,6 +52,7 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
@@ -379,6 +380,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void pushPath(Address uri) {
 
+		if(uri.getURI() instanceof TelURL) {
+			throw new IllegalArgumentException("Cannot push a TelUrl as a path !");
+		}
+		
 		if (logger.isDebugEnabled())
 			logger.debug("Pushing path into message of value [" + uri + "]");
 
@@ -397,6 +402,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public void pushRoute(Address address) {
+		if(address.getURI() instanceof TelURL) {
+			throw new IllegalArgumentException("Cannot push a TelUrl as a route !");
+		}
 		
 		javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) ((AddressImpl) address)
 			.getAddress().getURI();
@@ -716,8 +724,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null) {
 					FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
-					//FIXME what about other schemes ?
-					String fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();										
+					String fromName = null;
+					if(fromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
+						fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();
+					}
 					// Create the contact name address.
 					contactHeader = 
 						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), transport, fromName);										

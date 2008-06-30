@@ -20,6 +20,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.mobicents.servlet.sip.testsuite.address.SipURITest;
+import org.mobicents.servlet.sip.testsuite.address.TelURLTest;
 import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASipUnitTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUATcpUdpTest;
@@ -45,6 +46,7 @@ import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
+import org.mobicents.servlet.sip.testsuite.simple.ShootmeTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.NotifierSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.SubscriberSipServletTest;
 import org.mobicents.servlet.sip.testsuite.targeting.SessionKeyTargetingSipServletTest;
@@ -57,6 +59,7 @@ public class AllTests {
 				"Test for org.mobicents.servlet.sip.testsuite");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ShootmeSipServletTest.class);
+		suite.addTestSuite(ShootmeTelURLSipServletTest.class);
 		suite.addTestSuite(ShootistSipServletTest.class);
 		suite.addTestSuite(B2BUASipUnitTest.class);
 		suite.addTestSuite(B2BUATcpUdpTest.class);
@@ -86,6 +89,8 @@ public class AllTests {
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);
+		suite.addTestSuite(TelURLTest.class);
+		
 		//$JUnit-END$
 		return suite;
 	}

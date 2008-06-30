@@ -324,7 +324,7 @@
 						15.11 Encode URI and Session Targeting
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=134">
 						4.2.2 TelURL
@@ -336,7 +336,7 @@
 						Basic IPBX
 						</a>
 						<br />				
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=133">
 						Concurrency Control
@@ -372,25 +372,25 @@
 						More Extensions : REFER/PUBLISH/UPDATE
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
-								<img src="green" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=199">
 									New Application Router Packaging and Deployment
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="orange.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=200">
 									Implement the new Session invalidation methods from JSR 289 PFD
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="orange.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=202">
 									Implement the doBranchResponse callback
