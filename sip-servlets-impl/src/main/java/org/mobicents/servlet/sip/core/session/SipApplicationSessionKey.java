@@ -28,28 +28,37 @@ import java.io.Serializable;
  *
  */
 public class SipApplicationSessionKey implements Serializable {
-	String callId; 
+	String id; 
 	String applicationName;
+	boolean isAppGeneratedKey;
+	
 	/**
-	 * @param callId
+	 * @param id
 	 * @param applicationName
 	 */
-	protected SipApplicationSessionKey(String callId, String applicationName) {
+	protected SipApplicationSessionKey(String id, String applicationName, boolean isAppGeneratedKey) {
 		super();
-		this.callId = callId;
+		this.id = id;
 		this.applicationName = applicationName;
+		this.isAppGeneratedKey = isAppGeneratedKey;
 	}
 	/**
-	 * @return the callId
+	 * @return the Id
 	 */
-	public String getCallId() {
-		return callId;
+	public String getId() {
+		return id;
 	}
 	/**
 	 * @return the applicationName
 	 */
 	public String getApplicationName() {
 		return applicationName;
+	}
+	/**
+	 * @return the isAppGeneratedKey
+	 */
+	public boolean isAppGeneratedKey() {
+		return isAppGeneratedKey;
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -60,7 +69,7 @@ public class SipApplicationSessionKey implements Serializable {
 		int result = 1;
 		result = prime * result
 				+ ((applicationName == null) ? 0 : applicationName.hashCode());
-		result = prime * result + ((callId == null) ? 0 : callId.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 	/* (non-Javadoc)
@@ -80,10 +89,10 @@ public class SipApplicationSessionKey implements Serializable {
 				return false;
 		} else if (!applicationName.equals(other.applicationName))
 			return false;
-		if (callId == null) {
-			if (other.callId != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!callId.equals(other.callId))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}		
@@ -92,7 +101,7 @@ public class SipApplicationSessionKey implements Serializable {
 	public String toString() {
 		StringBuffer value = new StringBuffer();
 		value = value.append("(");
-		value = value.append(callId);
+		value = value.append(id);
 		value = value.append(",");
 		value = value.append(applicationName);
 		value = value.append(")");

@@ -25,7 +25,11 @@
 */
 package org.mobicents.servlet.sip.address;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.BitSet;
 
 /**
  * Copied from Apache Excalibur project.
@@ -35,6 +39,87 @@ import java.io.UnsupportedEncodingException;
  */
 public class RFC2396UrlDecoder {
 
+	static BitSet charactersDontNeedingEncoding;
+	static final int characterCaseDiff = ('a' - 'A');
+
+	/** Initialize the BitSet */
+	static {
+		charactersDontNeedingEncoding = new BitSet(256);
+		int i;
+		for (i = 'a'; i <= 'z'; i++) {
+			charactersDontNeedingEncoding.set(i);
+		}
+		for (i = 'A'; i <= 'Z'; i++) {
+			charactersDontNeedingEncoding.set(i);
+		}
+		for (i = '0'; i <= '9'; i++) {
+			charactersDontNeedingEncoding.set(i);
+		}
+		charactersDontNeedingEncoding.set('-');
+		charactersDontNeedingEncoding.set('_');
+		charactersDontNeedingEncoding.set('.');
+		charactersDontNeedingEncoding.set('*');
+		charactersDontNeedingEncoding.set('"');
+	}
+
+	    
+    /**
+     * Translates a string into <code>x-www-form-urlencoded</code> format.
+     *
+     * @param   s   <code>String</code> to be translated.
+     * @return  the translated <code>String</code>.
+     */
+    public static String encode( String s )
+    {
+        final StringBuffer out = new StringBuffer( s.length() );
+        final ByteArrayOutputStream buf = new ByteArrayOutputStream( 32 );
+        final OutputStreamWriter writer = new OutputStreamWriter( buf );
+        for( int i = 0; i < s.length(); i++ )
+        {
+            int c = s.charAt( i );
+            if( charactersDontNeedingEncoding.get( c ) )
+            {
+                out.append( (char)c );
+            }
+            else
+            {
+                try
+                {
+                    writer.write( c );
+                    writer.flush();
+                }
+                catch( IOException e )
+                {
+                    buf.reset();
+                    continue;
+                }
+                byte[] ba = buf.toByteArray();
+                for( int j = 0; j < ba.length; j++ )
+                {
+                    out.append( '%' );
+                    char ch = Character.forDigit( ( ba[ j ] >> 4 ) & 0xF, 16 );
+                    // converting to use uppercase letter as part of
+                    // the hex value if ch is a letter.
+                    if( Character.isLetter( ch ) )
+                    {
+                        ch -= characterCaseDiff;
+                    }
+                    out.append( ch );
+                    ch = Character.forDigit( ba[ j ] & 0xF, 16 );
+                    if( Character.isLetter( ch ) )
+                    {
+                        ch -= characterCaseDiff;
+                    }
+                    out.append( ch );
+                }
+                buf.reset();
+            }
+        }
+
+        return out.toString();
+    }
+
+	
     /**
      * Decode a path.
      *
@@ -49,6 +134,9 @@ public class RFC2396UrlDecoder {
      * @return the decoded path
      */
     public static String decode(String uri) {
+    	if(uri == null) {
+    		throw new NullPointerException("uri cannot be null !");
+    	}
         StringBuffer translatedUri = new StringBuffer(uri.length());
         byte[] encodedchars = new byte[uri.length() / 3];
         int i = 0;

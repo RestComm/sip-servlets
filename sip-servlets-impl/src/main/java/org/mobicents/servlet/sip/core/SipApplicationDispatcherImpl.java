@@ -52,6 +52,8 @@ import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
+import javax.servlet.sip.ar.SipTargetedRequestInfo;
+import javax.servlet.sip.ar.SipTargetedRequestType;
 import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -89,6 +91,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -101,6 +104,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
@@ -143,6 +147,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * This parameter is to know if a servlet application sent a final response
 	 */
 	public static final String FINAL_RESPONSE = "final_response";
+	/* 
+	 * This parameter is to know if a servlet application has generated its own application key
+	 */
+	public static final String GENERATED_APP_KEY = "gen_app_key";
 	/* 
 	 * This parameter is to know when an app was not deployed and couldn't handle the request
 	 * used so that the response doesn't try to call the app not deployed
@@ -686,6 +694,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
 		String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
+		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
+		if(generatedApplicationKey != null) {
+			generatedApplicationKey = RFC2396UrlDecoder.decode(generatedApplicationKey);
+		}
 		if(applicationName == null || applicationName.length() < 1 || 
 				handlerName == null || handlerName.length() < 1) {
 			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
@@ -702,8 +714,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					"in this popped routed header " + poppedAddress);
 		}
 		SipManager sipManager = (SipManager)sipContext.getManager();
-		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
+		SipApplicationSessionKey sipApplicationSessionKey = null;
+		if(generatedApplicationKey != null && generatedApplicationKey.length() > 0) {
+			sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+					applicationName, 
+					generatedApplicationKey,
+					true);
+		} else {
+			sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
+		}
 		SipApplicationSessionImpl sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
 			logger.error("Cannot find the corresponding sip application session to this subsequent request " + request +
@@ -868,9 +888,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Request request = (Request) sipServletRequest.getMessage();		
 		Dialog dialog = transaction.getDialog();
 		/*
-		 * WARNING: TODO: We need to find a way to route CANCELs through the app path
-		 * of the INVITE. CANCEL does not contain Route headers as other requests related
-		 * to the dialog.
+		 * WARNING: routing of CANCEL is special because CANCEL does not contain Route headers as other requests related
+		 * to the dialog. But still it has to be routed through the app path
+		 * of the INVITE
 		 */
 		/* If there is a proxy with the request, let's try to send it directly there.
 		 * This is needed because of CANCEL which is a subsequent request that might
@@ -1045,30 +1065,47 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	}
 	
 	private SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) {
-		String callId = null;
+		String id = null;
+		boolean isAppGeneratedKey = false;
 		Request request = (Request) sipServletRequestImpl.getMessage();
 		Method appKeyMethod = null;
-		if(sipContext != null) appKeyMethod = sipContext.getSipApplicationKeyMethod();
+		// Session Key Based Targeted Mechanism is oly for Initial Requests 
+		// see JSR 289 Section 15.11.2 Session Key Based Targeting Mechanism 
+		if(sipServletRequestImpl.isInitial() && sipContext != null) {
+			appKeyMethod = sipContext.getSipApplicationKeyMethod();
+		}
 		if(appKeyMethod != null) {
-			try {
-				callId = (String) appKeyMethod.invoke(null, new Object[] {sipServletRequestImpl});
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(logger.isDebugEnabled()) {
+				logger.debug("For request target to application " + sipContext.getApplicationName() + 
+						", using the following annotated method to generate the application key " + appKeyMethod);
 			}
-			if(callId == null) throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");
+			SipServletRequestReadOnly readOnlyRequest = new SipServletRequestReadOnly(sipServletRequestImpl);
+			try {
+				id = (String) appKeyMethod.invoke(null, new Object[] {readOnlyRequest});
+				isAppGeneratedKey = true;
+			} catch (IllegalArgumentException e) {
+				logger.error("Couldn't invoke the app session key annotated method !", e);
+			} catch (IllegalAccessException e) {
+				logger.error("Couldn't invoke the app session key annotated method !", e);
+			} catch (InvocationTargetException e) {
+				logger.error("Couldn't invoke the app session key annotated method !", e);
+			} finally {
+				readOnlyRequest = null;
+			}
+			if(id == null) {
+				throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("For request target to application " + sipContext.getApplicationName() + 
+						", following annotated method " + appKeyMethod + " generated the application key : " + id);
+			}
 		} else {
-			callId = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
+			id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
-				callId);
+				id,
+				isAppGeneratedKey);
 		return sipApplicationSessionKey;
 	}
 
@@ -1122,14 +1159,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(sipServletRequest.getSipSession() != null) {
 			routingRegion = sipServletRequest.getSipSession().getRegion();
 		}
-		//TODO the spec mandates that the sipServletRequest should be 
-		//made read only for the AR to process
+		
+		// 15.11.3 Target Session : Encode URI mechanism
+		// Upon receiving an initial request for processing, a container MUST check the topmost Route header and 
+		// Request-URI (in that order) to see if it contains an encoded URI. 
+		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
+		SipTargetedRequestInfo targetedRequestInfo = null;
+		String targetedApplicationKey = sipServletRequest.getRequestURI().getParameter(SipApplicationSessionImpl.SIP_APPLICATION_KEY_PARAM_NAME);
+		targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
+		if(targetedRequestInfo == null && poppedAddress != null) {
+			targetedApplicationKey = poppedAddress.getURI().getParameter(SipApplicationSessionImpl.SIP_APPLICATION_KEY_PARAM_NAME);
+			targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
+		}	
+		
+		SipServletRequestReadOnly sipServletRequestReadOnly = new SipServletRequestReadOnly(sipServletRequest);
+		
 		SipApplicationRouterInfo applicationRouterInfo = 
 			sipApplicationRouter.getNextApplication(
-					sipServletRequest, 
+					sipServletRequestReadOnly, 
 					routingRegion, 
-					sipApplicationRoutingDirective, 
+					sipApplicationRoutingDirective,
+					targetedRequestInfo,
 					stateInfo);
+		
+		sipServletRequestReadOnly= null;
 		
 		// 15.4.1 Procedure : point 2
 		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
@@ -1216,13 +1269,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
 			if(isAnotherDomain || routeHeaders.hasNext()) {
 				forwardStatefully(sipServletRequest, SipSessionRoutingType.PREVIOUS_SESSION, SipRouteModifier.NO_ROUTE);
-				// FIXME send it statefully
-//				try{					
-//					sipProvider.sendRequest((Request)request.clone());						
-//					logger.info("Initial Request dispatched outside the container" + request.toString());
-//				} catch (SipException ex) {			
-//					throw new IllegalStateException("Error sending request",ex);
-//				}	
 				return false;
 			} else {
 				// the Request-URI does not point to another domain, and there is no Route header, 
@@ -1378,6 +1424,36 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 		}		
 	}
+	
+	/**
+	 * Section 15.11.3 Encode URI Mechanism
+	 * The container MUST use the encoded URI to locate the targeted SipApplicationSession object. 
+	 * If a valid SipApplicationSession is found, the container must determine 
+	 * the name of the application that owns the SipApplicationSession object.
+	 * 
+	 * @param targetedApplicationKey the encoded URI parameter
+	 * @return null if no corresponding SipApplicationSession could be found or 
+	 * if the param is null, the SipTargetedRequestInfo completed otherwise
+	 */
+	private SipTargetedRequestInfo retrieveTargetedApplication(
+			String targetedApplicationKey) {
+		if( targetedApplicationKey != null && 
+				targetedApplicationKey.length() > 0) {
+			SipApplicationSessionKey targetedApplicationSessionKey;
+			try {
+				targetedApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(targetedApplicationKey);
+			} catch (ParseException e) {
+				logger.error("Couldn't parse the targeted application key " + targetedApplicationKey, e);
+				return null;
+			}
+			SipContext sipContext = applicationDeployed.get(targetedApplicationSessionKey.getApplicationName());
+			if(sipContext != null && ((SipManager)sipContext.getManager()).getSipApplicationSession(targetedApplicationSessionKey, false) != null) {
+				return new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, targetedApplicationSessionKey.getApplicationName());
+			}				
+		}
+		return null;
+	}
+
 	/**
 	 * Check if the route is external
 	 * @param routeHeader the route to check 
@@ -1872,6 +1948,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			sipServletRequest, 
 			routingRegion, 
 			sipServletRequest.getRoutingDirective(), 
+			null,
 			stateInfo);
 		// 15.4.1 Procedure : point 2
 		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();

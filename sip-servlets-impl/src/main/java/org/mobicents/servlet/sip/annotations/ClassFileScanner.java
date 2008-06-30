@@ -108,10 +108,11 @@ public class ClassFileScanner {
         File[] files = folder.listFiles();
         if(files != null) {
 	        for(int j = 0; j < files.length; j++) {
-	            if(files[j].isDirectory())
+	            if(files[j].isDirectory()) {
 	                _scan(files[j]);
-	            else
+	            } else {
 	            	analyzeClass(files[j].getAbsolutePath());
+	            }
 	        }
         }
     }
@@ -134,7 +135,7 @@ public class ClassFileScanner {
 				processServletAnnotation(clazz);
 				processSipApplicationKeyAnnotation(clazz);
 			} catch (ClassNotFoundException e) {
-				logger.error("Failed to parse annotations for class " + classpath);
+				logger.error("Failed to parse annotations for class " + classpath, e);
 			}
     	}
     }
@@ -149,7 +150,7 @@ public class ClassFileScanner {
 		Method[] methods = clazz.getMethods();
 		for(Method method:methods) {
 			if(method.getAnnotation(SipApplicationKey.class)!=null) {
-				if(!Modifier.isStatic(method.getModifiers()) || Modifier.isPublic(method.getModifiers())) {
+				if(!Modifier.isStatic(method.getModifiers()) || !Modifier.isPublic(method.getModifiers())) {
 					throw new AnnotationVerificationException(
 							"A method annotated with the @SipApplicationKey annotation MUST be public and static");
 				}

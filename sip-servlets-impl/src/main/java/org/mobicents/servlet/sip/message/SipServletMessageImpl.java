@@ -553,7 +553,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} else if (create) {						
 			SipApplicationSessionKey key = SessionManagerUtil.getSipApplicationSessionKey(
 					currentApplicationName, 
-					((CallIdHeader)message.getHeader((CallIdHeader.NAME))).getCallId());
+					((CallIdHeader)message.getHeader((CallIdHeader.NAME))).getCallId(),
+					false);
 			if(this.session == null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Tryin to create a new sip application session with key = " + key);

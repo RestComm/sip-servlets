@@ -318,7 +318,7 @@
 			<subsection name="Planned Versions">								
 				<subsection name="Version 0.5 - 08/01/2008">
 					<p>
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=121">
 						15.11 Encode URI and Session Targeting
@@ -445,6 +445,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=227">
 									Fix location where Facilities are stored in JNDI
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=245">
+									Implementation of 17.8 P-Asserted Identity Security 
 								</a>
 							</li>
 						</ul>

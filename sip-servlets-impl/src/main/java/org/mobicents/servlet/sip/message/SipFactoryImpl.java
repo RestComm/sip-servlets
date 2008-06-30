@@ -170,7 +170,8 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
 				sipApplicationDispatcher.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false)
-					.getSipProvider().getNewCallId().getCallId());		
+					.getSipProvider().getNewCallId().getCallId(),
+				false);		
 		SipApplicationSessionImpl sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
 				sipApplicationSessionKey, true);		
 		return sipApplicationSession;
@@ -383,7 +384,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
 					+ new Random().nextInt() );
 			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
-					sipApplicationSessionImpl.getKey().getCallId());
+					sipApplicationSessionImpl.getKey().getId());
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 

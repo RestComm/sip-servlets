@@ -33,6 +33,7 @@ import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
+import javax.servlet.sip.ar.SipTargetedRequestInfo;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -218,7 +219,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	public SipApplicationRouterInfo getNextApplication(
 			SipServletRequest initialRequest,
 			SipApplicationRoutingRegion region,
-			SipApplicationRoutingDirective directive, Serializable stateInfo) {		
+			SipApplicationRoutingDirective directive,
+			SipTargetedRequestInfo targetedRequestInfo,
+			Serializable stateInfo) {		
 		// Minimalist application router implementation with no processing logic 
 		// besides the declaration of the application order as specified in JSR 289 - Appendix C
 		if(initialRequest != null) {						

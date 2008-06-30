@@ -204,47 +204,38 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return this.httpSessions.get(httpSession.getId());
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipApplicationSession#encodeURI(javax.servlet.sip.URI)
+	/**
+	 * {@inheritDoc}
 	 */
 	public void encodeURI(URI uri) {
-		uri.setParameter("org.mobicents.servlet.sip.ApplicationSessionKey", getId());
+		uri.setParameter(SIP_APPLICATION_KEY_PARAM_NAME, getId());
 	}
 
 	/**
+	 * {@inheritDoc}
 	 * Adds a get parameter to the URL like this:
 	 * http://hostname/link -> http://hostname/link?org.mobicents.servlet.sip.ApplicationSessionKey=0
 	 * http://hostname/link?something=1 -> http://hostname/link?something=1&org.mobicents.servlet.sip.ApplicationSessionKey=0
 	 */
 	public URL encodeURL(URL url) {
 		String urlStr = url.toExternalForm();
-		try
-		{
+		try {
 			URL ret;
-			if(urlStr.contains("?"))
-			{
-				ret = new URL(
-						url + "&"+ SIP_APPLICATION_KEY_PARAM_NAME + "="
-							+ getId().toString());
-			}
-			else
-			{
-				ret = new URL(
-						url + "?"+ SIP_APPLICATION_KEY_PARAM_NAME + "="
-							+ getId().toString());
+			if (urlStr.contains("?")) {
+				ret = new URL(url + "&" + SIP_APPLICATION_KEY_PARAM_NAME + "="
+						+ getId().toString());
+			} else {
+				ret = new URL(url + "?" + SIP_APPLICATION_KEY_PARAM_NAME + "="
+						+ getId().toString());
 			}
 			return ret;
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException("Failed encoding URL", e);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Failed encoding URL : " + url, e);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipApplicationSession#getAttribute(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
 	public Object getAttribute(String name) {
 		return this.sipApplicationSessionAttributeMap.get(name);
@@ -283,9 +274,8 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return expirationTime;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipApplicationSession#getId()
+	/**
+	 * {@inheritDoc}
 	 */
 	public String getId() {
 		return key.toString();
@@ -299,6 +289,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		return lastAccessTime;
 	}
 
+	//TODO : Section 6.3 : Whenever the last accessed time for a SipApplicationSession is updated, it is considered refreshed i.e.,
+	//the expiry timer for that SipApplicationSession starts anew.
+	// this method should be called as soon as there is any modifications to the Sip Application Session
 	public void setLastAccessedTime(long lastAccessTime) {
 		this.lastAccessTime= lastAccessTime;
 	}

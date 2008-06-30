@@ -172,13 +172,6 @@ public class ListenersSipServlet
 			String message = (String)request.getContent();
 			if(message != null && message.length() > 0) {
 				SipServletRequest responseMessage = request.getSession().createRequest("MESSAGE");
-//				SipServletRequest responseMessage = sipFactory.createRequest(
-//						request.getApplicationSession(),
-//						"MESSAGE", 
-//						request.getTo().toString(), 
-//						request.getFrom().toString());
-//				SipURI requestURI = sipFactory.createSipURI("sender", "127.0.0.1:5080");
-//				responseMessage.setRequestURI(requestURI);
 				responseMessage.setContentLength(2);
 				responseMessage.setContent(KO, CONTENT_TYPE);
 				if (hasListenerBeenCalled(request, message)) {
@@ -190,11 +183,7 @@ public class ListenersSipServlet
 			logger.error("the encoding is not supported", e);
 		} catch (IOException e) {
 			logger.error("an IO exception occured", e);
-		} 
-//		catch (ServletParseException e) {
-//			logger.error("a parse exception occured", e);
-//		}
-		
+		} 		
 	}
 
 	/**

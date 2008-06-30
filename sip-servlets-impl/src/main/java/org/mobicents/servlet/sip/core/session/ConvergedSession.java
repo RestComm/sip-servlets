@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ConvergedHttpSession;
@@ -28,14 +27,11 @@ import javax.sip.ListeningPoint;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Manager;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.security.SecurityUtil;
-import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -70,8 +66,8 @@ public class ConvergedSession
         if (facade == null){
             if (SecurityUtil.isPackageProtectionEnabled()){
                 final ConvergedSession fsession = this;
-                facade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction(){
-                    public Object run(){
+                facade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction<ConvergedSessionFacade>(){
+                    public ConvergedSessionFacade run(){
                         return new ConvergedSessionFacade(fsession);
                     }
                 });
@@ -147,7 +143,8 @@ public class ConvergedSession
 			
 			SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					((SipContext)manager.getContainer()).getApplicationName(), 
-					listeningPoint.getSipProvider().getNewCallId().getCallId());
+					listeningPoint.getSipProvider().getNewCallId().getCallId(),
+					false);
 			
 			sipApplicationSession = 
 				((SipManager)manager).getSipApplicationSession(sipApplicationSessionKey, true);			
