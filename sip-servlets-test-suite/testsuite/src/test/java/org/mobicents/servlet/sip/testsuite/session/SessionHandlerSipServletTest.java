@@ -79,18 +79,8 @@ public class SessionHandlerSipServletTest extends SipServletTestCase {
 	}
 
 	/**
-	 * This test check to see if all requests with the same request URI
-	 * "sip:mychatroom1@example.com" will be handled by the same application
-	 * session. (The sip servlet will return the same key for the same request
-	 * URI)
+	 * This test check to see if the correct handler handled the correct SIP request or response.
 	 * 
-	 * So it starts 4 sip clients. 3 of them will connect to the same request
-	 * Uri and the last one to another request uri. The sip servlet application
-	 * will send back a MESSAGE containing the number of clients connected to
-	 * the same application session upon ACK reception.
-	 * 
-	 * The 3 first clients should receive respectively 1, 2 and 3. And the 4th
-	 * client should receive 1.
 	 * 
 	 * @throws InterruptedException
 	 * @throws SipException
