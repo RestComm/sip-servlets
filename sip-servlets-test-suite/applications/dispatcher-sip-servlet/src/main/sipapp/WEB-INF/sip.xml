@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.dispatcher.DispatcherSipServlet</app-name>
+	<display-name>MainHandler Test Sip Servlet</display-name>
+	<description>MainHandler Test Sip Servlet</description>
+	
+	<main-servlet>
+		DispatcherSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>DispatcherSipServlet</servlet-name>
+		<display-name>DispatcherSipServlet</display-name>
+		<description>Dispatcher Test SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.dispatcher.DispatcherSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>SecondaryHandlerSipServlet</servlet-name>
+		<display-name>SecondaryHandlerSipServlet</display-name>
+		<description>SecondaryHandler Test SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.dispatcher.SecondaryHandlerSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>

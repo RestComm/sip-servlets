@@ -14,7 +14,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.testsuite;
+package org.mobicents.servlet.sip.testsuite.dispatcher;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -22,6 +22,7 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipFactory;
@@ -32,23 +33,23 @@ import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.testsuite.dispatcher.MessageSenderUtil;
+import org.mobicents.servlet.sip.testsuite.MessageSenderUtil;
 
 /**
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class MainHandlerSipServlet
+public class DispatcherSipServlet
 		extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(MainHandlerSipServlet.class);
+	private static Log logger = LogFactory.getLog(DispatcherSipServlet.class);
 	
 	private SipFactory sipFactory;	
 	private static String TEST_BAD_HANDLER_USERNAME = "badHandler";
 	
 	/** Creates a new instance of MainHandlerSipServlet */
-	public MainHandlerSipServlet() {
+	public DispatcherSipServlet() {
 	}
 
 	@Override
@@ -75,36 +76,13 @@ public class MainHandlerSipServlet
 
 		logger.info("Got request: "
 				+ request.getMethod());
+		RequestDispatcher requestDispatcher;
 		if(TEST_BAD_HANDLER_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
-			request.getSession().setHandler(TEST_BAD_HANDLER_USERNAME);
+			requestDispatcher = request.getRequestDispatcher(TEST_BAD_HANDLER_USERNAME);
 		} else {
-			request.getSession().setHandler("SecondaryHandlerSipServlet");
+			requestDispatcher = request.getRequestDispatcher("SecondaryHandlerSipServlet");
 		}
-		SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
-		ringingResponse.send();				
-		SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
-		okResponse.send();		
-	}
-	
-	@Override
-	protected void doSuccessResponse(SipServletResponse response)
-			throws ServletException, IOException {
-		Boolean responseReceived = (Boolean) response.getSession().getAttribute("mainHandlerResponseReceived");
-		if(responseReceived == null) {
-			responseReceived = true;
-			response.getSession().setAttribute("mainHandlerResponseReceived", responseReceived);
-			MessageSenderUtil.sendMessageHandlerOK(response.getSession(), "MainHandler : response OK");
-		} 
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void doBye(SipServletRequest request) throws ServletException,
-			IOException {
-
-		logger.info("Got BYE request: " + request);		
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-		sipServletResponse.send();
+		request.setAttribute("testAttributePassing", "ok");
+		requestDispatcher.forward(request, null);				
 	}	
 }

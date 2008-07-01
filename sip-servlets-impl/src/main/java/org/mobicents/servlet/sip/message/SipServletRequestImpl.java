@@ -76,10 +76,12 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
@@ -628,9 +630,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
-	public RequestDispatcher getRequestDispatcher(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * {@inheritDoc}
+	 */
+	public RequestDispatcher getRequestDispatcher(String handler) {
+		SipServletImpl sipServletImpl = (SipServletImpl) 
+			getSipSession().getSipApplicationSession().getSipContext().getChildrenMap().get(handler);
+		if(sipServletImpl == null) {
+			throw new IllegalArgumentException(handler + " is not a valid servlet name");
+		}
+		return new SipRequestDispatcher(sipServletImpl);
 	}
 
 	public String getScheme() {

@@ -31,7 +31,8 @@
 		<module>notifier-servlet</module>
 		<module>subscriber-servlet</module>
 		<module>chatroom-sip-servlet</module>
-		<module>handler-sip-servlet</module>		
+		<module>handler-sip-servlet</module>
+		<module>disptacher-sip-servlet</module>				
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->

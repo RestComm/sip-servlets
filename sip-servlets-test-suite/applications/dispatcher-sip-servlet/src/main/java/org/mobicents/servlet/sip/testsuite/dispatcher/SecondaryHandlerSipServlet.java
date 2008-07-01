@@ -14,7 +14,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.testsuite;
+package org.mobicents.servlet.sip.testsuite.dispatcher;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -28,33 +28,32 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.testsuite.dispatcher.MessageSenderUtil;
+import org.mobicents.servlet.sip.testsuite.MessageSenderUtil;
 
 /**
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class MainHandlerSipServlet
+public class SecondaryHandlerSipServlet
 		extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(MainHandlerSipServlet.class);
+	private static Log logger = LogFactory.getLog(SecondaryHandlerSipServlet.class);
 	
 	private SipFactory sipFactory;	
-	private static String TEST_BAD_HANDLER_USERNAME = "badHandler";
 	
-	/** Creates a new instance of MainHandlerSipServlet */
-	public MainHandlerSipServlet() {
+	
+	/** Creates a new instance of SecondaryHandlerSipServlet */
+	public SecondaryHandlerSipServlet() {
 	}
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
-		logger.info("the main handler test sip servlet has been started");
+		logger.info("the secondary handler test sip servlet has been started");
 		try { 			
 			// Getting the Sip factory from the JNDI Context
 			Properties jndiProps = new Properties();			
@@ -66,35 +65,39 @@ public class MainHandlerSipServlet
 			throw new ServletException("Uh oh -- JNDI problem !", e);
 		}
 	}		
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
-		logger.info("Got request: "
+		logger.info("Got dispatched request: "
 				+ request.getMethod());
-		if(TEST_BAD_HANDLER_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
-			request.getSession().setHandler(TEST_BAD_HANDLER_USERNAME);
+		if(request.getAttribute("testAttributePassing") != null) {
+			SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			ringingResponse.send();				
+			SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
+			okResponse.send();			
 		} else {
-			request.getSession().setHandler("SecondaryHandlerSipServlet");
+			throw new IllegalArgumentException("attribute passing through RequestDisptacher failed!");
 		}
-		SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
-		ringingResponse.send();				
-		SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
-		okResponse.send();		
+	}
+	
+	
+	@Override
+	protected void doAck(SipServletRequest request) throws ServletException,
+			IOException {
+
+		logger.info("Got request: "
+				+ request.getMethod());		
+		MessageSenderUtil.sendMessageHandlerOK(request.getSession(), "Dispatch OK");
 	}
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse response)
 			throws ServletException, IOException {
-		Boolean responseReceived = (Boolean) response.getSession().getAttribute("mainHandlerResponseReceived");
-		if(responseReceived == null) {
-			responseReceived = true;
-			response.getSession().setAttribute("mainHandlerResponseReceived", responseReceived);
-			MessageSenderUtil.sendMessageHandlerOK(response.getSession(), "MainHandler : response OK");
-		} 
+		
 	}
 	
 	/**
@@ -106,5 +109,5 @@ public class MainHandlerSipServlet
 		logger.info("Got BYE request: " + request);		
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
-	}	
+	}
 }
