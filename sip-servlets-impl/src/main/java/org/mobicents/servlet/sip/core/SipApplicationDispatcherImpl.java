@@ -430,7 +430,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
-				    	if(request.getHeader(MaxForwardsHeader.NAME)==null){
+				    if(request.getHeader(MaxForwardsHeader.NAME)==null){
 					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
 					}
 					transaction = sipProvider.getNewServerTransaction(request);
@@ -1615,6 +1615,25 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			ClientTransaction clientTransaction = responseEvent.getClientTransaction();
 			Dialog dialog = responseEvent.getDialog();
 			
+			TransactionApplicationData applicationData = null;
+			SipServletRequestImpl originalRequest = null;
+			if(clientTransaction != null) {
+				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
+				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
+					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+				}
+			} //there is no client transaction associated with it, it means that this is a retransmission
+			else if(dialog != null) {	
+				applicationData = (TransactionApplicationData)dialog.getApplicationData();
+				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
+				if(proxyBranch == null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
+					}
+					return true;
+				}
+			}
+			
 			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
 			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
 				return true;
@@ -1655,17 +1674,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 			}	
 			logger.info("route response on following session " + sessionKey);
-			TransactionApplicationData applicationData = null;
-			SipServletRequestImpl originalRequest = null;
-			if(clientTransaction != null) {
-				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
-				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
-					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
-				}
-			} //there is no client transaction associated with it, it means that this is a retransmission
-			else if(dialog != null){	
-				applicationData = (TransactionApplicationData)dialog.getApplicationData();
-			}
+			
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
 					response, 
@@ -1676,12 +1685,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					originalRequest);				
 			
 			try {
-				session.setHandler(handlerName);				
 				// See if this is a response to a proxied request
 				if(originalRequest != null) {				
-						originalRequest.setLastFinalResponse(sipServletResponse);					
+					originalRequest.setLastFinalResponse(sipServletResponse);					
 				}
-				
 								
 				// We can not use session.getProxyBranch() because all branches belong to the same session
 				// and the session.proxyBranch is overwritten each time there is activity on the branch.				
@@ -1760,8 +1767,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		logger.info("Dispatching response " + response.toString() + 
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
+		
 		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
-		Wrapper sipServletImpl = (Wrapper) container;	
+		Wrapper sipServletImpl = (Wrapper) container;
+		
 		if(sipServletImpl.isUnavailable()) {
 			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
 		} else {

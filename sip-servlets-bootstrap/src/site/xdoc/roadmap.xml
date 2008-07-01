@@ -396,6 +396,13 @@
 									Implement the doBranchResponse callback
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=250">
+									SipSession.setHander() does not work reliably
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>

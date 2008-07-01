@@ -20,7 +20,9 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.naming.Context;
@@ -109,7 +111,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
      */
     protected List<SipServletMapping> sipServletMappings = new ArrayList<SipServletMapping>();
     
-    protected SipApplicationDispatcher sipApplicationDispatcher = null;    
+    protected SipApplicationDispatcher sipApplicationDispatcher = null;
+    
+    protected Map<String, Container> childrenMap;
+    
 	/**
 	 * 
 	 */
@@ -118,6 +123,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		sipApplicationSessionTimeout = DEFAULT_LIFETIME;
 		pipeline.setBasic(new SipStandardContextValve());
 		listeners = new SipListenersHolder();
+		childrenMap = new HashMap<String, Container>();
 	}
 
 	@Override
@@ -431,13 +437,21 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return super.createWrapper();
 	}		
 	
-	
-	public void addChild(SipServletImpl sipServletImpl) {	
+	public void addChild(SipServletImpl sipServletImpl) {
+		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
 		super.addChild(sipServletImpl);
 	}
 	
 	public void removeChild(SipServletImpl sipServletImpl) {
 		super.removeChild(sipServletImpl);
+		childrenMap.remove(sipServletImpl.getName());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Map<String, Container> getChildrenMap() {		
+		return childrenMap;
 	}
 
 	/* (non-Javadoc)

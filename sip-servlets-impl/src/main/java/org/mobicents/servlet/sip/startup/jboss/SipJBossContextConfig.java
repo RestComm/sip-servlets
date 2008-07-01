@@ -83,25 +83,26 @@ public class SipJBossContextConfig extends JBossContextConfig
 			// calling start on the parent to initialize web resources of the web
 			// app if any. That mean that this is a converged application.
 			InputStream webXmlInputStream = servletContext
-					.getResourceAsStream(Constants.ApplicationWebXml);
-			if(logger.isDebugEnabled()) {
-				logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
-			}
+					.getResourceAsStream(Constants.ApplicationWebXml);			
 			context.setWrapperClass(StandardWrapper.class.getName());						
 			if (webXmlInputStream != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
+				}
 				super.start();
-			}				
+			}						
+			
+			context.setWrapperClass(SipServletImpl.class.getName());
 			
 			//annotations scanning
-			SipStandardContext sipctx = (SipStandardContext) context;
-			ClassFileScanner scanner = new ClassFileScanner(sipctx.getJbossBasePath(), sipctx);
+			ClassFileScanner scanner = new ClassFileScanner(((SipStandardContext)context).getJbossBasePath(), (SipContext)context);
 			try {
 				scanner.scan();
 			} catch (AnnotationVerificationException ave) {
 				logger.error("An annotation didn't follow its annotation contract",
 						ave);
 				ok = false;
-			}
+			}					
 			
 			InputStream sipXmlInputStream = servletContext
 					.getResourceAsStream(SipContext.APPLICATION_SIP_XML);
@@ -109,12 +110,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 			if (sipXmlInputStream != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug(SipContext.APPLICATION_SIP_XML + " has been found !");
-				}
-				context.setWrapperClass(SipServletImpl.class.getName());
-
-				scanner.loadParsedDataInServlet(); // This method can be called
-													// only after SipServletImpl
-													// wrapper is set.
+				}								
 				
 				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
 	                    xmlNamespaceAware,
@@ -130,7 +126,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
 				} catch (Throwable e) {
-					logger.error("Impossible to parse the sip deployment descriptor",
+					logger.warn("Impossible to parse the sip deployment descriptor",
 							e);
 					ok = false;
 				}
@@ -139,9 +135,13 @@ public class SipJBossContextConfig extends JBossContextConfig
 				ok = false;
 			}	
 			
-			// Use description from the annotations no matter if sip.xml parsing failed. TODO: making sense?
+			// Use description from the annotations no matter if sip.xml parsing failed.
 			if(scanner.isApplicationParsed()) { 
 				ok = true;
+			}
+			
+			if(!scanner.isApplicationParsed() && sipXmlInputStream != null) {
+				context.setWrapperClass(StandardWrapper.class.getName());
 			}
 			
 			// Make our application available if no problems were encountered
@@ -151,8 +151,8 @@ public class SipJBossContextConfig extends JBossContextConfig
 				}
 				context.setConfigured(true);						
 			} else {
-				logger.warn("contextConfig.unavailable");
-				context.setAvailable(false);
+				logger.warn("sipContextConfig didn't start properly");
+				context.setConfigured(false);
 			}			
 		} else {
 			super.start();

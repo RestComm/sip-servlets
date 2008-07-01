@@ -681,24 +681,21 @@ public class SipSessionImpl implements SipSession {
 		if(!valid) {
 			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
 		}
-		SipContext sipContext = getSipApplicationSession().getSipContext();
-		Container[] containers = sipContext.findChildren();
-		boolean isServletExists = false;
-		int i = 0;
-		while (i < containers.length && !isServletExists) {
-			if(containers[i] instanceof SipServletImpl) {
-				final SipServletImpl sipServletImpl = (SipServletImpl)containers[i];
-				if(sipServletImpl.getServletName().equals(name)) {
-					isServletExists = true;
-				}
-			}
-			i++;
+		if(name.equals(handlerServlet)) {
+			return ;
 		}
-		if(!isServletExists) {
+		SipContext sipContext = getSipApplicationSession().getSipContext();
+		Map<String, Container> childrenMap = sipContext.getChildrenMap();
+		Container container = childrenMap.get(name);
+		
+		if(container == null) {
 			throw new ServletException("the sip servlet with the name "+ name + 
 					" doesn't exist in the sip application " + sipContext.getApplicationName());
-		}
+		}		
 		this.handlerServlet = name;
+		if(logger.isDebugEnabled()) {
+			logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
+		}
 	}
 	
 	/**

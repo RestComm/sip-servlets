@@ -27,7 +27,6 @@ import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
 
-import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -61,8 +60,6 @@ public class ClassFileScanner {
 	private Method sipAppKey = null;
 	
 	private AnnotationsClassLoader classLoader;
-	
-	SipServletImpl parsedServletData = null;
 	
 	public ClassFileScanner(String docbase, SipContext ctx) {
 		this.docbase = docbase;
@@ -104,7 +101,7 @@ public class ClassFileScanner {
 		_scan(new File(this.docbase));
 	}
 	
-    private void _scan(File folder) throws AnnotationVerificationException {
+    private void _scan(File folder) throws AnnotationVerificationException {    	
         File[] files = folder.listFiles();
         if(files != null) {
 	        for(int j = 0; j < files.length; j++) {
@@ -118,7 +115,9 @@ public class ClassFileScanner {
     }
     
     private void analyzeClass(String path) throws AnnotationVerificationException {
-    	
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("analyzing class " + path + " for annotations");
+    	}
     	// TODO: must check if there are extra /// or \\\ or /./ in the path after classes/
     	int classesIndex = path.toLowerCase().lastIndexOf("classes/");
     	if(classesIndex < 0) classesIndex = path.toLowerCase().lastIndexOf("classes\\");
@@ -141,12 +140,22 @@ public class ClassFileScanner {
     }
     
     private void processListenerAnnotation(Class<?> clazz) {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("scanning " + clazz.getCanonicalName() + " for listener annotations");
+    	}
     	SipListener listener = (SipListener) clazz.getAnnotation(SipListener.class);
-    	if(listener != null)
+    	if(listener != null) {
+    		if(logger.isDebugEnabled()) {
+    			logger.debug("the following listener has been found as an annotation " + clazz.getCanonicalName());
+    		}
     		sipContext.addSipApplicationListener(clazz.getCanonicalName());
+    	}
     }
     
     private void processSipApplicationKeyAnnotation(Class<?> clazz) throws AnnotationVerificationException {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("scanning " + clazz.getCanonicalName() + " for sip application key annotation");
+    	}
 		Method[] methods = clazz.getMethods();
 		for(Method method:methods) {
 			if(method.getAnnotation(SipApplicationKey.class)!=null) {
@@ -168,6 +177,9 @@ public class ClassFileScanner {
 						"More than one SipApplicationKey annotated method is not allowed.");
 				}
 				this.sipAppKey = method;
+				if(logger.isDebugEnabled()) {
+	    			logger.debug("the following @SipApplicationKey annotated method has been found " + method.toString());
+	    		}
 				sipContext.setSipApplicationKeyMethod(method);
 			}
 		}    	
@@ -175,11 +187,14 @@ public class ClassFileScanner {
     
     
     private void processServletAnnotation(Class<?> clazz) {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("scanning " + clazz.getCanonicalName() + " for servlet annotations");
+    	}
 		SipServlet servlet = (SipServlet) clazz.getAnnotation(SipServlet.class);
 		if (servlet == null)
 			return;
 		
-		this.parsedServletData = new SipServletImpl();
+		SipServletImpl parsedServletData = (SipServletImpl) sipContext.createWrapper();
 
 		String appName = null;
 		if (servlet.applicationName() == null
@@ -202,7 +217,7 @@ public class ClassFileScanner {
 				
 				if (this.parsedAnnotatedPackage == null) {
 					this.parsedAnnotatedPackage = packageName;
-					parseSipApplication(sipContext, appData, packageName);
+					parseSipApplication(appData, packageName);
 				}
 				appName = sipContext.getName();
 			}
@@ -224,58 +239,46 @@ public class ClassFileScanner {
 				|| sipContext.getMainServlet().equals("")) {
 			sipContext.setMainServlet(name);
 		}
-
+		if(logger.isDebugEnabled()) {
+			logger.debug("the following @SipServlet annotation has been found : ");
+			logger.debug("Name,ServletName,DisplayName : " + name);
+			logger.debug("Description : " + servlet.description());
+			logger.debug("servletClass : " + clazz.getCanonicalName());
+		}
 		parsedServletData.setName(name);
 		parsedServletData.setServletName(name);
 		parsedServletData.setDisplayName(name);
-		parsedServletData.setDescription(name + "description");
+		parsedServletData.setDescription(servlet.description());
 		parsedServletData.setServletClass(clazz.getCanonicalName());
 		parsedServletData.setLoadOnStartup(1);
 		parsedServletData.setParent(sipContext);
+		sipContext.addChild(parsedServletData);
 		this.applicationParsed = true;
 	}
     
-    public void loadParsedDataInServlet() {
-    	if(this.parsedServletData == null)
-    		return; // If no data has been found in the annotations just return
-    	
-    	SipServletImpl from = this.parsedServletData;
-    	Wrapper wrapper = sipContext.createWrapper();
-		if (wrapper instanceof SipServletImpl) {
-			SipServletImpl to = (SipServletImpl) wrapper;
-			to.setName(from.getName());
-			to.setServletName(from.getServletName());
-			to.setDisplayName(from.getDisplayName());
-			to.setDescription(from.getDescription());
-			to.setServletClass(from.getServletClass());
-			to.setLoadOnStartup(from.getLoadOnStartup());
-			to.setParent(sipContext);
-			sipContext.addChild(to);
-		} else {
-			throw new IllegalStateException("Failed loading sip servlet data from annotations.");
-		}
-    }
-    
-    private SipContext parseSipApplication(SipContext context, SipApplication appData, String packageName) {
-    	context.setMainServlet(appData.mainServlet());
-    	context.setProxyTimeout(appData.proxyTimeout());
-    	context.setSessionTimeout(appData.sessionTimeout());
+    private void parseSipApplication(SipApplication appData, String packageName) {
+    	sipContext.setMainServlet(appData.mainServlet());
+    	sipContext.setProxyTimeout(appData.proxyTimeout());
+    	sipContext.setSessionTimeout(appData.sessionTimeout());
     	
     	if(appData.name() == null || appData.name().equals(""))
-    		context.setApplicationName(packageName);
+    		sipContext.setApplicationName(packageName);
     	else
-    		context.setApplicationName(appData.name());
+    		sipContext.setApplicationName(appData.name());
     	
     	if(appData.displayName() == null || appData.displayName().equals(""))
-    		context.setDisplayName(packageName);
+    		sipContext.setDisplayName(packageName);
     	else
-    		context.setDisplayName(appData.displayName());
-    	
-    	context.setDescription(appData.description());
-    	context.setLargeIcon(appData.largeIcon());
-    	context.setSmallIcon(appData.smallIcon());
-    	context.setDistributable(appData.distributable());
-    	return context;
+    		sipContext.setDisplayName(appData.displayName());
+    	if(logger.isDebugEnabled()) {
+			logger.debug("the following @SipApplication annotation has been found : ");
+			logger.debug("ApplicationName : " + sipContext.getApplicationName());
+			logger.debug("MainServlet : " + sipContext.getMainServlet());
+		}
+    	sipContext.setDescription(appData.description());
+    	sipContext.setLargeIcon(appData.largeIcon());
+    	sipContext.setSmallIcon(appData.smallIcon());
+    	sipContext.setDistributable(appData.distributable());
     }
     
     private static SipApplication getApplicationAnnotation(Package pack) {
@@ -288,18 +291,6 @@ public class ClassFileScanner {
     	return null;
     }
     
-    private static void copyParsedProperties(SipContext from, SipContext to) {
-    	to.setMainServlet(from.getMainServlet());
-    	to.setApplicationName(from.getApplicationName());
-    	to.setDisplayName(from.getDisplayName());
-    	to.setDistributable(from.getDistributable());
-    	to.setProxyTimeout(from.getProxyTimeout());
-    	to.setSessionTimeout(from.getSessionTimeout());
-    	to.setSmallIcon(from.getSmallIcon());
-    	to.setLargeIcon(from.getLargeIcon());
-    	to.setDescription(from.getDescription());
-    }
-
     /**
      * Shows if there is SipApplication annotation parsed and thur we dont need to
      * look at sip.xml to seearch descriptor info.

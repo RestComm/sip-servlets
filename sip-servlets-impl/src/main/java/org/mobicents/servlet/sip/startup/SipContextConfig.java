@@ -88,18 +88,19 @@ public class SipContextConfig extends ContextConfig implements
 					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
 				}
 				super.start();
-			}			
+			}						
+			
+			context.setWrapperClass(SipServletImpl.class.getName());
 			
 			//annotations scanning
-			SipStandardContext sipctx = (SipStandardContext) context;
-			ClassFileScanner scanner = new ClassFileScanner(sipctx.getBasePath(), sipctx);
+			ClassFileScanner scanner = new ClassFileScanner(((SipStandardContext)context).getBasePath(), (SipContext)context);
 			try {
 				scanner.scan();
 			} catch (AnnotationVerificationException ave) {
 				logger.error("An annotation didn't follow its annotation contract",
 						ave);
 				ok = false;
-			}
+			}					
 			
 			InputStream sipXmlInputStream = servletContext
 					.getResourceAsStream(SipContext.APPLICATION_SIP_XML);
@@ -107,12 +108,7 @@ public class SipContextConfig extends ContextConfig implements
 			if (sipXmlInputStream != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug(SipContext.APPLICATION_SIP_XML + " has been found !");
-				}
-				context.setWrapperClass(SipServletImpl.class.getName());
-
-				scanner.loadParsedDataInServlet(); // This method can be called
-													// only after SipServletImpl
-													// wrapper is set.
+				}								
 				
 				Digester sipDigester =  DigesterFactory.newDigester(xmlValidation,
 	                    xmlNamespaceAware,
@@ -128,7 +124,7 @@ public class SipContextConfig extends ContextConfig implements
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
 				} catch (Throwable e) {
-					logger.error("Impossible to parse the sip deployment descriptor",
+					logger.warn("Impossible to parse the sip deployment descriptor",
 							e);
 					ok = false;
 				}
@@ -140,6 +136,10 @@ public class SipContextConfig extends ContextConfig implements
 			// Use description from the annotations no matter if sip.xml parsing failed.
 			if(scanner.isApplicationParsed()) { 
 				ok = true;
+			}
+			
+			if(!scanner.isApplicationParsed() && sipXmlInputStream != null) {
+				context.setWrapperClass(StandardWrapper.class.getName());
 			}
 			
 			// Make our application available if no problems were encountered

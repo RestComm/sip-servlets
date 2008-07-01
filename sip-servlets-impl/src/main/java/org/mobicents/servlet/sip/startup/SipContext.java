@@ -18,12 +18,15 @@ package org.mobicents.servlet.sip.startup;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.sip.SipServletRequest;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
@@ -97,4 +100,10 @@ public interface SipContext extends Context {
 	List<SipServletMapping> findSipServletMappings();
 	
 	SipServletMapping findSipServletMappings(SipServletRequest sipServletRequest);
+	
+	Map<String, Container> getChildrenMap();
+	
+	void addChild(SipServletImpl child);
+	
+	void removeChild(SipServletImpl child);
 }
