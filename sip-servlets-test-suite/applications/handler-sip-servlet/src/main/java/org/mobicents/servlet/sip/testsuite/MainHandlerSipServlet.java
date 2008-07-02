@@ -32,7 +32,6 @@ import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.testsuite.dispatcher.MessageSenderUtil;
 
 /**
  * 
