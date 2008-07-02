@@ -409,7 +409,7 @@
 								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=251">
-									SipSession.setHander() does not work reliably
+									6.2.5 The RequestDispatcher Interface
 								</a>
 							</li>
 						</ul>
