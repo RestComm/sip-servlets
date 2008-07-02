@@ -82,17 +82,17 @@
 			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
 	</target>
 	
-	<available file="${ant.file.mobicents.release}/../mobicents-media-server" property="mobicents.media.server.checked.out"/>
+	<available file="${ant.file.mobicents.release}/../mobicents-media-server-core" property="mobicents.media.server.checked.out"/>
 	<target name="get-mobicents-media-server" unless="mobicents.media.server.checked.out">
-        <echo>Checking out Mobicents JAIN-SLEE</echo>
+        <echo>Checking out Mobicents Media Server</echo>
 		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
-            <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mobicents-media-server"/>
+            <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mobicents-media-server-core"/>
         </exec>
 	</target>
 	
 	<target name="build-mobicents-media-server">
         <echo>Building Mobicents Media Server</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mobicents-media-server">
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mobicents-media-server-core">
             <arg line="install -Djboss.home=${base.path}/jboss-${jboss.version}" />
         </exec>
 	</target>
