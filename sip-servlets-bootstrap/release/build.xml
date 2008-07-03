@@ -30,11 +30,11 @@
 		<copy file="${base.path}/webserver-xmbean.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 
 		<exec executable="${mvn.executable}" dir="${base.path}/..">
-			<arg line="clean install -DCATALINA_HOME=${base.path}/../release/apache-tomcat-${tomcat.version}"/>
+			<arg line="clean install -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
 		<exec executable="${mvn.executable}" dir="${base.path}/..">
-			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/../release/jboss-${jboss.version}"/>
+			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
 		</exec>
 
 		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
@@ -48,8 +48,8 @@
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
 		<ant target="deploy-mgmnt">
-            <property name="system.JBOSS_HOME" value="${base.path}/../release/jboss-${jboss.version}"/>
-            <property name="system.GWT_HOME" value="${base.path}/../release/gwt-linux-${gwt.version}"/>
+            <property name="system.JBOSS_HOME" value="${base.path}/jboss-${jboss.version}"/>
+            <property name="system.GWT_HOME" value="${base.path}/gwt-linux-${gwt.version}"/>
         </ant>
 
 		<ant target="deploy-media"/>
@@ -62,10 +62,7 @@
 		<ant target="make-final-zip-tomcat"></ant>
         <ant target="make-src-zip"></ant>
 		
-		<!--
-		<zip destfile="${base.path}/mss-0.3-apache-tomcat-${tomcat.version}.zip" basedir="${base.path}/apache-tomcat-${tomcat.version}"/>
-		<zip destfile="${base.path}/mss-0.3-jboss-${jboss.version}.zip" basedir="${base.path}/jboss-${jboss.version}"/>			
-		-->
+        <ant target="clean"></ant>
 	</target>
 	
 	<target name="deploy-mgmnt">
@@ -146,7 +143,7 @@
 		
 		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
             <property name="system.JBOSS_HOME" value="${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
-            <property name="system.GWT_HOME" value="${base.path}/../release/gwt-linux-${gwt.version}"/>
+            <property name="system.GWT_HOME" value="${base.path}/gwt-linux-${gwt.version}"/>
 		</ant>
 		
 		<copy file="${this.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
@@ -189,9 +186,9 @@
     </target>
 
 	<target name="clean">
-		<delete dir="${tomcat.classes}" />
-		<delete dir="${tomcat.build}" />
-		<delete dir="${tomcat.jars}" />
+		<delete dir="${base.path}/jboss-${jboss.version}" />
+        <delete dir="${base.path}/apache-tomcat-${tomcat.version}" />
+		<delete dir="${base.path}/gwt-linux-${gwt.version}" />
 	</target>
 
 	<!-- Download and dependency building -->
