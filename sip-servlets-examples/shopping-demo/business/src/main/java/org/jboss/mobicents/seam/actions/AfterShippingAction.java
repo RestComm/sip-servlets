@@ -24,9 +24,9 @@ import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.log.Log;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
-import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
+import org.mobicents.mscontrol.impl.MsPeerFactory;
 
 /**
  * An example of a Seam component used to handle a jBPM transition event.

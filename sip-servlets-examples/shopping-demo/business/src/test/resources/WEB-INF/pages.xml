@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://jboss.com/products/seam/pages"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.0.xsd">
+    
+    <page view-id="/dvd.xhtml" 
+        action="#{search.selectFromRequest}" /> 
+    
+    <page view-id="/admin/ship.xhtml"
+        no-conversation-view-id="/admin/admin.xhtml"/>
+    
+    <page view-id="/admin/accept.xhtml"
+        no-conversation-view-id="/admin/admin.xhtml"/>
+    
+    <page view-id="/admin/admin.xhtml">
+        <navigation>
+            <rule if-outcome="ship">
+                <redirect view-id="/admin/ship.xhtml"/>
+            </rule>
+            <rule if-outcome="accept">
+                <redirect view-id="/admin/accept.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    
+    <!-- this action ensures that only admin users can access anything under /admin" -->
+    <page view-id="/admin/*">
+        <restrict>#{s:hasRole('admin')}</restrict>
+    </page>
+    
+    <page view-id="*">    
+        <navigation from-action="#{identity.logout}">
+            <redirect view-id="/home.xhtml"/>
+        </navigation>
+        
+        <navigation from-action="#{identity.login}">
+            <rule if="#{s:hasRole('admin')}">
+                <redirect view-id="/admin/admin.xhtml"/>
+            </rule>
+        </navigation>
+        
+        <navigation>
+            <rule if-outcome="home">
+                <redirect view-id="/home.xhtml"/>
+            </rule>
+            
+            <rule if-outcome="browse">
+                <redirect view-id="/browse.xhtml"/>
+            </rule>
+            
+            <rule if-outcome="checkout">
+                <redirect view-id="/checkout.xhtml"/>
+            </rule>
+            
+            <rule if-outcome="showorders">
+                <redirect view-id="/showorders.xhtml"/>
+            </rule>
+            
+            <rule if-outcome="admin">
+                <redirect view-id="/admin/admin.xhtml"/>
+            </rule>            
+        </navigation>
+    </page>
+    
+    
+    <exception class="org.jboss.seam.security.NotLoggedInException"> 
+        <redirect view-id="/home.xhtml"> 
+            <message>You must be logged in to access administrative pages.</message> 
+        </redirect> 
+    </exception> 
+    
+    <exception class="org.jboss.seam.security.AuthorizationException"> 
+        <redirect view-id="/home.xhtml"> 
+            <message>You are not authorized to access administrative pages.</message> 
+        </redirect> 
+    </exception> 
+    
+</pages>

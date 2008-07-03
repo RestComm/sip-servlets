@@ -52,14 +52,20 @@
 		<!-- Media dependencies -->
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
-			<artifactId>mobicents-server-media-mscontrol</artifactId>
-			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<artifactId>mobicents-media-server-msc-api</artifactId>
+			<version>1.0.0.BETA2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+			<version>1.0.0.BETA2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
-			<artifactId>mobicents-server-media-constants</artifactId>
-			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<artifactId>mobicents-media-server-constants</artifactId>
+			<version>1.0.0.BETA2</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- j2ee dependencies -->

@@ -28,9 +28,57 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>4.7</version>
+			<version>5.8</version>
 			<scope>test</scope>
 			<classifier>jdk15</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.jbpm</groupId>
+			<artifactId>jbpm-jpdl</artifactId>
+			<version>3.2.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>test</scope>
+		</dependency>
+			<dependency>
+			<groupId>org.jboss.seam.embedded</groupId>
+			<artifactId>jboss-embedded-all</artifactId>
+			<version>beta3</version> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam.embedded</groupId>
+			<artifactId>jboss-embedded-api</artifactId>
+			<version>beta3</version> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam.embedded</groupId>
+			<artifactId>hibernate-all</artifactId>
+			<version>beta3</version> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam.embedded</groupId>
+			<artifactId>thirdparty-all</artifactId>
+			<version>beta3</version> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.deployers</groupId>
+			<artifactId>jboss-deployers-client-spi</artifactId>
+			<version>2.0.0.Beta18</version> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.deployers</groupId>
+			<artifactId>jboss-deployers-core-spi</artifactId>
+			<version>2.0.0.Beta18</version> 
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>
@@ -67,7 +115,7 @@
 			<artifactId>jbpm</artifactId>
 			<version>3.1.1</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-ejb_3.0_spec</artifactId>
@@ -89,9 +137,9 @@
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam</artifactId>
-			<version>${jboss-seam.version}</version>
+			<version>2.0.2.GA</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>	
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
@@ -101,14 +149,20 @@
 		<!-- media deps -->
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
-			<artifactId>mobicents-server-media-mscontrol</artifactId>
-			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<artifactId>mobicents-media-server-msc-api</artifactId>
+			<version>1.0.0.BETA2</version>
+			<scope>provided</scope>			
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+			<version>1.0.0.BETA2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
-			<artifactId>mobicents-server-media-constants</artifactId>
-			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<artifactId>mobicents-media-server-constants</artifactId>
+			<version>1.0.0.BETA2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -162,7 +216,72 @@
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
-			</plugin>			
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.4.2</version>				
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+				</configuration>
+			</plugin>
+			<plugin>
+                <!-- This correctly merges the test-classes and classes directories for an EE container -->
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>setupTestClasspath</id>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <tasks>
+                                <echo message="Setting up a single merged test classpath directory" />
+                                <!-- move the originals -->
+                                <mkdir dir="${basedir}/target/tmp" />
+                                <move file="${basedir}/target/classes" todir="${basedir}/target/tmp" />
+                                <move file="${basedir}/target/test-classes" todir="${basedir}/target/tmp" />
+                                <!-- Merge into new directory -->
+                                <copy todir="${basedir}/target/test-classes" overwrite="true">
+                                    <fileset dir="${basedir}/target/tmp/test-classes" />
+                                </copy>                                
+                                <copy todir="${basedir}/target/test-classes" overwrite="false">
+                                    <fileset dir="${basedir}/target/tmp/classes" />
+                                </copy>
+                                <delete file="${basedir}/target/test-classes/META-INF/ejb-jar.xml"/>
+                                <mkdir dir="${basedir}/target/classes" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>restoreTestClasspath</id>
+                        <phase>test</phase>
+                        <configuration>
+                            <tasks>
+                                <echo message="Restoring original classes directories" />
+                                <delete dir="${basedir}/target/classes" />
+                                <move file="${basedir}/target/test-classes" tofile="${basedir}/target/test-classes-MERGED" />
+                                <move file="${basedir}/target/tmp/classes" todir="${basedir}/target" />
+                                <move file="${basedir}/target/tmp/test-classes" todir="${basedir}/target" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>				
 		</plugins>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>			
+			</testResource>
+			<testResource>
+				<directory>src/test/bootstrap</directory>
+			</testResource>
+		</testResources>
 	</build>
 </project>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="shop" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+            <ui:include src="/WEB-INF/incl/searchbox.xhtml" />
+            <ui:include src="/WEB-INF/incl/cart.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <div class="productbox">
+                <f:subview id="dvdimage" rendered="#{dvd.imageURL != null}">
+                    <div class="productimage">
+                        <img src="#{dvd.imageURL}" />
+                    </div>
+                </f:subview>
+                
+                <div class="productinfo">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Title:" />
+                        <h:outputText value="#{dvd.title}" />                 
+                        
+                        <h:outputText value="Price:" />
+                        <h:outputText value="#{dvd.price}" />
+                    </h:panelGrid>
+                </div>
+
+                <div class="cntInfo">
+                    #{dvd.description}
+                </div>
+
+                <div class="productbuttons">
+                    <s:button action="#{search.addToCart}" value="Add to Cart"/>
+                    &#160;
+                    <s:button view="/browse.xhtml" value="Back to Search"/>
+                </div>
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>
+
+
+
+

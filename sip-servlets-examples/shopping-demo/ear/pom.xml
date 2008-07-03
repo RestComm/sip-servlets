@@ -158,11 +158,11 @@
 			<version>1.0</version>
 			<type>jar</type>
 		</dependency>
-		
+				
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
-			<artifactId>mobicents-server-media-mscontrol</artifactId>
-			<version>1.0.0.BETA2-SNAPSHOT</version>
+			<artifactId>mobicents-media-server-msc-api</artifactId>
+			<version>1.0.0.BETA2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.mobicents.servers.media</groupId>
@@ -170,10 +170,17 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.mobicents.servers.media</groupId>
-					<artifactId>mobicents-server-media-constants</artifactId>
+					<artifactId>mobicents-media-server-constants</artifactId>
 				</exclusion>
 			</exclusions>
 			<type>jar</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+			<version>1.0.0.BETA2</version>
+			<scope>provided</scope>
 		</dependency>		
 	</dependencies>
 	<build>
@@ -192,10 +199,16 @@
 					<modules>	
 						<jarModule>
 							<groupId>org.mobicents.servers.media</groupId>
-							<artifactId>mobicents-server-media-mscontrol</artifactId>
+							<artifactId>mobicents-media-server-msc-api</artifactId>
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>			
+						</jarModule>
+						<jarModule>
+							<groupId>org.mobicents.servers.media</groupId>
+							<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+							<bundleDir>APP-INF/lib</bundleDir>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>				
 						<jarModule>
 							<groupId>org.mobicents.external.freetts</groupId>
 							<artifactId>freetts</artifactId>

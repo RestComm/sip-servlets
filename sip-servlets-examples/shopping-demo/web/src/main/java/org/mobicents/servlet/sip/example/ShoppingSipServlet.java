@@ -29,9 +29,9 @@ import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.jboss.mobicents.seam.util.TTSUtils;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
-import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
+import org.mobicents.mscontrol.impl.MsPeerFactory;
 
 /**
  * Sip Servlet handling responses to call initiated due to actions made on the web shopping demo

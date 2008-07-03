@@ -5,6 +5,7 @@
 	<classpathentry kind="src" output="business/target/test-classes" path="business/src/test/java"/>
 	<classpathentry kind="src" output="business/target/classes" path="business/src/main/resources"/>
 	<classpathentry kind="src" output="web/src/main/webapp/WEB-INF/classes" path="web/src/main/java"/>
+	<classpathentry kind="src" output="business/target/test-classes" path="business/src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-core/2.3.0/lucene-core-2.3.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-annotations/3.3.0.ga/hibernate-annotations-3.3.0.ga.jar"/>
@@ -21,13 +22,17 @@
 	<classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-server-media-mscontrol/1.0.0.BETA2-SNAPSHOT/mobicents-server-media-mscontrol-1.0.0.BETA2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/testng/testng/4.7/testng-4.7-jdk15.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-ejb_3.0_spec/1.0/geronimo-ejb_3.0_spec-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate/3.2.4.sp1/hibernate-3.2.4.sp1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.5-SNAPSHOT/sip-servlets-spec-1.1.5-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-server-media-constants/1.0.0.BETA2-SNAPSHOT/mobicents-server-media-constants-1.0.0.BETA2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.BETA2/mobicents-media-server-constants-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.BETA2/mobicents-media-server-msc-api-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.0.BETA2/mobicents-media-server-msc-api-local-impl-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/jboss-embedded-all/beta3/jboss-embedded-all-beta3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/jboss-embedded-api/beta3/jboss-embedded-api-beta3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/thirdparty-all/beta3/thirdparty-all-beta3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
