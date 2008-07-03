@@ -26,7 +26,7 @@
 								${basedir}/${external.modules.basedir}
 							</checkoutDirectory>
 							<connectionUrl>
-								scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/media/core
+								scm:svn:http://mobicents.googlecode.com/svn/tags/mobicents-media-server-core-1.0.0.BETA2
 							</connectionUrl>
 							<username>mobicents-read-only</username>
 							<password></password>

@@ -2,23 +2,14 @@
 <project name="MobicentsSipServlets" default="release" basedir=".">
 	<property environment="sys"/>
 	<property name="this.path" value="${ant.file.MobicentsSipServlets}/../"></property>
-	<property name="base.path" value="${ant.file.MobicentsSipServlets}/../"></property>
+	<property name="base.path" value="${basedir}"></property>
 	<property file="build.properties" />
 
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
 	    <os family="windows"/>
 	</condition>
 	
-	<target name="checks">
-		<fail message="GWT_HOME environment variable is not set. GWT 1.4 is required.">
-			<condition>
-				<not>
-					<isset property="sys.GWT_HOME" />
-				</not>
-			</condition>
-		</fail>
-	</target>
-	<target name="release" depends="checks">
+	<target name="release">
 		<antcall target="extract"/>
 		
 		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${base.path}/apache-tomcat-${tomcat.version}"/>
@@ -56,7 +47,11 @@
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		
-		<ant target="deploy-mgmnt"/>
+		<ant target="deploy-mgmnt">
+            <property name="system.JBOSS_HOME" value="${base.path}/../release/jboss-${jboss.version}"/>
+            <property name="system.GWT_HOME" value="${base.path}/../release/gwt-linux-${gwt.version}"/>
+        </ant>
+
 		<ant target="deploy-media"/>
 
         <delete dir="." includes="mss-${mss.release.version}-*.zip"/>
@@ -74,8 +69,7 @@
 	</target>
 	
 	<target name="deploy-mgmnt">
-		<ant dir="${base.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
-		</ant>
+		<ant dir="${base.path}/../../sip-servlets-management/" antfile="build.xml" target="war" />
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
 			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
@@ -128,7 +122,7 @@
 		</zip>
 	</target>
 	
-	<target name="release-mc-distro" depends="checks">
+	<target name="release-mc-distro" depends="extract-gwt">
 		<echo>Base path: ${this.path}</echo>
 		<mkdir dir="${jboss.dir}/server/default/conf/dars"/>
 		<copy verbose="true" failonerror="true" file="${this.path}/../src/site/resources/click2call-dar.properties" 
@@ -151,7 +145,10 @@
 			tofile="${jboss.dir}/server/default/deploy/click2call.war" />
 		
 		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
+            <property name="system.JBOSS_HOME" value="${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
+            <property name="system.GWT_HOME" value="${base.path}/../release/gwt-linux-${gwt.version}"/>
 		</ant>
+		
 		<copy file="${this.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
 			tofile="${jboss.dir}/server/default/deploy/sip-servlets-management.war"/>
 		
@@ -238,7 +235,7 @@
 		<mkdir dir="${destdir}" />
 		<unzip src="${sourcefile}" dest="${destdir}" />		
 	</target>
-
+	
 	<target name="extract" description="Builds and download dependent components">		
 		<antcall target="extractzip">
 			<param name="sourcefile" value="${tomcat-path}" />			
@@ -247,6 +244,13 @@
 		<antcall target="extractzip">
 			<param name="sourcefile" value="${jboss-path}" />			
 			<param name="destdir" value="${base.path}" />
-		</antcall>		
+		</antcall>
+		<antcall target="extract-gwt" />
 	</target>
+	
+   <target name="extract-gwt" depends="setproxy" >
+       <mkdir dir="${base.path}" />
+       <untar compression="gzip" src="${gwt-path}" dest="${base.path}" />
+    </target>
+	
 </project>
