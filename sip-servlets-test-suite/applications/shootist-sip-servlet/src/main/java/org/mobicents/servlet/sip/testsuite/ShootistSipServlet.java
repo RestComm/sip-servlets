@@ -61,7 +61,7 @@ public class ShootistSipServlet
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {				
-				logger.error(e);
+				logger.error("unexpected exception", e);
 			}
 			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
 			sipServletRequest.send();
