@@ -19,8 +19,6 @@
 
 package org.mobicents.servlet.sip.utils;
 
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Utility functions for IPV6 operations.

@@ -20,11 +20,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipServletRequest;
@@ -171,7 +172,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	//the parser for the properties file
 	private DefaultApplicationRouterParser defaultApplicationRouterParser;
 	//Applications deployed within the container
-	List<String> containerDeployedApplicationNames = null;
+	Set<String> containerDeployedApplicationNames = null;
 	//List of applications defined in the defautl application router properties file
 	Map<String, List<DefaultSipApplicationRouterInfo>> defaultSipApplicationRouterInfos;
 	
@@ -179,7 +180,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 * Default Constructor
 	 */
 	public DefaultApplicationRouter() {
-		containerDeployedApplicationNames = new ArrayList<String>();
+		containerDeployedApplicationNames = new HashSet<String>();
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
 		defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<DefaultSipApplicationRouterInfo>>();
 	}
@@ -244,7 +245,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 					if(log.isDebugEnabled()) {
 						log.debug("Route Modifier : " + defaultSipApplicationRouterInfo.getRouteModifier());
 					}
+					//if application is deployed in the container or if the intention is to route outside even if the application is not deployed
 					if(isApplicationPresentInContainer || !SipRouteModifier.NO_ROUTE.equals(defaultSipApplicationRouterInfo.getRouteModifier())) {
+						//prevents to route to the same application twice in a row
 						if(initialRequest.getSession(false) == null || 
 										!defaultSipApplicationRouterInfo.getApplicationName().equals(
 												initialRequest.getSession(false).getApplicationSession().getApplicationName())) {

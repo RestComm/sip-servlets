@@ -61,14 +61,11 @@ public class SipContextConfig extends ContextConfig implements
 	 * {@inheritDoc}
 	 */
 	public void lifecycleEvent(LifecycleEvent event) {
-		// logger.info("got lifecycle event : " + event.getType());
-		
 		try {
 			super.lifecycleEvent(event);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		// logger.info("lifecycle event handled");
 	}
 
 	@Override

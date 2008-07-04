@@ -145,7 +145,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletRequestImpl sipServletAckRequest = null; 
 		try {
 			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
-			logger.info("ackRequest just created " + ackRequest);
+			if(logger.isInfoEnabled()) {
+				logger.info("ackRequest just created " + ackRequest);
+			}
 			//Application Routing to avoid going through the same app that created the ack
 			ListIterator<RouteHeader> routeHeaders = ackRequest.getHeaders(RouteHeader.NAME);
 			ackRequest.removeHeader(RouteHeader.NAME);
@@ -339,7 +341,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 				sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
 				sipURI.setParameter(SipApplicationDispatcherImpl.FINAL_RESPONSE, "true");
-				sipURI.setParameter(SipApplicationDispatcherImpl.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(session.getSipApplicationSession().getKey().getId()));
+				if(session.getSipApplicationSession().getKey().isAppGeneratedKey()) {
+					sipURI.setParameter(SipApplicationDispatcherImpl.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(session.getSipApplicationSession().getKey().getId()));
+				}
 				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);
@@ -351,7 +355,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			// Update Session state
 			session.updateStateOnResponse(this, false);						
 						
-			logger.info("sending response "+ this.message);
+			if(logger.isInfoEnabled()) {
+				logger.info("sending response "+ this.message);
+			}
 			//if a response is sent for an initial request, it means that the application
 			//acted as an endpoint so a dialog must be created but only for dialog creating method
 			CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);

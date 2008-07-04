@@ -69,55 +69,44 @@ public class RFC2396UrlDecoder {
      * @param   s   <code>String</code> to be translated.
      * @return  the translated <code>String</code>.
      */
-    public static String encode( String s )
-    {
-        final StringBuffer out = new StringBuffer( s.length() );
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream( 32 );
-        final OutputStreamWriter writer = new OutputStreamWriter( buf );
-        for( int i = 0; i < s.length(); i++ )
-        {
-            int c = s.charAt( i );
-            if( charactersDontNeedingEncoding.get( c ) )
-            {
-                out.append( (char)c );
-            }
-            else
-            {
-                try
-                {
-                    writer.write( c );
-                    writer.flush();
-                }
-                catch( IOException e )
-                {
-                    buf.reset();
-                    continue;
-                }
-                byte[] ba = buf.toByteArray();
-                for( int j = 0; j < ba.length; j++ )
-                {
-                    out.append( '%' );
-                    char ch = Character.forDigit( ( ba[ j ] >> 4 ) & 0xF, 16 );
-                    // converting to use uppercase letter as part of
-                    // the hex value if ch is a letter.
-                    if( Character.isLetter( ch ) )
-                    {
-                        ch -= characterCaseDiff;
-                    }
-                    out.append( ch );
-                    ch = Character.forDigit( ba[ j ] & 0xF, 16 );
-                    if( Character.isLetter( ch ) )
-                    {
-                        ch -= characterCaseDiff;
-                    }
-                    out.append( ch );
-                }
-                buf.reset();
-            }
-        }
+    public static String encode(String s) {
+		final StringBuffer out = new StringBuffer(s.length());
+		final ByteArrayOutputStream buf = new ByteArrayOutputStream(32);
+		final OutputStreamWriter writer = new OutputStreamWriter(buf);
+		for (int i = 0; i < s.length(); i++) {
+			int c = s.charAt(i);
+			if (charactersDontNeedingEncoding.get(c)) {
+				out.append((char) c);
+			} else {
+				try {
+					writer.write(c);
+					writer.flush();
+				} catch (IOException e) {
+					buf.reset();
+					continue;
+				}
+				byte[] ba = buf.toByteArray();
+				for (int j = 0; j < ba.length; j++) {
+					out.append('%');
+					char ch = Character.forDigit((ba[j] >> 4) & 0xF, 16);
+					// converting to use uppercase letter as part of
+					// the hex value if ch is a letter.
+					if (Character.isLetter(ch)) {
+						ch -= characterCaseDiff;
+					}
+					out.append(ch);
+					ch = Character.forDigit(ba[j] & 0xF, 16);
+					if (Character.isLetter(ch)) {
+						ch -= characterCaseDiff;
+					}
+					out.append(ch);
+				}
+				buf.reset();
+			}
+		}
 
-        return out.toString();
-    }
+		return out.toString();
+	}
 
 	
     /**

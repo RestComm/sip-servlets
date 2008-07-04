@@ -740,7 +740,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// Create the contact name address.
 					contactHeader = 
 						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), transport, fromName);										
-					
 					request.addHeader(contactHeader);
 				}
 				
@@ -815,13 +814,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
-					|| getDialog().getState() == DialogState.EARLY) {				
-				logger.info("Sending the request " + request);
+					|| getDialog().getState() == DialogState.EARLY) {
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending the request " + request);
+				}
 				((ClientTransaction) super.getTransaction()).sendRequest();
 			} else {
 				// This is a subsequent (an in-dialog) request. 
 				// we don't redirect it to the container for now
-				logger.info("Sending the in dialog request " + request);
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending the in dialog request " + request);
+				}
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}			
 //			super.session.addOngoingTransaction(getTransaction());
@@ -924,12 +927,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			AuthInfo authInfo) {
 		AuthInfoImpl authInfoImpl = (AuthInfoImpl) authInfo;
 		
-		SipServletResponseImpl response = 
+		SipServletResponseImpl challengeResponseImpl = 
 			(SipServletResponseImpl) challengeResponse;
 		
+		Response response = (Response) challengeResponseImpl.getMessage();
 		// First check for WWWAuthentication headers
 		ListIterator authHeaderIterator = 
-			response.getMessage().getHeaders(WWWAuthenticateHeader.NAME);
+			response.getHeaders(WWWAuthenticateHeader.NAME);
 		while(authHeaderIterator.hasNext()) {
 			WWWAuthenticateHeader wwwAuthHeader = 
 				(WWWAuthenticateHeader) authHeaderIterator.next();
@@ -947,7 +951,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		
 		// Now check for Proxy-Authentication
 		authHeaderIterator = 
-			response.getMessage().getHeaders(ProxyAuthenticateHeader.NAME);
+			response.getHeaders(ProxyAuthenticateHeader.NAME);
 		while(authHeaderIterator.hasNext()) {
 			ProxyAuthenticateHeader wwwAuthHeader = 
 				(ProxyAuthenticateHeader) authHeaderIterator.next();
@@ -971,11 +975,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
 			String username, String password) {
-		SipServletResponseImpl response = 
+		SipServletResponseImpl challengeResponseImpl = 
 			(SipServletResponseImpl) challengeResponse;
 		
+		Response response = (Response) challengeResponseImpl.getMessage();
 		ListIterator authHeaderIterator = 
-			response.getMessage().getHeaders(WWWAuthenticateHeader.NAME);
+			response.getHeaders(WWWAuthenticateHeader.NAME);
 		
 		// First
 		while(authHeaderIterator.hasNext()) {
@@ -987,7 +992,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		
 		
 		authHeaderIterator = 
-			response.getMessage().getHeaders(ProxyAuthenticateHeader.NAME);
+			response.getHeaders(ProxyAuthenticateHeader.NAME);
 		
 		while(authHeaderIterator.hasNext()) {
 			ProxyAuthenticateHeader wwwAuthHeader = 
@@ -1011,7 +1016,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				username,
 				password);
 		
-		this.getMessage().addHeader(authorization);
+		message.addHeader(authorization);
 	}
 
 	/**

@@ -221,7 +221,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		//and initializes it if present
 		String sipApplicationRouterProviderClassName = System.getProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider");
 		if(sipApplicationRouterProviderClassName != null && sipApplicationRouterProviderClassName.length() > 0) {
-			logger.info("Using the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property to load the application router provider");
+			if(logger.isInfoEnabled()) {
+				logger.info("Using the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property to load the application router provider");
+			}
 			try {
 				sipApplicationRouter = (SipApplicationRouter)
 					Class.forName(sipApplicationRouterProviderClassName).newInstance();
@@ -235,7 +237,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
 			}		
 		} else {
-			logger.info("Using the Service Provider Framework to load the application router provider");
+			if(logger.isInfoEnabled()) {
+				logger.info("Using the Service Provider Framework to load the application router provider");
+			}
 			Iterator<SipApplicationRouterProvider> providers = Service.providers(SipApplicationRouterProvider.class);
 			if(providers.hasNext()) {
 				sipApplicationRouter = providers.next().getSipApplicationRouter();
@@ -246,7 +250,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					"No jar compliant with JSR 289 Section Section 15.4.2 could be found on the classpath " +
 					"and no javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property set");
 		}
-		logger.info("Using the following Application Router : " + sipApplicationRouter.getClass().getName());
+		if(logger.isInfoEnabled()) {
+			logger.info("Using the following Application Router : " + sipApplicationRouter.getClass().getName());
+		}
 		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));
 		
 		if( oname == null ) {
@@ -254,7 +260,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
                 oname=new ObjectName(domain + ":type=SipApplicationDispatcher");                
                 Registry.getRegistry(null, null)
                     .registerComponent(this, oname, null);
-                logger.info("Sip Application dispatcher registered under following name " + oname);
+                if(logger.isInfoEnabled()) {
+                	logger.info("Sip Application dispatcher registered under following name " + oname);
+                }
             } catch (Exception e) {
                 logger.error("Impossible to register the Sip Application dispatcher in domain" + domain, e);
             }
@@ -374,7 +382,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				notifySipServletsListeners(sipApplication);
 			}
 		}
-		logger.info("the following sip servlet application has been added : " + sipApplicationName);
+		if(logger.isInfoEnabled()) {
+			logger.info("the following sip servlet application has been added : " + sipApplicationName);
+		}
 	}
 	/**
 	 * {@inheritDoc}
@@ -385,7 +395,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		applicationsUndeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
 		((SipManager)sipContext.getManager()).removeAllSessions();
-		logger.info("the following sip servlet application has been removed : " + sipApplicationName);
+		if(logger.isInfoEnabled()) {
+			logger.info("the following sip servlet application has been removed : " + sipApplicationName);
+		}
 		return sipContext;
 	}
 	
@@ -395,7 +407,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
 		// TODO FIXME
-		logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
+		if(logger.isInfoEnabled()) {
+			logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
+		}
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 		SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
@@ -426,7 +440,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
 		Request request = requestEvent.getRequest();
 		try {
-			logger.info("Got a request event "  + request.toString());			
+			if(logger.isInfoEnabled()) {
+				logger.info("Got a request event "  + request.toString());
+			}
 			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
@@ -442,9 +458,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					// Already processed this request so just return.
 					return;				
 				} 
-			} 					
-			logger.info("ServerTx ref "  + transaction);
-			logger.info("Dialog ref "  + requestEvent.getDialog());			
+			} 	
+			if(logger.isInfoEnabled()) {
+				logger.info("ServerTx ref "  + transaction);
+				logger.info("Dialog ref "  + requestEvent.getDialog());
+			}
 			
 			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 						request,
@@ -464,14 +482,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
 			}							
-						
-			logger.info("Routing State " + sipServletRequest.getRoutingState());			
+			if(logger.isInfoEnabled()) {
+				logger.info("Routing State " + sipServletRequest.getRoutingState());
+			}
 										
 			if(sipServletRequest.isInitial()) {
-				logger.info("Routing of Initial Request " + request);
+				if(logger.isInfoEnabled()) {
+					logger.info("Routing of Initial Request " + request);
+				}
 				routeInitialRequest(sipProvider, sipServletRequest);							
 			} else {
-				logger.info("Routing of Subsequent Request " + request);							
+				if(logger.isInfoEnabled()) {
+					logger.info("Routing of Subsequent Request " + request);
+				}
 				if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
 					routeCancel(sipProvider, sipServletRequest);
 				} else {
@@ -593,15 +616,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				appData.setTransaction(serverTransaction);
 				ctx.setApplicationData(appData);				
 				//keeping the client transaction in the server transaction's application data
-				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);											
-				logger.info("Sending the request through a new client transaction " + clonedRequest);
+				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending the request through a new client transaction " + clonedRequest);
+				}
 				ctx.sendRequest();												
 			} else {
-				logger.info("Sending the request through the existing transaction " + clonedRequest);
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending the request through the existing transaction " + clonedRequest);
+				}
 				((ClientTransaction)transaction).sendRequest();
 			}
 		} else if ( clonedRequest.getMethod().equals("ACK") ) {
-			logger.info("Sending the ACK through the dialog " + clonedRequest);
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending the ACK through the dialog " + clonedRequest);
+			}
             dialog.sendAck(clonedRequest);
 		} else {
 			Request dialogRequest=
@@ -658,7 +687,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			//keeping the client transaction in the server transaction's application data
 			((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(clientTransaction);
 			dialog.setApplicationData(appData);
-			logger.info("Sending the request through the dialog " + clonedRequest);
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending the request through the dialog " + clonedRequest);
+			}
             dialog.sendRequest(clientTransaction);	        
 		}
 	}
@@ -735,7 +766,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			return false;
 		}
 		
-		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, sipServletRequest.getMessage(), inverted);
+		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
 		SipSessionImpl sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		
 		// Added by Vladimir because the inversion detection on proxied requests doesn't work
@@ -744,7 +775,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
 			}
-			key = SessionManagerUtil.getSipSessionKey(applicationName, sipServletRequest.getMessage(), !inverted);
+			key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
 			sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		}
 		
@@ -810,8 +841,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} 
 		else {					
 			if(finalResponse != null && finalResponse.length() > 0) {
-				logger.info("Subsequent Request reached the servlet application " +
+				if(logger.isInfoEnabled()) {
+					logger.info("Subsequent Request reached the servlet application " +
 						"that sent a final response, stop routing the subsequent request " + request.toString());
+				}
 				return false;
 			}
 			// Check if the request is meant for me. 
@@ -822,8 +855,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// FIXME send it statefully
 				if(dialog == null && transaction == null) {
 					try{
-						sipProvider.sendRequest((Request)request.clone());						
-						logger.info("Subsequent Request dispatched outside the container" + request.toString());
+						sipProvider.sendRequest((Request)request.clone());
+						if(logger.isInfoEnabled()) {
+							logger.info("Subsequent Request dispatched outside the container" + request.toString());
+						}
 					} catch (Exception ex) {			
 						throw new IllegalStateException("Error sending request",ex);
 					}	
@@ -1044,7 +1079,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
 			}
 			
-			Request clonedRequest = (Request) sipServletRequest.getMessage().clone();			
+			Request clonedRequest = (Request) request.clone();			
             // Branch Id will be assigned by the stack.
 			String transport = JainSipUtils.findTransport(clonedRequest);		
 			ViaHeader viaHeader = JainSipUtils.createViaHeader(
@@ -1127,7 +1162,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Request request = (Request) sipServletRequest.getMessage();
 		
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
-		logger.info("popped route : " + poppedAddress);
+		if(logger.isInfoEnabled()) {
+			logger.info("popped route : " + poppedAddress);
+		}
 		//set directive from popped route header if it is present			
 		Serializable stateInfo = null;
 		SipApplicationRoutingDirective sipApplicationRoutingDirective = SipApplicationRoutingDirective.NEW;;
@@ -1136,22 +1173,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			// that is has been routed back to the container			
 			String directive = poppedAddress.getParameter(ROUTE_PARAM_DIRECTIVE);
 			if(directive != null && directive.length() > 0) {
-				logger.info("directive before the request has been routed back to container : " + directive);
+				if(logger.isInfoEnabled()) {
+					logger.info("directive before the request has been routed back to container : " + directive);
+				}
 				sipApplicationRoutingDirective = SipApplicationRoutingDirective.valueOf(
 						SipApplicationRoutingDirective.class, directive);
 				String previousAppName = poppedAddress.getParameter(ROUTE_PARAM_PREV_APPLICATION_NAME);
-				logger.info("application name before the request has been routed back to container : " + previousAppName);
+				if(logger.isInfoEnabled()) {
+					logger.info("application name before the request has been routed back to container : " + previousAppName);
+				}
 				SipContext sipContext = applicationDeployed.get(previousAppName);				
 				SipSessionKey sipSessionKey = SessionManagerUtil.getSipSessionKey(previousAppName, request, false);
 				SipSessionImpl sipSession = ((SipManager)sipContext.getManager()).getSipSession(sipSessionKey, false, sipFactoryImpl, null);
 				stateInfo = sipSession.getStateInfo();
 				sipServletRequest.setSipSession(sipSession);
-				logger.info("state info before the request has been routed back to container : " + stateInfo);
+				if(logger.isInfoEnabled()) {
+					logger.info("state info before the request has been routed back to container : " + stateInfo);
+				}
 			}
 		} else if(sipServletRequest.getSipSession() != null) {
 			stateInfo = sipServletRequest.getSipSession().getStateInfo();
 			sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
-			logger.info("previous state info : " + stateInfo);
+			if(logger.isInfoEnabled()) {
+				logger.info("previous state info : " + stateInfo);
+			}
 		}
 		
 		// 15.4.1 Routing an Initial request Algorithm
@@ -1215,12 +1260,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						// send the request externally
 						for (int i = route.length-1 ; i >= 0; i--) {
 							Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, route[i]);
-							sipServletRequest.getMessage().addHeader(routeHeader);
+							request.addHeader(routeHeader);
 						}
 						if(logger.isDebugEnabled()) {
 							logger.debug("Routing the request externally " + sipServletRequest );
 						}
-						((Request)sipServletRequest.getMessage()).setRequestURI(SipFactories.addressFactory.createURI(route[0]));
+						request.setRequestURI(SipFactories.addressFactory.createURI(route[0]));
 						forwardStatefully(sipServletRequest, null, sipRouteModifier);
 						return false;
 					} else {
@@ -1243,12 +1288,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					SipURI sipURI = getOutboundInterfaces().get(0);
 					sipURI.setParameter("modifier", "route_back");
 					Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
-					sipServletRequest.getMessage().addHeader(routeHeader);
+					request.addHeader(routeHeader);
 					// push all of the routes on the Route header stack of the request and 
 					// send the request externally
 					for (int i = route.length-1 ; i >= 0; i--) {
 						routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, route[i]);
-						sipServletRequest.getMessage().addHeader(routeHeader);
+						request.addHeader(routeHeader);
 					}
 					if(logger.isDebugEnabled()) {
 						logger.debug("Routing the request externally " + sipServletRequest );
@@ -1259,7 +1304,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		// 15.4.1 Procedure : point 3
 		if(applicationRouterInfo.getNextApplicationName() == null) {
-			logger.info("Dispatching the request event outside the container");
+			if(logger.isInfoEnabled()) {
+				logger.info("Dispatching the request event outside the container");
+			}
 			//check if the request point to another domain
 			if(request.getRequestURI() instanceof TelURL) {
 				logger.error("cannot dispatch a request with a tel url request uri outside the container ");
@@ -1283,7 +1330,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				return false;
 			}
 		} else {
-			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
+			if(logger.isInfoEnabled()) {
+				logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
+			}
 			sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
 			SipContext sipContext = applicationDeployed.get(applicationRouterInfo.getNextApplicationName());
 			// follow the procedures of Chapter 16 to select a servlet from the application.									
@@ -1360,7 +1409,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			try {
 				callServlet(sipServletRequest);
-				logger.info("Request event dispatched to " + sipContext.getApplicationName());				
+				if(logger.isInfoEnabled()) {
+					logger.info("Request event dispatched to " + sipContext.getApplicationName());
+				}
 			} catch (ServletException e) {				
 				logger.error("An unexpected servlet exception occured while routing an initial request", e);
 				// Sends a 500 Internal server error and stops processing.				
@@ -1523,7 +1574,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
-		logger.info("Response " + responseEvent.getResponse().toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Response " + responseEvent.getResponse().toString());
+		}
 		Response response = responseEvent.getResponse();
 		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		//if this is a response to a cancel, the response is dropped
@@ -1609,7 +1662,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Response response = responseEvent.getResponse();
 		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
 		ViaHeader viaHeader = viaHeaders.next();
-		logger.info("viaHeader = " + viaHeader.toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("viaHeader = " + viaHeader.toString());
+		}
 		//response meant for the container
 		if(!isViaHeaderExternal(viaHeader)) {
 			ClientTransaction clientTransaction = responseEvent.getClientTransaction();
@@ -1673,7 +1728,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					sipManager.dumpSipSessions();
 				}
 			}	
-			logger.info("route response on following session " + sessionKey);
+			if(logger.isInfoEnabled()) {
+				logger.info("route response on following session " + sessionKey);
+			}
 			
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
@@ -1738,9 +1795,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
 		SipSessionImpl session = request.getSipSession();
-		logger.info("Dispatching request " + request.toString() + 
+		if(logger.isInfoEnabled()) {
+			logger.info("Dispatching request " + request.toString() + 
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
+		}
 		String sessionHandler = session.getHandler();
 		SipApplicationSessionImpl sipApplicationSessionImpl = session.getSipApplicationSession();
 		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
@@ -1764,9 +1823,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
 		SipSessionImpl session = response.getSipSession();
-		logger.info("Dispatching response " + response.toString() + 
+		if(logger.isInfoEnabled()) {
+			logger.info("Dispatching response " + response.toString() + 
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
+		}
 		
 		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 		Wrapper sipServletImpl = (Wrapper) container;
@@ -1801,9 +1862,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void processTimeout(TimeoutEvent timeoutEvent) {
 		// TODO: FIX ME
 		if(timeoutEvent.isServerTransaction()) {
-			logger.info("timeout => " + timeoutEvent.getServerTransaction().getRequest().toString());
+			if(logger.isInfoEnabled()) {
+				logger.info("timeout => " + timeoutEvent.getServerTransaction().getRequest().toString());
+			}
 		} else {
-			logger.info("timeout => " + timeoutEvent.getClientTransaction().getRequest().toString());
+			if(logger.isInfoEnabled()) {
+				logger.info("timeout => " + timeoutEvent.getClientTransaction().getRequest().toString());
+			}
 		}
 		
 		Transaction transaction = null;
@@ -1848,12 +1913,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			transaction = transactionTerminatedEvent.getClientTransaction();
 		}
-		logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());		
+		if(logger.isInfoEnabled()) {
+			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
+		}
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
 		SipSessionImpl sipSessionImpl = tad.getSipServletMessage().getSipSession();
 		if(sipSessionImpl == null) {
-			logger.info("no app were returned for this transaction " + transaction);
+			if(logger.isInfoEnabled()) {
+				logger.info("no app were returned for this transaction " + transaction);
+			}
 		} else {
 			sipSessionImpl.removeOngoingTransaction(transaction);
 		}
@@ -1957,13 +2026,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			routingRegion = sipServletRequest.getSipSession().getRegion();
 			stateInfo =sipServletRequest.getSipSession().getStateInfo(); 
 		}
+		Request request = (Request) sipServletRequest.getMessage();
 		
+		SipServletRequestReadOnly sipServletRequestReadOnly = new SipServletRequestReadOnly(sipServletRequest);
 		SipApplicationRouterInfo applicationRouterInfo = sipApplicationRouter.getNextApplication(
-			sipServletRequest, 
+			sipServletRequestReadOnly, 
 			routingRegion, 
 			sipServletRequest.getRoutingDirective(), 
 			null,
 			stateInfo);
+		sipServletRequestReadOnly = null;
 		// 15.4.1 Procedure : point 2
 		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 		String[] routes = applicationRouterInfo.getRoutes();		
@@ -1981,7 +2053,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					// send the request externally
 					for (int i = routes.length-1 ; i >= 0; i--) {
 						Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
-						sipServletRequest.getMessage().addHeader(routeHeader);
+						request.addHeader(routeHeader);
 					}				
 				}
 			} else if (SipRouteModifier.ROUTE_BACK.equals(sipRouteModifier)) {
@@ -1989,12 +2061,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				SipURI sipURI = getOutboundInterfaces().get(0);
 				sipURI.setParameter("modifier", "route_back");
 				Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
-				sipServletRequest.getMessage().addHeader(routeHeader);
+				request.addHeader(routeHeader);
 				// push all of the routes on the Route header stack of the request and 
 				// send the request externally
 				for (int i = routes.length-1 ; i >= 0; i--) {
 					routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
-					sipServletRequest.getMessage().addHeader(routeHeader);
+					request.addHeader(routeHeader);
 				}
 			}
 		} catch (ParseException e) {

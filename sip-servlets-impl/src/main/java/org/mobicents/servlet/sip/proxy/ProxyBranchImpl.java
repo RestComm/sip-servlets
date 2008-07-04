@@ -208,8 +208,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		// If the proxy is not adding record-route header, set it to null and it
 		// will be ignored in the Proxying
-		if(proxy.getRecordRoute())
-			recordRoute = getRecordRouteURI();
+		if(proxy.getRecordRoute()) {
+			recordRoute = recordRouteURI;
+		}
 						
 		Request cloned = this.proxyUtils.createProxiedRequest(
 				originalRequest,

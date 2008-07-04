@@ -264,7 +264,7 @@ public class SipSessionImpl implements SipSession {
 				//Issue 112 fix by folsson
 				methodRequest.removeHeader(ViaHeader.NAME);
 				
-				//if a SUBSCRIBE is sent for exemple, it will reuse the prexisiting dialog
+				//if a SUBSCRIBE or BYE is sent for exemple, it will reuse the prexisiting dialog
 				sipServletRequest = new SipServletRequestImpl(
 						methodRequest, this.sipFactory, this, null, sessionCreatingDialog,
 						false);
@@ -336,14 +336,15 @@ public class SipSessionImpl implements SipSession {
 		//removing the route headers and adding them back again except the one
 		//corresponding to the app that is creating the subsequent request
 		//avoid going through the same app that created the subsequent request
-		final ListIterator<RouteHeader> routeHeaders = sipServletRequest.getMessage().getHeaders(RouteHeader.NAME);
-		sipServletRequest.getMessage().removeHeader(RouteHeader.NAME);
+		Request request = (Request) sipServletRequest.getMessage();
+		final ListIterator<RouteHeader> routeHeaders = request.getHeaders(RouteHeader.NAME);
+		request.removeHeader(RouteHeader.NAME);
 		while (routeHeaders.hasNext()) {
 			RouteHeader routeHeader = routeHeaders.next();
 			String routeAppName = ((javax.sip.address.SipURI)routeHeader .getAddress().getURI()).
 				getParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME);
 			if(routeAppName == null || !routeAppName.equals(getKey().getApplicationName())) {
-				sipServletRequest.getMessage().addHeader(routeHeader);
+				request.addHeader(routeHeader);
 			}
 		}
 		return sipServletRequest;

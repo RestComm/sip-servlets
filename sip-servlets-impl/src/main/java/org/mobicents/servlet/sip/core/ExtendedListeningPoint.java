@@ -20,15 +20,22 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
+import javax.sip.header.ContactHeader;
+import javax.sip.header.ViaHeader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 
 /**
  * @author <A HREF="mailto:jean.deruellimport javax.sip.SipProvider;
@@ -46,6 +53,10 @@ public class ExtendedListeningPoint {
 	private int globalPort;
 	private List<String> ipAddresses;
 	private boolean isAnyLocalAddress;
+	
+	String host = null;
+	int port = -1;
+	String transport;
 
 	/**
 	 * 
@@ -79,10 +90,93 @@ public class ExtendedListeningPoint {
 			}
 		} else {
 			ipAddresses.add(listeningPoint.getIPAddress());
-		}
+		}		 
 		
+		initializeHostPortTransport();
 	}
 
+	/**
+	 *
+	 */
+	private void initializeHostPortTransport() {
+		// Making use of the global ip address discovered by STUN if it is present
+		if(globalIpAddress != null) {
+			host = globalIpAddress;
+//			port = listeningPoint.getGlobalPort();
+			port = listeningPoint.getPort();
+		} else {
+			host = JainSipUtils.getMostOutboundAddress(ipAddresses);
+			port = listeningPoint.getPort();
+		}
+		transport = listeningPoint.getTransport();
+	}
+
+	/**
+	 * 
+	 * @param sipNetworkInterfaceManager
+	 * @param transport
+	 * @return
+	 */
+	public ContactHeader createContactHeader(String displayName) {
+		try {
+			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
+			sipURI.setHost(host);
+			sipURI.setPort(port);			
+			sipURI.setTransportParam(transport);
+			javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);			
+			ContactHeader contact = SipFactories.headerFactory.createContactHeader(contactAddress);
+		
+			if(displayName != null && displayName.length() > 0) {
+				contactAddress.setDisplayName(displayName);
+			}
+			
+			return contact;
+		} catch (ParseException ex) {
+        	logger.error ("Unexpected error while creating the contact header for the extended listening point",ex);
+            throw new IllegalArgumentException("Unexpected exception when creating a sip URI", ex);
+        }
+	}
+
+	/**
+	 * 
+	 * @param sipNetworkInterfaceManager
+	 * @param transport
+	 * @param branch
+	 * @return
+	 */
+	public ViaHeader createViaHeader(String branch) {
+        try {
+            ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, branch);
+            
+            return via;
+        } catch (ParseException ex) {
+        	logger.error ("Unexpected error while creating a via header",ex);
+            throw new IllegalArgumentException("Unexpected exception when creating via header ", ex);
+        } catch (InvalidArgumentException e) {
+        	logger.error ("Unexpected error while creating a via header",e);
+            throw new IllegalArgumentException("Unexpected exception when creating via header ", e);
+		}
+    }
+	
+	/**
+	 * 
+	 * @param sipProviders
+	 * @param transport
+	 * @return
+	 */
+	public javax.sip.address.SipURI createRecordRouteURI() {		
+		try {			
+			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
+			sipUri.setPort(port);
+			sipUri.setTransportParam(transport);
+			// Do we want to add an ID here?
+			return sipUri;
+		} catch (ParseException ex) {
+        	logger.error ("Unexpected error while creating a record route URI",ex);
+            throw new IllegalArgumentException("Unexpected exception when creating a record route URI", ex);
+        }	
+	}
+	
 	/**
 	 * Retrieve the jain sip listening point being extended by this class
 	 * @return the jain sip listening point being extended by this class
@@ -125,6 +219,7 @@ public class ExtendedListeningPoint {
 	 */
 	public void setGlobalIpAddress(String globalIpAddress) {
 		this.globalIpAddress = globalIpAddress;
+		initializeHostPortTransport();
 	}
 	
 	/**
@@ -152,7 +247,7 @@ public class ExtendedListeningPoint {
 		stringBuilder = stringBuilder.append(", port=")
 		.append(listeningPoint.getPort())
 		.append(", transport=")
-		.append(listeningPoint.getTransport())
+		.append(transport)
 		.append(", globalIpAddress=")
 		.append(globalIpAddress)
 		.append(", gloablPort=")
@@ -174,7 +269,7 @@ public class ExtendedListeningPoint {
 	 * @return port associated with this listening point
 	 */
 	public int getPort() {
-		return listeningPoint.getPort();
+		return port;
 	}
 
 	/**
@@ -182,7 +277,7 @@ public class ExtendedListeningPoint {
 	 * @return the transport associated with this listening point
 	 */
 	public String getTransport() {
-		return listeningPoint.getTransport();
+		return transport;
 	}
 	
 	/**

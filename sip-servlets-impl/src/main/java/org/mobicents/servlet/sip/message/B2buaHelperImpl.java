@@ -199,9 +199,10 @@ public class B2buaHelperImpl implements B2buaHelper {
 			Request newRequest = dialog.createRequest(origRequest.getMethod());
 									
 			SipSessionImpl originalSession = origRequestImpl.getSipSession();
-
-			logger.info(origRequest.getSession());				
-			logger.info(session);
+			if(logger.isInfoEnabled()) {
+				logger.info(origRequest.getSession());				
+				logger.info(session);
+			}
 			
 			//For non-REGISTER requests, the Contact header field is not copied 
 			//but is populated by the container as usual

@@ -46,8 +46,6 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
  * @author Jean Deruelle
  */
 public class JainSipUtils {
-	//TODO since listening points don't change often, use a cache system
-	//or hashmap with correct keys to improve performance
 	
 	/**
      * The maximum int value that could correspond to a port nubmer.
@@ -94,7 +92,7 @@ public class JainSipUtils {
 		if(address.indexOf(".")>0) return 4; // match IPv4 addresses heuristically
 		return -1; // matches IPv6 or something malformed;
 	}
-	private static String getMostOutboundAddress(List<String> addresses) {
+	public static String getMostOutboundAddress(List<String> addresses) {
 		// getIpAddresses() returns [0:0:0:0:0:0:0:1, 127.0.0.1, 2001:0:d5c7:a2ca:3065:1735:3f57:fe71, fe80:0:0:0:3065:1735:3f57:fe71%15, 192.168.1.142, fe80:0:0:0:0:5efe:c0a8:18e%21]
 		// IPv6 addresses are not good for default value
 		String bestAddr = "127.0.0.1"; // The default is something completely fails
@@ -121,31 +119,7 @@ public class JainSipUtils {
 		
 		ExtendedListeningPoint listeningPoint = 
 			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
-		// Making use of the global ip address discovered by STUN if it is present
-		String host = null;
-		int port = -1;
-		String globalIpAddress = listeningPoint.getGlobalIpAddress();
-		if(globalIpAddress != null) {
-			host = globalIpAddress;
-//			port = listeningPoint.getGlobalPort();
-			port = listeningPoint.getPort();
-		} else {
-			
-			host = getMostOutboundAddress(listeningPoint.getIpAddresses());
-			port = listeningPoint.getPort();
-		}
-	 		 	
-        try {
-            ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, branch);
-          
-            return via;
-        } catch (ParseException ex) {
-        	logger.error ("Unexpected error while creating a via header",ex);
-            throw new IllegalArgumentException("Unexpected exception when creating via header ", ex);
-        } catch (InvalidArgumentException e) {
-        	logger.error ("Unexpected error while creating a via header",e);
-            throw new IllegalArgumentException("Unexpected exception when creating via header ", e);
-		}
+		return listeningPoint.createViaHeader(branch);		
     }
 	 
 	/**
@@ -158,36 +132,7 @@ public class JainSipUtils {
 		
 		ExtendedListeningPoint listeningPoint = 
 			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);						
-		
-		// Making use of the global ip address discovered by STUN if it is present
-		String host = null;
-		int port = -1;
-		String globalIpAddress = listeningPoint.getGlobalIpAddress();
-		if(globalIpAddress != null) {
-			host = globalIpAddress;
-//			port = listeningPoint.getGlobalPort();
-			port = listeningPoint.getPort();
-		} else {
-			host = getMostOutboundAddress(listeningPoint.getIpAddresses());
-			port = listeningPoint.getPort();
-		}
-		
-		try {
-			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
-			sipURI.setHost(host);
-			sipURI.setPort(port);			
-			sipURI.setTransportParam(transport);
-			javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
-			if(displayName != null && displayName.length() > 0) {
-				contactAddress.setDisplayName(displayName);
-			}
-			ContactHeader contact = SipFactories.headerFactory.createContactHeader(contactAddress);
-		
-			return contact;
-		} catch (ParseException ex) {
-        	logger.error ("Unexpected error while creating a sip URI",ex);
-            throw new IllegalArgumentException("Unexpected exception when creating a sip URI", ex);
-        }
+		return listeningPoint.createContactHeader(displayName);
 	}
 
 	/**
@@ -198,23 +143,7 @@ public class JainSipUtils {
 	 */
 	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport) {		
 		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);							
-		try {
-			String host = null;
-			String globalIpAddress = listeningPoint.getGlobalIpAddress();
-			if(globalIpAddress != null) {
-				host = globalIpAddress;
-			} else {
-				host = getMostOutboundAddress(listeningPoint.getIpAddresses());
-			}
-			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
-			sipUri.setPort(listeningPoint.getPort());
-			sipUri.setTransportParam(transport!=null?transport:listeningPoint.getTransport());
-			// Do we want to add an ID here?
-			return sipUri;
-		} catch (ParseException ex) {
-        	logger.error ("Unexpected error while creating a record route URI",ex);
-            throw new IllegalArgumentException("Unexpected exception when creating a record route URI", ex);
-        }	
+		return listeningPoint.createRecordRouteURI();
 	}
 	
 	/**

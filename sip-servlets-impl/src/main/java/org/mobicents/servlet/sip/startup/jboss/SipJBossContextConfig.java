@@ -63,14 +63,11 @@ public class SipJBossContextConfig extends JBossContextConfig
 
 	@Override
 	public void lifecycleEvent(LifecycleEvent event) {
-		// logger.info("got lifecycle event : " + event.getType());
-		
 		try {
 			super.lifecycleEvent(event);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		// logger.info("lifecycle event handled");
 	}
 
 	@Override
@@ -131,7 +128,9 @@ public class SipJBossContextConfig extends JBossContextConfig
 					ok = false;
 				}
 			} else {
-				logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
+				if(logger.isInfoEnabled()) {
+					logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
+				}
 				ok = false;
 			}	
 			

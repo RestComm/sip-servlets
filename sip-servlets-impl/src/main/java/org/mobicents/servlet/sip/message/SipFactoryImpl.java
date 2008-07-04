@@ -436,7 +436,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 				}										
 				// Create the contact name address.
 				contactHeader = 
-					JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);														
+					JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);
 			}
 			// Add all headers		
 			if(contactHeader != null) {

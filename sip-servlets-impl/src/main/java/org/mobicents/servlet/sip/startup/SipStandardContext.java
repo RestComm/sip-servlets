@@ -128,7 +128,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	@Override
 	public void init() throws Exception {
-		logger.info("Initializing the sip context");
+		if(logger.isInfoEnabled()) {
+			logger.info("Initializing the sip context");
+		}
 //		if (this.getParent() != null) {
 //			// Add the main configuration listener for sip applications
 //			LifecycleListener sipConfigurationListener = new SipContextConfig();
@@ -167,13 +169,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
 				sipSessionsUtil);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-				sipApplicationDispatcher.getOutboundInterfaces());		
-		logger.info("sip context Initialized");
+				sipApplicationDispatcher.getOutboundInterfaces());
+		if(logger.isInfoEnabled()) {
+			logger.info("sip context Initialized");
+		}
 	}
 
 	@Override
 	public synchronized void start() throws LifecycleException {
-		logger.info("Starting the sip context");
+		if(logger.isInfoEnabled()) {
+			logger.info("Starting the sip context");
+		}
 		 // Add missing components as necessary
         if (getResources() == null) {   // (1) Required by Loader
             if (logger.isDebugEnabled())
@@ -253,9 +259,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
-			logger.info("sip context started");
+			if(logger.isInfoEnabled()) {
+				logger.info("sip context started");
+			}
 		} else {
-			logger.info("sip context didn't started due to errors");
+			if(logger.isInfoEnabled()) {
+				logger.info("sip context didn't started due to errors");
+			}
 		}
 										
 	}
@@ -371,7 +381,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	@Override
 	public synchronized void stop() throws LifecycleException {
-		logger.info("Stopping the sip context");
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopping the sip context");
+		}
 		((SipManager)manager).dumpSipSessions();
 		((SipManager)manager).dumpSipApplicationSessions();		
 		super.stop();
