@@ -62,7 +62,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
 
 	private enum SipApplicationSessionEventType {
-		CREATION, DELETION, EXPIRATION;
+		CREATION, DELETION, EXPIRATION, READYTOINVALIDATE;
 	}
 	/**
 	 * Timer task that will notify the listeners that the sip application session has expired 
@@ -116,6 +116,10 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	private Map<String, ServletTimer> servletTimers;
 	
 	private boolean valid;
+	
+	private boolean invalidateWhenReady = true;
+	
+	private boolean readyToInvalidate = false;
 
 	/**
 	 * The first sip application for subsequent requests.
@@ -175,6 +179,8 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 					sipApplicationSessionListener.sessionDestroyed(event);
 				} else if (SipApplicationSessionEventType.EXPIRATION.equals(sipApplicationSessionEventType)) {
 					sipApplicationSessionListener.sessionExpired(event);
+				} else if (SipApplicationSessionEventType.READYTOINVALIDATE.equals(sipApplicationSessionEventType)) {
+					sipApplicationSessionListener.sessionReadyToInvalidate(event);
 				}
 				
 			} catch (Throwable t) {
@@ -345,6 +351,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 */
 	public void removeServletTimer(ServletTimer servletTimer){
 		servletTimers.remove(servletTimer);
+		updateReadyToInvalidateState();
 	}
 	
 	/*
@@ -362,6 +369,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		
 		//need to check before doing the real invalidation if they are eligible 
 		//for invalidation
+		
+		// checkInvalidation not needed after PFD2
+		/*
 		for(SipSessionImpl session: sipSessions.values()) {
 			if(session.isValid()) {
 				try {
@@ -372,7 +382,8 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 						" before invalidating the application session.", e);
 				}
 			}					
-		}
+		} */
+		
 		//doing the invalidation
 		for(SipSessionImpl session: sipSessions.values()) {
 			if(session.isValid()) {
@@ -644,8 +655,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
     }
 
 	public boolean getInvalidateWhenReady() {
-		// TODO Auto-generated method stub
-		return false;
+		return invalidateWhenReady;
 	}
 
 	/**
@@ -665,13 +675,50 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	}
 
 	public boolean isReadyToInvalidate() {
-		// TODO Auto-generated method stub
-		return false;
+		return readyToInvalidate;
 	}
 
 	public void setInvalidateWhenReady(boolean arg0) {
-		// TODO Auto-generated method stub
+		invalidateWhenReady = arg0;
+	}
+	
+	public void onSipSessionReadyToInvalidate(SipSessionImpl session) {
+		updateReadyToInvalidateState();
+	}
+	
+	synchronized private void updateReadyToInvalidateState() {
+		boolean allSipSessionsReadyToInvalidate = true;
+		for(SipSessionImpl sipSession:this.sipSessions.values()) {
+			if(sipSession.isReadyToInvalidate()) {
+				allSipSessionsReadyToInvalidate = false;
+				break;
+			}
+		}
 		
+		if(allSipSessionsReadyToInvalidate) {
+			if(this.servletTimers.size() <= 0) {
+				this.readyToInvalidate = true;
+			}
+		}
+		
+		if(readyToInvalidate) {	
+			// Here we give a chance to the app to modify invalidateWhenReady
+			if(invalidateWhenReady) {
+				notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
+				if(readyToInvalidate) attemptToInvalidate();
+			}
+		}
+	}
+	
+	private void attemptToInvalidate() {
+		boolean allSipSessionsInvalidated = true;
+		for(SipSessionImpl sipSession:this.sipSessions.values()) {
+			if(sipSession.isValid()) {
+				allSipSessionsInvalidated = false;
+				break;
+			}
+		}
+		if(allSipSessionsInvalidated) this.invalidate();
 	}
 
 }

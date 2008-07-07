@@ -100,7 +100,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 public class SipSessionImpl implements SipSession {
 	
 	private enum SipSessionEventType {
-		CREATION, DELETION;
+		CREATION, DELETION, READYTOINVALIDATE;
 	}
 	
 	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
@@ -190,6 +190,15 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private SipFactoryImpl sipFactory;
 	
+	private boolean invalidateWhenReady = true;
+	
+	private boolean readyToInvalidate = false;
+
+	/*
+	 * If this is a derived session, havea pointer to the parent session.
+	 */
+	private SipSessionImpl parentSession = null;
+	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, SipApplicationSessionImpl sipApplicationSessionImpl) {
 		this.key = key;
 		setSipApplicationSession(sipApplicationSessionImpl);
@@ -225,6 +234,8 @@ public class SipSessionImpl implements SipSession {
 					sipSessionListener.sessionCreated(sipSessionEvent);
 				} else if (SipSessionEventType.DELETION.equals(sipSessionEventType)) {
 					sipSessionListener.sessionDestroyed(sipSessionEvent);
+				} else if (SipSessionEventType.READYTOINVALIDATE.equals(sipSessionEventType)) {
+					sipSessionListener.sessionReadyToInvalidate(sipSessionEvent);
 				}
 			} catch (Throwable t) {
 				logger.error("SipSessionListener threw exception", t);
@@ -513,7 +524,9 @@ public class SipSessionImpl implements SipSession {
 		if(!valid) {
 			throw new IllegalStateException("SipSession already invalidated !");
 		}
-		checkInvalidation();
+		
+		// No need for checks after JSR 289 PFD spec
+		//checkInvalidation();
 		
 		for (String key : sipSessionAttributeMap.keySet()) {
 			removeAttribute(key);
@@ -528,14 +541,14 @@ public class SipSessionImpl implements SipSession {
 		((SipManager)getSipApplicationSession().getSipContext().getManager()).removeSipSession(key);
 		sipSessionAttributeMap = null;
 		proxyBranch = null;
-		key = null;
+		//key = null;
 		sessionCreatingDialog = null;
 		sessionCreatingTransaction = null;
 		
 	}
 	
 	/**
-	 * 
+	 * Not needed anymore after PFD JSR 289 spec
 	 */
 	protected void checkInvalidation() {
 		if(state.equals(State.CONFIRMED)
@@ -771,12 +784,28 @@ public class SipSessionImpl implements SipSession {
 
 	public void setState(State state) {
 		this.state = state;
+		if(state.equals(State.TERMINATED)) onTerminated();
+	}
+	
+	public void onTerminated() {
+		onReadyToInvalidate();
+		if(this.parentSession != null) {
+			boolean allDerivedSessionsTermintated = true;
+			for(SipSessionImpl derivedSession:parentSession.derivedSipSessions.values()) {
+				if(derivedSession.getState().equals(State.TERMINATED)) {
+					allDerivedSessionsTermintated = false;
+					break;
+				}
+			}
+			if(allDerivedSessionsTermintated) this.parentSession.onReadyToInvalidate();
+		}
 	}
 
 	/**
 	 * Add an ongoing tx to the session.
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
+		readyToInvalidate = false;
 		this.ongoingTransactions.add(transaction);
 		if(logger.isDebugEnabled()) {
 			logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
@@ -787,7 +816,9 @@ public class SipSessionImpl implements SipSession {
 	 * Remove an ongoing tx to the session.
 	 */
 	public void removeOngoingTransaction(Transaction transaction) {
+		
 		this.ongoingTransactions.remove(transaction);
+		
 		if(logger.isDebugEnabled()) {
 			logger.debug("transaction "+ transaction +" has been removed from sip session's ongoingTransactions" );
 		}		
@@ -820,6 +851,7 @@ public class SipSessionImpl implements SipSession {
 				response.getStatus() >= 200 && response.getStatus() < 300 && 
 				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
 			this.setState(State.CONFIRMED);
+			if(this.proxyBranch != null && !this.proxyBranch.getRecordRoute()) onReadyToInvalidate();
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
 			}
@@ -846,6 +878,7 @@ public class SipSessionImpl implements SipSession {
 			// cause the SipSession state to return to INITIAL rather than going to TERMINATED.
 			if(receive) {
 				setState(State.INITIAL);
+				onReadyToInvalidate();
 				if(logger.isDebugEnabled()) {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
 				}
@@ -888,6 +921,17 @@ public class SipSessionImpl implements SipSession {
 		}
 		
 	}
+    
+    /**
+     * This method is called immediately when the conditions for read to invalidate
+     * session are met
+     */
+    public void onReadyToInvalidate() {
+    	this.readyToInvalidate = true;
+    	
+    	if(this.invalidateWhenReady)
+    		this.notifySipSessionListeners(SipSessionEventType.READYTOINVALIDATE);
+    }
 
 	/**
 	 * @return the key
@@ -964,18 +1008,19 @@ public class SipSessionImpl implements SipSession {
 	public void setUserPrincipal(Principal userPrincipal) {
 		this.userPrincipal = userPrincipal;
 	}
+	
 	public boolean getInvalidateWhenReady() {
-		// TODO Auto-generated method stub
-		return false;
+		return invalidateWhenReady;
 	}
+	
 	public boolean isReadyToInvalidate() {
-		// TODO Auto-generated method stub
-		return false;
+		return readyToInvalidate;
 	}
+	
 	public void setInvalidateWhenReady(boolean arg0) {
-		// TODO Auto-generated method stub
-		
+		invalidateWhenReady = arg0;
 	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -1035,6 +1080,7 @@ public class SipSessionImpl implements SipSession {
 			sipSessionImpl.subscriberURI = subscriberURI.clone();
 		}
 		sipSessionImpl.userPrincipal = userPrincipal;
+		sipSessionImpl.parentSession = this;
 		
 		derivedSipSessions.put(sessionKey.getToTag(), sipSessionImpl);
 		

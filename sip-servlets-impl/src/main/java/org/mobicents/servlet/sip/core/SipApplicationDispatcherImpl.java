@@ -1819,6 +1819,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		servlet.service(request, null);
 		
 		sipServletImpl.deallocate(servlet);
+		
+		// We invalidate here just after the servlet is called because before that the session would be unavailable
+		// to the user code. TODO: FIXME: This event should occur after all transations are complete.
+		// if(session.isReadyToInvalidate() && session.getInvalidateWhenReady()) session.invalidate();
 	}
 	
 	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
