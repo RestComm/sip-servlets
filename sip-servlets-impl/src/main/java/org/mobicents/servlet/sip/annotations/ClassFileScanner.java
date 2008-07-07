@@ -82,11 +82,19 @@ public class ClassFileScanner {
 				cl);
 		this.classLoader.setResources(this.sipContext.getResources());
 		this.classLoader.setAntiJARLocking(true);
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Annotations docBase : " + this.docbase);
+		}
+		
 		this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
 		
-		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib
+		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib		
 		this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
 		this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
+		//Adding root dir to include jars located here like ejb modules and so on...
+		//Ideally we may want to parse the application.xml and get the jars that are defined in it...?
+		this.classLoader.addJarDir(this.docbase + "/../");
 		
 		// Try to add the EAR binaries as repositories
 		File earJarDir = new File(this.docbase + "/../APP-INF/lib");

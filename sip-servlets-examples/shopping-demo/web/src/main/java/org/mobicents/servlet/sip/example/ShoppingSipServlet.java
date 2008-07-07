@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -23,6 +25,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.util.DTMFUtils;
@@ -54,6 +57,13 @@ public class ShoppingSipServlet
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the shopping sip servlet has been started");
 		super.init(servletConfig);
+		try {
+			InitialContext ctx = new InitialContext();
+			OrderManager orderManager = Util.getOrderManager();
+			logger.info("Reference to OrderManagerBean " + orderManager);
+		} catch (NamingException e) {
+			logger.error("An exception occured while retrieving the EJB OrderManager",e);
+		}	
 	}		
 	
 	@Override

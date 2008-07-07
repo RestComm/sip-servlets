@@ -385,7 +385,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=200">
 									Implement the new Session invalidation methods from JSR 289 PFD
@@ -410,6 +410,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=251">
 									6.2.5 The RequestDispatcher Interface
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=259">
+									Classing loading issues when deployed as EAR
 								</a>
 							</li>
 						</ul>
