@@ -33,6 +33,12 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
+/**
+ * Checks that applicaiton session expiration is working
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
+ */
 public class TimersSipServletTest extends SipServletTestCase {
 	
 	private static Log logger = LogFactory.getLog(TimersSipServletTest.class);

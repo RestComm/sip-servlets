@@ -40,7 +40,11 @@ import javax.servlet.sip.TimerService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
+/**
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
+ */
 public class TimersSipServlet
 		extends SipServlet 
 		implements SipApplicationSessionListener, TimerListener {

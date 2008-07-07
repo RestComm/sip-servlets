@@ -84,8 +84,12 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				logger.debug("SipApplicationSessionTimerTask now running for sip application session " + sipApplicationSessionImpl.getId());
 			}
 			sipApplicationSessionImpl.notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
-			sipApplicationSessionImpl.expired = true;
-			sipApplicationSessionImpl.invalidate();
+			//It is possible that the application grant an extension to the lifetime of the session, thus the sip application
+			//should not be treated as expired.
+			if(expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) <= 0) {
+				sipApplicationSessionImpl.expired = true;
+				sipApplicationSessionImpl.invalidate();
+			}
 			return sipApplicationSessionImpl;
 		}
 		
@@ -556,7 +560,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			this.expirationTime = (expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) - expirationTime) + deltaMinutes * 1000 * 60;
 			if(expirationTimerFuture != null) {
 				if(logger.isDebugEnabled()) {
-					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60)+ " minutes");
+					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + deltaMinutes + " minutes");
 				}
 				expirationTimerFuture.cancel(false);
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
