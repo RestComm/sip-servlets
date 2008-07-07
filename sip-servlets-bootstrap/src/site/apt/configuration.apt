@@ -1,6 +1,8 @@
 Configuration
 
-	Here is the few things you can configure in the Mobicents Sip Servlets container :
+	Here is the few things you can configure in the Mobicents Sip Servlets container through the server.xml Tomcat file located 
+	on jboss under <jboss_home>/server/default/deploy/jboss-web.deployer/server.xml or  
+	on Tomcat under <tomcat_home>/conf/server.xml
 	
 * Connectors
 	
@@ -37,11 +39,11 @@ Configuration
 	
 	* <<<isReentrantListener>>> : If the listener is re-entrant then the stack manages a thread pool and synchronously calls the listener from the same thread which read the message. Check the nist sip stack javadoc for more information.
 		
-	* <<<useStun>>> : Set to true to enable STUN for this connector and make sure <<<ipAddress>>> is different from 127.0.0.1. (Default to false)
+	* <<<useStun>>> : Set to true to enable STUN for this connector and make sure <<<ipAddress>>> is different from 127.0.0.1. (Default to false, you can also check the {{{./stun.html}STUN section}} for more information)
 		
-	* <<<stunServerAddress>>> : The STUN server address that will be used for discovering the public IP address of this SIP connector (only needed if useStun="true")
+	* <<<stunServerAddress>>> : The STUN server address that will be used for discovering the public IP address of this SIP connector (only needed if useStun="true", you can also check the {{{./stun.html}STUN section}} for more information)
 		
-	* <<<stunServerPort>>> : The STUN server port of the STUN server used in the previous property (will rarely be changed if ever and only needed if useStun="true")
+	* <<<stunServerPort>>> : The STUN server port of the STUN server used in the previous property (will rarely be changed if ever and only needed if useStun="true", you can also check the {{{./stun.html}STUN section}} for more information)
 	
 	* <<<logLevel>>> : the log level of the underlying JAIN SIP Stack
 	
@@ -77,7 +79,7 @@ Configuration
   	
   	* <<<sipApplicationDispatcherClassName>>> : This attribute specifies the class name of the <<<org.mobicents.servlet.sip.core.SipApplicationDispatcher>>> implementation to use. The routing algorithm and application selection process is done in that class.
   	
-  	* <<<sipApplicationRouterClassName>>> : (removed starting from 0.5 version) This attribute specifies the class name of the <<<javax.servlet.sip.SipApplicationRouter>>> implementation. This allows to plug any Application Router to change the application selection logic.
+  	* <<<sipApplicationRouterClassName>>> : (removed starting from 0.5 version since the JSR 289 PFD-2 defines a mechanism to package and load an application router) This attribute specifies the class name of the <<<javax.servlet.sip.SipApplicationRouter>>> implementation. This allows to plug any Application Router to change the application selection logic.
   	
   	* <<<darConfigurationFileLocation>>> : The default application router file location. Used by our default application router to know the application selection logic. Check JSR 289 Spec Appendix C.
   	

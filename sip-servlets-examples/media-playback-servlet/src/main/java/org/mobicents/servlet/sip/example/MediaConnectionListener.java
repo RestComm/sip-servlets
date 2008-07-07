@@ -58,6 +58,11 @@ public class MediaConnectionListener implements MsConnectionListener{
 		
 	}
 
+	public void connectionInitialized(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public void txFailed(MsConnectionEvent arg0) {
 		// TODO Auto-generated method stub
 		

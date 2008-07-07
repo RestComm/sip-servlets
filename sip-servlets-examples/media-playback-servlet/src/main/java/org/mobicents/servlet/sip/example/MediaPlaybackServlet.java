@@ -31,9 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
-import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
+import org.mobicents.mscontrol.impl.MsPeerFactory;
 
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;

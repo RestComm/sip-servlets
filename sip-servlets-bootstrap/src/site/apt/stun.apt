@@ -21,11 +21,13 @@ STUN Support
 	
 	Mobicents Sip Servlets provides STUN support at the sip connector level through the STUN4J project available at {{{https://stun4j.dev.java.net/}https://stun4j.dev.java.net/}}. 
 	
-	So each connector can choose whether or not it wants to use STUN to dicsover 
+	So each connector can choose whether or not it wants to use STUN to discover 
 	its public IP address and use this public IP address in SIP messages that will be sent through it. 
 
 	To configure a SIP connector to be STUN enabled, you need to add the three 
-	following properties to the corresponding Connector tag in the server.xml (whether on jboss or Tomcat) :
+	following properties to the corresponding Connector tag in the server.xml 
+	(either on jboss under <jboss_home>/server/default/deploy/jboss-web.deployer/server.xml or  
+	on Tomcat under <tomcat_home>/conf/server.xml) :
 	
 	<<<useStun="true">>>\
 	<<<stunServerAddress="stun01.sipphone.com">>>\
@@ -37,6 +39,7 @@ STUN Support
 		
 		* <<<stunServerPort>>> : The STUN server port of the STUN server used in the previous property (will rarely be changed if ever)
 		
+	The {{{./configuration.html}Configuration section}} also contains those configuration parameters and some other you may want to check out 
 
 * Limitations and Future Work
 

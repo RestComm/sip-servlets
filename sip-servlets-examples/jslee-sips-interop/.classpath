@@ -26,7 +26,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee_1.4_spec/1.1/geronimo-j2ee_1.4_spec-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/resources/media-ratype/1.2.0.BETA3-SNAPSHOT/media-ratype-1.2.0.BETA3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/resources/tts-ratype/1.2.0.BETA3-SNAPSHOT/tts-ratype-1.2.0.BETA3-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-server-media-constants/1_0_0_ALPHA3/mobicents-server-media-constants-1_0_0_ALPHA3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-server-media-mscontrol/1_0_0_ALPHA3/mobicents-server-media-mscontrol-1_0_0_ALPHA3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.BETA2/mobicents-media-server-constants-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.BETA2/mobicents-media-server-msc-api-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.0.BETA2/mobicents-media-server-msc-api-local-impl-1.0.0.BETA2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
