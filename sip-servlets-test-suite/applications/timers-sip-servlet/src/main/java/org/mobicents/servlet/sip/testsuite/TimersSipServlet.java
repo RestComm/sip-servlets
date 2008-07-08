@@ -49,10 +49,15 @@ public class TimersSipServlet
 		extends SipServlet 
 		implements SipApplicationSessionListener, TimerListener {
 
+	private static final String ALREADY_EXTENDED = "alreadyExtended";
+	private static final String ALREADY_INVALIDATED = "alreadyInvalidated";
+	
+
 	private static Log logger = LogFactory.getLog(TimersSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String SIP_APP_SESSION_EXPIRED = "sipAppSessionExpired";
+	private static final String SIP_APP_SESSION_READY_TO_BE_INVALIDATED = "sipAppSessionReadyToBeInvalidated";
 	private static final String TIMER_EXPIRED = "timerExpired";
 	
 	private SipFactory sipFactory;	
@@ -91,9 +96,19 @@ public class TimersSipServlet
 		SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
 		okResponse.send();
 		request.getApplicationSession().setAttribute("sipFactory", sipFactory);
+		request.getApplicationSession().setInvalidateWhenReady(true);
 		//create a timer to test the feature				
 		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
 		timerService.createTimer(request.getApplicationSession(), 1000, false, null);
+	}
+	
+	@Override
+	protected void doSuccessResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+
+		if("MESSAGE".equals(resp.getMethod())) {
+			resp.getSession().invalidate();
+		}
 	}
 
 	/**
@@ -113,7 +128,11 @@ public class TimersSipServlet
 	 */
 	public void sessionExpired(SipApplicationSessionEvent ev) {
 		logger.info("sip application session expired " +  ev.getApplicationSession());
-		ev.getApplicationSession().setExpires(1);
+		if(!ev.getApplicationSession().isReadyToInvalidate() && ev.getApplicationSession().getAttribute(ALREADY_EXTENDED) == null) {
+			ev.getApplicationSession().setExpires(1);
+			ev.getApplicationSession().setAttribute(ALREADY_EXTENDED, Boolean.TRUE);
+		}
+		
 		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");		
 		try {
 			SipServletRequest sipServletRequest = storedFactory.createRequest(
@@ -178,8 +197,28 @@ public class TimersSipServlet
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sessionReadyToInvalidate called");
+		if(ev.getApplicationSession().getAttribute(ALREADY_INVALIDATED) == null) {
+			ev.getApplicationSession().setAttribute(ALREADY_INVALIDATED, Boolean.TRUE);
+			SipApplicationSession sipApplicationSession = ev.getApplicationSession();		
+			SipFactory storedFactory = (SipFactory)sipApplicationSession.getAttribute("sipFactory");		
+			try {
+				SipServletRequest sipServletRequest = storedFactory.createRequest(
+						sipApplicationSession, 
+						"MESSAGE", 
+						"sip:sender@sip-servlets.com", 
+						"sip:receiver@sip-servlets.com");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+				sipServletRequest.setRequestURI(sipUri);
+				sipServletRequest.setContentLength(SIP_APP_SESSION_READY_TO_BE_INVALIDATED.length());
+				sipServletRequest.setContent(SIP_APP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
+				sipServletRequest.send();
+			} catch (ServletParseException e) {
+				logger.error("Exception occured while parsing the addresses",e);
+			} catch (IOException e) {
+				logger.error("Exception occured while sending the request",e);			
+			}
+		}
 	}
 
 }

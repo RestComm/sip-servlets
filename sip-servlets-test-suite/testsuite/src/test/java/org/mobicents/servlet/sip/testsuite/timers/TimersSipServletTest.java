@@ -48,14 +48,14 @@ public class TimersSipServletTest extends SipServletTestCase {
 	//1 sec
 	private static final int TIMEOUT = 2000;
 	//1 minute and 10 sec
-	private static final int APP_SESSION_TIMEOUT = 70000;	
+	private static final int APP_SESSION_TIMEOUT = 80000;	
 //	private static final int TIMEOUT = 100000000;
 	
-	private static final String OK = "OK";
 	// the order is important here 
 	private static final String[] TIMERS_TO_TEST = new String[]{
 		"timerExpired",
-		"sipAppSessionExpired"				
+		"sipAppSessionExpired",
+		"sipAppSessionReadyToBeInvalidated"
 		};				
 	
 	TestSipListener sender;
@@ -123,6 +123,7 @@ public class TimersSipServletTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
+		Thread.sleep(TIMEOUT);
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
 		while (allMessagesIterator.hasNext()) {
 			String message = (String) allMessagesIterator.next();
