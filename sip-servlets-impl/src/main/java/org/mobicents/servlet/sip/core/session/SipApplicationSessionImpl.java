@@ -109,7 +109,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private long creationTime;
 	
-	private long expirationTime;
+//	private long expirationTime;
 	
 	private boolean expired;
 	
@@ -144,7 +144,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		if(sipContext != null) {
 			//scheduling the timer for session expiration
 			if(sipContext.getSipApplicationSessionTimeout() > 0) {
-				expirationTime = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
+				long expirationTime = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
@@ -157,7 +157,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				// If the session timeout value is 0 or less, then an application session timer 
 				// never starts for the SipApplicationSession object and the container does 
 				// not consider the object to ever have expired
-				expirationTime = -1;
+//				expirationTime = -1;
 			}
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
 		}
@@ -275,13 +275,13 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		if(!isValid()) {
 			throw new IllegalStateException("this sip application session " + getId() + " is not valid anymore");
 		}
-		if(expirationTime <= 0) {
+		if(expirationTimerFuture == null || expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) <= 0) {
 			return 0;
 		}
 		if(expired) {
 			return Long.MIN_VALUE;
 		}
-		return expirationTime;
+		return expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS);
 	}
 
 	/**
@@ -354,7 +354,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * @param servletTimer the servlet timer to remove
 	 */
 	public void removeServletTimer(ServletTimer servletTimer){
-		servletTimers.remove(servletTimer);
+		servletTimers.remove(servletTimer.getId());
 		updateReadyToInvalidateState();
 	}
 	
@@ -365,6 +365,9 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	public void invalidate() {
 		if(!valid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Invalidating the following sip application session " + key);
 		}
 		//JSR 289 Section 6.1.2.2.1
 		//When the IllegalStateException is thrown, the application is guaranteed 
@@ -551,16 +554,25 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			// If the session timeout value is 0 or less, then an application session timer 
 			// never starts for the SipApplicationSession object and the container 
 			// does not consider the object to ever have expired
-			this.expirationTime = -1;
+//			this.expirationTime = -1;
 			if(expirationTimerFuture != null) {
-				expirationTimerFuture.cancel(false);								
+				expirationTimerFuture.cancel(false);
+				expirationTimerFuture = null;
 			}		
 			return Integer.MAX_VALUE;
 		} else {
-			this.expirationTime = (expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) - expirationTime) + deltaMinutes * 1000 * 60;
+			long expirationTime = 0;
+			if(expirationTimerFuture != null) {
+				//extending the app session life time
+				expirationTime = expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) + deltaMinutes * 1000 * 60;
+			} else {
+				//the app session was scheduled to never expire and now an expiration time is set
+				expirationTime = deltaMinutes * 1000 * 60;
+			}
 			if(expirationTimerFuture != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + deltaMinutes + " minutes");
+					logger.debug("Re-Scheduling sip application session "+ key +" will expires in " + expirationTime + " milliseconds");
 				}
 				expirationTimerFuture.cancel(false);
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
@@ -687,29 +699,43 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	}
 	
 	public void onSipSessionReadyToInvalidate(SipSessionImpl session) {
+		removeSipSession(session);
 		updateReadyToInvalidateState();
 	}
 	
 	synchronized private void updateReadyToInvalidateState() {
-		boolean allSipSessionsReadyToInvalidate = true;
-		for(SipSessionImpl sipSession:this.sipSessions.values()) {
-			if(sipSession.isReadyToInvalidate()) {
-				allSipSessionsReadyToInvalidate = false;
-				break;
+		if(valid) {
+			boolean allSipSessionsReadyToInvalidate = true;
+			for(SipSessionImpl sipSession:this.sipSessions.values()) {
+				if(!sipSession.isReadyToInvalidate()) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Session not ready to be invalidated : " + sipSession.getKey());
+					}
+					allSipSessionsReadyToInvalidate = false;
+					break;
+				}
 			}
-		}
-		
-		if(allSipSessionsReadyToInvalidate) {
-			if(this.servletTimers.size() <= 0) {
-				this.readyToInvalidate = true;
+			
+			if(allSipSessionsReadyToInvalidate) {
+				if(this.servletTimers.size() <= 0) {
+					this.readyToInvalidate = true;
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug(servletTimers.size() + " Timers still alive, cannot invalidate this application session " + key);
+					}
+				}
 			}
-		}
-		
-		if(readyToInvalidate) {	
-			// Here we give a chance to the app to modify invalidateWhenReady
-			if(invalidateWhenReady) {
-				notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
-				if(readyToInvalidate) attemptToInvalidate();
+			
+			if(readyToInvalidate) {	
+				// Here we give a chance to the app to modify invalidateWhenReady
+				if(invalidateWhenReady) {
+					notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
+					if(readyToInvalidate) attemptToInvalidate();
+				}
+			}
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Sip application session already invalidated "+ key);
 			}
 		}
 	}

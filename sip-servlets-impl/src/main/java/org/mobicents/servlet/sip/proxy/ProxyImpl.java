@@ -474,6 +474,13 @@ public class ProxyImpl implements Proxy {
 		return proxyUtils;
 	}
 
+	/**
+	 * @return the bestResponse
+	 */
+	public SipServletResponseImpl getBestResponse() {
+		return bestResponse;
+	}
+	
 	void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
 	}

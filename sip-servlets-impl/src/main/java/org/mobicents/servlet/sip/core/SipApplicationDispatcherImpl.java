@@ -48,6 +48,7 @@ import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TelURL;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
@@ -825,7 +826,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			}
 			return false;
-		} 
+		} finally {
+			if(sipSession.isReadyToInvalidate()) {
+				sipSession.onTerminatedState();
+			}
+		}
 		//if a final response has been sent, or if the request has 
 		//been proxied or relayed we stop routing the request
 		RoutingState routingState = sipServletRequest.getRoutingState();
@@ -1732,6 +1737,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.info("route response on following session " + sessionKey);
 			}
 			
+			if(session == null) {
+				logger.error("Dropping the response since no active sip session has been found for it : " + response);
+				return false;
+			}
+			
 			// Transate the repsponse to SipServletResponse
 			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
 					response, 
@@ -1788,7 +1798,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
-			} 
+			} finally {
+				if(session.isReadyToInvalidate()) {
+					session.onTerminatedState();
+				}
+			}
 		}
 		return true;		
 	}
@@ -1815,10 +1829,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Thread.currentThread().setContextClassLoader(cl);
 		
 		if(!securityCheck(request)) return;
-	        
-		servlet.service(request, null);
-		
-		sipServletImpl.deallocate(servlet);
+	    
+		try {
+			servlet.service(request, null);
+		} finally {		
+			sipServletImpl.deallocate(servlet);
+		}
 		
 		// We invalidate here just after the servlet is called because before that the session would be unavailable
 		// to the user code. TODO: FIXME: This event should occur after all transations are complete.
@@ -1839,9 +1855,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(sipServletImpl.isUnavailable()) {
 			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
 		} else {
-			Servlet servlet = sipServletImpl.allocate();	        
-			servlet.service(null, response);
-			sipServletImpl.deallocate(servlet);
+			Servlet servlet = sipServletImpl.allocate();
+			try {
+				servlet.service(null, response);
+			} finally {
+				sipServletImpl.deallocate(servlet);
+			}
 		}
 				
 	}
