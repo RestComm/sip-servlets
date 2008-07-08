@@ -826,11 +826,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
 			}
 			return false;
-		} finally {
-			if(sipSession.isReadyToInvalidate()) {
-				sipSession.onTerminatedState();
-			}
-		}
+		} 
+//		finally {
+//			if(sipSession.isReadyToInvalidate()) {
+//				sipSession.onTerminatedState();
+//			}
+//		}
 		//if a final response has been sent, or if the request has 
 		//been proxied or relayed we stop routing the request
 		RoutingState routingState = sipServletRequest.getRoutingState();
@@ -1798,11 +1799,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
-			} finally {
-				if(session.isReadyToInvalidate()) {
-					session.onTerminatedState();
-				}
 			}
+//			finally {
+//				if(session.isReadyToInvalidate()) {
+//					session.onTerminatedState();
+//				}
+//			}
 		}
 		return true;		
 	}
@@ -1944,10 +1946,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		SipSessionImpl sipSessionImpl = tad.getSipServletMessage().getSipSession();
 		if(sipSessionImpl == null) {
 			if(logger.isInfoEnabled()) {
-				logger.info("no app were returned for this transaction " + transaction);
+				logger.info("no sip session were returned for this transaction " + transaction);
 			}
 		} else {
 			sipSessionImpl.removeOngoingTransaction(transaction);
+			if(sipSessionImpl.isReadyToInvalidate()) {
+				sipSessionImpl.onTerminatedState();
+			}
 		}
 	}
 

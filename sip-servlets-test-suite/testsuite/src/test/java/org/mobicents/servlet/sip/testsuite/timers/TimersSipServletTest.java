@@ -123,7 +123,7 @@ public class TimersSipServletTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(APP_SESSION_TIMEOUT);
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
 		while (allMessagesIterator.hasNext()) {
 			String message = (String) allMessagesIterator.next();
