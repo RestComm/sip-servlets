@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/publish-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/publish-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/update-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/update-sip-servlet/src/main/java"/>
-	<classpathentry kind="src" path="applications/dispatcher-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/dispatcher-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/dispatcher-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/handler-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/handler-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/chatroom-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/chatroom-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/notifier-servlet/src/main/sipapp/WEB-INF/classes" path="applications/notifier-servlet/src/main/java"/>

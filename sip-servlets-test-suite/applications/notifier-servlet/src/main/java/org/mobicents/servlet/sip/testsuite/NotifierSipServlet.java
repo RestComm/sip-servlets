@@ -27,7 +27,11 @@ import javax.servlet.sip.SipServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
+/**
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
+ */
 public class NotifierSipServlet extends SipServlet {
 
 	private static Log logger = LogFactory.getLog(NotifierSipServlet.class);

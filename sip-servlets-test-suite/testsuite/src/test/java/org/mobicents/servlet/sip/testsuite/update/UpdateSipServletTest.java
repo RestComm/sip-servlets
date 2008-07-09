@@ -87,12 +87,6 @@ public class UpdateSipServletTest extends SipServletTestCase {
 	
 	/**
 	 * Call flow tested : See RFC 3311 Page 9
-	 * 
-	 * 
-	 * @throws InterruptedException
-	 * @throws SipException
-	 * @throws ParseException
-	 * @throws InvalidArgumentException
 	 */
 	public void testUpdate() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";

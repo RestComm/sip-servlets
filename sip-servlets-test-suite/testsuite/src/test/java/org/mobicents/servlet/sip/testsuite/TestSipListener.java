@@ -16,10 +16,11 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
+import gov.nist.javax.sip.header.SIPETag;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -49,8 +50,9 @@ import javax.sip.header.EventHeader;
 import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.SIPETagHeader;
+import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -58,7 +60,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.SipFactories;
 
 /**
  * This class is a UAC template. Shootist is the guy that shoots and shootme is
@@ -73,9 +74,11 @@ public class TestSipListener implements SipListener {
 	private static final String PLAIN_UTF8_CONTENT_SUBTYPE = "plain;charset=UTF-8";
 
 	private static final String TEXT_CONTENT_TYPE = "text";
-
-	private static final String CONTENT_TYPE_TEXT = TEXT_CONTENT_TYPE;
 	
+	private static final String PIDF_XML_SUBTYPE = "pidf+xml";
+
+	private static final String APPLICATION_CONTENT_TYPE = "application";
+
 	private boolean sendBye;
 	
 	private SipProvider sipProvider;
@@ -149,6 +152,12 @@ public class TestSipListener implements SipListener {
 	private boolean useToURIasRequestUri;
 
 	private boolean sendUpdateOn180;
+
+	private String publishEvent = "reg";
+	
+	private String sipETag;
+
+	private String publishContentMessage;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 
@@ -229,12 +238,69 @@ public class TestSipListener implements SipListener {
 		if (request.getMethod().equals(Request.UPDATE)) {
 			processUpdate(request, serverTransactionId);
 		}
+		
+		if (request.getMethod().equals(Request.PUBLISH)) {
+			processPublish(requestReceivedEvent, serverTransactionId);
+		}
 	}
 	
+	private void processPublish(RequestEvent requestEvent,
+			ServerTransaction serverTransactionId) {
+		try {
+			SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+			Request request = requestEvent.getRequest();
+			
+			logger.info("shootist:  got a publish . ServerTxId = " + serverTransactionId);
+			ServerTransaction st = requestEvent.getServerTransaction();
+			if (st == null) {
+				st = sipProvider.getNewServerTransaction(request);
+			}
+			inviteServerTid = st;
+			Dialog dialog = st.getDialog();
+			
+			this.dialogCount ++;
+			this.dialog = dialog;
+			
+			logger.info("Shootme: dialog = " + dialog);
+			
+			if(request.getRawContent() != null) {
+				this.lastMessageContent = new String(request.getRawContent());
+				allMessagesContent.add(new String(lastMessageContent));
+			}
+			SIPIfMatchHeader sipIfMatchHeader = (SIPIfMatchHeader) request.getHeader(SIPIfMatchHeader.NAME);
+			boolean sipIfMatchFound = true;
+			if(sipIfMatchHeader!= null && sipIfMatchHeader.getETag() != null && !sipIfMatchHeader.getETag().equals(sipETag)) {
+				sipIfMatchFound = false;
+			}
+			if(sipIfMatchFound) {
+			
+				Response response = protocolObjects.messageFactory.createResponse(
+						200, request);
+				sipETag = Integer.toString((int) (Math.random()*10000000));
+				SIPETagHeader sipTagHeader = protocolObjects.headerFactory.createSIPETagHeader(sipETag);
+				response.addHeader(sipTagHeader);
+				response.addHeader(request.getHeader(ExpiresHeader.NAME));
+				st.sendResponse(response);
+				this.transactionCount++;
+				logger.info("shootist:  Sending OK.");
+			} else {
+				Response response = protocolObjects.messageFactory.createResponse(
+						500, request);
+				serverTransactionId.sendResponse(response);
+				this.transactionCount++;
+			}
+		
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(0);
+
+		}		
+	}
+
 	public void processUpdate(Request request,
 			ServerTransaction serverTransactionId) {
 		try {
-			logger.info("shootist:  got a bye . ServerTxId = " + serverTransactionId);
+			logger.info("shootist:  got a update. ServerTxId = " + serverTransactionId);
 			this.byeReceived  = true;
 			if (serverTransactionId == null) {
 				logger.info("shootist:  null TID.");
@@ -411,24 +477,26 @@ public class TestSipListener implements SipListener {
 			if (state.equalsIgnoreCase(SubscriptionStateHeader.TERMINATED)) {
 				dialog.delete();
 			} else if (state.equalsIgnoreCase(SubscriptionStateHeader.ACTIVE)) {
-				logger.info("Subscriber: sending unSUBSCRIBE");
-
-				// Else we end it ourselves
-				Request unsubscribe = dialog.createRequest(Request.SUBSCRIBE);
-				
-				logger.info( "dialog created:" + unsubscribe );
-				// SHOULD add a Contact (done by dialog), lets mark it to test updates
-//				((SipURI) dialog.getLocalParty().getURI()).setParameter( "id", "unsub" );
-				ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(0);
-				unsubscribe.addHeader(expires);
-				// JvB note : stack should do this!
-				unsubscribe.addHeader(notify.getHeader(EventHeader.NAME)); // copy
-											// event
-											// header
-				logger.info("Sending Unsubscribe : " + unsubscribe);
-				logger.info("unsubscribe dialog  " + dialog);
-				ClientTransaction ct = sipProvider.getNewClientTransaction(unsubscribe);
-				dialog.sendRequest(ct);
+				if("reg".equalsIgnoreCase(((EventHeader)notify.getHeader(EventHeader.NAME)).getEventType())) {
+					logger.info("Subscriber: sending unSUBSCRIBE");
+					
+					// Else we end it ourselves
+					Request unsubscribe = dialog.createRequest(Request.SUBSCRIBE);
+					
+					logger.info( "dialog created:" + unsubscribe );
+					// SHOULD add a Contact (done by dialog), lets mark it to test updates
+	//				((SipURI) dialog.getLocalParty().getURI()).setParameter( "id", "unsub" );
+					ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(0);
+					unsubscribe.addHeader(expires);
+					// JvB note : stack should do this!
+					unsubscribe.addHeader(notify.getHeader(EventHeader.NAME)); // copy
+												// event
+												// header
+					logger.info("Sending Unsubscribe : " + unsubscribe);
+					logger.info("unsubscribe dialog  " + dialog);
+					ClientTransaction ct = sipProvider.getNewClientTransaction(unsubscribe);
+					dialog.sendRequest(ct);
+				}
 			} else {
 				logger.info("Subscriber: state now " + state);// pending
 			}
@@ -459,7 +527,7 @@ public class TestSipListener implements SipListener {
 		
 		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
 		request.getHeader(ContentTypeHeader.NAME);		
-		if(CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
+		if(TEXT_CONTENT_TYPE.equals(contentTypeHeader.getContentType())) {
 			this.lastMessageContent = new String(request.getRawContent());
 			allMessagesContent.add(new String(lastMessageContent));
 		}
@@ -658,6 +726,9 @@ public class TestSipListener implements SipListener {
 								.getNewClientTransaction(byeRequest);
 						dialog.sendRequest(ct);
 					} 
+				} else if (cseq.getMethod().equals(Request.PUBLISH)) {
+					SIPETagHeader sipTagHeader = (SIPETagHeader)response.getHeader(SIPETag.NAME);
+					sipETag = sipTagHeader.getETag();
 				}
 			} else if  (response.getStatusCode() == Response.MOVED_TEMPORARILY) {
 				// Dialog dies as soon as you get an error response.
@@ -895,12 +966,26 @@ public class TestSipListener implements SipListener {
 			request.setContent(contents, contentTypeHeader);
 			request.setContentLength(contentLengthHeader);
 		}
-		if(Request.SUBSCRIBE.equals(method)) {
+		if(Request.SUBSCRIBE.equals(method) || Request.PUBLISH.equals(method)) {
 			// Create an event header for the subscription.
-			EventHeader eventHeader = protocolObjects.headerFactory.createEventHeader("reg");				
+			EventHeader eventHeader = protocolObjects.headerFactory.createEventHeader(publishEvent);				
 			request.addHeader(eventHeader);
 			ExpiresHeader expires = protocolObjects.headerFactory.createExpiresHeader(200);
-			request.addHeader(expires);
+			request.addHeader(expires);			
+		}
+		if(Request.PUBLISH.equals(method)) {
+			if(sipETag != null) {
+				SIPIfMatchHeader sipIfMatchHeader = protocolObjects.headerFactory.createSIPIfMatchHeader(sipETag);
+				request.addHeader(sipIfMatchHeader);
+			}
+			if(publishContentMessage != null) {
+				ContentLengthHeader contentLengthHeader = 
+					protocolObjects.headerFactory.createContentLengthHeader(publishContentMessage.length());
+				ContentTypeHeader contentTypeHeader = 
+					protocolObjects.headerFactory.createContentTypeHeader(APPLICATION_CONTENT_TYPE,PIDF_XML_SUBTYPE);
+				request.setContentLength(contentLengthHeader);
+				request.setContent(publishContentMessage, contentTypeHeader);
+			}
 		}
 		// Create the client transaction.
 		inviteClientTid = sipProvider.getNewClientTransaction(request);
@@ -1137,5 +1222,13 @@ public class TestSipListener implements SipListener {
 
 	public void setSendUpdateOn180(boolean sendUpdateOn180) {
 		this.sendUpdateOn180 = sendUpdateOn180;
+	}
+
+	public void setPublishEvent(String publishEvent) {
+		this.publishEvent  = publishEvent;
+	}
+
+	public void setPublishContentMessage(String publishContentMessage) {
+		this.publishContentMessage = publishContentMessage;		
 	}	
 }

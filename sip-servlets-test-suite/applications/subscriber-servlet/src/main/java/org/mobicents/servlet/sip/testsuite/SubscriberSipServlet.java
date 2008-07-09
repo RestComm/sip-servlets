@@ -32,6 +32,11 @@ import javax.servlet.sip.SipURI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
+ */
 public class SubscriberSipServlet 
 		extends SipServlet 
 		implements SipServletListener {
