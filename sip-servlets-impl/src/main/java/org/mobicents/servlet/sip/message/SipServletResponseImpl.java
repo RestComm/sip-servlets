@@ -323,7 +323,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	public void send()  {
 		try {			
 			//if this is a final response
-			if(response.getStatusCode() >= Response.OK && 
+			if(response.getStatusCode() >= Response.TRYING && 
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE && session.getProxyBranch() == null) {
 				//Issue 112 fix by folsson: use the viaheader transport
 				String transport = null;

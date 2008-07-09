@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.UpdateSipServlet</app-name>
+	<display-name>Update Sip Servlet</display-name>
+	<description>Update Sip Servlet</description>
+	
+	<main-servlet>
+		UpdateSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>UpdateSipServlet</servlet-name>
+		<display-name>UpdateSipServlet</display-name>
+		<description>Update Sip Servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.UpdateSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+</sip-app>

@@ -53,6 +53,7 @@ import org.mobicents.servlet.sip.testsuite.subsnotify.NotifierSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.SubscriberSipServletTest;
 import org.mobicents.servlet.sip.testsuite.targeting.SessionKeyTargetingSipServletTest;
 import org.mobicents.servlet.sip.testsuite.timers.TimersSipServletTest;
+import org.mobicents.servlet.sip.testsuite.update.UpdateSipServletTest;
 
 public class AllTests {
 
@@ -89,6 +90,7 @@ public class AllTests {
 		suite.addTestSuite(SubscriberSipServletTest.class);
 		suite.addTestSuite(NotifierSipServletTest.class);
 		suite.addTestSuite(ReInviteSipServletTest.class);
+		suite.addTestSuite(UpdateSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);

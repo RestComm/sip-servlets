@@ -147,6 +147,8 @@ public class TestSipListener implements SipListener {
 	private List<Integer> provisionalResponsesToSend;
 
 	private boolean useToURIasRequestUri;
+
+	private boolean sendUpdateOn180;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 
@@ -223,8 +225,38 @@ public class TestSipListener implements SipListener {
 		if (request.getMethod().equals(Request.SUBSCRIBE)) {
 			processSubscribe(requestReceivedEvent, serverTransactionId);
 		}
+		
+		if (request.getMethod().equals(Request.UPDATE)) {
+			processUpdate(request, serverTransactionId);
+		}
 	}
 	
+	public void processUpdate(Request request,
+			ServerTransaction serverTransactionId) {
+		try {
+			logger.info("shootist:  got a bye . ServerTxId = " + serverTransactionId);
+			this.byeReceived  = true;
+			if (serverTransactionId == null) {
+				logger.info("shootist:  null TID.");
+				return;
+			}
+			
+			Dialog dialog = serverTransactionId.getDialog();			
+			logger.info("Dialog State = " + dialog.getState());
+			Response response = protocolObjects.messageFactory.createResponse(
+					200, request);
+			serverTransactionId.sendResponse(response);
+			this.transactionCount++;
+			logger.info("shootist:  Sending OK.");
+			logger.info("Dialog State = " + dialog.getState());
+		
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(0);
+
+		}
+	}
+
 	/**
 	 * Process the invite request.
 	 */
@@ -594,7 +626,7 @@ public class TestSipListener implements SipListener {
 		logger.info("Dialog = " + tid.getDialog());
 		logger.info("Dialog State is " + tid.getDialog().getState());
 
-		try {
+		try {			
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
 				finalResponseReceived = true;
 			}
@@ -710,6 +742,11 @@ public class TestSipListener implements SipListener {
 				if(cseq.getMethod().equals(Request.INVITE)){
 					this.requestTerminatedReceived = true;
 				}
+			} else if(response.getStatusCode() == Response.RINGING && sendUpdateOn180) {
+				Request updateRequest = dialog.createRequest(Request.UPDATE);
+				ClientTransaction ct = sipProvider
+						.getNewClientTransaction(updateRequest);
+				dialog.sendRequest(ct);
 			}
 			/**
 			 * end of modified code
@@ -1096,5 +1133,9 @@ public class TestSipListener implements SipListener {
 	 */
 	public void setOkToByeReceived(boolean okToByeReceived) {
 		this.okToByeReceived = okToByeReceived;
+	}
+
+	public void setSendUpdateOn180(boolean sendUpdateOn180) {
+		this.sendUpdateOn180 = sendUpdateOn180;
 	}	
 }

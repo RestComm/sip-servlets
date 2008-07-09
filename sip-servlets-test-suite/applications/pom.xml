@@ -33,6 +33,7 @@
 		<module>chatroom-sip-servlet</module>
 		<module>handler-sip-servlet</module>
 		<module>dispatcher-sip-servlet</module>				
+		<module>update-sip-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->
