@@ -39,9 +39,9 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public interface SipApplicationDispatcher extends SipListener {
 
 	// List of sip extensions supported by the container
-	public static final String[] EXTENSIONS_SUPPORTED = new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE"};
+	public static final String[] EXTENSIONS_SUPPORTED = new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH"};
 	// List of sip rfcs supported by the container
-	public static final String[] RFC_SUPPORTED = new String[] {"3261", "3428", "2976", "3265", "3311"};
+	public static final String[] RFC_SUPPORTED = new String[] {"3261", "3428", "2976", "3265", "3311", "3903"};
 	
 	/**
 	 * Initialize the sip application dispatcher. <br/>

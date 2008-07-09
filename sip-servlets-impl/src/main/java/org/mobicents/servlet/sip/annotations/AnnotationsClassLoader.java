@@ -619,14 +619,14 @@ public class AnnotationsClassLoader
     	}
     	File[] files = dir.listFiles();
     	for(File file:files) {
-    		if(!file.isDirectory()) {    			    	
+    		if(!file.isDirectory() && file.getName().indexOf(".jar") != -1) {    			    	
 	    		try {
 					addJar(file.getName(), new JarFile(file), file );
 				} catch (IOException e) {
-					log.error("An exception occured when trying to add the following jar to the AnnotationsClassLoader : " + file.getName(), e);
+					log.error("An exception occured when trying to add the following jar to the AnnotationsClassLoader : " + file.getAbsolutePath(), e);
 				}
     		} else {
-    			log.error(file.getName() + " is a directory in " + dirPath + " and as such will be skipped.");
+    			log.error(file.getAbsolutePath() + " is a directory in " + dirPath + " and as such will be skipped.");
     		}
     	}
     }
