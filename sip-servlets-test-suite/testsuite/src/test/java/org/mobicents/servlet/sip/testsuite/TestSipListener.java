@@ -49,7 +49,9 @@ import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.ReferToHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SIPETagHeader;
 import javax.sip.header.SIPIfMatchHeader;
@@ -158,6 +160,8 @@ public class TestSipListener implements SipListener {
 	private String sipETag;
 
 	private String publishContentMessage;
+
+	private boolean referReceived;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 
@@ -242,8 +246,70 @@ public class TestSipListener implements SipListener {
 		if (request.getMethod().equals(Request.PUBLISH)) {
 			processPublish(requestReceivedEvent, serverTransactionId);
 		}
+		
+		if (request.getMethod().equals(Request.REFER)) {
+			processRefer(requestReceivedEvent, serverTransactionId);
+		}
 	}
 	
+	public void processRefer(RequestEvent requestEvent,
+			ServerTransaction serverTransactionId) {
+		try {
+			SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+			Request request = requestEvent.getRequest();
+			
+			logger.info("shootist:  got a refer . ServerTxId = " + serverTransactionId);
+			ServerTransaction st = requestEvent.getServerTransaction();
+			if (st == null) {
+				st = sipProvider.getNewServerTransaction(request);
+			}
+			inviteServerTid = st;
+			Dialog dialog = st.getDialog();
+			
+			this.dialogCount ++;
+			this.dialog = dialog;
+			
+			logger.info("Shootme: dialog = " + dialog);
+			
+			Response response = protocolObjects.messageFactory.createResponse(
+					Response.ACCEPTED, request);
+			sipETag = Integer.toString((int) (Math.random()*10000000));
+			st.sendResponse(response);
+			this.transactionCount++;
+			logger.info("shootist:  Sending ACCEPTED.");			
+			
+			List<Header> headers = new ArrayList<Header>();
+			EventHeader eventHeader = (EventHeader) 
+				protocolObjects.headerFactory.createHeader(EventHeader.NAME, "Refer");
+			headers.add(eventHeader);
+			
+			if(!referReceived) {
+				referReceived = true;
+								
+				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
+				headers.add(subscriptionStateHeader);
+				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Trying", "message", "sipfrag;version=2.0", headers);
+				Thread.sleep(1000);
+				headers.remove(subscriptionStateHeader);
+				subscriptionStateHeader = (SubscriptionStateHeader) 
+					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "terminated;reason=noresource");
+				headers.add(subscriptionStateHeader);
+				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 200 OK", "message", "sipfrag;version=2.0", headers);
+			} else {
+				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
+				headers.add(subscriptionStateHeader);
+				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Subsequent", "message", "sipfrag;version=2.0", headers);
+			}
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(0);
+
+		}		
+	}
+
 	private void processPublish(RequestEvent requestEvent,
 			ServerTransaction serverTransactionId) {
 		try {
@@ -297,6 +363,7 @@ public class TestSipListener implements SipListener {
 		}		
 	}
 
+	
 	public void processUpdate(Request request,
 			ServerTransaction serverTransactionId) {
 		try {
@@ -474,8 +541,14 @@ public class TestSipListener implements SipListener {
 			// Subscription is terminated?
 			String state = subscriptionState.getState();
 			allSubscriptionStates.add(state.toLowerCase());
+			if(notify.getRawContent() != null) {
+				this.lastMessageContent = new String(notify.getRawContent());
+				allMessagesContent.add(new String(lastMessageContent));
+			}
 			if (state.equalsIgnoreCase(SubscriptionStateHeader.TERMINATED)) {
-				dialog.delete();
+				if(subscriptionState.getReasonCode() == null) {
+					dialog.delete();
+				}
 			} else if (state.equalsIgnoreCase(SubscriptionStateHeader.ACTIVE)) {
 				if("reg".equalsIgnoreCase(((EventHeader)notify.getHeader(EventHeader.NAME)).getEventType())) {
 					logger.info("Subscriber: sending unSUBSCRIBE");
@@ -987,6 +1060,10 @@ public class TestSipListener implements SipListener {
 				request.setContent(publishContentMessage, contentTypeHeader);
 			}
 		}
+		if(Request.REFER.equals(method)) {
+			ReferToHeader referToHeader = (ReferToHeader) protocolObjects.headerFactory.createHeader(ReferToHeader.NAME, "sip:refer-to@nist.gov");
+			request.addHeader(referToHeader);
+		}
 		// Create the client transaction.
 		inviteClientTid = sipProvider.getNewClientTransaction(request);
 		// send the request out.
@@ -1106,6 +1183,34 @@ public class TestSipListener implements SipListener {
 		return ackReceived;
 	}
 
+	/**
+	 * 
+	 * @param messageToSend
+	 * @throws SipException
+	 * @throws InvalidArgumentException
+	 * @throws ParseException
+	 */ 
+	public void sendInDialogSipRequest(String method, String content, String contentType, String subContentType, List<Header> headers) throws SipException, InvalidArgumentException, ParseException {		
+		Request message = dialog.createRequest(method);
+		if(content != null) {
+			ContentLengthHeader contentLengthHeader = 
+				protocolObjects.headerFactory.createContentLengthHeader(content.length());
+			ContentTypeHeader contentTypeHeader = 
+				protocolObjects.headerFactory.createContentTypeHeader(contentType,subContentType);
+			message.setContentLength(contentLengthHeader);
+			message.setContent(content, contentTypeHeader);
+		}
+		
+		if(headers != null) {
+			for (Header header : headers) {
+				message.addHeader(header);
+			}
+		}
+				
+		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
+		dialog.sendRequest(clientTransaction);
+	}
+	
 	/**
 	 * 
 	 * @param messageToSend

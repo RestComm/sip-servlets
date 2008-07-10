@@ -107,7 +107,7 @@ public class PublishSipServletTest extends SipServletTestCase {
 	 * Call flow tested : See RFC 3903 Page 23
 	 * in this test, Sip Servlet is acting as PA(ESC) 
 	 */
-	public void testSendingPublish() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testSipServletReceivesPublish() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "watcher";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = watcherProtocolObjects.addressFactory.createSipURI(
@@ -153,7 +153,7 @@ public class PublishSipServletTest extends SipServletTestCase {
 	 * Call flow tested : See RFC 3903 Page 23
 	 * in this test, Sip Servlet is acting as PUA(EPA) 
 	 */
-	public void testReceivingPublish() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testSipServletSendsPublish() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		Thread.sleep(TIMEOUT);
 		Iterator<String> allMessagesIterator = watcher.getAllMessagesContent().iterator();
 		logger.info("all messages received : ");

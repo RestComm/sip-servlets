@@ -98,7 +98,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 	 */
 	protected void doSubscribe(SipServletRequest request) throws ServletException,
 			IOException {
-
+		//If we receive a SUBSCRIBE, we cancel the timer to avoid acting as UAC and sending PUBLISH
 		ServletTimer servletTimer = (ServletTimer)getServletContext().getAttribute("servletTimer");
 		servletTimer.cancel();
 		
