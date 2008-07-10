@@ -19,6 +19,9 @@ package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.SIPHeader;
+import gov.nist.javax.sip.header.extensions.ReferredByHeader;
+import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
+import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.IOException;
@@ -161,9 +164,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	static {
 
-		// The baseline SIP specification defines the following set of header
+		// Section 4.1 The baseline SIP specification defines the following set of header
 		// fields that conform to this grammar: From, To, Contact, Route,
 		// Record-Route, Reply-To, Alert-Info, Call-Info, and Error-Info
+		// The SipServletMessage interface defines a set of methods which operate 
+		// on any address header field (see section 5.4.1 Parameterable and Address Header Fields ). 
+		// This includes the RFC 3261 defined header fields listed above as well as extension headers 
+		// such as Refer-To [refer] and P-Asserted-Identity [privacy]. 
 
 		addressHeadersNames.add(FromHeader.NAME);
 		addressHeadersNames.add(ToHeader.NAME);
@@ -175,6 +182,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		addressHeadersNames.add(CallInfoHeader.NAME);
 		addressHeadersNames.add(ErrorInfoHeader.NAME);
 		addressHeadersNames.add(ReferToHeader.NAME);
+		addressHeadersNames.add(PAssertedIdentityHeader.NAME);
 			
 	}
 
@@ -220,10 +228,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		// sthis header?
 		// headerCompact2FullNamesMappings.put("n",IdentityInfoHeader );
 		headerCompact2FullNamesMappings.put("r", ReferToHeader.NAME);
-		// headerCompact2FullNamesMappings.put("b", ReferedByHeader);
+		 headerCompact2FullNamesMappings.put("b", ReferredByHeader.NAME);
 		// headerCompact2FullNamesMappings.put("j", RejectContactHeader);
 		headerCompact2FullNamesMappings.put("d", ContentDispositionHeader.NAME);
-		// headerCompact2FullNamesMappings.put("x", SessionExpiresHeader);
+		 headerCompact2FullNamesMappings.put("x", SessionExpiresHeader.NAME);
 		headerCompact2FullNamesMappings.put("s", SubjectHeader.NAME);
 		headerCompact2FullNamesMappings.put("k", SupportedHeader.NAME);
 	}

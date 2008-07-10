@@ -72,6 +72,7 @@ public class JainSipUtils {
 	static {		
 		dialogCreatingMethods.add(Request.INVITE);
 		dialogCreatingMethods.add(Request.SUBSCRIBE);
+		dialogCreatingMethods.add(Request.REFER);
 		dialogTerminatingMethods.add(Request.CANCEL);
 		dialogTerminatingMethods.add(Request.BYE);
 	}
