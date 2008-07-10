@@ -72,7 +72,7 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();			
 	}
 	
-	public void testShootist() throws InterruptedException {
+	public void testSipServletSendsSubscribe() throws InterruptedException {
 //		receiver.sendInvite();
 		Thread.sleep(TIMEOUT);
 		assertEquals(3, receiver.getAllSubscriptionState().size());

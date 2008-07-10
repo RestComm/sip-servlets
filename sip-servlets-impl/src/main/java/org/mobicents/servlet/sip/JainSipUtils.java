@@ -28,6 +28,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -172,31 +173,5 @@ public class JainSipUtils {
 		}
 		 
 		return transport;
-	}
-	/**
-	 * 
-	 * @param errorCode
-	 * @param transaction
-	 * @param request
-	 * @param sipProvider
-	 * @throws ParseException
-	 * @throws SipException
-	 * @throws InvalidArgumentException
-	 */
-	public static void sendErrorResponse(int errorCode,
-			ServerTransaction transaction, Request request,
-			SipProvider sipProvider) {
-		try{
-			Response response=SipFactories.messageFactory.createResponse
-	        	(errorCode,request);			
-	        if (transaction!=null) {
-	        	transaction.sendResponse(response);
-	        } else { 
-	        	sipProvider.sendResponse(response);
-	        }
-		} catch (Exception e) {
-			logger.error("Problem while sending the error response to the following request "
-					+ request.toString(), e);
-		}
 	}
 }

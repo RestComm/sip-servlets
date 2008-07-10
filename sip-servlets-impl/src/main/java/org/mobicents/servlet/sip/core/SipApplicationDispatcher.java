@@ -23,6 +23,8 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.sip.SipListener;
+import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
 
 import org.apache.catalina.LifecycleException;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -143,7 +145,14 @@ public interface SipApplicationDispatcher extends SipListener {
 	 */
 	SipApplicationRouterInfo getNextInterestedApplication(SipServletRequestImpl sipServletRequestImpl);
 	
-	public String getDomain();
+	String getDomain();
     
-    public void setDomain(String domain);	
+    void setDomain(String domain);
+    
+    boolean isRouteExternal(RouteHeader routeHeader);
+    
+    boolean isViaHeaderExternal(ViaHeader viaHeader);
+    
+    boolean isExternal(String host, int port, String transport);
+    
 }

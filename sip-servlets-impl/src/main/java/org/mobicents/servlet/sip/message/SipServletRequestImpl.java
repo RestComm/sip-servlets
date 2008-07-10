@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.RequestDispatcher;
@@ -76,6 +78,7 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
@@ -87,6 +90,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
 	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
 		
+	public static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
+	
+	static {
+		nonInitialSipRequestMethods.add("CANCEL");
+		nonInitialSipRequestMethods.add("BYE");
+		nonInitialSipRequestMethods.add("PRACK");
+		nonInitialSipRequestMethods.add("ACK");
+		nonInitialSipRequestMethods.add("UPDATE");
+		nonInitialSipRequestMethods.add("INFO");
+	};
+	
 	/* Linked request (for b2bua) */
 	private SipServletRequestImpl linkedRequest;
 	
@@ -802,13 +816,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			super.session.updateStateOnSubsequentRequest(this, false);
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					session.getKey().getApplicationName());
 			if(session.getHandler() != null && session.getHandler().length() > 0) {
-				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+				viaHeader.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME,
 					session.getHandler());
 			} else {
-				viaHeader.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+				viaHeader.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME,
 						session.getSipApplicationSession().getSipContext().getMainServlet());
 			}
 			
@@ -848,9 +862,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
 				JainSipUtils.findTransport(request));
 		sipURI.setLrParam();
-		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_DIRECTIVE, 
+		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_DIRECTIVE, 
 				routingDirective.toString());
-		sipURI.setParameter(SipApplicationDispatcherImpl.ROUTE_PARAM_PREV_APPLICATION_NAME, 
+		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APPLICATION_NAME, 
 				applicationName);
 		javax.sip.address.Address routeAddress = 
 			SipFactories.addressFactory.createAddress(sipURI);
@@ -872,8 +886,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
 				JainSipUtils.findTransport(request));
-		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
-		sipURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME, session.getHandler());
+		sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
+		sipURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, session.getHandler());
 		
 		sipURI.setLrParam();
 		javax.sip.address.Address recordRouteAddress = 
@@ -1093,7 +1107,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}		
 		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
 		//The request is not an initial request for which application selection occurs.
-		if(SipApplicationDispatcherImpl.nonInitialSipRequestMethods.contains(sipServletRequest.getMethod())) {
+		if(nonInitialSipRequestMethods.contains(sipServletRequest.getMethod())) {
 			return RoutingState.SUBSEQUENT;
 		}
 		// 4. Existing Dialog Detection - If the request has a tag in the To header field, 
@@ -1114,45 +1128,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if(dialog != null && !DialogState.EARLY.equals(dialog.getState())) {
 			return RoutingState.SUBSEQUENT;
 		}
-		// 5. Detection of Merged Requests - If the From tag, Call-ID, and CSeq exactly 
-		// match those associated with an ongoing transaction, 
-		// the request has arrived more than once across different paths, most likely due to forking. 
-		// Such requests represent merged requests and MUST NOT be treated as initial requests. 
-		// Refer to section 11.3 for more information on container treatment of merged requests.
 		
-		// The jain sip stack will send the 482 for us, in the other case the app will see the merged request 
-		// and be able to proxy it. Jain sip rocks and rolls !
-//		Iterator<SipSessionImpl> sipSessionIterator = sessionManager.getAllSipSessions();
-//		while (sipSessionIterator.hasNext()) {
-//			SipSessionImpl sipSessionImpl = (SipSessionImpl) sipSessionIterator
-//					.next();				
-//			Set<Transaction> transactions = sipSessionImpl.getOngoingTransactions();		
-//			for (Transaction transaction : transactions) {
-//				Request onGoingRequest = transaction.getRequest();
-//				Request currentRequest = (Request) sipServletRequest.getMessage();
-//				//Get the from headers
-//				FromHeader onGoingFromHeader = (FromHeader) onGoingRequest.getHeader(FromHeader.NAME);
-//				FromHeader currentFromHeader = (FromHeader) currentRequest.getHeader(FromHeader.NAME);
-//				//Get the CallId headers
-//				CallIdHeader onGoingCallIdHeader = (CallIdHeader) onGoingRequest.getHeader(CallIdHeader.NAME);
-//				CallIdHeader currentCallIdHeader = (CallIdHeader) currentRequest.getHeader(CallIdHeader.NAME);
-//				//Get the CSeq headers
-//				CSeqHeader onGoingCSeqHeader = (CSeqHeader) onGoingRequest.getHeader(CSeqHeader.NAME);
-//				CSeqHeader currentCSeqHeader = (CSeqHeader) currentRequest.getHeader(CSeqHeader.NAME);
-//				if(onGoingCSeqHeader.equals(currentCSeqHeader) &&
-//						onGoingCallIdHeader.equals(currentCallIdHeader) &&
-//						onGoingFromHeader.equals(currentFromHeader)) {
-//					return RoutingState.MERGED;
-//				}
-//			}
-//		}
-		
-		// TODO 6. Detection of Requests Sent to Encoded URIs - 
+		// 6. Detection of Requests Sent to Encoded URIs - 
 		// Requests may be sent to a container instance addressed to a URI obtained by calling 
 		// the encodeURI() method of a SipApplicationSession managed by this container instance. 
 		// When a container receives such a request, stop. This request is not an initial request. 
-		// Refer to section 15.9.2 Simple call with no modifications of requests 
-		// for more information on how a request sent to an encoded URI is handled by the container.
+		// Refer to section 15.11.1 Session Targeting and Application Selection 
+		//for more information on how a request sent to an encoded URI is handled by the container.
+		//This part will be done in routeIntialRequest since this is where the Session Targeting retrieval is done
 		
 		return RoutingState.INITIAL;		
 	}	

@@ -72,7 +72,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -355,7 +355,7 @@ public class SipSessionImpl implements SipSession {
 		while (routeHeaders.hasNext()) {
 			RouteHeader routeHeader = routeHeaders.next();
 			String routeAppName = ((javax.sip.address.SipURI)routeHeader .getAddress().getURI()).
-				getParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME);
+				getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 			if(routeAppName == null || !routeAppName.equals(getKey().getApplicationName())) {
 				request.addHeader(routeHeader);
 			}

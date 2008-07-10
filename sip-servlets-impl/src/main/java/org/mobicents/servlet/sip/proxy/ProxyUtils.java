@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -146,9 +146,9 @@ public class ProxyUtils {
 							params.routeRecord.getParameter(paramName));
 				}
 				
-				rrURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_APPLICATION_NAME,
+				rrURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 						originalRequest.getSipSession().getKey().getApplicationName());
-				rrURI.setParameter(SipApplicationDispatcherImpl.RR_PARAM_HANDLER_NAME,
+				rrURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME,
 						originalRequest.getSipSession().getHandler());
 				rrURI.setLrParam();
 				
