@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UpdateSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Log logger = LogFactory.getLog(UpdateSipServlet.class);
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public UpdateSipServlet() {
