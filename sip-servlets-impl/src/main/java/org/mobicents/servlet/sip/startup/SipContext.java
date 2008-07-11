@@ -25,6 +25,7 @@ import javax.servlet.sip.SipServletRequest;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
@@ -106,4 +107,6 @@ public interface SipContext extends Context {
 	void addChild(SipServletImpl child);
 	
 	void removeChild(SipServletImpl child);
+	
+	SipManager getSipManager();
 }

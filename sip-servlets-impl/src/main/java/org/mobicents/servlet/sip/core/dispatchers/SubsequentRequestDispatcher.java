@@ -69,7 +69,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws Exception {
+	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
 		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isInfoEnabled()) {
@@ -88,9 +88,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The popped route is null for an ACK, this is an ACK to a container generated error response, so it is dropped");
 				}
-				return false;
+				return ;
 			} else {
-				throw new IllegalArgumentException("The popped route shouldn't be null for not proxied requests.");
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "The popped route shouldn't be null for not proxied requests.");
 			}
 		}
 		//Extract information from the Record Route Header		
@@ -103,7 +103,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		if(applicationName == null || applicationName.length() < 1 || 
 				handlerName == null || handlerName.length() < 1) {
-			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
 		boolean inverted = false;
@@ -113,7 +113,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationName);
 		if(sipContext == null) {
-			throw new IllegalArgumentException("cannot find the application to handle this subsequent request " +
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
 		SipManager sipManager = (SipManager)sipContext.getManager();
@@ -129,12 +129,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		SipApplicationSessionImpl sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
-			logger.error("Cannot find the corresponding sip application session to this subsequent request " + request +
-					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 			sipManager.dumpSipApplicationSessions();
-			// Sends a 500 Internal server error and stops processing.				
-			sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-			return false;
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 		}
 		
 		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
@@ -150,13 +147,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		}
 		
-		if(sipSession == null) {			
-			logger.error("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
-					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+		if(sipSession == null) {
 			sipManager.dumpSipSessions();
-			// Sends a 500 Internal server error and stops processing.				
-			sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-			return false;
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
@@ -174,29 +168,19 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			if(sipServletRequest.getSipSession().getProxyBranch() != null) {
 				ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
 				if(proxyBranch.getProxy().getSupervised()) {
-					SipApplicationDispatcherImpl.callServlet(sipServletRequest);
+					callServlet(sipServletRequest);
 				}
 				proxyBranch.proxySubsequentRequest(sipServletRequest);
 			}
 			// If it's not for a proxy then it's just an AR, so go to the next application
 			else {
-				SipApplicationDispatcherImpl.callServlet(sipServletRequest);				
+				callServlet(sipServletRequest);				
 			}
-		} catch (ServletException e) {				
-			logger.error("An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
-			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
-				sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-			}
-			return false;
+		} catch (ServletException e) {
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
 		} catch (IOException e) {				
-			logger.error("An unexpected IO exception occured while processing the following subsequent request " + request, e);
-			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
-			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
-				sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-			}
-			return false;
-		} 
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+		} 	 
 
 		//if a final response has been sent, or if the request has 
 		//been proxied or relayed we stop routing the request
@@ -209,7 +193,6 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
 						"The Container hence stops routing the subsequent request.");
 			}
-			return false;
 		} 
 		else {					
 			if(finalResponse != null && finalResponse.length() > 0) {
@@ -217,7 +200,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					logger.info("Subsequent Request reached the servlet application " +
 						"that sent a final response, stop routing the subsequent request " + request.toString());
 				}
-				return false;
+				return ;
 			}
 			// Check if the request is meant for me. 
 			RouteHeader routeHeader = (RouteHeader) request
@@ -232,16 +215,22 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							logger.info("Subsequent Request dispatched outside the container" + request.toString());
 						}
 					} catch (Exception ex) {			
-						throw new IllegalStateException("Error sending request",ex);
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Error sending request",ex);
 					}	
 				} else {
-					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);	
+					try{
+						forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
+					} catch (Exception e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+					}
 				}
-				return false;
 			} else {		
 				//route header is meant for the container hence we continue
-				forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
-				return true;
+				try {
+					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
+				} catch (Exception e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+				}
 			}
 		}		
 	}	

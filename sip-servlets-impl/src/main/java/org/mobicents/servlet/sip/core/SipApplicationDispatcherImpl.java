@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,12 +48,10 @@ import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
-import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.Transaction;
@@ -78,6 +75,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -392,6 +390,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 										
 			MessageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 				dispatchMessage(sipProvider, sipServletRequest);
+		} catch (DispatcherException e) {
+			logger.error("Unexpected exception while processing request",e);
+			// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
+				MessageDispatcher.sendErrorResponse(e.getErrorCode(), transaction, request, sipProvider);
+			}
+			return;
 		} catch (Throwable e) {
 			logger.error("Unexpected exception while processing request",e);
 			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
@@ -445,135 +450,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				null, 
 				dialog);
 		
-		boolean continueRouting = false;
 		try {
-			continueRouting = MessageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
+			MessageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
 				dispatchMessage(null, sipServletResponse);
-		} catch (Exception e) {
-			logger.error("An unexpected exception happened while routing the response " +  response);
+		} catch (Throwable e) {
+			logger.error("An unexpected exception happened while routing the response " +  response, e);
 			return;
 		}
-				
-		// if continue routing is to true it means that
-		// a B2BUA got it so we don't have anything to do here 
-		// or an app that didn't do anything with it
-		// or a when handling the request an app had to be called but wasn't deployed
-		// we have to strip the topmost via header and forward it statefully		
-		if (continueRouting) {			
-			Response newResponse = (Response) response.clone();
-			newResponse.removeFirst(ViaHeader.NAME);
-			ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
-			if(viaHeadersLeft.hasNext()) {
-				//forward it statefully
-				//TODO should decrease the max forward header to avoid infinite loop
-				if(logger.isDebugEnabled()) {
-					logger.debug("forwarding the response statefully " + newResponse);
-				}
-				TransactionApplicationData applicationData = null; 
-				if(responseEvent.getClientTransaction() != null) {
-					applicationData = (TransactionApplicationData)responseEvent.getClientTransaction().getApplicationData();
-					if(logger.isDebugEnabled()) {
-						logger.debug("ctx application Data " + applicationData);
-					}
-				}
-				//there is no client transaction associated with it, it means that this is a retransmission
-				else if(responseEvent.getDialog() != null){	
-					applicationData = (TransactionApplicationData)responseEvent.getDialog().getApplicationData();
-					if(logger.isDebugEnabled()) {
-						logger.debug("dialog application data " + applicationData);
-					}
-				}								
-				ServerTransaction serverTransaction = (ServerTransaction)
-					applicationData.getTransaction();
-				try {					
-					serverTransaction.sendResponse(newResponse);
-				} catch (SipException e) {
-					logger.error("cannot forward the response statefully" , e);
-				} catch (InvalidArgumentException e) {
-					logger.error("cannot forward the response statefully" , e);
-				}				
-			} else {
-				//B2BUA case we don't have to do anything here
-				//no more via header B2BUA is the end point
-				if(logger.isDebugEnabled()) {
-					logger.debug("Not forwarding the response statefully. " +
-							"It was either an endpoint or a B2BUA, ie an endpoint too " + newResponse);
-				}
-			}			
-		}
-								
-	}
-	
-	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
-		SipSessionImpl session = request.getSipSession();
-		if(logger.isInfoEnabled()) {
-			logger.info("Dispatching request " + request.toString() + 
-				" to following App/servlet => " + session.getKey().getApplicationName()+ 
-				"/" + session.getHandler());
-		}
-		String sessionHandler = session.getHandler();
-		SipApplicationSessionImpl sipApplicationSessionImpl = session.getSipApplicationSession();
-		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
-		Servlet servlet = sipServletImpl.allocate();		
-		
-		// JBoss-specific CL issue:
-		// This is needed because usually the classloader here is some UnifiedClassLoader3,
-		// which has no idea where the servlet ENC is. We will use the classloader of the
-		// servlet class, which is the WebAppClassLoader, and has ENC fully loaded with
-		// with java:comp/env/security (manager, context etc)
-		ClassLoader cl = servlet.getClass().getClassLoader();
-		Thread.currentThread().setContextClassLoader(cl);
-		
-		if(!securityCheck(request)) return;
-	    
-		try {
-			servlet.service(request, null);
-		} finally {		
-			sipServletImpl.deallocate(servlet);
-		}
-		
-		// We invalidate here just after the servlet is called because before that the session would be unavailable
-		// to the user code. TODO: FIXME: This event should occur after all transations are complete.
-		// if(session.isReadyToInvalidate() && session.getInvalidateWhenReady()) session.invalidate();
-	}
-	
-	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
-		SipSessionImpl session = response.getSipSession();
-		if(logger.isInfoEnabled()) {
-			logger.info("Dispatching response " + response.toString() + 
-				" to following App/servlet => " + session.getKey().getApplicationName()+ 
-				"/" + session.getHandler());
-		}
-		
-		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
-		Wrapper sipServletImpl = (Wrapper) container;
-		
-		if(sipServletImpl.isUnavailable()) {
-			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
-		} else {
-			Servlet servlet = sipServletImpl.allocate();
-			try {
-				servlet.service(null, response);
-			} finally {
-				sipServletImpl.deallocate(servlet);
-			}
-		}
-				
-	}
-	
-	public static boolean securityCheck(SipServletRequestImpl request)
-	{
-		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
-		SipContext sipStandardContext = appSession.getSipContext();
-		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
-		
-		// This will propagate the identity for the thread and all called components
-		// TODO: FIXME: This would introduce a dependency on JBoss
-		// SecurityAssociation.setPrincipal(request.getUserPrincipal());
-		
-		return authorized;
-	}
+	}	
 
 	/*
 	 * (non-Javadoc)
@@ -658,16 +542,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
 		}
 		
-		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
-		SipSessionImpl sipSessionImpl = tad.getSipServletMessage().getSipSession();
-		if(sipSessionImpl == null) {
-			if(logger.isInfoEnabled()) {
-				logger.info("no sip session were returned for this transaction " + transaction);
+		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+		if(tad != null) {
+			SipSessionImpl sipSessionImpl = tad.getSipServletMessage().getSipSession();
+			if(sipSessionImpl == null) {
+				if(logger.isInfoEnabled()) {
+					logger.info("no sip session were returned for this transaction " + transaction);
+				}
+			} else {
+				sipSessionImpl.removeOngoingTransaction(transaction);
+				if(sipSessionImpl.isReadyToInvalidate()) {
+					sipSessionImpl.onTerminatedState();
+				}
 			}
 		} else {
-			sipSessionImpl.removeOngoingTransaction(transaction);
-			if(sipSessionImpl.isReadyToInvalidate()) {
-				sipSessionImpl.onTerminatedState();
+			if(logger.isDebugEnabled()) {
+				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
 		}
 	}
@@ -875,11 +765,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} catch (ParseException e) {
 			logger.error("Impossible to parse the route returned by the application router " +
 					"into a compliant address",e);							
-			// the AR returned an empty string route or a bad route
-			// this shouldn't happen if the route modifier is ROUTE, processing is stopped
-			//and a 500 is sent
-//					JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
-//					return false;
 		}
 		return applicationRouterInfo;
 	}

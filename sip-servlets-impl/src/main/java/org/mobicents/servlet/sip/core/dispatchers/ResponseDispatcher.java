@@ -22,6 +22,9 @@ import java.util.ListIterator;
 import javax.servlet.ServletException;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.InvalidArgumentException;
+import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Response;
@@ -29,7 +32,6 @@ import javax.sip.message.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -61,19 +63,19 @@ public class ResponseDispatcher extends MessageDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) {		
+	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
 		SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
-		Response response = sipServletResponse.getResponse();
-		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
-		ViaHeader viaHeader = viaHeaders.next();
+		final Response response = sipServletResponse.getResponse();
+		final ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
+		final ViaHeader viaHeader = viaHeaders.next();
 		if(logger.isInfoEnabled()) {
 			logger.info("viaHeader = " + viaHeader.toString());
 		}
 		//response meant for the container
 		if(!sipApplicationDispatcher.isViaHeaderExternal(viaHeader)) {
-			ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
-			Dialog dialog = sipServletResponse.getDialog();
+			final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
+			final Dialog dialog = sipServletResponse.getDialog();
 			
 			TransactionApplicationData applicationData = null;
 			SipServletRequestImpl originalRequest = null;
@@ -90,22 +92,22 @@ public class ResponseDispatcher extends MessageDispatcher {
 					if(logger.isDebugEnabled()) {
 						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
 					}
-					return true;
+					forwardResponseStatefully(sipServletResponse);
 				}
 			}
 			sipServletResponse.setOriginalRequest(originalRequest);
 			
 			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
 			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
-				return true;
+				forwardResponseStatefully(sipServletResponse);
 			}
 			String noAppReturned = viaHeader.getParameter(NO_APP_RETURNED);
 			if(noAppReturned != null && noAppReturned.length() > 0) {
-				return true;
+				forwardResponseStatefully(sipServletResponse);
 			}
 			String modifier = viaHeader.getParameter(MODIFIER);
 			if(modifier != null && modifier.length() > 0) {
-				return true;
+				forwardResponseStatefully(sipServletResponse);
 			}
 			String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
 			boolean inverted = false;
@@ -139,7 +141,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			
 			if(session == null) {
 				logger.error("Dropping the response since no active sip session has been found for it : " + response);
-				return false;
+				return ;
 			} else {
 				sipServletResponse.setSipSession(session);
 			}			
@@ -166,33 +168,86 @@ public class ResponseDispatcher extends MessageDispatcher {
 						logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
 					}
 					if(proxyBranch.getProxy().getSupervised()) {
-						SipApplicationDispatcherImpl.callServlet(sipServletResponse);
+						callServlet(sipServletResponse);
 					}
-					return false;
+					//we don't forward the response here since this has been done by the proxy
 				}
 				else {
 					// Update Session state
 					session.updateStateOnResponse(sipServletResponse, true);
 
-					SipApplicationDispatcherImpl.callServlet(sipServletResponse);
+					callServlet(sipServletResponse);
+					forwardResponseStatefully(sipServletResponse);
 				}
 			} catch (ServletException e) {				
 				logger.error("Unexpected servlet exception while processing the response : " + response, e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				return false;
 			} catch (IOException e) {				
 				logger.error("Unexpected io exception while processing the response : " + response, e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				return false;
 			} catch (Throwable e) {				
 				logger.error("Unexpected exception while processing response : " + response, e);
 				// Sends a 500 Internal server error and stops processing.				
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				return false;
 			}
+		} else {
+			forwardResponseStatefully(sipServletResponse);
 		}
-		return true;		
+	}
+	
+	/**
+	 * this method is called when 
+	 * a B2BUA got the response so we don't have anything to do here 
+	 * or an app that didn't do anything with it
+	 * or when handling the request an app had to be called but wasn't deployed
+	 * the topmost via header is stripped from the response and the response is forwarded statefully
+	 * @param sipServletResponse
+	 */
+	private final static void forwardResponseStatefully(SipServletResponseImpl sipServletResponse) {
+		final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
+		final Dialog dialog = sipServletResponse.getDialog();
+		
+		Response newResponse = (Response) sipServletResponse.getResponse().clone();
+		newResponse.removeFirst(ViaHeader.NAME);
+		ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
+		if(viaHeadersLeft.hasNext()) {
+			//forward it statefully
+			//TODO should decrease the max forward header to avoid infinite loop
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwarding the response statefully " + newResponse);
+			}
+			TransactionApplicationData applicationData = null; 
+			if(clientTransaction != null) {
+				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
+				if(logger.isDebugEnabled()) {
+					logger.debug("ctx application Data " + applicationData);
+				}
+			}
+			//there is no client transaction associated with it, it means that this is a retransmission
+			else if(dialog != null){	
+				applicationData = (TransactionApplicationData)dialog.getApplicationData();
+				if(logger.isDebugEnabled()) {
+					logger.debug("dialog application data " + applicationData);
+				}
+			}								
+			ServerTransaction serverTransaction = (ServerTransaction)
+				applicationData.getTransaction();
+			try {					
+				serverTransaction.sendResponse(newResponse);
+			} catch (SipException e) {
+				logger.error("cannot forward the response statefully" , e);
+			} catch (InvalidArgumentException e) {
+				logger.error("cannot forward the response statefully" , e);
+			}				
+		} else {
+			//B2BUA case we don't have to do anything here
+			//no more via header B2BUA is the end point
+			if(logger.isDebugEnabled()) {
+				logger.debug("Not forwarding the response statefully. " +
+						"It was either an endpoint or a B2BUA, ie an endpoint too " + newResponse);
+			}
+		}			
 	}
 }

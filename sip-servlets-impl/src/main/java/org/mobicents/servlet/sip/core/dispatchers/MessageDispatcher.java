@@ -16,12 +16,15 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -39,6 +42,8 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.catalina.Container;
+import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
@@ -48,12 +53,15 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -114,8 +122,7 @@ public abstract class MessageDispatcher {
 	 * @throws SipException
 	 * @throws InvalidArgumentException 
 	 */
-	public final void forwardStatefully(SipServletRequestImpl sipServletRequest, SipSessionRoutingType sipSessionRoutingType, SipRouteModifier sipRouteModifier) throws ParseException,
-			TransactionUnavailableException, SipException, InvalidArgumentException {
+	protected final void forwardStatefully(SipServletRequestImpl sipServletRequest, SipSessionRoutingType sipSessionRoutingType, SipRouteModifier sipRouteModifier) throws Exception {
 		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipApplicationDispatcher.getSipNetworkInterfaceManager();
 		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();		
 		
@@ -355,6 +362,78 @@ public abstract class MessageDispatcher {
 				isAppGeneratedKey);
 		return sipApplicationSessionKey;
 	}
+	
+	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
+		SipSessionImpl session = request.getSipSession();
+		if(logger.isInfoEnabled()) {
+			logger.info("Dispatching request " + request.toString() + 
+				" to following App/servlet => " + session.getKey().getApplicationName()+ 
+				"/" + session.getHandler());
+		}
+		String sessionHandler = session.getHandler();
+		SipApplicationSessionImpl sipApplicationSessionImpl = session.getSipApplicationSession();
+		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
+		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
+		Servlet servlet = sipServletImpl.allocate();		
+		
+		// JBoss-specific CL issue:
+		// This is needed because usually the classloader here is some UnifiedClassLoader3,
+		// which has no idea where the servlet ENC is. We will use the classloader of the
+		// servlet class, which is the WebAppClassLoader, and has ENC fully loaded with
+		// with java:comp/env/security (manager, context etc)
+		ClassLoader cl = servlet.getClass().getClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+		
+		if(!securityCheck(request)) return;
+	    
+		try {
+			servlet.service(request, null);
+		} finally {		
+			sipServletImpl.deallocate(servlet);
+		}
+		
+		// We invalidate here just after the servlet is called because before that the session would be unavailable
+		// to the user code. TODO: FIXME: This event should occur after all transations are complete.
+		// if(session.isReadyToInvalidate() && session.getInvalidateWhenReady()) session.invalidate();
+	}
+	
+	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
+		SipSessionImpl session = response.getSipSession();
+		if(logger.isInfoEnabled()) {
+			logger.info("Dispatching response " + response.toString() + 
+				" to following App/servlet => " + session.getKey().getApplicationName()+ 
+				"/" + session.getHandler());
+		}
+		
+		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
+		Wrapper sipServletImpl = (Wrapper) container;
+		
+		if(sipServletImpl.isUnavailable()) {
+			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
+		} else {
+			Servlet servlet = sipServletImpl.allocate();
+			try {
+				servlet.service(null, response);
+			} finally {
+				sipServletImpl.deallocate(servlet);
+			}
+		}
+				
+	}
+	
+	public static boolean securityCheck(SipServletRequestImpl request)
+	{
+		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
+		SipContext sipStandardContext = appSession.getSipContext();
+		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
+		
+		// This will propagate the identity for the thread and all called components
+		// TODO: FIXME: This would introduce a dependency on JBoss
+		// SecurityAssociation.setPrincipal(request.getUserPrincipal());
+		
+		return authorized;
+	}
+	
 	/**
 	 * Responsible for routing and dispatching a SIP message to the correct application
 	 * 
@@ -363,5 +442,5 @@ public abstract class MessageDispatcher {
 	 * @return true if we should continue routing to other applications, false otherwise
 	 * @throws Exception if anything wrong happens
 	 */
-	public abstract boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws Exception;
+	public abstract void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException;
 }

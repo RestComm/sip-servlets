@@ -779,4 +779,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public void removeSipServletMapping(SipServletMapping sipServletMapping) {
 		sipServletMappings.remove(sipServletMapping);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipManager getSipManager() {
+		return (SipManager)manager;
+	}
 }
