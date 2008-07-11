@@ -31,11 +31,9 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.SipTargetedRequestInfo;
 import javax.servlet.sip.ar.SipTargetedRequestType;
-import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
 import javax.sip.header.Header;
@@ -60,12 +58,19 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
+ * This class is responsible for implementing the logic for routing an initial request
+ * according to the following sections of the JSR 289 specification Section 
+ * 15.4.1 Procedure for Routing an Initial Request.
+ * 15.11 Session Targeting 
+ * 16 Mapping Requests To Servlets 
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
@@ -75,25 +80,20 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	private SipApplicationRouter sipApplicationRouter;
 	
 	public InitialRequestDispatcher(
-			SipApplicationDispatcher sipApplicationDispatcher, SipApplicationRouter sipApplicationRouter) {		
+			SipApplicationDispatcher sipApplicationDispatcher) {		
 		super(sipApplicationDispatcher);
-		this.sipApplicationRouter = sipApplicationRouter;
+		this.sipApplicationRouter = sipApplicationDispatcher.getSipApplicationRouter();
 	}
 
 	/**
-	 * 
-	 * @param sipProvider
-	 * @param transaction
-	 * @param request
-	 * @param session
-	 * @param sipServletRequest
-	 * @throws ParseException 
-	 * @throws InvalidArgumentException 
-	 * @throws SipException 
-	 * @throws TransactionUnavailableException 
+	 * {@inheritDoc}
 	 */
-	public boolean routeInitialRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws ParseException, TransactionUnavailableException, SipException, InvalidArgumentException {
+	public boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws Exception {
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
+		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
+		if(logger.isInfoEnabled()) {
+			logger.info("Routing of Initial Request " + sipServletRequest);
+		}
 
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();

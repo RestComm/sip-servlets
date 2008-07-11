@@ -17,16 +17,12 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
-import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -45,11 +41,18 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
+ * This class is responsible for routing and dispatching subsequent request to applications according to JSR 289 Section 
+ * 15.6 Responses, Subsequent Requests and Application Path 
+ * 
+ * It uses route header parameters that were previously set by the container on 
+ * record route headers to know which app has to be called 
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
@@ -62,18 +65,16 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		super(sipApplicationDispatcher);
 	}
 	
+	
 	/**
-	 * @param sipProvider
-	 * @param transaction
-	 * @param request
-	 * @param sipServletRequest
-	 * @throws InvalidArgumentException 
-	 * @throws SipException 
-	 * @throws ParseException 
-	 * @throws TransactionUnavailableException 
+	 * {@inheritDoc}
 	 */
-	public boolean routeSubsequentRequest(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws TransactionUnavailableException, ParseException, SipException, InvalidArgumentException {
+	public boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws Exception {
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
+		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
+		if(logger.isInfoEnabled()) {
+			logger.info("Routing of Subsequent Request " + sipServletRequest);
+		}	
 		
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();

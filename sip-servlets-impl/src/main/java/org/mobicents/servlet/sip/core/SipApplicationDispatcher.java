@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.sip.SipListener;
 import javax.sip.header.RouteHeader;
@@ -154,5 +155,7 @@ public interface SipApplicationDispatcher extends SipListener {
     boolean isViaHeaderExternal(ViaHeader viaHeader);
     
     boolean isExternal(String host, int port, String transport);
+
+	SipApplicationRouter getSipApplicationRouter();
     
 }

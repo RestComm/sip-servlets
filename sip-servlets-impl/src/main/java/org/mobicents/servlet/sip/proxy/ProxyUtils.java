@@ -217,15 +217,15 @@ public class ProxyUtils {
 		SipServletRequestImpl originalRequest =
 			(SipServletRequestImpl) this.proxy.getOriginalRequest();
 		
-		return new SipServletResponseImpl(clonedResponse,
+		SipServletResponseImpl newServletResponseImpl = new SipServletResponseImpl(clonedResponse,
 				sipFactoryImpl,
 				originalRequest.getTransaction(),
 				originalRequest.getSipSession(),
-				sipServetResponse.getDialog(),
-				originalRequest);
-
-
+				sipServetResponse.getDialog());
+		newServletResponseImpl.setOriginalRequest(originalRequest);
+		return newServletResponseImpl;
 	}
+	
 	public static synchronized String generateBranchId() throws Exception {
 		StringBuffer ret = new StringBuffer();
 		StringBuffer b = new StringBuffer();

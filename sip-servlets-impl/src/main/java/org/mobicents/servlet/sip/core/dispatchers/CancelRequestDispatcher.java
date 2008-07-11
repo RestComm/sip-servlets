@@ -43,13 +43,56 @@ import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 
 /**
- * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
- *
+ * <p>
+ * This class implements the logic for routing CANCEL requests along the
+ * application path followed by the INVITE. <br/> CANCEL deserves a special
+ * treatment since they are routed hop by hop.
+ * </p>
+ * 
+ * <p>
+ * Algorithm used : We can distinguish 2 cases here as per spec :
+ * <ul>
+ * <li>
+ * Applications that acts as User Agent or B2BUA 11.2.3 Receiving CANCEL :
+ * 
+ * When a CANCEL is received for a request which has been passed to an
+ * application, and the application has not responded yet or proxied the
+ * original request, the container responds to the original request with a 487
+ * (Request Terminated) and to the CANCEL with a 200 OK final response, and it
+ * notifies the application by passing it a SipServletRequest object
+ * representing the CANCEL request. The application should not attempt to
+ * respond to a request after receiving a CANCEL for it. Neither should it
+ * respond to the CANCEL notification. Clearly, there is a race condition
+ * between the container generating the 487 response and the SIP servlet
+ * generating its own response. This should be handled using standard Java
+ * mechanisms for resolving race conditions. If the application wins, it will
+ * not be notified that a CANCEL request was received. If the container wins and
+ * the servlet tries to send a response before (or for that matter after) being
+ * notified of the CANCEL, the container throws an IllegalStateException.</li>
+ * 
+ * <li>
+ * Applications that acts as proxy : 
+ * 
+ * 10.2.6 Receiving CANCEL if the original
+ * request has not been proxied yet the container responds to it with a 487
+ * final response otherwise, all branches are cancelled, and response processing
+ * continues as usual In either case, the application is subsequently invoked
+ * with the CANCEL request. This is a notification only, as the server has
+ * already responded to the CANCEL and cancelled outstanding branches as
+ * appropriate. The race condition between the server sending the 487 response
+ * and the application proxying the request is handled as in the UAS case as
+ * discussed in section 11.2.3 Receiving CANCEL.</li>
+ * </ul>
+ * </p>
+ * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+ * 
  */
 public class CancelRequestDispatcher extends RequestDispatcher {
 
@@ -61,51 +104,15 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 	}
 
 	/**
-	 * This method allows to route the CANCEL request along the application path 
-	 * followed by the INVITE.
-	 * We can distinguish cases here as per spec :
-	 * Applications that acts as User Agent or B2BUA  
-	 * 11.2.3 Receiving CANCEL 
-	 * 
-	 * When a CANCEL is received for a request which has been passed to an application, 
-	 * and the application has not responded yet or proxied the original request, 
-	 * the container responds to the original request with a 487 (Request Terminated) 
-	 * and to the CANCEL with a 200 OK final response, and it notifies the application 
-	 * by passing it a SipServletRequest object representing the CANCEL request. 
-	 * The application should not attempt to respond to a request after receiving a CANCEL for it. 
-	 * Neither should it respond to the CANCEL notification. 
-	 * Clearly, there is a race condition between the container generating the 487 response 
-	 * and the SIP servlet generating its own response. 
-	 * This should be handled using standard Java mechanisms for resolving race conditions. 
-	 * If the application wins, it will not be notified that a CANCEL request was received. 
-	 * If the container wins and the servlet tries to send a response before 
-	 * (or for that matter after) being notified of the CANCEL, 
-	 * the container throws an IllegalStateException.
-	 * 
-	 * Applications that acts as proxy : 
-	 * 10.2.6 Receiving CANCEL 
-	 * if the original request has not been proxied yet the container responds 
-	 * to it with a 487 final response otherwise, all branches are cancelled, 
-	 * and response processing continues as usual
-	 * In either case, the application is subsequently invoked with the CANCEL request. 
-	 * This is a notification only, as the server has already responded to the CANCEL 
-	 * and cancelled outstanding branches as appropriate. 
-	 * The race condition between the server sending the 487 response and 
-	 * the application proxying the request is handled as in the UAS case as 
-	 * discussed in section 11.2.3 Receiving CANCEL.
-	 * 
-	 * @param sipProvider
-	 * @param sipServletRequest
-	 * @param transaction
-	 * @param request
-	 * @param poppedAddress
-	 * @throws InvalidArgumentException 
-	 * @throws SipException 
-	 * @throws ParseException 
-	 * @throws TransactionUnavailableException 
+	 * {@inheritDoc} 
 	 */
-	public boolean routeCancel(SipProvider sipProvider, SipServletRequestImpl sipServletRequest) throws TransactionUnavailableException, ParseException, SipException, InvalidArgumentException {
+	public boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws TransactionUnavailableException, ParseException, SipException, InvalidArgumentException {
 		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipApplicationDispatcher.getSipNetworkInterfaceManager();
+		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
+		if(logger.isInfoEnabled()) {
+			logger.info("Routing of Cancel Request " + sipServletRequest);
+		}
+		
 		
 		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		Request request = (Request) sipServletRequest.getMessage();		
@@ -142,7 +149,6 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
 		}				
-//		TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
 		Transaction inviteTransaction = ((SIPServerTransaction) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
 		TransactionApplicationData dialogAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
 		SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
@@ -151,11 +157,9 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			logger.debug("message associated with the dialogAppData " +
 					"of the CANCEL " + inviteRequest);
 		}
-//		Transaction inviteTransaction = inviteRequest.getTransaction();
 		if(logger.isDebugEnabled()) {
 			logger.debug("invite transaction associated with the dialogAppData " +
 					"of the CANCEL " + inviteTransaction);
-//			logger.debug(dialog.isServer());
 		}
 		TransactionApplicationData inviteAppData = (TransactionApplicationData) 
 			inviteTransaction.getApplicationData();

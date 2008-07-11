@@ -77,7 +77,6 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
@@ -273,8 +272,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				response.addHeader(routeHeader);
 			}
 			
-			return new SipServletResponseImpl(response, super.sipFactoryImpl,
-					(ServerTransaction) getTransaction(), session, getDialog(), this);
+			SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
+					(ServerTransaction) getTransaction(), session, getDialog());
+			newSipServletResponse.setOriginalRequest(this);
+			return newSipServletResponse;
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode,
 					ex);

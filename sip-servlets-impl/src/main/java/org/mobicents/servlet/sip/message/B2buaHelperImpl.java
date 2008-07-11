@@ -334,7 +334,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			
 			SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(
 					response, sipFactoryImpl, st, sipSession,
-					sipSession.getSessionCreatingDialog(), sipServletRequest);			
+					sipSession.getSessionCreatingDialog());
+			newSipServletResponse.setOriginalRequest(sipServletRequest);
 			return newSipServletResponse;
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("bad input argument", ex);

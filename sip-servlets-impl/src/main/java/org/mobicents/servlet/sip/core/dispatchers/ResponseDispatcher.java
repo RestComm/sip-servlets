@@ -22,7 +22,7 @@ import java.util.ListIterator;
 import javax.servlet.ServletException;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.ResponseEvent;
+import javax.sip.SipProvider;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Response;
 
@@ -35,6 +35,7 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -42,6 +43,11 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
+ * This class is responsible for routing and dispatching responses to applications according to JSR 289 Section 
+ * 15.6 Responses, Subsequent Requests and Application Path 
+ * 
+ * It uses via header parameters that were previously set by the container to know which app has to be called 
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
@@ -53,15 +59,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 	}
 
 	/**
-	 * Method for routing responses to apps. This uses via header to know which 
-	 * app has to be called 
-	 * @param responseEvent the jain sip response received
-	 * @return true if we need to continue routing
+	 * {@inheritDoc}
 	 */
-	public boolean routeResponse(ResponseEvent responseEvent) {
+	public boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) {		
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
-		
-		Response response = responseEvent.getResponse();
+		SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
+		Response response = sipServletResponse.getResponse();
 		ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
 		ViaHeader viaHeader = viaHeaders.next();
 		if(logger.isInfoEnabled()) {
@@ -69,8 +72,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 		}
 		//response meant for the container
 		if(!sipApplicationDispatcher.isViaHeaderExternal(viaHeader)) {
-			ClientTransaction clientTransaction = responseEvent.getClientTransaction();
-			Dialog dialog = responseEvent.getDialog();
+			ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
+			Dialog dialog = sipServletResponse.getDialog();
 			
 			TransactionApplicationData applicationData = null;
 			SipServletRequestImpl originalRequest = null;
@@ -90,6 +93,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					return true;
 				}
 			}
+			sipServletResponse.setOriginalRequest(originalRequest);
 			
 			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
 			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
@@ -136,16 +140,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 			if(session == null) {
 				logger.error("Dropping the response since no active sip session has been found for it : " + response);
 				return false;
-			}
-			
-			// Transate the repsponse to SipServletResponse
-			SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
-					response, 
-					sipFactoryImpl,
-					clientTransaction, 
-					session, 
-					dialog, 
-					originalRequest);				
+			} else {
+				sipServletResponse.setSipSession(session);
+			}			
 			
 			try {
 				// See if this is a response to a proxied request
@@ -195,11 +192,6 @@ public class ResponseDispatcher extends MessageDispatcher {
 	//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 				return false;
 			}
-//			finally {
-//				if(session.isReadyToInvalidate()) {
-//					session.onTerminatedState();
-//				}
-//			}
 		}
 		return true;		
 	}

@@ -84,14 +84,18 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			SipFactoryImpl sipFactoryImpl, 
 			Transaction transaction, 
 			SipSession session, 
-			Dialog dialog,
-			SipServletRequestImpl originalRequest) {
+			Dialog dialog) {
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);
-		this.response = response;
-		this.originalRequest = originalRequest;
+		this.response = response;	
 	}
 	
+	/**
+	 * @return the response
+	 */
+	public Response getResponse() {
+		return response;
+	}
 	
 	@Override
 	public boolean isSystemHeader(String headerName) {
@@ -451,6 +455,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setIsBranchResponse(boolean isBranchResponse) {
 		this.isBranchResponse = isBranchResponse;
+	}
+
+	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
+		this.originalRequest = originalRequest;
 	}
 	
 	

@@ -45,6 +45,7 @@ import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -77,11 +78,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.core.dispatchers.CancelRequestDispatcher;
-import org.mobicents.servlet.sip.core.dispatchers.InitialRequestDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
-import org.mobicents.servlet.sip.core.dispatchers.ResponseDispatcher;
-import org.mobicents.servlet.sip.core.dispatchers.SubsequentRequestDispatcher;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -102,9 +100,9 @@ import sun.misc.Service;
 /**
  * Implementation of the SipApplicationDispatcher interface.
  * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine), 
- * translating jain sip SIP messages to sip servlets SIP messages, calling the application router 
- * to know which app is interested in the messages and
- * dispatching them to those sip applications interested in the messages.
+ * translating jain sip SIP messages to sip servlets SIP messages, creating a MessageRouter responsible 
+ * for choosing which Dispatcher will be used for routing the message and  
+ * dispatches the messages.
  * @author Jean Deruelle 
  */
 public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {	
@@ -129,10 +127,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
-	private InitialRequestDispatcher initialRequestDispatcher;
-	private SubsequentRequestDispatcher subsequentRequestDispatcher;
-	private CancelRequestDispatcher cancelRequestDispatcher;
-	private ResponseDispatcher responseDispatcher;
 	/**
 	 * 
 	 */
@@ -184,11 +178,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isInfoEnabled()) {
 			logger.info("Using the following Application Router : " + sipApplicationRouter.getClass().getName());
 		}
-		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));
-		initialRequestDispatcher = new InitialRequestDispatcher(this, sipApplicationRouter);
-		subsequentRequestDispatcher = new SubsequentRequestDispatcher(this);
-		cancelRequestDispatcher = new CancelRequestDispatcher(this);
-		responseDispatcher = new ResponseDispatcher(this);
+		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));		
 		
 		if( oname == null ) {
 			try {				
@@ -294,10 +284,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			started = Boolean.FALSE;
 		}
 		sipApplicationRouter.destroy();		
-		initialRequestDispatcher = null;
-		subsequentRequestDispatcher = null;
-		cancelRequestDispatcher = null;
-		responseDispatcher = null;
 		if(oname != null) {
 			Registry.getRegistry(null, null).unregisterComponent(oname);
 		}		
@@ -404,21 +390,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.info("Routing State " + sipServletRequest.getRoutingState());
 			}
 										
-			if(sipServletRequest.isInitial()) {
-				if(logger.isInfoEnabled()) {
-					logger.info("Routing of Initial Request " + request);
-				}
-				initialRequestDispatcher.routeInitialRequest(sipProvider, sipServletRequest);							
-			} else {
-				if(logger.isInfoEnabled()) {
-					logger.info("Routing of Subsequent Request " + request);
-				}
-				if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
-					cancelRequestDispatcher.routeCancel(sipProvider, sipServletRequest);
-				} else {
-					subsequentRequestDispatcher.routeSubsequentRequest(sipProvider, sipServletRequest);
-				}
-			}
+			MessageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
+				dispatchMessage(sipProvider, sipServletRequest);
 		} catch (Throwable e) {
 			logger.error("Unexpected exception while processing request",e);
 			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
@@ -461,7 +434,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			return;
 		}
-		boolean continueRouting = responseDispatcher.routeResponse(responseEvent);		
+		
+		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
+		Dialog dialog = responseEvent.getDialog();
+		// Transate the response to SipServletResponse
+		SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
+				response, 
+				sipFactoryImpl,
+				clientTransaction, 
+				null, 
+				dialog);
+		
+		boolean continueRouting = false;
+		try {
+			continueRouting = MessageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
+				dispatchMessage(null, sipServletResponse);
+		} catch (Exception e) {
+			logger.error("An unexpected exception happened while routing the response " +  response);
+			return;
+		}
+				
 		// if continue routing is to true it means that
 		// a B2BUA got it so we don't have anything to do here 
 		// or an app that didn't do anything with it
@@ -908,6 +900,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		return applicationDeployed.get(applicationName);
 	}
 
+	
 	// -------------------- JMX and Registration  --------------------
     protected String domain;
     protected ObjectName oname;
@@ -958,7 +951,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/* Exposed methods for the management console. Some of these duplicate existing methods, but
 	 * with JMX friendly types.
 	 */
-	
 	public String[] findInstalledSipApplications() {
 		Iterator<SipContext> apps = findSipApplications();
 		ArrayList<String> appList = new ArrayList<String>();

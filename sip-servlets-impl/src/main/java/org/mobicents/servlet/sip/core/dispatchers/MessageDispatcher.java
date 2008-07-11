@@ -19,7 +19,6 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
@@ -27,7 +26,6 @@ import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
-import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -37,7 +35,6 @@ import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -53,6 +50,7 @@ import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -357,4 +355,13 @@ public abstract class MessageDispatcher {
 				isAppGeneratedKey);
 		return sipApplicationSessionKey;
 	}
+	/**
+	 * Responsible for routing and dispatching a SIP message to the correct application
+	 * 
+	 * @param sipProvider use the sipProvider to route the message if needed, can be null
+	 * @param sipServletMessage the SIP message to route and dispatch
+	 * @return true if we should continue routing to other applications, false otherwise
+	 * @throws Exception if anything wrong happens
+	 */
+	public abstract boolean dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws Exception;
 }
