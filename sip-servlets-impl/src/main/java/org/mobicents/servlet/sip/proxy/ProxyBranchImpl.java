@@ -401,16 +401,18 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * party is still online.
 	 *
 	 */
-	void updateTimer()
-	{
+	void updateTimer() {
 		if(proxyBranchTimer != null) {
 			proxyBranchTimer.cancel();
 			proxyBranchTimer.purge();
 		}
 		proxyBranchTimer = new Timer();
 		proxyTimeoutTask = new ProxyBranchTimerTask(this);
-		if(this.getProxyBranchTimeout() != 0)
-			proxyBranchTimer.schedule(proxyTimeoutTask, this.getProxyBranchTimeout() * 1000);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
+		}
+		if(proxyBranchTimeout != 0)
+			proxyBranchTimer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
 	}
 	
 	/**

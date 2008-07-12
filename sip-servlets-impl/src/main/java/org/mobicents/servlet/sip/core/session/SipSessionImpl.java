@@ -525,27 +525,26 @@ public class SipSessionImpl implements SipSession {
 	public void invalidate() {		
 		if(!valid) {
 			throw new IllegalStateException("SipSession already invalidated !");
-		}
-		
+		}		
 		if(logger.isDebugEnabled()) {
 			logger.debug("Invalidating the sip session " + key);
 		}
-		
+				
 		// No need for checks after JSR 289 PFD spec
 		//checkInvalidation();
-		
+		notifySipSessionListeners(SipSessionEventType.DELETION);
 		for (String key : sipSessionAttributeMap.keySet()) {
 			removeAttribute(key);
 		}
-		valid = false;				
-		notifySipSessionListeners(SipSessionEventType.DELETION);
+		valid = false;	
+		
 		for (SipSessionImpl sipSessionImpl : derivedSipSessions.values()) {
 			sipSessionImpl.invalidate();
 		}
 		
 		derivedSipSessions.clear();
 		derivedSipSessions = null;
-		((SipManager)getSipApplicationSession().getSipContext().getManager()).removeSipSession(key);		
+		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		sipSessionAttributeMap = null;
 		proxyBranch = null;
@@ -795,16 +794,18 @@ public class SipSessionImpl implements SipSession {
 	}
 	
 	public void onTerminatedState() {
-		onReadyToInvalidate();
-		if(this.parentSession != null) {
-			boolean allDerivedSessionsTerminated = true;
-			for(SipSessionImpl derivedSession:parentSession.derivedSipSessions.values()) {
-				if(derivedSession.isReadyToInvalidate()) {
-					allDerivedSessionsTerminated = false;
-					break;
+		if(valid) {
+			onReadyToInvalidate();
+			if(this.parentSession != null) {
+				boolean allDerivedSessionsTerminated = true;
+				for(SipSessionImpl derivedSession:parentSession.derivedSipSessions.values()) {
+					if(derivedSession.isReadyToInvalidate()) {
+						allDerivedSessionsTerminated = false;
+						break;
+					}
 				}
+				if(allDerivedSessionsTerminated) this.parentSession.onReadyToInvalidate();
 			}
-			if(allDerivedSessionsTerminated) this.parentSession.onReadyToInvalidate();
 		}
 	}
 

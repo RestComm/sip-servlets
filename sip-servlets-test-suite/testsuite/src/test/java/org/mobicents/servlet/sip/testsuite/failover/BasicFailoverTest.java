@@ -416,6 +416,80 @@ public class BasicFailoverTest extends SipServletTestCase {
 		secondTomcatServer.stopTomcat();
 	}
 	
+//	public void testBasicFailoverCancelSpeedDialLocationService() throws Exception {
+//		senderProtocolObjects =new ProtocolObjects(
+//				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);
+//		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
+//		SipProvider senderProvider = sender.createProvider();			
+//		senderProvider.addSipListener(sender);
+//		senderProtocolObjects.start();	
+//		receiverProtocolObjects = new ProtocolObjects("sdls-failover-receiver",
+//				"gov.nist", TRANSPORT, AUTODIALOG);			
+//		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, false);
+//		receiver.setWaitForCancel(true);
+//		SipProvider receiverProvider = receiver.createProvider();
+//		receiverProvider.addSipListener(receiver);
+//		receiverProtocolObjects.start();
+//		//start the sip balancer
+//		startSipBalancer();				
+//		//starts the first server
+//		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
+//		tomcat.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
+//		tomcat.initTomcat(tomcatBasePath);
+//		tomcat.startTomcat();
+//		deployLocationServiceApplication(tomcat);
+//		deploySpeedDialApplication(tomcat);
+//		//starts the second server
+//		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
+//		secondTomcatServer.setLoggingFilePath(  
+//				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+//				File.separatorChar + "testsuite" + 
+//				File.separatorChar + "src" +
+//				File.separatorChar + "test" + 
+//				File.separatorChar + "resources" + File.separatorChar);
+//		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
+//		secondTomcatServer.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
+//		getTomcatBackupHomePath();
+//		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
+//		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
+//		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+//		secondTomcatServer.startTomcat();
+//		deployLocationServiceApplication(secondTomcatServer);
+//		deploySpeedDialApplication(secondTomcatServer);
+//		//first test
+//		Thread.sleep(TIMEOUT);
+//		String fromName = "sender";
+//		String fromSipAddress = "sip-servlets.com";
+//		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+//				fromName, fromSipAddress);
+//				
+//		String toUser = "6";
+//		String toSipAddress = "127.0.0.1:5090";
+//		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+//				toUser, toSipAddress);
+//		
+//		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+//		Thread.sleep(200);
+//		sender.sendCancel();
+//		Thread.sleep(TIMEOUT);
+//		assertTrue(sender.isCancelOkReceived());
+//		assertTrue(sender.isRequestTerminatedReceived());
+//		assertTrue(receiver.isCancelReceived());
+//		tomcat.stopTomcat();
+//		Thread.sleep(TIMEOUT);
+//		toUser = "6";
+//		toAddress = senderProtocolObjects.addressFactory.createSipURI(
+//				toUser, toSipAddress);
+//		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+//		Thread.sleep(200);
+//		sender.sendCancel();
+//		Thread.sleep(TIMEOUT);
+//		assertTrue(sender.isCancelOkReceived());
+//		assertTrue(sender.isRequestTerminatedReceived());
+//		assertTrue(receiver.isCancelReceived());
+//		secondTomcatServer.stopTomcat();
+//	}
+	
 	public void testFailoverNoNodeStarted() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
 				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);

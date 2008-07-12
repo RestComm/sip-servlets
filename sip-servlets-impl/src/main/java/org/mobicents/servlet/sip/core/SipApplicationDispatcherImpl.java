@@ -482,45 +482,40 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processTimeout(javax.sip.TimeoutEvent)
 	 */
 	public void processTimeout(TimeoutEvent timeoutEvent) {
-		// TODO: FIX ME
-		if(timeoutEvent.isServerTransaction()) {
-			if(logger.isInfoEnabled()) {
-				logger.info("timeout => " + timeoutEvent.getServerTransaction().getRequest().toString());
-			}
-		} else {
-			if(logger.isInfoEnabled()) {
-				logger.info("timeout => " + timeoutEvent.getClientTransaction().getRequest().toString());
-			}
-		}
-		
 		Transaction transaction = null;
 		if(timeoutEvent.isServerTransaction()) {
 			transaction = timeoutEvent.getServerTransaction();
 		} else {
 			transaction = timeoutEvent.getClientTransaction();
 		}
-		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
-		SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
-		SipSessionImpl sipSession = sipServletMessage.getSipSession();
-		sipSession.removeOngoingTransaction(transaction);
-		if(sipSession.isReadyToInvalidate()) {
-			sipSession.onTerminatedState();
+		if(logger.isInfoEnabled()) {
+			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
 		}
-		//notifying SipErrorListener that no ACK has been received for a UAS only
-		if(sipServletMessage instanceof SipServletRequestImpl &&
-				tad.getProxy() == null &&
-				((SipServletRequestImpl)sipServletMessage).getLastFinalResponse() != null) {
-			List<SipErrorListener> sipErrorListeners = 
-				sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
-			
-			SipErrorEvent sipErrorEvent = new SipErrorEvent(
-					(SipServletRequest)sipServletMessage, 
-					((SipServletRequestImpl)sipServletMessage).getLastFinalResponse());
-			for (SipErrorListener sipErrorListener : sipErrorListeners) {
-				try {					
-					sipErrorListener.noAckReceived(sipErrorEvent);
-				} catch (Throwable t) {
-					logger.error("SipErrorListener threw exception", t);
+		
+		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+		if(tad != null) {
+			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+			SipSessionImpl sipSession = sipServletMessage.getSipSession();
+			sipSession.removeOngoingTransaction(transaction);
+			if(sipSession.isReadyToInvalidate()) {
+				sipSession.onTerminatedState();
+			}
+			//notifying SipErrorListener that no ACK has been received for a UAS only
+			if(sipServletMessage instanceof SipServletRequestImpl &&
+					tad.getProxy() == null &&
+					((SipServletRequestImpl)sipServletMessage).getLastFinalResponse() != null) {
+				List<SipErrorListener> sipErrorListeners = 
+					sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
+				
+				SipErrorEvent sipErrorEvent = new SipErrorEvent(
+						(SipServletRequest)sipServletMessage, 
+						((SipServletRequestImpl)sipServletMessage).getLastFinalResponse());
+				for (SipErrorListener sipErrorListener : sipErrorListeners) {
+					try {					
+						sipErrorListener.noAckReceived(sipErrorEvent);
+					} catch (Throwable t) {
+						logger.error("SipErrorListener threw exception", t);
+					}
 				}
 			}
 		}
@@ -531,7 +526,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processTransactionTerminated(javax.sip.TransactionTerminatedEvent)
 	 */
 	public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
-		// TODO: FIX ME		
 		Transaction transaction = null;
 		if(transactionTerminatedEvent.isServerTransaction()) {
 			transaction = transactionTerminatedEvent.getServerTransaction();

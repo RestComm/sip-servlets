@@ -6,7 +6,7 @@
     <param name="file" value="logs/sip-server.log"/>
     <param name="MaxFileSize" value="2000KB"/>
     <!-- Keep one backup file -->
-    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxBackupIndex" value="20"/>
     <layout class="org.apache.log4j.PatternLayout"> 
       <param name="ConversionPattern" value="%p %t %l - %m%n"/> 
     </layout> 

@@ -400,25 +400,26 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		for(HttpSession session: httpSessions.values()) {
 			session.invalidate();
 		}
+		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
+		for (String key : sipApplicationSessionAttributeMap.keySet()) {
+			removeAttribute(key);
+		}
 		valid = false;	
 		//cancelling the timers
 		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
 			servletTimerEntry.getValue().cancel();
-		}
-		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
+		}		
 		if(!expired) {
 			expirationTimerFuture.cancel(false);			
 		}
-		// FIXME (refactor session manager
-		// to map to tomcat session management)
-		((SipManager)sipContext.getManager()).removeSipApplicationSession(key);		
+		sipContext.getSipManager().removeSipApplicationSession(key);		
 		expirationTimerTask = null;
 		expirationTimerFuture = null;
-		httpSessions = null;
+		httpSessions.clear();
 		key = null;
-		servletTimers = null;
-		sipApplicationSessionAttributeMap = null;
-		sipSessions = null;			
+		servletTimers.clear();
+		sipApplicationSessionAttributeMap.clear();
+		sipSessions.clear();			
 	}
 
 	/*

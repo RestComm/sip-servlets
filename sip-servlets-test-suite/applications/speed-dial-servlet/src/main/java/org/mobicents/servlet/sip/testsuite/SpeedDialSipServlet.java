@@ -68,8 +68,9 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		String dialNumber = ((SipURI)request.getRequestURI()).getUser();
 		String mappedUri = dialNumberToSipUriMapping.get(dialNumber);	
 		if(mappedUri != null) {
-			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
 			Proxy proxy = request.getProxy();
+			proxy.setProxyTimeout(120);
 			proxy.setRecordRoute(true);
 			proxy.setParallel(false);
 			proxy.setSupervised(false);

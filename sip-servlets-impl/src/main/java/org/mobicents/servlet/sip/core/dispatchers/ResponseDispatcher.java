@@ -93,6 +93,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
 					}
 					forwardResponseStatefully(sipServletResponse);
+					return ;
 				}
 			}
 			sipServletResponse.setOriginalRequest(originalRequest);
@@ -100,14 +101,17 @@ public class ResponseDispatcher extends MessageDispatcher {
 			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
 			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
 				forwardResponseStatefully(sipServletResponse);
+				return ;
 			}
 			String noAppReturned = viaHeader.getParameter(NO_APP_RETURNED);
 			if(noAppReturned != null && noAppReturned.length() > 0) {
 				forwardResponseStatefully(sipServletResponse);
+				return ;
 			}
 			String modifier = viaHeader.getParameter(MODIFIER);
 			if(modifier != null && modifier.length() > 0) {
 				forwardResponseStatefully(sipServletResponse);
+				return ;
 			}
 			String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
 			boolean inverted = false;

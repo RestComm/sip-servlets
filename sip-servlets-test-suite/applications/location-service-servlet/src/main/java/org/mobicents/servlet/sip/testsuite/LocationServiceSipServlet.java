@@ -73,6 +73,7 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 		List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
 		if(contactAddresses != null && contactAddresses.size() > 0) {			
 			Proxy proxy = request.getProxy();
+			proxy.setProxyTimeout(120);
 			proxy.setRecordRoute(true);
 			proxy.setParallel(true);
 			proxy.setSupervised(false);
