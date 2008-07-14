@@ -106,6 +106,11 @@ public abstract class MessageDispatcher {
 	 */
 	public static final String MODIFIER = "modifier";
 	
+	/*
+	 * This is URI parameter to contain application route in from/to header addresses. Used when in UAC mode (workaround IMS)
+	 */
+	public static final String MOBICENTS_URI_ROUTE_PARAM = "mobicents-app-route";
+	
 	protected SipApplicationDispatcher sipApplicationDispatcher = null;
 		
 	public MessageDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {

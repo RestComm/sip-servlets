@@ -16,12 +16,17 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.address.SipUri;
+
 import java.text.ParseException;
 
+import javax.sip.address.URI;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
+
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 
 /**
  * This class is used as a central place to get a session be it a sip session
@@ -54,19 +59,30 @@ public class SessionManagerUtil {
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
+		
+		// Here we remove the AR params in order to make session mapping possible by string compare
+		URI touri = (URI) ((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().clone();
+		if(touri instanceof SipUri) {
+			((SipUri) touri).removeParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
+		}
+		URI fromuri = (URI) ((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().clone();
+		if(fromuri instanceof SipUri) {
+			((SipUri) fromuri).removeParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
+		}
+		
 		if(inverted) {
 			return new SipSessionKey(
-					((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
+					touri.toString(),
 					((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
-					((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
+					fromuri.toString(),
 					((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 					((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 					applicationName);
 		} else {
 			return new SipSessionKey(
-				((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString(),
+				fromuri.toString(),
 				((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
-				((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString(),
+				touri.toString(),
 				((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 				applicationName);

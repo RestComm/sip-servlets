@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.core;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -63,6 +62,7 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -79,7 +79,6 @@ import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -90,7 +89,6 @@ import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
-import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 import sun.misc.Service;
@@ -378,6 +376,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			// Route header.
 			RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
+			
+			if(routeHeader == null) {
+				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
+				javax.sip.address.SipURI arUri = (javax.sip.address.SipURI)toHeader.getAddress().getURI();
+				String arText = arUri.getParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
+				ApplicationRoutingHeaderStack ar = new ApplicationRoutingHeaderStack(arText);
+				
+				javax.sip.address.SipURI localUri = JainSipUtils.createRecordRouteURI(
+						sipFactoryImpl.getSipNetworkInterfaceManager(), 
+						JainSipUtils.findTransport(request));
+				if(arText != null) {
+					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getLast().application);
+					localUri.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, ar.getLast().handler);
+					javax.sip.address.Address address = 
+						SipFactories.addressFactory.createAddress(localUri);
+					routeHeader = SipFactories.headerFactory.createRouteHeader(address);
+					ar.removeLast();
+					arUri.setParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM, ar.toString());
+				}
+			}
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
 			if(!isRouteExternal(routeHeader)) {

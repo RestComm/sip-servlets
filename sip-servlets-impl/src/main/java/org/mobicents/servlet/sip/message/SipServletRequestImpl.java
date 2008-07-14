@@ -58,6 +58,7 @@ import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -76,6 +77,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderStack;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
@@ -875,7 +877,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	/**
-	 * Add a record route header for app composition
+	 * Add a record route header for app composition (we use a custom route header called Mobicents-Sip-Servlets-App-Route-Header)
 	 * @throws ParseException if anything goes wrong while creating the record route header
 	 * @throws SipException 
 	 * @throws NullPointerException 
@@ -883,6 +885,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void addAppCompositionRRHeader()
 			throws ParseException, SipException {
 		Request request = (Request) super.message;
+		
+		FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
+		javax.sip.address.SipURI fromHeaderUri = (javax.sip.address.SipURI) fromHeader.getAddress().getURI();
+		
+		String applicationRouteText = fromHeaderUri.getParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
+		ApplicationRoutingHeaderStack stack = new ApplicationRoutingHeaderStack(applicationRouteText);
+		String app = session.getKey().getApplicationName();
+		String handler = session.getHandler();
+		ApplicationRoutingHeaderStack.ApplicationRouterNode node = new ApplicationRoutingHeaderStack.ApplicationRouterNode(app, handler);
+		stack.addNode(node);
+		fromHeaderUri.setParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM, stack.toString());
 		
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -893,9 +906,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		sipURI.setLrParam();
 		javax.sip.address.Address recordRouteAddress = 
 			SipFactories.addressFactory.createAddress(sipURI);
-		RecordRouteHeader recordRouteHeader = 
-			SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
-		request.addLast(recordRouteHeader);
+
 	}
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {
