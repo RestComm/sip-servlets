@@ -50,6 +50,15 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		blockedUris.add("sip:blocked-sender@sip-servlets.com");
 		blockedUris.add("sip:blocked-sender@127.0.0.1");
 	}
+	
+	public boolean isUriBlocked(String uri) {
+		for(String blockedUri:blockedUris) {
+			if(uri.indexOf(blockedUri)>=0) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
@@ -60,7 +69,7 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		String fromUri = request.getFrom().getURI().toString();
 		logger.info(fromUri);
 		
-		if(blockedUris.contains(fromUri)) {
+		if(isUriBlocked(fromUri)) {
 			logger.info(fromUri + " has been blocked !");
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
 			sipServletResponse.send();		
