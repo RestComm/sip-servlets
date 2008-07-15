@@ -65,9 +65,8 @@
 		<dependency>
 			<groupId>net.java.stun4j</groupId>
 			<artifactId>stun4j</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/Stun4J.jar</systemPath>
+			<version>1.0.MOBICENTS</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Tomcat dependencies -->
