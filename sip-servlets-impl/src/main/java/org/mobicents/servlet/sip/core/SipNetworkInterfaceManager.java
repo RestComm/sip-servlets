@@ -184,7 +184,7 @@ public class SipNetworkInterfaceManager {
 	 */
 	public ExtendedListeningPoint findMatchingListeningPoint(String ipAddress, int port, String transport) {
 		boolean isNumericalIPAddress = false;
-		InetAddress[] inetAddresses = null;
+		InetAddress[] inetAddresses = new InetAddress[0];
 		if(Inet6Util.isValidIP6Address(ipAddress) 
 				|| Inet6Util.isValidIPV4Address(ipAddress)) {
 			isNumericalIPAddress = true;

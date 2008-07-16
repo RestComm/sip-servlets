@@ -37,6 +37,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
 	private static String TEST_REINVITE_USERNAME = "reinvite";
+	private static String TEST_CANCEL_USERNAME = "cancel";
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public SimpleSipServlet() {
@@ -56,10 +57,23 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("from : " + request.getFrom());
 		logger.info("Got request: "
 				+ request.getMethod());
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
-		sipServletResponse.send();
-		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-		sipServletResponse.send();
+		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			sipServletResponse.send();
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+		} else {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			sipServletResponse.send();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+		}
 	}
 	
 	@Override

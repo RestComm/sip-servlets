@@ -31,6 +31,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.SipTargetedRequestInfo;
 import javax.servlet.sip.ar.SipTargetedRequestType;
+import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.Address;
@@ -177,7 +178,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			dispatchOutsideContainer(sipServletRequest);
 		} else {
-			dispatchInsideContainer(applicationRouterInfo, sipServletRequest, sipFactoryImpl);
+			dispatchInsideContainer(sipProvider, applicationRouterInfo, sipServletRequest, sipFactoryImpl);
 		}		
 	}
 
@@ -188,7 +189,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @param sipFactoryImpl the sip factory
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
-	private void dispatchInsideContainer(SipApplicationRouterInfo applicationRouterInfo, SipServletRequestImpl sipServletRequest, SipFactoryImpl sipFactoryImpl) throws DispatcherException {
+	private void dispatchInsideContainer(SipProvider sipProvider, SipApplicationRouterInfo applicationRouterInfo, SipServletRequestImpl sipServletRequest, SipFactoryImpl sipFactoryImpl) throws DispatcherException {
 		if(logger.isInfoEnabled()) {
 			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 		}
@@ -244,7 +245,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			} else {
 				SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
 				if(sipServletMapping == null) {
-					throw new DispatcherException(Response.NOT_FOUND, "Sending 404 because no matching servlet found for this request " + request);
+					logger.error("Sending 404 because no matching servlet found for this request ");
+					sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
+					return;
 				} else {
 					sipSessionHandlerName = sipServletMapping.getServletName();
 				}
@@ -312,7 +315,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					}
 				}
 				try {
-					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
+					forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
 				} catch (Exception e) {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
 				}
@@ -347,7 +350,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		ListIterator<String> routeHeaders = sipServletRequest.getHeaders(RouteHeader.NAME);				
 		if(isAnotherDomain || routeHeaders.hasNext()) {
 			try {
-				forwardStatefully(sipServletRequest, SipSessionRoutingType.PREVIOUS_SESSION, SipRouteModifier.NO_ROUTE);
+				forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.PREVIOUS_SESSION, SipRouteModifier.NO_ROUTE);
 			} catch (Exception e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
 			}
@@ -407,17 +410,22 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							for (int i = routes.length-1 ; i >= 0; i--) {
 								routeAddress = SipFactories.addressFactory.createAddress(routes[i]);
 								Header routeHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
-								request.addHeader(routeHeader);
+								// Fix for Issue 280 provided by eelcoc
+								try {
+									request.addFirst(routeHeader);
+								} catch (Exception e) {
+									throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to add a route header to route externally the following initial request " + request, e);
+								}
 							}
 							if(logger.isDebugEnabled()) {
 								logger.debug("Routing the request externally " + sipServletRequest );
 							}
 							request.setRequestURI(SipFactories.addressFactory.createURI(routes[0]));
 							try {
-								forwardStatefully(sipServletRequest, null, sipRouteModifier);
+								forwardRequestStatefully(sipServletRequest, null, sipRouteModifier);
 								return true;
 							} catch (Exception e) {
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following initial request " + request, e);
 							}							
 						} else {
 							// the container MUST make the route available to the applications 
@@ -451,13 +459,18 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						// send the request externally
 						for (int i = routes.length-1 ; i >= 0; i--) {
 							routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
-							request.addHeader(routeHeader);
+							// Fix for Issue 280 provided by eelcoc
+							try {
+								request.addFirst(routeHeader);
+							} catch (Exception e) {
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to add a route header to route externally the following initial request " + request, e);
+							}
 						}
 						if(logger.isDebugEnabled()) {
 							logger.debug("Routing the request externally " + sipServletRequest );
 						}					
 						try {
-							forwardStatefully(sipServletRequest, null, sipRouteModifier);
+							forwardRequestStatefully(sipServletRequest, null, sipRouteModifier);
 							return true;
 						} catch (Exception e) {
 							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);

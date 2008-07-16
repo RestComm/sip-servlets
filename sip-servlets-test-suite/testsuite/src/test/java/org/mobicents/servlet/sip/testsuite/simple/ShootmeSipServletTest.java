@@ -96,6 +96,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
 	}
+	
+	public void testShootmeCancel() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "cancel";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(200);
+		sender.sendCancel();
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isCancelOkReceived());
+		assertTrue(sender.isRequestTerminatedReceived());	
+	}
 
 	@Override
 	protected void tearDown() throws Exception {					

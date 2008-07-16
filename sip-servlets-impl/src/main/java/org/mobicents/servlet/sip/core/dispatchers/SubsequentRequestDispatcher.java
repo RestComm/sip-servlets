@@ -218,7 +218,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}	
 				} else {
 					try{
-						forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
+						forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
 					} catch (Exception e) {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
 					}
@@ -226,7 +226,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			} else {		
 				//route header is meant for the container hence we continue
 				try {
-					forwardStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
+					forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
 				} catch (Exception e) {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
 				}

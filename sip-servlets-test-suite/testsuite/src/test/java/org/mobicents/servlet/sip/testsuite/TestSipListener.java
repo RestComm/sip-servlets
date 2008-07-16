@@ -765,7 +765,9 @@ public class TestSipListener implements SipListener {
 		}
 		logger.info("transaction state is " + tid.getState());
 		logger.info("Dialog = " + tid.getDialog());
-		logger.info("Dialog State is " + tid.getDialog().getState());
+		if(tid.getDialog() != null) {
+			logger.info("Dialog State is " + tid.getDialog().getState());
+		}
 
 		try {			
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {

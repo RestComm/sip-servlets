@@ -419,6 +419,13 @@
 									Classing loading issues when deployed as EAR
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=280">
+									Routing to external application server incorrectly adds 'route' header
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>
