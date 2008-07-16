@@ -413,7 +413,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 								// Fix for Issue 280 provided by eelcoc
 								try {
 									request.addFirst(routeHeader);
-								} catch (Exception e) {
+								} catch (SipException e) {
 									throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to add a route header to route externally the following initial request " + request, e);
 								}
 							}
@@ -454,17 +454,17 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						SipURI sipURI = sipApplicationDispatcher.getOutboundInterfaces().get(0);
 						sipURI.setParameter("modifier", "route_back");
 						Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
-						request.addHeader(routeHeader);
-						// push all of the routes on the Route header stack of the request and 
-						// send the request externally
-						for (int i = routes.length-1 ; i >= 0; i--) {
-							routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
-							// Fix for Issue 280 provided by eelcoc
-							try {
+						// Fix for Issue 280 provided by eelcoc
+						try {
+							request.addFirst(routeHeader);
+							// push all of the routes on the Route header stack of the request and 
+							// send the request externally
+							for (int i = routes.length-1 ; i >= 0; i--) {
+								routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
 								request.addFirst(routeHeader);
-							} catch (Exception e) {
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to add a route header to route externally the following initial request " + request, e);
 							}
+						} catch (SipException e) {
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to add a route header to route externally the following initial request " + request, e);
 						}
 						if(logger.isDebugEnabled()) {
 							logger.debug("Routing the request externally " + sipServletRequest );
