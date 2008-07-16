@@ -676,7 +676,24 @@ public class BasicFailoverTest extends SipServletTestCase {
 		prepareRegister();		
 		reg.startServer();
 		RouterImpl.setRegister(reg);
-		fwd=new SIPBalancerForwarder(balancerAddress.getHostAddress(),BALANCER_INTERNAL_PORT,BALANCER_EXTERNAL_PORT,reg);
+		Properties properties = new Properties();
+		properties.setProperty("javax.sip.STACK_NAME", "SipBalancerForwarder");
+		properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
+		// You need 16 for logging traces. 32 for debug + traces.
+		// Your code will limp at 32 but it is best for debugging.
+		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
+		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+				"logs/sipbalancerforwarderdebug.txt");
+		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+				"logs/sipbalancerforwarder.xml");
+		properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+		properties.setProperty("gov.nist.javax.sip.CANCEL_CLIENT_TRANSACTION_CHECKED", "false");
+		
+		properties.setProperty("host", "127.0.0.1");
+		properties.setProperty("internalPort", "5065");
+		properties.setProperty("externalPort", "5060");
+		fwd=new SIPBalancerForwarder(properties,reg);
 		fwd.start();
 	}
 	
