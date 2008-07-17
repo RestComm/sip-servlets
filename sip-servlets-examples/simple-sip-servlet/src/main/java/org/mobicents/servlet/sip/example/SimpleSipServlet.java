@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -63,12 +62,14 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-
-		logger.info("SimpleProxyServlet: Got request:\n"
+		
+		if(logger.isInfoEnabled()) {
+			logger.info("SimpleProxyServlet: Got request:\n"
 				+ request.getMethod());
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
-		sipServletResponse.send();
-		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		}
+//		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+//		sipServletResponse.send();
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 		if(CALLEE_SEND_BYE.equalsIgnoreCase(((SipURI)request.getTo().getURI()).getUser())) {
 			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
@@ -88,8 +89,9 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 	 */
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-
-		logger.info("SimpleProxyServlet: Got BYE request:\n" + request);
+		if(logger.isInfoEnabled()) {
+			logger.info("SimpleProxyServlet: Got BYE request:\n" + request);
+		}
 		SipServletResponse sipServletResponse = request.createResponse(200);
 		sipServletResponse.send();
 	}
@@ -99,8 +101,9 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 	 */
 	protected void doResponse(SipServletResponse response)
 			throws ServletException, IOException {
-
-		logger.info("SimpleProxyServlet: Got response:\n" + response);
+		if(logger.isInfoEnabled()) {
+			logger.info("SimpleProxyServlet: Got response:\n" + response);
+		}
 		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
 			SipSession sipSession = response.getSession(false);
 			if(sipSession != null) {
