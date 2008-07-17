@@ -426,6 +426,13 @@
 									Routing to external application server incorrectly adds 'route' header
 								</a>
 							</li>
+							<li>
+								<img src="orange.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=65">
+								Load Balancer : Add support for CANCEL, externalize configuration, Fix memory leak
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>

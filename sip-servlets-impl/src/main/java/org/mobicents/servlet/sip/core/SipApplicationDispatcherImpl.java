@@ -562,6 +562,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					logger.info("no sip session were returned for this transaction " + transaction);
 				}
 			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("Invalidating sip session " + sipSessionImpl.getId() + " if ready to invalidate " + sipSessionImpl.isReadyToInvalidate());
+				}
 				sipSessionImpl.removeOngoingTransaction(transaction);
 				if(sipSessionImpl.isReadyToInvalidate()) {
 					sipSessionImpl.onTerminatedState();
