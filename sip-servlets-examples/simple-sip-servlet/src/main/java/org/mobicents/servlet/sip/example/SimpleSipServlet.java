@@ -108,8 +108,12 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 			SipSession sipSession = response.getSession(false);
 			if(sipSession != null) {
 				SipApplicationSession sipApplicationSession = sipSession.getApplicationSession();
-				sipSession.invalidate();
-				sipApplicationSession.invalidate();
+				if(sipSession.isValid()) {
+					sipSession.invalidate();
+				}
+				if(sipApplicationSession.isValid()) {
+					sipApplicationSession.invalidate();
+				}
 			}			
 		}
 	}
