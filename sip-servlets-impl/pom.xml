@@ -125,14 +125,14 @@
 			<groupId>jboss</groupId>
 			<artifactId>jbosssx</artifactId>
 			<version>${jboss.version}</version>
-			<scope>runtime</scope>
+			<scope>provided</scope>
 		</dependency>
 		  
 		<dependency>
 			<groupId>org.jboss.aop</groupId>
 			<artifactId>jboss-aop-aspects</artifactId>
 			<version>2.0.0.CR14</version>
-			<scope>runtime</scope>
+			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
