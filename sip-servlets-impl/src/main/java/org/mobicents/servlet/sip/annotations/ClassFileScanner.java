@@ -92,18 +92,20 @@ public class ClassFileScanner {
 		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib		
 		this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
 		this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
-		//Adding root dir to include jars located here like ejb modules and so on...
-		//Ideally we may want to parse the application.xml and get the jars that are defined in it...?
-		this.classLoader.addJarDir(this.docbase + "/../");
-		
-		// Try to add the EAR binaries as repositories
-		File earJarDir = new File(this.docbase + "/../APP-INF/lib");
-		File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
-		if(earJarDir.exists())
-			this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
-		if(earClassesDir.exists())
-			this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
-		
+		//Add those only for EAR files
+		if(docbase.indexOf(".ear")!=-1) {
+			//Adding root dir to include jars located here like ejb modules and so on...
+			//Ideally we may want to parse the application.xml and get the jars that are defined in it...?
+			this.classLoader.addJarDir(this.docbase + "/../");
+			
+			// Try to add the EAR binaries as repositories
+			File earJarDir = new File(this.docbase + "/../APP-INF/lib");
+			File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
+			if(earJarDir.exists())
+				this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
+			if(earClassesDir.exists())
+				this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
+		}
 		// TODO: Add META-INF classpath
 			
 		_scan(new File(this.docbase));

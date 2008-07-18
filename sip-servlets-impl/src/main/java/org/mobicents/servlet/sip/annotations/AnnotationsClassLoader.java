@@ -626,7 +626,7 @@ public class AnnotationsClassLoader
 					log.error("An exception occured when trying to add the following jar to the AnnotationsClassLoader : " + file.getAbsolutePath(), e);
 				}
     		} else {
-    			log.error(file.getAbsolutePath() + " is a directory in " + dirPath + " and as such will be skipped.");
+    			log.info(file.getAbsolutePath() + " is a directory in " + dirPath + " and as such will be skipped.");
     		}
     	}
     }
