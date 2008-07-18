@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>mobicents</artifactId>
-		<groupId>org.mobicents</groupId>
-		<version>2-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>sip-servlets-examples-parent</artifactId>
+		<version>1.0</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>media-playback-servlet</artifactId>
@@ -154,29 +154,5 @@
 
 		</plugins>
 	</build>
-	<!-- repositories -->
-	<repositories>
-		<repository>
-			<id>JbossRepository</id>
-			<name>Jboss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>jboss-snapshots</id>
-			<name>JBoss Snapshot Repository</name>
-			<url>http://snapshots.jboss.org/maven2</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+	
 </project>

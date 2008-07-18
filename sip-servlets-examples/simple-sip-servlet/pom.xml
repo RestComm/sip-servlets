@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>mobicents</artifactId>
-		<groupId>org.mobicents</groupId>
-		<version>2-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>sip-servlets-examples-parent</artifactId>
+		<version>1.0</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>simple-sip-servlet</artifactId>
@@ -14,59 +14,6 @@
 	<version>1.0</version>
 	<name>Simple Sip Servlet Example</name>
 	<url>http://www.mobicents.org/examples.html</url>
-	<dependencies>
-		<!-- test dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- logging dependency -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging-api</artifactId>
-			<version>${commons-logging.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- JAIN-SIP dependency for the shootist -->
-		<dependency>
-			<groupId>javax.sip</groupId>
-			<artifactId>jain-sip-api</artifactId>
-			<version>${jain-sip-api.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.sip</groupId>
-			<artifactId>jain-sip-ri</artifactId>
-			<version>${jain-sip-ri.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- j2ee dependencies -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mobicents.servlet.sip</groupId>
-			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-
-	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -85,29 +32,4 @@
 				</configuration>
 			</plugin>			
 		</plugins>	</build>
-	<!-- repositories -->
-	<repositories>
-		<repository>
-			<id>JbossRepository</id>
-			<name>Jboss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>jboss-snapshots</id>
-			<name>JBoss Snapshot Repository</name>
-			<url>http://snapshots.jboss.org/maven2</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>

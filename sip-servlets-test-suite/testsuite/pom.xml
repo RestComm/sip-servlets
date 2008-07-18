@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>sip-servlets-test-suite</artifactId>
 	<packaging>jar</packaging>
-	<name>sip-servlets-test-suite</name>
+	<name>Mobicents Sip Servlets Test Suite</name>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
