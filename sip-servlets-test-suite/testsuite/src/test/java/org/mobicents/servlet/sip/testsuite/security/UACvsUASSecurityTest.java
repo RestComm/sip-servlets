@@ -63,7 +63,7 @@ public class UACvsUASSecurityTest extends SipServletTestCase implements SipListe
 	public void testSecurity() {
 		tracker.init();
 		try {
-			for(int q=0; q<10; q++)
+			for(int q=0; q<15; q++)
 			{
 				if(tracker.receivedInvite) break;
 				Thread.sleep(1111);
