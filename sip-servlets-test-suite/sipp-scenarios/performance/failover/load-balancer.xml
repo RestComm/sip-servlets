@@ -29,7 +29,7 @@
     </send>
     <recv response="100" optional="true" />
     <recv response="180" optional="true" />
-    <recv response="200" rtd="true" rrs="true">
+    <recv response="200" rtd="true" rss="true">
         <action>
             <!-- TODO: Better regEx -->
             <ereg regexp="([[:graph:]])(.*:(.*@)?.*(:[[:digit:]]*)?)([[:graph:]])" search_in="hdr" header="Contact:" check_it="true" assign_to="1,2,3,4" />
@@ -48,6 +48,7 @@
             Contact: sip:sipp@[local_ip]:[local_port]
             [routes]
             Max-Forwards: 70
+            Subject: Performance Test
             Content-Length: 0
 
         ]]>
