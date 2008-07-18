@@ -28,7 +28,7 @@ import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
@@ -322,7 +322,7 @@ public abstract class AuthenticatorBase
                 + authType + "'");
         }
         request.setUserPrincipal(principal);
-        SipSessionImpl session = request.getSipSession();
+        MobicentsSipSession session = request.getSipSession();
         if(session != null) {
         	session.setUserPrincipal(principal);
         }

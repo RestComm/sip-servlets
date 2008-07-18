@@ -254,7 +254,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
 			if(getManager() instanceof SipStandardManager) {
 				((SipStandardManager)getManager()).setSipFactoryImpl(
-						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
+						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
+				((SipManager)manager).setContainer(this);
 			}
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
@@ -384,8 +385,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the sip context");
 		}
-		((SipManager)manager).dumpSipSessions();
-		((SipManager)manager).dumpSipApplicationSessions();		
+		if(manager instanceof SipStandardManager) {
+			((SipStandardManager)manager).dumpSipSessions();
+			((SipStandardManager)manager).dumpSipApplicationSessions();
+		}
 		super.stop();
 		// this should happen after so that applications can still do some processing
 		// in destroy methods to notify that context is getting destroyed and app removed
@@ -703,9 +706,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
     
     @Override
     public synchronized void setManager(Manager manager) {
-    	if(manager instanceof SipStandardManager && sipApplicationDispatcher != null) {
-			((SipStandardManager)manager).setSipFactoryImpl(
+    	if(manager instanceof SipManager && sipApplicationDispatcher != null) {
+			((SipManager)manager).setSipFactoryImpl(
 					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
+			((SipManager)manager).setContainer(this);
 		}
     	super.setManager(manager);
     }

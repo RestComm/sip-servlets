@@ -85,11 +85,11 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -108,7 +108,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	
 	protected Message message;
 	protected SipFactoryImpl sipFactoryImpl;
-	protected SipSessionImpl session;
+	protected MobicentsSipSession session;
 
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
 	private Transaction transaction;
@@ -288,7 +288,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected SipServletMessageImpl(Message message,
 			SipFactoryImpl sipFactoryImpl, Transaction transaction,
-			SipSession sipSession, Dialog dialog) {
+			MobicentsSipSession sipSession, Dialog dialog) {
 		if (sipFactoryImpl == null)
 			throw new NullPointerException("Null factory");
 		if (message == null)
@@ -298,7 +298,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.message = message;
 		this.transaction = transaction;
-		this.session = (SipSessionImpl) sipSession;
+		this.session = sipSession;
 		this.transactionApplicationData = new TransactionApplicationData(this);
 
 		if(sipSession != null && dialog != null) {
@@ -570,7 +570,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(currentApplicationName, message, false);
 				SipContext sipContext = 
 					sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(currentApplicationName);				
-				SipApplicationSessionImpl applicationSession = 
+				MobicentsSipApplicationSession applicationSession = 
 					((SipManager)sipContext.getManager()).getSipApplicationSession(key, create);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Tryin to create a new sip session with key = " + sessionKey);
@@ -956,7 +956,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public SipSession getSession(boolean create) {
 		if (this.session == null && create) {
-			SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl)getApplicationSession(create);
+			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getApplicationSession(create);
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(currentApplicationName, message, false);
 			this.session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);
@@ -969,14 +969,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * Retrieve the sip session implementation
 	 * @return the sip session implementation
 	 */
-	public SipSessionImpl getSipSession() {
+	public MobicentsSipSession getSipSession() {
 		return session;
 	}
 
 	/**
 	 * @param session the session to set
 	 */
-	public void setSipSession(SipSessionImpl session) {
+	public void setSipSession(MobicentsSipSession session) {
 		this.session = session;
 	}
 

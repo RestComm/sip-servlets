@@ -80,6 +80,7 @@ import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderStack;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
@@ -133,7 +134,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	private boolean isInitial;
 	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
-			SipSession sipSession, Transaction transaction, Dialog dialog,
+			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
 		super(request, sipFactoryImpl, transaction, sipSession, dialog);
 		this.createDialog = createDialog;

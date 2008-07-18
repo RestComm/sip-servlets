@@ -36,11 +36,10 @@ import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 
 /**
@@ -183,12 +182,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
         }
 
         if(request != null) {			
-			String sipApplicationKey = request.getParameter(SipApplicationSessionImpl.SIP_APPLICATION_KEY_PARAM_NAME);
+			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
 			if(sipApplicationKey != null && sipApplicationKey.length() > 0) {
 				try {
 					SipApplicationSessionKey sipApplicationSessionKey = 
 						SessionManagerUtil.parseSipApplicationSessionKey(sipApplicationKey);
-					SipApplicationSessionImpl sipApplicationSessionImpl = 
+					MobicentsSipApplicationSession sipApplicationSessionImpl = 
 						((SipManager)context.getManager()).getSipApplicationSession(sipApplicationSessionKey, false);
 					sipApplicationSessionImpl.addHttpSession(request.getSession());
 				} catch (ParseException pe) {

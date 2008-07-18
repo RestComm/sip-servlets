@@ -34,10 +34,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
@@ -168,14 +168,14 @@ public abstract class MessageDispatcher {
 	}
 	
 	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
-		SipSessionImpl session = request.getSipSession();
+		MobicentsSipSession session = request.getSipSession();
 		if(logger.isInfoEnabled()) {
 			logger.info("Dispatching request " + request.toString() + 
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
 		}
 		String sessionHandler = session.getHandler();
-		SipApplicationSessionImpl sipApplicationSessionImpl = session.getSipApplicationSession();
+		MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
 		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
 		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		Servlet servlet = sipServletImpl.allocate();		
@@ -195,24 +195,20 @@ public abstract class MessageDispatcher {
 		} finally {		
 			sipServletImpl.deallocate(servlet);
 		}
-		
-		// We invalidate here just after the servlet is called because before that the session would be unavailable
-		// to the user code. TODO: FIXME: This event should occur after all transations are complete.
-		// if(session.isReadyToInvalidate() && session.getInvalidateWhenReady()) session.invalidate();
 	}
 	
 	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
-		SipSessionImpl session = response.getSipSession();
+		MobicentsSipSession session = response.getSipSession();
 		if(logger.isInfoEnabled()) {
 			logger.info("Dispatching response " + response.toString() + 
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
 		}
 		
-		Container container = ((SipApplicationSessionImpl)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
+		Container container = ((MobicentsSipApplicationSession)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
 		Wrapper sipServletImpl = (Wrapper) container;
 		
-		if(sipServletImpl.isUnavailable()) {
+		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
 			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
 		} else {
 			Servlet servlet = sipServletImpl.allocate();
@@ -227,7 +223,7 @@ public abstract class MessageDispatcher {
 	
 	public static boolean securityCheck(SipServletRequestImpl request)
 	{
-		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) request.getApplicationSession();
+		MobicentsSipApplicationSession appSession = (MobicentsSipApplicationSession) request.getApplicationSession();
 		SipContext sipStandardContext = appSession.getSipContext();
 		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
 		

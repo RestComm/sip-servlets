@@ -33,12 +33,13 @@ import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -126,15 +127,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
 		}
-		SipApplicationSessionImpl sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
-		if(sipApplicationSession == null) {
-			sipManager.dumpSipApplicationSessions();
+		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
+		if(sipApplicationSession == null && sipManager instanceof SipStandardManager) {
+			((SipStandardManager)sipManager).dumpSipApplicationSessions();
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 		}
 		
 		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
-		SipSessionImpl sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+		MobicentsSipSession sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		
 		// Added by Vladimir because the inversion detection on proxied requests doesn't work
 		if(sipSession == null) {
@@ -146,8 +147,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		}
 		
-		if(sipSession == null) {
-			sipManager.dumpSipSessions();
+		if(sipSession == null && sipManager instanceof SipStandardManager) {
+			((SipStandardManager)sipManager).dumpSipSessions();
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 		} else {

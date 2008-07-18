@@ -37,7 +37,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -193,7 +193,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 					inviteRequest.getLinkedRequest().createCancel();
 				cancelRequest.send();
 			} else {
-				SipSessionImpl sipSession = inviteRequest.getSipSession();
+				MobicentsSipSession sipSession = inviteRequest.getSipSession();
 				sipServletRequest.setSipSession(sipSession);
 				try{
 					callServlet(sipServletRequest);
@@ -245,7 +245,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 					logger.info("request already proxied, dropping the cancel");
 					return;
 				}
-				SipSessionImpl sipSession = inviteRequest.getSipSession();
+				MobicentsSipSession sipSession = inviteRequest.getSipSession();
 				sipServletRequest.setSipSession(sipSession);
 				try{
 					callServlet(sipServletRequest);

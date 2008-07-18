@@ -133,7 +133,7 @@ public class ConvergedSession
 	 */
 	public SipApplicationSession getApplicationSession() {		
 		//the application session if currently associated is returned, 
-		SipApplicationSessionImpl sipApplicationSession =
+		MobicentsSipApplicationSession sipApplicationSession =
 			((SipManager)manager).findSipApplicationSession(this);
 		if(sipApplicationSession == null) {
 			//however if no application session is associated it is created, 

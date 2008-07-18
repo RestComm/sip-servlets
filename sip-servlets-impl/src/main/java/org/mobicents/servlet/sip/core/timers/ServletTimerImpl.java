@@ -26,12 +26,12 @@ import javax.servlet.sip.TimerListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
 	private transient static final Log logger = LogFactory.getLog(ServletTimerImpl.class);
 	
-	private SipApplicationSessionImpl appSession;
+	private MobicentsSipApplicationSession appSession;
 	/**
 	 * Logger for this class
 	 */
@@ -124,7 +124,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 *            Listener that will get timeout events.
 	 */
 	public ServletTimerImpl(Serializable info, long delay,
-			TimerListener listener, SipApplicationSessionImpl appSession) {
+			TimerListener listener, MobicentsSipApplicationSession appSession) {
 		this(info, delay, false, 0, listener, appSession);
 		isRepeatingTimer = false;		
 	}
@@ -145,7 +145,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 */
 	public ServletTimerImpl(Serializable info, long delay, boolean fixedDelay,
 			long period, TimerListener listener,
-			SipApplicationSessionImpl appSession) {
+			MobicentsSipApplicationSession appSession) {
 		this.id = new UID().toString();
 		this.info = info;
 		this.delay = delay;
@@ -169,7 +169,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 * @param mayInterruptIfRunning
 	 */
 	public void cancel(boolean mayInterruptIfRunning) {
-		SipApplicationSessionImpl appSessionToCancelThisTimersFrom = null;
+		MobicentsSipApplicationSession appSessionToCancelThisTimersFrom = null;
 		synchronized (TIMER_LOCK) {
 			if (future != null) {
 				// need to force cancel to get rid of

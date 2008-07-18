@@ -50,11 +50,11 @@ import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
@@ -99,7 +99,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		if(logger.isInfoEnabled()) {
 			logger.info("popped route : " + poppedAddress);
 		}
-		SipSessionImpl sipSessionImpl = sipServletRequest.getSipSession();
+		MobicentsSipSession sipSessionImpl = sipServletRequest.getSipSession();
 		//set directive from popped route header if it is present			
 		Serializable stateInfo = null;
 		//If request is received from an external SIP entity, directive is set to NEW. 
@@ -147,10 +147,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// Upon receiving an initial request for processing, a container MUST check the topmost Route header and 
 		// Request-URI (in that order) to see if it contains an encoded URI. 
 		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
-		String targetedApplicationKey = sipServletRequest.getRequestURI().getParameter(SipApplicationSessionImpl.SIP_APPLICATION_KEY_PARAM_NAME);
+		String targetedApplicationKey = sipServletRequest.getRequestURI().getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
 		SipTargetedRequestInfo targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
 		if(targetedRequestInfo == null && poppedAddress != null) {
-			targetedApplicationKey = poppedAddress.getURI().getParameter(SipApplicationSessionImpl.SIP_APPLICATION_KEY_PARAM_NAME);
+			targetedApplicationKey = poppedAddress.getURI().getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
 			targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
 		}	
 		
@@ -209,11 +209,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//sip appliation session association
 		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
-		SipApplicationSessionImpl appSession = sipManager.getSipApplicationSession(
+		MobicentsSipApplicationSession appSession = sipManager.getSipApplicationSession(
 				sipApplicationSessionKey, true);
 		//sip session association
 		SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
-		SipSessionImpl sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
+		MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
 		sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 		sipServletRequest.setSipSession(sipSessionImpl);						
 		

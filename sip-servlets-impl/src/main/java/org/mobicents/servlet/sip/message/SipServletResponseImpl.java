@@ -56,6 +56,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
  * Implementation of the sip servlet response interface
@@ -83,7 +84,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			Response response, 
 			SipFactoryImpl sipFactoryImpl, 
 			Transaction transaction, 
-			SipSession session, 
+			MobicentsSipSession session, 
 			Dialog dialog) {
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);

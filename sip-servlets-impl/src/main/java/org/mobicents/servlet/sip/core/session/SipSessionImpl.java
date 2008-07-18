@@ -38,7 +38,6 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
@@ -99,7 +98,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author mranga
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
-public class SipSessionImpl implements SipSession {
+public class SipSessionImpl implements MobicentsSipSession {
 	
 	private enum SipSessionEventType {
 		CREATION, DELETION, READYTOINVALIDATE;
@@ -107,7 +106,7 @@ public class SipSessionImpl implements SipSession {
 	
 	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
 	
-	private SipApplicationSessionImpl sipApplicationSession;			
+	private MobicentsSipApplicationSession sipApplicationSession;			
 	
 	private ProxyBranchImpl proxyBranch;
 
@@ -201,9 +200,9 @@ public class SipSessionImpl implements SipSession {
 	 */
 	private SipSessionImpl parentSession = null;
 	
-	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, SipApplicationSessionImpl sipApplicationSessionImpl) {
+	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
-		setSipApplicationSession(sipApplicationSessionImpl);
+		setSipApplicationSession(mobicentsSipApplicationSession);
 		this.sipFactory = sipFactoryImpl;
 		this.creationTime = this.lastAccessTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
@@ -212,7 +211,7 @@ public class SipSessionImpl implements SipSession {
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		this.derivedSipSessions = new ConcurrentHashMap<String, SipSessionImpl>();
 		// the sip context can be null if the AR returned an application that was not deployed
-		if(sipApplicationSessionImpl.getSipContext() != null) {
+		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
 		}
 	}
@@ -741,12 +740,12 @@ public class SipSessionImpl implements SipSession {
 		return sessionCreatingDialog;
 	}
 
-	public SipApplicationSessionImpl getSipApplicationSession() {
+	public MobicentsSipApplicationSession getSipApplicationSession() {
 		return sipApplicationSession;
 	}
 
 	protected void setSipApplicationSession(
-			SipApplicationSessionImpl sipApplicationSession) {
+			MobicentsSipApplicationSession sipApplicationSession) {
 		this.sipApplicationSession = sipApplicationSession;
 		if ( sipApplicationSession != null) {
 			if(sipApplicationSession.getSipSession(key.toString()) == null) {
@@ -1106,12 +1105,9 @@ public class SipSessionImpl implements SipSession {
 	}
 	
 	/**
-	 * clone the current sip session except its attributes (they will be shared) 
-	 * and add it to the internal map of derived sessions identifying it by its ToTag
-	 * @param toTag the to tag identifying the derived sip session to create
-	 * @return the newly created sip session
+	 * {@inheritDoc}
 	 */
-	public SipSessionImpl createDerivedSipSession(SipSessionKey sessionKey) {
+	public MobicentsSipSession createDerivedSipSession(SipSessionKey sessionKey) {
 		// clone the session and add it to the map of derived sessions
 		SipSessionImpl sipSessionImpl = new SipSessionImpl(sessionKey, sipFactory, sipApplicationSession);
 		sipSessionImpl.sipSessionAttributeMap = sipSessionAttributeMap;
@@ -1135,20 +1131,16 @@ public class SipSessionImpl implements SipSession {
 	}
 	
 	/**
-	 * Removes the derived sip session identified by the To tag in parameter
-	 * @param toTag the to Tag identifying the sip session to remove
-	 * @return the removed derived sip session
+	 * {@inheritDoc}
 	 */
-	public SipSessionImpl removeDerivedSipSession(String toTag) {
+	public MobicentsSipSession removeDerivedSipSession(String toTag) {
 		return derivedSipSessions.remove(toTag);
 	}
 	
 	/**
-	 * Find the derived sip session identified by its to tag
-	 * @param toTag the to Tag identifying the sip session to remove
-	 * @return the derived sip session identified by its to tag or null if none has been found
+	 * {@inheritDoc}
 	 */
-	public SipSessionImpl findDerivedSipSession(String toTag) {
+	public MobicentsSipSession findDerivedSipSession(String toTag) {
 		return derivedSipSessions.get(toTag);
 	}
 }

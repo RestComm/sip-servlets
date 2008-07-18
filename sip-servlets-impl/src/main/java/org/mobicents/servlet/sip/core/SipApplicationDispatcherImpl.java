@@ -78,10 +78,10 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -489,7 +489,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 		SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
-		SipSessionImpl sipSessionImpl = sipServletMessageImpl.getSipSession();
+		MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
 		if(sipSessionImpl.isReadyToInvalidate()) {
 			sipSessionImpl.onTerminatedState();
 		}
@@ -513,7 +513,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		if(tad != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
-			SipSessionImpl sipSession = sipServletMessage.getSipSession();
+			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 			sipSession.removeOngoingTransaction(transaction);
 			if(sipSession.isReadyToInvalidate()) {
 				sipSession.onTerminatedState();
@@ -556,7 +556,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		if(tad != null) {
-			SipSessionImpl sipSessionImpl = tad.getSipServletMessage().getSipSession();
+			MobicentsSipSession sipSessionImpl = tad.getSipServletMessage().getSipSession();
 			if(sipSessionImpl == null) {
 				if(logger.isInfoEnabled()) {
 					logger.info("no sip session were returned for this transaction " + transaction);

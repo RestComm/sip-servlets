@@ -49,13 +49,13 @@ public interface SipManager extends org.apache.catalina.Manager {
 	 * @param key the identifier for this session
 	 * @return the sip session that had just been removed, null otherwise
 	 */
-	public SipSessionImpl removeSipSession(final SipSessionKey key);
+	public MobicentsSipSession removeSipSession(final SipSessionKey key);
 	/**
 	 * Removes a sip application session from the manager by its key
 	 * @param key the identifier for this session
 	 * @return the sip application session that had just been removed, null otherwise
 	 */
-	public SipApplicationSessionImpl removeSipApplicationSession(final SipApplicationSessionKey key);
+	public MobicentsSipApplicationSession removeSipApplicationSession(final SipApplicationSessionKey key);
 	
 	/**
 	 * Retrieve a sip application session from its key. If none exists, one can enforce
@@ -64,7 +64,7 @@ public interface SipManager extends org.apache.catalina.Manager {
 	 * @param create if set to true, if no session has been found one will be created
 	 * @return the sip application session matching the key
 	 */
-	public SipApplicationSessionImpl getSipApplicationSession(final SipApplicationSessionKey key, final boolean create);
+	public MobicentsSipApplicationSession getSipApplicationSession(final SipApplicationSessionKey key, final boolean create);
 
 	/**
 	 * Retrieve a sip session from its key. If none exists, one can enforce
@@ -73,40 +73,36 @@ public interface SipManager extends org.apache.catalina.Manager {
 	 * @param key the key identifying the sip session to retrieve 
 	 * @param create if set to true, if no session has been found one will be created
 	 * @param sipFactoryImpl needed only for sip session creation.
-	 * @param sipApplicationSessionImpl to associate the SipSession with if create is set to true, if false it won't be used
+	 * @param MobicentsSipApplicationSession to associate the SipSession with if create is set to true, if false it won't be used
 	 * @return the sip session matching the key
 	 * @throws IllegalArgumentException if create is set to true and sip Factory is null
 	 */
-	public SipSessionImpl getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final SipApplicationSessionImpl sipApplicationSessionImpl);
+	public MobicentsSipSession getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final MobicentsSipApplicationSession MobicentsSipApplicationSession);
 	
 	/**
 	 * Retrieve all sip sessions currently hold by the session manager
 	 * @return an iterator on the sip sessions
 	 */
-	public Iterator<SipSessionImpl> getAllSipSessions();
+	public Iterator<MobicentsSipSession> getAllSipSessions();
 
 	/**
 	 * Retrieve all sip application sessions currently hold by the session manager
 	 * @return an iterator on the sip sessions
 	 */
-	public Iterator<SipApplicationSessionImpl> getAllSipApplicationSessions();
+	public Iterator<MobicentsSipApplicationSession> getAllSipApplicationSessions();
 	
 	/**
 	 * Retrieves the sip application session holding the converged http session in parameter
 	 * @param convergedHttpSession the converged session to look up
 	 * @return the sip application session holding a reference to it or null if none references it
 	 */
-	public SipApplicationSessionImpl findSipApplicationSession(HttpSession httpSession);
-	/**
-	 * 
-	 */
-	public void dumpSipSessions();
-	/**
-	 * 
-	 */
-	public void dumpSipApplicationSessions();
+	public MobicentsSipApplicationSession findSipApplicationSession(HttpSession httpSession);
 	/**
 	 * Remove the sip sessions and sip application sessions 
 	 */
 	public void removeAllSessions();
+	
+	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl);
+	
+	public SipFactoryImpl getSipFactoryImpl();
 }

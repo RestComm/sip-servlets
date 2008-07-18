@@ -41,7 +41,7 @@ import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 
@@ -75,7 +75,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		String transport = JainSipUtils.findTransport(clonedRequest);		
 		ViaHeader viaHeader = JainSipUtils.createViaHeader(
 				sipNetworkInterfaceManager, transport, null);
-		SipSessionImpl session = sipServletRequest.getSipSession();
+		MobicentsSipSession session = sipServletRequest.getSipSession();
 		
 		if(session != null) {			
 			if(SipSessionRoutingType.CURRENT_SESSION.equals(sipSessionRoutingType)) {

@@ -39,7 +39,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -263,7 +263,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		// Initialize the sip session for the new request if initial
 		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
-		SipSessionImpl newSession = (SipSessionImpl) clonedRequest.getSession(true);
+		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
 		
 		// Use the original dialog in the new session
 		newSession.setSessionCreatingDialog(originalRequest.getSipSession().getSessionCreatingDialog());

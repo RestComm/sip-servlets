@@ -27,8 +27,7 @@ import javax.servlet.sip.TimerService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
-
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 public class TimerServiceImpl implements TimerService, Serializable {
 	
@@ -51,7 +50,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	public ServletTimer createTimer(SipApplicationSession appSession,
 			long delay, boolean isPersistent, Serializable info) {			
 		
-		SipApplicationSessionImpl sipApplicationSessionImpl =(SipApplicationSessionImpl)appSession;
+		MobicentsSipApplicationSession sipApplicationSessionImpl =(MobicentsSipApplicationSession)appSession;
 		
 		if (sipApplicationSessionImpl.isValid() == false) {
 			throw new IllegalStateException("Sip application session has been invalidated!!!");
@@ -77,7 +76,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 			throw new IllegalArgumentException(
 					"Period should be greater than 0");
 		}
-		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl) appSession;
+		MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession) appSession;
 		
 		if (sipApplicationSessionImpl.isValid() == false) {
 			throw new IllegalStateException("Sip application session has been invalidated!!!");
@@ -102,7 +101,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	 * @return
 	 */
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
-			boolean isPersistent, Serializable info, SipApplicationSessionImpl sipApplicationSession) {				
+			boolean isPersistent, Serializable info, MobicentsSipApplicationSession sipApplicationSession) {				
 		ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
 		// logger.log(Level.FINE, "starting timer
 		// at:"+System.currentTimeMillis());
@@ -128,7 +127,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	 */
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
 			long period, boolean fixedDelay, boolean isPersistent,
-			Serializable info, SipApplicationSessionImpl sipApplicationSession) {		
+			Serializable info, MobicentsSipApplicationSession sipApplicationSession) {		
 		final ServletTimerImpl servletTimer = new ServletTimerImpl(
 				info, delay, fixedDelay, period, listener, sipApplicationSession);
 		ScheduledFuture<?> future = null;

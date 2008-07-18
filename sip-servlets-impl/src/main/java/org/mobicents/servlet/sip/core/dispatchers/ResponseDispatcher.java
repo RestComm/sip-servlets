@@ -32,10 +32,11 @@ import javax.sip.message.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -124,7 +125,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Trying to find session with following session key " + sessionKey);
 			}
-			SipSessionImpl session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+			MobicentsSipSession session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
 			//needed in the case of RE-INVITE by example
 			if(session == null) {
 				sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, !inverted);
@@ -135,8 +136,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("session found is " + session);
-				if(session == null) {
-					sipManager.dumpSipSessions();
+				if(session == null && sipManager instanceof SipStandardManager) {
+					((SipStandardManager)sipManager).dumpSipSessions();
 				}
 			}	
 			if(logger.isInfoEnabled()) {

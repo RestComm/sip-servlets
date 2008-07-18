@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
-import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
@@ -58,8 +57,8 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  */
-public class SipApplicationSessionImpl implements SipApplicationSession {
-	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
+public class SipApplicationSessionImpl implements MobicentsSipApplicationSession {
+	private transient static final Log logger = LogFactory.getLog(SipApplicationSessionImpl.class);
 
 	private enum SipApplicationSessionEventType {
 		CREATION, DELETION, EXPIRATION, READYTOINVALIDATE;
@@ -68,7 +67,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	 * Timer task that will notify the listeners that the sip application session has expired 
 	 * @author Jean Deruelle
 	 */
-	private class SipApplicationSessionTimerTask implements Callable<SipApplicationSession> {		
+	private class SipApplicationSessionTimerTask implements Callable<MobicentsSipApplicationSession> {		
 		private SipApplicationSessionImpl sipApplicationSessionImpl;
 		
 		/**
@@ -79,7 +78,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			this.sipApplicationSessionImpl = sipApplicationSessionImpl;
 		}		
 
-		public SipApplicationSession call() throws Exception {
+		public MobicentsSipApplicationSession call() throws Exception {
 			if(logger.isDebugEnabled()) {
 				logger.debug("SipApplicationSessionTimerTask now running for sip application session " + sipApplicationSessionImpl.getId());
 			}
@@ -93,13 +92,11 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 			return sipApplicationSessionImpl;
 		}
 		
-	}
-	
-	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey"; 
+	} 
 	
 	private Map<String, Object> sipApplicationSessionAttributeMap;
 
-	private Map<String,SipSessionImpl> sipSessions;
+	private Map<String,MobicentsSipSession> sipSessions;
 	
 	private Map<String, HttpSession> httpSessions;
 	
@@ -115,7 +112,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private SipApplicationSessionTimerTask expirationTimerTask;
 	
-	private ScheduledFuture<SipApplicationSession> expirationTimerFuture;
+	private ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
 	
 	private Map<String, ServletTimer> servletTimers;
 	
@@ -132,7 +129,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		
 	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
-		sipSessions = new ConcurrentHashMap<String,SipSessionImpl>();
+		sipSessions = new ConcurrentHashMap<String,MobicentsSipSession>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
@@ -149,7 +146,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
 				}
-				expirationTimerFuture = (ScheduledFuture<SipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
+				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
@@ -193,20 +190,20 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		}		
 	}
 	
-	protected void addSipSession( SipSessionImpl sipSessionImpl) {
-		this.sipSessions.put(sipSessionImpl.getKey().toString(), sipSessionImpl);
+	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
+		this.sipSessions.put(mobicentsSipSession.getKey().toString(), mobicentsSipSession);
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
-	protected SipSessionImpl removeSipSession (SipSessionImpl sipSessionImpl) {
-		return this.sipSessions.remove(sipSessionImpl.getKey().toString());
+	public MobicentsSipSession removeSipSession (MobicentsSipSession mobicentsSipSession) {
+		return this.sipSessions.remove(mobicentsSipSession.getKey().toString());
 	}
 	
-	public void addHttpSession( HttpSession httpSession) {
+	public void addHttpSession(HttpSession httpSession) {
 		this.httpSessions.put(httpSession.getId(), httpSession);
 	}
 	
-	public HttpSession removeHttpSession (HttpSession httpSession) {
+	public HttpSession removeHttpSession(HttpSession httpSession) {
 		return this.httpSessions.remove(httpSession.getId());
 	}
 	
@@ -392,7 +389,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		} */
 		
 		//doing the invalidation
-		for(SipSessionImpl session: sipSessions.values()) {
+		for(MobicentsSipSession session: sipSessions.values()) {
 			if(session.isValid()) {
 				session.invalidate();
 			}
@@ -577,7 +574,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 				}
 				expirationTimerFuture.cancel(false);
 				expirationTimerTask = new SipApplicationSessionTimerTask(this);
-				expirationTimerFuture = (ScheduledFuture<SipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
+				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
 			}
 			return deltaMinutes;
 		}				
@@ -699,15 +696,15 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 		invalidateWhenReady = arg0;
 	}
 	
-	public void onSipSessionReadyToInvalidate(SipSessionImpl session) {
-		removeSipSession(session);
+	public void onSipSessionReadyToInvalidate(MobicentsSipSession mobicentsSipSession) {
+		removeSipSession(mobicentsSipSession);
 		updateReadyToInvalidateState();
 	}
 	
 	synchronized private void updateReadyToInvalidateState() {
 		if(valid) {
 			boolean allSipSessionsReadyToInvalidate = true;
-			for(SipSessionImpl sipSession:this.sipSessions.values()) {
+			for(MobicentsSipSession sipSession:this.sipSessions.values()) {
 				if(!sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Session not ready to be invalidated : " + sipSession.getKey());
@@ -743,7 +740,7 @@ public class SipApplicationSessionImpl implements SipApplicationSession {
 	
 	private void attemptToInvalidate() {
 		boolean allSipSessionsInvalidated = true;
-		for(SipSessionImpl sipSession:this.sipSessions.values()) {
+		for(MobicentsSipSession sipSession:this.sipSessions.values()) {
 			if(sipSession.isValid()) {
 				allSipSessionsInvalidated = false;
 				break;

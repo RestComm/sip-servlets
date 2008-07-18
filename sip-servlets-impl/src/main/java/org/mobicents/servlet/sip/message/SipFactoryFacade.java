@@ -32,8 +32,8 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -82,8 +82,8 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 * @see javax.servlet.sip.SipFactory#createApplicationSession()
 	 */
 	public SipApplicationSession createApplicationSession() {
-		SipApplicationSessionImpl sipApplicationSessionImpl = 
-			(SipApplicationSessionImpl)sipFactoryImpl.createApplicationSessionByAppName(sipContext.getApplicationName());
+		MobicentsSipApplicationSession sipApplicationSessionImpl = 
+			(MobicentsSipApplicationSession)sipFactoryImpl.createApplicationSessionByAppName(sipContext.getApplicationName());
 		associateHttpSession(sipApplicationSessionImpl);
 		return sipApplicationSessionImpl;
 	}
@@ -96,7 +96,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 * @param sipApplicationSessionImpl the app session to assocaiate the http session with
 	 */
 	private void associateHttpSession(
-			SipApplicationSessionImpl sipApplicationSessionImpl) {
+			MobicentsSipApplicationSession sipApplicationSessionImpl) {
 		
 		HttpSession httpSession = threadLocalHttpSession.get();
 		if(httpSession != null) {
@@ -171,7 +171,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 * @param request the session of this request will have its handler set.
 	 */
 	private void checkHandler(SipServletRequest request) {
-		SipSessionImpl sipSessionImpl = (SipSessionImpl)request.getSession();
+		MobicentsSipSession sipSessionImpl = (MobicentsSipSession)request.getSession();
 		if(sipSessionImpl.getHandler() == null) {
 			try {
 				sipSessionImpl.setHandler(sipContext.getMainServlet());
@@ -204,7 +204,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipApplicationSession createApplicationSessionByKey(
 			String sipApplicationKey) {
-		SipApplicationSessionImpl sipApplicationSessionImpl = (SipApplicationSessionImpl)
+		MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)
 			sipFactoryImpl.createApplicationSessionByKey(sipApplicationKey);
 		associateHttpSession(sipApplicationSessionImpl);
 		return sipApplicationSessionImpl;

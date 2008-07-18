@@ -59,10 +59,10 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
@@ -92,7 +92,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	//FIXME @jean.deruelle session map is never cleaned up => could lead to memory leak
 	//shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	//FIXME this is not a one to one mapping - B2BUA can link to more than one other sip session
-	private Map<SipSessionImpl, SipSessionImpl> sessionMap = new ConcurrentHashMap<SipSessionImpl, SipSessionImpl>();
+	private Map<MobicentsSipSession, MobicentsSipSession> sessionMap = new ConcurrentHashMap<MobicentsSipSession, MobicentsSipSession>();
 	//Map to handle responses to original request and cancel on original request
 	private Map<String, SipServletRequest> originalRequestMap = new ConcurrentHashMap<String, SipServletRequest>();
 
@@ -144,12 +144,12 @@ public class B2buaHelperImpl implements B2buaHelper {
 
 			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);			
-			SipSessionImpl originalSession = origRequestImpl.getSipSession();
-			SipApplicationSessionImpl appSession = originalSession
+			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			MobicentsSipApplicationSession appSession = originalSession
 					.getSipApplicationSession();				
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			SipSessionImpl session = ((SipManager)appSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, appSession);			
+			MobicentsSipSession session = ((SipManager)appSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 						
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
@@ -192,13 +192,13 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipServletRequest origRequest, Map<String, List<String>> headerMap) {
 		try {
 			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-			SipSessionImpl sessionImpl = (SipSessionImpl) session;
+			MobicentsSipSession sessionImpl = (MobicentsSipSession) session;
 
 			Dialog dialog = sessionImpl.getSessionCreatingDialog();
 			
 			Request newRequest = dialog.createRequest(origRequest.getMethod());
 									
-			SipSessionImpl originalSession = origRequestImpl.getSipSession();
+			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			if(logger.isInfoEnabled()) {
 				logger.info(origRequest.getSession());				
 				logger.info(session);
@@ -220,7 +220,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,
-					session, 
+					sessionImpl, 
 					sessionImpl.getSessionCreatingTransaction(), 
 					dialog, 
 					JainSipUtils.dialogCreatingMethods.contains(newRequest.getMethod()));
@@ -292,7 +292,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			throw new NullPointerException("Null arg");
 		}
 
-		SipSessionImpl sipSession = (SipSessionImpl) session;
+		MobicentsSipSession sipSession = (MobicentsSipSession) session;
 
 		Transaction trans = sipSession.getSessionCreatingTransaction();
 
@@ -353,7 +353,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 		if(!session.isValid()) {
 			throw new IllegalArgumentException("the session is invalid");
 		}
-		return this.sessionMap.get((SipSessionImpl) session );
+		return this.sessionMap.get((MobicentsSipSession) session );
 		
 	}
 
@@ -371,7 +371,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	 */
 	public List<SipServletMessage> getPendingMessages(SipSession session,
 			UAMode mode) {
-		SipSessionImpl sipSessionImpl = (SipSessionImpl) session;
+		MobicentsSipSession sipSessionImpl = (MobicentsSipSession) session;
 		List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
 		if ( mode.equals(UAMode.UAC)) {
 			for ( Transaction transaction: sipSessionImpl.getOngoingTransactions()) {
@@ -405,8 +405,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 		
 		if(!session1.isValid() || !session2.isValid() || 
-				State.TERMINATED.equals(((SipSessionImpl)session1).getState()) ||
-				State.TERMINATED.equals(((SipSessionImpl)session2).getState()) ||
+				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
+				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
 				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
 				sessionMap.get(session1) != null ||
 				sessionMap.get(session2) != null) {
@@ -414,8 +414,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 					"or the sessions do not belong to the same application session or " +
 					"one or both the sessions are already linked with some other session(s)");
 		}
-		this.sessionMap.put((SipSessionImpl)session1, (SipSessionImpl)session2);
-		this.sessionMap.put((SipSessionImpl) session2, (SipSessionImpl) session1);
+		this.sessionMap.put((MobicentsSipSession)session1, (MobicentsSipSession)session2);
+		this.sessionMap.put((MobicentsSipSession) session2, (MobicentsSipSession) session1);
 
 	}
 	
@@ -428,12 +428,12 @@ public class B2buaHelperImpl implements B2buaHelper {
 			throw new NullPointerException("the argument is null");
 		}
 		if(!session.isValid() || 
-				State.TERMINATED.equals(((SipSessionImpl)session).getState()) ||
+				State.TERMINATED.equals(((MobicentsSipSession)session).getState()) ||
 				sessionMap.get(session) == null) {
 			throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 		}
-		SipSessionImpl key = (SipSessionImpl) session;
-		SipSessionImpl value  = this.sessionMap.get(key);
+		MobicentsSipSession key = (MobicentsSipSession) session;
+		MobicentsSipSession value  = this.sessionMap.get(key);
 		if (value != null) {
 			this.sessionMap.remove(value);
 		}
@@ -474,12 +474,12 @@ public class B2buaHelperImpl implements B2buaHelper {
 			CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			
-			SipSessionImpl originalSession = origRequestImpl.getSipSession();
-			SipApplicationSessionImpl originalAppSession = originalSession
+			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			MobicentsSipApplicationSession originalAppSession = originalSession
 					.getSipApplicationSession();				
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			SipSessionImpl session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			
+			MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			
 			session.setHandler(originalSession.getHandler());
 			
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
