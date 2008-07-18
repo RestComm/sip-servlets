@@ -15,7 +15,7 @@ Goals
   strive to develop interoperability standards between Sip Servlets and JSLEE so that applications 
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
-  Mobicents JSLEE is be used as the SLEE implementation.
+  Mobicents JSLEE is used as the SLEE implementation.
   
 Version 0.4.1 is out !
 
