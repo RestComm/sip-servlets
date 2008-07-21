@@ -141,6 +141,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	@Override
 	public void setUp() throws Exception {
+		System.setProperty("java.util.logging.config.file", projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar + "logging.properties");
 		serverName = "SIP-Servlet-First-Tomcat-Server";
 		serviceFullClassName = SIP_SERVICE_CLASS_NAME;
 		super.setUp();

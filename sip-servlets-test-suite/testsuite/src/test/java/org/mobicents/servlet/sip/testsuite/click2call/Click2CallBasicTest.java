@@ -101,7 +101,9 @@ public class Click2CallBasicTest extends SipServletTestCase {
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/simplesipservlettest_debug_port" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/simplesipservlettest_log_port" + port + ".txt");
+				"logs/simplesipservlettest_log_port" + port + ".xml");
+		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+				"32");
 		return new SipStack(transport, port, properties);
 	}
 
