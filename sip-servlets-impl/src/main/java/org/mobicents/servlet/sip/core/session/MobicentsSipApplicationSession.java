@@ -51,4 +51,10 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	void addServletTimer(ServletTimer servletTimer);
 	
 	void removeServletTimer(ServletTimer servletTimer);
+
+	void notifySipApplicationSessionListeners(SipApplicationSessionEventType expiration);
+
+	void setExpired(boolean isExpired);
+	
+	boolean isExpired();
 }

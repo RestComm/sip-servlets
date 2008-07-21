@@ -60,36 +60,33 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public class SipApplicationSessionImpl implements MobicentsSipApplicationSession {
 	private transient static final Log logger = LogFactory.getLog(SipApplicationSessionImpl.class);
 
-	private enum SipApplicationSessionEventType {
-		CREATION, DELETION, EXPIRATION, READYTOINVALIDATE;
-	}
 	/**
 	 * Timer task that will notify the listeners that the sip application session has expired 
 	 * @author Jean Deruelle
 	 */
 	private class SipApplicationSessionTimerTask implements Callable<MobicentsSipApplicationSession> {		
-		private SipApplicationSessionImpl sipApplicationSessionImpl;
+		private MobicentsSipApplicationSession mobicentsSipApplicationSession;
 		
 		/**
 		 * Default Constructor
 		 * @param sipApplicationSessionImpl the sip application session that will expires
 		 */
-		public SipApplicationSessionTimerTask(SipApplicationSessionImpl sipApplicationSessionImpl) {
-			this.sipApplicationSessionImpl = sipApplicationSessionImpl;
+		public SipApplicationSessionTimerTask(MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+			this.mobicentsSipApplicationSession = mobicentsSipApplicationSession;
 		}		
 
 		public MobicentsSipApplicationSession call() throws Exception {
 			if(logger.isDebugEnabled()) {
-				logger.debug("SipApplicationSessionTimerTask now running for sip application session " + sipApplicationSessionImpl.getId());
+				logger.debug("SipApplicationSessionTimerTask now running for sip application session " + mobicentsSipApplicationSession.getId());
 			}
-			sipApplicationSessionImpl.notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
+			mobicentsSipApplicationSession.notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
 			//It is possible that the application grant an extension to the lifetime of the session, thus the sip application
 			//should not be treated as expired.
 			if(expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) <= 0) {
-				sipApplicationSessionImpl.expired = true;
-				sipApplicationSessionImpl.invalidate();
+				mobicentsSipApplicationSession.setExpired(true);
+				mobicentsSipApplicationSession.invalidate();
 			}
-			return sipApplicationSessionImpl;
+			return mobicentsSipApplicationSession;
 		}
 		
 	} 
@@ -164,7 +161,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * Notifies the listeners that a lifecycle event occured on that sip application session 
 	 * @param sipApplicationSessionEventType the type of event that happened
 	 */
-	private void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {				
+	public void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {				
 		SipApplicationSessionEvent event = new SipApplicationSessionEvent(this);
 		if(logger.isDebugEnabled()) {
 			logger.debug("notifying sip application session listeners of context " + 
@@ -747,6 +744,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 		if(allSipSessionsInvalidated) this.invalidate();
+	}
+
+	/**
+	 * @return the expired
+	 */
+	public boolean isExpired() {
+		return expired;
+	}
+
+	/**
+	 * @param expired the expired to set
+	 */
+	public void setExpired(boolean expired) {
+		this.expired = expired;
 	}
 
 }

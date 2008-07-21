@@ -18,10 +18,13 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.Transaction;
@@ -44,12 +47,10 @@ public interface MobicentsSipSession extends SipSession {
 	SipSessionKey getKey();
 
 	/**
-	 * clone the current sip session except its attributes (they will be shared) 
-	 * and add it to the internal map of derived sessions identifying it by its ToTag
-	 * @param toTag the to tag identifying the derived sip session to create
-	 * @return the newly created sip session
+	 * Add the derived sip session it will be identified by the To tag from its key 
+	 * @param derivedSession the derived session to add  
 	 */
-	public MobicentsSipSession createDerivedSipSession(SipSessionKey sessionKey);	
+	void addDerivedSipSessions(MobicentsSipSession derivedSession);
 	/**
 	 * Removes the derived sip session identified by the To tag in parameter
 	 * @param toTag the to Tag identifying the sip session to remove
@@ -98,6 +99,8 @@ public interface MobicentsSipSession extends SipSession {
 
 	void setSupervisedMode(boolean supervised);
 
+	boolean getSupervisedMode();
+	
 	void updateStateOnResponse(SipServletResponseImpl sipServletResponseImpl,
 			boolean receive);
 
@@ -106,6 +109,22 @@ public interface MobicentsSipSession extends SipSession {
 
 	void onTerminatedState();
 
+	void onReadyToInvalidate();
+	
 	SipURI getOutboundInterface();
+
+	Iterator<MobicentsSipSession> getDerivedSipSessions();
+
+	void setState(State state);	
+
+	void setSipSubscriberURI(URI subscriberURI);
+
+	URI getSipSubscriberURI();
+	
+	void setParentSession(MobicentsSipSession mobicentsSipSession);
+
+	Map<String, Object> getSipSessionAttributeMap();	
+
+	void setSipSessionAttributeMap(Map<String, Object> sipSessionAttributeMap);
 
 }

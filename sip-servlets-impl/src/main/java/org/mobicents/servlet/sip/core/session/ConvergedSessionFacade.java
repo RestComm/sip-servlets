@@ -32,15 +32,6 @@ import javax.servlet.sip.SipApplicationSession;
  */
 public class ConvergedSessionFacade implements HttpSession, javax.servlet.sip.ConvergedHttpSession {
 	javax.servlet.sip.ConvergedHttpSession session;
-	
-    /**
-     * Construct a new session facade.
-     */
-    public ConvergedSessionFacade(ConvergedSession session) {
-        super();
-        this.session = (ConvergedHttpSession) session;
-    }
-
 
     /**
      * Construct a new session facade.

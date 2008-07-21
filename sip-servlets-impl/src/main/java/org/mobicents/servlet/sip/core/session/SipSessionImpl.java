@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -184,7 +185,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	private boolean supervisedMode;
 
-	private Map<String, SipSessionImpl> derivedSipSessions;
+	private Map<String, MobicentsSipSession> derivedSipSessions;
 
 	/*
 	 * The almighty provider
@@ -198,7 +199,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/*
 	 * If this is a derived session, havea pointer to the parent session.
 	 */
-	private SipSessionImpl parentSession = null;
+	private MobicentsSipSession parentSession = null;
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
@@ -209,7 +210,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.valid = true;
 		this.supervisedMode = true;
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
-		this.derivedSipSessions = new ConcurrentHashMap<String, SipSessionImpl>();
+		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -537,8 +538,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		valid = false;	
 		
-		for (SipSessionImpl sipSessionImpl : derivedSipSessions.values()) {
-			sipSessionImpl.invalidate();
+		for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
+			derivedMobicentsSipSession.invalidate();
 		}
 		
 		derivedSipSessions.clear();
@@ -773,8 +774,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.supervisedMode = supervisedMode;
 	}
 
-	public void setSubscriberURI(URI subscriberURI) {
+	public void setSipSubscriberURI(URI subscriberURI) {
 		this.subscriberURI = subscriberURI;
+	}
+	
+	public URI getSipSubscriberURI() {
+		return subscriberURI;
 	}
 
 	public SipURI getOutboundInterface() {
@@ -797,12 +802,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 			onReadyToInvalidate();
 			if(this.parentSession != null) {
 				boolean allDerivedSessionsTerminated = true;
-				for(SipSessionImpl derivedSession:parentSession.derivedSipSessions.values()) {
-					if(derivedSession.isReadyToInvalidate()) {
+				Iterator<MobicentsSipSession> derivedSessionsIterator = parentSession.getDerivedSipSessions();
+				while (derivedSessionsIterator.hasNext()) {
+					MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) derivedSessionsIterator
+							.next();
+					if(mobicentsSipSession.isReadyToInvalidate()) {
 						allDerivedSessionsTerminated = false;
 						break;
 					}
-				}
+				}					
 				if(allDerivedSessionsTerminated) this.parentSession.onReadyToInvalidate();
 			}
 		}
@@ -1107,32 +1115,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * {@inheritDoc}
 	 */
-	public MobicentsSipSession createDerivedSipSession(SipSessionKey sessionKey) {
-		// clone the session and add it to the map of derived sessions
-		SipSessionImpl sipSessionImpl = new SipSessionImpl(sessionKey, sipFactory, sipApplicationSession);
-		sipSessionImpl.sipSessionAttributeMap = sipSessionAttributeMap;
-		sipSessionImpl.supervisedMode = supervisedMode;
-		sipSessionImpl.handlerServlet = new String(handlerServlet);
-		sipSessionImpl.routingRegion = routingRegion;
-		// dialog will be set when the response will be associated with this session
-//		sipSessionImpl.sessionCreatingDialog = dialog;
-		sipSessionImpl.state = state;
-		sipSessionImpl.stateInfo = stateInfo;
-		sipSessionImpl.supervisedMode = supervisedMode;
-		if(subscriberURI != null) {
-			sipSessionImpl.subscriberURI = subscriberURI.clone();
-		}
-		sipSessionImpl.userPrincipal = userPrincipal;
-		sipSessionImpl.parentSession = this;
-		
-		derivedSipSessions.put(sessionKey.getToTag(), sipSessionImpl);
-		
-		return sipSessionImpl;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
 	public MobicentsSipSession removeDerivedSipSession(String toTag) {
 		return derivedSipSessions.remove(toTag);
 	}
@@ -1142,5 +1124,45 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public MobicentsSipSession findDerivedSipSession(String toTag) {
 		return derivedSipSessions.get(toTag);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Iterator<MobicentsSipSession> getDerivedSipSessions() {
+		return derivedSipSessions.values().iterator();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setParentSession(MobicentsSipSession mobicentsSipSession) {
+		parentSession = mobicentsSipSession;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setSipSessionAttributeMap(
+			Map<String, Object> sipSessionAttributeMap) {
+		this.sipSessionAttributeMap = sipSessionAttributeMap;
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addDerivedSipSessions(MobicentsSipSession derivedSession) {
+		derivedSipSessions.put(derivedSession.getKey().getToTag(), derivedSession);
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public Map<String, Object> getSipSessionAttributeMap() {
+		return sipSessionAttributeMap;
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean getSupervisedMode() {
+		return supervisedMode;
 	}
 }

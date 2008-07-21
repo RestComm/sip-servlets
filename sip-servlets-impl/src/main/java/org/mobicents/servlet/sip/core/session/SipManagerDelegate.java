@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
@@ -32,7 +33,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * This class handles the management of sip sessions and sip application sessions for a given container (context)
- * It is a delegate since it is used by many manager implementations classes (Standard and converged one) 
+ * It is a delegate since it is used by many manager implementations classes (Standard and clustered ones) 
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
@@ -182,7 +183,7 @@ public class SipManagerDelegate {
 							logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
 									" creates new derived session with following to Tag " + key.getToTag());
 						}
-						derivedSipSession = sipSessionImpl.createDerivedSipSession(key);
+						derivedSipSession = createDerivedSipSession(sipSessionImpl, key);
 					} else {
 						if(logger.isDebugEnabled()) {
 							logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
@@ -195,7 +196,43 @@ public class SipManagerDelegate {
 		}
 		return sipSessionImpl;
 	}
-	
+
+	/**
+	 * clone the parent sip session given in parameter except its attributes (they will be shared) 
+	 * and add it to the internal map of derived sessions identifying it by its ToTag
+	 * 
+	 * @param parentSipSession the parent sip session holding the newly created derived session
+	 * @param sessionKey the key of the new derived session to create
+	 * @return the newly created derived session
+	 */
+	protected MobicentsSipSession createDerivedSipSession(MobicentsSipSession parentSipSession, SipSessionKey sessionKey) {
+		// clone the session and add it to the map of derived sessions
+		MobicentsSipSession sipSessionImpl = new SipSessionImpl(sessionKey, sipFactoryImpl, parentSipSession.getSipApplicationSession());
+		sipSessionImpl.setSipSessionAttributeMap(parentSipSession.getSipSessionAttributeMap());
+		sipSessionImpl.setSupervisedMode(parentSipSession.getSupervisedMode());
+		try {
+			sipSessionImpl.setHandler(new String(parentSipSession.getHandler()));
+		} catch (ServletException e) {
+			//cannot happen
+			logger.error(e);
+		}
+		sipSessionImpl.setRoutingRegion(parentSipSession.getRegion());
+		// dialog will be set when the response will be associated with this session
+//		sipSessionImpl.sessionCreatingDialog = dialog;
+		sipSessionImpl.setState(parentSipSession.getState());
+		sipSessionImpl.setStateInfo(parentSipSession.getStateInfo());
+		sipSessionImpl.setSupervisedMode(parentSipSession.getSupervisedMode());
+		if(parentSipSession.getSipSubscriberURI() != null) {
+			sipSessionImpl.setSipSubscriberURI(parentSipSession.getSipSubscriberURI().clone());
+		}
+		sipSessionImpl.setUserPrincipal(parentSipSession.getUserPrincipal());
+		sipSessionImpl.setParentSession(parentSipSession);
+		
+		parentSipSession.addDerivedSipSessions(sipSessionImpl);
+		
+		return sipSessionImpl;
+	}
+
 	/**
 	 * Retrieve all sip sessions currently hold by the session manager
 	 * @return an iterator on the sip sessions
