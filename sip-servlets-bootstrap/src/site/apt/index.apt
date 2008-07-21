@@ -11,7 +11,7 @@ Goals
 
   Mobicents Sip Servlets delivers a consistent, open platform on which to develop and deploy portable 
   and distributable SIP and Converged JEE services. 
-  It is an implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss and 
+  It is an implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss containers and 
   strive to develop interoperability standards between Sip Servlets and JSLEE so that applications 
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
