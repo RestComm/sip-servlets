@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-bootstrap</artifactId>
+		<version>0.5-SNAPSHOT</version>
+		<relativePath>../sip-servlets-bootstrap/pom.xml</relativePath>
+	</parent>
+	<groupId>org.mobicents.servlet.sip.example</groupId>
+	<artifactId>sip-servlets-examples-parent</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+	<name>Mobicents Sip Servlet Examples</name>
+	<url>http://www.mobicents.org/examples.html</url>
+	<modules>
+		<module>call-blocking</module>
+		<module>call-forwarding</module>
+		<module>chatserver</module>
+		<module>click-to-call</module>
+		<module>facebook-c2c</module>
+		<module>jslee-sips-interop</module>
+		<module>location-service</module>
+		<module>media-playback-servlet</module>
+		<module>shopping-demo</module>
+		<module>simple-sip-servlet</module>
+		<module>speed-dial</module>
+		<module>uac-register</module>
+	</modules>
+	<dependencies>
+		<!-- test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- logging dependency -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging-api</artifactId>
+			<version>${commons-logging.version}</version>
+			<scope>provided</scope>
+		</dependency>	
+
+		<!-- j2ee dependencies -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-spec</artifactId>
+			<version>1.1.5-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>		
+	</dependencies>	
+</project>
