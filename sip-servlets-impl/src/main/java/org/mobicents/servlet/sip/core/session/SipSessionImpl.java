@@ -185,7 +185,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	private boolean supervisedMode;
 
-	private Map<String, MobicentsSipSession> derivedSipSessions;
+	private ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
 
 	/*
 	 * The almighty provider
@@ -1151,7 +1151,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void addDerivedSipSessions(MobicentsSipSession derivedSession) {
-		derivedSipSessions.put(derivedSession.getKey().getToTag(), derivedSession);
+		derivedSipSessions.putIfAbsent(derivedSession.getKey().getToTag(), derivedSession);
 	}
 	/**
 	 * {@inheritDoc}

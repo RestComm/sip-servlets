@@ -93,9 +93,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	private Map<String, Object> sipApplicationSessionAttributeMap;
 
-	private Map<String,MobicentsSipSession> sipSessions;
+	private ConcurrentHashMap<String,MobicentsSipSession> sipSessions;
 	
-	private Map<String, HttpSession> httpSessions;
+	private ConcurrentHashMap<String, HttpSession> httpSessions;
 	
 	private SipApplicationSessionKey key;	
 	
@@ -111,7 +111,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	private ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
 	
-	private Map<String, ServletTimer> servletTimers;
+	private ConcurrentHashMap<String, ServletTimer> servletTimers;
 	
 	private boolean valid;
 	
@@ -188,7 +188,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
-		this.sipSessions.put(mobicentsSipSession.getKey().toString(), mobicentsSipSession);
+		this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession);
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
@@ -197,7 +197,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addHttpSession(HttpSession httpSession) {
-		this.httpSessions.put(httpSession.getId(), httpSession);
+		this.httpSessions.putIfAbsent(httpSession.getId(), httpSession);
 	}
 	
 	public HttpSession removeHttpSession(HttpSession httpSession) {
@@ -341,7 +341,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @param servletTimer the servlet timer to add
 	 */
 	public void addServletTimer(ServletTimer servletTimer){
-		servletTimers.put(servletTimer.getId(), servletTimer);
+		servletTimers.putIfAbsent(servletTimer.getId(), servletTimer);
 	}
 	/**
 	 * Remove a servlet timer from this application session

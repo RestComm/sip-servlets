@@ -17,10 +17,9 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
@@ -42,17 +41,13 @@ public class SipManagerDelegate {
 
 	private static transient Log logger = LogFactory.getLog(SipManagerDelegate.class);
 	
-	private Map<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
-		new HashMap<SipApplicationSessionKey, MobicentsSipApplicationSession>();
+	private ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
+		new ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession>();
 	//if it's never cleaned up a memory leak will occur
 	//Shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	//=> after a chat with ranga the better way to go for now is removing on processDialogTerminated
-	private Map<SipSessionKey, MobicentsSipSession> sipSessions = 
-		new HashMap<SipSessionKey, MobicentsSipSession>();
-
-	private Object sipSessionLock = new Object();
-	
-	private Object sipApplicationSessionLock = new Object();
+	private ConcurrentHashMap<SipSessionKey, MobicentsSipSession> sipSessions = 
+		new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
 
 	SipFactoryImpl sipFactoryImpl;
 	
@@ -102,9 +97,7 @@ public class SipManagerDelegate {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip session with the key : " + key);
 		}
-		synchronized (sipSessionLock) {			
-			return sipSessions.remove(key);
-		}
+		return sipSessions.remove(key);
 	}
 	
 	/**
@@ -116,9 +109,7 @@ public class SipManagerDelegate {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip application session with the key : " + key);
 		}
-		synchronized (sipApplicationSessionLock) {			
-			return sipApplicationSessions.remove(key);
-		}
+		return sipApplicationSessions.remove(key);
 	}
 	
 	/**
@@ -129,16 +120,19 @@ public class SipManagerDelegate {
 	 * @return the sip application session matching the key
 	 */
 	public MobicentsSipApplicationSession getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
-		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
-		synchronized (sipApplicationSessionLock) {
-			sipApplicationSessionImpl = sipApplicationSessions.get(key);
-			if(sipApplicationSessionImpl == null && create) {
-				sipApplicationSessionImpl = new SipApplicationSessionImpl(key, (SipContext) container);
+		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
+		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.get(key);
+		if(sipApplicationSessionImpl == null && create) {
+			MobicentsSipApplicationSession newSipApplicationSessionImpl = 
+				new SipApplicationSessionImpl(key, (SipContext) container);
+			sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
+			if (sipApplicationSessionImpl == null) {
+				// put succeeded, use new value
 				if(logger.isDebugEnabled()) {
 					logger.debug("Adding a sip application session with the key : " + key);
-				}			
-				sipApplicationSessions.put(key, sipApplicationSessionImpl);			
-			}
+				}
+	            sipApplicationSessionImpl = newSipApplicationSessionImpl;
+	        }						
 		}
 		return sipApplicationSessionImpl;
 	}	
@@ -159,39 +153,40 @@ public class SipManagerDelegate {
 		if(create && sipFactoryImpl == null) {
 			throw new IllegalArgumentException("the sip factory should not be null");
 		}
-		MobicentsSipSession sipSessionImpl = null;
-		//TODO check if a reentrant lock would be more efficient
-		synchronized (sipSessionLock) {
-			sipSessionImpl = sipSessions.get(key);
-			if(sipSessionImpl == null && create) {
-				sipSessionImpl = new SipSessionImpl(key, sipFactoryImpl, sipApplicationSessionImpl);
+		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
+		MobicentsSipSession sipSessionImpl = sipSessions.get(key);
+		if(sipSessionImpl == null && create) {
+			MobicentsSipSession newSipSessionImpl = new SipSessionImpl(key, sipFactoryImpl, sipApplicationSessionImpl);
+			sipSessionImpl = sipSessions.putIfAbsent(key, newSipSessionImpl);
+			if(sipSessionImpl == null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Adding a sip session with the key : " + key);
 				}
-				sipSessions.put(key, sipSessionImpl);					
+				// put succeeded, use new value
+	            sipSessionImpl = newSipSessionImpl;
 			}
-			// check if this session key has a to tag.
-			if(sipSessionImpl != null) {
-				String toTag = sipSessionImpl.getKey().getToTag();
-				if(toTag == null && key.getToTag() != null) {
-					sipSessionImpl.getKey().setToTag(key.getToTag());
-				} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
-					MobicentsSipSession derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
-					if(derivedSipSession == null) {
-						// if the to tag is different a sip session is created
-						if(logger.isDebugEnabled()) {
-							logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
-									" creates new derived session with following to Tag " + key.getToTag());
-						}
-						derivedSipSession = createDerivedSipSession(sipSessionImpl, key);
-					} else {
-						if(logger.isDebugEnabled()) {
-							logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
-									" already has a derived session with following to Tag " + key.getToTag() + " - reusing it");
-						}
+		}
+		// check if this session key has a to tag.
+		if(sipSessionImpl != null) {
+			String toTag = sipSessionImpl.getKey().getToTag();
+			if(toTag == null && key.getToTag() != null) {
+				sipSessionImpl.getKey().setToTag(key.getToTag());
+			} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
+				MobicentsSipSession derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
+				if(derivedSipSession == null) {
+					// if the to tag is different a sip session is created
+					if(logger.isDebugEnabled()) {
+						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
+								" creates new derived session with following to Tag " + key.getToTag());
 					}
-					return derivedSipSession;	
+					derivedSipSession = createDerivedSipSession(sipSessionImpl, key);
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
+								" already has a derived session with following to Tag " + key.getToTag() + " - reusing it");
+					}
 				}
+				return derivedSipSession;	
 			}
 		}
 		return sipSessionImpl;
@@ -238,6 +233,7 @@ public class SipManagerDelegate {
 	 * @return an iterator on the sip sessions
 	 */
 	public Iterator<MobicentsSipSession> getAllSipSessions() {
+		
 		return sipSessions.values().iterator();
 	}
 

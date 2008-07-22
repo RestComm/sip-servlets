@@ -409,14 +409,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			MessageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 				dispatchMessage(sipProvider, sipServletRequest);
 		} catch (DispatcherException e) {
-			logger.error("Unexpected exception while processing request",e);
+			logger.error("Unexpected exception while processing request " + request,e);
 			// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
 				MessageDispatcher.sendErrorResponse(e.getErrorCode(), transaction, request, sipProvider);
 			}
 			return;
 		} catch (Throwable e) {
-			logger.error("Unexpected exception while processing request",e);
+			logger.error("Unexpected exception while processing request " + request,e);
 			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
 				MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
