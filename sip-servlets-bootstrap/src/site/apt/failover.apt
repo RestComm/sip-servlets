@@ -52,7 +52,7 @@ Fail-Over Support
 
 * Step-By-Step Example
 
-	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT//sip-balancer-1.0-20080721.161657-13-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
+	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080722.134556-14-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
 	
 	* Get the default {{{http://code.google.com/p/mobicents/source/browse/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties}load balancer configuration properties files}}
 	
@@ -64,7 +64,7 @@ Fail-Over Support
 		
 		* the rest of the properties are jain sip stack properties that you can tune (refer to jain sip javadoc for SipStack and SipStackImpl classes to get more information on jain sip stack properties)
 	
-	* Fire up the sip balancer with following command java -jar /sip-balancer-1.0-20080721.161657-13-jar-with-dependencies.jar load-balancer-configuration.properties (if you need to stop it just do Ctrl+C) :		
+	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080722.134556-14-jar-with-dependencies.jar load-balancer-configuration.properties (if you need to stop it just do Ctrl+C) :		
 	
 	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}; only the Service tag has been modified as compared to a standard version of Mobicents Sip Servlets.
 	(make sure they don't listen on same port for http or sip connectors)
