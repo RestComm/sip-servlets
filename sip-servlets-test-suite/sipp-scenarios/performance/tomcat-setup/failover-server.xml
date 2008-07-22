@@ -86,7 +86,7 @@
     -->
 
     <!-- Define a non-SSL HTTP/1.1 Connector on port 8080 -->
-    <Connector acceptCount="100" connectionTimeout="20000" disableUploadTimeout="true" enableLookups="false" maxHttpHeaderSize="8192" maxSpareThreads="75" maxThreads="150" minSpareThreads="25" port="8080" redirectPort="8443"/>
+    <!--Connector acceptCount="100" connectionTimeout="20000" disableUploadTimeout="true" enableLookups="false" maxHttpHeaderSize="8192" maxSpareThreads="75" maxThreads="150" minSpareThreads="25" port="8080" redirectPort="8443"/-->
     <!-- Note : To disable connection timeouts, set connectionTimeout value
      to 0 -->
 	
@@ -108,7 +108,7 @@
     -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
-    <Connector enableLookups="false" port="8009" protocol="AJP/1.3" redirectPort="8443"/>
+    <!--Connector enableLookups="false" port="8009" protocol="AJP/1.3" redirectPort="8443"/-->
 
     <!-- Define a Proxied HTTP/1.1 Connector on port 8082 -->
     <!-- See proxy documentation for more information about using this. -->
@@ -120,7 +120,7 @@
     -->
 
 	<!-- Define a SIP Connector -->
-    <Connector port="5080" 
+    <Connector port="5081" 
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	signalingTransport="udp"

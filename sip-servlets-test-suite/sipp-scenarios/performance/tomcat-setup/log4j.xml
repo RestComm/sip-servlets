@@ -21,6 +21,6 @@
   <root> 
     <priority value ="ERROR" />     
     <appender-ref ref="rolling-file" /> 
-    <!--appender-ref ref="console" /-->
+    <appender-ref ref="console" />
   </root>   
 </log4j:configuration>
