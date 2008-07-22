@@ -295,6 +295,7 @@
    <!-- ======================= -->
 
    <root>
+   	  <priority value ="ERROR" />  
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
    </root>
