@@ -29,6 +29,7 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
+import javax.servlet.sip.SipSession.State;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,10 +125,12 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 	 */
 	public void timeout(ServletTimer servletTimer) {
 		SipSession sipSession = servletTimer.getApplicationSession().getSipSession((String)servletTimer.getInfo());
-		try {
-			sipSession.createRequest("BYE").send();
-		} catch (IOException e) {
-			logger.error("An unexpected exception occured while sending the BYE", e);
-		}				
+		if(!State.TERMINATED.equals(sipSession.getState())) {
+			try {
+				sipSession.createRequest("BYE").send();
+			} catch (IOException e) {
+				logger.error("An unexpected exception occured while sending the BYE", e);
+			}				
+		}
 	}
 }
