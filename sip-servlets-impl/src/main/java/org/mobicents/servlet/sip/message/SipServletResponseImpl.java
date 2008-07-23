@@ -400,8 +400,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			
 			st.sendResponse( (Response)this.message );
 			//updating the last accessed times 
-			getSipSession().setLastAccessedTime(System.currentTimeMillis());
-			getSipSession().getSipApplicationSession().setLastAccessedTime(System.currentTimeMillis());
+			getSipSession().access();
+			getSipSession().getSipApplicationSession().access();
 		} catch (Exception e) {			
 			logger.error("an exception occured when sending the response", e);
 			throw new IllegalStateException(e);

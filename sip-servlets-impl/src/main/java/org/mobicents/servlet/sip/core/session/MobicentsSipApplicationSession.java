@@ -44,7 +44,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 
 	SipApplicationSessionKey getKey();
 
-	void setLastAccessedTime(long currentTimeMillis);	
+	void access();	
 
 	boolean hasTimerListener();
 

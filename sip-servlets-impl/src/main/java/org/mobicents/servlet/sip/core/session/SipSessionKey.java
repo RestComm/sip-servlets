@@ -48,7 +48,7 @@ public class SipSessionKey implements Serializable {
 	 * @param callId
 	 * @param applicationName
 	 */
-	protected SipSessionKey(String fromAddress, String fromTag, String toAddress,
+	public SipSessionKey(String fromAddress, String fromTag, String toAddress,
 			String toTag, String callId, String applicationName) {
 		super();
 		this.fromAddress = fromAddress;

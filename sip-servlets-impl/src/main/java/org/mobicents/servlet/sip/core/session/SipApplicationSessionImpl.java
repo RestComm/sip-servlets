@@ -293,11 +293,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return lastAccessTime;
 	}
 
+	private void setLastAccessedTime(long lastAccessTime) {
+		this.lastAccessTime= lastAccessTime;
+	}
+	
+	/**
+     * Update the accessed time information for this session.  This method
+     * should be called by the context when a request comes in for a particular
+     * session, even if the application does not reference it.
+     */
 	//TODO : Section 6.3 : Whenever the last accessed time for a SipApplicationSession is updated, it is considered refreshed i.e.,
 	//the expiry timer for that SipApplicationSession starts anew.
 	// this method should be called as soon as there is any modifications to the Sip Application Session
-	public void setLastAccessedTime(long lastAccessTime) {
-		this.lastAccessTime= lastAccessTime;
+	public void access() {
+		setLastAccessedTime(System.currentTimeMillis());
 	}
 	
 	/*

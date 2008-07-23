@@ -17,21 +17,14 @@
 package org.mobicents.servlet.sip;
 
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
-import javax.sip.ServerTransaction;
-import javax.sip.SipException;
-import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
-import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

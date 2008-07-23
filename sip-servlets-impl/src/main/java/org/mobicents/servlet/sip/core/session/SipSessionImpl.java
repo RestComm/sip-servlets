@@ -101,67 +101,67 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipSessionImpl implements MobicentsSipSession {
 	
-	private enum SipSessionEventType {
+	protected enum SipSessionEventType {
 		CREATION, DELETION, READYTOINVALIDATE;
 	}
 	
 	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
 	
-	private MobicentsSipApplicationSession sipApplicationSession;			
+	protected MobicentsSipApplicationSession sipApplicationSession;			
 	
-	private ProxyBranchImpl proxyBranch;
+	protected ProxyBranchImpl proxyBranch;
 
-	private Map<String, Object> sipSessionAttributeMap;
+	protected Map<String, Object> sipSessionAttributeMap;
 	
-	private SipSessionKey key;
+	protected SipSessionKey key;
 	
-	private Principal userPrincipal;
+	protected Principal userPrincipal;
 	
 	/**
 	 * Creation time.
 	 */
-	private long creationTime;
+	protected long creationTime;
 	
 	/**
 	 * Last access time.
 	 */
-	private long lastAccessTime;
+	protected long lastAccessedTime;
 	
 	/**
 	 * Routing region per session/dialog.
 	 */
-	private SipApplicationRoutingRegion routingRegion;
+	protected SipApplicationRoutingRegion routingRegion;
 	
 	/**
 	 * AR state info
 	 */
-	private Serializable stateInfo;
+	protected Serializable stateInfo;
 	
 	/**
 	 * Current state of the session, one of INTITIAL, EARLY, ESTABLISHED and TERMINATED.
 	 */
-	private State state;
+	protected State state;
 	
 	/**
 	 * Is the session valid.
 	 */
-	private boolean valid;
+	protected boolean isValid;
 	
 	/**
 	 * The name of the servlet withing this same app to handle all subsequent requests.
 	 */
-	private String handlerServlet;
+	protected String handlerServlet;
 		
 	/**
 	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
 	 */
-	private URI subscriberURI;
+	protected URI subscriberURI;
 	
 	/**
 	 * Outbound interface is onle of the allowed values in the Servlet COntext attribute
 	 * "javax.servlet.ip.outboundinterfaces"
 	 */
-	private SipURI outboundInterface;
+	protected SipURI outboundInterface;
 	
 	
 	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===
@@ -171,43 +171,43 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * We use this for dialog-related requests. In this case the dialog
 	 * directly corresponds to the session.
 	 */
-	private Dialog sessionCreatingDialog;
+	protected Dialog sessionCreatingDialog;
 	
 	/**
 	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info.
 	 * In this case the session only spans a single transaction.
 	 */
-	private Transaction sessionCreatingTransaction;
+	protected Transaction sessionCreatingTransaction;
 	// =============================================================
 		
-	private Set<Transaction> ongoingTransactions = 
+	protected Set<Transaction> ongoingTransactions = 
 		Collections.synchronizedSet(new HashSet<Transaction>());
 	
-	private boolean supervisedMode;
+	protected boolean supervisedMode;
 
-	private ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
+	protected ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
 
 	/*
 	 * The almighty provider
 	 */
-	private SipFactoryImpl sipFactory;
+	protected SipFactoryImpl sipFactory;
 	
-	private boolean invalidateWhenReady = true;
+	protected boolean invalidateWhenReady = true;
 	
-	private boolean readyToInvalidate = false;
+	protected boolean readyToInvalidate = false;
 
 	/*
 	 * If this is a derived session, havea pointer to the parent session.
 	 */
-	private MobicentsSipSession parentSession = null;
+	protected MobicentsSipSession parentSession = null;
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
 		setSipApplicationSession(mobicentsSipApplicationSession);
 		this.sipFactory = sipFactoryImpl;
-		this.creationTime = this.lastAccessTime = System.currentTimeMillis();		
+		this.creationTime = this.lastAccessedTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
-		this.valid = true;
+		this.isValid = true;
 		this.supervisedMode = true;
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
@@ -420,11 +420,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getLastAccessedTime()
 	 */
 	public long getLastAccessedTime() {
-		return lastAccessTime;
+		return lastAccessedTime;
 	}
 
-	public void setLastAccessedTime(long lastAccessTime) {
-		this.lastAccessTime= lastAccessTime;
+	private void setLastAccessedTime(long lastAccessedTime) {
+		this.lastAccessedTime= lastAccessedTime;
+	}
+	
+	/**
+     * Update the accessed time information for this session.  This method
+     * should be called by the context when a request comes in for a particular
+     * session, even if the application does not reference it.
+     */
+	public void access() {
+		setLastAccessedTime(System.currentTimeMillis());
 	}
 	/*
 	 * (non-Javadoc)
@@ -523,7 +532,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#invalidate()
 	 */
 	public void invalidate() {		
-		if(!valid) {
+		if(!isValid) {
 			throw new IllegalStateException("SipSession already invalidated !");
 		}		
 		if(logger.isDebugEnabled()) {
@@ -536,7 +545,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		for (String key : sipSessionAttributeMap.keySet()) {
 			removeAttribute(key);
 		}
-		valid = false;	
+		isValid = false;	
 		
 		for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
 			derivedMobicentsSipSession.invalidate();
@@ -605,7 +614,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#isValid()
 	 */
 	public boolean isValid() {
-		return this.valid;
+		return this.isValid;
 	}
 
 	/*
@@ -699,7 +708,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#setHandler(java.lang.String)
 	 */
 	public void setHandler(String name) throws ServletException {
-		if(!valid) {
+		if(!isValid) {
 			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
 		}
 		if(name.equals(handlerServlet)) {
@@ -798,7 +807,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	public void onTerminatedState() {
-		if(valid) {
+		if(isValid) {
 			onReadyToInvalidate();
 			if(this.parentSession != null) {
 				boolean allDerivedSessionsTerminated = true;
@@ -982,7 +991,7 @@ public class SipSessionImpl implements MobicentsSipSession {
     	
     	//If the application does not explicitly invalidate the session in the callback or has not defined a listener, 
     	//the container will invalidate the session. 
-    	if(valid) {
+    	if(isValid) {
     		invalidate();
     	}
     }

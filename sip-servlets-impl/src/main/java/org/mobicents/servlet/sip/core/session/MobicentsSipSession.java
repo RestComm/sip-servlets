@@ -95,7 +95,7 @@ public interface MobicentsSipSession extends SipSession {
 
 	void setProxyBranch(ProxyBranchImpl branch);
 	
-	void setLastAccessedTime(long currentTimeMillis);
+	void access();
 
 	void setSupervisedMode(boolean supervised);
 
