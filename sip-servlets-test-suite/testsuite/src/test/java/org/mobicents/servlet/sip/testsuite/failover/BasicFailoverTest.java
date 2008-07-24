@@ -696,8 +696,8 @@ public class BasicFailoverTest extends SipServletTestCase {
 		properties.setProperty("gov.nist.javax.sip.CANCEL_CLIENT_TRANSACTION_CHECKED", "false");
 		
 		properties.setProperty("host", "127.0.0.1");
-		properties.setProperty("internalPort", "5065");
-		properties.setProperty("externalPort", "5060");
+		properties.setProperty("internalPort", "" + BALANCER_INTERNAL_PORT);
+		properties.setProperty("externalPort", "" + BALANCER_EXTERNAL_PORT);
 		fwd=new SIPBalancerForwarder(properties,reg);
 		fwd.start();
 	}
