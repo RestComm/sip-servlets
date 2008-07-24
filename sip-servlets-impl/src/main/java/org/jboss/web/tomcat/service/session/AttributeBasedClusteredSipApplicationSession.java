@@ -31,7 +31,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Implementation of a clustered sip application session for the JBossCacheManager.
- * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession 
+ * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession JBOSS AS 4.2.2 Tag
  * 
  * The replication granularity level is attribute based; that is, we replicate only the dirty attributes.
  * We use JBossCache for our internal, deplicated data store.
