@@ -38,7 +38,8 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	protected JBossCacheClusteredSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
-		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
+		super(key, sipFactoryImpl, mobicentsSipApplicationSession, 
+				((JBossCacheSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getUseJK());
 		establishProxy();
 	}
 	

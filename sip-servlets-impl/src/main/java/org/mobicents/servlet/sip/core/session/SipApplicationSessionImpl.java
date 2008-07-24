@@ -91,38 +91,38 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		
 	} 
 	
-	private Map<String, Object> sipApplicationSessionAttributeMap;
+	protected Map<String, Object> sipApplicationSessionAttributeMap;
 
-	private ConcurrentHashMap<String,MobicentsSipSession> sipSessions;
+	protected ConcurrentHashMap<String,MobicentsSipSession> sipSessions;
 	
-	private ConcurrentHashMap<String, HttpSession> httpSessions;
+	protected ConcurrentHashMap<String, HttpSession> httpSessions;
 	
-	private SipApplicationSessionKey key;	
+	protected SipApplicationSessionKey key;	
 	
-	private long lastAccessTime;
+	protected long lastAccessedTime;
 	
-	private long creationTime;
+	protected long creationTime;
 	
 //	private long expirationTime;
 	
-	private boolean expired;
+	protected boolean expired;
 	
-	private SipApplicationSessionTimerTask expirationTimerTask;
+	protected SipApplicationSessionTimerTask expirationTimerTask;
 	
-	private ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
+	protected ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
 	
-	private ConcurrentHashMap<String, ServletTimer> servletTimers;
+	protected ConcurrentHashMap<String, ServletTimer> servletTimers;
 	
-	private boolean valid;
+	protected boolean isValid;
 	
-	private boolean invalidateWhenReady = true;
+	protected boolean invalidateWhenReady = true;
 	
-	private boolean readyToInvalidate = false;
+	protected boolean readyToInvalidate = false;
 
 	/**
 	 * The first sip application for subsequent requests.
 	 */
-	private SipContext sipContext;
+	protected SipContext sipContext;
 		
 	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
@@ -131,9 +131,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
 		this.sipContext = sipContext;
-		lastAccessTime = creationTime = System.currentTimeMillis();
+		lastAccessedTime = creationTime = System.currentTimeMillis();
 		expired = false;		
-		valid = true;
+		isValid = true;
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
 			//scheduling the timer for session expiration
@@ -290,11 +290,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getLastAccessedTime()
 	 */
 	public long getLastAccessedTime() {
-		return lastAccessTime;
+		return lastAccessedTime;
 	}
 
 	private void setLastAccessedTime(long lastAccessTime) {
-		this.lastAccessTime= lastAccessTime;
+		this.lastAccessedTime= lastAccessTime;
 	}
 	
 	/**
@@ -366,7 +366,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#invalidate()
 	 */
 	public void invalidate() {
-		if(!valid) {
+		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isDebugEnabled()) {
@@ -407,7 +407,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		for (String key : sipApplicationSessionAttributeMap.keySet()) {
 			removeAttribute(key);
 		}
-		valid = false;	
+		isValid = false;	
 		//cancelling the timers
 		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
 			servletTimerEntry.getValue().cancel();
@@ -430,7 +430,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#isValid()
 	 */
 	public boolean isValid() {
-		return valid;
+		return isValid;
 	}
 
 	/*
@@ -708,7 +708,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	synchronized private void updateReadyToInvalidateState() {
-		if(valid) {
+		if(isValid) {
 			boolean allSipSessionsReadyToInvalidate = true;
 			for(MobicentsSipSession sipSession:this.sipSessions.values()) {
 				if(!sipSession.isReadyToInvalidate()) {

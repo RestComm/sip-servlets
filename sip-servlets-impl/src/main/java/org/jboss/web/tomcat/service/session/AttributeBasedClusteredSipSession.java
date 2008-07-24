@@ -121,7 +121,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		this.incrementVersion();
-		proxy_.putSession(realId, this);
+		proxy_.putSipSession(realId, this);
 
 		// Go thru the attribute change list
 

@@ -304,7 +304,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       return toLoad;
    }
 
-   public void putSession(String realId, ClusteredSipSession session)
+   public void putSession(String realId, ClusteredSession session)
    {
       Fqn fqn = getSessionFqn(realId);
       
@@ -337,6 +337,28 @@ public class ConvergedJBossCacheService extends JBossCacheService
 //            map.put(realId, session);
 //         else
             map.put(realId, externalizeSipSession(session));
+         // Put in (VERSION_KEY, version) after the real put for cache invalidation
+         map.put(VERSION_KEY, new Integer(session.getVersion()));
+         cacheWrapper_.put(fqn, map);
+      }
+      else
+      {
+         // Invalidate the remote caches
+         cacheWrapper_.put(fqn, VERSION_KEY, new Integer(session.getVersion()));
+      }
+   }
+   
+   public void putSipApplicationSession(String realId, ClusteredSipApplicationSession session)
+   {
+      Fqn fqn = getSessionFqn(realId);
+      
+      if (session.getReplicateSessionBody())
+      {
+         Map map = new HashMap();
+//         if (useTreeCacheMarshalling_)
+//            map.put(realId, session);
+//         else
+            map.put(realId, externalizeSipApplicationSession(session));
          // Put in (VERSION_KEY, version) after the real put for cache invalidation
          map.put(VERSION_KEY, new Integer(session.getVersion()));
          cacheWrapper_.put(fqn, map);
@@ -1038,7 +1060,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
 //      }
       }
 
-   private byte[] externalizeSession(ClusteredSipSession session)
+   private byte[] externalizeSession(ClusteredSession session)
    {      
       try
       {
@@ -1068,6 +1090,35 @@ public class ConvergedJBossCacheService extends JBossCacheService
    }
    
    private byte[] externalizeSipSession(ClusteredSipSession session)
+   {      
+      try
+      {
+         // Write the contents of session to a byte array and store that
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         // Use MarshalledValueOutputStream instead of superclass ObjectOutputStream
+         // or else there are problems finding classes with scoped loaders
+         MarshalledValueOutputStream oos = new MarshalledValueOutputStream(baos);
+         session.writeExternal(oos);
+         oos.close(); // flushes bytes to baos
+         
+         byte[] bytes = baos.toByteArray();
+         
+         if (log_.isTraceEnabled())
+         {
+            log_.trace("marshalled object to size " + bytes.length + " bytes");
+         }
+
+         return bytes;
+      }
+      catch (Exception e)
+      {
+         log_.error("externalizeSession(): exception occurred externalizing session " + session, e);
+         return null;
+      }
+      
+   }
+   
+   private byte[] externalizeSipApplicationSession(ClusteredSipApplicationSession session)
    {      
       try
       {

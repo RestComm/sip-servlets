@@ -36,7 +36,7 @@ public class SipApplicationSessionKey implements Serializable {
 	 * @param id
 	 * @param applicationName
 	 */
-	protected SipApplicationSessionKey(String id, String applicationName, boolean isAppGeneratedKey) {
+	public SipApplicationSessionKey(String id, String applicationName, boolean isAppGeneratedKey) {
 		super();
 		this.id = id;
 		this.applicationName = applicationName;

@@ -40,6 +40,7 @@ public final class ConvergedSessionReplicationContext
    private Map crossCtxSessions;
    private Map expiredSessions;
    private Map expiredSipSessions;
+   private Map expiredSipApplicationSessions;
    private Request outerRequest;
    private Response outerResponse;
    
@@ -132,6 +133,15 @@ public final class ConvergedSessionReplicationContext
       if (ctx != null && ctx.webappCount > 0)
       {
          ctx.addExpiredSipSession(session, manager);
+      }      
+   }
+   
+   public static void sipApplicationSessionExpired(ClusteredSipApplicationSession session, String realId, SnapshotManager manager)
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentContext();
+      if (ctx != null && ctx.webappCount > 0)
+      {
+         ctx.addExpiredSipApplicationSession(session, manager);
       }      
    }
    
@@ -319,6 +329,30 @@ public final class ConvergedSessionReplicationContext
             expiredSipSessions = new HashMap();
          }
          expiredSipSessions.put(manager, session.getRealId());      
+      }
+   }
+   
+   private void addExpiredSipApplicationSession(ClusteredSipApplicationSession session, SnapshotManager manager)
+   {
+      boolean store = manager.equals(soleManager);
+      if (store)
+      {
+         soleManager = null;
+         soleSession = null;
+      }
+      else if (crossCtxSessions != null)
+      {
+         // Only store the session if it was previously in our map
+         store = (crossCtxSessions.remove(session) != null);
+      }
+      
+      if (store)
+      {
+         if (this.expiredSipApplicationSessions == null)
+         {
+        	 expiredSipApplicationSessions = new HashMap();
+         }
+         expiredSipApplicationSessions.put(manager, session.getRealId());      
       }
    }
    

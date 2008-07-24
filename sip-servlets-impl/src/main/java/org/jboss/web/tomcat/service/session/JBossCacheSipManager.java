@@ -30,6 +30,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
@@ -908,6 +909,50 @@ public class JBossCacheSipManager extends JBossCacheManager implements SipManage
 	            // We don't want to replicate this session at the end
 	            // of the request; the removal process took care of that
 	            ConvergedSessionReplicationContext.sipSessionExpired(clusterSess, realId, snapshotManager_);
+	            
+	            sessions_.remove(realId);
+	            stats_.removeStats(realId);
+
+	            // Update counters.
+	            // It's a bit ad-hoc to do it here. But since we currently call
+	            // this when session expires ...
+	            expiredCounter_++;
+	            activeCounter_--;
+	         }
+	      }
+	   }
+	   
+	   /**
+	    * Removes the session from this Manager's collection of actively managed
+	    * sessions.  Also removes the session from this server's copy of the
+	    * distributed cache (but does not remove it from other servers'
+	    * distributed cache).
+	    */
+	   public void removeLocal(SipApplicationSession session)
+	   {
+		   ClusteredSipApplicationSession clusterSess = (ClusteredSipApplicationSession) session;
+	      synchronized (clusterSess)
+	      {
+	         String realId = clusterSess.getRealId();
+	         if (realId == null) return;
+
+	         if (log_.isDebugEnabled())
+	         {
+	            log_.debug("Removing session from local store with id: " + realId);
+	         }
+
+	         try {
+	            // Ignore any cache notifications that our own work generates
+	            ConvergedSessionReplicationContext.startCacheActivity();
+	            clusterSess.removeMyselfLocal();
+	         }
+	         finally
+	         {
+	            ConvergedSessionReplicationContext.finishCacheActivity();
+	            
+	            // We don't want to replicate this session at the end
+	            // of the request; the removal process took care of that
+	            ConvergedSessionReplicationContext.sipApplicationSessionExpired(clusterSess, realId, snapshotManager_);
 	            
 	            sessions_.remove(realId);
 	            stats_.removeStats(realId);

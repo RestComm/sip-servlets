@@ -16,18 +16,131 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class JBossCacheClusteredSipApplicationSession extends ClusteredSipApplicationSession {
+public abstract class JBossCacheClusteredSipApplicationSession extends ClusteredSipApplicationSession {
+	private transient static final Log logger = LogFactory.getLog(JBossCacheClusteredSipApplicationSession.class);
 
-	public JBossCacheClusteredSipApplicationSession(SipApplicationSessionKey key,
+	/**
+	 * Our proxy to the cache.
+	 */
+	protected transient ConvergedJBossCacheService proxy_;
+	   
+	protected JBossCacheClusteredSipApplicationSession(SipApplicationSessionKey key,
 			SipContext sipContext) {
-		super(key, sipContext);
+		super(key, sipContext, ((JBossCacheSipManager)sipContext.getSipManager()).getUseJK());
+		establishProxy();
 	}
+	
+	/**
+	 * Initialize fields marked as transient after loading this session from the
+	 * distributed store
+	 * 
+	 * @param manager
+	 *            the manager for this session
+	 */
+	public void initAfterLoad(AbstractJBossManager manager) {
+		// Our manager and proxy may have been lost if we were recycled,
+		// so reestablish them
+		//TODO set objects that might have been lost during the move
+//		setManager(manager);
+		establishProxy();
+
+		// Since attribute map may be transient, we may need to populate it
+		// from the underlying store.
+		populateAttributes();
+
+		// Notify all attributes of type HttpSessionActivationListener (SRV
+		// 7.7.2)
+		this.activate();
+
+		// We are no longer outdated vis a vis distributed cache
+		clearOutdated();
+	}
+
+	/**
+	 * Gets a reference to the JBossCacheService.
+	 */
+	protected void establishProxy() {
+		if (proxy_ == null) {
+			proxy_ = (ConvergedJBossCacheService)((JBossCacheSipManager) getSipContext().getSipManager()).getCacheService();
+
+			// still null???
+			if (proxy_ == null) {
+				throw new RuntimeException(
+						"JBossCacheClusteredSession: Cache service is null.");
+			}
+		}
+	}
+
+	protected abstract void populateAttributes();
+
+	/**
+	 * Override the superclass to additionally reset this class' fields.
+	 * <p>
+	 * <strong>NOTE:</strong> It is not anticipated that this method will be
+	 * called on a ClusteredSession, but we are overriding the method to be
+	 * thorough.
+	 * </p>
+	 */
+//	public void recycle() {
+//		super.recycle();
+//
+//		proxy_ = null;
+//	}
+
+	/**
+	 * Increment our version and place ourself in the cache.
+	 */
+	public synchronized void processSessionRepl() {
+		// Replicate the session.
+		if (logger.isDebugEnabled()) {
+			logger.debug("processSessionRepl(): session is dirty. Will increment "
+					+ "version from: " + getVersion() + " and replicate.");
+		}
+		this.incrementVersion();
+		proxy_.putSipApplicationSession(realId, this);
+
+		sessionAttributesDirty = false;
+		sessionMetadataDirty = false;
+
+		updateLastReplicated();
+	}
+
+	/**
+	 * Overrides the superclass impl by doing nothing if <code>localCall</code>
+	 * is <code>false</code>. The JBossCacheManager will already be aware of a
+	 * remote invalidation and will handle removal itself.
+	 */
+	protected void removeFromManager(boolean localCall, boolean localOnly) {
+		if (localCall) {
+			super.removeFromManager(localCall, localOnly);
+		}
+	}
+
+	protected Object removeAttributeInternal(String name, boolean localCall,
+			boolean localOnly) {
+		return removeJBossInternalAttribute(name, localCall, localOnly);
+	}
+
+	protected Object removeJBossInternalAttribute(String name) {
+		throw new UnsupportedOperationException(
+				"removeJBossInternalAttribute(String) "
+						+ "is not supported by JBossCacheClusteredSession; use "
+						+ "removeJBossInternalAttribute(String, boolean, boolean");
+	}
+
+	protected abstract Object removeJBossInternalAttribute(String name,
+			boolean localCall, boolean localOnly);
 
 }

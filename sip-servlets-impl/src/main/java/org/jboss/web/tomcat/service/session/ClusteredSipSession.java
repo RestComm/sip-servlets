@@ -26,11 +26,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpSessionActivationListener;
-import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
@@ -38,7 +37,6 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.Enumerator;
@@ -59,17 +57,11 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	implements Externalizable {
 
 	private transient static final Log logger = LogFactory.getLog(ClusteredSipSession.class);
-	
-	protected ClusteredSipSession(SipSessionKey key,
-			SipFactoryImpl sipFactoryImpl,
-			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
-		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
-	}
 
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
-	protected static final String info = "ClusteredSession/1.0";
+	protected static final String info = "ClusteredSipSession/1.0";
 
 	/**
 	 * Set of attribute names which are not allowed to be replicated/persisted.
@@ -509,14 +501,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		}
 
 		// Notify interested application event listeners
-		Context context = (Context) getSipApplicationSession().getSipContext().getSipManager().getContainer();
-		Object listeners[] = context.getApplicationEventListeners();
+		List<SipSessionAttributeListener> listeners = getSipApplicationSession().getSipContext().getListeners().getSipSessionAttributeListeners();
 		if (listeners == null)
 			return;
-		for (int i = 0; i < listeners.length; i++) {
-			if (!(listeners[i] instanceof SipSessionAttributeListener))
-				continue;
-			SipSessionAttributeListener listener = (SipSessionAttributeListener) listeners[i];
+		for (SipSessionAttributeListener listener : listeners) {
 			try {
 				if (unbound != null) {
 //					fireContainerEvent(context,
@@ -693,15 +681,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 			// Notify interested application event listeners
 			// FIXME - Assumes we call listeners in reverse order
-			Context context = (Context) getSipApplicationSession().getSipContext().getSipManager().getContainer();
-			Object listeners[] = context.getApplicationLifecycleListeners();
+			List<SipSessionListener> listeners = getSipApplicationSession().getSipContext().getListeners().getSipSessionListeners();
 			if (notify && (listeners != null)) {
 				SipSessionEvent event = new SipSessionEvent(this);
-				for (int i = 0; i < listeners.length; i++) {
-					int j = (listeners.length - 1) - i;
-					if (!(listeners[j] instanceof SipSessionListener))
-						continue;
-					SipSessionListener listener = (SipSessionListener) listeners[j];
+				for (SipSessionListener listener : listeners) {
 					try {
 //						fireContainerEvent(context, "beforeSessionDestroyed",
 //								listener);
@@ -715,13 +698,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //						} catch (Exception e) {
 //							;
 //						}
-						getSipApplicationSession().getSipContext().getSipManager()
-								.getContainer()
-								.getLogger()
-								.error(
-										sm
-												.getString("standardSession.sessionEvent"),
-										t);
+						getSipApplicationSession().getSipContext().getLogger()
+								.error(sm.getString("standardSession.sessionEvent"),t);
 					}
 				}
 			}
@@ -1186,14 +1164,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		}
 
 		// Notify interested application event listeners
-		Context context = (Context) sipApplicationSession.getSipContext();
-		Object listeners[] = context.getApplicationEventListeners();
+		List<SipSessionAttributeListener> listeners = getSipApplicationSession().getSipContext().getListeners().getSipSessionAttributeListeners();
 		if (listeners == null)
 			return;
-		for (int i = 0; i < listeners.length; i++) {
-			if (!(listeners[i] instanceof HttpSessionAttributeListener))
-				continue;
-			SipSessionAttributeListener listener = (SipSessionAttributeListener) listeners[i];
+		for (SipSessionAttributeListener listener : listeners) {
 			try {
 //				fireContainerEvent(context, "beforeSessionAttributeRemoved",
 //						listener);
@@ -1245,7 +1219,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	}
 
 	protected Object setInternalAttribute(String name, Object value) {
-		if (value instanceof HttpSessionActivationListener)
+		if (value instanceof SipSessionActivationListener)
 			hasActivationListener = Boolean.TRUE;
 
 		return setJBossInternalAttribute(name, value);
