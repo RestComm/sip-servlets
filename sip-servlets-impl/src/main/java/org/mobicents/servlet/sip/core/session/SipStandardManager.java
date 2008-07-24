@@ -49,7 +49,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	 */
 	public SipStandardManager() {
 		super();
-		sipManagerDelegate = new SipManagerDelegate();
+		sipManagerDelegate = new SipStandardManagerDelegate();
 	}
 	
 	@Override

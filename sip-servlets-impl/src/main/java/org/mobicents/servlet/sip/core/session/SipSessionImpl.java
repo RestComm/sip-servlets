@@ -100,13 +100,13 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipSessionImpl implements MobicentsSipSession {
 	
-	protected enum SipSessionEventType {
+	protected static enum SipSessionEventType {
 		CREATION, DELETION, READYTOINVALIDATE;
 	}
 	
 	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
 	
-	protected MobicentsSipApplicationSession sipApplicationSession;			
+	protected transient MobicentsSipApplicationSession sipApplicationSession;			
 	
 	protected ProxyBranchImpl proxyBranch;
 
@@ -176,19 +176,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info.
 	 * In this case the session only spans a single transaction.
 	 */
-	protected Transaction sessionCreatingTransaction;
+	protected transient Transaction sessionCreatingTransaction;
 	// =============================================================
 		
-	protected Set<Transaction> ongoingTransactions;
+	protected transient Set<Transaction> ongoingTransactions;
 	
 	protected boolean supervisedMode;
 
-	protected ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
+	protected transient ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
 
 	/*
 	 * The almighty provider
 	 */
-	protected SipFactoryImpl sipFactory;
+	protected transient SipFactoryImpl sipFactory;
 	
 	protected boolean invalidateWhenReady = true;
 	
@@ -197,7 +197,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/*
 	 * If this is a derived session, havea pointer to the parent session.
 	 */
-	protected MobicentsSipSession parentSession = null;
+	protected transient MobicentsSipSession parentSession = null;
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;

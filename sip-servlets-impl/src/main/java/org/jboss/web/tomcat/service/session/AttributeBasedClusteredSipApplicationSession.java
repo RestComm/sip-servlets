@@ -100,7 +100,7 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 	public String toString() {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("AttributeBasedClusteredSession[");
+		sb.append("AttributeBasedClusteredSipApplicationSession[");
 		sb.append(super.toString());
 		sb.append("]");
 		return (sb.toString());

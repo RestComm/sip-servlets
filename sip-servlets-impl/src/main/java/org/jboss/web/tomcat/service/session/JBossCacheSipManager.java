@@ -146,7 +146,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	// ---------------------------------------------------------- Constructors
 
 	public JBossCacheSipManager() {
-		super();
+		super();		
 	}
 
 	/**
@@ -160,6 +160,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			boolean useLocalCache) throws ClusteringNotSupportedException {
 		replicationGranularity_ = webMetaData.getReplicationGranularity();
 		invalidateSessionPolicy_ = webMetaData.getInvalidateSessionPolicy();
+		sipManagerDelegate = new ClusteredSipManagerDelegate(replicationGranularity_);
 		useLocalCache_ = useLocalCache;
 		log_.debug("init(): replicationGranularity_ is "
 				+ replicationGranularity_ + " and invalidateSessionPolicy is "

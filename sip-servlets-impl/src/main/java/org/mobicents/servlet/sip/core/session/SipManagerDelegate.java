@@ -37,7 +37,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class SipManagerDelegate {
+public abstract class SipManagerDelegate {
 
 	private static transient Log logger = LogFactory.getLog(SipManagerDelegate.class);
 	
@@ -124,7 +124,7 @@ public class SipManagerDelegate {
 		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		if(sipApplicationSessionImpl == null && create) {
 			MobicentsSipApplicationSession newSipApplicationSessionImpl = 
-				new SipApplicationSessionImpl(key, (SipContext) container);
+				getNewMobicentsSipApplicationSession(key, (SipContext) container);
 			sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
 			if (sipApplicationSessionImpl == null) {
 				// put succeeded, use new value
@@ -156,7 +156,7 @@ public class SipManagerDelegate {
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipSession sipSessionImpl = sipSessions.get(key);
 		if(sipSessionImpl == null && create) {
-			MobicentsSipSession newSipSessionImpl = new SipSessionImpl(key, sipFactoryImpl, sipApplicationSessionImpl);
+			MobicentsSipSession newSipSessionImpl = getNewMobicentsSipSession(key, sipFactoryImpl, sipApplicationSessionImpl);
 			sipSessionImpl = sipSessions.putIfAbsent(key, newSipSessionImpl);
 			if(sipSessionImpl == null) {
 				if(logger.isDebugEnabled()) {
@@ -202,7 +202,7 @@ public class SipManagerDelegate {
 	 */
 	protected MobicentsSipSession createDerivedSipSession(MobicentsSipSession parentSipSession, SipSessionKey sessionKey) {
 		// clone the session and add it to the map of derived sessions
-		MobicentsSipSession sipSessionImpl = new SipSessionImpl(sessionKey, sipFactoryImpl, parentSipSession.getSipApplicationSession());
+		MobicentsSipSession sipSessionImpl = getNewMobicentsSipSession(sessionKey, sipFactoryImpl, parentSipSession.getSipApplicationSession());
 		sipSessionImpl.setSipSessionAttributeMap(parentSipSession.getSipSessionAttributeMap());
 		sipSessionImpl.setSupervisedMode(parentSipSession.getSupervisedMode());
 		try {
@@ -305,4 +305,8 @@ public class SipManagerDelegate {
 			removeSipApplicationSession(sipApplicationSessionKey);
 		}				
 	}
+	
+	protected abstract MobicentsSipSession getNewMobicentsSipSession(SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession);
+	
+	protected abstract MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(SipApplicationSessionKey key, SipContext sipContext);
 }

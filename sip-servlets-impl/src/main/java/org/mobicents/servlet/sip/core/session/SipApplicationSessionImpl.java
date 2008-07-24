@@ -107,11 +107,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected boolean expired;
 	
-	protected SipApplicationSessionTimerTask expirationTimerTask;
+	protected transient SipApplicationSessionTimerTask expirationTimerTask;
 	
-	protected ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
+	protected transient ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
 	
-	protected ConcurrentHashMap<String, ServletTimer> servletTimers;
+	protected transient ConcurrentHashMap<String, ServletTimer> servletTimers;
 	
 	protected boolean isValid;
 	
@@ -124,7 +124,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	protected SipContext sipContext;
 		
-	public SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
+	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<String,MobicentsSipSession>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
