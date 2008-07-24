@@ -131,8 +131,8 @@ public class SipStandardService extends StandardService implements SipService {
 				Boolean isSipConnector = (Boolean)
 					connector.getProtocolHandler().getAttribute("isSipConnector");				
 				if(isSipConnector != null && isSipConnector) {
-					if(logger.isInfoEnabled()) {
-						logger.info("Attaching the sip application dispatcher " +
+					if(logger.isDebugEnabled()) {
+						logger.debug("Attaching the sip application dispatcher " +
 							"as a sip listener to connector listening on port " + 
 							connector.getPort());
 					}
@@ -147,8 +147,8 @@ public class SipStandardService extends StandardService implements SipService {
 				if(extendedListeningPoint != null && sipStack != null) {
 					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
 					if(sipStack instanceof SipStackImpl) {
-						if(logger.isInfoEnabled()) {
-							logger.info(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
+						if(logger.isDebugEnabled()) {
+							logger.debug(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
 						}
 						((SipStackImpl) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
 					}

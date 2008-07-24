@@ -156,19 +156,27 @@ public class SipProtocolHandler implements ProtocolHandler {
 	 * {@inheritDoc}
 	 */
 	public void destroy() throws Exception {
-		logger.info("Stopping a sip protocol handler");
+		if(logger.isDebugEnabled()) {
+			logger.debug("Stopping a sip protocol handler");
+		}
 		//Jboss specific unloading case
 		SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
 			getAttribute(SipApplicationDispatcher.class.getSimpleName());
 		if(sipApplicationDispatcher != null) {
-			logger.info("Removing the Sip Application Dispatcher as a sip listener for listening point " + extendedListeningPoint);
+			if(logger.isDebugEnabled()) {
+				logger.debug("Removing the Sip Application Dispatcher as a sip listener for listening point " + extendedListeningPoint);
+			}
 			extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
 			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
 		// removing listening point and sip provider
-		logger.info("Removing the following Listening Point " + extendedListeningPoint);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Removing the following Listening Point " + extendedListeningPoint);
+		}
 		sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
-		logger.info("Removing the sip provider");
+		if(logger.isDebugEnabled()) {
+			logger.debug("Removing the sip provider");
+		}
 		sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
 		extendedListeningPoint = null;
 		// stopping the sip stack
@@ -229,7 +237,9 @@ public class SipProtocolHandler implements ProtocolHandler {
 	
 	public void start() throws Exception {
 		try {
-			logger.info("Starting a sip protocol handler");
+			if(logger.isDebugEnabled()) {
+				logger.debug("Starting a sip protocol handler");
+			}
 			
 			String catalinaHome = System.getProperty("catalina.home");
 	        if (catalinaHome == null) {
@@ -248,7 +258,9 @@ public class SipProtocolHandler implements ProtocolHandler {
 				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
 					logMessageContent);
 			}
-			logger.info("logLevel = " + this.logLevel);
+			if(logger.isDebugEnabled()) {
+				logger.debug("logLevel = " + this.logLevel);
+			}
 			
 			if (this.logLevel != null) {				
 
@@ -264,8 +276,9 @@ public class SipProtocolHandler implements ProtocolHandler {
 					properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
 						catalinaHome + "/" + this.serverLog);
 				}
-				
-				logger.info(properties.toString());
+				if(logger.isDebugEnabled()) {
+					logger.debug(properties.toString());
+				}
 				
 			}
 			properties.setProperty("javax.sip.STACK_NAME", sipStackName);
@@ -337,8 +350,6 @@ public class SipProtocolHandler implements ProtocolHandler {
 			extendedListeningPoint.setGlobalPort(globalPort);
 			//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
 			
-			logger.info("useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);						
-			
 			//made the sip stack and the extended listening Point available to the service implementation
 			setAttribute(SipStack.class.getSimpleName(), sipStack);					
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
@@ -347,18 +358,22 @@ public class SipProtocolHandler implements ProtocolHandler {
 			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
 				getAttribute(SipApplicationDispatcher.class.getSimpleName());
 			if(sipApplicationDispatcher != null) {
-				logger.info("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
+				}
 				sipProvider.addSipListener(sipApplicationDispatcher);
 				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
 				// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
 				if(sipStack instanceof SipStackImpl) {
-					logger.info(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
+					if(logger.isDebugEnabled()) {
+						logger.debug(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
+					}
 					((SipStackImpl) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
 				}
 			}
 			
-			logger.info("Sip stack started on ip address : " + ipAddress
-					+ " and port " + port);
+			logger.info("Sip Connector started on ip address : " + ipAddress
+					+ ",port " + port + ", useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);
 		} catch (Exception ex) {
 			logger.fatal(
 					"Bad shit happened -- check server.xml for tomcat. ", ex);

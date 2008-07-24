@@ -29,6 +29,11 @@ import org.mobicents.servlet.sip.core.session.ConvergedSessionDelegate;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
 
 /**
+ * Extension of the Jboss FieldBasedClusteredSession class so that applications
+ * are able to cast this session implementation to javax.servlet.sip.ConvergedHttpSession interface.
+ * 
+ * Based on FieldBasedClusteredSession JBOSS AS 4.2.2 Tag
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */

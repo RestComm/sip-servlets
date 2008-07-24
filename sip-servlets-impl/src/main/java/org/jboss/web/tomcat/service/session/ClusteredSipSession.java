@@ -50,6 +50,9 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
+ * Abstract base class for sip session clustering based on SipSessionImpl. Different session
+ * replication strategy can be implemented such as session- field- or attribute-based ones.
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */

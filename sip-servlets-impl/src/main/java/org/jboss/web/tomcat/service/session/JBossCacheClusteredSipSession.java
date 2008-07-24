@@ -24,6 +24,9 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 
 /**
+ * Common superclass of ClusteredSipSession types that use JBossCache
+ * as their distributed cache.
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */

@@ -54,14 +54,11 @@ import org.jboss.logging.Logger;
 import org.jboss.mx.util.MBeanProxyExt;
 
 /**
- * A wrapper class to JBossCache. This is currently needed to handle various operations such as
- * <ul>
- * <li>Using MarshalledValue to replace Serializable used inside different web app class loader context.</li>
- * <li>Stripping out any id string after ".". This is to handle the JK failover properly with
- * Tomcat JvmRoute.</li>
- * <li>Cache exception retry.</li>
- * <li>Helper APIS.</li>
- * </ul>
+ * Implementation of a converged wrapper jboss cache service.
+ * 
+ * Based on JBossCacheService JBOSS AS 4.2.2 Tag 
+ * I was forced to copy over most of the code since some things that needed to be adapted
+ * were private 
  */
 public class ConvergedJBossCacheService extends JBossCacheService
 {   

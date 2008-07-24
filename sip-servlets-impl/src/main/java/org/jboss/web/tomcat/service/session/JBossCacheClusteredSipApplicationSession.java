@@ -18,13 +18,14 @@ package org.jboss.web.tomcat.service.session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 
 /**
+ * Common superclass of ClusteredSipApplicationSession types that use JBossCache
+ * as their distributed cache.
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */

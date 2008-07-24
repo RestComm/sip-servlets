@@ -47,6 +47,9 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
+ * Abstract base class for sip session clustering based on SipApplicationSessionImpl. Different session
+ * replication strategy can be implemented such as session- field- or attribute-based ones.
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
@@ -58,7 +61,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
-	protected static final String info = "ClusteredSession/1.0";
+	protected static final String info = "ClusteredSipApplicationSession/1.0";
 
 	/**
 	 * Set of attribute names which are not allowed to be replicated/persisted.

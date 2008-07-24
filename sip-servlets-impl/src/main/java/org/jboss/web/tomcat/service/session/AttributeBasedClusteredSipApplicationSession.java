@@ -30,7 +30,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 
 
 /**
- * Implementation of a clustered sip session for the JBossCacheManager.
+ * Implementation of a clustered sip application session for the JBossCacheManager.
  * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession 
  * 
  * The replication granularity level is attribute based; that is, we replicate only the dirty attributes.
@@ -62,7 +62,7 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
-	protected static final String info = "AttributeBasedClusteredSipSession/1.0";
+	protected static final String info = "AttributeBasedClusteredSipApplicationSession/1.0";
 
 	// Transient map to store attr changes for replication.
 	private transient Map<Object, Object> attrModifiedMap_ = new HashMap<Object, Object>();
