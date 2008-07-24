@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -103,7 +104,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
      */
-    protected String sipApplicationListeners[] = new String[0];
+    protected List<String> sipApplicationListeners = new CopyOnWriteArrayList<String>();
     
     /**
      * The set of sip servlet mapping configured for this
@@ -283,7 +284,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
         // Instantiate the required listeners
         ClassLoader loader = getLoader().getClassLoader();
-        ok = listeners.loadListeners(sipApplicationListeners, loader);
+        ok = listeners.loadListeners(findSipApplicationListeners(), loader);
         if(!ok) {
 			return ok;
 		}
@@ -589,17 +590,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
      */
     public void addSipApplicationListener(String listener) {
 
-        synchronized (sipApplicationListeners) {
-            String results[] =new String[sipApplicationListeners.length + 1];
-            for (int i = 0; i < sipApplicationListeners.length; i++) {
-                if (listener.equals(sipApplicationListeners[i]))
-                    return;
-                results[i] = sipApplicationListeners[i];
-            }
-            results[sipApplicationListeners.length] = listener;
-            sipApplicationListeners = results;
-        }
-        fireContainerEvent("addSipApplicationListener", listener);
+    	sipApplicationListeners.add(listener);
+    	fireContainerEvent("addSipApplicationListener", listener);
 
         // FIXME - add instance if already started?
 
@@ -613,28 +605,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
      */
     public void removeSipApplicationListener(String listener) {
 
-        synchronized (sipApplicationListeners) {
-            // Make sure this listener is currently present
-            int n = -1;
-            for (int i = 0; i < sipApplicationListeners.length; i++) {
-                if (sipApplicationListeners[i].equals(listener)) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0)
-                return;
-
-            // Remove the specified listener
-            int j = 0;
-            String results[] = new String[sipApplicationListeners.length - 1];
-            for (int i = 0; i < sipApplicationListeners.length; i++) {
-                if (i != n)
-                    results[j++] = sipApplicationListeners[i];
-            }
-            sipApplicationListeners = results;
-
-        }
+    	sipApplicationListeners.remove(listener);
 
         // Inform interested listeners
         fireContainerEvent("removeSipApplicationListener", listener);
@@ -648,7 +619,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
      * for this application.
      */
     public String[] findSipApplicationListeners() {
-        return (sipApplicationListeners);
+        return sipApplicationListeners.toArray(new String[sipApplicationListeners.size()]);
     }
 
 	/**

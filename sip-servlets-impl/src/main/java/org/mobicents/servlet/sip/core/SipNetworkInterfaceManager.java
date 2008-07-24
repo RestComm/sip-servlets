@@ -19,13 +19,13 @@ package org.mobicents.servlet.sip.core;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.sip.SipURI;
 import javax.sip.ListeningPoint;
@@ -73,15 +73,15 @@ public class SipNetworkInterfaceManager {
 	 * Default Constructor
 	 */
 	public SipNetworkInterfaceManager() {
-		extendedListeningPointList = new ArrayList<ExtendedListeningPoint>();
-		outboundInterfaces = new ArrayList<SipURI>();
+		extendedListeningPointList = new CopyOnWriteArrayList<ExtendedListeningPoint>();
+		outboundInterfaces = new CopyOnWriteArrayList<SipURI>();
 		
 		// creating and populating the transport cache map with transports
 		transportMappingCacheMap = new HashMap<String, List<ExtendedListeningPoint>>();
-		transportMappingCacheMap.put(ListeningPoint.TCP.toLowerCase(), Collections.synchronizedList(new ArrayList<ExtendedListeningPoint>()));
-		transportMappingCacheMap.put(ListeningPoint.UDP.toLowerCase(), Collections.synchronizedList(new ArrayList<ExtendedListeningPoint>()));
-		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), Collections.synchronizedList(new ArrayList<ExtendedListeningPoint>()));
-		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), Collections.synchronizedList(new ArrayList<ExtendedListeningPoint>()));
+		transportMappingCacheMap.put(ListeningPoint.TCP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.UDP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
 		// creating the ipaddress/port/transport cache map
 		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();
 	}
@@ -91,9 +91,7 @@ public class SipNetworkInterfaceManager {
 	 * @return the listening points for this manager
 	 */
 	public Iterator<ExtendedListeningPoint> getExtendedListeningPoints() {
-		synchronized (extendedListeningPointList) {
-			return Collections.unmodifiableList(extendedListeningPointList).iterator();
-		}
+		return extendedListeningPointList.iterator();
 	}
 	
 	/**
@@ -101,10 +99,8 @@ public class SipNetworkInterfaceManager {
 	 * @param extendedListeningPoint
 	 */
 	public void addExtendedListeningPoint(ExtendedListeningPoint extendedListeningPoint) {
-		synchronized (extendedListeningPointList) {
-			extendedListeningPointList.add(extendedListeningPoint);
-			computeOutboundInterfaces();
-		}
+		extendedListeningPointList.add(extendedListeningPoint);
+		computeOutboundInterfaces();
 		// Adding to the transport cache map
 		List<ExtendedListeningPoint> extendedListeningPoints = 
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
@@ -125,10 +121,8 @@ public class SipNetworkInterfaceManager {
 	 * @param extendedListeningPoint
 	 */
 	public void removeExtendedListeningPoint(ExtendedListeningPoint extendedListeningPoint) {
-		synchronized (extendedListeningPointList) {
-			extendedListeningPointList.add(extendedListeningPoint);
-			computeOutboundInterfaces();
-		}
+		extendedListeningPointList.add(extendedListeningPoint);
+		computeOutboundInterfaces();
 		// removing from the transport cache map
 		List<ExtendedListeningPoint> extendedListeningPoints = 
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
@@ -250,7 +244,7 @@ public class SipNetworkInterfaceManager {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Outbound Interface List : ");
 		}
-		List<SipURI> newlyComputedOutboundInterfaces = new ArrayList<SipURI>();
+		List<SipURI> newlyComputedOutboundInterfaces = new CopyOnWriteArrayList<SipURI>();
 		Iterator<ExtendedListeningPoint> it = getExtendedListeningPoints();
 		while (it.hasNext()) {
 			ExtendedListeningPoint extendedListeningPoint = it

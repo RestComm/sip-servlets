@@ -4,9 +4,9 @@ import gov.nist.core.net.AddressResolver;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sip.ListeningPoint;
 import javax.sip.address.Hop;
@@ -35,7 +35,7 @@ public class DNSAddressResolver implements AddressResolver {
 	//the sip factory implementation to be able
 	SipApplicationDispatcher sipApplicationDispatcher;
 	
-	Map<String, Map<String, String>> cachedLookup = null;
+	ConcurrentHashMap<String, Map<String, String>> cachedLookup = null;
 	
 	/**
 	 * @param sipApplicationDispatcherImpl
@@ -43,7 +43,7 @@ public class DNSAddressResolver implements AddressResolver {
 	public DNSAddressResolver(
 			SipApplicationDispatcher sipApplicationDispatcher) {		
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
-		cachedLookup = Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
+		cachedLookup = new ConcurrentHashMap<String, Map<String, String>>();
 	}
 
 	/*
@@ -140,7 +140,7 @@ public class DNSAddressResolver implements AddressResolver {
 					entry.put("hostName", resolvedName);
 					entry.put("hostAddress", hostAddress);
 					entry.put("hostPort", ""+recordPort);
-					cachedLookup.put(host + transport, entry);
+					cachedLookup.putIfAbsent(host + transport, entry);
 					return new HopImpl(hostAddress, recordPort, transport);
 				} catch (UnknownHostException e) {
 					logger.error("Impossible to get the host address of the resolved name, " +

@@ -23,9 +23,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.Principal;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -33,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -180,8 +179,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected Transaction sessionCreatingTransaction;
 	// =============================================================
 		
-	protected Set<Transaction> ongoingTransactions = 
-		Collections.synchronizedSet(new HashSet<Transaction>());
+	protected Set<Transaction> ongoingTransactions;
 	
 	protected boolean supervisedMode;
 
@@ -211,6 +209,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.supervisedMode = true;
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
+		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -550,7 +549,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
 			derivedMobicentsSipSession.invalidate();
 		}
-		
 		derivedSipSessions.clear();
 		derivedSipSessions = null;
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
@@ -560,7 +558,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		//key = null;
 		sessionCreatingDialog = null;
 		sessionCreatingTransaction = null;
-		
+		ongoingTransactions.clear();
+		parentSession = null;
+		userPrincipal = null;
 	}
 	
 	/**

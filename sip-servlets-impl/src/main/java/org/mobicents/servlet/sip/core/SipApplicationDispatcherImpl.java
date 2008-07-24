@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -130,7 +131,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		sipFactoryImpl = new SipFactoryImpl(this);
 		sessionManager = new SessionManagerUtil();
-		hostNames = Collections.synchronizedList(new ArrayList<String>());
+		hostNames = new CopyOnWriteArrayList<String>();
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();		
 	}
 	
@@ -702,7 +703,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#findHostNames()
 	 */
 	public List<String> findHostNames() {		
-		return Collections.unmodifiableList(hostNames);
+		return hostNames;
 	}
 
 	/*

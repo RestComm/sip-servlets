@@ -16,11 +16,10 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
+import gov.nist.javax.sip.Utils;
 import gov.nist.javax.sip.header.HeaderFactoryImpl;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 
 import javax.sip.ListeningPoint;
@@ -112,7 +111,7 @@ public class ProxyUtils {
 			ViaHeader viaHeader = null;
 			if(proxy.getOutboundInterface() == null) { 
 				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipNetworkInterfaceManager(), transport, generateBranchId());
+						sipFactoryImpl.getSipNetworkInterfaceManager(), transport, Utils.generateBranchId());
 			} else { 
 				//If outbound interface is specified use it
 				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
@@ -123,7 +122,7 @@ public class ProxyUtils {
 						proxy.getOutboundInterface().getHost(),
 						proxy.getOutboundInterface().getPort(),
 						outboundTransport,
-						generateBranchId());
+						Utils.generateBranchId());
 			}
 					
 			clonedRequest.addHeader(viaHeader);				
@@ -224,26 +223,6 @@ public class ProxyUtils {
 				sipServetResponse.getDialog());
 		newServletResponseImpl.setOriginalRequest(originalRequest);
 		return newServletResponseImpl;
-	}
-	
-	public static synchronized String generateBranchId() throws Exception {
-		StringBuffer ret = new StringBuffer();
-		StringBuffer b = new StringBuffer();
-
-		b.append(new Integer((int) (Math.random() * 10000)).toString()
-				+ System.currentTimeMillis());
-
-		try {
-			MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-			byte[] bytes = messageDigest.digest(b.toString().getBytes());
-			String hex = toHexString(bytes);
-
-			ret.append("z9hG4bK" + hex);
-		} catch (NoSuchAlgorithmException ex) {
-			throw ex;
-		}
-
-		return ret.toString();
 	}
 	
 	public static String toHexString(byte[] b) {
