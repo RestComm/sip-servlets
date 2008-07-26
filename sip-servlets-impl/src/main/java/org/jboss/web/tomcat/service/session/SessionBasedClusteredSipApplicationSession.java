@@ -33,10 +33,10 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * We use JBossCache for our internal replicated data store.
  * The internal structure in JBossCache is as follows:
  * <pre>
- * /JSESSION
+ * /SIPSESSION
  *    /hostname
- *       /web_app_path    (path + session id is unique)
- *          /id    Map(id, session)
+ *       /sip_app_name    (path + session id is unique)
+ *          /sipapplicationsessionid    Map(id, session)         
  *                    (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
  * </pre>
  * <p/>
@@ -56,7 +56,7 @@ public class SessionBasedClusteredSipApplicationSession extends
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
-	protected static final String info = "SessionBasedClusteredSession/1.0";
+	protected static final String info = "SessionBasedClusteredSipApplicationSession/1.0";
 
 	/**
 	 * @param key
@@ -75,7 +75,7 @@ public class SessionBasedClusteredSipApplicationSession extends
 	 */
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("SessionBasedClusteredSession[");
+		sb.append("SessionBasedClusteredSipApplicationSession[");
 		sb.append(super.toString());
 		sb.append("]");
 		return (sb.toString());
@@ -83,11 +83,11 @@ public class SessionBasedClusteredSipApplicationSession extends
 	}
 
 	public void removeMyself() {
-		proxy_.removeSession(realId);
+		proxy_.removeSipApplicationSession(getId());
 	}
 
 	public void removeMyselfLocal() {
-		proxy_.removeSessionLocal(realId);
+		proxy_.removeSipApplicationSessionLocal(getId());
 	}
 
 	// ----------------------------------------------HttpSession Public Methods

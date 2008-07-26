@@ -113,7 +113,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		this.incrementVersion();
-		proxy_.putSipSession(realId, this);
+		proxy_.putSipSession(getId(), this);
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;

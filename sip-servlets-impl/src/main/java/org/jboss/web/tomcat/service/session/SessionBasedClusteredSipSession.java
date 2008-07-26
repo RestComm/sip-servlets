@@ -34,10 +34,12 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * We use JBossCache for our internal replicated data store.
  * The internal structure in JBossCache is as follows:
  * <pre>
- * /JSESSION
+ * /SIPSESSION
  *    /hostname
- *       /web_app_path    (path + session id is unique)
- *          /id    Map(id, session)
+ *       /sip_application_name    (path + session id is unique)
+ *          /sipappsessionid    Map(id, session)
+ *          		  (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
+ *          	/sipsessionid   Map(id, session)
  *                    (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
  * </pre>
  * <p/>
@@ -57,7 +59,7 @@ public class SessionBasedClusteredSipSession extends
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
-	protected static final String info = "SessionBasedClusteredSession/1.0";
+	protected static final String info = "SessionBasedClusteredSipSession/1.0";
 
 	/**
 	 * @param key
@@ -68,7 +70,6 @@ public class SessionBasedClusteredSipSession extends
 			SipFactoryImpl sipFactoryImpl,
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
-		// TODO Auto-generated constructor stub
 	}
 
 	// ---------------------------------------------- Overridden Public Methods
@@ -78,7 +79,7 @@ public class SessionBasedClusteredSipSession extends
 	 */
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("SessionBasedClusteredSession[");
+		sb.append("SessionBasedClusteredSipSession[");
 		sb.append(super.toString());
 		sb.append("]");
 		return (sb.toString());
@@ -86,11 +87,11 @@ public class SessionBasedClusteredSipSession extends
 	}
 
 	public void removeMyself() {
-		proxy_.removeSession(realId);
+		proxy_.removeSipSession(sipApplicationSession.getId(), getId());
 	}
 
 	public void removeMyselfLocal() {
-		proxy_.removeSessionLocal(realId);
+		proxy_.removeSipSessionLocal(sipApplicationSession.getId(), getId());
 	}
 
 	// ----------------------------------------------HttpSession Public Methods

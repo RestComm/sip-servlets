@@ -108,13 +108,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient MobicentsSipApplicationSession sipApplicationSession;			
 	
-	protected ProxyBranchImpl proxyBranch;
+	protected transient ProxyBranchImpl proxyBranch;
 
 	protected Map<String, Object> sipSessionAttributeMap;
 	
 	protected SipSessionKey key;
 	
-	protected Principal userPrincipal;
+	protected transient Principal userPrincipal;
 	
 	/**
 	 * Creation time.
@@ -157,10 +157,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected URI subscriberURI;
 	
 	/**
-	 * Outbound interface is onle of the allowed values in the Servlet COntext attribute
+	 * Outbound interface is one of the allowed values in the Servlet Context attribute
 	 * "javax.servlet.ip.outboundinterfaces"
+	 * This one is not serialized, it has to be reset by the app on sessionActivated listener method
 	 */
-	protected SipURI outboundInterface;
+	protected transient SipURI outboundInterface;
 	
 	
 	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===

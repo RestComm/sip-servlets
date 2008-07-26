@@ -38,12 +38,14 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * We use JBossCache for our internal, deplicated data store.
  * The internal structure is like in JBossCache:
  * <pre>
- * /JSESSION
+ * /SIPSESSION
  *    /hostname
- *       /web_app_path    (path + session id is unique)
- *          /id   Map(id, session)
- *                   (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
- *             /ATTRIBUTE    Map(attr_key, value)
+ *       /sip_application_name    (path + session id is unique)
+ *          /sipappsessionid    Map(id, session)
+ *          		  (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
+ *          	/sipsessionid   Map(id, session)
+ *                    (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
+ *             		/ATTRIBUTE    Map(attr_key, value)
  * </pre>
  * <p/>
  * Note that the isolation level of the cache dictates the
@@ -121,7 +123,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		this.incrementVersion();
-		proxy_.putSipSession(realId, this);
+		proxy_.putSipSession(getId(), this);
 
 		// Go thru the attribute change list
 
@@ -132,20 +134,20 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 				for (Iterator it = attrModifiedMap_.entrySet().iterator(); it
 						.hasNext();) {
 					Map.Entry entry = (Entry) it.next();
-					proxy_.putAttribute(realId, (String) entry.getKey(), entry
+					proxy_.putSipSessionAttribute(sipApplicationSession.getId(), getId(), (String) entry.getKey(), entry
 							.getValue());
 				}
 			} else if (modCount > 0) {
 				// It's more efficient to write a map than 2 method calls,
 				// plus it reduces the number of CacheListener notifications
-				proxy_.putAttribute(realId, attrModifiedMap_);
+				proxy_.putSipSessionAttribute(sipApplicationSession.getId(), getId(), attrModifiedMap_);
 			}
 
 			// Go thru the remove attr list
 			if (attrRemovedMap_.size() > 0) {
 				for (Iterator it = attrRemovedMap_.keySet().iterator(); it
 						.hasNext();) {
-					proxy_.removeAttribute(realId, (String) it.next());
+					proxy_.removeSipSessionAttribute(sipApplicationSession.getId(), getId(), (String) it.next());
 				}
 			}
 
@@ -160,7 +162,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 
 	public void removeMyself() {
 		// This is a shortcut to remove session and it's child attributes.
-		proxy_.removeSession(realId);
+		proxy_.removeSipSession(sipApplicationSession.getId(), getId());
 	}
 
 	public void removeMyselfLocal() {
@@ -169,8 +171,8 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 		// removeAttributesLocal call here in order to evict the ATTRIBUTE node.
 		// Otherwise empty nodes for the session root and child ATTRIBUTE will
 		// remain in the tree and screw up our list of session names.
-		proxy_.removeAttributesLocal(realId);
-		proxy_.removeSessionLocal(realId);
+		proxy_.removeSipSessionAttributesLocal(sipApplicationSession.getId(), getId());
+		proxy_.removeSipSessionLocal(sipApplicationSession.getId(), getId());
 	}
 
 	// ------------------------------------------------ JBoss internal abstract
@@ -181,7 +183,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 	 * transient ones.
 	 */
 	protected void populateAttributes() {
-		Map map = proxy_.getAttributes(realId);
+		Map map = proxy_.getSipSessionAttributes(sipApplicationSession.getId(), getId());
 
 		// Preserve any local attributes that were excluded from replication
 		Map excluded = removeExcludedAttributes(attributes_);

@@ -427,7 +427,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=65">
 								Load Balancer : Add support for CANCEL, externalize configuration, Fix memory leak

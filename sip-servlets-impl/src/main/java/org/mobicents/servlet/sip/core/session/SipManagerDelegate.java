@@ -41,24 +41,17 @@ public abstract class SipManagerDelegate {
 
 	private static transient Log logger = LogFactory.getLog(SipManagerDelegate.class);
 	
-	private ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
+	protected ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
 		new ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession>();
 	//if it's never cleaned up a memory leak will occur
 	//Shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	//=> after a chat with ranga the better way to go for now is removing on processDialogTerminated
-	private ConcurrentHashMap<SipSessionKey, MobicentsSipSession> sipSessions = 
+	protected ConcurrentHashMap<SipSessionKey, MobicentsSipSession> sipSessions = 
 		new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
 
-	SipFactoryImpl sipFactoryImpl;
+	protected SipFactoryImpl sipFactoryImpl;
 	
-	Container container;
-
-
-	/**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info = "SipStandardManager/1.0";
-    
+	protected Container container;
 
 	/**
 	 * @return the SipFactoryImpl

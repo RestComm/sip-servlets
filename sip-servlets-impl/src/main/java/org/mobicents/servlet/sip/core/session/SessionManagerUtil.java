@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core.session;
 import gov.nist.javax.sip.address.SipUri;
 
 import java.text.ParseException;
+import java.util.StringTokenizer;
 
 import javax.sip.address.URI;
 import javax.sip.header.CallIdHeader;
@@ -138,5 +139,33 @@ public class SessionManagerUtil {
 		String applicationName = sipApplicationKey.substring(indexOfComma + 1, indexOfRightParenthesis);
 		
 		return getSipApplicationSessionKey(applicationName, callId, false);			
+	}
+	
+	/**
+	 * Parse a sip application key that was previously generated and put as an http request param
+	 * through the encodeURL method of SipApplicationSession
+	 * @param sipSessionKey the stringified version of the sip application key
+	 * @return the corresponding sip application session key
+	 * @throws ParseException if the stringfied key cannot be parse to a valid key
+	 */
+	public static SipSessionKey parseSipSessionKey(
+			String sipSessionKey) throws ParseException {
+		
+		int indexOfLeftParenthesis = sipSessionKey.indexOf("(");
+		int indexOfRightParenthesis = sipSessionKey.indexOf(")");
+		if(indexOfLeftParenthesis == -1) {
+			throw new ParseException("The left parenthesis could not be found in the following key " + sipSessionKey, 0);
+		}
+		if(indexOfRightParenthesis == -1) {
+			throw new ParseException("The right parenthesis could not be found in the following key " + sipSessionKey, 0);
+		}
+		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKey, ",");
+		String fromAddress = stringTokenizer.nextToken();
+		String fromTag = stringTokenizer.nextToken();
+		String toAddress = stringTokenizer.nextToken();
+		String callId = stringTokenizer.nextToken();
+		String applicationName = stringTokenizer.nextToken();
+		
+		return new SipSessionKey(fromAddress, fromTag, toAddress, null, callId, applicationName);			
 	}
 }

@@ -80,18 +80,6 @@ public interface SipManager extends org.apache.catalina.Manager {
 	public MobicentsSipSession getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final MobicentsSipApplicationSession MobicentsSipApplicationSession);
 	
 	/**
-	 * Retrieve all sip sessions currently hold by the session manager
-	 * @return an iterator on the sip sessions
-	 */
-	public Iterator<MobicentsSipSession> getAllSipSessions();
-
-	/**
-	 * Retrieve all sip application sessions currently hold by the session manager
-	 * @return an iterator on the sip sessions
-	 */
-	public Iterator<MobicentsSipApplicationSession> getAllSipApplicationSessions();
-	
-	/**
 	 * Retrieves the sip application session holding the converged http session in parameter
 	 * @param convergedHttpSession the converged session to look up
 	 * @return the sip application session holding a reference to it or null if none references it

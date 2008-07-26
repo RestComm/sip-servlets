@@ -125,7 +125,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	/**
 	 * The session's id with any jvmRoute removed.
 	 */
-	protected transient String realId;
+//	protected transient String realId;
 
 	/**
 	 * Whether JK is being used, in which case our realId will not match our id
@@ -241,22 +241,22 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * 
 	 * @see #getUseJK()
 	 */
-	public String getRealId() {
-		return realId;
-	}
-
-	private void parseRealId(String sessionId) {
-		String newId = null;
-		if (useJK)
-			newId = Util.getRealId(sessionId);
-		else
-			newId = sessionId;
-
-		// realId is used in a lot of map lookups, so only replace it
-		// if the new id is actually different -- preserve object identity
-		if (!newId.equals(realId))
-			realId = newId;
-	}
+//	public String getRealId() {
+//		return realId;
+//	}
+//
+//	private void parseRealId(String sessionId) {
+//		String newId = null;
+//		if (useJK)
+//			newId = Util.getRealId(sessionId);
+//		else
+//			newId = sessionId;
+//
+//		// realId is used in a lot of map lookups, so only replace it
+//		// if the new id is actually different -- preserve object identity
+//		if (!newId.equals(realId))
+//			realId = newId;
+//	}
 
 	/**
 	 * This is called specifically for failover case using mod_jk where the new

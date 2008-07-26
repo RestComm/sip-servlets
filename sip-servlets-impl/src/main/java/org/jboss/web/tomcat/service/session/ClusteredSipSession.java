@@ -16,12 +16,15 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import gov.nist.javax.sip.stack.SIPDialog;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,6 +39,8 @@ import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.sip.address.URI;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.session.StandardSession;
@@ -44,7 +49,12 @@ import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.metadata.WebMetaData;
+import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -128,7 +138,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	/**
 	 * The session's id with any jvmRoute removed.
 	 */
-	protected transient String realId;
+//	protected transient String realId;
 
 	/**
 	 * Whether JK is being used, in which case our realId will not match our id
@@ -163,6 +173,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * Has this session only been accessed once?
 	 */
 	protected transient boolean firstAccess;
+	
+	protected transient SipApplicationSessionKey sipAppSessionParentKey;
 
 	/**
 	 * The string manager for this package.
@@ -243,22 +255,22 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * 
 	 * @see #getUseJK()
 	 */
-	public String getRealId() {
-		return realId;
-	}
+//	public String getRealId() {
+//		return realId;
+//	}
 
-	private void parseRealId(String sessionId) {
-		String newId = null;
-		if (useJK)
-			newId = Util.getRealId(sessionId);
-		else
-			newId = sessionId;
-
-		// realId is used in a lot of map lookups, so only replace it
-		// if the new id is actually different -- preserve object identity
-		if (!newId.equals(realId))
-			realId = newId;
-	}
+//	private void parseRealId(String sessionId) {
+//		String newId = null;
+//		if (useJK)
+//			newId = Util.getRealId(sessionId);
+//		else
+//			newId = sessionId;
+//
+//		// realId is used in a lot of map lookups, so only replace it
+//		// if the new id is actually different -- preserve object identity
+//		if (!newId.equals(realId))
+//			realId = newId;
+//	}
 
 	/**
 	 * This is called specifically for failover case using mod_jk where the new
@@ -977,7 +989,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		synchronized (this) {
-			// From StandardSession
+			// From SipSessionImpl
 			String fromAddress = in.readUTF();
 			String fromTag = in.readUTF();
 			String toAddress = in.readUTF();
@@ -985,6 +997,32 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			String callId = in.readUTF();
 			String applicationName = in.readUTF();
 			key = new SipSessionKey(fromAddress,fromTag,toAddress, toTag, callId, applicationName);
+			
+			String parentAppSessionKey = in.readUTF();
+			try {
+				sipAppSessionParentKey = SessionManagerUtil.parseSipApplicationSessionKey(parentAppSessionKey);
+			} catch (ParseException e) {
+				logger.error("Couldn't parse the store parent app session key " + parentAppSessionKey, e);
+			}
+			routingRegion = (SipApplicationRoutingRegion) in.readObject();
+			stateInfo = (Serializable) in.readObject();
+			handlerServlet = in.readUTF();
+			String subscriberURIStringified = null;
+			try {
+				URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
+				if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
+					subscriberURI = new SipURIImpl((javax.sip.address.SipURI)jsipSubscriberUri);
+				} else if (jsipSubscriberUri instanceof javax.sip.address.TelURL) {
+					subscriberURI = new TelURLImpl((javax.sip.address.TelURL)jsipSubscriberUri);
+				}
+			} catch (ParseException pe) {
+				logger.error("Impossible to parse the subscriber URI " 
+						+ subscriberURIStringified, pe);
+			}
+			sessionCreatingDialog = (SIPDialog) in.readObject();
+			supervisedMode = in.readBoolean();
+			invalidateWhenReady = in.readBoolean();
+			readyToInvalidate = in.readBoolean();
 			
 			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();
@@ -1049,6 +1087,16 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			out.writeUTF(key.getToTag());
 			out.writeUTF(key.getCallId());
 			out.writeUTF(key.getApplicationName());
+			
+			out.writeUTF(sipApplicationSession.getKey().toString());
+			out.writeObject(routingRegion);
+			out.writeObject(stateInfo);
+			out.writeUTF(handlerServlet);			
+			out.writeUTF(subscriberURI.toString());
+			out.writeObject((SIPDialog)sessionCreatingDialog);
+			out.writeBoolean(supervisedMode);
+			out.writeBoolean(invalidateWhenReady);
+			out.writeBoolean(readyToInvalidate);
 			
 			out.writeLong(creationTime);
 			out.writeLong(lastAccessedTime);
@@ -1299,7 +1347,5 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		return attribute != null
 				&& !(attribute instanceof String || attribute instanceof Number
 						|| attribute instanceof Character || attribute instanceof Boolean);
-	}
-
-	
+	}	
 }

@@ -52,6 +52,7 @@ import org.jboss.invocation.MarshalledValueInputStream;
 import org.jboss.invocation.MarshalledValueOutputStream;
 import org.jboss.logging.Logger;
 import org.jboss.mx.util.MBeanProxyExt;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Implementation of a converged wrapper jboss cache service.
@@ -62,10 +63,11 @@ import org.jboss.mx.util.MBeanProxyExt;
  */
 public class ConvergedJBossCacheService extends JBossCacheService
 {   
-   protected static Logger log_ = Logger.getLogger(JBossCacheService.class);
+   protected static Logger log_ = Logger.getLogger(ConvergedJBossCacheService.class);
    public static final String BUDDY_BACKUP = BuddyManager.BUDDY_BACKUP_SUBTREE;
    public static final Fqn BUDDY_BACKUP_FQN = BuddyManager.BUDDY_BACKUP_SUBTREE_FQN;
    public static final String SESSION = "JSESSION";
+   public static final String SIPSESSION = "SIPSESSION";
    public static final String ATTRIBUTE = "ATTRIBUTE";
    // Needed for cache invalidation
    static final String VERSION_KEY = "VERSION";
@@ -80,10 +82,13 @@ public class ConvergedJBossCacheService extends JBossCacheService
    // web app path (JBAS-1367 and JBAS-2194). 
    // Idea is host_name + web_app_path + session id is a unique combo.
    private String webAppPath_;
+   // Idea is host_name + sip_application_name + session id is a unique combo.
+   private String sipApplicationName;
    private TransactionManager tm;
 
    private JBossCacheSipManager manager_;
    private CacheListener cacheListener_;
+   private SipCacheListener sipCacheListener_;
    private JBossCacheWrapper cacheWrapper_;
    
    // Do we have to marshall attributes ourself or can we let 
@@ -131,7 +136,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    {
       manager_ = manager;
       
-      Context webapp = (Context) manager_.getContainer();
+      Context webapp = (Context) manager_.getContainer();      
       String path = webapp.getName();
       if( path.length() == 0 || path.equals("/")) {
          // If this is root.
@@ -178,6 +183,32 @@ public class ConvergedJBossCacheService extends JBossCacheService
          throw new RuntimeException("Can't register class loader", ex);
       }
 
+      if(webapp instanceof SipContext) {
+    	  SipContext sipApp = (SipContext) webapp;
+    	  //As per JSR 289, application name should be unique
+    	  sipApplicationName = sipApp.getApplicationName();
+    	  // Listen for cache changes
+          sipCacheListener_ = new SipCacheListener(cacheWrapper_, manager_, hostName_, sipApplicationName);
+          proxy_.addTreeCacheListener(sipCacheListener_);
+
+          // register the tcl and bring over the state for the webapp
+          Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
+          Fqn sipPathFqn = new Fqn( sipObjs );
+          String sipFqnStr = sipPathFqn.toString();
+          try {
+             if(useTreeCacheMarshalling_)
+             {
+                log_.debug("UseMarshalling is true. We will register the fqn: " +
+                            sipFqnStr + " with class loader" +tcl +
+                            " and activate the sipapp's Region");
+                proxy_.registerClassLoader(sipFqnStr, tcl);
+                proxy_.activateRegion(sipFqnStr);
+             }
+          } catch (Exception ex)
+          {
+             throw new RuntimeException("Can't register class loader", ex);
+          }  
+      }
       // We require the cache tm to be BatchModeTransactionManager now.
       tm = proxy_.getTransactionManager();
       if( ! (tm instanceof BatchModeTransactionManager) )
@@ -190,6 +221,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
    public void stop()
    {
       proxy_.removeTreeCacheListener(cacheListener_);
+      if(sipCacheListener_ != null) {
+    	  proxy_.removeTreeCacheListener(sipCacheListener_);
+      }
 
       // Construct the fqn
       Object[] objs = new Object[]{SESSION, hostName_, webAppPath_};
@@ -214,6 +248,32 @@ public class ConvergedJBossCacheService extends JBossCacheService
 
       // remove session data
       cacheWrapper_.evictSubtree(pathFqn);
+      
+      if(sipApplicationName != null) {
+	      // Construct the fqn
+	      Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
+	      Fqn sipPathFqn = new Fqn( sipObjs );
+	
+	      String sipFqnStr = sipPathFqn.toString();
+	      if(useTreeCacheMarshalling_)
+	      {
+	            log_.debug("UseMarshalling is true. We will inactivate the fqn: " +
+	            		sipFqnStr + " and un-register its classloader");
+	            
+	         try {
+	            proxy_.inactivateRegion(sipFqnStr);
+	            proxy_.unregisterClassLoader(sipFqnStr);          
+	         }
+	         catch (Exception e) 
+	         {
+	            log_.error("Exception during inactivation of sipapp region " + sipFqnStr + 
+	                        " or un-registration of its class loader", e);
+	         }
+	      }
+	
+	      // remove session data
+	      cacheWrapper_.evictSubtree(pathFqn);
+      }
    }
 
    /**
@@ -300,6 +360,143 @@ public class ConvergedJBossCacheService extends JBossCacheService
       
       return toLoad;
    }
+   
+   /**
+    * Loads any serialized data in the cache into the given session
+    * using its <code>readExternal</code> method.
+    *
+    * @return the session passed as <code>toLoad</code>, or
+    *         <code>null</code> if the cache had no data stored
+    *         under the given session id.
+    */
+   public ClusteredSipSession loadSipSession(String realId, ClusteredSipSession toLoad)
+   {
+      Fqn fqn = getSessionFqn(realId);
+   
+      
+      Object sessionData = cacheWrapper_.get(fqn, realId, true);
+      
+      if (sessionData == null) {
+         // Requested session is no longer in the cache; return null
+         return null;
+      }
+      
+      boolean firstLoad = (toLoad.getVersion() == 0);
+      
+//      if (useTreeCacheMarshalling_)
+//      {
+//         toLoad.update((ClusteredSession) sessionData);
+//      }
+//      else
+//      {
+         byte[] sessionBytes = (byte[]) sessionData;
+         
+         // Swap in/out the webapp classloader so we can deserialize
+         // attributes whose classes are only available to the webapp
+         ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+         Thread.currentThread().setContextClassLoader(manager_.getWebappClassLoader());
+         try
+         {
+            ByteArrayInputStream bais = new ByteArrayInputStream(sessionBytes);
+            // Use MarshalledValueInputStream instead of superclass ObjectInputStream
+            // or else there are problems finding classes with scoped loaders
+            MarshalledValueInputStream input = new MarshalledValueInputStream(bais);
+            toLoad.readExternal(input);
+            input.close();
+         }
+         catch (Exception e)
+         {
+            log_.error("loadSession(): id: " + realId + " exception occurred during deserialization", e);
+            return null;
+         }
+         finally {
+            Thread.currentThread().setContextClassLoader(prevTCL);
+         }
+//      }
+      
+      // The internal version of the serialized session may be less than the
+      // real one due to not replicating metadata.  If our listener hasn't 
+      // been keeping the outdatedVersion of the session up to date because
+      // the session has never been loaded into the JBCManager cache, we 
+      // need to fix the version
+      if (firstLoad)
+      {         
+         Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
+         if (ver != null)
+            toLoad.setVersion(ver.intValue());
+      }
+      
+      return toLoad;
+   }
+
+   /**
+    * Loads any serialized data in the cache into the given session
+    * using its <code>readExternal</code> method.
+    *
+    * @return the session passed as <code>toLoad</code>, or
+    *         <code>null</code> if the cache had no data stored
+    *         under the given session id.
+    */
+   public ClusteredSipApplicationSession loadSipApplicationSession(String realId, ClusteredSipApplicationSession toLoad)
+   {
+      Fqn fqn = getSessionFqn(realId);
+   
+      
+      Object sessionData = cacheWrapper_.get(fqn, realId, true);
+      
+      if (sessionData == null) {
+         // Requested session is no longer in the cache; return null
+         return null;
+      }
+      
+      boolean firstLoad = (toLoad.getVersion() == 0);
+      
+//      if (useTreeCacheMarshalling_)
+//      {
+//         toLoad.update((ClusteredSession) sessionData);
+//      }
+//      else
+//      {
+         byte[] sessionBytes = (byte[]) sessionData;
+         
+         // Swap in/out the webapp classloader so we can deserialize
+         // attributes whose classes are only available to the webapp
+         ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+         Thread.currentThread().setContextClassLoader(manager_.getWebappClassLoader());
+         try
+         {
+            ByteArrayInputStream bais = new ByteArrayInputStream(sessionBytes);
+            // Use MarshalledValueInputStream instead of superclass ObjectInputStream
+            // or else there are problems finding classes with scoped loaders
+            MarshalledValueInputStream input = new MarshalledValueInputStream(bais);
+            toLoad.readExternal(input);
+            input.close();
+         }
+         catch (Exception e)
+         {
+            log_.error("loadSession(): id: " + realId + " exception occurred during deserialization", e);
+            return null;
+         }
+         finally {
+            Thread.currentThread().setContextClassLoader(prevTCL);
+         }
+//      }
+      
+      // The internal version of the serialized session may be less than the
+      // real one due to not replicating metadata.  If our listener hasn't 
+      // been keeping the outdatedVersion of the session up to date because
+      // the session has never been loaded into the JBCManager cache, we 
+      // need to fix the version
+      if (firstLoad)
+      {         
+         Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
+         if (ver != null)
+            toLoad.setVersion(ver.intValue());
+      }
+      
+      return toLoad;
+   }
+
 
    public void putSession(String realId, ClusteredSession session)
    {
@@ -382,10 +579,60 @@ public class ConvergedJBossCacheService extends JBossCacheService
       cacheWrapper_.remove(fqn);
       //return obj;
    }
+   public void removeSipSession(String sipApplicationSessionId, String realId)
+   {
+      Fqn fqn = getSipSessionFqn(sipApplicationSessionId, realId);
+      if (log_.isDebugEnabled())
+      {
+         log_.debug("Remove session from distributed store. Fqn: " + fqn);
+      }
+      //Object obj = getUnMarshalledValue(cacheWrapper_.remove(fqn, realId));
+      cacheWrapper_.remove(fqn, realId); 
+      // This needs to go after object removal to support correct cache invalidation.
+//      _remove(fqn, VERSION_KEY);
+      // Let just remove the whole thing (including the fqn)
+      cacheWrapper_.remove(fqn);
+      //return obj;
+   }
+   public void removeSipApplicationSession(String realId)
+   {
+      Fqn fqn = getSipApplicationSessionFqn(realId);
+      if (log_.isDebugEnabled())
+      {
+         log_.debug("Remove session from distributed store. Fqn: " + fqn);
+      }
+      //Object obj = getUnMarshalledValue(cacheWrapper_.remove(fqn, realId));
+      cacheWrapper_.remove(fqn, realId); 
+      // This needs to go after object removal to support correct cache invalidation.
+//      _remove(fqn, VERSION_KEY);
+      // Let just remove the whole thing (including the fqn)
+      cacheWrapper_.remove(fqn);
+      //return obj;
+   }
 
    public void removeSessionLocal(String realId)
    {
       Fqn fqn = getSessionFqn(realId);
+      if (log_.isDebugEnabled())
+      {
+         log_.debug("Remove session from my own distributed store only. Fqn: " + fqn);
+      }
+      cacheWrapper_.evictSubtree(fqn);
+   }
+   
+   public void removeSipSessionLocal(String id, String realId)
+   {
+      Fqn fqn = getSipSessionFqn(id, realId);
+      if (log_.isDebugEnabled())
+      {
+         log_.debug("Remove session from my own distributed store only. Fqn: " + fqn);
+      }
+      cacheWrapper_.evictSubtree(fqn);
+   }
+   
+   public void removeSipApplicationSessionLocal(String realId)
+   {
+      Fqn fqn = getSipApplicationSessionFqn(realId);
       if (log_.isDebugEnabled())
       {
          log_.debug("Remove session from my own distributed store only. Fqn: " + fqn);
@@ -422,9 +669,33 @@ public class ConvergedJBossCacheService extends JBossCacheService
       return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
    }
 
+   public Object getSipApplicationSessionAttribute(String realId, String key)
+   {
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
+   }
+
+   public Object getSipSessionAttribute(String id, String realId, String key)
+   {
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
+      return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
+   }
+   
    public void putAttribute(String realId, String key, Object value)
    {
       Fqn fqn = getAttributeFqn(realId);
+      cacheWrapper_.put(fqn, key, getMarshalledValue(value));
+   }
+   
+   public void putSipApplicationSessionAttribute(String realId, String key, Object value)
+   {
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      cacheWrapper_.put(fqn, key, getMarshalledValue(value));
+   }
+   
+   public void putSipSessionAttribute(String id, String realId, String key, Object value)
+   {
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
       cacheWrapper_.put(fqn, key, getMarshalledValue(value));
    }
 
@@ -444,6 +715,39 @@ public class ConvergedJBossCacheService extends JBossCacheService
       
    }
 
+   public void putSipApplicationSessionAttribute(String realId, Map map)
+   {
+      // Duplicate the map with marshalled values
+      Map marshalled = new HashMap(map.size());
+      Set entries = map.entrySet();
+      for (Iterator it = entries.iterator(); it.hasNext(); )
+      {
+         Map.Entry entry = (Map.Entry) it.next();
+         marshalled.put(entry.getKey(), getMarshalledValue(entry.getValue()));
+      }
+      
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      cacheWrapper_.put(fqn, marshalled);
+      
+   }
+
+   
+   public void putSipSessionAttribute(String id, String realId, Map map)
+   {
+      // Duplicate the map with marshalled values
+      Map marshalled = new HashMap(map.size());
+      Set entries = map.entrySet();
+      for (Iterator it = entries.iterator(); it.hasNext(); )
+      {
+         Map.Entry entry = (Map.Entry) it.next();
+         marshalled.put(entry.getKey(), getMarshalledValue(entry.getValue()));
+      }
+      
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
+      cacheWrapper_.put(fqn, marshalled);
+      
+   }
+
    public void removeAttributes(String realId)
    {
       Fqn fqn = getAttributeFqn(realId);
@@ -459,10 +763,50 @@ public class ConvergedJBossCacheService extends JBossCacheService
       }
       return getUnMarshalledValue(cacheWrapper_.remove(fqn, key));
    }
+   
+   public Object removeSipApplicationSessionAttribute(String realId, String key)
+   {
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      if (log_.isTraceEnabled())
+      {
+         log_.trace("Remove attribute from distributed store. Fqn: " + fqn + " key: " + key);
+      }
+      return getUnMarshalledValue(cacheWrapper_.remove(fqn, key));
+   }
+   
+   public Object removeSipSessionAttribute(String id, String realId, String key)
+   {
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
+      if (log_.isTraceEnabled())
+      {
+         log_.trace("Remove attribute from distributed store. Fqn: " + fqn + " key: " + key);
+      }
+      return getUnMarshalledValue(cacheWrapper_.remove(fqn, key));
+   }
 
    public void removeAttributesLocal(String realId)
    {
       Fqn fqn = getAttributeFqn(realId);
+      if (log_.isDebugEnabled())
+      {
+         log_.debug("Remove attributes from my own distributed store only. Fqn: " + fqn);
+      }
+      cacheWrapper_.evict(fqn);
+   }
+   
+   public void removeSipApplicationSessionAttributesLocal(String realId)
+   {
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      if (log_.isDebugEnabled())
+      {
+         log_.debug("Remove attributes from my own distributed store only. Fqn: " + fqn);
+      }
+      cacheWrapper_.evict(fqn);
+   }
+   
+   public void removeSipSessionAttributesLocal(String id, String realId)
+   {
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
       if (log_.isDebugEnabled())
       {
          log_.debug("Remove attributes from my own distributed store only. Fqn: " + fqn);
@@ -513,6 +857,54 @@ public class ConvergedJBossCacheService extends JBossCacheService
       }
       return map;
    }
+   
+   /**
+    * Return all attributes associated with this session id.
+    *
+    * @param realId the session id with any jvmRoute removed
+    * @return the attributes, or any empty Map if none are found.
+    */
+   public Map getSipApplicationSessionAttributes(String realId)
+   {
+      if (realId == null || realId.length() == 0) return new HashMap();
+      
+      Map map = new HashMap();
+      Set set = getAttributeKeys(realId);
+      if(set != null)
+      {
+         for (Iterator it = set.iterator(); it.hasNext();)
+         {
+            String key = (String) it.next();
+            Object value = getSipApplicationSessionAttribute(realId, key);
+            map.put(key, value);
+         }
+      }
+      return map;
+   }
+   
+   /**
+    * Return all attributes associated with this session id.
+    *
+    * @param realId the session id with any jvmRoute removed
+    * @return the attributes, or any empty Map if none are found.
+    */
+   public Map getSipSessionAttributes(String id, String realId)
+   {
+      if (realId == null || realId.length() == 0) return new HashMap();
+      
+      Map map = new HashMap();
+      Set set = getAttributeKeys(realId);
+      if(set != null)
+      {
+         for (Iterator it = set.iterator(); it.hasNext();)
+         {
+            String key = (String) it.next();
+            Object value = getSipSessionAttribute(id, realId, key);
+            map.put(key, value);
+         }
+      }
+      return map;
+   }
 
    /**
     * Gets the ids of all sessions in the underlying cache.
@@ -538,7 +930,52 @@ public class ConvergedJBossCacheService extends JBossCacheService
 
       return result;
    }
+   
+   /**
+    * Gets the ids of all sessions in the underlying cache.
+    *
+    * @return Set containing all of the session ids of sessions in the cache
+    *         (with any jvmRoute removed) or <code>null</code> if there
+    *         are no sessions in the cache.
+    */
+   public Map getSipSessionIds(Set sipApplicationSessionIds, Object owner) throws CacheException
+   {
+	   Map result = new HashMap();
+	  for (Object object : sipApplicationSessionIds) {
+          Set ids = proxy_.getChildrenNames(getSipApplicationSessionFqn((String)object, (String)owner));
+          storeSessionOwners(ids, owner, result);
+	      
+	  }
+	  return result;
+      
+   }
+   
+   /**
+    * Gets the ids of all sessions in the underlying cache.
+    *
+    * @return Set containing all of the session ids of sessions in the cache
+    *         (with any jvmRoute removed) or <code>null</code> if there
+    *         are no sessions in the cache.
+    */
+   public Map getSipApplicationSessionIds() throws CacheException
+   {
+      Map result = new HashMap();
+      Set owners = proxy_.getChildrenNames(BUDDY_BACKUP_FQN);
+      if (owners != null)
+      {
+         for (Iterator it = owners.iterator(); it.hasNext();)
+         {
+            Object owner = it.next();
+            Set ids = proxy_.getChildrenNames(getSipappFqn(owner));
+            storeSessionOwners(ids, owner, result);
+            getSipSessionIds(ids, owner);
+         }
+      }
+      storeSessionOwners(proxy_.getChildrenNames(getSipappFqn()), null, result);
 
+      return result;
+   }
+   
    private void storeSessionOwners(Set ids, Object owner, Map map)
    {
       if (ids != null)
@@ -578,6 +1015,64 @@ public class ConvergedJBossCacheService extends JBossCacheService
          ConvergedSessionReplicationContext.finishCacheActivity();
       }
    }
+   
+   /**
+    * store the pojo instance in the cache. Note that this is for the aop cache.
+    * THe pojo needs to be "aspectized".
+    * 
+    * @param realId the session id with any jvmRoute removed
+    * @param key    the attribute key
+    * @param pojo
+    */
+   public Object setSipApplicationSessionPojo(String realId, String key, Object pojo)
+   {
+      if(log_.isTraceEnabled())
+      {
+         log_.trace("setPojo(): sipa app session id: " + realId + " key: " + key + 
+                    " object: " + pojo.toString());
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         return proxy_.putObject(fqn, pojo);
+      } catch (CacheException e) {
+         throw new RuntimeException("JBossCacheService: exception occurred in cache setSipApplicationSessionPojo ... ", e);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
+   
+   /**
+    * store the pojo instance in the cache. Note that this is for the aop cache.
+    * THe pojo needs to be "aspectized".
+    * 
+    * @param realId the session id with any jvmRoute removed
+    * @param key    the attribute key
+    * @param pojo
+    */
+   public Object setSipSessionPojo(String id, String realId, String key, Object pojo)
+   {
+      if(log_.isTraceEnabled())
+      {
+         log_.trace("setPojo(): sip session id: " + realId + " key: " + key + 
+                    " object: " + pojo.toString());
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipSessionFieldFqn(id, realId, key);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         return proxy_.putObject(fqn, pojo);
+      } catch (CacheException e) {
+         throw new RuntimeException("JBossCacheService: exception occurred in cache setSipSessionPojo ... ", e);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
 
    /**
     * Remove pojo from the underlying cache store.
@@ -604,6 +1099,58 @@ public class ConvergedJBossCacheService extends JBossCacheService
          ConvergedSessionReplicationContext.finishCacheActivity();
       }
    }
+   
+   /**
+    * Remove pojo from the underlying cache store.
+    * @param realId the session id with any jvmRoute removed
+    * @param key    the attribute key
+    * @return pojo that just removed. Null if there none.
+    */
+   public Object removeSipApplicationSessionPojo(String realId, String key)
+   {
+      if(log_.isTraceEnabled())
+      {
+         log_.trace("removePojo(): sip app session id: " +realId + " key: " +key);
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         return proxy_.removeObject(fqn);
+      } catch (CacheException e) {
+         throw new RuntimeException("JBossCacheService: exception occurred in cache removeSipApplicationSessionPojo ... ", e);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
+   
+   /**
+    * Remove pojo from the underlying cache store.
+    * @param realId the session id with any jvmRoute removed
+    * @param key    the attribute key
+    * @return pojo that just removed. Null if there none.
+    */
+   public Object removeSipSessionPojo(String id, String realId, String key)
+   {
+      if(log_.isTraceEnabled())
+      {
+         log_.trace("removePojo(): sip session id: " +realId + " key: " +key);
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipSessionFieldFqn(id, realId, key);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         return proxy_.removeObject(fqn);
+      } catch (CacheException e) {
+         throw new RuntimeException("JBossCacheService: exception occurred in cache removeSipSessionPojo ... ", e);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
 
    /**
     * Remove all the pojos from the underlying cache store locally 
@@ -619,6 +1166,53 @@ public class ConvergedJBossCacheService extends JBossCacheService
       }
       // Construct the fqn.
       Fqn fqn = getAttributeFqn(realId);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         cacheWrapper_.evictSubtree(fqn);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
+   /**
+    * Remove all the pojos from the underlying cache store locally 
+    * without replication.
+    * 
+    * @param realId the session id with any jvmRoute removed
+    */
+   public void removeSipSessionPojosLocal(String id, String realId)
+   {
+      if(log_.isDebugEnabled())
+      {
+         log_.debug("removeSipSessionPojosLocal(): session id: " +realId);
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         cacheWrapper_.evictSubtree(fqn);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
+
+   /**
+    * Remove all the pojos from the underlying cache store locally 
+    * without replication.
+    * 
+    * @param realId the session id with any jvmRoute removed
+    */
+   public void removeSipApplicationSessionPojosLocal(String realId)
+   {
+      if(log_.isDebugEnabled())
+      {
+         log_.debug("removeSipApplicationSessionPojosLocal(): session id: " +realId);
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
       try {
          // Ignore any cache notifications that our own work generates 
          ConvergedSessionReplicationContext.startCacheActivity();
@@ -653,10 +1247,90 @@ public class ConvergedJBossCacheService extends JBossCacheService
       }
    }
    
+   /**
+    * Remove all the pojos from the underlying cache store locally 
+    * without replication.
+    * 
+    * @param realId the session id with any jvmRoute removed
+    */
+   public void removeSipApplicationSessionPojoLocal(String realId, String key)
+   {
+      if(log_.isTraceEnabled())
+      {
+         log_.trace("removeSipApplicationPojoLocal(): sip app session id: " + realId + " key: " +key);
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         cacheWrapper_.evictSubtree(fqn);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
+   
+   /**
+    * Remove all the pojos from the underlying cache store locally 
+    * without replication.
+    * 
+    * @param realId the session id with any jvmRoute removed
+    */
+   public void removeSipSessionPojoLocal(String id, String realId, String key)
+   {
+      if(log_.isTraceEnabled())
+      {
+         log_.trace("removeSipSessionPojoLocal(): sip session id: " + realId + " key: " +key);
+      }
+      // Construct the fqn.
+      Fqn fqn = getSipSessionFieldFqn(id, realId, key);
+      try {
+         // Ignore any cache notifications that our own work generates 
+         ConvergedSessionReplicationContext.startCacheActivity();
+         cacheWrapper_.evictSubtree(fqn);
+      }
+      finally {
+         ConvergedSessionReplicationContext.finishCacheActivity();
+      }
+   }
+   
    public Set getPojoKeys(String realId)
    {
       Set keys = null;
       Fqn fqn = getAttributeFqn(realId);
+      try
+      {
+         keys = proxy_.getChildrenNames(fqn);
+      }
+      catch (CacheException e)
+      {
+         log_.error("getPojoKeys(): Exception getting keys for session " + realId, e);
+      }
+      
+      return keys;      
+   }
+   
+   public Set getSipApplicationSessionPojoKeys(String realId)
+   {
+      Set keys = null;
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      try
+      {
+         keys = proxy_.getChildrenNames(fqn);
+      }
+      catch (CacheException e)
+      {
+         log_.error("getPojoKeys(): Exception getting keys for session " + realId, e);
+      }
+      
+      return keys;      
+   }
+   
+   public Set getSipSessionPojoKeys(String id, String realId)
+   {
+      Set keys = null;
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
       try
       {
          keys = proxy_.getChildrenNames(fqn);
@@ -694,6 +1368,56 @@ public class ConvergedJBossCacheService extends JBossCacheService
          throw new RuntimeException("JBossCacheService: exception occurred in cache getPojo ... ", e);
       }
    }
+   
+   /**
+   *
+   * @param realId the session id with any jvmRoute removed
+   * @param key    the attribute key
+   * @return Pojo that is associated with the attribute
+   */
+  public Object getSipApplicationSessionPojo(String realId, String key)
+  {
+     if(log_.isTraceEnabled())
+     {
+        log_.trace("getSipApplicationSessionPojo(): sip app session id: " +realId + " key: " +key);
+     }
+     // Construct the fqn.
+     Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
+     
+     try 
+     {
+        return proxy_.getObject(fqn);
+     } 
+     catch (CacheException e) 
+     {
+        throw new RuntimeException("JBossCacheService: exception occurred in cache getSipApplicationPojo ... ", e);
+     }
+  }
+  
+  /**
+  *
+  * @param realId the session id with any jvmRoute removed
+  * @param key    the attribute key
+  * @return Pojo that is associated with the attribute
+  */
+ public Object getSipSessionPojo(String id, String realId, String key)
+ {
+    if(log_.isTraceEnabled())
+    {
+       log_.trace("getSipSessionPojo(): sip session id: " +realId + " key: " +key);
+    }
+    // Construct the fqn.
+    Fqn fqn = getSipSessionFieldFqn(id, realId, key);
+    
+    try 
+    {
+       return proxy_.getObject(fqn);
+    } 
+    catch (CacheException e) 
+    {
+       throw new RuntimeException("JBossCacheService: exception occurred in cache getSipSessionPojo ... ", e);
+    }
+ }
 
    /**
     * Recursively adds session as observer to the pojo graph. Assumes the 
@@ -940,6 +1664,35 @@ public class ConvergedJBossCacheService extends JBossCacheService
       breakKeys(key, list);
       return new Fqn(list);
    }
+   
+   private Fqn getSipApplicationSessionFieldFqn(String id, String key)
+   {
+      // /SIPSESSION/id/ATTR/key
+      // Guard against string with delimiter.
+      List list = new ArrayList(6);
+      list.add(SIPSESSION);
+      list.add(hostName_);
+      list.add(sipApplicationName);
+      list.add(id);
+      list.add(ATTRIBUTE);
+      breakKeys(key, list);
+      return new Fqn(list);
+   }
+   
+   private Fqn getSipSessionFieldFqn(String id, String sessionId, String key)
+   {
+      // /SIPSESSION/id/sessionid/ATTR/key
+      // Guard against string with delimiter.
+      List list = new ArrayList(6);
+      list.add(SIPSESSION);
+      list.add(hostName_);
+      list.add(sipApplicationName);
+      list.add(id);
+      list.add(sessionId);
+      list.add(ATTRIBUTE);
+      breakKeys(key, list);
+      return new Fqn(list);
+   }
 
    private void breakKeys(String key, List list)
    {
@@ -957,6 +1710,13 @@ public class ConvergedJBossCacheService extends JBossCacheService
       return new Fqn(objs);
    }
    
+   private Fqn getSipappFqn()
+   {
+      // /SIPSESSION/hostname/sipApplicationName
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
+      return new Fqn(objs);
+   }
+   
    private Fqn getWebappFqn(Object dataOwner)
    {
       if (dataOwner == null)
@@ -967,10 +1727,34 @@ public class ConvergedJBossCacheService extends JBossCacheService
       return new Fqn(objs);
    }
    
+   private Fqn getSipappFqn(Object dataOwner)
+   {
+      if (dataOwner == null)
+         return getSipappFqn();
+      
+      // /SIPSESSION/hostname/sipApplicationName
+      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationName};
+      return new Fqn(objs);
+   }
+   
    private Fqn getSessionFqn(String id)
    {
       // /SESSION/hostname/webAppPath/id
       Object[] objs = new Object[]{SESSION, hostName_, webAppPath_, id};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipApplicationSessionFqn(String id)
+   {
+      // /SIPSESSION/hostname/sipApplicationName/id
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipSessionFqn(String id, String sessionId)
+   {
+      // /SIPSESSION/hostname/sipApplicationName/id/sessionId
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId};
       return new Fqn(objs);
    }
 
@@ -980,11 +1764,39 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SESSION, hostName_, webAppPath_, id};
       return new Fqn(objs);
    }
+   
+   private Fqn getSipApplicationSessionFqn(String id, String dataOwner)
+   {
+      // /_BUDDY_BACKUP_/dataOwner/SIPSESSION/hostname/sipApplicationName/id
+      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationName, id};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipSessionFqn(String id, String sessionId, String dataOwner)
+   {
+      // /_BUDDY_BACKUP_/dataOwner/SIPSESSION/hostname/sipApplicationName/id/sessionId
+      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationName, id, sessionId};
+      return new Fqn(objs);
+   }
 
    private Fqn getAttributeFqn(String id)
    {
       // /SESSION/hostName/webAppPath/id/ATTR
       Object[] objs = new Object[]{SESSION, hostName_, webAppPath_, id, ATTRIBUTE};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipApplicationSessionAttributeFqn(String id)
+   {
+      // /SIPSESSION/hostName/sipapplicationname/id/ATTR
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, ATTRIBUTE};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipSessionAttributeFqn(String id, String sessionId)
+   {
+      // /SIPSESSION/hostName/sipapplicationname/id/sessionid/ATTR
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId, ATTRIBUTE};
       return new Fqn(objs);
    }
 

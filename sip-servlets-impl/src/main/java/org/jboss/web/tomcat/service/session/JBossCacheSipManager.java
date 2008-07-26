@@ -44,6 +44,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.ContainerBase;
 import org.jboss.cache.CacheException;
+import org.jboss.logging.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.jboss.web.tomcat.service.JBossWeb;
@@ -73,6 +74,8 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public class JBossCacheSipManager extends JBossCacheManager implements
 		SipManager {
 
+	protected static Logger logger = Logger.getLogger(JBossCacheSipManager.class);
+	
 	private SipManagerDelegate sipManagerDelegate;
 
 	/**
@@ -96,6 +99,16 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 * Id/timestamp of sessions in cache that we haven't loaded
 	 */
 	private Map unloadedSessions_ = new ConcurrentHashMap();
+	
+	/**
+	 * Id/timestamp of sessions in cache that we haven't loaded
+	 */
+	private Map unloadedSipSessions_ = new ConcurrentHashMap();
+	
+	/**
+	 * Id/timestamp of sessions in cache that we haven't loaded
+	 */
+	private Map unloadedSipApplicationSessions_ = new ConcurrentHashMap();
 
 	/** Our TreeCache's ObjectName */
 	private String cacheObjectNameString_ = JBossWeb.DEFAULT_CACHE_NAME;
@@ -522,6 +535,44 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			unloadedSessions_.remove(realId);
 		}
 	}
+	
+	/**
+	 * Clear the underlying cache store and also pojo that has the observers.
+	 */
+	protected void clearSipApplicationSessions() {
+		// First, the sessions we have actively loaded
+		ClusteredSession[] sessions = findLocalSessions();
+		for (int i = 0; i < sessions.length; i++) {
+			ClusteredSession ses = sessions[i];
+			if (log_.isDebugEnabled()) {
+				log_
+						.debug("clearSessions(): clear session by expiring: "
+								+ ses);
+			}
+			boolean notify = true;
+			boolean localCall = true;
+			boolean localOnly = true;
+			try {
+				ses.expire(notify, localCall, localOnly);
+			} catch (Throwable t) {
+				log_.warn("clearSessions(): Caught exception expiring session "
+						+ ses.getIdInternal(), t);
+			} finally {
+				// Guard against leaking memory if anything is holding a
+				// ref to the session by clearing its internal state
+				ses.recycle();
+			}
+		}
+
+		// Next, the local copy of the distributed cache
+		Map unloaded = new HashMap(unloadedSipSessions_);
+		Set keys = unloaded.keySet();
+		for (Iterator it = keys.iterator(); it.hasNext();) {
+			String realId = (String) it.next();
+			proxy_.removeSipApplicationSessionLocal(realId);
+			unloadedSipSessions_.remove(realId);
+		}
+	}
 
 	/**
 	 * Create a new session with a generated id.
@@ -635,6 +686,78 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		return stored;
 	}
 
+	public boolean storeSipSession(SipSession baseSession) {
+		boolean stored = false;
+		if (baseSession != null && started_) {
+			ClusteredSipSession session = (ClusteredSipSession) baseSession;
+
+			synchronized (session) {
+				if (trace) {
+					log_.trace("check to see if needs to store and replicate "
+							+ "session with id " + session.getId());
+				}
+
+				if (session.isValid()
+						&& (session.isSessionDirty() || session
+								.getExceedsMaxUnreplicatedInterval())) {
+					String realId = session.getId();
+
+					// Notify all session attributes that they get serialized
+					// (SRV 7.7.2)
+					long begin = System.currentTimeMillis();
+					session.passivate();
+					long elapsed = System.currentTimeMillis() - begin;
+					stats_.updatePassivationStats(realId, elapsed);
+
+					// Do the actual replication
+					begin = System.currentTimeMillis();
+					processSipSessionRepl(session);
+					elapsed = System.currentTimeMillis() - begin;
+					stored = true;
+					stats_.updateReplicationStats(realId, elapsed);
+				}
+			}
+		}
+
+		return stored;
+	}
+	
+	public boolean storeSipApplicationSession(SipApplicationSession baseSession) {
+		boolean stored = false;
+		if (baseSession != null && started_) {
+			ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) baseSession;
+
+			synchronized (session) {
+				if (trace) {
+					log_.trace("check to see if needs to store and replicate "
+							+ "session with id " + session.getId());
+				}
+
+				if (session.isValid()
+						&& (session.isSessionDirty() || session
+								.getExceedsMaxUnreplicatedInterval())) {
+					String realId = session.getId();
+
+					// Notify all session attributes that they get serialized
+					// (SRV 7.7.2)
+					long begin = System.currentTimeMillis();
+					session.passivate();
+					long elapsed = System.currentTimeMillis() - begin;
+					stats_.updatePassivationStats(realId, elapsed);
+
+					// Do the actual replication
+					begin = System.currentTimeMillis();
+					processSipApplicationSessionRepl(session);
+					elapsed = System.currentTimeMillis() - begin;
+					stored = true;
+					stats_.updateReplicationStats(realId, elapsed);
+				}
+			}
+		}
+
+		return stored;
+	}
+	
 	public void add(Session session) {
 		if (session == null)
 			return;
@@ -648,6 +771,36 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 		// add((ClusteredSession) session, true);
 		add((ClusteredSession) session, false);
+	}
+	
+	public void add(SipSession session) {
+		if (session == null)
+			return;
+
+		if (!(session instanceof ClusteredSession)) {
+			throw new IllegalArgumentException(
+					"You can only add instances of "
+							+ "type ClusteredSession to this Manager. Session class name: "
+							+ session.getClass().getName());
+		}
+
+		// add((ClusteredSession) session, true);
+		add((ClusteredSipSession) session, false);
+	}
+	
+	public void add(SipApplicationSession session) {
+		if (session == null)
+			return;
+
+		if (!(session instanceof ClusteredSession)) {
+			throw new IllegalArgumentException(
+					"You can only add instances of "
+							+ "type ClusteredSession to this Manager. Session class name: "
+							+ session.getClass().getName());
+		}
+
+		// add((ClusteredSession) session, true);
+		add((ClusteredSipApplicationSession) session, false);
 	}
 
 	/**
@@ -684,6 +837,86 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 			if (log_.isDebugEnabled()) {
 				log_.debug("Session with id=" + session.getIdInternal()
+						+ " added. " + "Current active sessions "
+						+ activeCounter_);
+			}
+		}
+	}
+	
+	/**
+	 * Adds the given session to the collection of those being managed by this
+	 * Manager.
+	 * 
+	 * @param session
+	 *            the session. Cannot be <code>null</code>.
+	 * @param replicate
+	 *            whether the session should be replicated
+	 * 
+	 * @throws NullPointerException
+	 *             if <code>session</code> is <code>null</code>.
+	 */
+	private void add(ClusteredSipSession session, boolean replicate) {
+		if (!session.isValid()) {
+			log_.error("Cannot add session with id=" + session.getId()
+					+ " because it is invalid");
+			return;
+		}
+
+		SipSessionKey key = session.getKey();
+		Object existing = ((ClusteredSipManagerDelegate)sipManagerDelegate).putSipSession(key, session);
+		unloadedSipSessions_.remove(key.toString());
+
+		if (!session.equals(existing)) {
+			if (replicate) {
+				storeSipSession(session);
+			}
+
+			activeCounter_++;
+			if (activeCounter_ > maxActiveCounter_)
+				maxActiveCounter_++;
+
+			if (log_.isDebugEnabled()) {
+				log_.debug("Session with id=" + session.getId()
+						+ " added. " + "Current active sessions "
+						+ activeCounter_);
+			}
+		}
+	}
+	
+	/**
+	 * Adds the given session to the collection of those being managed by this
+	 * Manager.
+	 * 
+	 * @param session
+	 *            the session. Cannot be <code>null</code>.
+	 * @param replicate
+	 *            whether the session should be replicated
+	 * 
+	 * @throws NullPointerException
+	 *             if <code>session</code> is <code>null</code>.
+	 */
+	private void add(ClusteredSipApplicationSession session, boolean replicate) {
+		if (!session.isValid()) {
+			log_.error("Cannot add session with id=" + session.getId()
+					+ " because it is invalid");
+			return;
+		}
+
+		SipApplicationSessionKey key = session.getKey();
+		Object existing = ((ClusteredSipManagerDelegate)sipManagerDelegate).putSipApplicationSession(key, session);
+		unloadedSipApplicationSessions_.remove(key.toString());
+
+		if (!session.equals(existing)) {
+			if (replicate) {
+				storeSipApplicationSession(session);
+			}
+
+			activeCounter_++;
+			if (activeCounter_ > maxActiveCounter_)
+				maxActiveCounter_++;
+
+			if (log_.isDebugEnabled()) {
+				log_.debug("Session with id=" + session.getId()
 						+ " added. " + "Current active sessions "
 						+ activeCounter_);
 			}
@@ -819,6 +1052,36 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	}
 
 	/**
+	 * Returns the given sip session if it is being actively managed by this
+	 * manager. An actively managed sip session is on that was either created on
+	 * this server, brought into local management by a call to
+	 * {@link #findLocalSipSession(String)} or brought into local management by a
+	 * call to {@link #findSipSessions()}.
+	 * 
+	 * @param key
+	 *            the session key, with any trailing jvmRoute removed.
+	 */
+	public ClusteredSipSession findLocalSipSession(final SipSessionKey key, final boolean create, final MobicentsSipApplicationSession sipApplicationSessionImpl) {
+		return (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipManagerDelegate.getSipFactoryImpl(), sipApplicationSessionImpl);
+	}
+
+	
+	/**
+	 * Returns the given sip application session if it is being actively managed by this
+	 * manager. An actively managed sip application session is on that was either created on
+	 * this server, brought into local management by a call to
+	 * {@link #findLocalSipApplicationSession(String)} or brought into local management by a
+	 * call to {@link #findSipApplicationSessions()}.
+	 * 
+	 * @param key 
+	 *            the session key, with any trailing jvmRoute removed.
+	 */
+	public ClusteredSipApplicationSession findLocalSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
+		return (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
+	}
+
+	
+	/**
 	 * Removes the session from this Manager's collection of actively managed
 	 * sessions. Also removes the session from the distributed cache, both on
 	 * this server and on all other server to which this one replicates.
@@ -904,7 +1167,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void removeLocal(SipSession session) {
 		ClusteredSipSession clusterSess = (ClusteredSipSession) session;
 		synchronized (clusterSess) {
-			String realId = clusterSess.getRealId();
+			String realId = clusterSess.getId();
 			if (realId == null)
 				return;
 
@@ -946,7 +1209,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void removeLocal(SipApplicationSession session) {
 		ClusteredSipApplicationSession clusterSess = (ClusteredSipApplicationSession) session;
 		synchronized (clusterSess) {
-			String realId = clusterSess.getRealId();
+			String realId = clusterSess.getId();
 			if (realId == null)
 				return;
 
@@ -1077,6 +1340,200 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 		return session;
 	}
+	
+	/**
+	 * Loads a session from the distributed store. If an existing session with
+	 * the id is already under local management, that session's internal state
+	 * will be updated from the distributed store. Otherwise a new session will
+	 * be created and added to the collection of those sessions under local
+	 * management.
+	 * 
+	 * @param realId
+	 *            id of the session-id with any jvmRoute removed
+	 * 
+	 * @return the session or <code>null</code> if the session cannot be found
+	 *         in the distributed store
+	 * 
+	 *         TODO refactor this into 2 overloaded methods -- one that takes a
+	 *         ClusteredSession and populates it and one that takes an id,
+	 *         creates the session and calls the first
+	 */
+	protected ClusteredSipSession loadSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final MobicentsSipApplicationSession sipApplicationSessionImpl) {
+		if (key == null) {
+			return null;
+		}
+
+		long begin = System.currentTimeMillis();
+		boolean mustAdd = false;
+		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+		if (session == null) {
+			// This is either the first time we've seen this session on this
+			// server, or we previously expired it and have since gotten
+			// a replication message from another server
+			mustAdd = true;
+			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+		}
+
+		synchronized (session) {
+			boolean doTx = false;
+			try {
+				// We need transaction so any data gravitation replication
+				// is sent in batch.
+				// Don't do anything if there is already transaction context
+				// associated with this thread.
+				if (tm.getTransaction() == null)
+					doTx = true;
+
+				if (doTx)
+					tm.begin();
+
+				// Ignore cache notifications we may generate for this
+				// session if data gravitation occurs.
+				ConvergedSessionReplicationContext.startCacheActivity();
+
+				session = proxy_.loadSipSession(key.toString(), session);
+			} catch (Exception ex) {
+				try {
+					// if(doTx)
+					// Let's set it no matter what.
+					tm.setRollbackOnly();
+				} catch (Exception exn) {
+					log_.error("Problem rolling back session mgmt transaction",
+							exn);
+				}
+
+				// We will need to alert Tomcat of this exception.
+				if (ex instanceof RuntimeException)
+					throw (RuntimeException) ex;
+
+				throw new RuntimeException("Failed to load session " + key.toString(),
+						ex);
+			} finally {
+				try {
+					if (doTx)
+						endTransaction(key.toString());
+				} finally {
+					ConvergedSessionReplicationContext.finishCacheActivity();
+				}
+			}
+
+			if (session != null) {
+				// Need to initialize.
+				session.initAfterLoad(this);
+				if (mustAdd)
+					add(session, false); // don't replicate
+				long elapsed = System.currentTimeMillis() - begin;
+				stats_.updateLoadStats(key.toString(), elapsed);
+
+				if (log_.isDebugEnabled()) {
+					log_.debug("loadSession(): id= " + key.toString() + ", session="
+							+ session);
+				}
+			} else if (log_.isDebugEnabled()) {
+				log_.debug("loadSession(): session " + key.toString()
+						+ " not found in distributed cache");
+			}
+		}
+
+		return session;
+	}
+	
+	/**
+	 * Loads a session from the distributed store. If an existing session with
+	 * the id is already under local management, that session's internal state
+	 * will be updated from the distributed store. Otherwise a new session will
+	 * be created and added to the collection of those sessions under local
+	 * management.
+	 * 
+	 * @param realId
+	 *            id of the session-id with any jvmRoute removed
+	 * 
+	 * @return the session or <code>null</code> if the session cannot be found
+	 *         in the distributed store
+	 * 
+	 *         TODO refactor this into 2 overloaded methods -- one that takes a
+	 *         ClusteredSession and populates it and one that takes an id,
+	 *         creates the session and calls the first
+	 */
+	protected ClusteredSipApplicationSession loadSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
+		if (key == null) {
+			return null;
+		}
+
+		long begin = System.currentTimeMillis();
+		boolean mustAdd = false;
+		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sessions_.get(key);
+		if (session == null) {
+			// This is either the first time we've seen this session on this
+			// server, or we previously expired it and have since gotten
+			// a replication message from another server
+			mustAdd = true;
+			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
+		}
+
+		synchronized (session) {
+			boolean doTx = false;
+			try {
+				// We need transaction so any data gravitation replication
+				// is sent in batch.
+				// Don't do anything if there is already transaction context
+				// associated with this thread.
+				if (tm.getTransaction() == null)
+					doTx = true;
+
+				if (doTx)
+					tm.begin();
+
+				// Ignore cache notifications we may generate for this
+				// session if data gravitation occurs.
+				ConvergedSessionReplicationContext.startCacheActivity();
+
+				session = proxy_.loadSipApplicationSession(key.toString(), session);
+			} catch (Exception ex) {
+				try {
+					// if(doTx)
+					// Let's set it no matter what.
+					tm.setRollbackOnly();
+				} catch (Exception exn) {
+					log_.error("Problem rolling back session mgmt transaction",
+							exn);
+				}
+
+				// We will need to alert Tomcat of this exception.
+				if (ex instanceof RuntimeException)
+					throw (RuntimeException) ex;
+
+				throw new RuntimeException("Failed to load session " + key,
+						ex);
+			} finally {
+				try {
+					if (doTx)
+						endTransaction(key.toString());
+				} finally {
+					ConvergedSessionReplicationContext.finishCacheActivity();
+				}
+			}
+
+			if (session != null) {
+				// Need to initialize.
+				session.initAfterLoad(this);
+				if (mustAdd)
+					add(session, false); // don't replicate
+				long elapsed = System.currentTimeMillis() - begin;
+				stats_.updateLoadStats(key.toString(), elapsed);
+
+				if (log_.isDebugEnabled()) {
+					log_.debug("loadSession(): id= " + key.toString() + ", session="
+							+ session);
+				}
+			} else if (log_.isDebugEnabled()) {
+				log_.debug("loadSession(): session " + key.toString()
+						+ " not found in distributed cache");
+			}
+		}
+
+		return session;
+	}
 
 	/**
 	 * Places the current session contents in the distributed cache and
@@ -1086,6 +1543,128 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 *            the session. Cannot be <code>null</code>.
 	 */
 	protected void processSessionRepl(ClusteredSession session) {
+		// If we are using SESSION granularity, we don't want to initiate a TX
+		// for a single put
+		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
+		boolean doTx = false;
+		try {
+			// We need transaction so all the replication are sent in batch.
+			// Don't do anything if there is already transaction context
+			// associated with this thread.
+			if (notSession && tm.getTransaction() == null)
+				doTx = true;
+
+			if (doTx)
+				tm.begin();
+
+			// Tell the proxy to ignore cache notifications we are about
+			// to generate for this session. We have to do this
+			// at this level because we don't want to resume handling
+			// notifications until any compensating changes resulting
+			// from a tx rollback are done.
+			ConvergedSessionReplicationContext.startCacheActivity();
+
+			session.processSessionRepl();
+		} catch (Exception ex) {
+			if (log_.isDebugEnabled())
+				log_.debug("processSessionRepl(): failed with exception", ex);
+
+			try {
+				// if(doTx)
+				// Let's setRollbackOnly no matter what.
+				// (except if there's no tx due to SESSION (JBAS-3840))
+				if (notSession)
+					tm.setRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Caught exception rolling back transaction", exn);
+			}
+
+			// We will need to alert Tomcat of this exception.
+			if (ex instanceof RuntimeException)
+				throw (RuntimeException) ex;
+
+			throw new RuntimeException(
+					"JBossCacheManager.processSessionRepl(): "
+							+ "failed to replicate session.", ex);
+		} finally {
+			try {
+				if (doTx)
+					endTransaction(session.getId());
+			} finally {
+				ConvergedSessionReplicationContext.finishCacheActivity();
+			}
+		}
+	}
+	
+	/**
+	 * Places the current session contents in the distributed cache and
+	 * replicates them to the cluster
+	 * 
+	 * @param session
+	 *            the session. Cannot be <code>null</code>.
+	 */
+	protected void processSipSessionRepl(ClusteredSipSession session) {
+		// If we are using SESSION granularity, we don't want to initiate a TX
+		// for a single put
+		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
+		boolean doTx = false;
+		try {
+			// We need transaction so all the replication are sent in batch.
+			// Don't do anything if there is already transaction context
+			// associated with this thread.
+			if (notSession && tm.getTransaction() == null)
+				doTx = true;
+
+			if (doTx)
+				tm.begin();
+
+			// Tell the proxy to ignore cache notifications we are about
+			// to generate for this session. We have to do this
+			// at this level because we don't want to resume handling
+			// notifications until any compensating changes resulting
+			// from a tx rollback are done.
+			ConvergedSessionReplicationContext.startCacheActivity();
+
+			session.processSessionRepl();
+		} catch (Exception ex) {
+			if (log_.isDebugEnabled())
+				log_.debug("processSessionRepl(): failed with exception", ex);
+
+			try {
+				// if(doTx)
+				// Let's setRollbackOnly no matter what.
+				// (except if there's no tx due to SESSION (JBAS-3840))
+				if (notSession)
+					tm.setRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Caught exception rolling back transaction", exn);
+			}
+
+			// We will need to alert Tomcat of this exception.
+			if (ex instanceof RuntimeException)
+				throw (RuntimeException) ex;
+
+			throw new RuntimeException(
+					"JBossCacheManager.processSessionRepl(): "
+							+ "failed to replicate session.", ex);
+		} finally {
+			try {
+				if (doTx)
+					endTransaction(session.getId());
+			} finally {
+				ConvergedSessionReplicationContext.finishCacheActivity();
+			}
+		}
+	}
+	
+	/**
+	 * Places the current session contents in the distributed cache and
+	 * replicates them to the cluster
+	 * 
+	 * @param session
+	 *            the session. Cannot be <code>null</code>.
+	 */
+	protected void processSipApplicationSessionRepl(ClusteredSipApplicationSession session) {
 		// If we are using SESSION granularity, we don't want to initiate a TX
 		// for a single put
 		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
@@ -1391,6 +1970,52 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			}
 		}
 	}
+	
+	/**
+	 * Callback from the CacheListener to notify us that a session we haven't
+	 * loaded has been changed.
+	 * 
+	 * @param realId
+	 *            the session id, without any trailing jvmRoute
+	 * @param dataOwner
+	 *            the owner of the session. Can be <code>null</code> if the
+	 *            owner is unknown.
+	 */
+	protected void unloadedSipSessionChanged(String realId, String dataOwner) {
+		Object obj = unloadedSipSessions_.put(realId, new OwnedSessionUpdate(
+				dataOwner, System.currentTimeMillis()));
+		if (trace) {
+			if (obj == null) {
+				log_.trace("New session " + realId
+						+ " added to unloaded session map");
+			} else {
+				log_.trace("Updated timestamp for unloaded session " + realId);
+			}
+		}
+	}
+	
+	/**
+	 * Callback from the CacheListener to notify us that a session we haven't
+	 * loaded has been changed.
+	 * 
+	 * @param realId
+	 *            the session id, without any trailing jvmRoute
+	 * @param dataOwner
+	 *            the owner of the session. Can be <code>null</code> if the
+	 *            owner is unknown.
+	 */
+	protected void unloadedSipApplicationSessionChanged(String realId, String dataOwner) {
+		Object obj = unloadedSessions_.put(realId, new OwnedSessionUpdate(
+				dataOwner, System.currentTimeMillis()));
+		if (trace) {
+			if (obj == null) {
+				log_.trace("New session " + realId
+						+ " added to unloaded session map");
+			} else {
+				log_.trace("Updated timestamp for unloaded session " + realId);
+			}
+		}
+	}
 
 	// ---------------------------------------------------- Lifecyle Unembedded
 
@@ -1417,6 +2042,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 		try {
 			initializeUnloadedSessions();
+//			initializeUnloadedSipSessions();
+			initializeUnloadedSipApplicationSessions();
 
 			// Setup our SnapshotManager
 			initSnapshotManager();
@@ -1517,6 +2144,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 		try {
 			initializeUnloadedSessions();
+//			initializeUnloadedSipSessions();
+			initializeUnloadedSipApplicationSessions();
 
 			// Add SnapshotValve and, if needed, JvmRouteValve and batch repl
 			// valve
@@ -1619,6 +2248,46 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			}
 		}
 	}
+	
+	/**
+	 * Gets the ids of all sessions in the distributed cache and adds them to
+	 * the unloaded sessions map, with the current time as the last replication
+	 * time. This means these sessions may not be evicted from the cache for a
+	 * period well beyond when they would normally expire, but this is a
+	 * necessary tradeoff to avoid deserializing them all to check their
+	 * lastAccessedTime.
+	 */
+//	private void initializeUnloadedSipSessions() throws CacheException {
+//		Map sessions = proxy_.getSipSessionIds();
+//		if (sessions != null) {
+//			long now = System.currentTimeMillis();
+//			for (Iterator it = sessions.entrySet().iterator(); it.hasNext();) {
+//				Map.Entry entry = (Entry) it.next();
+//				unloadedSipSessions_.put(entry.getKey(), new OwnedSessionUpdate(
+//						(String) entry.getValue(), now));
+//			}
+//		}
+//	}
+//	
+	/**
+	 * Gets the ids of all sessions in the distributed cache and adds them to
+	 * the unloaded sessions map, with the current time as the last replication
+	 * time. This means these sessions may not be evicted from the cache for a
+	 * period well beyond when they would normally expire, but this is a
+	 * necessary tradeoff to avoid deserializing them all to check their
+	 * lastAccessedTime.
+	 */
+	private void initializeUnloadedSipApplicationSessions() throws CacheException {
+		Map sessions = proxy_.getSipApplicationSessionIds();
+		if (sessions != null) {
+			long now = System.currentTimeMillis();
+			for (Iterator it = sessions.entrySet().iterator(); it.hasNext();) {
+				Map.Entry entry = (Entry) it.next();
+				unloadedSipApplicationSessions_.put(entry.getKey(), new OwnedSessionUpdate(
+						(String) entry.getValue(), now));
+			}
+		}
+	}
 
 	/**
 	 * Instantiate a SnapshotManager and ClusteredSessionValve and add the valve
@@ -1657,14 +2326,14 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		String ctxPath = ((Context) container_).getPath();
 		if ("instant".equals(snapshotMode_)
 				|| replicationGranularity_ == WebMetaData.REPLICATION_GRANULARITY_FIELD) {
-			snapshotManager_ = new InstantSnapshotManager(this, ctxPath);
+			snapshotManager_ = new InstantConvergedSnapshotManager(this, ctxPath);
 		} else if ("interval".equals(snapshotMode_)) {
-			snapshotManager_ = new IntervalSnapshotManager(this, ctxPath,
+			snapshotManager_ = new IntervalConvergedSnapshotManager(this, ctxPath,
 					snapshotInterval_);
 		} else {
 			log_.error("Snapshot mode must be 'instant' or 'interval' - "
 					+ "using 'instant'");
-			snapshotManager_ = new InstantSnapshotManager(this, ctxPath);
+			snapshotManager_ = new InstantConvergedSnapshotManager(this, ctxPath);
 		}
 
 		snapshotManager_.start();
@@ -1838,7 +2507,50 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 */
 	public MobicentsSipApplicationSession getSipApplicationSession(
 			final SipApplicationSessionKey key, final boolean create) {
-		return sipManagerDelegate.getSipApplicationSession(key, create);
+		// Find it from the local store first
+		ClusteredSipApplicationSession session = findLocalSipApplicationSession(key, create);
+
+		// If we didn't find it locally, only check the distributed cache
+		// if we haven't previously handled this session id on this request.
+		// If we handled it previously but it's no longer local, that means
+		// it's been invalidated. If we request an invalidated session from
+		// the distributed cache, it will be missing from the local cache but
+		// may still exist on other nodes (i.e. if the invalidation hasn't
+		// replicated yet because we are running in a tx). With buddy
+		// replication,
+		// asking the local cache for the session will cause the out-of-date
+		// session from the other nodes to be gravitated, thus resuscitating
+		// the session.
+		if (session == null
+				&& !ConvergedSessionReplicationContext
+						.isSipApplicationSessionBoundAndExpired(key.toString(), snapshotManager_)) {
+			if (trace)
+				log_.trace("Checking for session " + key
+						+ " in the distributed cache");
+
+			session = loadSipApplicationSession(key, create);
+			if (session != null) {
+				add(session);
+				// TODO should we advise of a new session?
+				// tellNew();
+			}
+		} else if (session != null && session.isOutdated()) {
+			if (trace)
+				log_.trace("Updating session " + key
+						+ " from the distributed cache");
+
+			// Need to update it from the cache
+			loadSipApplicationSession(key, create);
+		}
+
+		if (session != null) {
+			// Add this session to the set of those potentially needing
+			// replication
+			ConvergedSessionReplicationContext.bindSipApplicationSession(session,
+					snapshotManager_);
+		}
+
+		return session;
 	}
 
 	/**
@@ -1847,22 +2559,51 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public MobicentsSipSession getSipSession(final SipSessionKey key,
 			final boolean create, final SipFactoryImpl sipFactoryImpl,
 			final MobicentsSipApplicationSession sipApplicationSessionImpl) {
-		return sipManagerDelegate.getSipSession(key, create, sipFactoryImpl,
-				sipApplicationSessionImpl);
-	}
+		
+		// Find it from the local store first
+		ClusteredSipSession session = findLocalSipSession(key, create, sipApplicationSessionImpl);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Iterator<MobicentsSipSession> getAllSipSessions() {
-		return sipManagerDelegate.getAllSipSessions();
-	}
+		// If we didn't find it locally, only check the distributed cache
+		// if we haven't previously handled this session id on this request.
+		// If we handled it previously but it's no longer local, that means
+		// it's been invalidated. If we request an invalidated session from
+		// the distributed cache, it will be missing from the local cache but
+		// may still exist on other nodes (i.e. if the invalidation hasn't
+		// replicated yet because we are running in a tx). With buddy
+		// replication,
+		// asking the local cache for the session will cause the out-of-date
+		// session from the other nodes to be gravitated, thus resuscitating
+		// the session.
+		if (session == null
+				&& !ConvergedSessionReplicationContext
+						.isSipSessionBoundAndExpired(key.toString(), snapshotManager_)) {
+			if (trace)
+				log_.trace("Checking for session " + key
+						+ " in the distributed cache");
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Iterator<MobicentsSipApplicationSession> getAllSipApplicationSessions() {
-		return sipManagerDelegate.getAllSipApplicationSessions();
+			session = loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+			if (session != null) {
+				add(session);
+				// TODO should we advise of a new session?
+				// tellNew();
+			}
+		} else if (session != null && session.isOutdated()) {
+			if (trace)
+				log_.trace("Updating session " + key
+						+ " from the distributed cache");
+
+			// Need to update it from the cache
+			loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+		}
+
+		if (session != null) {
+			// Add this session to the set of those potentially needing
+			// replication
+			ConvergedSessionReplicationContext.bindSipSession(session,
+					snapshotManager_);
+		}
+
+		return session;
 	}
 
 	/**

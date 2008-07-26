@@ -31,6 +31,11 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 
+	/**
+     * The descriptive information about this implementation.
+     */
+    protected static final String info = "ClusteredSipManager/1.0";
+	
 	private int replicationGranularity = WebMetaData.REPLICATION_GRANULARITY_SESSION;
 
 	/**
@@ -88,4 +93,11 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		return session;
 	}
 
+	public ClusteredSipSession putSipSession(SipSessionKey key, ClusteredSipSession session) {
+		return (ClusteredSipSession) sipSessions.put(key, session);
+	}
+
+	public ClusteredSipApplicationSession putSipApplicationSession(SipApplicationSessionKey key, ClusteredSipApplicationSession session) {
+		return (ClusteredSipApplicationSession) sipApplicationSessions.put(key, session);
+	}
 }
