@@ -62,9 +62,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	/**
 	 * Timer task that will notify the listeners that the sip application session has expired 
-	 * @author Jean Deruelle
+	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
 	 */
-	private class SipApplicationSessionTimerTask implements Callable<MobicentsSipApplicationSession> {		
+	protected class SipApplicationSessionTimerTask implements Callable<MobicentsSipApplicationSession> {		
 		private MobicentsSipApplicationSession mobicentsSipApplicationSession;
 		
 		/**
@@ -93,9 +93,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected Map<String, Object> sipApplicationSessionAttributeMap;
 
-	protected ConcurrentHashMap<String,MobicentsSipSession> sipSessions;
+	protected transient ConcurrentHashMap<String,MobicentsSipSession> sipSessions;
 	
-	protected ConcurrentHashMap<String, HttpSession> httpSessions;
+	protected transient ConcurrentHashMap<String, HttpSession> httpSessions;
 	
 	protected SipApplicationSessionKey key;	
 	
@@ -122,7 +122,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	/**
 	 * The first sip application for subsequent requests.
 	 */
-	protected SipContext sipContext;
+	protected transient SipContext sipContext;
 		
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;

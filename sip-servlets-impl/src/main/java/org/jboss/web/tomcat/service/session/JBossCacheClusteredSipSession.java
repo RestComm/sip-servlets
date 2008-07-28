@@ -53,12 +53,8 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 * @param manager
 	 *            the manager for this session
 	 */
-	public void initAfterLoad(AbstractJBossManager manager) {
-		// Our manager and proxy may have been lost if we were recycled,
-		// so reestablish them
-		//TODO set objects that might have been lost during the move
-//		setManager(manager);
-		establishProxy();
+	public void initAfterLoad(JBossCacheSipManager manager) {
+		sipFactory = manager.getSipFactoryImpl();
 
 		// Since attribute map may be transient, we may need to populate it
 		// from the underlying store.

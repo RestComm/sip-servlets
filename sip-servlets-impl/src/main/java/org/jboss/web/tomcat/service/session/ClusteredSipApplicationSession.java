@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +29,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
@@ -42,8 +46,12 @@ import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.metadata.WebMetaData;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -160,7 +168,18 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * Has this session only been accessed once?
 	 */
 	protected transient boolean firstAccess;
-
+	/**
+	 * this will hold the remaining time at which the session should have been expired at the time it has been passivated
+	 */
+	protected transient long futureExpirationTimeOnPassivation;
+	/**
+	 * the Set of keys of the sip sessions that were present in the sip application session at the time it has been passivated
+	 */
+	protected transient Set<SipSessionKey> sipSessionsOnPassivation;
+	/**
+	 * the Set of realId of the http sessions that were present in the sip application session at the time it has been passivated
+	 */
+	protected transient Set<String> httpSessionsOnPassivation;
 	/**
 	 * The string manager for this package.
 	 */
@@ -175,6 +194,8 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		this.useJK = useJK;
 		this.firstAccess = true;
 		calcMaxUnreplicatedInterval();
+		sipSessionsOnPassivation = new HashSet<SipSessionKey>();
+		httpSessionsOnPassivation = new HashSet<String>();
 	}
 
 	/**
@@ -385,9 +406,9 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * This is called after loading a session to initialize the transient
 	 * values.
 	 * 
-	 * @param manager
+	 * @param context
 	 */
-	public abstract void initAfterLoad(AbstractJBossManager manager);
+	public abstract void initAfterLoad(JBossCacheSipManager manager);
 
 	/**
 	 * Propogate session to the internal store.
@@ -963,7 +984,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
 		synchronized (this) {
-			// From StandardSession
+			// From SipApplicationSessionImpl
 			String id = in.readUTF();
 			String applicationName = in.readUTF();
 			boolean isAppGeneratedKey = in.readBoolean();
@@ -976,12 +997,37 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			isValid = in.readBoolean();
 			lastAccessedTime = in.readLong();
 
+			futureExpirationTimeOnPassivation = in.readLong();
+			expirationTimerTask = new SipApplicationSessionTimerTask(this);
+			if(logger.isDebugEnabled()) {
+				logger.debug("Scheduling reactivted sip application session "+ key +" to expire in " + (futureExpirationTimeOnPassivation / 1000 / 60) + " minutes");
+			}
+			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, futureExpirationTimeOnPassivation, TimeUnit.MILLISECONDS);
+			
+			int nbOfSipSessions = in.readInt();
+			for (int i = 0; i < nbOfSipSessions; i++) {
+				String sipSessionKeyStringified = in.readUTF();
+				try {
+					SipSessionKey sipSessionKey = SessionManagerUtil.parseSipSessionKey(sipSessionKeyStringified);
+					sipSessionsOnPassivation.add(sipSessionKey);
+				} catch (ParseException e) {
+					logger.error("Unexpected exception while parsing the sip session key that has been previously passivated " + sipSessionKeyStringified, e);
+				}				
+			}
+			
+			int nbOfHttpSessions = in.readInt();
+			for (int i = 0; i < nbOfHttpSessions; i++) {
+				httpSessionsOnPassivation.add(in.readUTF());
+			}
+			
+			//TODO get the persistent servletTimers
+			
 			// From ClusteredSession
 			invalidationPolicy = in.readInt();
 			version = in.readInt();
 
 			// Get our id without any jvmRoute appended
-//			parseRealId(id);
+//			parseRealId(id);StandardSession
 
 			// We no longer know if we have an activationListener
 			hasActivationListener = null;
@@ -1025,7 +1071,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
 		synchronized (this) {
-			// From SipSessionimpl
+			// From SipApplicationSessionImpl
 			out.writeUTF(key.getId());
 			out.writeUTF(key.getApplicationName());
 			out.writeBoolean(key.isAppGeneratedKey());
@@ -1037,9 +1083,21 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			out.writeBoolean(isValid);
 			out.writeLong(lastAccessedTime);
 
+			out.writeLong(expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS));
+			
+			out.writeInt(sipSessions.size());
+			for (String sipSessionKey : sipSessions.keySet()) {
+				out.writeUTF(sipSessionKey);
+			}
+			
+			out.writeInt(httpSessions.size());
+			for (HttpSession httpSession : httpSessions.values()) {
+				out.writeUTF(((ClusteredSession)httpSession).getRealId());
+			}
+			
 			// From ClusteredSession
 			out.writeInt(invalidationPolicy);
-			out.writeInt(version);
+			out.writeInt(version);			
 
 			// TODO uncomment when work on JBAS-1900 is completed
 			// // Session notes -- for FORM auth apps, allow replicated session

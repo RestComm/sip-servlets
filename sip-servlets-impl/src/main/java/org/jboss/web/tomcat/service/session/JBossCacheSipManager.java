@@ -1362,16 +1362,19 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (key == null) {
 			return null;
 		}
-
+		SipFactoryImpl sipFactory = sipFactoryImpl;
+		if(sipFactory == null) {
+			sipFactory = this.getSipFactoryImpl();
+		}
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
-		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		if (session == null) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
-			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		}
 
 		synchronized (session) {

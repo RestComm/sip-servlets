@@ -401,7 +401,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * 
 	 * @param manager
 	 */
-	public abstract void initAfterLoad(AbstractJBossManager manager);
+	public abstract void initAfterLoad(JBossCacheSipManager manager);
 
 	/**
 	 * Propogate session to the internal store.

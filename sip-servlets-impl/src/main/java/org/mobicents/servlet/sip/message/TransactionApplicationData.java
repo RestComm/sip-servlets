@@ -31,7 +31,6 @@ public class TransactionApplicationData {
 	private ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 	private Transaction transaction;
-	private SipServletRequestImpl originalProxyRequest;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;		

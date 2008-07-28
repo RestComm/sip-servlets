@@ -196,7 +196,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected boolean readyToInvalidate = false;
 
 	/*
-	 * If this is a derived session, havea pointer to the parent session.
+	 * If this is a derived session, have a pointer to the parent session.
 	 */
 	protected transient MobicentsSipSession parentSession = null;
 	

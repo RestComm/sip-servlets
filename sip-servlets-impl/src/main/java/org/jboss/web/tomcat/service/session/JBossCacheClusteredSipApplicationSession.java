@@ -16,9 +16,15 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 
@@ -50,11 +56,23 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 	 * @param manager
 	 *            the manager for this session
 	 */
-	public void initAfterLoad(AbstractJBossManager manager) {
-		// Our manager and proxy may have been lost if we were recycled,
-		// so reestablish them
-		//TODO set objects that might have been lost during the move
-//		setManager(manager);
+	public void initAfterLoad(JBossCacheSipManager manager) {		
+		sipContext = (SipContext) manager.getContainer();
+		//TODO get the sip and http sessions from the cache
+		for (SipSessionKey sipSessionKey : sipSessionsOnPassivation) {
+			MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
+			sipSessions.put(sipSessionKey.toString(), sipSession);
+		}
+		
+		for (String httpSessionKey : httpSessionsOnPassivation) {
+			try {
+				HttpSession httpSession = (HttpSession) sipContext.getSipManager().findSession(httpSessionKey);
+				httpSessions.put(httpSessionKey, httpSession);
+			} catch (IOException e) {
+				logger.error("Unexpected exception while loading an http session that has been previously passivated ", e);
+			}
+		}
+		
 		establishProxy();
 
 		// Since attribute map may be transient, we may need to populate it
