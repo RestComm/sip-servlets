@@ -16,11 +16,21 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import gov.nist.javax.sip.SipStackImpl;
+import gov.nist.javax.sip.stack.SIPDialog;
+
+import javax.sip.SipStack;
+
+import org.apache.catalina.Container;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Service;
+import org.apache.catalina.connector.Connector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.SipService;
 
 
 /**
@@ -55,7 +65,23 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 */
 	public void initAfterLoad(JBossCacheSipManager manager) {
 		sipFactory = manager.getSipFactoryImpl();
-
+		//inject the dialog into the available sip stacks
+		Container context = manager.getContainer();
+		Container container = context.getParent().getParent();
+		if(container instanceof Engine) {
+			Service service = ((Engine)container).getService();
+			if(service instanceof SipService) {
+				Connector[] connectors = service.findConnectors();
+				for (Connector connector : connectors) {
+					SipStack sipStack = (SipStack)
+						connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+					if(sipStack != null) {
+						((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
+					}
+				}
+			}
+		}
+		
 		// Since attribute map may be transient, we may need to populate it
 		// from the underlying store.
 		populateAttributes();

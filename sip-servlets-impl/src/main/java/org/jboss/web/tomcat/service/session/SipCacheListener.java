@@ -115,11 +115,12 @@ public class SipCacheListener extends AbstractCacheListener
             // need to inform manager
         	String sessId = null;
         	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
-        		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);	
+        		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+        		manager_.processRemoteSipApplicationSessionInvalidation(sessId);
         	} else {
         		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-        	}
-            manager_.processRemoteInvalidation(sessId);
+        		manager_.processRemoteSipSessionInvalidation(sessId);
+        	}            
          }
       }
       else if (fieldBased_ && isFqnForOurSipapp(fqn, isBuddy))
@@ -132,22 +133,24 @@ public class SipCacheListener extends AbstractCacheListener
          	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
          		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
          		attrKey = getSipApplicationSessionIdPojoKeyFromFqn(fqn, isBuddy);
+         		manager_.processRemoteSipApplicationSessionAttributeRemoval(sessId, attrKey);
          	} else {
          		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
          		attrKey = getSipSessionIdPojoKeyFromFqn(fqn, isBuddy);
-         	}
-            manager_.processRemoteAttributeRemoval(sessId, attrKey);
+         		manager_.processRemoteSipSessionAttributeRemoval(sessId, attrKey);
+         	}         	
          }
          else if (local && isFqnInPojo(size, isBuddy))
          {
             // One of our pojo's is modified
         	 String sessId = null;
          	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
-         		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);	
+         		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+         		manager_.processSipApplicationSessionLocalPojoModification(sessId);
          	} else {
          		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
+         		manager_.processSipSessionLocalPojoModification(sessId);
          	}
-            manager_.processLocalPojoModification(sessId);
          }
       }
    }
@@ -177,11 +180,12 @@ public class SipCacheListener extends AbstractCacheListener
          // One of our pojo's is modified
     	 String sessId = null;
       	 if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
-      		 sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);	
+      		 sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+      		manager_.processSipApplicationSessionLocalPojoModification(sessId);
       	 } else {
       		 sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-      	 }
-         manager_.processLocalPojoModification(sessId);
+      		manager_.processSipSessionLocalPojoModification(sessId);
+      	 }         
       }
    }
 

@@ -27,10 +27,10 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  *@author mranga
  */
 public class TransactionApplicationData {
-	private ProxyImpl proxy;
-	private ProxyBranchImpl proxyBranch;	
-	private SipServletMessageImpl sipServletMessage;
-	private Transaction transaction;
+	private transient ProxyImpl proxy;
+	private transient ProxyBranchImpl proxyBranch;	
+	private transient SipServletMessageImpl sipServletMessage;
+	private transient Transaction transaction;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;		

@@ -16,6 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ import org.jboss.web.tomcat.service.JBossWeb;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
@@ -1885,7 +1887,77 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			}
 		}
 	}
+	
+	public void processRemoteSipApplicationSessionAttributeRemoval(String realId, String attrKey) {
+		SipApplicationSessionKey sipApplicationSessionKey;
+		try {
+			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(realId);
+		} catch (ParseException e) {
+			logger.error("Unexpected exception while parsing the following sip application session key " + realId, e);
+			return;
+		}
+		ClusteredSipApplicationSession session = findLocalSipApplicationSession(sipApplicationSessionKey, false);
+		if (session != null) {
+			boolean localCall = false; // call is due to remote event
+			boolean localOnly = true; // don't call back into cache
+			boolean notify = false; // SRV.10.7 gives us leeway
+			// not to notify listeners,
+			// which is safer
 
+			// Ensure the correct TCL is in place
+			ClassLoader prevTcl = Thread.currentThread()
+					.getContextClassLoader();
+			try {
+				Thread.currentThread().setContextClassLoader(tcl_);
+				synchronized (session) {
+					session.removeAttributeInternal(attrKey, localCall,
+							localOnly, notify);
+				}
+				if (trace)
+					log_
+							.trace("processRemoteAttributeRemoval: removed attribute "
+									+ attrKey + " from " + realId);
+			} finally {
+				Thread.currentThread().setContextClassLoader(prevTcl);
+			}
+		}
+	}
+
+	public void processRemoteSipSessionAttributeRemoval(String realId, String attrKey) {
+		SipSessionKey sipSessionKey;
+		try {
+			sipSessionKey = SessionManagerUtil.parseSipSessionKey(realId);
+		} catch (ParseException e) {
+			logger.error("Unexpected exception while parsing the following sip session key " + realId, e);
+			return;
+		}
+		ClusteredSipSession session = findLocalSipSession(sipSessionKey, false, null);
+		if (session != null) {
+			boolean localCall = false; // call is due to remote event
+			boolean localOnly = true; // don't call back into cache
+			boolean notify = false; // SRV.10.7 gives us leeway
+			// not to notify listeners,
+			// which is safer
+
+			// Ensure the correct TCL is in place
+			ClassLoader prevTcl = Thread.currentThread()
+					.getContextClassLoader();
+			try {
+				Thread.currentThread().setContextClassLoader(tcl_);
+				synchronized (session) {
+					session.removeAttributeInternal(attrKey, localCall,
+							localOnly, notify);
+				}
+				if (trace)
+					log_
+							.trace("processRemoteAttributeRemoval: removed attribute "
+									+ attrKey + " from " + realId);
+			} finally {
+				Thread.currentThread().setContextClassLoader(prevTcl);
+			}
+		}
+	}
+	
 	public void processRemoteInvalidation(String realId) {
 		// Remove the session from our local map
 		ClusteredSession session = (ClusteredSession) sessions_.remove(realId);
@@ -1929,8 +2001,148 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 	}
 
+	public void processRemoteSipApplicationSessionInvalidation(String realId) {
+		// Remove the session from our local map
+		SipApplicationSessionKey sipApplicationSessionKey;
+		try {
+			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(realId);
+		} catch (ParseException e) {
+			logger.error("Unexpected exception while parsing the following sip application session key " + realId, e);
+			return;
+		}
+		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) 
+			sipManagerDelegate.removeSipApplicationSession(sipApplicationSessionKey);
+		if (session == null) {
+			// We weren't managing the session anyway. But remove it
+			// from the list of cached sessions we haven't loaded
+			if (unloadedSipApplicationSessions_.remove(realId) != null) {
+				if (trace)
+					log_.trace("Removed entry for session " + realId
+							+ " from unloaded session map");
+			}
+		} else {
+			// Expire the session
+			// DON'T SYNCHRONIZE ON SESSION HERE -- isValid() and
+			// expire() are meant to be multi-threaded and synchronize
+			// properly internally; synchronizing externally can lead
+			// to deadlocks!!
+			boolean notify = false; // Don't notify listeners. SRV.10.7
+			// allows this, and sending notifications
+			// leads to all sorts of issues; e.g.
+			// circular calls with ClusteredSSO
+			boolean localCall = false; // this call originated from the cache;
+			// we have already removed session
+			boolean localOnly = true; // Don't pass attr removals to cache
+
+			// Ensure the correct TCL is in place
+			ClassLoader prevTcl = Thread.currentThread()
+					.getContextClassLoader();
+			try {
+				Thread.currentThread().setContextClassLoader(tcl_);
+				session.expire(notify, localCall, localOnly);
+			} finally {
+				Thread.currentThread().setContextClassLoader(prevTcl);
+			}
+
+			// Remove any stats for this session
+			stats_.removeStats(realId);
+
+			// Update counter.
+			activeCounter_--;
+		}
+	}
+	
+	public void processRemoteSipSessionInvalidation(String realId) {
+		// Remove the session from our local map
+		SipSessionKey sipSessionKey;
+		try {
+			sipSessionKey = SessionManagerUtil.parseSipSessionKey(realId);
+		} catch (ParseException e) {
+			logger.error("Unexpected exception while parsing the following sip session key " + realId, e);
+			return;
+		}
+		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.removeSipSession(sipSessionKey);
+		if (session == null) {
+			// We weren't managing the session anyway. But remove it
+			// from the list of cached sessions we haven't loaded
+			if (unloadedSipSessions_.remove(realId) != null) {
+				if (trace)
+					log_.trace("Removed entry for session " + realId
+							+ " from unloaded session map");
+			}
+		} else {
+			//remove the dialog from the local stacks 
+			session.getSessionCreatingDialog().delete();
+			
+			// Expire the session
+			// DON'T SYNCHRONIZE ON SESSION HERE -- isValid() and
+			// expire() are meant to be multi-threaded and synchronize
+			// properly internally; synchronizing externally can lead
+			// to deadlocks!!
+			boolean notify = false; // Don't notify listeners. SRV.10.7
+			// allows this, and sending notifications
+			// leads to all sorts of issues; e.g.
+			// circular calls with ClusteredSSO
+			boolean localCall = false; // this call originated from the cache;
+			// we have already removed session
+			boolean localOnly = true; // Don't pass attr removals to cache
+
+			// Ensure the correct TCL is in place
+			ClassLoader prevTcl = Thread.currentThread()
+					.getContextClassLoader();
+			try {
+				Thread.currentThread().setContextClassLoader(tcl_);
+				session.expire(notify, localCall, localOnly);
+			} finally {
+				Thread.currentThread().setContextClassLoader(prevTcl);
+			}
+
+			// Remove any stats for this session
+			stats_.removeStats(realId);
+
+			// Update counter.
+			activeCounter_--;
+		}
+	}
+
 	public void processLocalPojoModification(String realId) {
 		ClusteredSession session = findLocalSession(realId);
+		if (session != null) {
+			if (trace) {
+				log_.trace("Marking attributes of session " + realId
+						+ " dirty due to POJO modification");
+			}
+			session.sessionAttributesDirty();
+		}
+	}
+	
+	public void processSipApplicationSessionLocalPojoModification(String realId) {
+		SipApplicationSessionKey sipApplicationSessionKey;
+		try {
+			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(realId);
+		} catch (ParseException e) {
+			logger.error("Unexpected exception while parsing the following sip application session key " + realId, e);
+			return;
+		}
+		ClusteredSipApplicationSession session = findLocalSipApplicationSession(sipApplicationSessionKey, false);
+		if (session != null) {
+			if (trace) {
+				log_.trace("Marking attributes of session " + realId
+						+ " dirty due to POJO modification");
+			}
+			session.sessionAttributesDirty();
+		}
+	}
+	
+	public void processSipSessionLocalPojoModification(String realId) {
+		SipSessionKey sipSessionKey;
+		try {
+			sipSessionKey = SessionManagerUtil.parseSipSessionKey(realId);
+		} catch (ParseException e) {
+			logger.error("Unexpected exception while parsing the following sip session key " + realId, e);
+			return;
+		}
+		ClusteredSipSession session = findLocalSipSession(sipSessionKey, false, null);
 		if (session != null) {
 			if (trace) {
 				log_.trace("Marking attributes of session " + realId
