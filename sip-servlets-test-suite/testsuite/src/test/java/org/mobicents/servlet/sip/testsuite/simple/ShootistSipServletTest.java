@@ -36,6 +36,8 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	
 	public ShootistSipServletTest(String name) {
 		super(name);
+		startTomcatOnStartup = false;
+		autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -66,8 +68,10 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();			
 	}
 	
-	public void testShootist() throws InterruptedException {
+	public void testShootist() throws Exception {
 //		receiver.sendInvite();
+		tomcat.startTomcat();
+		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
