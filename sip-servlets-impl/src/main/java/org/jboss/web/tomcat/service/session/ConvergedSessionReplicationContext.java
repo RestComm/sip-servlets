@@ -132,7 +132,7 @@ public final class ConvergedSessionReplicationContext
     */
    public static void enterSipapp(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
       if (ctx == null)
       {
          ctx = new ConvergedSessionReplicationContext(request, response);

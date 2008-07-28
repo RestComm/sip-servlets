@@ -97,6 +97,12 @@ public class SipCacheListener extends AbstractCacheListener
 
    // --------------- TreeCacheListener methods ------------------------------------
 
+   @Override
+   public void nodeCreated(Fqn fqn)
+   {
+	   logger.info("following node created " + fqn.toString() + " with name " +fqn.getName());
+   }
+   
    public void nodeRemoved(Fqn fqn)
    {
       // Ignore our own activity if not field based

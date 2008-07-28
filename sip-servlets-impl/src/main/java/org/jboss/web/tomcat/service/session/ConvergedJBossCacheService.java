@@ -183,10 +183,10 @@ public class ConvergedJBossCacheService extends JBossCacheService
          throw new RuntimeException("Can't register class loader", ex);
       }
 
-      if(webapp instanceof SipContext) {
+      if(webapp instanceof SipContext) {    	  
     	  SipContext sipApp = (SipContext) webapp;
     	  //As per JSR 289, application name should be unique
-    	  sipApplicationName = sipApp.getApplicationName();
+    	  sipApplicationName = sipApp.getApplicationName();    	  
     	  // Listen for cache changes
           sipCacheListener_ = new SipCacheListener(cacheWrapper_, manager_, hostName_, sipApplicationName);
           proxy_.addTreeCacheListener(sipCacheListener_);
@@ -195,6 +195,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
           Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
           Fqn sipPathFqn = new Fqn( sipObjs );
           String sipFqnStr = sipPathFqn.toString();
+          log_.info("Adding jboss cache listener for sip application : " + sipApplicationName + " on following fqn : " + sipFqnStr);
           try {
              if(useTreeCacheMarshalling_)
              {
@@ -369,9 +370,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
     *         <code>null</code> if the cache had no data stored
     *         under the given session id.
     */
-   public ClusteredSipSession loadSipSession(String realId, ClusteredSipSession toLoad)
+   public ClusteredSipSession loadSipSession(String id, String realId, ClusteredSipSession toLoad)
    {
-      Fqn fqn = getSessionFqn(realId);
+      Fqn fqn = getSipSessionFqn(id, realId);
    
       
       Object sessionData = cacheWrapper_.get(fqn, realId, true);
@@ -439,7 +440,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSipApplicationSession loadSipApplicationSession(String realId, ClusteredSipApplicationSession toLoad)
    {
-      Fqn fqn = getSessionFqn(realId);
+      Fqn fqn = getSipApplicationSessionFqn(realId);
    
       
       Object sessionData = cacheWrapper_.get(fqn, realId, true);

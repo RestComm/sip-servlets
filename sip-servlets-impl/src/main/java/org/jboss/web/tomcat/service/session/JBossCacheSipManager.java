@@ -177,7 +177,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		invalidateSessionPolicy_ = webMetaData.getInvalidateSessionPolicy();
 		sipManagerDelegate = new ClusteredSipManagerDelegate(replicationGranularity_);
 		useLocalCache_ = useLocalCache;
-		log_.debug("init(): replicationGranularity_ is "
+		log_.info("init(): replicationGranularity_ is "
 				+ replicationGranularity_ + " and invalidateSessionPolicy is "
 				+ invalidateSessionPolicy_);
 
@@ -779,7 +779,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (session == null)
 			return;
 
-		if (!(session instanceof ClusteredSession)) {
+		if (!(session instanceof ClusteredSipSession)) {
 			throw new IllegalArgumentException(
 					"You can only add instances of "
 							+ "type ClusteredSession to this Manager. Session class name: "
@@ -794,7 +794,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (session == null)
 			return;
 
-		if (!(session instanceof ClusteredSession)) {
+		if (!(session instanceof ClusteredSipApplicationSession)) {
 			throw new IllegalArgumentException(
 					"You can only add instances of "
 							+ "type ClusteredSession to this Manager. Session class name: "
@@ -1180,10 +1180,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 			try {
 				// Ignore any cache notifications that our own work generates
-				ConvergedSessionReplicationContext.startCacheActivity();
+				ConvergedSessionReplicationContext.startSipCacheActivity();
 				clusterSess.removeMyselfLocal();
 			} finally {
-				ConvergedSessionReplicationContext.finishCacheActivity();
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
 
 				// We don't want to replicate this session at the end
 				// of the request; the removal process took care of that
@@ -1222,10 +1222,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 			try {
 				// Ignore any cache notifications that our own work generates
-				ConvergedSessionReplicationContext.startCacheActivity();
+				ConvergedSessionReplicationContext.startSipCacheActivity();
 				clusterSess.removeMyselfLocal();
 			} finally {
-				ConvergedSessionReplicationContext.finishCacheActivity();
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
 
 				// We don't want to replicate this session at the end
 				// of the request; the removal process took care of that
@@ -1370,15 +1370,15 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
-		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
-		if (session == null) {
+		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, false, sipFactory, sipApplicationSessionImpl);
+		if (session == null && create) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
 			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		}
-
+		ClusteredSipSession sessionInCache = null;
 		synchronized (session) {
 			boolean doTx = false;
 			try {
@@ -1394,9 +1394,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 				// Ignore cache notifications we may generate for this
 				// session if data gravitation occurs.
-				ConvergedSessionReplicationContext.startCacheActivity();
+				ConvergedSessionReplicationContext.startSipCacheActivity();
 
-				session = proxy_.loadSipSession(key.toString(), session);
+				sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), session);
 			} catch (Exception ex) {
 				try {
 					// if(doTx)
@@ -1422,11 +1422,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				}
 			}
 
-			if (session != null) {
+			if (sessionInCache != null) {
 				// Need to initialize.
-				session.initAfterLoad(this);
+				sessionInCache.initAfterLoad(this);
 				if (mustAdd)
-					add(session, false); // don't replicate
+					add(sessionInCache, false); // don't replicate
 				long elapsed = System.currentTimeMillis() - begin;
 				stats_.updateLoadStats(key.toString(), elapsed);
 
@@ -1434,12 +1434,14 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					log_.debug("loadSession(): id= " + key.toString() + ", session="
 							+ session);
 				}
+				return sessionInCache;
 			} else if (log_.isDebugEnabled()) {
 				log_.debug("loadSession(): session " + key.toString()
 						+ " not found in distributed cache");
 			}
 		}
-
+		ConvergedSessionReplicationContext.bindSipSession(session,
+				snapshotManager_);
 		return session;
 	}
 	
@@ -1467,15 +1469,15 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
-		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sessions_.get(key);
-		if (session == null) {
+		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, false);
+		if (session == null && create) {			
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
 			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
 		}
-
+		ClusteredSipApplicationSession sessionInCache = null; 
 		synchronized (session) {
 			boolean doTx = false;
 			try {
@@ -1491,9 +1493,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 				// Ignore cache notifications we may generate for this
 				// session if data gravitation occurs.
-				ConvergedSessionReplicationContext.startCacheActivity();
+				ConvergedSessionReplicationContext.startSipCacheActivity();
 
-				session = proxy_.loadSipApplicationSession(key.toString(), session);
+				sessionInCache = proxy_.loadSipApplicationSession(key.toString(), session);
 			} catch (Exception ex) {
 				try {
 					// if(doTx)
@@ -1519,24 +1521,26 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				}
 			}
 
-			if (session != null) {
+			if (sessionInCache != null) {
 				// Need to initialize.
-				session.initAfterLoad(this);
+				sessionInCache.initAfterLoad(this);
 				if (mustAdd)
-					add(session, false); // don't replicate
+					add(sessionInCache, false); // don't replicate
 				long elapsed = System.currentTimeMillis() - begin;
 				stats_.updateLoadStats(key.toString(), elapsed);
 
 				if (log_.isDebugEnabled()) {
 					log_.debug("loadSession(): id= " + key.toString() + ", session="
-							+ session);
+							+ sessionInCache);
 				}
+				return sessionInCache;
 			} else if (log_.isDebugEnabled()) {
 				log_.debug("loadSession(): session " + key.toString()
-						+ " not found in distributed cache");
+						+ " not found in distributed cache");				
 			}
 		}
-
+		ConvergedSessionReplicationContext.bindSipApplicationSession(session,
+				snapshotManager_);
 		return session;
 	}
 
@@ -1628,7 +1632,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// at this level because we don't want to resume handling
 			// notifications until any compensating changes resulting
 			// from a tx rollback are done.
-			ConvergedSessionReplicationContext.startCacheActivity();
+			ConvergedSessionReplicationContext.startSipCacheActivity();
 
 			session.processSessionRepl();
 		} catch (Exception ex) {
@@ -1689,7 +1693,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// at this level because we don't want to resume handling
 			// notifications until any compensating changes resulting
 			// from a tx rollback are done.
-			ConvergedSessionReplicationContext.startCacheActivity();
+			ConvergedSessionReplicationContext.startSipCacheActivity();
 
 			session.processSessionRepl();
 		} catch (Exception ex) {
@@ -2723,7 +2727,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public MobicentsSipApplicationSession getSipApplicationSession(
 			final SipApplicationSessionKey key, final boolean create) {
 		// Find it from the local store first
-		ClusteredSipApplicationSession session = findLocalSipApplicationSession(key, create);
+		ClusteredSipApplicationSession session = findLocalSipApplicationSession(key, false);
 
 		// If we didn't find it locally, only check the distributed cache
 		// if we haven't previously handled this session id on this request.
@@ -2776,7 +2780,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			final MobicentsSipApplicationSession sipApplicationSessionImpl) {
 		
 		// Find it from the local store first
-		ClusteredSipSession session = findLocalSipSession(key, create, sipApplicationSessionImpl);
+		ClusteredSipSession session = findLocalSipSession(key, false, sipApplicationSessionImpl);
 
 		// If we didn't find it locally, only check the distributed cache
 		// if we haven't previously handled this session id on this request.

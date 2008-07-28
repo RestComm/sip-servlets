@@ -203,10 +203,12 @@ public abstract class MessageDispatcher {
 			servlet.service(request, null);
 		} finally {
 			if (isDistributable) {
-				// We are now after the servlet invocation, We replicate no matter what
+				if(logger.isInfoEnabled()) {
+					logger.info("We are now after the servlet invocation, We replicate no matter what");
+				}
 				try {
 					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-							.exitWebapp();
+							.exitSipapp();
 
 					if (ctx.getSoleSnapshotManager() != null) {
 						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
@@ -215,7 +217,7 @@ public abstract class MessageDispatcher {
 								ctx.getSoleSipApplicationSession());
 					} 
 				} finally {
-					ConvergedSessionReplicationContext.finishCacheActivity();
+					ConvergedSessionReplicationContext.finishSipCacheActivity();
 				}
 			}
 			sipServletImpl.deallocate(servlet);
@@ -246,10 +248,12 @@ public abstract class MessageDispatcher {
 				servlet.service(null, response);
 			} finally {
 				if (isDistributable) {
-					// We are now after the servlet invocation, We replicate no matter what
+					if(logger.isInfoEnabled()) {
+						logger.info("We are now after the servlet invocation, We replicate no matter what");
+					}
 					try {
 						ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-								.exitWebapp();
+								.exitSipapp();
 
 						if (ctx.getSoleSnapshotManager() != null) {
 							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
@@ -258,7 +262,7 @@ public abstract class MessageDispatcher {
 									ctx.getSoleSipApplicationSession());
 						} 
 					} finally {
-						ConvergedSessionReplicationContext.finishCacheActivity();
+						ConvergedSessionReplicationContext.finishSipCacheActivity();
 					}
 				}
 				sipServletImpl.deallocate(servlet);
