@@ -20,7 +20,7 @@ package org.jboss.web.tomcat.service.session;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  * 
  */
-public class InstantConvergedSnapshotManager extends InstantSnapshotManager {
+public class InstantConvergedSnapshotManager extends InstantSnapshotManager implements SnapshotSipManager {
 
 	/**
 	 * @param manager

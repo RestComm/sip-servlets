@@ -26,15 +26,21 @@ import java.util.Map;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
 public final class ConvergedSessionReplicationContext
 {
    private static final ThreadLocal replicationContext = new ThreadLocal();
+   private static final ThreadLocal sipReplicationContext = new ThreadLocal();
    
    private static final ConvergedSessionReplicationContext EMPTY = new ConvergedSessionReplicationContext();
+   private static final ConvergedSessionReplicationContext EMPTY_SIP = new ConvergedSessionReplicationContext();
    
    private int webappCount;
+   private int sipappCount;
    private int activityCount;
+   private int sipActivityCount;
    private SnapshotManager soleManager;
    private ClusteredSession soleSession;
    private ClusteredSipSession soleSipSession;
@@ -47,6 +53,9 @@ public final class ConvergedSessionReplicationContext
    private Map expiredSipApplicationSessions;
    private Request outerRequest;
    private Response outerResponse;
+   private SipServletRequestImpl outerSipRequest;
+   private SipServletResponseImpl outerSipResponse;
+   
    
    /**
     * Associate a SessionReplicationContext with the current thread, if
@@ -106,6 +115,67 @@ public final class ConvergedSessionReplicationContext
       
       // A nested valve called us. Just return an empty context
       return EMPTY;
+      
+   }
+   
+   /**
+    * Associate a SessionReplicationContext with the current thread, if
+    * there isn't one already.  If there isn't one, associate the 
+    * given request and response with the context.
+    * <p/>
+    * <strong>NOTE:</strong> Nested calls to this method and {@link #exitWebapp()}
+    * are supported; once a context is established the number of calls to this
+    * method and <code>exitWebapp()</code> are tracked.
+    * 
+    * @param request
+    * @param response
+    */
+   public static void enterSipapp(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity)
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentContext();
+      if (ctx == null)
+      {
+         ctx = new ConvergedSessionReplicationContext(request, response);
+         sipReplicationContext.set(ctx);
+      }
+      
+      ctx.sipappCount++;
+      if (startCacheActivity)
+         ctx.sipActivityCount++;
+   }
+   
+   /**
+    * Signals that the webapp is finished handling the request (and
+    * therefore replication can begin.)
+    * 
+    * @return a SessionReplicationContext, from which information
+    *         about any sessions needing replication can be obtained.
+    *         Will not return <code>null</code>.
+    */
+   public static ConvergedSessionReplicationContext exitSipapp()
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx != null)
+      {
+         ctx.sipappCount--;
+         if (ctx.sipappCount < 1)
+         {
+            // We've unwound any nested webapp calls, so we'll clean up and 
+            // return the context to allow replication.  If all cache activity
+            // is done as well, clear the ThreadLocal
+            
+            ctx.outerSipRequest = null;
+            ctx.outerSipResponse = null;
+            
+            if (ctx.sipActivityCount < 1)
+               sipReplicationContext.set(null);
+            
+            return ctx;
+         }
+      }
+      
+      // A nested valve called us. Just return an empty context
+      return EMPTY_SIP;
       
    }
    
@@ -243,9 +313,50 @@ public final class ConvergedSessionReplicationContext
       }
    }
    
+   
+   /**
+    * Marks the current thread as actively processing the given session.
+    * If the thread has already been so marked, increases a counter
+    * so a subsequent call to finishLocalActivity does not remove
+    * the association (allowing nested calls).
+    */
+   public static void startSipCacheActivity()
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx == null)
+      {
+         ctx = new ConvergedSessionReplicationContext();
+         sipReplicationContext.set(ctx);
+      }
+      
+      ctx.sipActivityCount++;
+   }
+   
+   /**
+    * Marks the completion of activity on a given session.  Should be called
+    * once for each invocation of {@link #startCacheActivity()}.
+    */
+   public static void finishSipCacheActivity()
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx != null)
+      {
+         ctx.sipActivityCount--;
+         if (ctx.sipActivityCount < 1 && ctx.sipappCount < 1)
+         {
+            sipReplicationContext.set(null);
+         }
+      }
+   }
+   
    public static boolean isLocallyActive()
    {
       return getCurrentContext() != null;
+   }
+   
+   public static boolean isSipLocallyActive()
+   {
+      return getCurrentSipContext() != null;
    }
    
    public static Request getOriginalRequest()
@@ -265,10 +376,21 @@ public final class ConvergedSessionReplicationContext
       return (ConvergedSessionReplicationContext) replicationContext.get();
    }
    
+   private static ConvergedSessionReplicationContext getCurrentSipContext()
+   {
+      return (ConvergedSessionReplicationContext) sipReplicationContext.get();
+   }
+   
    private ConvergedSessionReplicationContext(Request request, Response response) 
    {
       this.outerRequest = request;
       this.outerResponse = response;
+   }
+   
+   private ConvergedSessionReplicationContext(SipServletRequestImpl request, SipServletResponseImpl response) 
+   {
+      this.outerSipRequest = request;
+      this.outerSipResponse = response;
    }
    
    private ConvergedSessionReplicationContext() {}
@@ -307,6 +429,30 @@ public final class ConvergedSessionReplicationContext
    public ClusteredSession getSoleSession()
    {
       return soleSession;
+   }
+   
+   /**
+    * Gets the ClusteredSession that was passed to  
+    * {@link #bindSession(ClusteredSession, SnapshotManager)} if and only
+    * if only one SnapshotManager was passed. Returns <code>null</code>
+    * otherwise, in which case a cross-context request is a possibility,
+    * and {@link #getCrossContextSessions()} should be checked.
+    */
+   public ClusteredSipSession getSoleSipSession()
+   {
+      return soleSipSession;
+   }
+   
+   /**
+    * Gets the ClusteredSession that was passed to  
+    * {@link #bindSession(ClusteredSession, SnapshotManager)} if and only
+    * if only one SnapshotManager was passed. Returns <code>null</code>
+    * otherwise, in which case a cross-context request is a possibility,
+    * and {@link #getCrossContextSessions()} should be checked.
+    */
+   public ClusteredSipApplicationSession getSoleSipApplicationSession()
+   {
+      return soleSipApplicationSession;
    }
    
    private void addReplicatableSession(ClusteredSession session, SnapshotManager mgr)
@@ -421,7 +567,7 @@ public final class ConvergedSessionReplicationContext
       if (store)
       {
          soleManager = null;
-         soleSession = null;
+         soleSipSession = null;
       }
       else if (crossCtxSessions != null)
       {
@@ -445,7 +591,7 @@ public final class ConvergedSessionReplicationContext
       if (store)
       {
          soleManager = null;
-         soleSession = null;
+         soleSipApplicationSession = null;
       }
       else if (crossCtxSessions != null)
       {

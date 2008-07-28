@@ -2318,7 +2318,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 
 		// Add clustered session valve
-		ClusteredSessionValve valve = new ClusteredSessionValve();
+		ConvergedClusteredSessionValve valve = new ConvergedClusteredSessionValve();
 		installContextValve(valve);
 	}
 

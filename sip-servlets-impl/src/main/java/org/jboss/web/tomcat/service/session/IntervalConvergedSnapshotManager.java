@@ -23,7 +23,7 @@ import java.util.Set;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  * 
  */
-public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager {
+public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager implements SnapshotSipManager {
 	// the modified sessions
 	protected Set sipSessions = new LinkedHashSet();
 	protected Set sipApplicationSessions = new LinkedHashSet();

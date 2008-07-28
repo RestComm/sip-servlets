@@ -1035,13 +1035,13 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          return proxy_.putObject(fqn, pojo);
       } catch (CacheException e) {
          throw new RuntimeException("JBossCacheService: exception occurred in cache setSipApplicationSessionPojo ... ", e);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
    
@@ -1064,13 +1064,13 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipSessionFieldFqn(id, realId, key);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          return proxy_.putObject(fqn, pojo);
       } catch (CacheException e) {
          throw new RuntimeException("JBossCacheService: exception occurred in cache setSipSessionPojo ... ", e);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
 
@@ -1116,13 +1116,13 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          return proxy_.removeObject(fqn);
       } catch (CacheException e) {
          throw new RuntimeException("JBossCacheService: exception occurred in cache removeSipApplicationSessionPojo ... ", e);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
    
@@ -1142,13 +1142,13 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipSessionFieldFqn(id, realId, key);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          return proxy_.removeObject(fqn);
       } catch (CacheException e) {
          throw new RuntimeException("JBossCacheService: exception occurred in cache removeSipSessionPojo ... ", e);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
 
@@ -1191,11 +1191,11 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipSessionAttributeFqn(id, realId);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          cacheWrapper_.evictSubtree(fqn);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
 
@@ -1215,11 +1215,11 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          cacheWrapper_.evictSubtree(fqn);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
 
@@ -1263,11 +1263,11 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipApplicationSessionFieldFqn(realId, key);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          cacheWrapper_.evictSubtree(fqn);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
    
@@ -1287,11 +1287,11 @@ public class ConvergedJBossCacheService extends JBossCacheService
       Fqn fqn = getSipSessionFieldFqn(id, realId, key);
       try {
          // Ignore any cache notifications that our own work generates 
-         ConvergedSessionReplicationContext.startCacheActivity();
+         ConvergedSessionReplicationContext.startSipCacheActivity();
          cacheWrapper_.evictSubtree(fqn);
       }
       finally {
-         ConvergedSessionReplicationContext.finishCacheActivity();
+         ConvergedSessionReplicationContext.finishSipCacheActivity();
       }
    }
    

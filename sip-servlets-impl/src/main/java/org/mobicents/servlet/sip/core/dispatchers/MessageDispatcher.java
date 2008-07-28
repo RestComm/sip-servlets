@@ -19,6 +19,8 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -32,6 +34,9 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.web.tomcat.service.session.ClusteredSipSession;
+import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
+import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -189,10 +194,30 @@ public abstract class MessageDispatcher {
 		Thread.currentThread().setContextClassLoader(cl);
 		
 		if(!securityCheck(request)) return;
-	    
+
+		boolean isDistributable = sipContext.getDistributable();
 		try {
+			if(isDistributable) {
+				ConvergedSessionReplicationContext.enterSipapp(request, null, true);
+			}
 			servlet.service(request, null);
-		} finally {		
+		} finally {
+			if (isDistributable) {
+				// We are now after the servlet invocation, We replicate no matter what
+				try {
+					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+							.exitWebapp();
+
+					if (ctx.getSoleSnapshotManager() != null) {
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipSession());
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipApplicationSession());
+					} 
+				} finally {
+					ConvergedSessionReplicationContext.finishCacheActivity();
+				}
+			}
 			sipServletImpl.deallocate(servlet);
 		}
 	}
@@ -204,17 +229,38 @@ public abstract class MessageDispatcher {
 				" to following App/servlet => " + session.getKey().getApplicationName()+ 
 				"/" + session.getHandler());
 		}
-		
-		Container container = ((MobicentsSipApplicationSession)session.getApplicationSession()).getSipContext().findChild(session.getHandler());
-		Wrapper sipServletImpl = (Wrapper) container;
+		String sessionHandler = session.getHandler();
+		MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
+		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
+		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		
 		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
 			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
 		} else {
 			Servlet servlet = sipServletImpl.allocate();
+			boolean isDistributable = sipContext.getDistributable();
 			try {
+				if(isDistributable) {
+					ConvergedSessionReplicationContext.enterSipapp(null, response, true);
+				}
 				servlet.service(null, response);
 			} finally {
+				if (isDistributable) {
+					// We are now after the servlet invocation, We replicate no matter what
+					try {
+						ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+								.exitWebapp();
+
+						if (ctx.getSoleSnapshotManager() != null) {
+							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+									ctx.getSoleSipSession());
+							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+									ctx.getSoleSipApplicationSession());
+						} 
+					} finally {
+						ConvergedSessionReplicationContext.finishCacheActivity();
+					}
+				}
 				sipServletImpl.deallocate(servlet);
 			}
 		}
