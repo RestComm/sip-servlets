@@ -162,12 +162,4 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	public void removeAllSessions() {		
 		sipManagerDelegate.removeAllSessions();
 	}
-
-	/**
-	 * {@inheritDoc} 
-	 */
-	public void changeSessionKey(SipSessionKey oldKey, SipSessionKey newKey) {
-		sipManagerDelegate.changeSessionKey(oldKey, newKey);
-		
-	}
 }
