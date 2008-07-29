@@ -535,8 +535,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isValid) {
 			throw new IllegalStateException("SipSession already invalidated !");
 		}		
-		if(logger.isDebugEnabled()) {
-			logger.debug("Invalidating the sip session " + key);
+		if(logger.isInfoEnabled()) {
+			logger.info("Invalidating the sip session " + key);
 		}
 				
 		// No need for checks after JSR 289 PFD spec

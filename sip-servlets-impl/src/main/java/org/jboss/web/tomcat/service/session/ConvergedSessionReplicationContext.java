@@ -46,8 +46,8 @@ public final class ConvergedSessionReplicationContext
    private ClusteredSipSession soleSipSession;
    private ClusteredSipApplicationSession soleSipApplicationSession;
    private Map crossCtxSessions;
-   private Map crossCtxSipSessions;
-   private Map crossCtxSipApplicationSessions;
+//   private Map crossCtxSipSessions;
+//   private Map crossCtxSipApplicationSessions;
    private Map expiredSessions;
    private Map expiredSipSessions;
    private Map expiredSipApplicationSessions;
@@ -194,8 +194,8 @@ public final class ConvergedSessionReplicationContext
    
    public static void bindSipSession(ClusteredSipSession session, SnapshotManager manager)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
-      if (ctx != null && ctx.webappCount > 0)
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addReplicatableSipSession(session, manager);
       }
@@ -207,8 +207,8 @@ public final class ConvergedSessionReplicationContext
    
    public static void bindSipApplicationSession(ClusteredSipApplicationSession session, SnapshotManager manager)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
-      if (ctx != null && ctx.webappCount > 0)
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addReplicatableSipApplicationSession(session, manager);
       }
@@ -229,8 +229,8 @@ public final class ConvergedSessionReplicationContext
    
    public static void sipSessionExpired(ClusteredSipSession session, String realId, SnapshotManager manager)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
-      if (ctx != null && ctx.webappCount > 0)
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addExpiredSipSession(session, manager);
       }      
@@ -238,8 +238,8 @@ public final class ConvergedSessionReplicationContext
    
    public static void sipApplicationSessionExpired(ClusteredSipApplicationSession session, String realId, SnapshotManager manager)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
-      if (ctx != null && ctx.webappCount > 0)
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addExpiredSipApplicationSession(session, manager);
       }      
@@ -259,7 +259,7 @@ public final class ConvergedSessionReplicationContext
    public static boolean isSipSessionBoundAndExpired(String key, SnapshotManager manager)
    {
       boolean result = false;
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
       if (ctx != null)
       {
          result = ctx.isSipSessionExpired(key, manager);
@@ -270,7 +270,7 @@ public final class ConvergedSessionReplicationContext
    public static boolean isSipApplicationSessionBoundAndExpired(String key, SnapshotManager manager)
    {
       boolean result = false;
-      ConvergedSessionReplicationContext ctx = getCurrentContext();
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
       if (ctx != null)
       {
          result = ctx.isSipApplicationSessionExpired(key, manager);
@@ -484,25 +484,26 @@ public final class ConvergedSessionReplicationContext
    
    private void addReplicatableSipSession(ClusteredSipSession session, SnapshotManager mgr)
    {
-      if (crossCtxSipSessions != null)
-      {
-         crossCtxSipSessions.put(session, mgr);
-      }
-      else if (soleManager == null)
+//      if (crossCtxSipSessions != null)
+//      {
+//         crossCtxSipSessions.put(session, mgr);
+//      }
+//      else 
+    	  if (soleManager == null)
       {
          // First one bound
          soleManager = mgr;
          soleSipSession = session;
       }
-      else if (!mgr.equals(soleManager))
-      {
-         // We have a cross-context call; need a Map for the sessions
-         crossCtxSipSessions = new HashMap();
-         crossCtxSipSessions.put(soleSipSession, soleManager);
-         crossCtxSipSessions.put(session, mgr);
-         soleManager = null;
-         soleSipSession = null;
-      }
+//      else if (!mgr.equals(soleManager))
+//      {
+//         // We have a cross-context call; need a Map for the sessions
+//         crossCtxSipSessions = new HashMap();
+//         crossCtxSipSessions.put(soleSipSession, soleManager);
+//         crossCtxSipSessions.put(session, mgr);
+//         soleManager = null;
+//         soleSipSession = null;
+//      }
       else
       {
          soleSipSession = session;
@@ -511,25 +512,26 @@ public final class ConvergedSessionReplicationContext
    
    private void addReplicatableSipApplicationSession(ClusteredSipApplicationSession session, SnapshotManager mgr)
    {
-      if (crossCtxSipApplicationSessions != null)
-      {
-         crossCtxSipApplicationSessions.put(session, mgr);
-      }
-      else if (soleManager == null)
+//      if (crossCtxSipApplicationSessions != null)
+//      {
+//         crossCtxSipApplicationSessions.put(session, mgr);
+//      }
+//      else 
+    	  if (soleManager == null)
       {
          // First one bound
          soleManager = mgr;
          soleSipApplicationSession = session;
       }
-      else if (!mgr.equals(soleManager))
-      {
-         // We have a cross-context call; need a Map for the sessions
-         crossCtxSipApplicationSessions = new HashMap();
-         crossCtxSipApplicationSessions.put(soleSipApplicationSession, soleManager);
-         crossCtxSipApplicationSessions.put(session, mgr);
-         soleManager = null;
-         soleSipApplicationSession = null;
-      }
+//      else if (!mgr.equals(soleManager))
+//      {
+//         // We have a cross-context call; need a Map for the sessions
+//         crossCtxSipApplicationSessions = new HashMap();
+//         crossCtxSipApplicationSessions.put(soleSipApplicationSession, soleManager);
+//         crossCtxSipApplicationSessions.put(session, mgr);
+//         soleManager = null;
+//         soleSipApplicationSession = null;
+//      }
       else
       {
          soleSipApplicationSession = session;

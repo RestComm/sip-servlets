@@ -702,6 +702,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				if (session.isValid()
 						&& (session.isSessionDirty() || session
 								.getExceedsMaxUnreplicatedInterval())) {
+					if(logger.isInfoEnabled()) {
+						logger.info("replicating following sip session " + session.getId());
+					}
 					String realId = session.getId();
 
 					// Notify all session attributes that they get serialized
@@ -738,6 +741,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				if (session.isValid()
 						&& (session.isSessionDirty() || session
 								.getExceedsMaxUnreplicatedInterval())) {
+					if(logger.isInfoEnabled()) {
+						logger.info("replicating following sip application session " + session.getId());
+					}
 					String realId = session.getId();
 
 					// Notify all session attributes that they get serialized
@@ -1418,7 +1424,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					if (doTx)
 						endTransaction(key.toString());
 				} finally {
-					ConvergedSessionReplicationContext.finishCacheActivity();
+					ConvergedSessionReplicationContext.finishSipCacheActivity();
 				}
 			}
 
@@ -1517,7 +1523,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					if (doTx)
 						endTransaction(key.toString());
 				} finally {
-					ConvergedSessionReplicationContext.finishCacheActivity();
+					ConvergedSessionReplicationContext.finishSipCacheActivity();
 				}
 			}
 
@@ -2710,7 +2716,34 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 * {@inheritDoc}
 	 */
 	public MobicentsSipSession removeSipSession(final SipSessionKey key) {
-		return sipManagerDelegate.removeSipSession(key);
+		ClusteredSipSession clusterSess = (ClusteredSipSession) sipManagerDelegate.removeSipSession(key);
+		if(clusterSess == null) {
+			return null;
+		}
+		synchronized (clusterSess) {
+			String realId = clusterSess.getId();
+
+			if (log_.isDebugEnabled()) {
+				log_.debug("Removing session from store with id: " + realId);
+			}
+
+			try {
+				// Ignore any cache notifications that our own work generates
+				ConvergedSessionReplicationContext.startSipCacheActivity();
+				clusterSess.removeMyself();
+			} finally {
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
+
+				// We don't want to replicate this session at the end
+				// of the request; the removal process took care of that
+				ConvergedSessionReplicationContext.sipSessionExpired(clusterSess,
+						realId, snapshotManager_);
+
+				stats_.removeStats(realId);
+				activeCounter_--;
+			}
+		}
+		return clusterSess;
 	}
 
 	/**
@@ -2718,7 +2751,34 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 */
 	public MobicentsSipApplicationSession removeSipApplicationSession(
 			final SipApplicationSessionKey key) {
-		return sipManagerDelegate.removeSipApplicationSession(key);
+		ClusteredSipApplicationSession clusterSess = (ClusteredSipApplicationSession) sipManagerDelegate.removeSipApplicationSession(key);
+		if(clusterSess == null) {
+			return null;
+		}
+		synchronized (clusterSess) {
+			String realId = clusterSess.getId();
+
+			if (log_.isDebugEnabled()) {
+				log_.debug("Removing session from store with id: " + realId);
+			}
+
+			try {
+				// Ignore any cache notifications that our own work generates
+				ConvergedSessionReplicationContext.startSipCacheActivity();
+				clusterSess.removeMyself();
+			} finally {
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
+
+				// We don't want to replicate this session at the end
+				// of the request; the removal process took care of that
+				ConvergedSessionReplicationContext.sipApplicationSessionExpired(clusterSess,
+						realId, snapshotManager_);
+
+				stats_.removeStats(realId);
+				activeCounter_--;
+			}
+		}
+		return clusterSess;
 	}
 
 	/**

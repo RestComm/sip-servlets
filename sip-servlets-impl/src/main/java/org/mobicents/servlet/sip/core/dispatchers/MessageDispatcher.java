@@ -195,31 +195,9 @@ public abstract class MessageDispatcher {
 		
 		if(!securityCheck(request)) return;
 
-		boolean isDistributable = sipContext.getDistributable();
 		try {
-			if(isDistributable) {
-				ConvergedSessionReplicationContext.enterSipapp(request, null, true);
-			}
 			servlet.service(request, null);
-		} finally {
-			if (isDistributable) {
-				if(logger.isInfoEnabled()) {
-					logger.info("We are now after the servlet invocation, We replicate no matter what");
-				}
-				try {
-					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-							.exitSipapp();
-
-					if (ctx.getSoleSnapshotManager() != null) {
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipSession());
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipApplicationSession());
-					} 
-				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
-				}
-			}
+		} finally {			
 			sipServletImpl.deallocate(servlet);
 		}
 	}
@@ -240,31 +218,9 @@ public abstract class MessageDispatcher {
 			logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
 		} else {
 			Servlet servlet = sipServletImpl.allocate();
-			boolean isDistributable = sipContext.getDistributable();
-			try {
-				if(isDistributable) {
-					ConvergedSessionReplicationContext.enterSipapp(null, response, true);
-				}
+			try {				
 				servlet.service(null, response);
 			} finally {
-				if (isDistributable) {
-					if(logger.isInfoEnabled()) {
-						logger.info("We are now after the servlet invocation, We replicate no matter what");
-					}
-					try {
-						ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-								.exitSipapp();
-
-						if (ctx.getSoleSnapshotManager() != null) {
-							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-									ctx.getSoleSipSession());
-							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-									ctx.getSoleSipApplicationSession());
-						} 
-					} finally {
-						ConvergedSessionReplicationContext.finishSipCacheActivity();
-					}
-				}
 				sipServletImpl.deallocate(servlet);
 			}
 		}

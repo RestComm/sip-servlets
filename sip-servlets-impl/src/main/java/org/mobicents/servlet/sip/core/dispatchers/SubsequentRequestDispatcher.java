@@ -29,6 +29,8 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
+import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -127,61 +129,89 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
 		}
-		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
-		if(sipApplicationSession == null && sipManager instanceof SipStandardManager) {
-			((SipStandardManager)sipManager).dumpSipApplicationSessions();
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
-					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+		boolean isDistributable = sipContext.getDistributable();
+		if(isDistributable) {
+			ConvergedSessionReplicationContext.enterSipapp(sipServletRequest, null, true);
 		}
-		
-		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
-		MobicentsSipSession sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
-		
-		// Added by Vladimir because the inversion detection on proxied requests doesn't work
-		if(sipSession == null) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
-						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
-			}
-			key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
-			sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
-		}
-		
-		if(sipSession == null && sipManager instanceof SipStandardManager) {
-			((SipStandardManager)sipManager).dumpSipSessions();
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
-					" with the following popped route header " + sipServletRequest.getPoppedRoute());
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
-			}
-		}
-		sipServletRequest.setSipSession(sipSession);			
-		// JSR 289 Section 6.2.1 :
-		// any state transition caused by the reception of a SIP message, 
-		// the state change must be accomplished by the container before calling 
-		// the service() method of any SipServlet to handle the incoming message.
-		sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
-		
 		try {
-			// See if the subsequent request should go directly to the proxy
-			if(sipServletRequest.getSipSession().getProxyBranch() != null) {
-				ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
-				if(proxyBranch.getProxy().getSupervised()) {
-					callServlet(sipServletRequest);
+			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
+			if(sipApplicationSession == null && sipManager instanceof SipStandardManager) {
+				((SipStandardManager)sipManager).dumpSipApplicationSessions();
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+						" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			}
+			
+			SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
+			MobicentsSipSession sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+			
+			// Added by Vladimir because the inversion detection on proxied requests doesn't work
+			if(sipSession == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
+							" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
 				}
-				proxyBranch.proxySubsequentRequest(sipServletRequest);
+				key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
+				sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 			}
-			// If it's not for a proxy then it's just an AR, so go to the next application
-			else {
-				callServlet(sipServletRequest);				
+			
+			if(sipSession == null && sipManager instanceof SipStandardManager) {
+				((SipStandardManager)sipManager).dumpSipSessions();
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
+						" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
+				}
 			}
-		} catch (ServletException e) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-		} catch (IOException e) {				
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-		} 	 
+			sipServletRequest.setSipSession(sipSession);			
+			// JSR 289 Section 6.2.1 :
+			// any state transition caused by the reception of a SIP message, 
+			// the state change must be accomplished by the container before calling 
+			// the service() method of any SipServlet to handle the incoming message.
+			sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
+			
+			try {
+				// See if the subsequent request should go directly to the proxy
+				if(sipServletRequest.getSipSession().getProxyBranch() != null) {
+					ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
+					if(proxyBranch.getProxy().getSupervised()) {
+						callServlet(sipServletRequest);
+					}
+					proxyBranch.proxySubsequentRequest(sipServletRequest);
+				}
+				// If it's not for a proxy then it's just an AR, so go to the next application
+				else {
+					callServlet(sipServletRequest);				
+				}
+			} catch (ServletException e) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+			} catch (IOException e) {				
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+			} 	 
+		} finally {
+			if (isDistributable) {
+				if(logger.isInfoEnabled()) {
+					logger.info("We are now after the servlet invocation, We replicate no matter what");
+				}
+				try {
+					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+							.exitSipapp();
 
+					if(logger.isInfoEnabled()) {
+						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+					}
+					if (ctx.getSoleSnapshotManager() != null) {
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipSession());
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipApplicationSession());
+					} 
+				} finally {
+					ConvergedSessionReplicationContext.finishSipCacheActivity();
+				}
+			}
+		}
+		
 		//if a final response has been sent, or if the request has 
 		//been proxied or relayed we stop routing the request
 		RoutingState routingState = sipServletRequest.getRoutingState();

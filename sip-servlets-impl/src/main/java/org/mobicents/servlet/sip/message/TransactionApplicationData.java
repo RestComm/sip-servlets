@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import java.io.Serializable;
+
 import javax.sip.Transaction;
 
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
@@ -26,7 +28,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  * 
  *@author mranga
  */
-public class TransactionApplicationData {
+public class TransactionApplicationData implements Serializable {
 	private transient ProxyImpl proxy;
 	private transient ProxyBranchImpl proxyBranch;	
 	private transient SipServletMessageImpl sipServletMessage;

@@ -73,6 +73,8 @@ import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
+import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
+import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
@@ -490,8 +492,44 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 		SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 		MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
-		if(sipSessionImpl.isReadyToInvalidate()) {
-			sipSessionImpl.onTerminatedState();
+		tryToInvalidateSession(sipSessionImpl);
+	}
+
+	/**
+	 * @param sipSessionImpl
+	 */
+	private void tryToInvalidateSession(MobicentsSipSession sipSessionImpl) {
+		SipContext sipContext = findSipApplication(sipSessionImpl.getKey().getApplicationName());
+		boolean isDistributable = sipContext.getDistributable();
+		if(isDistributable) {
+			ConvergedSessionReplicationContext.enterSipapp(null, null, true);
+		}
+		try {
+			if(sipSessionImpl.isReadyToInvalidate()) {
+				sipSessionImpl.onTerminatedState();
+			}
+		} finally {
+			if (isDistributable) {
+				if(logger.isInfoEnabled()) {
+					logger.info("We are now after the servlet invocation, We replicate no matter what");
+				}
+				try {
+					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+							.exitSipapp();
+	
+					if(logger.isInfoEnabled()) {
+						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+					}
+					if (ctx.getSoleSnapshotManager() != null) {
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipSession());
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipApplicationSession());
+					} 
+				} finally {
+					ConvergedSessionReplicationContext.finishSipCacheActivity();
+				}
+			}
 		}
 	}
 	
@@ -514,10 +552,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(tad != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
-			sipSession.removeOngoingTransaction(transaction);
-			if(sipSession.isReadyToInvalidate()) {
-				sipSession.onTerminatedState();
-			}
+			sipSession.removeOngoingTransaction(transaction);			
 			//notifying SipErrorListener that no ACK has been received for a UAS only
 			if(sipServletMessage instanceof SipServletRequestImpl &&
 					tad.getProxy() == null &&
@@ -536,6 +571,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 				}
 			}
+			tryToInvalidateSession(sipSession);
 		}
 	}
 	
@@ -566,9 +602,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					logger.info("Invalidating sip session " + sipSessionImpl.getId() + " if ready to invalidate " + sipSessionImpl.isReadyToInvalidate());
 				}
 				sipSessionImpl.removeOngoingTransaction(transaction);
-				if(sipSessionImpl.isReadyToInvalidate()) {
-					sipSessionImpl.onTerminatedState();
-				}
+				tryToInvalidateSession(sipSessionImpl);
 			}
 		} else {
 			if(logger.isDebugEnabled()) {

@@ -105,6 +105,7 @@ public class SipCacheListener extends AbstractCacheListener
    
    public void nodeRemoved(Fqn fqn)
    {
+	   logger.info("following node removed " + fqn.toString() + " with name " +fqn.getName());
       // Ignore our own activity if not field based
       boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
       if (!fieldBased_ && local)
@@ -163,6 +164,7 @@ public class SipCacheListener extends AbstractCacheListener
 
    public void nodeModified(Fqn fqn)
    {
+	  logger.info("following node modified " + fqn.toString() + " with name " +fqn.getName());
       boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
       if (!fieldBased_ && local)
          return;

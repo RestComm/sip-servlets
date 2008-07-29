@@ -523,7 +523,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    
    public void putSipSession(String realId, ClusteredSipSession session)
    {
-      Fqn fqn = getSessionFqn(realId);
+      Fqn fqn = getSipSessionFqn(session.getSipApplicationSession().getId(), realId);
       
       if (session.getReplicateSessionBody())
       {
@@ -545,7 +545,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    
    public void putSipApplicationSession(String realId, ClusteredSipApplicationSession session)
    {
-      Fqn fqn = getSessionFqn(realId);
+      Fqn fqn = getSipApplicationSessionFqn(realId);
       
       if (session.getReplicateSessionBody())
       {
@@ -1884,9 +1884,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
          
          byte[] bytes = baos.toByteArray();
          
-         if (log_.isTraceEnabled())
+         if (log_.isInfoEnabled())
          {
-            log_.trace("marshalled object to size " + bytes.length + " bytes");
+            log_.info("marshalled object to size " + bytes.length + " bytes");
          }
 
          return bytes;
@@ -1913,9 +1913,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
          
          byte[] bytes = baos.toByteArray();
          
-         if (log_.isTraceEnabled())
+         if (log_.isInfoEnabled())
          {
-            log_.trace("marshalled object to size " + bytes.length + " bytes");
+            log_.info("marshalled object to size " + bytes.length + " bytes");
          }
 
          return bytes;

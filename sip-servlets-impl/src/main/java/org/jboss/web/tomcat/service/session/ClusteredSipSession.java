@@ -580,17 +580,17 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * @exception IllegalStateException
 	 *                if this method is called on an invalidated session
 	 */
-	public void invalidate() {
-		if (!isValid())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.invalidate.ise"));
+//	public void invalidate() {
+//		if (!isValid())
+//			throw new IllegalStateException(sm
+//					.getString("clusteredSession.invalidate.ise"));
 
 		// Cause this session to expire globally
-		boolean notify = true;
-		boolean localCall = true;
-		boolean localOnly = false;
-		expire(notify, localCall, localOnly);
-	}
+//		boolean notify = true;
+//		boolean localCall = true;
+//		boolean localOnly = false;
+//		expire(notify, localCall, localOnly);
+//	}
 
 	/**
 	 * Overrides the {@link StandardSession#isValid() superclass method} to call @
@@ -994,6 +994,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			String fromTag = in.readUTF();
 			String toAddress = in.readUTF();
 			String toTag = in.readUTF();
+			if("".equals(toTag)) {
+				toTag = null;
+			}
 			String callId = in.readUTF();
 			String applicationName = in.readUTF();
 			key = new SipSessionKey(fromAddress,fromTag,toAddress, toTag, callId, applicationName);
@@ -1007,17 +1010,21 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			routingRegion = (SipApplicationRoutingRegion) in.readObject();
 			stateInfo = (Serializable) in.readObject();
 			handlerServlet = in.readUTF();
-			String subscriberURIStringified = null;
-			try {
-				URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
-				if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
-					subscriberURI = new SipURIImpl((javax.sip.address.SipURI)jsipSubscriberUri);
-				} else if (jsipSubscriberUri instanceof javax.sip.address.TelURL) {
-					subscriberURI = new TelURLImpl((javax.sip.address.TelURL)jsipSubscriberUri);
+			String subscriberURIStringified = in.readUTF();
+			if("".equals(subscriberURIStringified)) {
+				subscriberURIStringified = null;
+			} else {
+				try {
+					URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
+					if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
+						subscriberURI = new SipURIImpl((javax.sip.address.SipURI)jsipSubscriberUri);
+					} else if (jsipSubscriberUri instanceof javax.sip.address.TelURL) {
+						subscriberURI = new TelURLImpl((javax.sip.address.TelURL)jsipSubscriberUri);
+					}
+				} catch (ParseException pe) {
+					logger.error("Impossible to parse the subscriber URI " 
+							+ subscriberURIStringified, pe);
 				}
-			} catch (ParseException pe) {
-				logger.error("Impossible to parse the subscriber URI " 
-						+ subscriberURIStringified, pe);
 			}
 			sessionCreatingDialog = (SIPDialog) in.readObject();
 			supervisedMode = in.readBoolean();
@@ -1080,19 +1087,27 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
 		synchronized (this) {
-			// From SipSessionimpl
+			// From SipSessionimpl			
 			out.writeUTF(key.getFromAddress());
 			out.writeUTF(key.getFromTag());
 			out.writeUTF(key.getToAddress());
-			out.writeUTF(key.getToTag());
+			if(key.getToTag() != null) {
+				out.writeUTF(key.getToTag());
+			} else {
+				out.writeUTF("");
+			}
 			out.writeUTF(key.getCallId());
 			out.writeUTF(key.getApplicationName());
 			
 			out.writeUTF(sipApplicationSession.getKey().toString());
 			out.writeObject(routingRegion);
 			out.writeObject(stateInfo);
-			out.writeUTF(handlerServlet);			
-			out.writeUTF(subscriberURI.toString());
+			out.writeUTF(handlerServlet);
+			if(subscriberURI != null) {
+				out.writeUTF(subscriberURI.toString());
+			} else {
+				out.writeUTF("");
+			}
 			out.writeObject((SIPDialog)sessionCreatingDialog);
 			out.writeBoolean(supervisedMode);
 			out.writeBoolean(invalidateWhenReady);

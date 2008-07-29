@@ -587,17 +587,17 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * @exception IllegalStateException
 	 *                if this method is called on an invalidated session
 	 */
-	public void invalidate() {
-		if (!isValid())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.invalidate.ise"));
-
-		// Cause this session to expire globally
-		boolean notify = true;
-		boolean localCall = true;
-		boolean localOnly = false;
-		expire(notify, localCall, localOnly);
-	}
+//	public void invalidate() {
+//		if (!isValid())
+//			throw new IllegalStateException(sm
+//					.getString("clusteredSession.invalidate.ise"));
+//
+//		// Cause this session to expire globally
+//		boolean notify = true;
+//		boolean localCall = true;
+//		boolean localOnly = false;
+//		expire(notify, localCall, localOnly);
+//	}
 
 	/**
 	 * Overrides the {@link StandardSession#isValid() superclass method} to call @
