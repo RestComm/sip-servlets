@@ -184,6 +184,14 @@ public abstract class SipManagerDelegate {
 		}
 		return sipSessionImpl;
 	}
+	
+	public void changeSessionKey(SipSessionKey oldKey, SipSessionKey newKey) {
+		MobicentsSipSession session = this.sipSessions.get(oldKey);
+		if(session == null)
+			throw new IllegalArgumentException("oldKey doesn't exist in this application session.");
+		this.sipSessions.put(newKey, session);
+		this.sipSessions.remove(oldKey);
+	}
 
 	/**
 	 * clone the parent sip session given in parameter except its attributes (they will be shared) 

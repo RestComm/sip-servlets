@@ -381,9 +381,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			
 			if(routeHeader == null) {
 				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
-				javax.sip.address.SipURI arUri = (javax.sip.address.SipURI)toHeader.getAddress().getURI();
-				String arText = arUri.getParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
-				ApplicationRoutingHeaderStack ar = new ApplicationRoutingHeaderStack(arText);
+				String arText = toHeader.getTag();
+				ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(arText);
 				
 				javax.sip.address.SipURI localUri = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -394,8 +393,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					javax.sip.address.Address address = 
 						SipFactories.addressFactory.createAddress(localUri);
 					routeHeader = SipFactories.headerFactory.createRouteHeader(address);
-					ar.removeLast();
-					arUri.setParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM, ar.toString());
+					//ar.removeLast();
+					//toHeader.setTag(ar.toString());
 				}
 			}
 			//Popping the router header if it's for the container as

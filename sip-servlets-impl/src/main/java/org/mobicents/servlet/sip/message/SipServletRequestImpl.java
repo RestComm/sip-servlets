@@ -77,15 +77,20 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderStack;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
@@ -888,25 +893,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		Request request = (Request) super.message;
 		
 		FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
-		javax.sip.address.SipURI fromHeaderUri = (javax.sip.address.SipURI) fromHeader.getAddress().getURI();
 		
-		String applicationRouteText = fromHeaderUri.getParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
-		ApplicationRoutingHeaderStack stack = new ApplicationRoutingHeaderStack(applicationRouteText);
+		ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer("");
 		String app = session.getKey().getApplicationName();
 		String handler = session.getHandler();
-		ApplicationRoutingHeaderStack.ApplicationRouterNode node = new ApplicationRoutingHeaderStack.ApplicationRouterNode(app, handler);
+		ApplicationRoutingHeaderComposer.ApplicationRouterNode node = new ApplicationRoutingHeaderComposer.ApplicationRouterNode(app, handler);
 		stack.addNode(node);
-		fromHeaderUri.setParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM, stack.toString());
-		
-		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
-				sipFactoryImpl.getSipNetworkInterfaceManager(), 
-				JainSipUtils.findTransport(request));
-		sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
-		sipURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, session.getHandler());
-		
-		sipURI.setLrParam();
-		javax.sip.address.Address recordRouteAddress = 
-			SipFactories.addressFactory.createAddress(sipURI);
+		SipSessionKey oldKey = SessionManagerUtil.getSipSessionKey(app, message, false);
+		fromHeader.setTag(stack.toString());
+		SipSessionKey newKey = SessionManagerUtil.getSipSessionKey(app, message, false);
+		SipApplicationSessionImpl appSession = (SipApplicationSessionImpl) this.session.getApplicationSession();
+		SipManager manager = (SipManager) appSession.getSipContext().getManager();
+		manager.changeSessionKey(oldKey, newKey);
 
 	}
 

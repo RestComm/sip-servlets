@@ -61,30 +61,26 @@ public class SessionManagerUtil {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
 		
-		// Here we remove the AR params in order to make session mapping possible by string compare
-		URI touri = (URI) ((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().clone();
-		if(touri instanceof SipUri) {
-			((SipUri) touri).removeParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
-		}
-		URI fromuri = (URI) ((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().clone();
-		if(fromuri instanceof SipUri) {
-			((SipUri) fromuri).removeParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
-		}
+		String toUri = ((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString();
+		String fromUri = ((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString();
+		String toTag = ((ToHeader) message.getHeader(ToHeader.NAME)).getTag();
+		String fromTag = 	((FromHeader) message.getHeader(FromHeader.NAME)).getTag();
+
 		
 		if(inverted) {
 			return new SipSessionKey(
-					touri.toString(),
-					((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
-					fromuri.toString(),
-					((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
+					toUri,
+					toTag,
+					fromUri,
+					fromTag,
 					((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 					applicationName);
 		} else {
 			return new SipSessionKey(
-				fromuri.toString(),
-				((FromHeader) message.getHeader(FromHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
-				touri.toString(),
-				((ToHeader) message.getHeader(ToHeader.NAME)).getParameter(TAG_PARAMETER_NAME),
+				fromUri,
+				fromTag,
+				toUri,
+				toTag,
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 				applicationName);
 		}

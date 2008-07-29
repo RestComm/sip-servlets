@@ -2913,4 +2913,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void removeAllSessions() {
 		sipManagerDelegate.removeAllSessions();
 	}
+
+	public void changeSessionKey(SipSessionKey oldKey, SipSessionKey newKey) {
+		sipManagerDelegate.changeSessionKey(oldKey, newKey);
+		
+	}
 }

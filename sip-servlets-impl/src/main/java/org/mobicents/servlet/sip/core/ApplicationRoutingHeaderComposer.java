@@ -10,15 +10,16 @@ import java.util.ArrayList;
  * @author vralev
  *
  */
-public class ApplicationRoutingHeaderStack {
+public class ApplicationRoutingHeaderComposer {
 	
-	public ApplicationRoutingHeaderStack(String text) {
+	public ApplicationRoutingHeaderComposer(String text) {
 		if(text == null) {
 			return;
 		}
 		String[] txtNodes = text.split("/");
 		for(String node:txtNodes) {
 			String[] params = node.split("!");
+			if(params.length!=2) return;
 			ApplicationRouterNode arNode = new ApplicationRouterNode(params[0], params[1]);
 			this.nodes.add(arNode);
 		}
@@ -41,11 +42,11 @@ public class ApplicationRoutingHeaderStack {
 	
 	public void removeLast() {
 		if(this.nodes.size()<=0) return;
-		this.nodes.remove(0);//this.nodes.size() - 1);
+		this.nodes.remove(0);
 	}
 	
 	public ApplicationRouterNode getLast() {
-		return this.nodes.get(0);//this.nodes.size()-1);
+		return this.nodes.get(0);
 	}
 	
 	public String toString() {

@@ -93,4 +93,6 @@ public interface SipManager extends org.apache.catalina.Manager {
 	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl);
 	
 	public SipFactoryImpl getSipFactoryImpl();
+	
+	public void changeSessionKey(SipSessionKey oldKey, SipSessionKey newKey);
 }
