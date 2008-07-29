@@ -1,11 +1,11 @@
-Failover support
+Clustering support
 
 * Description
 	
 	For a good description of Mobicents fail-over system (and even give us some feeback about it), I invite to read the 
 	{{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}.\
 	You can only read Section 1 and 2 since following sections are for jslee.\
-	We will cover the Mobicents Sip Servlets specific failover implementation, configuration and an example below.
+	We will cover the Mobicents Sip Servlets specific Clustering implementation and configuration and an example below.
 	
 * Implementation
 
@@ -17,9 +17,9 @@ Failover support
 
 * Step-By-Step Example
 
-	
+
 		
 * Limitations
 
-	Mobicents Sip Servlets doesn't currently support mid call failover for proxy or B2BUA sip applications only UA sip applications.
+	Mobicents Sip Servlets doesn't currently support clustering of proxy or B2BUA sip applications only UA sip applications.
 	To check our progess, check out {{{http://code.google.com/p/mobicents/issues/detail?id=}Issue }} and {{{http://code.google.com/p/mobicents/issues/detail?id=}Issue}} from time to time as we are working on it. 

@@ -1,0 +1,84 @@
+SIP Load Balancer
+
+* Description
+	
+	For a good description of Mobicents fail-over system (and even give us some feeback about it), I invite to read the 
+	{{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}.\
+	You can only read Section 1 and 2 since following sections are for jslee.\
+	We will cover the Mobicents Sip Servlets specific load balancer implementation, configuration and an example below.
+	
+* Implementation
+
+	As in Mobicents JSLEE, Mobicents Sip Servlets uses no standby nodes, so typically in this configuration
+	 proxies/registrars will need to share the user location table by using a database cluster.    
+	
+	The Mobicents Sip Balancer (Sip Call-Id aware load-balancer) will be used as the man in the middle, forwarding (transaction statefully) requests to any of the different nodes of the cluster.
+	
+	This implementation has many pros :
+	
+		* No need for standby nodes, because the remaining nodes take over the load of the failed node
+		
+		* No need to make sure requests are directed to the right node, as all nodes can serve requests to any users
+		
+		* All hardware is in use, reducing costs
+		
+		* Maintenance is easier, as all nodes have equal configurations	
+	
+	The different nodes are responsible for contacting the Mobicents Sip Balancer and 
+	sending to it liveness heartbeats and status health.
+	
+	For Mobicents Sip Servlets this is done in extending the 
+	<<<SipStandardService>>> class which already extends the Tomcat <<<StandardService>>> class implementing the Tomcat <<<Service>>> interface.\
+	In Tomcat's Architecture, a <<<Service>>> is an intermediate component which lives inside a Server and 
+	ties one or more Connectors to exactly one Engine.
+	
+	So when the service is started the new <<<SipStandardBalancerNodeService>>> looks up its configuration and gather the address(es) of the Sip Balancer(s) and
+	sends a heartbeat and health status to it(them) to make it(them)selves known as an available node of the cluster.\
+	The different parameters of the node are configurable through its MBean interface, see Section below for more information on configuration.
+	
+* Installation & Configuration
+
+	* To be able to start a tomcat instance as a client node of the sip balancer(s),
+	 you need to follow first the {{{./installation-jboss.html}instructions on how to setup your converged server}} (if that is not already done) and then modify your container's server.xml so that the 
+	 <<<Service>>> tag attribute <<<className>>> is equals to <<<org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService>>> instead of 
+	 <<<org.mobicents.servlet.sip.startup.SipStandardService>>> and add an attribute called <<<balancers>>> with the ip address(es) of the sip balancer you want to send heartbeats to.
+
+	* As seen above, each node has a JMX interface to be easily configurable. It is available under <<<serviceName=jboss.web,type=Service>>> in the jmx-console and provides the following configurable properties :
+	
+		* balancers : the sip balancer(s) host names with the corresponding <<<addBalancerAddress>>> and <<<removeBalancerAddress>>> methods.
+	
+		* heartBeatInterval : the interval at which each heartbeat is sent to the sip balancer(s)
+	
+
+* Step-By-Step Example
+
+	* Download {{{http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080729.163357-20-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
+	
+	* Get the default {{{http://code.google.com/p/mobicents/source/browse/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties}load balancer configuration properties files}}
+	
+		* The first property in the file is the local IP Address (interface) where the Sip Balancer will listen for incoming requests
+		
+		* The second property in the file is the port where the Sip Balancer will listen for incoming requests from UA sip clients. (external port)
+		
+		* The third property in the file is the port from where the Sip Balancer will forward incoming requests to different nodes of the cluster. (local port)
+		
+		* the rest of the properties are jain sip stack properties that you can tune (refer to jain sip javadoc for SipStack and SipStackImpl classes to get more information on jain sip stack properties)
+	
+	* Fire up the sip balancer with following command java -jar sip-balancer-1.0-20080729.163357-20-jar-with-dependencies.jar load-balancer-configuration.properties (if you need to stop it just do Ctrl+C) :		
+	
+	* Start 2 nodes either tomcat or jboss (or even a mix of them both) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/fialover-server-jboss.xml}here}}; only the Service tag has been modified as compared to a standard version of Mobicents Sip Servlets.
+	(make sure they don't listen on same port for http or sip connectors)
+	
+	* Deploy the same application, let's say {{{./location_service.html}location service}} on both nodes (you need to deploy the application manually on both nodes, when deployed on one node it won't deploy automatically in the whole cluster for now and don't forget to setup the dar file in the server.xml on both nodes neither)
+	
+	* Start a sip client with following sip address sip:sender@sip-servlets-com on port 5055, with outbound proxy the sip-balancer 127.0.0.1:5060
+	
+	* Start a second sip client with following sip address sip:receiver-failover@sip-servlets.com on port 5090
+	
+	* From first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done
+	
+	* Now stop one of the 2 nodes, wait a bit like 5 seconds and try again : From first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done 
+	
+* Limitations
+
+	Mobicents Sip Servlets in Tomcat Version doesn't support mid-call failover onmly the JBoss version does and this will stay that way. 

@@ -1,61 +1,63 @@
 <?xml version="1.0" ?>
 <project name="Mobicents Sip Servlets">
-  <skin>
-    <groupId>org.mobicents</groupId>
-    <artifactId>mobicents-skin</artifactId>
-    <version>1.0-SNAPSHOT</version>
-  </skin>
-  <body>
-    <menu name="Overview">
-      <item name="Introduction" href="products_sip_servlets.html"/>
-      <item name="Downloads" href="mss-downloads.html"/>
-      <item name="Installation" href="installation.html" collapse="true">
-      	<item name="Tomcat Installation" href="installation-tomcat.html"/>
-      	<item name="Jboss Installation" href="installation-jboss.html"/>
-      </item>
-      <item name="Configuration" href="configuration.html"/>
-      <item name="Roadmap" href="roadmap.html"/>
-      <item name="License" href="license.html"/>
-      <item name="QA" href="qa.html"/>
-   </menu>
-   <menu name="Examples">
-      <item name="Examples" href="examples.html" collapse="true">
-      	<item name="Call Blocking" href="call_blocking.html"/>
-      	<item name="Call Forwarding" href="call_forwarding.html"/>
-      	<item name="Call Controller" href="call_controller.html"/>
-      	<item name="Speed Dial" href="speed_dial.html"/>
-      	<item name="Location Service" href="location_service.html"/>
-      	<item name="Speed Dial/Location Service" href="speeddial_locationservice.html"/>
-      	<item name="Click to Call" href="click2call.html"/>
-      	<item name="Chat Server" href="chatserver.html"/>
-      	<item name="Media Demo" href="media-demo.html"/>
-      	<item name="Shopping Demo" href="shopping-demo.html"/>
-      	<item name="JSLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html"/>
-      	<item name="Facebook Click To Call Plugin" href="facebook-c2c.html"/>
-      </item>
-    
-    </menu>  
-    <menu name="Advanced Features">
-      <item name="Fail-over support" href="failover.html"/>
-      <item name="Media support" href="media.html"/>
-      <item name="Security" href="security.html"/>      
-      <item name="STUN suport" href="stun.html"/>
-      <item name="Management Console" href="sip-servlets-managment.htm"/>
-     
-     </menu>  
-    <menu name="Community">
-      <item name="Project Team" href="team-list.html"/>
-      <item name="Acknowledgements" href="acknowledgements.html"/>
-      <item name="Issue Tracker" href="http://code.google.com/p/mobicents/issues/list?q=label%3Acomponent%20label%3Asip-servlets&amp;can=2"/>
-      <item name="Source Repository" href="source-repository.html"/>      
-      <item name="How to Contribute" href="contributor.html"/>
-      <item name="Write a Test/Run the Testsuite" href="tests.html"/> 
-      <item name="Project Blogs" href="blogs.html"/>
-      <item name="Feedback" href="feedback.html"/>           
-      <item name="User Forum" href="http://forums.java.net/jive/forum.jspa?forumID=55"/>
-	  <item name="Develper Forum" href="http://forums.java.net/jive/forum.jspa?forumID=54"/>	                 
-      <item name="Legacy Project site" href="https://sip-servlets.dev.java.net/"/>
-    </menu>
-
-  </body>
+	<skin>
+		<groupId>org.mobicents</groupId>
+		<artifactId>mobicents-skin</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</skin>
+	<body>
+		<menu name="Overview">
+			<item name="Introduction" href="products_sip_servlets.html" />
+			<item name="Downloads" href="mss-downloads.html" />
+			<item name="Installation" href="installation.html" collapse="true">
+				<item name="Tomcat Installation" href="installation-tomcat.html" />
+				<item name="Jboss Installation" href="installation-jboss.html" />
+			</item>
+			<item name="Configuration" href="configuration.html" />
+			<item name="Roadmap" href="roadmap.html" />
+			<item name="License" href="license.html" />
+			<item name="QA" href="qa.html" />
+		</menu>
+		<menu name="Examples">
+			<item name="Examples" href="examples.html" collapse="true">
+				<item name="Call Blocking" href="call_blocking.html" />
+				<item name="Call Forwarding" href="call_forwarding.html" />
+				<item name="Call Controller" href="call_controller.html" />
+				<item name="Speed Dial" href="speed_dial.html" />
+				<item name="Location Service" href="location_service.html" />
+				<item name="Speed Dial/Location Service" href="speeddial_locationservice.html" />
+				<item name="Click to Call" href="click2call.html" />
+				<item name="Chat Server" href="chatserver.html" />
+				<item name="Media Demo" href="media-demo.html" />
+				<item name="Shopping Demo" href="shopping-demo.html" />
+				<item name="JSLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html" />
+				<item name="Facebook Click To Call Plugin" href="facebook-c2c.html" />
+			</item>
+		</menu>
+		<menu name="Advanced Features">
+			<item name="Media support" href="media.html" />
+			<item name="Security" href="security.html" />
+			<item name="STUN suport" href="stun.html" />
+			<item name="Management Console" href="sip-servlets-managment.htm" />
+		</menu>
+		<menu name="High Availability">
+			<item name="SIP Load Balancer" href="load-balancer.html" />
+			<item name="Clustering" href="clustering.html" />
+			<item name="Failover" href="failover.html" />
+		</menu>
+		<menu name="Community">
+			<item name="Project Team" href="team-list.html" />
+			<item name="Acknowledgements" href="acknowledgements.html" />
+			<item name="Issue Tracker"
+				href="http://code.google.com/p/mobicents/issues/list?q=label%3Acomponent%20label%3Asip-servlets&amp;can=2" />
+			<item name="Source Repository" href="source-repository.html" />
+			<item name="How to Contribute" href="contributor.html" />
+			<item name="Write a Test/Run the Testsuite" href="tests.html" />
+			<item name="Project Blogs" href="blogs.html" />
+			<item name="Feedback" href="feedback.html" />
+			<item name="User Forum" href="http://forums.java.net/jive/forum.jspa?forumID=55" />
+			<item name="Develper Forum" href="http://forums.java.net/jive/forum.jspa?forumID=54" />
+			<item name="Legacy Project site" href="https://sip-servlets.dev.java.net/" />
+		</menu>
+	</body>
 </project>
