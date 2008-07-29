@@ -1376,13 +1376,13 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
-		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, false, sipFactory, sipApplicationSessionImpl);
-		if (session == null && create) {
+		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
+		if (session == null) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
-			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
+			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
 		}
 		ClusteredSipSession sessionInCache = null;
 		synchronized (session) {
@@ -1475,13 +1475,13 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
-		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, false);
-		if (session == null && create) {			
+		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
+		if (session == null) {			
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
-			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
+			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
 		}
 		ClusteredSipApplicationSession sessionInCache = null; 
 		synchronized (session) {

@@ -1,9 +1,10 @@
-To use perf test, first run the 'download-and-compile-sipp.sh' to download and compile sipp, as the filename says.
-This is needed once, because sipp is a C program and needs to be compiled in you system. It takes about 1 minute. 
+build mobicents-sip-servlets from source in bootstrap with mvn clean install -P clustering
+build sip-balancer from source with mvn clean install
 
-Start the sip-servlets container with the server.xml provided in the folder (just change the absolute paths), 
-running the simple-sip-servlet example, and run the the performance-test script.
-
-use keys + and - to increase or decrease the calls per second rate. 
-
-Note: There are no plans at the moment to port the bash scripts to windows batch files.
+modify the JBOSS_HOME variable in prepare-jboss-server-for-clustering-failover.sh script to map your own
+run sh prepare-jboss-server-for-clustering-failover.sh from this directory
+run sh start-lb.sh from this directory
+run sh start-jboss-server-port-1.sh from this directory
+run sh start-jboss-server-port-2.sh from this directory
+run sh clustering-test.sh from this directory 
+When the ACK has been received kill the first node, the second node still handles the BYE and sends the OK to it :-)
