@@ -32,7 +32,7 @@ public class SipURITest extends junit.framework.TestCase {
 			{"sip:carol@chicago.com;security=off", "sip:carol@chicago.com;security=on"}
 	};
 	
-	private SipFactory sipFactory;
+	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {
 		SipFactories.initialize("gov.nist");

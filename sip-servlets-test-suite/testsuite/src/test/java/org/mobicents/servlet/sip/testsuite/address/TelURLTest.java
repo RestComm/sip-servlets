@@ -20,7 +20,7 @@ public class TelURLTest extends junit.framework.TestCase {
 			{"tel:+358-555-1234567;postd=pp23@foo.com;user=phone", "tel:+358-555-1234567;POSTD=PP22@foo.com;user=phone"}
 	};
 	
-	private SipFactory sipFactory;
+	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {
 		SipFactories.initialize("gov.nist");
