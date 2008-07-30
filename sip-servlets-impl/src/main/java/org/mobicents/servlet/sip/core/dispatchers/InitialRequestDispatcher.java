@@ -58,6 +58,7 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -90,7 +91,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
-		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
+		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isInfoEnabled()) {
 			logger.info("Routing of Initial Request " + sipServletRequest);
@@ -311,6 +312,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
 						"The Container hence stops routing the initial request.");
+				((SipStandardManager)sipContext.getSipManager()).dumpSipSessions();
 			}
 		} else {
 			if(logger.isDebugEnabled()) {
@@ -320,7 +322,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			try {
 				// the app that was called didn't do anything with the request
 				// in any case we should route back to container statefully 
-				sipServletRequest.addAppCompositionRRHeader();
+//				sipServletRequest.addAppCompositionRRHeader();
 				SipApplicationRouterInfo routerInfo = sipApplicationDispatcher.getNextInterestedApplication(sipServletRequest);
 				if(routerInfo.getNextApplicationName() != null) {
 					if(logger.isDebugEnabled()) {
@@ -351,9 +353,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				} catch (Exception e) {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
 				}
-			} catch (SipException e) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "an exception has occured when trying to forward statefully", e);
-			} catch (ParseException e) {
+			} 
+//			catch (SipException e) {
+//				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "an exception has occured when trying to forward statefully", e);
+//			} 
+			catch (ParseException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);					
 			}	
 		}

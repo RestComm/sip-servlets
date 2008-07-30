@@ -116,8 +116,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, Address from, Address to) {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to);
-		checkHandler(sipServletRequest);		
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, sipContext.getMainServlet());
 		return sipServletRequest;
 	}
 
@@ -126,8 +125,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, String from, String to) throws ServletParseException {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to);
-		checkHandler(sipServletRequest);		
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, sipContext.getMainServlet());
 		return sipServletRequest;
 	}
 
@@ -136,8 +134,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, URI from, URI to) {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to);
-		checkHandler(sipServletRequest);		
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, sipContext.getMainServlet());
 		return sipServletRequest;
 	}
 
@@ -149,20 +146,6 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(origRequest, sameCallId);
 		checkHandler(sipServletRequest);		
 		return sipServletRequest;
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String, java.lang.String)
-	 */
-	public SipURI createSipURI(String user, String host) {
-		return sipFactoryImpl.createSipURI(user, host);
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.servlet.sip.SipFactory#createURI(java.lang.String)
-	 */
-	public URI createURI(String uri) throws ServletParseException {
-		return sipFactoryImpl.createURI(uri);
 	}
 
 	/**
@@ -181,6 +164,20 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 				logger.error("Impossible to set the default handler on the newly created request "+ request.toString(),se);
 			} 
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String, java.lang.String)
+	 */
+	public SipURI createSipURI(String user, String host) {
+		return sipFactoryImpl.createSipURI(user, host);
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.sip.SipFactory#createURI(java.lang.String)
+	 */
+	public URI createURI(String uri) throws ServletParseException {
+		return sipFactoryImpl.createURI(uri);
 	}
 	
 	/**

@@ -342,7 +342,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 					this.sipApplicationSession,
 					method,
 					this.getLocalParty(),
-					this.getRemoteParty());			
+					this.getRemoteParty(),
+					handlerServlet);			
 			}
 		}
 		//Application Routing :

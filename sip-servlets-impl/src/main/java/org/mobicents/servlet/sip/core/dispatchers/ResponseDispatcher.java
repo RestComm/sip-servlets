@@ -67,7 +67,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
-		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
+		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
 		final Response response = sipServletResponse.getResponse();
 		final ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
@@ -146,10 +146,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					if(session == null && sipManager instanceof SipStandardManager) {
 						((SipStandardManager)sipManager).dumpSipSessions();
 					}
-				}	
-				if(logger.isInfoEnabled()) {
-					logger.info("route response on following session " + sessionKey);
-				}
+				}					
 				
 				if(session == null) {
 					logger.error("Dropping the response since no active sip session has been found for it : " + response);
@@ -157,6 +154,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 				} else {
 					sipServletResponse.setSipSession(session);
 				}			
+				
+				if(logger.isInfoEnabled()) {
+					logger.info("route response on following session " + session.getId());
+				}
 				
 				try {
 					// See if this is a response to a proxied request

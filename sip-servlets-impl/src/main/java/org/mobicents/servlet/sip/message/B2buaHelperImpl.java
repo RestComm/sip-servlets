@@ -58,12 +58,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 
 /**
  * Implementation of the B2BUA helper class.
@@ -137,7 +139,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			newRequest.removeHeader(RecordRouteHeader.NAME);
 			
 			//For non-REGISTER requests, the Contact header field is not copied 
-			//but is populated by the container as usual
+			//but is populated by the container as usualB2buaHelperImpl
 			if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
 				newRequest.removeHeader(ContactHeader.NAME);
 			}
@@ -146,12 +148,20 @@ public class B2buaHelperImpl implements B2buaHelper {
 					newRequest);			
 			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			MobicentsSipApplicationSession appSession = originalSession
-					.getSipApplicationSession();				
+					.getSipApplicationSession();	
+			
+			FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
+			FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
+			
+			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(oldFromHeader.getTag());
+			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
+					originalSession.getKey().getApplicationName(), originalSession.getHandler()));
+			newFromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			MobicentsSipSession session = ((SipManager)appSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, appSession);			
+			MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
-						
+		
 			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,					
@@ -175,7 +185,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 				sessionMap.put(originalSession, session);
 				sessionMap.put(session, originalSession);				
 			}
-
+			
 			return newSipServletRequest;
 		} catch (Exception ex) {
 			logger.error("Unexpected exception ", ex);

@@ -17,13 +17,16 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -31,7 +34,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
@@ -72,7 +78,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
-		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
+		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isInfoEnabled()) {
 			logger.info("Routing of Subsequent Request " + sipServletRequest);
@@ -235,6 +241,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			// Check if the request is meant for me. 
 			RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
+			
+			if(logger.isInfoEnabled()) {
+				logger.info("Checking route header " + routeHeader + " to know what to do next with the subsequent request " + request.toString());
+			}
 			if(routeHeader == null || sipApplicationDispatcher.isRouteExternal(routeHeader)) {
 				// no route header or external, send outside the container
 				// FIXME send it statefully
@@ -242,19 +252,25 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					try{
 						sipProvider.sendRequest((Request)request.clone());
 						if(logger.isInfoEnabled()) {
-							logger.info("Subsequent Request dispatched outside the container" + request.toString());
+							logger.info("Subsequent Request dispatched outside the container " + request.toString());
 						}
 					} catch (Exception ex) {			
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Error sending request",ex);
 					}	
 				} else {
 					try{
+						if(logger.isInfoEnabled()) {
+							logger.info("Subsequent Request forwarded statefully " + request.toString());
+						}
 						forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
 					} catch (Exception e) {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
 					}
 				}
-			} else {		
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("Subsequent Request forwarded statefully " + request.toString());
+				}
 				//route header is meant for the container hence we continue
 				try {
 					forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);

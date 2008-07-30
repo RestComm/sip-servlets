@@ -379,11 +379,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
 			
-			if(routeHeader == null) {
+			if(routeHeader == null && !isExternal(((javax.sip.address.SipURI)request.getRequestURI()).getHost(), ((javax.sip.address.SipURI)request.getRequestURI()).getPort(), ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam())) {
 				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
-				javax.sip.address.SipURI arUri = (javax.sip.address.SipURI)toHeader.getAddress().getURI();
-				String arText = arUri.getParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
-				ApplicationRoutingHeaderStack ar = new ApplicationRoutingHeaderStack(arText);
+				String arText = toHeader.getTag();
+				ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(arText);
 				
 				javax.sip.address.SipURI localUri = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -394,8 +393,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					javax.sip.address.Address address = 
 						SipFactories.addressFactory.createAddress(localUri);
 					routeHeader = SipFactories.headerFactory.createRouteHeader(address);
-					ar.removeLast();
-					arUri.setParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM, ar.toString());
+					//ar.removeLast();
+					//toHeader.setTag(ar.toString());
 				}
 			}
 			//Popping the router header if it's for the container as
@@ -696,7 +695,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipFactory()
 	 */
-	public SipFactory getSipFactory() {
+	public SipFactoryImpl getSipFactory() {
 		return sipFactoryImpl;
 	}
 

@@ -77,15 +77,21 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderStack;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
@@ -708,7 +714,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    		message.addHeader(viaHeader);
 		    	}
 		    }
-			
+		    
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
@@ -719,10 +725,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(request.getMethod())) {
 				// Additional checks for https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29
-				if(getSipSession().getProxyBranch() == null ||
-						(transactionApplicationData.getProxy() != null &&
-						transactionApplicationData.getProxy().getRecordRoute())) // If the app is proxying it already does that
+				if(transactionApplicationData.getProxy() != null &&
+						transactionApplicationData.getProxy().getRecordRoute()) // If the app is proxying it already does that
 				{
+					if(logger.isDebugEnabled()) {
+						logger.debug("Add a record route header for app composition ");
+					}
+					((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
 					//Add a record route header for app composition		
 					addAppCompositionRRHeader();	
 				}
@@ -742,7 +751,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 			}
-			
+			((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
 			if (super.getTransaction() == null) {
 
 				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
@@ -830,6 +839,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						session.getSipApplicationSession().getSipContext().getMainServlet());
 			}
 			
+			((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
 					|| getDialog().getState() == DialogState.EARLY) {
@@ -848,7 +858,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 //			super.session.addOngoingTransaction(getTransaction());
 			//updating the last accessed times 
 			getSipSession().access();
-			getSipSession().getSipApplicationSession().access();
+			getSipSession().getSipApplicationSession().access();			
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request",ex);
 		}
@@ -878,7 +888,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	/**
-	 * Add a record route header for app composition (we use a custom route header called Mobicents-Sip-Servlets-App-Route-Header)
+	 * Add a record route header for app composition
 	 * @throws ParseException if anything goes wrong while creating the record route header
 	 * @throws SipException 
 	 * @throws NullPointerException 
@@ -886,28 +896,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void addAppCompositionRRHeader()
 			throws ParseException, SipException {
 		Request request = (Request) super.message;
-		
-		FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
-		javax.sip.address.SipURI fromHeaderUri = (javax.sip.address.SipURI) fromHeader.getAddress().getURI();
-		
-		String applicationRouteText = fromHeaderUri.getParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM);
-		ApplicationRoutingHeaderStack stack = new ApplicationRoutingHeaderStack(applicationRouteText);
-		String app = session.getKey().getApplicationName();
-		String handler = session.getHandler();
-		ApplicationRoutingHeaderStack.ApplicationRouterNode node = new ApplicationRoutingHeaderStack.ApplicationRouterNode(app, handler);
-		stack.addNode(node);
-		fromHeaderUri.setParameter(MessageDispatcher.MOBICENTS_URI_ROUTE_PARAM, stack.toString());
-		
-		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
-				sipFactoryImpl.getSipNetworkInterfaceManager(), 
-				JainSipUtils.findTransport(request));
-		sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
-		sipURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, session.getHandler());
-		
-		sipURI.setLrParam();
-		javax.sip.address.Address recordRouteAddress = 
-			SipFactories.addressFactory.createAddress(sipURI);
-
+        
+        javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
+                        sipFactoryImpl.getSipNetworkInterfaceManager(), 
+                        JainSipUtils.findTransport(request));
+        sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
+        sipURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, session.getHandler());
+        
+        sipURI.setLrParam();
+        javax.sip.address.Address recordRouteAddress = 
+                SipFactories.addressFactory.createAddress(sipURI);
+        RecordRouteHeader recordRouteHeader = 
+                SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
+        request.addFirst(recordRouteHeader);
 	}
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {

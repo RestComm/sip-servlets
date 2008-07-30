@@ -53,6 +53,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -64,7 +65,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
-public class SipFactoryImpl implements SipFactory, Serializable {
+public class SipFactoryImpl implements Serializable {
 	private static final transient Log logger = LogFactory.getLog(SipFactoryImpl.class
 			.getCanonicalName());
 
@@ -185,7 +186,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 *      javax.servlet.sip.Address)
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
-			String method, Address from, Address to) {
+			String method, Address from, Address to, String handler) {
 		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
@@ -197,7 +198,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 
 		validateCreation(method, sipAppSession);
 
-		return createSipServletRequest(sipAppSession, method, from, to);
+		return createSipServletRequest(sipAppSession, method, from, to, handler);
 	}
 
 	/*
@@ -207,7 +208,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 *      java.lang.String, javax.servlet.sip.URI, javax.servlet.sip.URI)
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
-			String method, URI from, URI to) {
+			String method, URI from, URI to, String handler) {
 		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
@@ -222,7 +223,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA);
+		return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
 
 	}
 
@@ -233,7 +234,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 *      java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
-			String method, String from, String to) throws ServletParseException {
+			String method, String from, String to, String handler) throws ServletParseException {
 		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
@@ -249,7 +250,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA);
+		return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
 
 	}
 
@@ -345,7 +346,7 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 	 */
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
-			Address to) {
+			Address to, String handler) {
 		
 		MobicentsSipApplicationSession MobicentsSipApplicationSession = (MobicentsSipApplicationSession) sipAppSession;
 		
@@ -380,9 +381,9 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 			toAddress.setDisplayName(to.getDisplayName());
 
 
-			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);
-			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, ""
-					+ new Random().nextInt() );
+			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);				
+			
+			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, null);
 			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
 					MobicentsSipApplicationSession.getKey().getId());
 			maxForwardsHeader = SipFactories.headerFactory
@@ -445,11 +446,16 @@ public class SipFactoryImpl implements SipFactory, Serializable {
 //			if(routeHeader != null) {
 //				requestToWrap.addHeader(routeHeader);
 //			}
-
+			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer();
+			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
+					sipAppSession.getApplicationName(), handler));
+			fromHeader.setTag(stack.toString());
+			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
 					MobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
 			MobicentsSipSession session = ((SipManager)MobicentsSipApplicationSession.getSipContext().getManager()).
 				getSipSession(key, true, this, MobicentsSipApplicationSession);
+			session.setHandler(handler);
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,

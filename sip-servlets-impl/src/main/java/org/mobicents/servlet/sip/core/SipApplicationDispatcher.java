@@ -29,6 +29,7 @@ import javax.sip.header.ViaHeader;
 
 import org.apache.catalina.LifecycleException;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -106,7 +107,7 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * retrieve the sip factory
 	 * @return the sip factory
 	 */
-	SipFactory getSipFactory();
+	SipFactoryImpl getSipFactory();
 	/**
 	 * Returns An immutable instance of the java.util.List interface containing 
 	 * the SipURI representation of IP addresses which are used by the container to send out the messages.
