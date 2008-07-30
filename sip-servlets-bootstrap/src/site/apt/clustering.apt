@@ -1,25 +1,40 @@
-Clustering support
+Mobicents Sip Servlets Clustering support
 
 * Description
 	
-	For a good description of Mobicents fail-over system (and even give us some feeback about it), I invite to read the 
-	{{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}.\
-	You can only read Section 1 and 2 since following sections are for jslee.\
-	We will cover the Mobicents Sip Servlets specific Clustering implementation and configuration and an example below.
+	For a good description of Mobicents Sip Servlets clustering system I invite you to read the 
+	{{{http://docs.jboss.org/jbossas/jboss4guide/r4/html/cluster.chapt.html}JBoss Guide Clustering chapter}}.\
+	Since Mobicents Sip Servlets SIP Clustering support integrates tightly with the http session clustering implemented in JBoss, the Clustering is available only for JBoss and not Tomcat.
+	We will cover the Mobicents Sip Servlets specific Clustering implementation and configuration below.
 	
 * Implementation
 
-	
+	As for HTTP session replication, SIP session replication is used to replicate the state associated with your SIP clients on other nodes of a cluster. 
+	Thus, in the event one of your node crashes, another node in the cluster will be able to recover.\ 
+	Two distinct functions must be performed:
+
+    *	SIP Session state replication.  
+    
+    *	Load-balance of incoming invocations. {{{./load-balancer.html}See Mobicents SIP Load Balancer}}
+    
+    SIP Session State replication can be handled directly by JBoss. When you run JBoss in the all configuration, SIP session state replication can be enabled. 
+    See below on how to configure the server to enable it.
+
+	SIP Session State replication is comprised of two things : the replication of your sip application session and the underlying sip sessions belonging to that application.
+	JBoss Cache and JGroups technologies are used as the underlying replication mechanism.
 	
 * Installation & Configuration
 
-		
-
-* Step-By-Step Example
-
-
+	First of all, to enable SIP Session State Clustering in addition to HTTP Session clustering, you'll need to use the 'all' configuration profile of your Jboss server.\
+	So repeat the steps described in the {{{./installation-jboss.html}JBoss Installation Section}} but for the 'all' configuration profile instead of the 'default' configuration profiles to make the 'all' profile SIP-enbaled.\
+	Now to enable clustering, you'll need to modify one more file : 
+	
+	In jboss_home/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml, modify the attribute <<<ManagerClass>>> so that its value is <<<org.jboss.web.tomcat.service.session.JBossCacheSipManager>>> instead of <<<org.jboss.web.tomcat.service.session.JBossCacheManager>>>
+	
+	You also need to make your SIP Servlets application distributable. To do that, in the sip.xml and web.xml of your application add the following tag <<<<distributable/>>>>. See Section 16.5.6 of {{{http://docs.jboss.org/jbossas/jboss4guide/r4/html/cluster.chapt.html}JBoss Guide Clustering chapter}}. 
+	  
+	To test clustering please refer to the {{{./failover.html}Failover Section}}.
 		
 * Limitations
 
-	Mobicents Sip Servlets doesn't currently support clustering of proxy or B2BUA sip applications only UA sip applications.
-	To check our progess, check out {{{http://code.google.com/p/mobicents/issues/detail?id=}Issue }} and {{{http://code.google.com/p/mobicents/issues/detail?id=}Issue}} from time to time as we are working on it. 
+	Mobicents Sip Servlets doesn't currently support clustering of proxy, B2BUA sip applications and converged applications only UA pure sip applications. 

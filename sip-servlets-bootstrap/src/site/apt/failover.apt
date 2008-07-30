@@ -1,4 +1,4 @@
-Failover support
+Mobicents Sip Servlets Failover support
 
 * Description
 	
@@ -9,17 +9,61 @@ Failover support
 	
 * Implementation
 
+	As in Mobicents JSLEE, Mobicents Sip Servlets uses no standby nodes, so typically in this configuration
+	 proxies/registrars will need to share the user location table by using a database cluster.    
+	
+	The Mobicents Sip Balancer (Sip Call-Id aware load-balancer) will be used as the man in the middle, forwarding (transaction statefully) requests to any of the different nodes of the cluster.
+	
+	This implementation has many pros :
+	
+		* No need for standby nodes, because the remaining nodes take over the load of the failed node as both the Mobicents SIP load Balancer and Mobicents Sip Servlets support mid-call failover.
+		
+		* No need to make sure requests are directed to the right node, as all nodes can serve requests to any users
+		
+		* All hardware is in use, reducing costs
+		
+		* Maintenance is easier, as all nodes have equal configurations		
 	
 	
 * Installation & Configuration
 
-		
+	Please refer to {{{./load-balancer.html}Mobicents SIP Load Balancer}} and {{{./clustering.html}Mobicents Sip Servlets Clustering}}. Both combined will make mid call failover available for your application.  		
 
 * Step-By-Step Example
 
+	We provide an example to run the Mobicents Sip Servelts cluster (comprised of 2 nodes), the load balancer and client application on the same machine for ease of testing purposes.
 	
+	Please checkout {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/sipp-scenarios/clustering}our clustering and mid-call failover example}} and follow the README.txt instructions.
+	
+	Here is the modifications needed to run two application servers running at the same time on the same machine. (Those steps are done in the above example as part of the prepare-jboss-server-for-clustering-failover.sh script)
+	
+	As we need two application servers running at the same time, we must avoid any conflict. For instance we will need JBoss Tomcat to bind its socket on two different ports otherwise a network conflict will occur. 
+	We will leverage the service binding manager {{{http://docs.jboss.org/jbossas/jboss4guide/r3/html/ch10.html}this chapter}} of the JBoss AS documentation.
+
+	The first step is to copy the all configuration of JBoss into two separate configurations that we name ports-01 and ports-02 :
+
+	<<<cd JBOSS_HOME/server>>>\
+	<<<cp -r all ports-01>>>\
+	<<<cp -r all ports-02>>>
+
+	Edit the file <<<JBOSS_HOME/server/ports-01/conf/jboss-service.xml>>> and uncomment the service binding manager :
+
+	<<<<mbean code="org.jboss.services.binding.ServiceBindingManager">>>\
+   		<<<name="jboss.system:service=ServiceBindingManager">>>>\
+   		<<<<attribute name="ServerName">ports-01</attribute>>>>\
+   		<<<<attribute name="StoreURL">$\{jboss.home.url\}/docs/examples/binding-manager/sample-bindings.xml</attribute>>>>\
+   		<<<<attribute name="StoreFactoryClassName">org.jboss.services.binding.XMLServicesStoreFactory</attribute>>>>\
+	<<<</mbean>>>>
+
+	Edit the file <<<JBOSS_HOME/server/ports-02/conf/jboss-service.xml>>>, uncomment the service binding manager and change the value ports-01 into ports-02:
+
+	<<<<mbean code="org.jboss.services.binding.ServiceBindingManager">>>\
+   		<<<name="jboss.system:service=ServiceBindingManager">>>>\
+   		<<<<attribute name="ServerName">node-02</attribute>>>>\
+   		<<<<attribute name="StoreURL">$\{jboss.home.url\}/docs/examples/binding-manager/sample-bindings.xml</attribute>>>>\
+   		<<<<attribute name="StoreFactoryClassName">org.jboss.services.binding.XMLServicesStoreFactory</attribute>>>>\
+	<<<</mbean>>>>
 		
 * Limitations
 
-	Mobicents Sip Servlets doesn't currently support mid call failover for proxy or B2BUA sip applications only UA sip applications.
-	To check our progess, check out {{{http://code.google.com/p/mobicents/issues/detail?id=}Issue }} and {{{http://code.google.com/p/mobicents/issues/detail?id=}Issue}} from time to time as we are working on it. 
+	Mobicents Sip Servlets doesn't currently support mid call failover for proxy, B2BUA pure sip applications or converged applications only UA pure sip applications.

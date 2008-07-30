@@ -1,31 +1,38 @@
-SIP Load Balancer
+Mobicents SIP Load Balancer
 
 * Description
 	
-	For a good description of Mobicents fail-over system (and even give us some feeback about it), I invite to read the 
-	{{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}.\
-	You can only read Section 1 and 2 since following sections are for jslee.\
-	We will cover the Mobicents Sip Servlets specific load balancer implementation, configuration and an example below.
+	The Mobicents SIP Load Balancer is used to load balance SIP related services, in order to achieve performance scalability and high availability of the services.
+	
+	The Mobicents SIP Load Balancer is a very simple proxy that is useful in SIP-based VoIP installations where there are multiple ingress proxy servers.
+	
+	The Mobicents SIP Load Balancer permits pooling these servers, thereby eliminating the need to balance user demands for connectivity through a complicated provisioning algorithm.
+	 
+	All users can send their INVITEs and REGISTERs to the same SIP URI and the Load Balancer will assign ingress proxy servers dynamically to each transaction. 
+	In this way, the traffic load is balanced over a pool of proxy servers based on the real-time demand for services.
+	
+	The Mobicents SIP Load Balancer will distribute requests across the healthy and available instances in cluster to increase throughput of the overall system. 
+	It can also fail-over mid-call requests from unhealthy/inaccessible instances to healthy and available instances.
+
+	More information can also be found in the {{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}. 
+	
+	We will now cover the Mobicents SIP Load Balancer implementation, configuration and an example below.
 	
 * Implementation
 
-	As in Mobicents JSLEE, Mobicents Sip Servlets uses no standby nodes, so typically in this configuration
-	 proxies/registrars will need to share the user location table by using a database cluster.    
+	The Mobicents SIP Load Balancer receives SIP requests from endpoints on a port that is specified in a configuration file.
 	
-	The Mobicents Sip Balancer (Sip Call-Id aware load-balancer) will be used as the man in the middle, forwarding (transaction statefully) requests to any of the different nodes of the cluster.
+	It then select nodes to serve the SIP requests through a round-robin algorithm for load-balancing picking up nodes from a list of Mobicents Sip Servlets nodes 
+	that is created at runtime. The different nodes are responsible for contacting the load balancer and sending to it heartbeats and health status.
 	
-	This implementation has many pros :
+	It then forwards the SIP requests through a different port to the selected node.\
+	It maintains stickiness of requests in a session to a single node as long as the serving node is healthy and available.
+
+	The Mobicents SIP Load Balancer adds itself to the Via header of requests to enable responses to return to the Mobicents SIP Balancer before being sent to orginating endpoint.\
+	It also adds itself to the path of subsequent requests by adding record route headers. Thus it can handle mid call failover by forwarding subsequent requests to a different node
+	in the cluster if the node that originally handled the initial request when down. 
 	
-		* No need for standby nodes, because the remaining nodes take over the load of the failed node
-		
-		* No need to make sure requests are directed to the right node, as all nodes can serve requests to any users
-		
-		* All hardware is in use, reducing costs
-		
-		* Maintenance is easier, as all nodes have equal configurations	
-	
-	The different nodes are responsible for contacting the Mobicents Sip Balancer and 
-	sending to it liveness heartbeats and status health.
+	As said above, the different nodes are responsible for contacting the Mobicents Sip Load Balancer and sending to it liveness heartbeats and status health.
 	
 	For Mobicents Sip Servlets this is done in extending the 
 	<<<SipStandardService>>> class which already extends the Tomcat <<<StandardService>>> class implementing the Tomcat <<<Service>>> interface.\
@@ -33,7 +40,8 @@ SIP Load Balancer
 	ties one or more Connectors to exactly one Engine.
 	
 	So when the service is started the new <<<SipStandardBalancerNodeService>>> looks up its configuration and gather the address(es) of the Sip Balancer(s) and
-	sends a heartbeat and health status to it(them) to make it(them)selves known as an available node of the cluster.\
+	sends a heartbeat and health status to it(them) to make it(them)selves known as an available node of the cluster.
+	
 	The different parameters of the node are configurable through its MBean interface, see Section below for more information on configuration.
 	
 * Installation & Configuration
@@ -77,8 +85,12 @@ SIP Load Balancer
 	
 	* From first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done
 	
-	* Now stop one of the 2 nodes, wait a bit like 5 seconds and try again : From first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done 
+	* Redo it another, from first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done. The request should have been handled by the other node 
 	
-* Limitations
+* Current Limitations
 
-	Mobicents Sip Servlets in Tomcat Version doesn't support mid-call failover onmly the JBoss version does and this will stay that way. 
+	* It can handle only SIP(S) requests not and HTTP(S).
+	
+	* It cannot load-balance converged application (application having web and sip components) or pure web applications, only sip applications.
+	
+	

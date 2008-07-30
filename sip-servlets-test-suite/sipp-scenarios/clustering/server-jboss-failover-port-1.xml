@@ -54,7 +54,7 @@
     	 logLevel="DEBUG"
 	     debugLog = "logs/jsip-debug-cluster-port-1.txt" 
 		 serverLog = "logs/jsip-log-cluster-port-1.xml"
-	     sipStackName="SIP-Servlet-Jboss-Server" 
+	     sipStackName="SIP-Servlet-Jboss-Server-Port-1" 
 	     sipPathName="gov.nist"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
