@@ -35,6 +35,13 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
+	@Override
+	protected void doBranchResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		resp.getApplicationSession().setAttribute("doBranchResponse", "true");
+		super.doBranchResponse(resp);
+	}
+
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
 	private static String TEST_REINVITE_USERNAME = "reinvite";
 	private static String TEST_CANCEL_USERNAME = "cancel";
@@ -109,7 +116,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 
 		logger.info("Got BYE request: " + request);
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-		sipServletResponse.send();
+		
+		// Force fail by not sending OK if the doBranchResponse is called. In non-proxy app
+		// this would be wrong.
+		if(!"true".equals(request.getApplicationSession().getAttribute("doBranchResponse")))
+			sipServletResponse.send();
 	}	
 
 	// SipErrorListener methods
