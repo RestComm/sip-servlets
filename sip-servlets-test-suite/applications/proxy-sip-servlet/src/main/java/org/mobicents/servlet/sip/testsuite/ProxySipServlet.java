@@ -41,6 +41,14 @@ import org.apache.commons.logging.LogFactory;
 public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
+	@Override
+	protected void doBranchResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		logger.info("doBranchResponse callback was called.");
+		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");
+		super.doBranchResponse(resp);
+	}
+
 	private static Log logger = LogFactory.getLog(ProxySipServlet.class);
 	
 	private static String USE_HOSTNAME= "useHostName";
@@ -122,7 +130,12 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 
 		logger.info("Got BYE request:\n" + request);
 		SipServletResponse sipServletResponse = request.createResponse(200);
-		sipServletResponse.send();
+		
+		// If the branchResponse callback was called we are good otherwise fail by
+		// not delivering OK to BYE
+		String doBranchRespValue = (String) request.getApplicationSession().getAttribute("branchResponseReceived");
+		if("true".equals(doBranchRespValue))
+			sipServletResponse.send();
 	}
 
 	/**
@@ -152,5 +165,6 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 	public void noPrackReceived(SipErrorEvent ee) {
 		logger.error("noPrackReceived.");
 	}
+	
 
 }
