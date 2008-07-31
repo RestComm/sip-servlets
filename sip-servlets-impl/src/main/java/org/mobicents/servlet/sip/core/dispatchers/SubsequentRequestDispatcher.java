@@ -17,16 +17,13 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
-import javax.sip.address.SipURI;
 import javax.sip.header.RouteHeader;
-import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -34,10 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
-import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
-import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
@@ -103,14 +97,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		//Extract information from the Record Route Header		
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
-		String handlerName = poppedAddress.getParameter(RR_PARAM_HANDLER_NAME);
 		String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
 		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
 		if(generatedApplicationKey != null) {
 			generatedApplicationKey = RFC2396UrlDecoder.decode(generatedApplicationKey);
 		}
-		if(applicationName == null || applicationName.length() < 1 || 
-				handlerName == null || handlerName.length() < 1) {
+		if(applicationName == null || applicationName.length() < 1) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}

@@ -48,19 +48,17 @@ public class ApplicationRoutingHeaderComposer {
 		
 		// Otherwise extract the uniqueValue from the tag string, it's the first token.
 		uniqueValue = txtNodes[0];
-		for(int q = 1; q<txtNodes.length; q+=2) {
-			ApplicationRouterNode arNode = new ApplicationRouterNode(txtNodes[q], txtNodes[q+1]);
+		for(int q = 1; q<txtNodes.length; q+=1) {
+			ApplicationRouterNode arNode = new ApplicationRouterNode(txtNodes[q]);
 			this.nodes.add(arNode);
 		}
 	}
 	
 	public static class ApplicationRouterNode {
-		public ApplicationRouterNode(String app, String handler) {
+		public ApplicationRouterNode(String app) {
 			this.application = app;
-			this.handler = handler;
 		}
 		public String application;
-		public String handler;
 	}
 	
 	public void addNode(ApplicationRouterNode node) {
@@ -79,7 +77,7 @@ public class ApplicationRoutingHeaderComposer {
 	public String toString() {
 		String text = uniqueValue + TOKEN_SEPARATOR;
 		for(int q=0; q<this.nodes.size(); q++) {
-			text += this.nodes.get(q).application + TOKEN_SEPARATOR + this.nodes.get(q).handler +TOKEN_SEPARATOR;
+			text += this.nodes.get(q).application + TOKEN_SEPARATOR;
 		}
 		if(text.length()>0)
 			text = text.substring(0, text.length() - 1);

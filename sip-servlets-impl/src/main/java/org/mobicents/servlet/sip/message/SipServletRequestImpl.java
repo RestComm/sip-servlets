@@ -831,13 +831,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					session.getKey().getApplicationName());
-			if(session.getHandler() != null && session.getHandler().length() > 0) {
-				viaHeader.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME,
-					session.getHandler());
-			} else {
-				viaHeader.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME,
-						session.getSipApplicationSession().getSipContext().getMainServlet());
-			}
 			
 			((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
 			// If dialog does not exist or has no state.
@@ -901,7 +894,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
                         sipFactoryImpl.getSipNetworkInterfaceManager(), 
                         JainSipUtils.findTransport(request));
         sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
-        sipURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, session.getHandler());
         
         sipURI.setLrParam();
         javax.sip.address.Address recordRouteAddress = 

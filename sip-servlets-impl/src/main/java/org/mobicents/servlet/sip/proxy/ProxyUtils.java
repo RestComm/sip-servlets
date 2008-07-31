@@ -147,8 +147,6 @@ public class ProxyUtils {
 				
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 						originalRequest.getSipSession().getKey().getApplicationName());
-				rrURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME,
-						originalRequest.getSipSession().getHandler());
 				rrURI.setLrParam();
 				
 				Address rraddress = SipFactories.addressFactory

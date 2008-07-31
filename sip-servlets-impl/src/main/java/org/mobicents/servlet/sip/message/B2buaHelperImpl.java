@@ -65,7 +65,6 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 
 /**
  * Implementation of the B2BUA helper class.
@@ -155,7 +154,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(oldFromHeader.getTag());
 			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
-					originalSession.getKey().getApplicationName(), originalSession.getHandler()));
+					originalSession.getKey().getApplicationName()));
 			newFromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);

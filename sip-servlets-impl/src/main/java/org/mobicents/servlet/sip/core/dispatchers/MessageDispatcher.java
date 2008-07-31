@@ -19,8 +19,6 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -30,13 +28,9 @@ import javax.sip.header.CallIdHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.web.tomcat.service.session.ClusteredSipSession;
-import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -65,10 +59,6 @@ public abstract class MessageDispatcher {
 	 * This parameter is to know which app handled the request 
 	 */
 	public static final String RR_PARAM_APPLICATION_NAME = "appname";
-	/* 
-	 * This parameter is to know which servlet handled the request 
-	 */
-	public static final String RR_PARAM_HANDLER_NAME = "handler";
 	/* 
 	 * This parameter is to know if a servlet application sent a final response
 	 */

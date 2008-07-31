@@ -448,7 +448,7 @@ public class SipFactoryImpl implements Serializable {
 //			}
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer();
 			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
-					sipAppSession.getApplicationName(), handler));
+					sipAppSession.getApplicationName()));
 			fromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(

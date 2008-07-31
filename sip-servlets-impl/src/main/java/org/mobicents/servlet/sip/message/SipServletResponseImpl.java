@@ -344,7 +344,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						transport
 						);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
-				sipURI.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, session.getHandler());
 				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");
 				if(session.getSipApplicationSession().getKey().isAppGeneratedKey()) {
 					sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(session.getSipApplicationSession().getKey().getId()));

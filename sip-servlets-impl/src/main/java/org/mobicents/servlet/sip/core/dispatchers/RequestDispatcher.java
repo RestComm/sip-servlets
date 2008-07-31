@@ -29,8 +29,6 @@ import javax.sip.Transaction;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.RouteHeader;
-import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -39,7 +37,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
@@ -87,8 +84,6 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				if(handlerName != null) { 
 					viaHeader.setParameter(RR_PARAM_APPLICATION_NAME,
 							sipServletRequest.getSipSession().getKey().getApplicationName());
-					viaHeader.setParameter(RR_PARAM_HANDLER_NAME,
-							sipServletRequest.getSipSession().getHandler());					
 				} else {				
 					// if the handler name is null it means that the app returned by the AR was not deployed
 					// and couldn't be called, 
@@ -161,41 +156,10 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Dialog existing " + (dialog != null));
 		}
-//		RouteHeader routeHeader = (RouteHeader) clonedRequest
-//			.getHeader(RouteHeader.NAME);
-//		boolean addRouteHeaderForRoutingBackToContainer = false;
-//		if(routeHeader == null && !sipApplicationDispatcher.isExternal(((javax.sip.address.SipURI)clonedRequest.getRequestURI()).getHost(), ((javax.sip.address.SipURI)clonedRequest.getRequestURI()).getPort(), ((javax.sip.address.SipURI)clonedRequest.getRequestURI()).getTransportParam())) {
-//			ToHeader toHeader = (ToHeader) clonedRequest.getHeader(ToHeader.NAME);
-//			String arText = toHeader.getTag();
-//			ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(arText);
-//			
-//			javax.sip.address.SipURI localUri = JainSipUtils.createRecordRouteURI(
-//					sipNetworkInterfaceManager, 
-//					JainSipUtils.findTransport(clonedRequest));
-//			if(arText != null) {
-//				try {
-//					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getLast().application);
-//					localUri.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, ar.getLast().handler);						
-//					javax.sip.address.Address address = 
-//						SipFactories.addressFactory.createAddress(localUri);
-//					routeHeader = SipFactories.headerFactory.createRouteHeader(address);
-//					addRouteHeaderForRoutingBackToContainer = true;
-//				} catch (Exception ex) {			
-//					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Error sending request",ex);
-//				}
-//			}
-//		}
-//		if(logger.isDebugEnabled()) {
-//			logger.debug("addRouteHeaderForRoutingBackToContainer " + addRouteHeaderForRoutingBackToContainer);
-//		}
 		if(dialog == null) {			
 			Transaction transaction = ((TransactionApplicationData)
 					serverTransaction.getApplicationData()).getSipServletMessage().getTransaction();
 			if(transaction == null || transaction instanceof ServerTransaction) {
-//				if(addRouteHeaderForRoutingBackToContainer) {
-//					clonedRequest.addFirst(routeHeader);
-//					clonedRequest.setRequestURI(routeHeader.getAddress().getURI());
-//				}
 				ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
 				//keeping the server transaction in the client transaction's application data
 				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
@@ -229,10 +193,6 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 	            	dialogRequest.setContent(content,contentTypeHeader);
 	        	}
 	        }
-//	        if(addRouteHeaderForRoutingBackToContainer) {
-//	        	dialogRequest.addFirst(routeHeader);
-//	        	dialogRequest.setRequestURI(routeHeader.getAddress().getURI());
-//	        }
             // Copy all the headers from the original request to the 
             // dialog created request:	
 	        // => not needed already done by the clone method

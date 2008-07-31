@@ -389,12 +389,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						JainSipUtils.findTransport(request));
 				if(arText != null) {
 					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getLast().application);
-					localUri.setParameter(MessageDispatcher.RR_PARAM_HANDLER_NAME, ar.getLast().handler);
 					javax.sip.address.Address address = 
 						SipFactories.addressFactory.createAddress(localUri);
 					routeHeader = SipFactories.headerFactory.createRouteHeader(address);
-					//ar.removeLast();
-					//toHeader.setTag(ar.toString());
 				}
 			}
 			//Popping the router header if it's for the container as
