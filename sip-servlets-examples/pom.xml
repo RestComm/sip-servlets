@@ -25,6 +25,7 @@
 		<module>media-playback-servlet</module>
 		<module>shopping-demo</module>
 		<module>simple-sip-servlet</module>
+		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
 		<module>uac-register</module>
 	</modules>
