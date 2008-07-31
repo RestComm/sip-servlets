@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.core;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +34,6 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
@@ -75,6 +76,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
@@ -116,6 +118,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private SipApplicationRouter sipApplicationRouter = null;
 	//map of applications deployed
 	private Map<String, SipContext> applicationDeployed = null;
+	//map hashes to app names
+	private Map<String, String> mdToApplicationName = null;
+
 	//List of host names managed by the container
 	private List<String> hostNames = null;
 	
@@ -130,6 +135,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public SipApplicationDispatcherImpl() {
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
+		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		sipFactoryImpl = new SipFactoryImpl(this);
 		sessionManager = new SessionManagerUtil();
 		hostNames = new CopyOnWriteArrayList<String>();
@@ -294,7 +300,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isDebugEnabled()) {
 			logger.debug("Adding the following sip servlet application " + sipApplicationName + ", SipContext=" + sipApplication);
 		}
+
 		applicationDeployed.put(sipApplicationName, sipApplication);
+
+		mdToApplicationName.put(GenericUtils.hashString(sipApplicationName), sipApplicationName);
+		
 		List<String> newlyApplicationsDeployed = new ArrayList<String>();
 		newlyApplicationsDeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
@@ -318,6 +328,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		applicationsUndeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
 		((SipManager)sipContext.getManager()).removeAllSessions();
+		mdToApplicationName.remove(GenericUtils.hashString(sipApplicationName));
 		if(logger.isInfoEnabled()) {
 			logger.info("the following sip servlet application has been removed : " + sipApplicationName);
 		}
@@ -382,13 +393,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(routeHeader == null && !isExternal(((javax.sip.address.SipURI)request.getRequestURI()).getHost(), ((javax.sip.address.SipURI)request.getRequestURI()).getPort(), ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam())) {
 				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 				String arText = toHeader.getTag();
-				ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(arText);
+				ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(this.mdToApplicationName, arText);
 				
 				javax.sip.address.SipURI localUri = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
 						JainSipUtils.findTransport(request));
 				if(arText != null) {
-					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getLast().application);
+					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getLast().getApplication());
 					javax.sip.address.Address address = 
 						SipFactories.addressFactory.createAddress(localUri);
 					routeHeader = SipFactories.headerFactory.createRouteHeader(address);
@@ -605,6 +616,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
 		}
+	}
+
+	public Map<String, String> getMdToApplicationName() {
+		return mdToApplicationName;
 	}
 	
 	/**

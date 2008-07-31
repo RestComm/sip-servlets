@@ -446,7 +446,11 @@ public class SipFactoryImpl implements Serializable {
 //			if(routeHeader != null) {
 //				requestToWrap.addHeader(routeHeader);
 //			}
-			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer();
+			
+			SipApplicationDispatcher dispatcher = 
+				MobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
+			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
+					dispatcher.getMdToApplicationName());
 			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
 					sipAppSession.getApplicationName()));
 			fromHeader.setTag(stack.toString());

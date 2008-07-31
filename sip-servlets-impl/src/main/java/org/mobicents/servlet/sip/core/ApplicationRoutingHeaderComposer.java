@@ -1,7 +1,10 @@
 package org.mobicents.servlet.sip.core;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
+
+import org.mobicents.servlet.sip.GenericUtils;
 
 /**
  * This class manipulates strings representing the AR stack for cases when the container
@@ -15,50 +18,66 @@ import java.util.Random;
 public class ApplicationRoutingHeaderComposer {
 	
 	private static Random random = new Random();
-	private static final String TOKEN_SEPARATOR = "!";
-	
+	private static final String TOKEN_SEPARATOR = "_";
 	
 	private static String randomString() {
-		long randValue = random.nextLong() ^ System.currentTimeMillis();
+		long randValue = Math.abs(random.nextLong() ^ System.currentTimeMillis());
 		return String.valueOf(randValue);
 	}
 	
 	private String uniqueValue;
+	
+	private Map<String, String> mdToAppName = null;
 
 	private ArrayList<ApplicationRouterNode> nodes = new ArrayList<ApplicationRouterNode>();
 	
-	public ApplicationRoutingHeaderComposer() {
-		this(null);
+	public ApplicationRoutingHeaderComposer(Map<String, String> hashMap) {
+		this(hashMap, null);
 	}
 	
-	public ApplicationRoutingHeaderComposer(String text) {
+	public ApplicationRoutingHeaderComposer(Map<String, String> hashMap, String text) {
+		this.mdToAppName = hashMap;
+		
 		if(text == null) {
 			uniqueValue = randomString();
 			return;
 		}
 		
-		String[] txtNodes = text.split(TOKEN_SEPARATOR);
+		String[] tokens = text.split(TOKEN_SEPARATOR);
 		
 		// If there is no AR in the string, generate a uniqueValue for the tag
 		// and it will be stored for later.
-		if(txtNodes.length<=1) {
+		if(tokens.length<=1) {
 			uniqueValue = randomString();
 			return;
 		}
 		
 		// Otherwise extract the uniqueValue from the tag string, it's the first token.
-		uniqueValue = txtNodes[0];
-		for(int q = 1; q<txtNodes.length; q+=1) {
-			ApplicationRouterNode arNode = new ApplicationRouterNode(txtNodes[q]);
+		uniqueValue = tokens[0];
+		for(int q = 1; q<tokens.length; q+=1) {
+			String hashedAppName = tokens[q];
+			String appName = mdToAppName.get(hashedAppName);
+			if(appName == null) 
+				throw new NullPointerException("The hash doesn't correspond to any app name: " + hashedAppName);
+			ApplicationRouterNode arNode = new ApplicationRouterNode(appName);
 			this.nodes.add(arNode);
 		}
 	}
 	
 	public static class ApplicationRouterNode {
+		private String application;
+		
 		public ApplicationRouterNode(String app) {
 			this.application = app;
 		}
-		public String application;
+		
+		public String toString() {
+			return GenericUtils.hashString(this.application);
+		}
+		
+		public String getApplication() {
+			return this.application;
+		}
 	}
 	
 	public void addNode(ApplicationRouterNode node) {
@@ -77,10 +96,10 @@ public class ApplicationRoutingHeaderComposer {
 	public String toString() {
 		String text = uniqueValue + TOKEN_SEPARATOR;
 		for(int q=0; q<this.nodes.size(); q++) {
-			text += this.nodes.get(q).application + TOKEN_SEPARATOR;
+			text += this.nodes.get(q).toString() + TOKEN_SEPARATOR;
 		}
 		if(text.length()>0)
-			text = text.substring(0, text.length() - 1);
+			text = text.substring(0, text.length() - TOKEN_SEPARATOR.length());
 		return text;
 	}
 

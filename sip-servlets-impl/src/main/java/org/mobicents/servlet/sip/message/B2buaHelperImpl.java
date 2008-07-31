@@ -60,6 +60,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -152,7 +153,9 @@ public class B2buaHelperImpl implements B2buaHelper {
 			FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
 			FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
 			
-			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(oldFromHeader.getTag());
+			SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) appSession.getSipContext().getSipApplicationDispatcher();
+			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
+					dispatcher.getMdToApplicationName(), oldFromHeader.getTag());
 			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
 					originalSession.getKey().getApplicationName()));
 			newFromHeader.setTag(stack.toString());

@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.core;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipURI;
@@ -158,5 +159,7 @@ public interface SipApplicationDispatcher extends SipListener {
     boolean isExternal(String host, int port, String transport);
 
 	SipApplicationRouter getSipApplicationRouter();
+
+	public Map<String, String> getMdToApplicationName();
     
 }
