@@ -26,10 +26,12 @@ Mobicents Sip Servlets Clustering support
 * Installation & Configuration
 
 	First of all, to enable SIP Session State Clustering in addition to HTTP Session clustering, you'll need to use the 'all' configuration profile of your Jboss server.\
-	So repeat the steps described in the {{{./installation-jboss.html}JBoss Installation Section}} but for the 'all' configuration profile instead of the 'default' configuration profiles to make the 'all' profile SIP-enbaled.\
+	So repeat the steps described in the {{{./installation-jboss.html}JBoss Installation Section}} but for the 'all' configuration profile instead of the 'default' configuration profile. This will make the 'all' configuration profile SIP-enabled.\
 	Now to enable clustering, you'll need to modify one more file : 
 	
-	In jboss_home/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml, modify the attribute <<<ManagerClass>>> so that its value is <<<org.jboss.web.tomcat.service.session.JBossCacheSipManager>>> instead of <<<org.jboss.web.tomcat.service.session.JBossCacheManager>>>
+	In <<<jboss_home/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml>>>, modify the attribute <<<ManagerClass>>> so that its value is <<<org.jboss.web.tomcat.service.session.JBossCacheSipManager>>> instead of <<<org.jboss.web.tomcat.service.session.JBossCacheManager>>> or
+	Make a backup of your jboss_home/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml file\
+	Copy the jboss-service-all.xml located in docs to jboss_home/server/all/deploy/jboss-web.deployer/META-INF/
 	
 	You also need to make your SIP Servlets application distributable. To do that, in the sip.xml and web.xml of your application add the following tag <<<<distributable/>>>>. See Section 16.5.6 of {{{http://docs.jboss.org/jbossas/jboss4guide/r4/html/cluster.chapt.html}JBoss Guide Clustering chapter}}. 
 	  

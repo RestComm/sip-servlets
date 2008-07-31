@@ -1,0 +1,1 @@
+java -Djava.util.logging.config.file=./lb-logging.properties -jar ${M2_REPO}/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-SNAPSHOT-jar-with-dependencies.jar lb-configuration-net.properties

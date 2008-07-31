@@ -182,7 +182,7 @@
 		<profile>			
 			<id>clustering</id>
 			<properties>
-				<jain-sip-ri.version>1.2.75</jain-sip-ri.version>
+				<jain-sip-ri.version>1.2.76</jain-sip-ri.version>
 			</properties>
 		</profile>
 	</profiles>
