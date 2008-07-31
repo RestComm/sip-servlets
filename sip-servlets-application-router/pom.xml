@@ -106,7 +106,7 @@
 									<tasks>
 										<copy verbose="true"
 											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${env.JBOSS_HOME}/server/default/lib" />
+											todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/" />
 									</tasks>
 								</configuration>
 								<goals>
@@ -164,7 +164,7 @@
 									<tasks>
 										<copy verbose="true"
 											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${JBOSS_HOME}/server/default/lib" />
+											todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/" />
 									</tasks>
 								</configuration>
 								<goals>

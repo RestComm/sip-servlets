@@ -293,8 +293,8 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/lib"/>
-										<copy verbose="true" file="docs/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/default/conf"/>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer"/>
+										<copy verbose="true" file="docs/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -315,7 +315,7 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j</includeArtifactIds>
-					    			<outputDirectory>${env.JBOSS_HOME}/server/default/lib</outputDirectory>
+					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
 		 	        	</executions>
@@ -336,7 +336,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/default/lib"/>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -357,7 +357,7 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,concurrent,dnsjava,stun4j</includeArtifactIds>
-					    			<outputDirectory>${JBOSS_HOME}/server/default/lib/</outputDirectory>
+					    			<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
 		 	        	</executions>
