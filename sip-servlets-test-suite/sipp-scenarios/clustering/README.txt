@@ -1,6 +1,3 @@
-build mobicents-sip-servlets from source in bootstrap with mvn clean install -P clustering
-build sip-balancer from source with mvn clean install
-
 modify the JBOSS_HOME variable in prepare-jboss-server-for-clustering-failover.sh script to map your own
 run sh prepare-jboss-server-for-clustering-failover.sh from this directory
 run sh start-lb.sh from this directory

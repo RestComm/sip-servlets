@@ -15,24 +15,8 @@ cp webserver-xmbean.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/META
 cp log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
 cp log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 
-cp $M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.5-SNAPSHOT/sip-servlets-impl-0.5-SNAPSHOT.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.5-SNAPSHOT/sip-servlets-impl-0.5-SNAPSHOT.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/0.5-SNAPSHOT/sip-servlets-application-router-0.5-SNAPSHOT.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/0.5-SNAPSHOT/sip-servlets-application-router-0.5-SNAPSHOT.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.5-SNAPSHOT/sip-servlets-spec-1.1.5-SNAPSHOT.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.5-SNAPSHOT/sip-servlets-spec-1.1.5-SNAPSHOT.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-SNAPSHOT.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-SNAPSHOT.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/javax/sip/jain-sip-ri/1.2.76/jain-sip-ri-1.2.76.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/javax/sip/jain-sip-ri/1.2.76/jain-sip-ri-1.2.76.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
+mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=port-1 -Djain-sip-ri.version=1.2.76
+mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=port-2 -Djain-sip-ri.version=1.2.76
 
 mkdir $JBOSS_HOME/server/port-1/conf/dars
 mkdir $JBOSS_HOME/server/port-2/conf/dars

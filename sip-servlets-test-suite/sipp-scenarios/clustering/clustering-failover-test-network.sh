@@ -1,0 +1,1 @@
+./sipp 192.168.1.21:5080 -s yousendbye -sf clustering-uac.xml -trace_err -i 192.168.1.21 -p 5050 -r 1 -m 1 -rsa 192.168.1.21:5060

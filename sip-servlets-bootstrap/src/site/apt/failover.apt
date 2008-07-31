@@ -29,7 +29,15 @@ Mobicents Sip Servlets Failover support
 
 	Please refer to {{{./load-balancer.html}Mobicents SIP Load Balancer}} and {{{./clustering.html}Mobicents Sip Servlets Clustering}}. Both combined will make mid call failover available for your application.  		
 
-* Step-By-Step Example
+* Step-By-Step Examples
+
+** Cluster spread on 2 machines
+
+	We provide an example to run the Mobicents Sip Servelts cluster (comprised of 2 nodes), the load balancer and client application on different machines.
+
+	Please checkout {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/sipp-scenarios/clustering}our clustering and mid-call failover example}} and follow the README-network.txt instructions.
+
+** Cluster on the same machine
 
 	We provide an example to run the Mobicents Sip Servelts cluster (comprised of 2 nodes), the load balancer and client application on the same machine for ease of testing purposes.
 	
