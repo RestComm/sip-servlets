@@ -329,25 +329,13 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=114">
 						Distributable applications
 						</a>
-						<br />
-						<img src="orange.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=123">
-						Open IMS integration example
-						</a>
-						<br />
+						<br />						
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=124">
 						JSR 289 Proposed Final Draft-2  API Alignement
 						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=125">
-						JBON Integration
-						</a>
-						<br />
+						<br />						
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=121">
@@ -378,7 +366,7 @@
 						More Extensions : REFER/PUBLISH/UPDATE
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -389,7 +377,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=202">
 									Implement the doBranchResponse callback
@@ -420,7 +408,14 @@
 								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=65">
-								Load Balancer : Add support for CANCEL, externalize configuration, Fix memory leak
+								Load Balancer : CANCEL support, externalize configuration, Fix memory leak, mid call failover support
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=123">
+								Open IMS integration : Record Route wrongly added in UAC mode
 								</a>
 							</li>
 						</ul>
@@ -428,10 +423,22 @@
 				</subsection>
 				<subsection name="Version 0.6 - 09/01/2008">
 					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=120">
+						TCK compliance
+						</a>
+						<br />
 						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=122">
 						Basic IPBX
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=125">
+						JBON Integration
 						</a>
 						<br />	
 						<img src="red.jpeg" />
@@ -445,13 +452,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=130">						
 						User Guide with DocBook Documentation
 						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=120">
-						TCK compliance
-						</a>
-						<br />				
+						<br />									
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=129">

@@ -75,7 +75,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 				for (Connector connector : connectors) {
 					SipStack sipStack = (SipStack)
 						connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-					if(sipStack != null) {
+					if(sipStack != null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
 						((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
 					}
 				}
@@ -86,8 +86,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 		// from the underlying store.
 		populateAttributes();
 
-		// Notify all attributes of type HttpSessionActivationListener (SRV
-		// 7.7.2)
+		// Notify all attributes of type SipSessionActivationListener 
 		this.activate();
 
 		// We are no longer outdated vis a vis distributed cache

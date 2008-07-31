@@ -30,4 +30,14 @@
 			org.mobicents.servlet.sip.example.DistributableSimpleSipServlet
 		</listener-class>
 	</listener>
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.SipApplicationSessionActivationListenerAttribute
+		</listener-class>
+	</listener>
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.SipSessionActivationListenerAttribute
+		</listener-class>
+	</listener>
 </sip-app>

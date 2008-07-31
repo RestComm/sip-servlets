@@ -22,14 +22,10 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipApplicationSessionActivationListener;
-import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSessionActivationListener;
-import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
@@ -47,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DistributableSimpleSipServlet 
 		extends SipServlet 
-		implements TimerListener, SipApplicationSessionActivationListener, SipSessionActivationListener {
+		implements TimerListener {
 	
 	private static final String RECEIVED = "Received";
 
@@ -78,7 +74,9 @@ public class DistributableSimpleSipServlet
 				+ request.getMethod());
 		}
 		request.getSession().setAttribute("INVITE", RECEIVED);
+		request.getSession().setAttribute("activationListener", new SipSessionActivationListenerAttribute());
 		request.getApplicationSession().setAttribute("INVITE", RECEIVED);
+		request.getSession().setAttribute("activationListener", new SipApplicationSessionActivationListenerAttribute());
 //		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 //		sipServletResponse.send();
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
@@ -158,33 +156,5 @@ public class DistributableSimpleSipServlet
 				logger.error("An unexpected exception occured while sending the BYE", e);
 			}				
 		}
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipApplicationSessionEvent)
-	 */
-	public void sessionDidActivate(SipApplicationSessionEvent event) {
-		logger.info("Following sip application session just activated " + event.getApplicationSession().getId());
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionWillPassivate(javax.servlet.sip.SipApplicationSessionEvent)
-	 */
-	public void sessionWillPassivate(SipApplicationSessionEvent event) {
-		logger.info("Following sip application session just passivated " + event.getApplicationSession().getId());		
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipSessionEvent)
-	 */
-	public void sessionDidActivate(SipSessionEvent event) {
-		logger.info("Following sip session just activated " + event.getSession().getId());		
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipSessionActivationListener#sessionWillPassivate(javax.servlet.sip.SipSessionEvent)
-	 */
-	public void sessionWillPassivate(SipSessionEvent event) {
-		logger.info("Following sip session just passivated " + event.getSession().getId());		
 	}
 }

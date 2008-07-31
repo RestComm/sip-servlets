@@ -79,8 +79,7 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		// from the underlying store.
 		populateAttributes();
 
-		// Notify all attributes of type HttpSessionActivationListener (SRV
-		// 7.7.2)
+		// Notify all attributes of type SipApplicationSessionActivationListener 
 		this.activate();
 
 		// We are no longer outdated vis a vis distributed cache
