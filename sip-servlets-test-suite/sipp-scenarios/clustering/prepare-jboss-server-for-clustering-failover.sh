@@ -29,8 +29,8 @@ cp $M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar $JBOSS_HOME/server/port-
 cp $M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
 cp $M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
 cp $M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
-cp $M2_REPO/javax/sip/jain-sip-ri/1.2.75/jain-sip-ri-1.2.75.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
-cp $M2_REPO/javax/sip/jain-sip-ri/1.2.75/jain-sip-ri-1.2.75.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
+cp $M2_REPO/javax/sip/jain-sip-ri/1.2.76/jain-sip-ri-1.2.76.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
+cp $M2_REPO/javax/sip/jain-sip-ri/1.2.76/jain-sip-ri-1.2.76.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
 cp $M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer
 cp $M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer
 
