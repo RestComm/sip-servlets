@@ -65,4 +65,14 @@ public class MediaResourceListener implements MsResourceListener {
 			connection.release();			
 		}
 	}
+
+	public void resourceCreated(MsNotifyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void resourceInvalid(MsNotifyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

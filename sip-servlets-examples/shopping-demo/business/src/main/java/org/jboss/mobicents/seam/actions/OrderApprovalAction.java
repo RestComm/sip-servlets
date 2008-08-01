@@ -21,9 +21,9 @@ import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.log.Log;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
+import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.impl.MsPeerFactory;
 
 @Name("orderApprovalAction")
 @Stateless
@@ -73,7 +73,7 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 			}
 			
 			//Media Server Control Creation
-			MsPeer peer = MsPeerFactory.getPeer();
+			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
 			MsConnection connection = session.createNetworkConnection("media/trunk/IVR/1");

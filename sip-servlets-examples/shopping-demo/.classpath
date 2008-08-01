@@ -28,11 +28,10 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate/3.2.4.sp1/hibernate-3.2.4.sp1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.5-SNAPSHOT/sip-servlets-spec-1.1.5-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.BETA2/mobicents-media-server-constants-1.0.0.BETA2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.BETA2/mobicents-media-server-msc-api-1.0.0.BETA2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.0.BETA2/mobicents-media-server-msc-api-local-impl-1.0.0.BETA2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/jboss-embedded-all/beta3/jboss-embedded-all-beta3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/jboss-embedded-api/beta3/jboss-embedded-api-beta3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/thirdparty-all/beta3/thirdparty-all-beta3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.BETA3-SNAPSHOT/mobicents-media-server-constants-1.0.0.BETA3-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.BETA3-SNAPSHOT/mobicents-media-server-msc-api-1.0.0.BETA3-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

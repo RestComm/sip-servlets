@@ -60,4 +60,14 @@ public class DTMFListener implements MsResourceListener{
 		dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
 	}
 
+	public void resourceCreated(MsNotifyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void resourceInvalid(MsNotifyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

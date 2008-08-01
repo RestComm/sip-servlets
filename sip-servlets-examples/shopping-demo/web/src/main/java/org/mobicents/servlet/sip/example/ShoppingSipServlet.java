@@ -32,9 +32,9 @@ import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.jboss.mobicents.seam.util.TTSUtils;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
+import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.impl.MsPeerFactory;
 
 /**
  * Sip Servlet handling responses to call initiated due to actions made on the web shopping demo
@@ -170,6 +170,8 @@ public class ShoppingSipServlet
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got bye " + request);		
+		MsConnection connection = (MsConnection)request.getSession().getApplicationSession().getAttribute("connection");
+		connection.release();
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
@@ -245,7 +247,7 @@ public class ShoppingSipServlet
 			sipServletRequest.setRequestURI(requestURI);
 														
 			//Media Server Control Creation
-			MsPeer peer = MsPeerFactory.getPeer();
+			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
 			MsConnection connection = session.createNetworkConnection("media/trunk/IVR/1");
