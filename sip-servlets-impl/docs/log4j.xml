@@ -3,7 +3,7 @@
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
   <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender"> 
-    <param name="file" value="/home/deruelle/servers/apache-tomcat-6.0.14/logs/sip-server.log"/>
+    <param name="file" value="logs/sip-server.log"/>
     <param name="MaxFileSize" value="1000KB"/>
     <!-- Keep one backup file -->
     <param name="MaxBackupIndex" value="10"/>
@@ -19,7 +19,7 @@
     </layout> 
   </appender> 
   <root> 
-    <priority value ="DEBUG" />     
+    <priority value ="INFO" />     
     <appender-ref ref="rolling-file" /> 
     <appender-ref ref="console" />
   </root>   

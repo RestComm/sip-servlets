@@ -18,6 +18,25 @@ The default port for SIP is 5080. There is one predeployed sample application - 
 to http://localhost:8080/click2call in order to see it in action.
 
 
+Clustering for JBoss
+--------------------
+
+This distribution includes a pre-configured cluster-enabled server. It is located in the 'all' configuration.
+Be aware that the clustering and failover support in Mobicents Sip Servlets are still in the early experimental
+stage and have limitations.
+Before starting the cluster-enabled server you must have the Sip Load Balancer from the sip-balancer 
+directory running on your machine or on the network. For more information read the following documents:
+
+http://www.mobicents.org/load-balancer.html
+http://www.mobicents.org/clustering.html
+http://www.mobicents.org/failover.html
+
+Note that most of the configuration is already done in the 'all' configuration from this distribution. You should
+just change the binding addresses and the ports specific to your set up.
+
+To run the 'all' configuration you you should execute:
+run -c all
+
 
 What is different from JBoss standard version
 ---------------------------------------------

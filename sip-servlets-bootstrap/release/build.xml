@@ -22,13 +22,35 @@
 		<mkdir dir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
 		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
 			todir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
+		
+		<mkdir dir="${base.path}/jboss-${jboss.version}/server/all/conf/dars"/>
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
+			todir="${base.path}/jboss-${jboss.version}/server/all/conf/dars"/>
 			
 		<copy file="${base.path}/server-tomcat-6.xml" tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/server.xml"/>
+		
 		<copy file="${base.path}/server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/server.xml"/>
 		<copy file="${base.path}/context-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/context.xml"/>
-		<copy file="${base.path}/jboss-service.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>
-		<copy file="${base.path}/webserver-xmbean.xml" todir="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF"/>						
+		<copy file="${base.path}/jboss-service.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml"/>
+		<copy file="${base.path}/webserver-xmbean.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml"/>						
 
+		<copy file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/server.xml"/>
+		<!-- <copy file="${base.path}/server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/server.xml"/> -->
+		<copy file="${base.path}/context-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/context.xml"/>
+		<copy file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml"/>
+		<copy file="${base.path}/webserver-xmbean.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml"/>
+			
+		<!-- The Sip Load Balancer -->
+		<mkdir dir="${base.path}/jboss-${jboss.version}/sip-balancer"/>
+		<get src="http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080729.163357-20-jar-with-dependencies.jar" 
+		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-1.0-20080729.163357-20-jar-with-dependencies.jar" 
+		    verbose="true"
+		    usetimestamp="true"/>
+		<get src="http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties" 
+		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/lb-configuration.properties" 
+		    verbose="true"
+		    usetimestamp="true"/>
+		
 		<exec executable="${mvn.executable}" dir="${base.path}/..">
 			<arg line="clean install -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
 		</exec>
@@ -37,22 +59,32 @@
 			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
 		</exec>
 
+		<exec executable="${mvn.executable}" dir="${base.path}/..">
+			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
+		</exec>
+				
 		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install"/>
 		</exec>
 		
-		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/all"/>
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
 		
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
 		
 		<ant target="deploy-mgmnt">
             <property name="system.JBOSS_HOME" value="${base.path}/jboss-${jboss.version}"/>
             <property name="system.GWT_HOME" value="${base.path}/gwt-linux-${gwt.version}"/>
         </ant>
+		<copy todir="${base.path}/jboss-${jboss.version}/server/all/deploy/">
+		    <fileset dir="${base.path}/jboss-${jboss.version}/server/default/deploy/" includes="*media*.sar/**"/>
+		</copy>
 
 		<ant target="deploy-media"/>
+		<copy todir="${base.path}/jboss-${jboss.version}/server/all/deploy/">
+		    <fileset dir="${base.path}/jboss-${jboss.version}/server/default/deploy/" includes="sip-servlets-manage*"/>
+		</copy>
 
         <delete dir="." includes="mss-${mss.release.version}-*.zip"/>
         <tstamp>
@@ -70,20 +102,24 @@
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
 			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
+			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
+		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
 			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
 	</target>
 	
 	<available file="${ant.file.mobicents.release}/../mobicents-media-server-core" property="mobicents.media.server.checked.out"/>
 	<target name="get-mobicents-media-server" unless="mobicents.media.server.checked.out">
         <echo>Checking out Mobicents Media Server</echo>
+		<delete dir="mms"/>
+		<mkdir dir="mms"/>
 		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
-            <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mobicents-media-server-core"/>
+            <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mms/mobicents-media-server-core"/>
         </exec>
 	</target>
 	
 	<target name="build-mobicents-media-server">
         <echo>Building Mobicents Media Server</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mobicents-media-server-core">
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mms/mobicents-media-server-core">
             <arg line="install -Djboss.home=${base.path}/jboss-${jboss.version}" />
         </exec>
 	</target>
