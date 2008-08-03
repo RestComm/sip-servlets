@@ -317,13 +317,7 @@
 			</subsection>
 			<subsection name="Planned Versions">								
 				<subsection name="Version 0.5 - 08/01/2008">
-					<p>																		
-						<img src="orange.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=133">
-						Concurrency Control
-						</a>						
-						<br />
+					<p>																								
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=114">
@@ -423,6 +417,12 @@
 				</subsection>
 				<subsection name="Version 0.6 - 09/01/2008">
 					<p>
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=133">
+						Concurrency Control
+						</a>						
+						<br />
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=120">
