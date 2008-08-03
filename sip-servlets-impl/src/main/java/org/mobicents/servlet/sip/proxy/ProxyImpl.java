@@ -272,10 +272,10 @@ public class ProxyImpl implements Proxy {
 		}
 		if(rr) {
 			this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null));
-		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURI.toString());
-		}
+			if(logger.isDebugEnabled()) {
+				logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURI.toString());
+			}
+		}		
 		this.recordRoutingEnabled = rr;
 
 	}
