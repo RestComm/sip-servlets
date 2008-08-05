@@ -17,43 +17,39 @@ Goals
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
   
-Version 0.4.1 is out !
-
-	Only the JBoss version has been updated since it was to release our JBoss version with the latest Mobicents Media Server release (1.0.0.BETA2)
-	
-	To download this release and try it out, follow the following link :
-	
-	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.4.1 downloads}} 
-  
-Version 0.4 is out !
+Version 0.5 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
 		
-		* {{{failover.html}Failover support}}
+		* {{{clustering.html}Clustering}} and {{{failover.html}}mid-call failover support}} for UAS type of sip applications
 		
-		* {{{http://groups.google.com/group/mobicents-public/browse_thread/thread/9002afc3ef00c08}Performance improvement/Performance apps}} : Tomcat 6.0.14, JDK 1.5 : Call rate was 100 calls/sec for 24h, for a total of 8.640.000 calls.
+		* JSR 289 Proposed Final Draft-2 API Alignment
 		
-		* {{{http://www.mobicents.org/jslee-sips-interop-demo.html}JSLEE/SIPS interop app}}
+		* 15.11 Encode URI and Session Targeting
 		
-		* More Extensions : SUBSCRIBE/NOTIFY
+		* 4.2.2 TelURL
 		
-		* JSR 289 Proposed Final Draft API Alignement
+		* 15.4.2 New Application Router Packaging and Deployment
 		
-		* Merge SIP Session Management with HTTP Session Management
+		* 6.2.5 The RequestDispatcher Interface
+		
+		* More Extensions : REFER/PUBLISH/UPDATE
 		
 		* {{{roadmap.html}usual round of bug fixes}}
-		
+				
 	It is shipped with :		
 	
 		* {{{sip-servlets-managment.htm}Management Console}}
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
 	
-		* Mobicents Media Server 1.0.0-BETA2-SNAPSHOT (JBoss only)
+		* For JBoss only, Mobicents Media Server 1.0.0-BETA2, the Mobicents SIP load Balancer 
+		and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
+		to test clustering and mid call failover. 
 	
 	To download this release and try it out, follow the following link : 
 
-	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.4 downloads}}
+	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.5 downloads}}
 
 Roadmap
 

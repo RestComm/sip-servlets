@@ -179,12 +179,6 @@
 				<module>../sip-servlets-test-suite</module>
 			</modules>
 		</profile>
-		<profile>			
-			<id>clustering</id>
-			<properties>
-				<jain-sip-ri.version>1.2.76</jain-sip-ri.version>
-			</properties>
-		</profile>
 	</profiles>
 	<!-- repositories -->
 	<repositories>
