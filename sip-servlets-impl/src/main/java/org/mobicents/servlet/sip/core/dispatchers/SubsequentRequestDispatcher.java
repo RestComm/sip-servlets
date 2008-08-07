@@ -41,7 +41,6 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -133,8 +132,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		try {
 			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
-			if(sipApplicationSession == null && sipManager instanceof SipStandardManager) {
-				((SipStandardManager)sipManager).dumpSipApplicationSessions();
+			if(sipApplicationSession == null) {
+				sipManager.dumpSipApplicationSessions();
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
 						" with the following popped route header " + sipServletRequest.getPoppedRoute());
 			}
@@ -152,8 +151,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 			}
 			
-			if(sipSession == null && sipManager instanceof SipStandardManager) {
-				((SipStandardManager)sipManager).dumpSipSessions();
+			if(sipSession == null) {
+				sipManager.dumpSipSessions();
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 						" with the following popped route header " + sipServletRequest.getPoppedRoute());
 			} else {

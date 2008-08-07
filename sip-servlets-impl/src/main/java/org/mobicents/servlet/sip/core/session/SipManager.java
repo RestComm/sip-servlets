@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import java.util.Iterator;
-
 import javax.servlet.http.HttpSession;
 
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -93,4 +91,7 @@ public interface SipManager extends org.apache.catalina.Manager {
 	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl);
 	
 	public SipFactoryImpl getSipFactoryImpl();
+	
+	public void dumpSipSessions();
+	public void dumpSipApplicationSessions();
 }

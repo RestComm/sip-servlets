@@ -39,7 +39,6 @@ import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
@@ -58,7 +57,6 @@ import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
-import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -77,21 +75,14 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
@@ -731,7 +722,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					if(logger.isDebugEnabled()) {
 						logger.debug("Add a record route header for app composition ");
 					}
-					((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
+					getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 					//Add a record route header for app composition		
 					addAppCompositionRRHeader();	
 				}
@@ -751,8 +742,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 			}
-			((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
-			if (super.getTransaction() == null) {
+			getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
+			if (super.getTransaction() == null) {				
 
 				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
@@ -832,7 +823,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					session.getKey().getApplicationName());
 			
-			((SipStandardManager)getSipSession().getSipApplicationSession().getSipContext().getSipManager()).dumpSipSessions();
+			getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
 					|| getDialog().getState() == DialogState.EARLY) {

@@ -58,7 +58,6 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -312,7 +311,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
 						"The Container hence stops routing the initial request.");
-				((SipStandardManager)sipContext.getSipManager()).dumpSipSessions();
+				sipContext.getSipManager().dumpSipSessions();
 			}
 		} else {
 			if(logger.isDebugEnabled()) {

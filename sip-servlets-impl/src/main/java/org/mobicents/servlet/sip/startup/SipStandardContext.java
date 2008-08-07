@@ -253,8 +253,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}						
 			}			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
-			if(getManager() instanceof SipStandardManager) {
-				((SipStandardManager)getManager()).setSipFactoryImpl(
+			if(getManager() instanceof SipManager) {
+				((SipManager)getManager()).setSipFactoryImpl(
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
 				((SipManager)manager).setContainer(this);
 			}
@@ -386,10 +386,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the sip context");
 		}
-		if(manager instanceof SipStandardManager) {
-			((SipStandardManager)manager).dumpSipSessions();
-			((SipStandardManager)manager).dumpSipApplicationSessions();
-		}
+		((SipManager)manager).dumpSipSessions();
+		((SipManager)manager).dumpSipApplicationSessions();
 		super.stop();
 		// this should happen after so that applications can still do some processing
 		// in destroy methods to notify that context is getting destroyed and app removed
