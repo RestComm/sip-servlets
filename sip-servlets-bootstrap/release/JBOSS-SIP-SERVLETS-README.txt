@@ -9,7 +9,7 @@ check this link out http://www.mobicents.org/examples.html
 There is an Application Router Management Console at this location http://localhost:8080/sip-servlets-management.
 This application will help you to more easily configure the default application router.
 
-This package includes Mobicents Media Server BETA2 to allow developers to create complete SIP/JEE/Web/Media
+This package includes Mobicents Media Server BETA3 to allow developers to create complete SIP/JEE/Web/Media
 converged applications. For more information about Media Server visit http://groups.google.com/group/mobicents-public/web/mobicents-media-server.
 You can find a real example demonstrating Sip Servlets, JEE, JBoss Seam, Media Server, Text to Speech and
 jBPM working together here http://www.mobicents.org/shopping-demo.html.
