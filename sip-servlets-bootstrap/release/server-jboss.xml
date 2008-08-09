@@ -14,7 +14,7 @@
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="conf/dars/click2call-dar.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :

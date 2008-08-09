@@ -17,15 +17,15 @@
 		
 		<mkdir dir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
 		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
-			todir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
+			tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/dars/mobicents-dar.properties"/>
 			
 		<mkdir dir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
 		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
-			todir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
+			tofile="${base.path}/jboss-${jboss.version}/server/default/conf/dars/mobicents-dar.properties"/>
 		
 		<mkdir dir="${base.path}/jboss-${jboss.version}/server/all/conf/dars"/>
 		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
-			todir="${base.path}/jboss-${jboss.version}/server/all/conf/dars"/>
+			tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties"/>
 			
 		<copy file="${base.path}/server-tomcat-6.xml" tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/server.xml"/>
 		
@@ -76,7 +76,7 @@
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/click2call-dar.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties" />
 				
 		<ant target="deploy-mgmnt">
             <property name="system.JBOSS_HOME" value="${base.path}/jboss-${jboss.version}"/>
