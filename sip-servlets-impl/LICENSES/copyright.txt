@@ -1,0 +1,3 @@
+The Mobicents JSLEE and SIP server is Copyright 2003-2006 Mobicents, and individual
+contributors, and is licensed under the GPL or custom license. 
+For questions regarding custom licensing contact support@mobicents.org.

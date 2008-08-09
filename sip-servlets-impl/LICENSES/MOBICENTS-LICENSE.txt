@@ -1,0 +1,8 @@
+
+Mobicents is freely available under the terms and conditions of the  GNU 
+General Public License (GPL). See terms and conditions of the license at:
+http://www.opensource.org/licenses/gpl-license.php
+
+For custom licensing including license for commercial derivatives contact support@mobicent.org.
+
+
