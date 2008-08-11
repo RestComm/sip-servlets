@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
         <artifactId>mobicents</artifactId>
@@ -7,7 +9,7 @@
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
-	<version>0.5</version>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>	
 	<name>Mobicents Sip Servlets</name>
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
@@ -67,9 +69,15 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:http://mobicents.googlecode.com/svn/tags/sip-servlets/sip-servlets-bootstrap-0.5</connection>
-		<developerConnection>scm:svn:http://mobicents.googlecode.com/svn/tags/sip-servlets/sip-servlets-bootstrap-0.5</developerConnection>
-		<url>scm:svn:http://mobicents.googlecode.com/svn/tags/sip-servlets/sip-servlets-bootstrap-0.5</url>
+		<connection>
+			scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets
+		</connection>
+		<developerConnection>
+			scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets
+		</developerConnection>
+		<url>
+			http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets
+		</url>
 	</scm>
 	<modules>
 		<module>../sip-servlets-spec</module>
@@ -160,7 +168,7 @@
 								<phase>site</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/site/index.html" tofile="${project.build.directory}/site/products_sip_servlets.html" />
+										<copy verbose="true" file="${project.build.directory}/site/index.html" tofile="${project.build.directory}/site/products_sip_servlets.html"/>
 									</tasks>
 								</configuration>
 								<goals>
