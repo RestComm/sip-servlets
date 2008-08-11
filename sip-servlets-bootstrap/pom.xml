@@ -5,12 +5,11 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>3-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <version>3</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
-	<version>0.5</version>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>	
 	<name>Mobicents Sip Servlets</name>
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
@@ -88,7 +87,7 @@
 	
 	<properties>
 		<!-- MOBICENTS TOOL VERSIONS -->
-		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA1-SNAPSHOT</mobicents.tools.mavenplugin.eclipse.version>
+		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
 	</properties>
 	
 	<dependencies>
@@ -110,6 +109,15 @@
 	</dependencies>
 	<build>
 		<plugins>
+	<plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-release-plugin</artifactId>
+		<configuration>
+			<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+		</configuration>
+	</plugin>
+
+		
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
