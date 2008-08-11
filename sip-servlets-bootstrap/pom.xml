@@ -11,7 +11,7 @@
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>	
-	<name>Mobicents Sip Servlets</name>
+	<name>Mobicents Sip Servlets Documentation and Release Scripts</name>
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<ciManagement>
 		<system>Hudson</system>
@@ -79,12 +79,6 @@
 			http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets
 		</url>
 	</scm>
-	<modules>
-		<module>../sip-servlets-spec</module>
-		<module>../sip-servlets-impl</module>
-		<module>../sip-servlets-application-router</module>
-	</modules>
-	
 	<properties>
 		<!-- MOBICENTS TOOL VERSIONS -->
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
@@ -179,13 +173,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>			
-			<id>release</id>
-			<modules>
-				<module>../sip-servlets-examples</module>
-				<module>../sip-servlets-test-suite</module>
-			</modules>
 		</profile>
 	</profiles>
 	<!-- repositories -->
