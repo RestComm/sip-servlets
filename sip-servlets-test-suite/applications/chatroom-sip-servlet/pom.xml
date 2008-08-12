@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>0.5-SNAPSHOT</version>
+		<version>0.6-SNAPSHOT</version>
 	</parent>
 	<artifactId>chatroom-sip-servlet</artifactId>
 	<packaging>war</packaging>

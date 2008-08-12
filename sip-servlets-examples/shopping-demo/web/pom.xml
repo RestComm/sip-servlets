@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
+			<version>1.1.6-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- logging dependency -->
@@ -66,7 +66,6 @@
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
 			<version>1.0.0.BETA3-SNAPSHOT</version>
-			<scope>provided</scope>
 		</dependency>
 		<!-- j2ee dependencies -->
 		<dependency>

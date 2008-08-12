@@ -7,7 +7,7 @@
 
 	<artifactId>sip-servlets-external-modules-checkout</artifactId>
 	<groupId>org.mobicents.servlet.sip</groupId>
-	<version>0.5-SNAPSHOT</version>
+	<version>0.6-SNAPSHOT</version>
 	
 	<build>
 		<plugins>
