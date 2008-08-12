@@ -21,6 +21,7 @@ import java.util.Iterator;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -87,8 +88,20 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	 * @param container the container to set
 	 */
 	public void setContainer(Container container) {
-		this.container = container;
+
+        // De-register from the old Container (if any)
+        if ((this.container != null) && (this.container instanceof Context))
+            ((Context) this.container).removePropertyChangeListener(this);
+
+        this.container = container;
 		sipManagerDelegate.setContainer(container);
+
+        // Register with the new Container (if any)
+        if ((this.container != null) && (this.container instanceof Context)) {
+            setMaxInactiveInterval
+                ( ((Context) this.container).getSessionTimeout()*60 );
+            ((Context) this.container).addPropertyChangeListener(this);
+        }
 	}
 	
 	/**
