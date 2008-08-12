@@ -4,6 +4,7 @@
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
 		<version>0.6-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-impl</artifactId>
