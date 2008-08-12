@@ -5,8 +5,8 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>0.5</version>
-		<relativePath>../sip-servlets-bootstrap/pom.xml</relativePath>
+		<version>0.6-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>sip-servlets-examples-parent</artifactId>
