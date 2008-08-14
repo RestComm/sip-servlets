@@ -73,6 +73,9 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 
     private boolean started = false;
     
+    private boolean displayBalancerWarining = true;
+    private boolean displayBalancerFound = true;
+    
     @Override
     public String getInfo() {
         return (info);
@@ -342,10 +345,19 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 					Registry registry = LocateRegistry.getRegistry(ah.getHostAddress(),2000);
 					NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 					reg.handlePing(info);
-				} catch (RemoteException e) {
-					logger.error("Cannot acces the sip load balancer RMI registry", e);
-				} catch (NotBoundException e) {
-					logger.error("Cannot acces the sip load balancer RMI registry", e);
+					displayBalancerWarining = true;
+					if(displayBalancerFound) {
+						logger.info("SIP Load Balancer Found!");
+						displayBalancerFound = false;
+					}
+				} catch (Exception e) {
+					if(displayBalancerWarining) {
+						logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
+								"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
+						logger.debug("Cannot access the SIP load balancer RMI registry: " , e);
+						displayBalancerWarining = false;
+					}
+					displayBalancerFound = true;
 				}
 			}
 			if(logger.isDebugEnabled()) {
