@@ -51,15 +51,15 @@
 		    verbose="true"
 		    usetimestamp="true"/>
 		
-		<exec executable="${mvn.executable}" dir="${base.path}/..">
+		<exec executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
-		<exec executable="${mvn.executable}" dir="${base.path}/..">
+		<exec executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
 		</exec>
 
-		<exec executable="${mvn.executable}" dir="${base.path}/..">
+		<exec executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
 		</exec>
 				
@@ -75,6 +75,7 @@
 		
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
 		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties" />
 				
