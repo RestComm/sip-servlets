@@ -105,6 +105,13 @@
 								Open IMS integration : Record Route wrongly added in UAC mode
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=312">
+								HTTP Session timeout ignored
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>

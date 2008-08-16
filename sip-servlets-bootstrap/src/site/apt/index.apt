@@ -21,7 +21,7 @@ Version 0.5 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
 		
-		* {{{clustering.html}Clustering}} and {{{failover.html}}mid-call failover support}} for UAS type of sip applications
+		* {{{clustering.html}Clustering}} and {{{failover.html}mid-call failover support}} for UAS type of sip applications
 		
 		* JSR 289 Proposed Final Draft-2 API Alignment
 		
@@ -43,7 +43,7 @@ Version 0.5 is out !
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
 	
-		* For JBoss only, Mobicents Media Server 1.0.0-BETA2, the Mobicents SIP load Balancer 
+		* For JBoss only, Mobicents Media Server 1.0.0-BETA3, the Mobicents SIP load Balancer 
 		and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
 		to test clustering and mid call failover. 
 	
