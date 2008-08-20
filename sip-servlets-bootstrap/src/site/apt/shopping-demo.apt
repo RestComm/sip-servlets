@@ -50,8 +50,8 @@ Shopping Demo
  	It's working with the Mobicents Media Server 1.0.0.BETA3.\
  	Rename it to shopping-demo.ear\
  	Drop the renamed shopping-demo.ear file into your <<<jboss_home/server/default/deploy>>> directory. 
- 	If you need this example for Mobicents SipServlets 0.4.1 you shoulod use this EAR
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0.1/shopping-demo-ear-1.0.1.ear}here}}.\	 	 
+ 	If you need this example for Mobicents SipServlets 0.4.1 you should use this EAR
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0.1/shopping-demo-ear-1.0.1.ear}here}}.	 	 
  	
  	Get the corresponding {{{/shopping-demo-dar.properties}dar configuration file}}.\
  	Drop it in your <<<jboss_home/server/default/conf/dars>>> directory.\
