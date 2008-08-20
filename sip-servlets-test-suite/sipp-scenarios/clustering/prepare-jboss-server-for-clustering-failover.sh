@@ -15,8 +15,8 @@ cp webserver-xmbean.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/META
 cp log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
 cp log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 
-mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=port-1 -Djain-sip-ri.version=1.2.76
-mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=port-2 -Djain-sip-ri.version=1.2.76
+mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=port-1
+mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=port-2
 
 mkdir $JBOSS_HOME/server/port-1/conf/dars
 mkdir $JBOSS_HOME/server/port-2/conf/dars

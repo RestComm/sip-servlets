@@ -7,7 +7,7 @@ cp jboss-tomcat-service.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/MET
 cp webserver-xmbean.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
 cp log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
 
-mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=all -Djain-sip-ri.version=1.2.76
+mvn clean install -f ../../../sip-servlets-bootstrap/pom.xml -P jboss -Dnode=all
 
 mkdir $JBOSS_HOME/server/all/conf/dars
 
