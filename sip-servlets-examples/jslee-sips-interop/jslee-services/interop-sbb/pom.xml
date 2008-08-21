@@ -11,12 +11,14 @@
 	</parent>
 	
 	<artifactId>jslee-sips-interop-demo-jslee-interop-sbb</artifactId>
-	
+		
 	<dependencies>
+	
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>jslee-sips-interop-commons</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
@@ -32,18 +34,20 @@
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
-			<version>1.0.0.BETA2</version>
+			<version>1.0.0.BETA3</version>
 			<scope>provided</scope>
 		</dependency>		
 		<dependency>				
-			<groupId>org.mobicents.resources</groupId>
-			<artifactId>media-ratype</artifactId>
-			<version>1.2.0.BETA3-SNAPSHOT</version>
+			<groupId>org.mobicents.servers.media.controllers</groupId>
+			<artifactId>msc-ratype</artifactId>
+			<version>1.0.0.BETA3</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>tts-ratype</artifactId>
-			<version>1.2.0.BETA3-SNAPSHOT</version>
+			<version>1.2.0.CR1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>

@@ -3,12 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.mobicents.servlet.sip.example</groupId>
-		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.0</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+	
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>jslee-sips-interop-demo-parent</artifactId>
 	<packaging>pom</packaging>
@@ -32,4 +27,92 @@
 			</plugin>			
 		</plugins>
 	</build>
+	
+	<properties>		
+		<!-- dependency versions -->
+		<jboss.version>4.2.2.GA</jboss.version>
+		<javassist.version>3.6.0.GA</javassist.version>
+		<jboss-cache.version>1.4.1.SP3</jboss-cache.version>
+		<commons-pool.version>1.4</commons-pool.version>
+		<commons-lang.version>2.1</commons-lang.version>
+		<commons-jxpath.version>1.2</commons-jxpath.version>
+		<sleetck-ra-common.version>1.0</sleetck-ra-common.version>
+		<sleetck-minimal.version>1.0</sleetck-minimal.version>
+		<jgroups.version>2.4.1</jgroups.version>
+		<jain-slee.version>1.1.draft</jain-slee.version>
+		<log4j.version>1.2.14</log4j.version>
+		<junit.version>4.1</junit.version>
+		<gwt-user.version>1.4.61</gwt-user.version>
+		<commons-fileupload.version>1.1</commons-fileupload.version>
+		<jain-sip-api.version>1.2</jain-sip-api.version>
+		<jain-sip-ri.version>1.2.76</jain-sip-ri.version>
+		<jain-mgcp.version>1.0</jain-mgcp.version>			
+		<javax.activation.version>1.1</javax.activation.version>
+		<jcc.version>1.1</jcc.version>				
+		<jaxb-api.version>2.1</jaxb-api.version>
+		<jaxb-impl.version>${jaxb-api.version}</jaxb-impl.version>
+		<jsr173.version>1.0</jsr173.version>
+		<servlet-api.version>2.4</servlet-api.version>
+		<commons.httpclient.version>3.1</commons.httpclient.version>		
+		<commons.codec.version>1.2</commons.codec.version>
+		<xmlpull.version>1.1.3.4d_b4_min</xmlpull.version>
+		<jzlib.version>1.0.7</jzlib.version>
+		<rome.version>0.9</rome.version>		
+		<jdom.version>1.0</jdom.version>
+		<drools.version>3.0.5</drools.version>
+		<antlr.stringtemplate.version>2.3b6</antlr.stringtemplate.version>		
+		<jxl.version>2.4.2</jxl.version>
+		<eclipse-jdt.core.version>3.2.0.666</eclipse-jdt.core.version>
+		<commons-jci-core.version>1.0</commons-jci-core.version>		
+		<commons-jci-eclipse.version>${commons-jci-core.version}</commons-jci-eclipse.version>
+		<asterisk.version>0.3.1</asterisk.version>
+		<diameter.version>0.9.6.2</diameter.version>
+		<smpp.version>0.3.7</smpp.version>
+		<freetts.version>1.0</freetts.version>		
+		<hibernate-core.version>3.2.6.ga</hibernate-core.version>
+		<hibernate-tools.version>3.2.0.ga</hibernate-tools.version>
+		<hibernate-annotations.version>3.3.0.ga</hibernate-annotations.version>
+		<hibernate-common-annotations.version>3.0.0.ga</hibernate-common-annotations.version>
+		<hibernate-entitymanager.version>3.3.1.ga</hibernate-entitymanager.version>
+		<hibernate-search.version>3.0.1.GA</hibernate-search.version>	
+		<hibernate-validator.version>3.0.0.ga</hibernate-validator.version>	
+		<commons-logging.version>1.0.4</commons-logging.version>
+		<asm.version>1.5.3</asm.version>		
+		<cglib.version>2.1_3</cglib.version>
+		<dom4j.version>1.6.1</dom4j.version>		
+		<jboss-archive-browsing.version>5.0.0alpha-200607201-119</jboss-archive-browsing.version>
+		<ant-antlr.version>1.7.0</ant-antlr.version>							
+		<lucene-core.version>2.2.0</lucene-core.version>
+		<antlr.version>2.7.6</antlr.version>		
+		<javax.resource.connector.version>1.0</javax.resource.connector.version>
+		<bcprov-jdk14.version>136</bcprov-jdk14.version>		
+		<cactus.version>13-1.7.2</cactus.version>
+		<ant-optional.version>1.5</ant-optional.version>
+		<jmf.version>2.1.1e</jmf.version>
+		<jboss-seam.version>2.0.0.GA</jboss-seam.version>		
+		<jbpm.version>3.2.1</jbpm.version>
+		<jboss-el.version>2.0.0.GA</jboss-el.version>
+		<jsf-api.version>1.2_08</jsf-api.version>
+		<hsqldb.version>1.8.0.8-brew</hsqldb.version>
+		<xercesImpl.version>2.6.0</xercesImpl.version>
+		<concurrent.version>1.3.4</concurrent.version>
+		<ant.version>1.6.5</ant.version>
+		<jdiameter.version>1.5.1</jdiameter.version>
+		<picocontainer.version>1.2</picocontainer.version>
+		<commons-io.version>1.1</commons-io.version>
+		
+		<!--  build properties  -->
+		<compile.debug>true</compile.debug>
+		<compile.source>1.5</compile.source>
+		<node>default</node>				
+		<jboss.home>${env.JBOSS_HOME}</jboss.home>
+		
+		<!-- redefine in your POM if you want to change url in manifest file -->
+		<manifest.url>http://www.mobicents.org</manifest.url>
+		
+		<!-- release properties -->
+		<release.name.prefix>mobicents-all-</release.name.prefix> 
+		<release.name.suffix>-jboss-${jboss.version}</release.name.suffix> 		
+		<release.name>${release.name.prefix}${pom.version}${release.name.suffix}</release.name>
+	</properties>
 </project>
