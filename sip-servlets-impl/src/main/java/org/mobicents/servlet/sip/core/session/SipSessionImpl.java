@@ -906,7 +906,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// cause the SipSession state to return to INITIAL rather than going to TERMINATED.
 			if(receive) {
 				setState(State.INITIAL);
-				readyToInvalidate = true; 
+//				readyToInvalidate = true; 
 				if(logger.isDebugEnabled()) {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
 				}
