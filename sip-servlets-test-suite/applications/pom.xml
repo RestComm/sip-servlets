@@ -12,7 +12,9 @@
 	<name>Sip Servlets Test Suite Applications Parent Pom</name>
 	<modules>
 		<module>simple-sip-servlet</module>
+		<module>shootme-sip-servlet-auth</module>
 		<module>shootist-sip-servlet</module>
+		<module>shootist-sip-servlet-auth</module>
 		<module>proxy-sip-servlet</module>		
 		<module>b2bua-sip-servlet</module>		
 		<module>call-blocking-servlet</module>
@@ -25,7 +27,6 @@
 		<module>timers-sip-servlet</module>
 		<module>session-state-uas</module>
 		<module>session-state-uac</module>
-		<module>secure-servlet</module>
 		<module>annotated-servlet</module>
 		<module>servlet-mapping-servlet</module>
 		<module>notifier-servlet</module>

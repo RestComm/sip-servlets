@@ -44,6 +44,8 @@ import org.mobicents.servlet.sip.testsuite.publish.PublishSipServletTest;
 import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
 import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
+import org.mobicents.servlet.sip.testsuite.security.ShootistSipServletAuthTest;
+import org.mobicents.servlet.sip.testsuite.security.ShootmeSipServletAuthTest;
 import org.mobicents.servlet.sip.testsuite.session.RequestDispatcherSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionHandlerSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
@@ -66,6 +68,8 @@ public class AllTests {
 		suite.addTestSuite(ShootmeSipServletTest.class);
 		suite.addTestSuite(ShootmeTelURLSipServletTest.class);
 		suite.addTestSuite(ShootistSipServletTest.class);
+		suite.addTestSuite(ShootmeSipServletAuthTest.class);
+		suite.addTestSuite(ShootistSipServletAuthTest.class);
 		suite.addTestSuite(B2BUASipUnitTest.class);
 		suite.addTestSuite(B2BUATcpUdpTest.class);
 		suite.addTestSuite(CallBlockingTest.class);

@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import gov.nist.javax.sip.header.SIPETag;
+import gov.nist.javax.sip.header.SIPHeaderNames;
+import gov.nist.javax.sip.header.WWWAuthenticate;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
 import javax.sip.address.URI;
+import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -51,6 +54,8 @@ import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SIPETagHeader;
@@ -62,6 +67,9 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
 /**
  * This class is a UAC template. Shootist is the guy that shoots and shootme is
@@ -162,8 +170,14 @@ public class TestSipListener implements SipListener {
 	private String publishContentMessage;
 
 	private boolean referReceived;
+
+	private boolean challengeRequests;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
+	
+	DigestServerAuthenticationMethod dsam;
+
+	private long timeToWaitBetweenProvisionnalResponse = 1000;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -652,8 +666,36 @@ public class TestSipListener implements SipListener {
 			ServerTransaction serverTransaction) {
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
-		logger.info("shootme: got an Invite " + request);	
+		logger.info("shootme: got an Invite " + request);
 		try {
+			if(challengeRequests) {
+				// Verify AUTHORIZATION !!!!!!!!!!!!!!!!
+		        dsam = new DigestServerAuthenticationMethod();
+		        dsam.initialize(); // it should read values from file, now all static
+		        if ( !checkProxyAuthorization(request) ) {
+		            Response responseauth = protocolObjects.messageFactory.createResponse(Response.PROXY_AUTHENTICATION_REQUIRED,request);
+		
+		            ProxyAuthenticateHeader proxyAuthenticate = 
+		            	protocolObjects.headerFactory.createProxyAuthenticateHeader(dsam.getScheme());
+		            proxyAuthenticate.setParameter("realm",dsam.getRealm(null));
+		            proxyAuthenticate.setParameter("nonce",dsam.generateNonce());
+		            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
+		            proxyAuthenticate.setParameter("opaque","");
+		            proxyAuthenticate.setParameter("stale","FALSE");
+		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
+		            responseauth.setHeader(proxyAuthenticate);
+		
+		            if (serverTransaction!=null)
+		                serverTransaction.sendResponse(responseauth);
+		            else 
+		                sipProvider.sendResponse(responseauth);
+		
+		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
+		            return;
+		        }
+		        System.out.println("shootme: got an Invite with Authorization, sending Trying");
+			}
+		
 			ServerTransaction st = requestEvent.getServerTransaction();			
 			if (st == null) {
 				st = sipProvider.getNewServerTransaction(request);
@@ -677,7 +719,7 @@ public class TestSipListener implements SipListener {
 						toHeader.setTag(TO_TAG); // Application is supposed to set.
 					}
 					st.sendResponse(response);
-					Thread.sleep(1000);
+					Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
 				}
 			}								
 						
@@ -704,6 +746,33 @@ public class TestSipListener implements SipListener {
 			ex.printStackTrace();
 		}
 	}
+	
+	public boolean checkProxyAuthorization(Request request) {
+        // Let Acks go through unchallenged.
+        boolean retorno;
+        ProxyAuthorizationHeader proxyAuthorization=
+                (ProxyAuthorizationHeader)request.getHeader(ProxyAuthorizationHeader.NAME);
+
+       if (proxyAuthorization==null) {
+           System.out.println("Authentication failed: ProxyAuthorization header missing!");     
+           return false;
+       }else{
+           String username=proxyAuthorization.getParameter("username");
+           //String password=proxyAuthorization.getParameter("password");
+   
+           try{
+                boolean res=dsam.doAuthenticate(username,proxyAuthorization,request);
+                if (res) System.out.println("Authentication passed for user: "+username);
+                else System.out.println("Authentication failed for user: "+username); 
+                return res;
+           }
+           catch(Exception e) {
+                e.printStackTrace();
+                return false;
+           }     
+       } 
+    }
+
 
 	public void processBye(Request request,
 			ServerTransaction serverTransactionId) {
@@ -893,6 +962,15 @@ public class TestSipListener implements SipListener {
 				ClientTransaction ct = sipProvider
 						.getNewClientTransaction(updateRequest);
 				dialog.sendRequest(ct);
+			} else if (response.getStatusCode() == Response.PROXY_AUTHENTICATION_REQUIRED
+					|| response.getStatusCode() == Response.UNAUTHORIZED) {
+				URI uriReq = tid.getRequest().getRequestURI();
+				Request authrequest = this.processResponseAuthorization(
+						response, uriReq);
+		
+				inviteClientTid.sendRequest();
+				System.out
+						.println("INVITE AUTHORIZATION sent:\n" + authrequest);
 			}
 			/**
 			 * end of modified code
@@ -903,6 +981,162 @@ public class TestSipListener implements SipListener {
 
 	}
 
+	public Request processResponseAuthorization(Response response, URI uriReq) {
+		Request requestauth = null;
+		try {
+			System.out.println("processResponseAuthorization()");
+			
+			requestauth = (Request) inviteClientTid.getRequest().clone();
+			
+			CSeqHeader cSeq = (CSeqHeader) requestauth.getHeader((CSeqHeader.NAME));
+			try {
+				cSeq.setSeqNumber(cSeq.getSeqNumber() + 1l);
+			} catch (InvalidArgumentException e) {
+				logger.error("Cannot increment the Cseq header to the new INVITE request",e);
+				throw new IllegalArgumentException("Cannot create the INVITE request",e);				
+			}
+			requestauth.setHeader(cSeq);
+			requestauth.removeHeader(ViaHeader.NAME);
+			// Create ViaHeaders
+			ViaHeader viaHeader = protocolObjects.headerFactory
+					.createViaHeader("127.0.0.1", sipProvider
+							.getListeningPoint(protocolObjects.transport).getPort(), protocolObjects.transport,
+							null);
+			// add via headers
+			requestauth.addHeader(viaHeader);
+			
+			try {
+				ClientTransaction retryTran = sipProvider
+					.getNewClientTransaction(requestauth);
+				inviteClientTid = retryTran;		
+				
+				
+				dialog = retryTran.getDialog();
+				if (dialog == null) {					
+					dialog = sipProvider.getNewDialog(retryTran);
+				}
+			} catch (TransactionUnavailableException e) {
+				logger.error("Cannot get a new transaction for the request " + requestauth,e);
+				throw new IllegalArgumentException("Cannot get a new transaction for the request " + requestauth,e);
+			}
+			AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+					((CSeqHeader) response
+							.getHeader(CSeqHeader.NAME)).getMethod(),
+							uriReq.toString(),
+					"", // TODO: What is this entity-body?
+					((WWWAuthenticate) (response
+							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))),
+					"user",
+					"pass");
+			
+			requestauth.addHeader(authorization);
+		} catch (ParseException pa) {
+			System.out
+					.println("processResponseAuthorization() ParseException:");
+			System.out.println(pa.getMessage());
+			pa.printStackTrace();
+		} catch (Exception ex) {
+			System.out.println("processResponseAuthorization() Exception:");
+			System.out.println(ex.getMessage());
+			ex.printStackTrace();
+		}
+		return requestauth;
+	}
+	
+	public Request createInvite(String callId, long cseq) throws ParseException,
+			InvalidArgumentException {
+		String fromName = "BigGuy";
+		String fromSipAddress = "here.com";
+		String fromDisplayName = "The Master Blaster";
+		
+		String toSipAddress = "there.com";
+		String toUser = "LittleGuy";
+		String toDisplayName = "The Little Blister";
+		
+		// create >From Header
+		SipURI fromAddress = protocolObjects.addressFactory.createSipURI(fromName,
+				fromSipAddress);
+		
+		Address fromNameAddress = protocolObjects.addressFactory.createAddress(fromAddress);
+		fromNameAddress.setDisplayName(fromDisplayName);
+		FromHeader fromHeader = protocolObjects.headerFactory.createFromHeader(fromNameAddress,
+				"12345");
+		
+		// create To Header
+		SipURI toAddress = protocolObjects.addressFactory.createSipURI(toUser, toSipAddress);
+		Address toNameAddress = protocolObjects.addressFactory.createAddress(toAddress);
+		toNameAddress.setDisplayName(toDisplayName);
+		ToHeader toHeader = protocolObjects.headerFactory.createToHeader(toNameAddress, null);
+		
+		// create Request URI
+		SipURI requestURI = protocolObjects.addressFactory.createSipURI(toUser, peerHostPort);
+		
+		// Create ViaHeaders
+		ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
+		ViaHeader viaHeader = protocolObjects.headerFactory.createViaHeader("127.0.0.1",
+				listeningPoint.getPort(), listeningPoint.getTransport(),
+				null);
+		// add via headers
+		viaHeaders.add(viaHeader);
+		
+		// Create ContentTypeHeader
+		ContentTypeHeader contentTypeHeader = protocolObjects.headerFactory
+				.createContentTypeHeader("application", "sdp");
+		
+		// Create a new CallId header
+		CallIdHeader callIdHeader;
+		callIdHeader = sipProvider.getNewCallId();
+		if (callId.trim().length() > 0)
+			callIdHeader.setCallId(callId);
+		
+		// Create a new Cseq header
+		CSeqHeader cSeqHeader = protocolObjects.headerFactory.createCSeqHeader(cseq,
+				Request.INVITE);
+		
+		// Create a new MaxForwardsHeader
+		MaxForwardsHeader maxForwards = protocolObjects.headerFactory
+				.createMaxForwardsHeader(70);
+		
+		// Create the request.
+		Request request = protocolObjects.messageFactory.createRequest(requestURI,
+				Request.INVITE, callIdHeader, cSeqHeader, fromHeader, toHeader,
+				viaHeaders, maxForwards);
+		// Create contact headers
+		String host = "127.0.0.1";
+		
+		SipURI contactUrl = protocolObjects.addressFactory.createSipURI(fromName, host);
+		contactUrl.setPort(listeningPoint.getPort());
+		
+		// Create the contact name address.
+		SipURI contactURI = protocolObjects.addressFactory.createSipURI(fromName, host);
+		contactURI.setPort(listeningPoint.getPort());
+		
+		Address contactAddress = protocolObjects.addressFactory.createAddress(contactURI);
+		
+		// Add the contact address.
+		contactAddress.setDisplayName(fromName);
+		
+		contactHeader = protocolObjects.headerFactory.createContactHeader(contactAddress);
+		request.addHeader(contactHeader);
+		
+		String sdpData = "v=0\r\n"
+				+ "o=4855 13760799956958020 13760799956958020"
+				+ " IN IP4  129.6.55.78\r\n" + "s=mysession session\r\n"
+				+ "p=+46 8 52018010\r\n" + "c=IN IP4  129.6.55.78\r\n"
+				+ "t=0 0\r\n" + "m=audio 6022 RTP/AVP 0 4 18\r\n"
+				+ "a=rtpmap:0 PCMU/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
+				+ "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";
+		byte[] contents = sdpData.getBytes();
+		
+		request.setContent(contents, contentTypeHeader);
+		
+		Header callInfoHeader = protocolObjects.headerFactory.createHeader("Call-Info",
+				"<http://www.antd.nist.gov>");
+		request.addHeader(callInfoHeader);
+		
+		return request;
+	}
+	
 	/**
 	 * @throws SipException
 	 * @throws TransactionUnavailableException
@@ -1337,5 +1571,24 @@ public class TestSipListener implements SipListener {
 
 	public void setPublishContentMessage(String publishContentMessage) {
 		this.publishContentMessage = publishContentMessage;		
+	}
+
+	public void setChallengeRequests(boolean challengeRequests) {
+		this.challengeRequests = challengeRequests; 
+	}
+
+	/**
+	 * @param timeToWaitBetweenProvisionnalResponse the timeToWaitBetweenProvisionnalResponse to set
+	 */
+	public void setTimeToWaitBetweenProvisionnalResponse(
+			long timeToWaitBetweenProvisionnalResponse) {
+		this.timeToWaitBetweenProvisionnalResponse = timeToWaitBetweenProvisionnalResponse;
+	}
+
+	/**
+	 * @return the timeToWaitBetweenProvisionnalResponse
+	 */
+	public long getTimeToWaitBetweenProvisionnalResponse() {
+		return timeToWaitBetweenProvisionnalResponse;
 	}	
 }
