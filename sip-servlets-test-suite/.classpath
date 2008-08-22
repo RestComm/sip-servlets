@@ -23,7 +23,6 @@
 	<classpathentry kind="src" output="applications/speed-dial-servlet/src/main/sipapp/WEB-INF/classes" path="applications/speed-dial-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/listeners-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/listeners-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/timers-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/timers-sip-servlet/src/main/java"/>
-	<classpathentry kind="src" output="applications/secure-servlet/src/main/sipapp/WEB-INF/classes" path="applications/secure-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/session-state-uas/src/main/sipapp/WEB-INF/classes" path="applications/session-state-uas/src/main/java"/>
 	<classpathentry kind="src" output="applications/session-state-uac/src/main/sipapp/WEB-INF/classes" path="applications/session-state-uac/src/main/java"/>
 	<classpathentry kind="src" output="applications/annotated-servlet/src/main/sipapp/WEB-INF/classes" path="applications/annotated-servlet/src/main/java"/>
