@@ -42,7 +42,7 @@ public class ShootmeSipServletAuth extends SipServlet implements SipErrorListene
 		super.doBranchResponse(resp);
 	}
 
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Log logger = LogFactory.getLog(ShootmeSipServletAuth.class);
 	private static String TEST_REINVITE_USERNAME = "reinvite";
 	private static String TEST_CANCEL_USERNAME = "cancel";
 	
