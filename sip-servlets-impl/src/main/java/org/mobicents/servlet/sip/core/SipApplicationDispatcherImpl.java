@@ -182,7 +182,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isInfoEnabled()) {
 			logger.info("Using the following Application Router : " + sipApplicationRouter.getClass().getName());
 		}
-		sipApplicationRouter.init(new ArrayList<String>(applicationDeployed.keySet()));		
+		sipApplicationRouter.init();
+		sipApplicationRouter.applicationDeployed(new ArrayList<String>(applicationDeployed.keySet()));
 		
 		if( oname == null ) {
 			try {				

@@ -87,7 +87,7 @@ public interface B2buaHelper {
 	javax.servlet.sip.SipServletRequest createRequest(
 			javax.servlet.sip.SipServletRequest origRequest, boolean linked,
 			java.util.Map<java.lang.String, List<java.lang.String>> headerMap)
-			throws java.lang.IllegalArgumentException;
+			throws java.lang.IllegalArgumentException, TooManyHopsException;
 
 	/**
 	 * Creates a new subsequent request based on the specified original request.

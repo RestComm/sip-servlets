@@ -267,7 +267,7 @@ public class SipFactoryImpl implements Serializable {
 					+ origRequest + "] with same call id[" + sameCallId + "]");
 		}
 
-	    return origRequest.getB2buaHelper().createRequest(origRequest, true, null);
+	    return origRequest.getB2buaHelper().createRequest(origRequest);
 	}
 
 	/*

@@ -123,8 +123,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
 				} catch (Throwable e) {
-					logger.warn("Impossible to parse the sip deployment descriptor",
-							e);
+					logger.warn("Impossible to parse the sip.xml deployment descriptor");
 					ok = false;
 				}
 			} else {

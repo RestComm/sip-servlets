@@ -121,12 +121,13 @@ public class SipContextConfig extends ContextConfig implements
 					sipDigester.resolveEntity(null, null);
 					sipDigester.parse(sipXmlInputStream);
 				} catch (Throwable e) {
-					logger.warn("Impossible to parse the sip deployment descriptor",
-							e);
+					logger.warn("Impossible to parse the sip.xml deployment descriptor");
 					ok = false;
 				}
 			} else {
-				logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
+				if(logger.isInfoEnabled()) {
+					logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
+				}
 				ok = false;
 			}	
 			

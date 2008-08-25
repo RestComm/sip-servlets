@@ -288,11 +288,8 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init(List<String> deployedApplicationNames) {
-		init();
-		synchronized (containerDeployedApplicationNames) {
-			this.containerDeployedApplicationNames.addAll(deployedApplicationNames);
-		}
+	public void init(Properties properties) {
+		init();		
 	}
 	
 	/* (non-Javadoc)

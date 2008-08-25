@@ -17,6 +17,7 @@
 package javax.servlet.sip.ar;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.sip.SipServletRequest;
 
@@ -53,6 +54,6 @@ public interface SipApplicationRouter{
     /**
      * Container calls this method to initialize the application router, with applications that are currently deployed.
      */
-    void init(List<String> deployedApplicationNames);
+    void init(Properties properties);
 
 }
