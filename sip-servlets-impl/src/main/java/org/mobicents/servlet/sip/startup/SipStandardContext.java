@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.sip.SipServletRequest;
@@ -37,6 +38,7 @@ import javax.servlet.sip.TimerService;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
@@ -272,6 +274,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 										
 	}
 
+	@Override
+	public ServletContext getServletContext() {
+        if (context == null) {
+            context = new ConvergedApplicationContext(getBasePath(), this);
+            if (getAltDDName() != null)
+                context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
+        }
+
+        return ((ConvergedApplicationContext)context).getFacade();
+
+    }
+	
 	@Override
 	public boolean listenerStart() {
 		boolean ok = super.listenerStart();

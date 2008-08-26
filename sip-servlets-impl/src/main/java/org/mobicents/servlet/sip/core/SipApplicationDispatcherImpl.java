@@ -319,6 +319,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isInfoEnabled()) {
 			logger.info("the following sip servlet application has been added : " + sipApplicationName);
 		}
+		if(logger.isInfoEnabled()) {
+			logger.info("It contains the following Sip Servlets : ");
+			for(String servletName : sipApplication.getChildrenMap().keySet()) {
+				logger.info("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
+			}
+		}
 	}
 	/**
 	 * {@inheritDoc}
