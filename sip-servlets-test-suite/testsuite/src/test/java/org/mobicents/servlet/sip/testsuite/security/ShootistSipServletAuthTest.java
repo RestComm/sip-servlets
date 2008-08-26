@@ -31,7 +31,8 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	private static Log logger = LogFactory.getLog(ShootistSipServletAuthTest.class);		
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 20000;	
+	private static final int TIMEOUT = 30000;	
+	private static final int TIME_TO_WAIT_BETWEEN_PROV_RESPONSES = 7000;
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener receiver;
@@ -70,7 +71,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		provisionalResponsesToSend.add(Response.TRYING);
 		provisionalResponsesToSend.add(Response.SESSION_PROGRESS);		
 		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
-		receiver.setTimeToWaitBetweenProvisionnalResponse(5000);
+		receiver.setTimeToWaitBetweenProvisionnalResponse(TIME_TO_WAIT_BETWEEN_PROV_RESPONSES);
 		SipProvider senderProvider = receiver.createProvider();			
 		
 		senderProvider.addSipListener(receiver);
