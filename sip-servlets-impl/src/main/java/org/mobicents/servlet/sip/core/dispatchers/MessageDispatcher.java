@@ -142,7 +142,11 @@ public abstract class MessageDispatcher {
 				readOnlyRequest = null;
 			}
 			if(id == null) {
-				throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");
+				//JSR 289 Section 18.2.5 @SipApplicationKey Annotation , The container should treat a "null" return 
+				//or an invalid session id as a failure to obtain a key from the application. 
+				//It is recommended that the container create a new SipApplicationSession for the incoming request in such a case.
+//				throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");				
+				id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("For request target to application " + sipContext.getApplicationName() + 

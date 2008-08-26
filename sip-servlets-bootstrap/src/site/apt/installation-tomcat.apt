@@ -11,7 +11,7 @@ Installation Instructions
 	Open up the pom.xml from sip-servlets-bootstrap project and change the following property tomcat.home at the end of the file
 	Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-6.0.14 
 	
-	Run mvn clean install from the project root (sip-servlets-bootstrap)
+	Run <<<mvn clean install>>> from the project root
 	
 	Open the project with Eclipse,
 	You need to add the M2_REPO variable so that eclipse can locate the jar files.
@@ -30,13 +30,13 @@ Installation Instructions
 	To run the sip servlet container :
 	check that the following files have been copied during the mvn clean install
 	
-		* in tomcat_home/lib directory, there should be a sip-servlets-impl-0.5.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-impl-0.6-SNAPSHOT.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-servlets-application-router-0.5.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-application-router-0.6-SNAPSHOT.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-balancer-1.0.jar
+		* in tomcat_home/lib directory, there should be a sip-balancer-1.0-SNAPSHOT.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-servlets-spec-1.1.5.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-spec-1.1.6-SNAPSHOT.jar
 		
 		* in tomcat_home/lib directory, there should be a jain-sip-api-1.2.jar
 		

@@ -10,7 +10,7 @@ Installation Instructions
 	
 	Set the JBOSS_HOME environment variable to the same as your jboss root installation by example E:\servers\jboss-4.2.2.GA 
 	
-	Run <<<mvn clean install -P jboss>>> (-P jboss is to activate the jboss profile) from the project root (sip-servlets-bootstrap)
+	Run <<<mvn clean install -P jboss>>> (-P jboss is to activate the jboss profile) from the project root
 	
 	Open the project with Eclipse,
 	You need to add the M2_REPO variable so that eclipse can locate the jar files.\
@@ -28,13 +28,13 @@ Installation Instructions
 	To run the sip servlet container :\
 	Check that the following files have been copied during the <<<mvn clean install -P jboss>>>
 	
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-impl-0.5-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-impl-0.6-SNAPSHOT.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-application-router-0.5.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-application-router-0.6-SNPASHOT.jar
 	
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-balancer-1.0.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-balancer-1.0-SNPASHOT.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-spec-1.1.5.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-spec-1.1.6-SNAPSHOT.jar
 		
 		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-api-1.2.jar
 		

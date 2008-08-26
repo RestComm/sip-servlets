@@ -513,7 +513,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			ConvergedSessionReplicationContext.enterSipapp(null, null, true);
 		}
 		try {
-			if(sipSessionImpl.isReadyToInvalidate()) {
+			if(logger.isInfoEnabled()) {
+				logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+			}
+			if(sipSessionImpl.isReadyToInvalidate()) {				
 				sipSessionImpl.onTerminatedState();
 			}
 		} finally {
@@ -607,7 +610,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 			} else {
 				if(logger.isInfoEnabled()) {
-					logger.info("Invalidating sip session " + sipSessionImpl.getId() + " if ready to invalidate " + sipSessionImpl.isReadyToInvalidate());
+					logger.info("sip session " + sipSessionImpl.getId() + " returned for this transaction " + transaction);
 				}
 				sipSessionImpl.removeOngoingTransaction(transaction);
 				tryToInvalidateSession(sipSessionImpl);

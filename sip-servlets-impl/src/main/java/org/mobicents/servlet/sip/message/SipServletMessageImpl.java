@@ -722,12 +722,15 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	public String getHeader(String name) {
 
 		String nameToSearch = getCorrectHeaderName(name);
-
-		if (this.message.getHeader(nameToSearch) != null)
-			return ((SIPHeader) this.message.getHeader(nameToSearch))
+		String value = null;
+		if (this.message.getHeader(nameToSearch) != null) {
+			value = ((SIPHeader) this.message.getHeader(nameToSearch))
 					.getHeaderValue();
-		else
-			return null;
+		}
+//		if(logger.isDebugEnabled()) {
+//			logger.debug("getHeader "+ name+ ", value="+ value	);
+//		}
+		return value;
 	}
 
 	/*
