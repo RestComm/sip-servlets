@@ -291,10 +291,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)) {
-				Request request = (Request) sessionCreatingTransaction.getRequest().clone();
-				sipServletRequest = new SipServletRequestImpl(
-						request, this.sipFactory, this, null, null,
-						false);
+				Request request = (Request) sessionCreatingTransaction.getRequest().clone();				
 				
 				CSeqHeader cSeq = (CSeqHeader) request.getHeader((CSeqHeader.NAME));
 				try {
@@ -310,7 +307,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 				try {
 					ClientTransaction retryTran = sipProvider
 						.getNewClientTransaction(request);
-					sessionCreatingTransaction = retryTran;				
+					
+					sipServletRequest = new SipServletRequestImpl(
+							request, this.sipFactory, this, retryTran, retryTran.getDialog(),
+							true);
+					
 					// SIP Request is ALWAYS pointed to by the client tx.
 					// Notice that the tx appplication data is cached in the request
 					// copied over to the tx so it can be quickly accessed when response
@@ -320,13 +321,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 					Dialog dialog = retryTran.getDialog();
 					if (dialog == null && JainSipUtils.dialogCreatingMethods.contains(sipServletRequest.getMethod())) {					
 						dialog = sipProvider.getNewDialog(retryTran);
-						this.setSessionCreatingDialog(dialog);
 						dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
 						if(logger.isDebugEnabled()) {
 							logger.debug("new Dialog for request " + sipServletRequest + ", ref = " + dialog);
 						}
 					}													
-															
+					sessionCreatingDialog = dialog;
+					
 					sipServletRequest.setTransaction(retryTran);					
 				} catch (TransactionUnavailableException e) {
 					logger.error("Cannot get a new transaction for the request " + sipServletRequest,e);
@@ -725,6 +726,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					" doesn't exist in the sip application " + sipContext.getApplicationName());
 		}		
 		this.handlerServlet = name;
+		sipContext.setCurrentRequestHandler(handlerServlet);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
 		}

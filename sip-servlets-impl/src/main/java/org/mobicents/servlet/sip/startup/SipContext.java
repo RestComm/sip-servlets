@@ -65,6 +65,10 @@ public interface SipContext extends Context {
 
 	void setMainServlet(String mainServlet);
 
+	String getCurrentRequestHandler();
+
+	void setCurrentRequestHandler(String currentRequestHandler);
+	
 	int getProxyTimeout();
 	
 	void setProxyTimeout(int proxyTimeout);

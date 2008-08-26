@@ -31,7 +31,6 @@ import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
@@ -149,6 +148,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		SipServletRequestImpl sipServletAckRequest = null; 
 		try {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dialog to create the ack Request " + dialog);
+			}
 			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
 			if(logger.isInfoEnabled()) {
 				logger.info("ackRequest just created " + ackRequest);

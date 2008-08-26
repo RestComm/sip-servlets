@@ -152,6 +152,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 					return ;
 				} else {
 					sipServletResponse.setSipSession(session);
+					session.setSessionCreatingTransaction(clientTransaction);
+					session.setSessionCreatingDialog(dialog);
 				}			
 				
 				if(logger.isInfoEnabled()) {

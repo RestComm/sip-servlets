@@ -42,7 +42,7 @@ public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 1000;
+	private static final int TIMEOUT = 10000;
 	private static final int TIMEOUT_TIMER = 6000;	
 //	private static final int TIMEOUT = 100000000;
 	

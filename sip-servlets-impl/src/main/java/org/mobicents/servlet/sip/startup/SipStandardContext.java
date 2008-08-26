@@ -94,6 +94,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected int sipApplicationSessionTimeout;
 	protected SipListenersHolder listeners;
 	protected String mainServlet;	
+	protected String currentRequestHandler;
 	protected SipFactoryFacade sipFactoryFacade;	
 	protected SipSessionsUtilImpl sipSessionsUtil;
 	protected SipLoginConfig sipLoginConfig;
@@ -541,7 +542,22 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public void setMainServlet(String mainServlet) {
 		this.mainServlet = mainServlet;
+		this.currentRequestHandler = mainServlet;
 	}
+	/**
+	 * @param currentServletHandler the currentServletHandler to set
+	 */
+	public void setCurrentRequestHandler(String currentRequestHandler) {
+		this.currentRequestHandler = currentRequestHandler;
+	}
+
+	/**
+	 * @return the currentServletHandler
+	 */
+	public String getCurrentRequestHandler() {
+		return currentRequestHandler;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getProxyTimeout()
 	 */

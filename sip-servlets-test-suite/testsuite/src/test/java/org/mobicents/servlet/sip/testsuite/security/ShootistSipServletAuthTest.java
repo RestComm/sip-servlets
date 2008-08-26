@@ -84,7 +84,8 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.getByeReceived());		
+		assertTrue(receiver.isAckReceived());
+		assertTrue(receiver.getByeReceived());
 	}
 
 	@Override

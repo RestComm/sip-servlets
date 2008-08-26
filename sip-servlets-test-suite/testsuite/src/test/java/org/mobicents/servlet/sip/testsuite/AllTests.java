@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.mobicents.servlet.sip.testsuite.address.AddressTest;
 import org.mobicents.servlet.sip.testsuite.address.SipURITest;
 import org.mobicents.servlet.sip.testsuite.address.TelURLTest;
 import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
@@ -103,6 +104,7 @@ public class AllTests {
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);
+		suite.addTestSuite(AddressTest.class);
 		suite.addTestSuite(TelURLTest.class);
 		
 		//$JUnit-END$
