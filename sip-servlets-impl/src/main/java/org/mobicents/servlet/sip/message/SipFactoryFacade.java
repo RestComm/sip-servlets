@@ -116,7 +116,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, Address from, Address to) {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, sipContext.getCurrentRequestHandler());
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, ((MobicentsSipApplicationSession)appSession).getCurrentRequestHandler());
 		return sipServletRequest;
 	}
 
@@ -125,7 +125,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, String from, String to) throws ServletParseException {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, sipContext.getCurrentRequestHandler());
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, ((MobicentsSipApplicationSession)appSession).getCurrentRequestHandler());
 		return sipServletRequest;
 	}
 
@@ -134,7 +134,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, URI from, URI to) {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, sipContext.getCurrentRequestHandler());
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, ((MobicentsSipApplicationSession)appSession).getCurrentRequestHandler());
 		return sipServletRequest;
 	}
 
@@ -157,7 +157,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 		MobicentsSipSession sipSessionImpl = (MobicentsSipSession)request.getSession();
 		if(sipSessionImpl.getHandler() == null) {
 			try {
-				sipSessionImpl.setHandler(sipContext.getCurrentRequestHandler());
+				sipSessionImpl.setHandler(sipContext.getMainServlet());
 //				((SipApplicationSessionImpl)sipSessionImpl.getApplicationSession()).setSipContext(sipContext);
 			} catch (ServletException se) {
 				//should never happen

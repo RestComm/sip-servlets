@@ -726,7 +726,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					" doesn't exist in the sip application " + sipContext.getApplicationName());
 		}		
 		this.handlerServlet = name;
-		sipContext.setCurrentRequestHandler(handlerServlet);
+		sipApplicationSession.setCurrentRequestHandler(handlerServlet);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
 		}

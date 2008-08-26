@@ -246,7 +246,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			} 									
 			String sipSessionHandlerName = sipSessionImpl.getHandler();						
 			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
-				String mainServlet = sipContext.getCurrentRequestHandler();
+				String mainServlet = appSession.getCurrentRequestHandler();
 				if(mainServlet != null && mainServlet.length() > 0) {
 					sipSessionHandlerName = mainServlet;				
 				} else {

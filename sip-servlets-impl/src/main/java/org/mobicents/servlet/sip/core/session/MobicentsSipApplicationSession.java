@@ -57,4 +57,9 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	void setExpired(boolean isExpired);
 	
 	boolean isExpired();
+	
+	String getCurrentRequestHandler();
+
+	void setCurrentRequestHandler(String currentRequestHandler);
+
 }

@@ -113,7 +113,7 @@ public abstract class MessageDispatcher {
 		}
 	}
 	
-	protected static SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) {
+	protected static SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) throws DispatcherException {
 		String id = null;
 		boolean isAppGeneratedKey = false;
 		Request request = (Request) sipServletRequestImpl.getMessage();
@@ -133,11 +133,11 @@ public abstract class MessageDispatcher {
 				id = (String) appKeyMethod.invoke(null, new Object[] {readOnlyRequest});
 				isAppGeneratedKey = true;
 			} catch (IllegalArgumentException e) {
-				logger.error("Couldn't invoke the app session key annotated method !", e);
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't invoke the app session key annotated method !" ,e);		
 			} catch (IllegalAccessException e) {
-				logger.error("Couldn't invoke the app session key annotated method !", e);
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't invoke the app session key annotated method !" ,e);
 			} catch (InvocationTargetException e) {
-				logger.error("Couldn't invoke the app session key annotated method !", e);
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "A Problem occured while invoking the app session key annotated method !" ,e);
 			} finally {
 				readOnlyRequest = null;
 			}

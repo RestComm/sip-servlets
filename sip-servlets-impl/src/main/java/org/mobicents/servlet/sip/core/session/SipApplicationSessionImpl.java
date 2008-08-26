@@ -153,6 +153,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * The first sip application for subsequent requests.
 	 */
 	protected transient SipContext sipContext;
+	
+	protected String currentRequestHandler;
 		
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
@@ -161,6 +163,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		this.key = key;
 		this.sipContext = sipContext;
+		this.currentRequestHandler = sipContext.getMainServlet();
 		lastAccessedTime = creationTime = System.currentTimeMillis();
 		expired = false;		
 		isValid = true;
@@ -799,4 +802,18 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		this.expired = expired;
 	}
 
+	/**
+	 * @param currentServletHandler the currentServletHandler to set
+	 */
+	public void setCurrentRequestHandler(String currentRequestHandler) {
+		this.currentRequestHandler = currentRequestHandler;
+	}
+
+	/**
+	 * @return the currentServletHandler
+	 */
+	public String getCurrentRequestHandler() {
+		return currentRequestHandler;
+	}
+	
 }
