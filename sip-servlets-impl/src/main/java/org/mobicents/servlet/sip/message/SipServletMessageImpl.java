@@ -711,7 +711,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress());
+		AddressImpl address = new AddressImpl(from.getAddress(), transaction == null ? true : false);
 		return address;
 	}
 	
@@ -989,7 +989,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public Address getTo() {
 		return new AddressImpl(((ToHeader) this.message
-				.getHeader(getCorrectHeaderName(ToHeader.NAME))).getAddress());
+				.getHeader(getCorrectHeaderName(ToHeader.NAME))).getAddress(), transaction == null ? true : false);
 	}
 
 	/*

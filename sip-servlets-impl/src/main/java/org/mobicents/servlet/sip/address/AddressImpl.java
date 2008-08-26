@@ -17,16 +17,18 @@
 package org.mobicents.servlet.sip.address;
 
 import gov.nist.core.NameValueList;
+import gov.nist.javax.sip.address.RFC2396UrlDecoder;
 import gov.nist.javax.sip.header.AddressParametersHeader;
-import gov.nist.javax.sip.header.From;
+import gov.nist.javax.sip.header.Contact;
 
 import java.text.ParseException;
 import java.util.Iterator;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.URI;
+import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
-import javax.sip.header.FromHeader;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.Parameters;
 
@@ -40,13 +42,17 @@ import org.mobicents.servlet.sip.SipFactories;
  * 
  */
 public class AddressImpl  extends ParameterableImpl implements Address {
-
+	
 //	private static Log logger = LogFactory.getLog(AddressImpl.class
 //			.getCanonicalName());
 	
+	private static final String Q_PARAM_NAME = "q";
+	private static final String EXPIRES_PARAM_NAME = "expires";
 	private javax.sip.address.Address address;	
-
+	private transient boolean isModifiable = true;
+	
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
+	private static AddressFactory addressFactory = SipFactories.addressFactory;
 	
 	public javax.sip.address.Address getAddress() {
 		return address;
@@ -55,8 +61,9 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	public AddressImpl() {}
 	
 	@SuppressWarnings("unchecked")
-	public AddressImpl (javax.sip.address.Address address) {
+	public AddressImpl (javax.sip.address.Address address, boolean isModifiable) {
 		this.address = address;				
+		this.isModifiable = isModifiable;
 		Parameters uri = (Parameters) this.address.getURI();
 		Iterator<String> parameterNames = uri.getParameterNames();
 		while (parameterNames.hasNext()) {
@@ -107,16 +114,16 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#getExpires()
 	 */
 	public int getExpires() {		
-		return this.parameters.get("expires") == null ? -1 : 
-			Integer.parseInt(this.parameters.get("expires").getValue());		
+		return ((SipURI)address.getURI()).getParameter(EXPIRES_PARAM_NAME) == null ? -1 : 
+			Integer.parseInt(((SipURI)address.getURI()).getParameter(EXPIRES_PARAM_NAME));		
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Address#getQ()
 	 */
 	public float getQ() {
-		return this.parameters.get("expires") == null ? (float) -1.0  : 
-			Float.parseFloat(this.parameters.get("expires").getValue());
+		return ((SipURI)address.getURI()).getParameter(Q_PARAM_NAME) == null ? (float) -1.0  : 
+			Float.parseFloat(((SipURI)address.getURI()).getParameter(Q_PARAM_NAME));
 	}
 	/*
 	 * (non-Javadoc)
@@ -143,6 +150,9 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#setDisplayName(java.lang.String)
 	 */
 	public void setDisplayName(String name) {
+		if(!isModifiable) {
+			throw new IllegalStateException("this Address is used in a context where it cannot be modified");
+		}
 		try {
 			getAddress().setDisplayName(name);
 		} catch (ParseException e) {
@@ -161,7 +171,7 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 		if (uri instanceof SipURI) {
 			SipURI sipUri = (SipURI) uri;
 			try {
-				sipUri.setParameter("expires", Integer.toString(seconds));
+				sipUri.setParameter(EXPIRES_PARAM_NAME, Integer.toString(seconds));
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",
 						e);
@@ -176,9 +186,14 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#setQ(float)
 	 */
 	public void setQ(float q) {
+		if(q <= 0.0 || q >= 1.0) {
+			if(q!=-1.0) {
+				throw new IllegalArgumentException("the new qvalue isn't between 0.0 and 1.0 (inclusive) and isn't -1.0.");
+			}			
+		}
 		try {
 			Parameters uri = (Parameters) this.address.getURI();
-			uri.setParameter("q", Float.toString(q));
+			uri.setParameter(Q_PARAM_NAME, Float.toString(q));
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad parameter", ex);
 		}
@@ -188,11 +203,15 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#setURI(javax.servlet.sip.URI)
 	 */
 	public void setURI(URI uri) {
+		if(!isModifiable) {
+			throw new IllegalStateException("this Address is used in a context where it cannot be modified");
+		}
 		this.getAddress().setURI(((URIImpl) uri).uri);
 	}
 	
 	public Object clone() {
 		AddressImpl retval = new AddressImpl();
+		retval.address = (javax.sip.address.Address) address.clone();
 		retval.parameters = (NameValueList) this.parameters.clone();
 		return retval;
 	}
@@ -220,11 +239,11 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Parameterable#setValue(java.lang.String)
 	 */
 	public void setValue(String value) {
-		try {
-			FromHeader fromHeader = (FromHeader) headerFactory.createHeader(
-					FromHeader.NAME, value);
-			this.address = fromHeader.getAddress();
-			this.parameters = ((From) fromHeader).getParameters();
+		try {			
+			ContactHeader contactHeader = (ContactHeader) headerFactory.createHeader(
+					ContactHeader.NAME, value);
+			this.address = addressFactory.createAddress(value);
+			this.parameters = ((Contact) contactHeader).getParameters();
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal argument", ex);
 		}
@@ -243,5 +262,52 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Problem setting parameter",e);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((address == null) ? 0 : address.hashCode());
+		result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final AddressImpl other = (AddressImpl) obj;
+		if (address.getURI() == null) {
+			if (other.address.getURI() != null)
+				return false;
+		} else if (!address.getURI().equals(other.address.getURI())) {
+			return false;
+		}
+		if (parameters == null) {
+			if (other.parameters != null)
+				return false;
+		} else {
+			for (Iterator<String> it = parameters.getNames(); it.hasNext();) {
+				String pname = it.next();
+				
+				String p1 = parameters.getParameter(pname);
+				String p2 = other.parameters.getParameter(pname);
+				
+				// those present in both must match (case-insensitive)
+				if (p1!=null && p2!=null && !RFC2396UrlDecoder.decode(p1).equalsIgnoreCase(RFC2396UrlDecoder.decode(p2))) return false;
+			}
+		}
+		return true;
 	}
 }

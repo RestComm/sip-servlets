@@ -325,7 +325,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public Address getPoppedRoute() {
 		AddressImpl addressImpl = null;
 		if (this.popedRouteHeader != null) {
-			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress());			
+			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress(), getTransaction() == null ? true : false);			
 		}
 		return addressImpl;
 	}

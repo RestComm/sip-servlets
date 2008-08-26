@@ -442,11 +442,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getLocalParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getLocalParty());
+			return new AddressImpl(sessionCreatingDialog.getLocalParty(), false);
 		} else if (sessionCreatingTransaction != null){
 			try {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader.getAddress());
+				return new AddressImpl(fromHeader.getAddress(), false);
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
@@ -494,11 +494,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getRemoteParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getRemoteParty());
+			return new AddressImpl(sessionCreatingDialog.getRemoteParty(), false);
 		} else if (sessionCreatingTransaction != null){
 			try {
 				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
-				return new AddressImpl(toHeader.getAddress());
+				return new AddressImpl(toHeader.getAddress(), false);
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
