@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 
 import java.text.ParseException;
+import java.util.Iterator;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -113,7 +114,14 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
-		assertTrue(sender.isRequestTerminatedReceived());	
+		assertTrue(sender.isRequestTerminatedReceived());			
+		Thread.sleep(TIMEOUT);
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue(sender.getAllMessagesContent().contains("cancelReceived"));
 	}
 
 	@Override

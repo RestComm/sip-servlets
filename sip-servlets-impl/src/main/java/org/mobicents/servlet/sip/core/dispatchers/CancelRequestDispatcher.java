@@ -208,36 +208,25 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 				logger.debug("the final response has already been sent, nothing to do here");
 			}
 		} else if(RoutingState.INITIAL.equals(inviteRequest.getRoutingState()) ||
-				RoutingState.SUBSEQUENT.equals(inviteRequest.getRoutingState())) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("the app didn't do anything with the request forwarding the cancel on the other tx");				
-			}
-			javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
-			
-			if(poppedAddress==null){
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "The popped route shouldn't be null for not proxied requests.");
-			}
-			
-			Request clonedRequest = (Request) request.clone();			
-            // Branch Id will be assigned by the stack.
-			String transport = JainSipUtils.findTransport(clonedRequest);		
-			ViaHeader viaHeader = JainSipUtils.createViaHeader(
-					sipNetworkInterfaceManager, transport, null);                                
-        
-            // Cancel is hop by hop so remove all other via headers.
-            clonedRequest.removeHeader(ViaHeader.NAME);                
-            clonedRequest.addHeader(viaHeader);                       
-            
+				RoutingState.SUBSEQUENT.equals(inviteRequest.getRoutingState())) {			
+						    
             if(inviteAppData.getTransaction() != null && inviteAppData.getTransaction() instanceof ClientTransaction) {
+            	if(logger.isDebugEnabled()) {
+    				logger.debug("the app didn't do anything with the request, sending a new CANCEL as we are hop by hop");				
+    			}
             	ClientTransaction clientTransaction = (ClientTransaction)inviteAppData.getTransaction();
             	//if there is another transaction we send it on the other transaction
 	            try {
+	            	// Cancel is hop by hop  so creating a new CANCEL and send it
 		            Request cancelRequest = clientTransaction.createCancel();
 		            sipProvider.getNewClientTransaction(cancelRequest).sendRequest();
 	            } catch (SipException e) {
 	            	throw new DispatcherException(Response.SERVER_INTERNAL_ERROR,"Impossible to send the CANCEL",e); 
 	    		} 
             } else {
+            	if(logger.isDebugEnabled()) {
+    				logger.debug("replying 487 to INVITE cancelled");				
+    			}
             	//otherwise it means that this is for the app
             	try {
 					send487Response(inviteTransaction, inviteRequest);

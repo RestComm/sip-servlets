@@ -21,8 +21,10 @@ import java.io.IOException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -34,7 +36,10 @@ import org.apache.commons.logging.LogFactory;
 
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-
+	
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	private static final String CANCEL_RECEIVED = "cancelReceived";
+	
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {
@@ -122,6 +127,30 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		if(!"true".equals(request.getApplicationSession().getAttribute("doBranchResponse")))
 			sipServletResponse.send();
 	}	
+	
+	@Override
+	protected void doCancel(SipServletRequest request) throws ServletException,
+			IOException {
+		
+		logger.info("Got CANCEL request: " + request);
+		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
+		try {
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipFactory.createApplicationSession(), 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(CANCEL_RECEIVED.length());
+			sipServletRequest.setContent(CANCEL_RECEIVED, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
 
 	// SipErrorListener methods
 
