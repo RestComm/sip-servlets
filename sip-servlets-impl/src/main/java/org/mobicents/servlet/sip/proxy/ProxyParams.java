@@ -17,17 +17,18 @@
 package org.mobicents.servlet.sip.proxy;
 
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 public class ProxyParams
 {
-	public ProxyParams(SipURI destination, SipURI outboundInterface, SipURI routeRecord, SipURI path)
+	public ProxyParams(URI destination, SipURI outboundInterface, SipURI routeRecord, SipURI path)
 	{
 		this.destination = destination;
 		this.outboundInterface = outboundInterface;
 		this.routeRecord = routeRecord;
 		this.path = path;
 	}
-	public SipURI destination;
+	public URI destination;
 	public SipURI outboundInterface;
 	public SipURI routeRecord;
 	public SipURI path;// for REGISTER path header

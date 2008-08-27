@@ -27,14 +27,15 @@ import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
+import javax.sip.address.TelURL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
-public class ParallelProxyWithRecordRouteTest extends SipServletTestCase implements SipListener {
+public class ParallelProxyTelURLWithRecordRouteTest extends SipServletTestCase implements SipListener {
 
-	private static Log logger = LogFactory.getLog(ParallelProxyWithRecordRouteTest.class);
+	private static Log logger = LogFactory.getLog(ParallelProxyTelURLWithRecordRouteTest.class);
 
 	protected Shootist shootist;
 
@@ -48,7 +49,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 
 	private static final int receiversCount = 1;
 
-	public ParallelProxyWithRecordRouteTest(String name) {
+	public ParallelProxyTelURLWithRecordRouteTest(String name) {
 		super(name);
 
 		this.sipIpAddress="0.0.0.0";
@@ -65,7 +66,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 	public void testProxy() {
 		this.shootme.init("stackName");
 		this.cutme.init();
-		this.shootist.init("useHostName",false);
+		this.shootist.init("useHostName", true);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {

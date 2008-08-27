@@ -19,7 +19,9 @@ package org.mobicents.servlet.sip.testsuite;
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
@@ -28,6 +30,7 @@ import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,8 +79,18 @@ public class ShootistSipServlet
 	public void servletInitialized(SipServletContextEvent ce) {
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-		SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
-		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+		
+		URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
+		URI toURI = null;
+		if(ce.getServletContext().getInitParameter("urlType") != null && ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
+			try {
+				toURI = sipFactory.createURI("tel:+358-555-1234567");
+			} catch (ServletParseException e) {
+				logger.error("Impossible to create the tel URL", e);
+			}
+		} else {
+			toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+		}
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");

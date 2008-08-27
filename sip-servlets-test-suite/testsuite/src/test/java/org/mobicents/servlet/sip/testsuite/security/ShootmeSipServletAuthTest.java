@@ -23,6 +23,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,6 +62,10 @@ public class ShootmeSipServletAuthTest extends SipServletTestCase {
 		context.setPath("sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("testContextApplicationParameter");
+		applicationParameter.setValue("OK");
+		context.addApplicationParameter(applicationParameter);
 		MemoryRealm realm = new MemoryRealm();
 		realm
 				.setPathname(projectHome

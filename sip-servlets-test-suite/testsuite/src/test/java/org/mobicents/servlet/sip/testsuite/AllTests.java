@@ -38,6 +38,7 @@ import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJ
 import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
+import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyTelURLWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteUseHostNameTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
@@ -52,6 +53,7 @@ import org.mobicents.servlet.sip.testsuite.session.SessionHandlerSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
+import org.mobicents.servlet.sip.testsuite.simple.ShootistTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.NotifierSipServletTest;
@@ -69,6 +71,7 @@ public class AllTests {
 		suite.addTestSuite(ShootmeSipServletTest.class);
 		suite.addTestSuite(ShootmeTelURLSipServletTest.class);
 		suite.addTestSuite(ShootistSipServletTest.class);
+		suite.addTestSuite(ShootistTelURLSipServletTest.class);
 		suite.addTestSuite(ShootmeSipServletAuthTest.class);
 		suite.addTestSuite(ShootistSipServletAuthTest.class);
 		suite.addTestSuite(B2BUASipUnitTest.class);
@@ -81,6 +84,7 @@ public class AllTests {
 		suite.addTestSuite(CallControllerJunitTest.class);
 		suite.addTestSuite(CallControllerCancelTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteTest.class);
+		suite.addTestSuite(ParallelProxyTelURLWithRecordRouteTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteUseHostNameTest.class);
 		suite.addTestSuite(ProxyBranchTimeoutTest.class);
 		suite.addTestSuite(SpeedDialLocationServiceJunitTest.class);

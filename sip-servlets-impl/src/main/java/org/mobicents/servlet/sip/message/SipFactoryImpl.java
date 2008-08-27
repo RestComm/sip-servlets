@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.TreeSet;
 
 import javax.servlet.sip.Address;
@@ -30,7 +29,6 @@ import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
@@ -395,8 +393,7 @@ public class SipFactoryImpl implements Serializable {
 
 			// routeHeader = sipHeaderFactory.createRouteHeader(routeAddress);
 
-			SipURIImpl requestURI = (SipURIImpl) ((SipURIImpl) to.getURI())
-					.clone();
+			URIImpl requestURI = (URIImpl)to.getURI().clone();
 
 			// now lets put header params into headers.
 			Iterator<String> keys = to.getParameterNames();
@@ -420,7 +417,7 @@ public class SipFactoryImpl implements Serializable {
 			List<Header> viaHeaders = new ArrayList<Header>();
 						 			
 			requestToWrap = SipFactories.messageFactory.createRequest(
-					requestURI.getSipURI(), 
+					requestURI.getURI(), 
 					method, 
 					callIdHeader, 
 					cseqHeader, 

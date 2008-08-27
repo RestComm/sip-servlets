@@ -27,6 +27,7 @@ import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -54,7 +55,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private SipServletRequestImpl originalRequest;
 	private SipServletRequestImpl outgoingRequest;
 	private SipServletResponseImpl lastResponse;
-	private SipURI targetURI;
+	private URI targetURI;
 	private SipURI outboundInterface;
 	private SipURI recordRouteURI;
 	private boolean recordRoutingEnabled;
@@ -72,7 +73,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private List<ProxyBranch> recursedBranches;
 	
 	
-	public ProxyBranchImpl(SipURI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
+	public ProxyBranchImpl(URI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
 	{
 		this.targetURI = uri;
 		this.proxy = proxy;

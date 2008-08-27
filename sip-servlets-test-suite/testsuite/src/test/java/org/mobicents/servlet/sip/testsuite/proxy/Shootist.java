@@ -43,6 +43,8 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.address.Address;
 import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
+import javax.sip.address.TelURL;
+import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -285,10 +287,10 @@ public class Shootist implements SipListener {
 	}
 
 	public void init() {
-		init("BigGuy");
+		init("BigGuy", false);
 	}
 	
-	public void init(String fromName) {
+	public void init(String fromName, boolean useTelURL) {
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
@@ -359,8 +361,13 @@ public class Shootist implements SipListener {
 					fromNameAddress, "12345");
 
 			// create To Header
-			SipURI toAddress = addressFactory
-					.createSipURI(toUser, toSipAddress);
+			URI toAddress = null;
+			if(useTelURL) {
+				toAddress = addressFactory.createTelURL("+358-555-1234567");
+			} else {
+				toAddress = addressFactory
+				.createSipURI(toUser, toSipAddress);	
+			}			
 			Address toNameAddress = addressFactory.createAddress(toAddress);
 			toNameAddress.setDisplayName(toDisplayName);
 			ToHeader toHeader = headerFactory.createToHeader(toNameAddress,

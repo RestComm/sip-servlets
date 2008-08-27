@@ -39,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -350,12 +351,20 @@ public class ProxyImpl implements Proxy {
 				response.getMessage().getHeaders(ContactHeader.NAME);
 			while(headers.hasNext()) {
 				ContactHeader contactHeader = (ContactHeader) headers.next();
-				SipURIImpl sipUri = new SipURIImpl(
-						(javax.sip.address.SipURI)contactHeader.getAddress().getURI());
-				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(sipUri, this, sipFactoryImpl, this.recordRouteURI);
+				javax.sip.address.URI addressURI = contactHeader.getAddress().getURI();
+				URI contactURI = null;
+				if (addressURI instanceof javax.sip.address.SipURI) {
+					contactURI = new SipURIImpl(
+							(javax.sip.address.SipURI) addressURI);
+				} else if (addressURI instanceof javax.sip.address.TelURL) {
+					contactURI = new TelURLImpl(
+							(javax.sip.address.TelURL) addressURI);
+
+				}
+				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this, sipFactoryImpl, this.recordRouteURI);
 				recurseBranch.setRecordRoute(recordRoutingEnabled);
 				recurseBranch.setRecurse(recurse);
-				this.proxyBranches.put(sipUri, recurseBranch);
+				this.proxyBranches.put(contactURI, recurseBranch);
 				branch.addRecursedBranch(branch);
 				if(parallel) recurseBranch.start();
 				// if not parallel, just adding it to the list is enough

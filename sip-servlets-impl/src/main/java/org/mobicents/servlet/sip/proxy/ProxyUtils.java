@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -67,7 +68,7 @@ public class ProxyUtils {
 					logger.debug("request URI on the request to proxy : " + params.destination);
 				}
 				//this way everything is copied even the port but might not work for TelURI...
-				clonedRequest.setRequestURI(((SipURIImpl)params.destination).getURI());
+				clonedRequest.setRequestURI(((URIImpl)params.destination).getURI());
 				
 //				// Add route header
 //				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(

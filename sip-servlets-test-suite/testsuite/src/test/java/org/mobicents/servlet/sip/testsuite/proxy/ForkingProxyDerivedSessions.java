@@ -57,7 +57,7 @@ public class ForkingProxyDerivedSessions extends SipServletTestCase {
 	public void testProxy() {
 		this.ua1.init("ua1stackName");
 		this.ua2.init("ua2stackName");
-		this.shootist.init("useHostName");
+		this.shootist.init("useHostName", false);
 		for (int q = 0; q < 20; q++) {
 			if (!shootist.ended && !ua1.ended) {
 				logger.info("loop number " + q);

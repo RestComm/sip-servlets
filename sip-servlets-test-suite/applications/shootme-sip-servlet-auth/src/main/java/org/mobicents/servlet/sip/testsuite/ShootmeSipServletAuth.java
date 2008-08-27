@@ -53,7 +53,12 @@ public class ShootmeSipServletAuth extends SipServlet implements SipErrorListene
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the simple sip servlet has been started");
-		super.init(servletConfig);
+		super.init(servletConfig);		
+		if(!servletConfig.getServletContext().getInitParameter("testContextApplicationParameter").equals("OK")) {
+			throw new ServletException("Cannot read the Context ApplicationParameter");
+		} else {
+			logger.info("testContextApplicationParameter : " + servletConfig.getServletContext().getInitParameter("testContextApplicationParameter"));
+		}
 	}
 
 	/**
