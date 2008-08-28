@@ -59,6 +59,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -313,13 +314,20 @@ public class B2buaHelperImpl implements B2buaHelper {
 		if (session == null) {
 			throw new NullPointerException("Null arg");
 		}
-
+		if(!session.isValid()) {
+			throw new IllegalArgumentException("session is invalid !");
+		}
+		
 		MobicentsSipSession sipSession = (MobicentsSipSession) session;
 
+		
 		Transaction trans = sipSession.getSessionCreatingTransaction();				
 		TransactionApplicationData appData = (TransactionApplicationData) trans.getApplicationData();
 		
 		SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) appData.getSipServletMessage();
+		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
+			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
+		}
 		return sipServletRequestImpl.createResponse(status, reasonPhrase);
 	}
 	

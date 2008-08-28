@@ -80,6 +80,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -520,8 +521,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isInfoEnabled()) {
 				logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 			}
+			MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
 			if(sipSessionImpl.isReadyToInvalidate()) {				
 				sipSessionImpl.onTerminatedState();
+			}
+			if(sipApplicationSession.isReadyToInvalidate()) {
+				sipApplicationSession.tryToInvalidate();
 			}
 		} finally {
 			if (isDistributable) {

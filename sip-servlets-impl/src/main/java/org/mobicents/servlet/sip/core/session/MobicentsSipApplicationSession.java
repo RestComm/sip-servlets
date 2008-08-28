@@ -61,5 +61,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	String getCurrentRequestHandler();
 
 	void setCurrentRequestHandler(String currentRequestHandler);
+	
+	void tryToInvalidate();
 
 }

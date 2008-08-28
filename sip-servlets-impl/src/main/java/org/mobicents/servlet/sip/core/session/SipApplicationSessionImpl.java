@@ -222,6 +222,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
 		this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession);
+		readyToInvalidate = false;
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
@@ -231,6 +232,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	public void addHttpSession(HttpSession httpSession) {
 		this.httpSessions.putIfAbsent(httpSession.getId(), httpSession);
+		readyToInvalidate = false;
 	}
 	
 	public HttpSession removeHttpSession(HttpSession httpSession) {
@@ -452,7 +454,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		expirationTimerTask = null;
 		expirationTimerFuture = null;
 		httpSessions.clear();
-		key = null;
+//		key = null;
 		servletTimers.clear();
 		sipApplicationSessionAttributeMap.clear();
 		sipSessions.clear();			
@@ -762,14 +764,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					}
 				}
 			}
-			
-			if(readyToInvalidate) {	
-				// Here we give a chance to the app to modify invalidateWhenReady
-				if(invalidateWhenReady) {
-					notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
-					if(readyToInvalidate) attemptToInvalidate();
-				}
-			}
+						
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Sip application session already invalidated "+ key);
@@ -777,15 +772,23 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 	}
 	
-	private void attemptToInvalidate() {
-		boolean allSipSessionsInvalidated = true;
-		for(MobicentsSipSession sipSession:this.sipSessions.values()) {
-			if(sipSession.isValid()) {
-				allSipSessionsInvalidated = false;
-				break;
+	public void tryToInvalidate() {
+		if(isValid && invalidateWhenReady) {
+			notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
+			if(readyToInvalidate) {
+				boolean allSipSessionsInvalidated = true;
+				for(MobicentsSipSession sipSession:this.sipSessions.values()) {
+					if(sipSession.isValid()) {
+						allSipSessionsInvalidated = false;
+						break;
+					}
+				}
+				if(allSipSessionsInvalidated) {
+					this.invalidate();
+				}
 			}
 		}
-		if(allSipSessionsInvalidated) this.invalidate();
+		
 	}
 
 	/**
