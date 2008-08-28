@@ -18,7 +18,9 @@ package org.mobicents.servlet.sip.message;
 
 
 import gov.nist.javax.sip.header.AddressParametersHeader;
+import gov.nist.javax.sip.header.From;
 import gov.nist.javax.sip.header.SIPHeader;
+import gov.nist.javax.sip.header.To;
 import gov.nist.javax.sip.header.extensions.ReferredByHeader;
 import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
@@ -377,18 +379,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletMessage#addHeader(java.lang.String, java.lang.String)
-	 */
-	public void addHeader(String name, String value) {
-
+	protected void addHeaderInternal(String name, String value, boolean bypassSystemHeaderCheck) {
 		String hName = getFullHeaderName(name);
 
 		if (logger.isDebugEnabled())
 			logger.debug("Adding header under name [" + hName + "]");
 
-		if (isSystemHeader(hName)) {
+		if (!bypassSystemHeaderCheck && isSystemHeader(hName)) {
 
 			logger.error("Cant add system header [" + hName + "]");
 
@@ -404,7 +401,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
 		}
-
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#addHeader(java.lang.String, java.lang.String)
+	 */
+	public void addHeader(String name, String value) {
+		addHeaderInternal(name, value, false);
 	}
 
 	/*
@@ -711,7 +715,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress(), transaction == null ? true : false);
+		AddressImpl address = new AddressImpl(from.getAddress(), ((From)from).getParameters(), transaction == null ? true : false);
 		return address;
 	}
 	
@@ -988,8 +992,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getTo()
 	 */
 	public Address getTo() {
-		return new AddressImpl(((ToHeader) this.message
-				.getHeader(getCorrectHeaderName(ToHeader.NAME))).getAddress(), transaction == null ? true : false);
+		ToHeader to = (ToHeader) this.message
+			.getHeader(getCorrectHeaderName(ToHeader.NAME));
+		return new AddressImpl(to.getAddress(), ((To)to).getParameters(), transaction == null ? true : false);
 	}
 
 	/*
@@ -1032,14 +1037,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	
 	public void setUserPrincipal(Principal principal) {
 		this.userPrincipal = principal;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletMessage#isCommitted()
-	 */
-	public boolean isCommitted() {
-		return this.transaction.getState() != null;
 	}
 
 	/*

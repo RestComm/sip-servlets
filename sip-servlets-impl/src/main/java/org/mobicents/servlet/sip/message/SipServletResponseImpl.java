@@ -37,6 +37,7 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
@@ -70,6 +71,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	ProxyBranch proxyBranch;
 
 	private boolean isBranchResponse;
+	private boolean isProxiedResponse;
+	private boolean isResponseForwardedUpstream;
 	/**
 	 * Constructor
 	 * @param response
@@ -88,6 +91,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);
 		this.response = response;	
+		setProxiedResponse(false);
+		isBranchResponse = false;
+		isResponseForwardedUpstream = false;
 	}
 	
 	/**
@@ -400,6 +406,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			
 			st.sendResponse( (Response)this.message );
+			if(isProxiedResponse) {
+				isResponseForwardedUpstream = true;
+			}
 			//updating the last accessed times 
 			getSipSession().access();
 			getSipSession().getSipApplicationSession().access();
@@ -451,6 +460,33 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return isBranchResponse;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#isCommitted()
+	 */
+	public boolean isCommitted() {
+		//the message is an incoming non-reliable provisional response received by a servlet acting as a UAC
+		if(getTransaction() instanceof ServerTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") == null) {
+			return true;
+		}
+		//the message is an incoming reliable provisional response for which PRACK has already been generated. (Note that this scenario applies to containers that support the 100rel extension.)
+		if(getTransaction() instanceof ServerTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") != null && TransactionState.TERMINATED.equals(getTransaction().getState())) {
+			return true;
+		}
+		//the message is an incoming final response received by a servlet acting as a UAC for a Non INVITE transaction
+		if(getTransaction() instanceof ServerTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(getTransaction().getRequest().getMethod())) {
+			return true;
+		}
+		//the message is a response which has been forwarded upstream
+		if(isResponseForwardedUpstream) {
+			return true;
+		}
+		//message is an incoming final response to an INVITE transaction and an ACK has been generated
+		if(getTransaction() instanceof ServerTransaction && getStatus() >= 200 && getStatus() <= 999 && TransactionState.TERMINATED.equals(getTransaction().getState())) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * @param isBranchResponse the isBranchResponse to set
@@ -462,6 +498,19 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
 	}
-	
+
+	/**
+	 * @param isProxiedResponse the isProxiedResponse to set
+	 */
+	public void setProxiedResponse(boolean isProxiedResponse) {
+		this.isProxiedResponse = isProxiedResponse;
+	}
+
+	/**
+	 * @return the isProxiedResponse
+	 */
+	public boolean isProxiedResponse() {
+		return isProxiedResponse;
+	}
 	
 }

@@ -86,9 +86,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 				}
+				//add the response for access from B2BUAHelper.getPendingMessages
+				applicationData.addSipServletResponse(sipServletResponse);
 			} //there is no client transaction associated with it, it means that this is a retransmission
-			else if(dialog != null) {	
+			else if(dialog != null) {				
 				applicationData = (TransactionApplicationData)dialog.getApplicationData();
+				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
+					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+				}
 				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
 				if(proxyBranch == null) {
 					if(logger.isDebugEnabled()) {

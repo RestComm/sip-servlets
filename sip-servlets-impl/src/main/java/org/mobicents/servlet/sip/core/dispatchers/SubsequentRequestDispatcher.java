@@ -41,9 +41,11 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -160,6 +162,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
 				}
 			}
+			sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 			sipServletRequest.setSipSession(sipSession);			
 			// JSR 289 Section 6.2.1 :
 			// any state transition caused by the reception of a SIP message, 
@@ -178,6 +181,18 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				}
 				// If it's not for a proxy then it's just an AR, so go to the next application
 				else {
+					if(dialog != null) {	
+						TransactionApplicationData applicationData = (TransactionApplicationData) dialog.getApplicationData();
+						if(applicationData != null) {
+							sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
+						}
+					} else if(transaction != null) {
+						TransactionApplicationData applicationData = (TransactionApplicationData) transaction.getApplicationData();
+						if(applicationData != null) {
+							sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
+						}
+					} 
+					
 					callServlet(sipServletRequest);				
 				}
 			} catch (ServletException e) {

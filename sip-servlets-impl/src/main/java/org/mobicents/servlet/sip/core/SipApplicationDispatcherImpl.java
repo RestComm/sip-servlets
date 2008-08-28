@@ -17,8 +17,6 @@
 package org.mobicents.servlet.sip.core;
 
 import java.io.Serializable;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -618,7 +616,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(logger.isInfoEnabled()) {
 					logger.info("sip session " + sipSessionImpl.getId() + " returned for this transaction " + transaction);
 				}
-				sipSessionImpl.removeOngoingTransaction(transaction);
+//				sipSessionImpl.removeOngoingTransaction(transaction);
 				tryToInvalidateSession(sipSessionImpl);
 			}
 		} else {

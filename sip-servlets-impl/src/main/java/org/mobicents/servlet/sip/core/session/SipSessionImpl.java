@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.header.From;
+import gov.nist.javax.sip.header.To;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
 
 import java.io.Serializable;
@@ -262,9 +264,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(State.TERMINATED.equals(state)) {
 			throw new IllegalStateException("cannot create a request because the session is in TERMINATED state");
 		}
-		if((State.INITIAL.equals(state) && hasOngoingTransaction())) {
-			throw new IllegalStateException("cannot create a request because the session is in INITIAL state with ongoing transactions");
-		}
+//		if((State.INITIAL.equals(state) && hasOngoingTransaction())) {
+//			throw new IllegalStateException("cannot create a request because the session is in INITIAL state with ongoing transactions");
+//		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("dialog associated with this session to create the new request within that dialog "+
 					sessionCreatingDialog);
@@ -443,11 +445,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getLocalParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getLocalParty(), false);
+			return new AddressImpl(sessionCreatingDialog.getLocalParty(), null, false);
 		} else if (sessionCreatingTransaction != null){
 			try {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader.getAddress(), false);
+				return new AddressImpl(fromHeader.getAddress(), ((From)fromHeader).getParameters(), false);
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
@@ -495,11 +497,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getRemoteParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getRemoteParty(), false);
+			return new AddressImpl(sessionCreatingDialog.getRemoteParty(), null, false);
 		} else if (sessionCreatingTransaction != null){
 			try {
 				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
-				return new AddressImpl(toHeader.getAddress(), false);
+				return new AddressImpl(toHeader.getAddress(), ((To)toHeader).getParameters(),  false);
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
@@ -569,27 +571,27 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * Not needed anymore after PFD JSR 289 spec
 	 */
-	protected void checkInvalidation() {
-		if(state.equals(State.CONFIRMED)
-				|| state.equals(State.EARLY))
-			throw new IllegalStateException("Can not invalidate sip session in " + 
-					state.toString() + " state.");
-		if(isSupervisedMode() && hasOngoingTransaction()) {
-			dumpOngoingTransactions();
-			throw new IllegalStateException("Can not invalidate sip session with " +
-					ongoingTransactions.size() + " ongoing transactions in supervised mode.");
-		}
-	}
+//	protected void checkInvalidation() {
+//		if(state.equals(State.CONFIRMED)
+//				|| state.equals(State.EARLY))
+//			throw new IllegalStateException("Can not invalidate sip session in " + 
+//					state.toString() + " state.");
+//		if(isSupervisedMode() && hasOngoingTransaction()) {
+//			dumpOngoingTransactions();
+//			throw new IllegalStateException("Can not invalidate sip session with " +
+//					ongoingTransactions.size() + " ongoing transactions in supervised mode.");
+//		}
+//	}
 
-	private void dumpOngoingTransactions() {
-		if(logger.isDebugEnabled()) {
-			logger.debug("ongoing transactions in sip the session " + key);
-		
-			for (Transaction transaction : ongoingTransactions) {
-				logger.debug("Transaction " + transaction + " : state = " + transaction.getState());
-			}
-		}
-	}
+//	private void dumpOngoingTransactions() {
+//		if(logger.isDebugEnabled()) {
+//			logger.debug("ongoing transactions in sip the session " + key);
+//		
+//			for (Transaction transaction : ongoingTransactions) {
+//				logger.debug("Transaction " + transaction + " : state = " + transaction.getState());
+//			}
+//		}
+//	}
 
 	/**
 	 * Removed from the interface in PFD stage
@@ -777,6 +779,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {
 		this.sessionCreatingTransaction = sessionCreatingTransaction;
+		if(sessionCreatingTransaction != null) {
+			addOngoingTransaction(sessionCreatingTransaction);
+		}
 	}
 	
 	public boolean isSupervisedMode() {

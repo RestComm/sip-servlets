@@ -122,7 +122,7 @@ public class SipFactoryImpl implements Serializable {
 		}
 		URIImpl uriImpl = (URIImpl) uri;
 		return new AddressImpl(SipFactories.addressFactory
-				.createAddress(uriImpl.getURI()), true);
+				.createAddress(uriImpl.getURI()), null, true);
 	}
 
 	/*
@@ -141,7 +141,7 @@ public class SipFactoryImpl implements Serializable {
 			javax.sip.address.Address address = SipFactories.addressFactory
 					.createAddress(((URIImpl) uri).getURI());
 			address.setDisplayName(displayName);
-			return new AddressImpl(address, true);
+			return new AddressImpl(address, null, true);
 
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(e);

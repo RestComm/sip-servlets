@@ -80,6 +80,8 @@ public interface MobicentsSipSession extends SipSession {
 	Set<Transaction> getOngoingTransactions();
 	
 	void removeOngoingTransaction(Transaction transaction);
+	
+	void addOngoingTransaction(Transaction transaction);
 
 	Serializable getStateInfo();
 

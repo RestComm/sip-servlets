@@ -221,6 +221,7 @@ public class ProxyUtils {
 				originalRequest.getSipSession(),
 				sipServetResponse.getDialog());
 		newServletResponseImpl.setOriginalRequest(originalRequest);
+		newServletResponseImpl.setProxiedResponse(true);
 		return newServletResponseImpl;
 	}
 	

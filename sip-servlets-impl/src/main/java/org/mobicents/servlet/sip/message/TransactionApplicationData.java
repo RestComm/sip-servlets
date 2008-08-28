@@ -17,7 +17,10 @@
 package org.mobicents.servlet.sip.message;
 
 import java.io.Serializable;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.servlet.sip.B2buaHelper;
 import javax.sip.Transaction;
 
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
@@ -32,10 +35,13 @@ public class TransactionApplicationData implements Serializable {
 	private transient ProxyImpl proxy;
 	private transient ProxyBranchImpl proxyBranch;	
 	private transient SipServletMessageImpl sipServletMessage;
+	private transient Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
+	private transient B2buaHelper b2buaHelper;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
-		this.sipServletMessage = sipServletMessage;		
+		this.sipServletMessage = sipServletMessage;
+		sipServletResponses = new CopyOnWriteArraySet<SipServletResponseImpl>();
 	}
 	/**
 	 * set proxy
@@ -55,6 +61,18 @@ public class TransactionApplicationData implements Serializable {
 		return proxy;
 	}
 	
+	/**
+	 * @param b2buaHelperImpl the b2buaHelperImpl to set
+	 */
+	public void setB2buaHelper(B2buaHelper b2buaHelper) {
+		this.b2buaHelper = b2buaHelper;
+	}
+	/**
+	 * @return the b2buaHelperImpl
+	 */
+	public B2buaHelper getB2buaHelper() {
+		return b2buaHelper;
+	}
 	/**
 	 * @return the proxyBranch
 	 */
@@ -76,6 +94,17 @@ public class TransactionApplicationData implements Serializable {
 	 */
 	public void setTransaction(Transaction transaction) {
 		this.transaction = transaction;
+	}
+	
+	/**
+	 * used to get access from the B2BUA to pending messages on the transaction
+	 */
+	public void addSipServletResponse(SipServletResponseImpl sipServletResponse) {
+		sipServletResponses.add(sipServletResponse);
+	}
+	
+	public Set<SipServletResponseImpl> getSipServletResponses() {
+		return sipServletResponses;
 	}
 
 }

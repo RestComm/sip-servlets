@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.Route;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
@@ -115,7 +116,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private RoutingState routingState;
 	
-	private B2buaHelper b2buahelper;
+	private B2buaHelper b2buaHelper;
 	
 	private SipServletResponse lastFinalResponse;
 	
@@ -285,12 +286,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public B2buaHelper getB2buaHelper() {
 		if (this.transactionApplicationData.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
-		if (this.b2buahelper != null)
-			return this.b2buahelper;
+		if (this.b2buaHelper != null)
+			return this.b2buaHelper;
 		try {
+			this.b2buaHelper = new B2buaHelperImpl(this);
+			Request request = (Request) super.message;
 			if (this.getTransaction() != null
-					&& this.getTransaction().getDialog() == null) {
-				Request request = (Request) super.message;
+					&& this.getTransaction().getDialog() == null
+					&& JainSipUtils.dialogCreatingMethods.contains(request.getMethod())) {
+				
 				String transport = JainSipUtils.findTransport(request);
 				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
@@ -298,15 +302,21 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
 				this.session.setSessionCreatingDialog(dialog);
+				transactionApplicationData.setB2buaHelper(b2buaHelper);
 				dialog.setApplicationData( this.transactionApplicationData);				
+			}			
+			if(JainSipUtils.dialogCreatingMethods.contains(request.getMethod())) {
+				this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			}
-			this.b2buahelper = new B2buaHelperImpl(this);
-			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
-			return this.b2buahelper;
+			return this.b2buaHelper;
 		} catch (SipException ex) {
 			throw new IllegalStateException("Cannot get B2BUAHelper", ex);
 		}
 	}
+	
+	public void setB2buaHelper(B2buaHelperImpl helperImpl) {
+		this.b2buaHelper = helperImpl;
+	}	
 
 	public ServletInputStream getInputStream() throws IOException {
 		return null;
@@ -325,7 +335,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public Address getPoppedRoute() {
 		AddressImpl addressImpl = null;
 		if (this.popedRouteHeader != null) {
-			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress(), getTransaction() == null ? true : false);			
+			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress(), ((Route)this.popedRouteHeader).getParameters(), getTransaction() == null ? true : false);			
 		}
 		return addressImpl;
 	}
@@ -345,7 +355,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @TODO -- deal with maxforwards header.
 	 */
 	public Proxy getProxy() throws TooManyHopsException {
-		if ( this.b2buahelper != null ) throw new IllegalStateException("Cannot proxy request");
+		if ( this.b2buaHelper != null ) throw new IllegalStateException("Cannot proxy request");
 		return getProxy(true);
 	}
 
@@ -353,7 +363,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
-		if ( this.b2buahelper != null ) throw new IllegalStateException("Cannot proxy request");
+		if ( this.b2buaHelper != null ) throw new IllegalStateException("Cannot proxy request");
 		
 		if (create && transactionApplicationData.getProxy() == null) {
 			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
@@ -390,6 +400,25 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public boolean isInitial() {
 		return isInitial; 
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#isCommitted()
+	 */
+	public boolean isCommitted() {		
+		//the message is an incoming request for which a final response has been generated
+		if(getTransaction() instanceof ServerTransaction && RoutingState.FINAL_RESPONSE_SENT.equals(routingState)) {
+			return true;
+		}
+		//the message is an outgoing request which has been sent
+		if(getTransaction() instanceof ClientTransaction) {
+			return true;
+		}
+		if(Request.ACK.equals((((Request)message).getMethod()))) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -791,7 +820,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
 					}
 				}
-				
+				transactionApplicationData.setB2buaHelper(b2buaHelper);
 				// Make the dialog point here so that when the dialog event
 				// comes in we can find the session quickly.
 				if (dialog != null) {
@@ -1135,5 +1164,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		//This part will be done in routeIntialRequest since this is where the Session Targeting retrieval is done
 		
 		return RoutingState.INITIAL;		
-	}	
+	}
+
 }

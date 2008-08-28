@@ -61,9 +61,12 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	public AddressImpl() {}
 	
 	@SuppressWarnings("unchecked")
-	public AddressImpl (javax.sip.address.Address address, boolean isModifiable) {
+	public AddressImpl (javax.sip.address.Address address, NameValueList parameters, boolean isModifiable) {
 		this.address = address;				
 		this.isModifiable = isModifiable;
+		if(parameters!= null) {
+			this.parameters = parameters;
+		}
 		Parameters uri = (Parameters) this.address.getURI();
 		Iterator<String> parameterNames = uri.getParameterNames();
 		while (parameterNames.hasNext()) {
