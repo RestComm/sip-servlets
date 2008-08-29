@@ -427,7 +427,7 @@
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=120">
-						TCK compliance
+						TCK compliance : (Address, AuthInfo, B2BUA fixes)
 						</a>
 						<br />	
 						<img src="red.jpeg" />
@@ -445,6 +445,27 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=245">
 									Implementation of 17.8 P-Asserted Identity Security 
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=332">
+									Incorrect Session Invalidation on final response to INVITE 
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=336">
+									Creation of request with TelURL 
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=337">
+									CANCEL to INVITE not passed to the application 
 								</a>
 							</li>
 						</ul>					
@@ -494,24 +515,24 @@
 						More Extensions : PRACK, OPTIONS, INFO
 						</a>
 						<br />
-						<!--img src="red.jpeg" />
+						<img src="red.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
 								<img src="red.jpeg" />
 								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=227">
-									Fix location where Facilities are stored in JNDI
+									href="http://code.google.com/p/mobicents/issues/detail?id=308">
+									MSS CLustering improvements
 								</a>
 							</li>
-							<li>
+							<!--li>
 								<img src="red.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=245">
 									Implementation of 17.8 P-Asserted Identity Security 
 								</a>
-							</li>
-						</ul-->
+							</li-->
+						</ul>
 					</p>
 				</subsection>
 				<subsection name="Version 0.8 - 12/01/2008">
