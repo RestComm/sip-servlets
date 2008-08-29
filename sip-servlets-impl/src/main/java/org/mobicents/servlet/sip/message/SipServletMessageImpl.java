@@ -1506,9 +1506,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				paramMap.put(vals[0], vals[1]);
 			}
 		}
-
+		boolean isNotModifiable = systemHeaders.contains(header.getName());
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
-				header, value, paramMap);
+				header, value, paramMap, isNotModifiable);
 		return parameterable;
 	}
 

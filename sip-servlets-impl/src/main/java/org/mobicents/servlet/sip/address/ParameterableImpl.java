@@ -90,6 +90,12 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 * @see javax.servlet.sip.Parameterable#removeParameter(java.lang.String)
 	 */
 	public void removeParameter(String name) {
+		if(name == null) {
+			throw new NullPointerException("parameter name is null ! ");
+		}
+		if(name.equalsIgnoreCase("tag")) {
+			throw new IllegalStateException("it is forbidden for an application to remove the tag parameter");
+		}
 		this.parameters.remove(name);
 		if(header != null) {
 			header.removeParameter(name);
@@ -101,6 +107,12 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 * @see javax.servlet.sip.Parameterable#setParameter(java.lang.String, java.lang.String)
 	 */
 	public void setParameter(String name, String value) {
+		if(name == null) {
+			throw new NullPointerException("parameter name is null ! ");
+		}
+		if(name.equalsIgnoreCase("tag")) {
+			throw new IllegalStateException("it is forbidden for an application to set the tag parameter");
+		}
 		this.parameters.put(name,new NameValue(name,value));
 		if(header != null) {
 			try {
@@ -148,4 +160,45 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	}
 	
 	public abstract Object clone();
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((header == null) ? 0 : header.hashCode());
+		result = prime * result
+				+ ((parameters == null) ? 0 : parameters.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ParameterableImpl other = (ParameterableImpl) obj;
+		if (header == null) {
+			if (other.header != null)
+				return false;
+		} else if (!header.equals(other.header))
+			return false;
+		if (parameters == null) {
+			if (other.parameters != null)
+				return false;
+		} else if (!parameters.equals(other.parameters))
+			return false;
+		return true;
+	}
+	
+	
+	
 }

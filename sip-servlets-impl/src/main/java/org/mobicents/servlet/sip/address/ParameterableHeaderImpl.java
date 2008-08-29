@@ -16,11 +16,16 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.core.NameValueList;
+
 import java.util.Map;
 
+import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
+import javax.sip.header.Parameters;
 
-import gov.nist.core.NameValueList;
+import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 
 /**
  * This class is impl of Parameterable object returned
@@ -31,15 +36,18 @@ import gov.nist.core.NameValueList;
 public class ParameterableHeaderImpl extends ParameterableImpl {
 
 	protected String value = null;
-
+	//do not copy it during the clone that would be wrong
+	protected boolean isNotModifiable = false;
+	
 	public ParameterableHeaderImpl() {
 		super();
 	}
 
-	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params) {
+	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, boolean isNotModifiable) {
 		// General form of parametrable header
 		super(header, params);
-		this.value = value;		
+		this.value = value;
+		this.isNotModifiable = isNotModifiable;
 	}
 
 	@Override
@@ -47,6 +55,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl();
 		cloned.parameters = (NameValueList) super.parameters.clone();
 		cloned.value = new String(this.value);
+		cloned.header = (Parameters)((Header)super.header).clone();
 		return cloned;
 	}
 
@@ -55,6 +64,45 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	}
 
 	public void setValue(String value) {
+		if(value == null) {
+			throw new NullPointerException("value is null ! ");
+		}
+		if(isNotModifiable) {
+			throw new IllegalStateException("it is forbidden for an application to set the From Header");
+		}
 		this.value = value;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ParameterableHeaderImpl other = (ParameterableHeaderImpl) obj;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!value.equals(other.value))
+			return false;
+		return true;
+	}
+	
+	
 }
