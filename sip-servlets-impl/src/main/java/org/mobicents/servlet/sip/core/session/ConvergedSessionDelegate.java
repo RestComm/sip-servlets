@@ -58,10 +58,41 @@ public class ConvergedSessionDelegate {
 	 * @see javax.servlet.sip.ConvergedHttpSession#encodeURL(java.lang.String)
 	 */
 	public String encodeURL(String url) {
+
 		StringBuffer urlEncoded = new StringBuffer();
-		urlEncoded = urlEncoded.append(url);
-		urlEncoded = urlEncoded.append(";jsessionid=");
-		urlEncoded = urlEncoded.append(httpSession.getId());
+		int indexOfQuestionMark = url.indexOf("?");
+		if(indexOfQuestionMark > 0) {
+			//Handles those cases : 
+			//http://forums.searchenginewatch.com/showthread.php?t=9817
+			//http://forums.searchenginewatch.com/showthread.php?p=72232#post72232
+			String urlBeforeQuestionMark = url.substring(0, indexOfQuestionMark);
+			String urlAfterQuestionMark = url.substring(indexOfQuestionMark);
+			urlEncoded = urlEncoded.append(urlBeforeQuestionMark);
+			urlEncoded = urlEncoded.append(";jsessionid=");
+			urlEncoded = urlEncoded.append(httpSession.getId());
+			urlEncoded = urlEncoded.append(urlAfterQuestionMark);
+		} else {
+			//Handles those cases : 
+			//http://www.seroundtable.com/archives/003204.html#more		
+			//http://www.seroundtable.com/archives#more
+			int indexOfPoundSign = url.indexOf("#");
+			if(indexOfPoundSign > 0) {
+				String urlBeforePoundSign = url.substring(0, indexOfPoundSign);
+				String urlAfterPoundSign = url.substring(indexOfPoundSign);
+				urlEncoded = urlEncoded.append(urlBeforePoundSign);
+				urlEncoded = urlEncoded.append(";jsessionid=");
+				urlEncoded = urlEncoded.append(httpSession.getId());
+				urlEncoded = urlEncoded.append(urlAfterPoundSign);
+			} else {
+				//Handles the rest
+				//http://www.seroundtable.com/archives/003204.html
+				//http://www.seroundtable.com/archives
+				urlEncoded = urlEncoded.append(url);
+				urlEncoded = urlEncoded.append(";jsessionid=");
+				urlEncoded = urlEncoded.append(httpSession.getId());
+			}
+		}
+		
 		return urlEncoded.toString();
 	}
 	
@@ -84,7 +115,7 @@ public class ConvergedSessionDelegate {
 		Connector[] connectors = service.findConnectors();
 		int i = 0;
 		while (i < connectors.length && port < 0) {
-			if(scheme != null && scheme.equalsIgnoreCase(connectors[i].getProtocol())) {
+			if(scheme != null && connectors[i].getProtocol().toLowerCase().contains(scheme.toLowerCase())) {
 				port = connectors[i].getPort();
 			}
 			i++;
@@ -94,11 +125,8 @@ public class ConvergedSessionDelegate {
 		urlEncoded = urlEncoded.append(hostname);
 		urlEncoded = urlEncoded.append(":");
 		urlEncoded = urlEncoded.append(port);
-		urlEncoded = urlEncoded.append("/");
 		urlEncoded = urlEncoded.append(((Context)sipManager.getContainer()).getPath());
-		urlEncoded = urlEncoded.append(relativePath);
-		urlEncoded = urlEncoded.append(";jsessionid=");
-		urlEncoded = urlEncoded.append(httpSession.getId());
+		urlEncoded = urlEncoded.append(encodeURL(relativePath));
 		return urlEncoded.toString();
 	}
 
