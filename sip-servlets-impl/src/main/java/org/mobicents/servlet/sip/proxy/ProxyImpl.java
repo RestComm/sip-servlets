@@ -118,6 +118,7 @@ public class ProxyImpl implements Proxy {
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			list.add(branch);
+			this.proxyBranches.put(target, branch);
 		}
 		return list;
 	}
