@@ -612,7 +612,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			long expirationTime = 0;
 			if(expirationTimerFuture != null) {
 				//extending the app session life time
-				expirationTime = expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) + deltaMinutes * 1000 * 60;
+//				expirationTime = expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) + deltaMinutes * 1000 * 60;
+				expirationTime = deltaMinutes * 1000 * 60;
 			} else {
 				//the app session was scheduled to never expire and now an expiration time is set
 				expirationTime = deltaMinutes * 1000 * 60;

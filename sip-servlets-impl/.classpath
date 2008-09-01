@@ -24,11 +24,12 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.14/servlet-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.6-SNAPSHOT/sip-servlets-spec-1.1.6-SNAPSHOT.jar"/>
+	<!--classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.6-SNAPSHOT/sip-servlets-spec-1.1.6-SNAPSHOT.jar"/-->
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/jboss/jboss-cache/1.4.1.SP5/jboss-cache-1.4.1.SP5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.0.1B/jta-1.0.1B.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jgroups/jgroups/2.4.1/jgroups-2.4.1.jar"/>
+	<classpathentry kind="lib" path="/home/deruelle/java/specs/sip-servlets/SipServlet-v1.1-Spec/lib/sipservlet-1_1-api.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
