@@ -19,22 +19,19 @@ package org.mobicents.servlet.sip.startup.jboss;
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
-import org.apache.naming.ContextAccessController;
-import org.apache.tomcat.util.modeler.ManagedBean;
-import org.apache.tomcat.util.modeler.Registry;
+import org.jboss.deployment.DeploymentInfo;
+import org.jboss.metadata.WebMetaData;
 import org.jboss.util.naming.NonSerializableFactory;
 import org.jboss.util.naming.Util;
 import org.jboss.web.AbstractWebContainer;
 import org.jboss.web.WebApplication;
 import org.jboss.web.tomcat.service.DeployerConfig;
 import org.jboss.web.tomcat.service.TomcatDeployer;
-import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
 import org.mobicents.servlet.sip.startup.SipNamingContextListener;
 
@@ -45,6 +42,10 @@ import org.mobicents.servlet.sip.startup.SipNamingContextListener;
 public class TomcatConvergedDeployer extends TomcatDeployer {
 	
 	private DeployerConfig config;
+	protected String applicationName; 
+	protected SipFactory sipFactoryFacade;
+	protected TimerService timerService;
+	protected SipSessionsUtil sipSessionsUtil;
 	
 	@Override
 	public void init(Object containerConfig) throws Exception {
@@ -56,16 +57,13 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 	protected void performDeployInternal(String hostName,
 		      WebApplication appInfo, String warUrl,
 		      AbstractWebContainer.WebDescriptorParser webAppParser) throws Exception {
-
+		
 		super.performDeployInternal(hostName, appInfo, warUrl, webAppParser);
 
 		if(log.isDebugEnabled()) {
 			log.debug("Context class name : " + config.getContextClassName() + " for context " + appInfo.getMetaData().getContextRoot());
-		}
+		}		
 		if(config.getContextClassName().equals(SipHostConfig.SIP_CONTEXT_CLASS)) {
-			//Making the SipFatcory, SipSessionsUtil and TimerService for the current context being deployed available
-			//to the global JNDI context for other JEE components 
-			//TODO fix this to make them appear in the private ENC and not the global JNDI context
 			String objectNameS = config.getCatalinaDomain()
 	        + ":j2eeType=WebModule,name=//" +
 	        ((hostName == null) ? "localhost" : hostName)
@@ -86,7 +84,26 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 			NonSerializableFactory.rebind(applicationNameSubcontext, SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
 			NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME, timerService);
 			if(log.isDebugEnabled()) {
-				log.debug("Sip Objects made available to global JNDI under following conetxt : java:/sip/" + applicationName + "/<ObjectName>");
+				log.debug("Sip Objects made available to global JNDI under following conetxt : java:sip/" + applicationName + "/<ObjectName>");				
+			}
+			Thread currentThread = Thread.currentThread();
+			ClassLoader currentLoader = currentThread.getContextClassLoader();
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			ClassLoader parent = loader.getParent();
+			while (parent != null) {
+				parent = parent.getParent();
+			}
+			currentThread.setContextClassLoader(loader);
+	        appInfo.getMetaData().setENCLoader(loader);	        
+			Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+			currentThread.setContextClassLoader(currentLoader);
+			sipSubcontext = Util.createSubcontext(envCtx,SipNamingContextListener.SIP_SUBCONTEXT);
+			applicationNameSubcontext = Util.createSubcontext(sipSubcontext,applicationName);			
+			NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.SIP_FACTORY_JNDI_NAME, sipFactoryFacade);
+			NonSerializableFactory.rebind(applicationNameSubcontext, SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
+			NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME, timerService);
+			if(log.isDebugEnabled()) {
+				log.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/" + applicationName + "/<ObjectName>");				
 			}
 		}
 	}
@@ -127,5 +144,4 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 		
 		super.performUndeployInternal(hostName, warUrl, appInfo);	
 	}
-	
 }

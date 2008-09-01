@@ -76,7 +76,7 @@ public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 	            }
 	        }
 	}
-	
+		
 	protected boolean lookupResourceInServletContext(Object instance, Field field, String annotationName) {
 		String typeName = field.getType().getCanonicalName();
 		if(annotationName == null || annotationName.equals("")) annotationName = typeName;
@@ -98,11 +98,65 @@ public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 		}
 		return false;
 	}
-	        
+	   
+	/**
+     * Inject resources in specified field.
+     */
+    protected static void lookupFieldResource(javax.naming.Context context, 
+            Object instance, Field field, String name)
+        throws NamingException, IllegalAccessException {
+    
+        Object lookedupResource = null;
+        boolean accessibility = false;
+        
+        if ((name != null) &&
+                (name.length() > 0)) {
+            lookedupResource = context.lookup(name);
+        } else {
+        	if(field.getClass().getName().startsWith("javax.servlet.sip")) {
+        		lookedupResource = context.lookup("sip/" + instance.getClass().getName() + "/" + field.getName());
+        	} else {
+        		lookedupResource = context.lookup(instance.getClass().getName() + "/" + field.getName());
+        	}
+        }
+        
+        accessibility = field.isAccessible();
+        field.setAccessible(true);
+        field.set(instance, lookedupResource);
+        field.setAccessible(accessibility);
+    }
 
 	public SipAnnotationProcessor(Context context, SipContext sipContext) {
 		super(context);
 		this.sipContext = sipContext;
+	}
+
+	/**
+	 * @param sipContext the sipContext to set
+	 */
+	public void setSipContext(SipContext sipContext) {
+		this.sipContext = sipContext;
+	}
+
+	/**
+	 * @return the sipContext
+	 */
+	public SipContext getSipContext() {
+		return sipContext;
+	}
+	
+	/**
+	 * @param context the context to set
+	 */
+	public void setContext(Context context) {
+		this.context = context;
+	}
+
+	/**
+	 * @return the context
+	 */
+	public Context getContext() {
+		return context;
 	}
 
 }

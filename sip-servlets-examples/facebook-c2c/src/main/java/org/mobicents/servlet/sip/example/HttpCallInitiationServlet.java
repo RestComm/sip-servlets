@@ -53,7 +53,7 @@ public class HttpCallInitiationServlet extends HttpServlet
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			sipFactory = (SipFactory) envCtx.lookup("sip/SipFactory");
+			sipFactory = (SipFactory) envCtx.lookup("sip/FacebookClickToCallSip/SipFactory");
 			logger.info("Sip Factory ref from JNDI : " + sipFactory);
 		} catch (NamingException e) {
 			throw new ServletException("Uh oh -- JNDI problem !", e);

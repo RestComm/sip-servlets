@@ -17,8 +17,12 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.annotation.Resource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -60,6 +64,33 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the simple sip servlet has been started");
 		super.init(servletConfig);
+		logger.info("SipFactory injected resource" + sipFactory);
+		logger.info("SipSessionsUtil injected resource" + sipSessionsUtil);
+		logger.info("TimerService injected resource" + timerService);
+		if(sipFactory == null || sipSessionsUtil == null || timerService == null) {
+			throw new ServletException("Impossible to get one of the annotated resource");
+		}
+		SipFactory sipFactoryJndi;
+		SipSessionsUtil sipSessionsUtilJndi;
+		TimerService timerServiceJndi;
+		try { 			
+			// Getting the Sip factory from the JNDI Context
+			Properties jndiProps = new Properties();			
+			Context initCtx = new InitialContext(jndiProps);
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			sipFactoryJndi = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedServlet/SipFactory");
+			sipSessionsUtilJndi = (SipSessionsUtil) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedServlet/SipSessionsUtil");
+			timerServiceJndi = (TimerService) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedServlet/TimerService");
+			logger.info("SipFactory injected resource" + sipFactory);
+			logger.info("SipSessionsUtil injected resource" + sipSessionsUtil);
+			logger.info("TimerService injected resource" + timerService);
+			logger.info("Sip Factory ref from JNDI : " + sipFactory);
+		} catch (NamingException e) {
+			throw new ServletException("Uh oh -- JNDI problem !", e);
+		}
+		if(sipFactoryJndi == null || sipSessionsUtilJndi == null || timerServiceJndi == null) {
+			throw new ServletException("Impossible to get one of the annotated resource");
+		}
 	}
 
 	/**

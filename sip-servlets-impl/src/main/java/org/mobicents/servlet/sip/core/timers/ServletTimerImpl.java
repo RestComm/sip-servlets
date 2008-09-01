@@ -291,8 +291,15 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 					// save timestamp of first execution
 					firstExecution = scheduledExecutionTime;
 				}
-				scheduledExecutionTime = firstExecution
-						+ (++numInvocations * period);
+				long now = System.currentTimeMillis();
+				long executedTime = (numInvocations++ * period);
+				scheduledExecutionTime = firstExecution + executedTime;
+				if(logger.isDebugEnabled()) {
+					logger.debug("next execution estimated to run at " + scheduledExecutionTime);
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("current time is " + now);
+				}
 			}
 		}
 	}

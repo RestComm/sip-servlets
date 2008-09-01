@@ -49,6 +49,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.security.auth.spi.AnonLoginModule;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -223,7 +224,28 @@ public class SipStandardContext extends StandardContext implements SipContext {
                 addLifecycleListener(namingContextListener);
                 addContainerListener(namingContextListener);                
             }
-        }   
+        	// Replace the default annotation processor. This is needed to handle resource injection
+			// for SipFactory, Session utils and other objects residing in the servlet context space.
+			// Of course if the variable is not found in in the servet context it defaults to the
+			// normal lookup method - in the default naming context.
+			//tomcat naming 
+			this.setAnnotationProcessor(
+					new SipAnnotationProcessor(
+							getNamingContextListener().getEnvContext(),
+							this));
+        } else {
+        	// jboss or other kind of naming
+			try {
+				InitialContext iniCtx = new InitialContext();
+				Context envCtx = (Context) iniCtx.lookup("java:comp/env");					
+				this.setAnnotationProcessor(
+						new SipAnnotationProcessor(
+								envCtx,
+								this));
+			} catch (NamingException e) {
+				logger.error("Impossible to get the naming context ", e);
+			}
+        }
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
@@ -235,24 +257,26 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			// for SipFactory, Session utils and other objects residing in the servlet context space.
 			// Of course if the variable is not found in in the servet context it defaults to the
 			// normal lookup method - in the default naming context.
-			if(isUseNaming()) {
-				//tomcat naming 
-				this.setAnnotationProcessor(
-						new SipAnnotationProcessor(
-								getNamingContextListener().getEnvContext(),
-								this));
-			} else {
-				// jboss or other kind of naming
-				try {
-					InitialContext iniCtx = new InitialContext();
-					Context envCtx = (Context) iniCtx.lookup("java:comp/env");					
+			if(getAnnotationProcessor() == null || !(getAnnotationProcessor() instanceof SipAnnotationProcessor)) {
+				if(isUseNaming()) {
+					//tomcat naming 
 					this.setAnnotationProcessor(
 							new SipAnnotationProcessor(
-									envCtx,
+									getNamingContextListener().getEnvContext(),
 									this));
-				} catch (NamingException e) {
-					logger.error("Impossible to get the naming context ", e);
-				}						
+				} else {
+					// jboss or other kind of naming
+					try {
+						InitialContext iniCtx = new InitialContext();
+						Context envCtx = (Context) iniCtx.lookup("java:comp/env");					
+						this.setAnnotationProcessor(
+								new SipAnnotationProcessor(
+										envCtx,
+										this));
+					} catch (NamingException e) {
+						logger.error("Impossible to get the naming context ", e);
+					}
+				}
 			}			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
 			if(getManager() instanceof SipManager) {
@@ -438,8 +462,23 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	@Override
 	public void loadOnStartup(Container[] containers) {
+		if(getAnnotationProcessor() instanceof SipAnnotationProcessor) {
+			if(getNamingContextListener() != null) {
+				((SipAnnotationProcessor)getAnnotationProcessor()).setContext(getNamingContextListener().getEnvContext());
+			} else {
+				try {
+					InitialContext iniCtx = new InitialContext();
+					Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+					((SipAnnotationProcessor)getAnnotationProcessor()).setContext(envCtx);
+				} catch (NamingException e) {
+					logger.error("Impossible to get the naming context ", e);
+					throw new IllegalStateException(e);
+				}	  			
+			}
+		}
 		if(isUseNaming()) {
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_ADDED_EVENT, null);
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_APPNAME_SUBCONTEXT_ADDED_EVENT, null);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT, sipFactoryFacade);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_ADDED_EVENT, sipSessionsUtil);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());			
@@ -449,9 +488,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
 				// jboss or other kind of naming
 				SipNamingContextListener.addSipSubcontext(envCtx);
-				SipNamingContextListener.addSipFactory(envCtx, sipFactoryFacade);
-				SipNamingContextListener.addSipSessionsUtil(envCtx, sipSessionsUtil);
-				SipNamingContextListener.addTimerService(envCtx, TimerServiceImpl.getInstance());
+				SipNamingContextListener.addAppNameSubContext(envCtx, applicationName);
+				SipNamingContextListener.addSipFactory(envCtx, applicationName, sipFactoryFacade);
+				SipNamingContextListener.addSipSessionsUtil(envCtx, applicationName, sipSessionsUtil);
+				SipNamingContextListener.addTimerService(envCtx, applicationName, TimerServiceImpl.getInstance());
 			} catch (NamingException e) {
 				logger.error("Impossible to get the naming context ", e);
 				throw new IllegalStateException(e);
@@ -773,5 +813,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public SipManager getSipManager() {
 		return (SipManager)manager;
+	}
+	
+	@Override
+	public String getInfo() {
+		return info;
 	}
 }

@@ -424,17 +424,17 @@
 			<subsection name="Planned Versions">								
 				<subsection name="Version 0.6 - 09/15/2008">
 					<p>
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=120">
-						TCK compliance : (Address, AuthInfo, B2BUA fixes)
+						TCK compliance : (Address, AuthInfo, B2BUAHelper, ConvergedHttpSession, Parameterable, ServletTimer, JNDI fixes)
 						</a>
 						<br />	
 						<img src="red.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
-								<img src="red.jpeg" />
+								<img src="orange.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=227">
 									Fix location where Facilities are stored in JNDI

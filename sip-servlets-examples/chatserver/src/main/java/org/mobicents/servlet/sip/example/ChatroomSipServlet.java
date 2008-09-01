@@ -60,7 +60,7 @@ public class ChatroomSipServlet extends SipServlet {
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			factory = (SipFactory) envCtx.lookup("sip/SipFactory");
+			factory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.example.ChatroomSipServlet/SipFactory");
 			logger.info("Sip Factory ref from JNDI : " + factory);
 		} catch (NamingException e) {
 			throw new ServletException("Uh oh -- JNDI problem !", e);
