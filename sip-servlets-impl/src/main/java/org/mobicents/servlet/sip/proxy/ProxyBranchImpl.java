@@ -19,11 +19,13 @@ package org.mobicents.servlet.sip.proxy;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
@@ -31,12 +33,14 @@ import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
@@ -88,6 +92,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.proxyUtils = proxy.getProxyUtils();
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
 		this.canceled = false;
+		this.recursedBranches = new ArrayList<ProxyBranch>();
 	}
 	
 	/* (non-Javadoc)
@@ -145,7 +150,13 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#getRecordRouteURI()
 	 */
 	public SipURI getRecordRouteURI() {
-		return this.recordRouteURI;
+		if(this.getRecordRoute()) {
+			if(this.recordRouteURI == null) 
+				this.recordRouteURI = this.sipFactoryImpl.createSipURI("proxy", "localhost");
+			return this.recordRouteURI;
+		}
+		
+		else throw new IllegalStateException("Record Route not enabled for this ProxyBranch. You must call proxyBranch.setRecordRoute(true) before getting an URI.");
 	}
 
 	/* (non-Javadoc)
@@ -163,7 +174,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#getRequest()
 	 */
 	public SipServletRequest getRequest() {
-		return outgoingRequest;
+		return originalRequest;
 	}
 
 	/* (non-Javadoc)
@@ -171,6 +182,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 */
 	public SipServletResponse getResponse() {
 		return lastResponse;
+	}
+	
+	public void setResponse(SipServletResponse response) {
+		lastResponse = (SipServletResponseImpl) response;
 	}
 
 	/* (non-Javadoc)
@@ -184,6 +199,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#setProxyBranchTimeout(int)
 	 */
 	public void setProxyBranchTimeout(int seconds) {
+		if(seconds<0) 
+			throw new IllegalArgumentException("Negative timeout not allowed");
+		
 		this.proxyBranchTimeout = seconds;
 	}
 	
@@ -209,7 +227,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		// If the proxy is not adding record-route header, set it to null and it
 		// will be ignored in the Proxying
-		if(proxy.getRecordRoute()) {
+		if(proxy.getRecordRoute() || this.getRecordRoute()) {
+			if(recordRouteURI == null) {
+				recordRouteURI = this.sipFactoryImpl.createSipURI("proxy", "localhost");
+			}
 			recordRoute = recordRouteURI;
 		}
 						
@@ -289,7 +310,6 @@ public class ProxyBranchImpl implements ProxyBranch {
 	public void onResponse(SipServletResponseImpl response)
 	{
 		response.setIsBranchResponse(true);
-		lastResponse = response;
 		
 		// We have already sent TRYING, don't send another one
 		if(response.getStatus() == 100)
@@ -323,7 +343,28 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		// FYI: ACK is sent automatically by jsip when needed
 		
-		if(response.getStatus() >= 200)
+		boolean recursed = false;
+		if(response.getStatus() >= 300 && response.getStatus()<400 && recurse) {
+			String contact = response.getHeader("Contact");
+			//javax.sip.address.SipURI uri = SipFactories.addressFactory.createAddress(contact);
+			try {
+				int start = contact.indexOf('<');
+				int end = contact.indexOf('>');
+				contact = contact.substring(start + 1, end);
+				URI uri = sipFactoryImpl.createURI(contact);
+				ArrayList<SipURI> list = new ArrayList<SipURI>();
+				list.add((SipURI)uri);
+				List<ProxyBranch> pblist = proxy.createProxyBranches(list);
+				ProxyBranchImpl pbi = (ProxyBranchImpl)pblist.get(0);
+				this.addRecursedBranch(pbi);
+				pbi.start();
+				recursed = true;
+			} catch (ServletParseException e) {
+				throw new RuntimeException("Can not parse contact header", e);
+			}
+			
+		}
+		if(response.getStatus() >= 200 && !recursed)
 		{
 			if(outgoingRequest != null && outgoingRequest.isInitial()) {
 				this.proxy.onFinalResponse(this);
@@ -476,7 +517,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
-		//TODO check against our defined outbound interfaces		
+		//TODO check against our defined outbound interfaces
+		checkSessionValidity();
 		String address = inetAddress.getHostAddress();
 		outboundInterface = sipFactoryImpl.createSipURI(null, address);		
 	}
@@ -486,6 +528,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
 		//TODO check against our defined outbound interfaces		
+		checkSessionValidity();
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
 		outboundInterface = sipFactoryImpl.createSipURI(null, address);		
 	}
@@ -503,4 +546,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 	public void setRecurse(boolean isRecurse) {
 		recurse = isRecurse;
 	}	
+	
+	private void checkSessionValidity() {
+		if(this.originalRequest.getApplicationSession().isValid() 
+		&& this.originalRequest.getSession().isValid())
+			return;
+		throw new IllegalStateException("Invalid session.");
+	}
 }

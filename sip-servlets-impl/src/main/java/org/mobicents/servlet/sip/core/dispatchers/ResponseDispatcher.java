@@ -179,17 +179,17 @@ public class ResponseDispatcher extends MessageDispatcher {
 						sipServletResponse.setProxyBranch(proxyBranch);
 						// Update Session state
 						session.updateStateOnResponse(sipServletResponse, true);
-						
-						// Handle it at the branch
-						proxyBranch.onResponse(sipServletResponse); 
+						proxyBranch.setResponse(sipServletResponse);
 						
 						// Notfiy the servlet
 						if(logger.isDebugEnabled()) {
 							logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
 						}
-						if(proxyBranch.getProxy().getSupervised()) {
+						if(proxyBranch.getProxy().getSupervised() || sipServletResponse.getStatus()>=200) {
 							callServlet(sipServletResponse);
 						}
+						// Handle it at the branch
+						proxyBranch.onResponse(sipServletResponse); 
 						//we don't forward the response here since this has been done by the proxy
 					}
 					else {
