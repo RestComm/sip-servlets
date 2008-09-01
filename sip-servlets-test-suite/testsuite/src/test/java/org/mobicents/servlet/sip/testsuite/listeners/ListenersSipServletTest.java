@@ -44,11 +44,13 @@ public class ListenersSipServletTest extends SipServletTestCase {
 	// the order is important here 
 	private static final String[] LISTENERS_TO_TEST = new String[]{
 		"sipServletInitialized",
-		"sipAppSessionCreated",		
-		"sipAppSessionValueBound", "sipAppSessionValueUnbound", 
+		"sipAppSessionCreated",
+		//Tested by the tCK
+//		"sipAppSessionValueBound", "sipAppSessionValueUnbound", 
 		"sipAppSessionAttributeReplaced","sipAppSessionAttributeRemoved", "sipAppSessionAttributeAdded", 
-		"sipSessionCreated", 
-		"sipSessionValueBound", "sipSessionValueUnbound",  
+		"sipSessionCreated",
+		//Tested by the tCK
+//		"sipSessionValueBound", "sipSessionValueUnbound",  
 		"sipSessionAttributeReplaced", "sipSessionAttributeRemoved", "sipSessionAttributeAdded"
 		};		
 		

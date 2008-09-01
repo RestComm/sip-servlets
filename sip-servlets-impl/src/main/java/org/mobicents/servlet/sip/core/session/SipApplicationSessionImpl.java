@@ -483,20 +483,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			// null!!!");
 			return;
 
-		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
-				this, name);
+		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(this, name);
+		Object value = sipApplicationSessionAttributeMap.get(name);
+		// Call the valueUnbound() method if necessary
+        if (value != null && value instanceof SipApplicationSessionBindingListener) {
+            ((SipApplicationSessionBindingListener) value).valueUnbound(event);
+        }
+		
+		this.sipApplicationSessionAttributeMap.remove(name);
+		
 		SipListenersHolder listeners = sipContext.getListeners();
-		if(logger.isDebugEnabled()) {
-			logger.debug("notifying SipApplicationSessionBindingListeners of value unbound on key "+ key);
-		}
-		for (SipApplicationSessionBindingListener listener : listeners
-				.getSipApplicationSessionBindingListeners()) {
-			try {
-				listener.valueUnbound(event);
-			} catch (Throwable t) {
-				logger.error("SipApplicationSessionBindingListener threw exception", t);
-			}
-		}
+
 		if(logger.isDebugEnabled()) {
 			logger.debug("notifying SipApplicationSessionAttributeListener of attribute removed on key "+ key);
 		}
@@ -509,7 +506,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 
-		this.sipApplicationSessionAttributeMap.remove(name);
 	}
 
 	/*
@@ -529,22 +525,36 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			throw new NullPointerException(
 					"Attribute that is to be bound cant be null!!!");
 
-		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(
-				this, key);
+		// Construct an event with the new value
+		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(this, key);
+
+        // Call the valueBound() method if necessary
+        if (attribute instanceof SipApplicationSessionBindingListener) {
+            // Don't call any notification if replacing with the same value
+            Object oldValue = sipApplicationSessionAttributeMap.get(key);
+            if (attribute != oldValue) {
+                try {
+                    ((SipApplicationSessionBindingListener) attribute).valueBound(event);
+                } catch (Throwable t){
+                	logger.error("SipSessionBindingListener threw exception", t); 
+                }
+            }
+        }
+		
+		Object previousValue = this.sipApplicationSessionAttributeMap.put(key, attribute);
+		
+		if (previousValue != null && previousValue != attribute &&
+	            previousValue instanceof SipApplicationSessionBindingListener) {
+            try {
+                ((SipApplicationSessionBindingListener) previousValue).valueUnbound
+                    (new SipApplicationSessionBindingEvent(this, key));
+            } catch (Throwable t) {
+            	logger.error("SipSessionBindingListener threw exception", t);
+            }
+        }
+
 		SipListenersHolder listeners = sipContext.getListeners();
-		if (!sipApplicationSessionAttributeMap.containsKey(key)) {
-			// This is initial, we need to send value bound event
-			if(logger.isDebugEnabled()) {
-				logger.debug("notifying SipApplicationSessionBindingListeners of value bound on key "+ key);
-			}
-			for (SipApplicationSessionBindingListener listener : listeners
-					.getSipApplicationSessionBindingListeners()) {
-				try {					
-					listener.valueBound(event);
-				} catch (Throwable t) {
-					logger.error("SipApplicationSessionBindingListener threw exception", t);
-				}				
-			}
+		if (previousValue == null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("notifying SipApplicationSessionAttributeListener of attribute added on key "+ key);
 			}
@@ -568,8 +578,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					logger.error("SipApplicationSessionAttributeListener threw exception", t);
 				}
 			}
-		}
-		this.sipApplicationSessionAttributeMap.put(key, attribute);
+		}		
 	}
 	
 	/*
