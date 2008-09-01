@@ -257,6 +257,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * http://hostname/link?something=1 -> http://hostname/link?something=1&org.mobicents.servlet.sip.ApplicationSessionKey=0
 	 */
 	public URL encodeURL(URL url) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		String urlStr = url.toExternalForm();
 		try {
 			URL ret;
@@ -277,6 +280,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * {@inheritDoc}
 	 */
 	public Object getAttribute(String name) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return this.sipApplicationSessionAttributeMap.get(name);
 	}
 
@@ -285,6 +291,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getAttributeNames()
 	 */
 	public Iterator<String> getAttributeNames() {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return this.sipApplicationSessionAttributeMap.keySet().iterator();
 	}
 
@@ -293,6 +302,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getCreationTime()
 	 */
 	public long getCreationTime() {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return creationTime;
 	}
 
@@ -349,7 +361,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions()
 	 */
 	public Iterator<?> getSessions() {
-		return sipSessions.entrySet().iterator();
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		return sipSessions.values().iterator();
 	}
 
 	/*
@@ -357,10 +372,18 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions(java.lang.String)
 	 */
 	public Iterator<?> getSessions(String protocol) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		if(protocol == null) {
+			throw new NullPointerException("protocol given in argument is null");
+		}
 		if("SIP".equalsIgnoreCase(protocol)) {
 			return sipSessions.values().iterator();
-		} else {			
+		} else if("HTTP".equalsIgnoreCase(protocol)) {			
 			return httpSessions.values().iterator();
+		} else {
+			throw new IllegalArgumentException(protocol + " sessions are not handled by this container");
 		}
 	}
 
@@ -369,7 +392,23 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getSipSession(java.lang.String)
 	 */
 	public SipSession getSipSession(String id) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Trying to find a session with the id " + id);
+			dumpSipSessions();
+		}
 		return sipSessions.get(id);
+	}
+
+	private void dumpSipSessions() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("sessions contained in the following app session " + key);
+			for (String sessionKey : sipSessions.keySet()) {
+				logger.debug("session key " + sessionKey  + ", value = " + sipSessions.get(sessionKey));
+			}
+		}
 	}
 
 	/*
@@ -377,6 +416,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getTimers()
 	 */
 	public Collection<ServletTimer> getTimers() {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return servletTimers.values();
 	}
 
@@ -438,10 +480,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		for(HttpSession session: httpSessions.values()) {
 			session.invalidate();
 		}
-		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		for (String key : sipApplicationSessionAttributeMap.keySet()) {
 			removeAttribute(key);
 		}
+		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
+		
 		isValid = false;	
 		//cancelling the timers
 		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
@@ -484,14 +527,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			return;
 
 		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(this, name);
-		Object value = sipApplicationSessionAttributeMap.get(name);
-		// Call the valueUnbound() method if necessary
+		
+        Object value = this.sipApplicationSessionAttributeMap.remove(name);
+
+        // Call the valueUnbound() method if necessary
         if (value != null && value instanceof SipApplicationSessionBindingListener) {
             ((SipApplicationSessionBindingListener) value).valueUnbound(event);
         }
-		
-		this.sipApplicationSessionAttributeMap.remove(name);
-		
+        
 		SipListenersHolder listeners = sipContext.getListeners();
 
 		if(logger.isDebugEnabled()) {
@@ -670,6 +713,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getTimer(java.lang.String)
 	 */
 	public ServletTimer getTimer(String id) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return servletTimers.get(id);
 	}
 	
@@ -720,6 +766,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
     }
 
 	public boolean getInvalidateWhenReady() {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return invalidateWhenReady;
 	}
 
@@ -727,24 +776,38 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * {@inheritDoc}
 	 */
 	public Object getSession(String id, Protocol protocol) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		if(id == null) {
+			throw new NullPointerException("id is null");
+		}
+		if(protocol == null) {
+			throw new NullPointerException("protocol is null");
+		}
 		switch (protocol) {
 			case SIP :
-				sipSessions.get(id);
-				break;
+				return sipSessions.get(id);
 				
 			case HTTP :
-				httpSessions.get(id);
-				break;
+				return httpSessions.get(id);
 		}
 		return null;
 	}
 
 	public boolean isReadyToInvalidate() {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		updateReadyToInvalidateState();
 		return readyToInvalidate;
 	}
 
-	public void setInvalidateWhenReady(boolean arg0) {
-		invalidateWhenReady = arg0;
+	public void setInvalidateWhenReady(boolean invalidateWhenReady) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
+		this.invalidateWhenReady = invalidateWhenReady;
 	}
 	
 	public void onSipSessionReadyToInvalidate(MobicentsSipSession mobicentsSipSession) {
@@ -754,7 +817,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	synchronized private void updateReadyToInvalidateState() {
 		if(isValid) {
-			boolean allSipSessionsReadyToInvalidate = true;
+			boolean allSipSessionsReadyToInvalidate = true;			
 			for(MobicentsSipSession sipSession:this.sipSessions.values()) {
 				if(!sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
@@ -779,6 +842,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			if(logger.isDebugEnabled()) {
 				logger.debug("Sip application session already invalidated "+ key);
 			}
+			this.readyToInvalidate = true;
 		}
 	}
 	

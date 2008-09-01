@@ -545,10 +545,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 				
 		// No need for checks after JSR 289 PFD spec
 		//checkInvalidation();
-		notifySipSessionListeners(SipSessionEventType.DELETION);
 		for (String key : sipSessionAttributeMap.keySet()) {
 			removeAttribute(key);
 		}
+		notifySipSessionListeners(SipSessionEventType.DELETION);
+		
 		isValid = false;	
 		
 		for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
