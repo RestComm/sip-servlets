@@ -58,7 +58,7 @@ public class SipApplicationRoutingRegion implements Serializable {
     /**
      * Each routing region is either ORIGINATING, TERMINATING, or NEUTRAL type.
      */
-    public javax.servlet.sip.ar.SipApplicationRoutingRegionType getType(){
+    public final javax.servlet.sip.ar.SipApplicationRoutingRegionType getType(){
         return sipApplicationRoutingRegionType;
     }
 
