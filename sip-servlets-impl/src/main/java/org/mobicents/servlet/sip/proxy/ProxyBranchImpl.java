@@ -203,6 +203,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			throw new IllegalArgumentException("Negative timeout not allowed");
 		
 		this.proxyBranchTimeout = seconds;
+		if(this.started) updateTimer();
 	}
 	
 	/**

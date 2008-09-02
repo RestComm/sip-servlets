@@ -232,11 +232,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
 				if(subscriberUri instanceof javax.sip.address.SipURI) {
 					javax.servlet.sip.URI uri = new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
-					sipServletRequest.setRequestURI(uri);
 					sipServletRequest.setSubscriberURI(uri);
 				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
 					javax.servlet.sip.URI uri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
-					sipServletRequest.setRequestURI(uri);
 					sipServletRequest.setSubscriberURI(uri);
 				}
 			} catch (ParseException pe) {

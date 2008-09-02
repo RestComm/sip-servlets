@@ -261,7 +261,12 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#setProxyTimeout(int)
 	 */
 	public void setProxyTimeout(int seconds) {
+		if(seconds<0) throw new IllegalArgumentException("Negative timeout not allowed");
+		
 		proxyTimeout = seconds;
+		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
+			proxyBranch.setProxyBranchTimeout(seconds);
+		}
 
 	}
 
