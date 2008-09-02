@@ -6,7 +6,7 @@ Installation Instructions
 	  
 	Install {{{http://maven.apache.org}maven 2}}
 	
-	Check out the sip-servlets project at {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets}http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets}} 
+	Check out the sip-servlets project at {{{http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/}http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/}} 
 	
 	Set the JBOSS_HOME environment variable to the same as your jboss root installation by example E:\servers\jboss-4.2.2.GA 
 	
