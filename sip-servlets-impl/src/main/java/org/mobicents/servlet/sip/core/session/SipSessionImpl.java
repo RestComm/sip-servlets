@@ -515,6 +515,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getState()
 	 */
 	public State getState() {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
 		return this.state;
 	}
 
@@ -1098,14 +1101,23 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	public boolean getInvalidateWhenReady() {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
 		return invalidateWhenReady;
 	}
 	
 	public boolean isReadyToInvalidate() {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
 		return readyToInvalidate;
 	}
 	
 	public void setInvalidateWhenReady(boolean arg0) {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
 		invalidateWhenReady = arg0;
 	}
 	
@@ -1113,6 +1125,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
+		if(inetAddress == null) {
+			throw new NullPointerException("parameter is null");
+		}
 		//TODO check against our defined outbound interfaces
 		String address = inetAddress.getHostAddress();
 		try {
@@ -1128,6 +1146,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
+		if(inetSocketAddress == null) {
+			throw new NullPointerException("parameter is null");
+		}
 		//TODO check against our defined outbound interfaces		
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
 		try {

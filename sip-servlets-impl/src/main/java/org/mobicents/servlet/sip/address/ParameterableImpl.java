@@ -114,6 +114,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
 		}
+		if(value == null) {
+			throw new NullPointerException("parameter value is null ! ");
+		}
 		if(!isModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
