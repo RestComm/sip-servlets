@@ -76,7 +76,6 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private boolean isAddToPath;
 	private List<ProxyBranch> recursedBranches;
 	
-	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
 	{
 		this.targetURI = uri;
@@ -107,6 +106,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#cancel(java.lang.String[], int[], java.lang.String[])
 	 */
 	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
+		if(proxy.getAckReceived()) throw new IllegalStateException("There has been an ACK received on this branch. Can not cancel.");
 		try {			
 			cancelTimer();
 			if(this.isStarted() && !canceled && !timedOut &&
@@ -219,6 +219,9 @@ public class ProxyBranchImpl implements ProxyBranch {
 		}
 		if(timedOut) {
 			throw new IllegalStateException("Proxy brnach has timed out!");
+		}
+		if(proxy.getAckReceived()) {
+			throw new IllegalStateException("An ACK request has been received on this proxy. Can not start new branches.");
 		}
 		
 		// Initialize these here for efficiency.
@@ -554,4 +557,5 @@ public class ProxyBranchImpl implements ProxyBranch {
 			return;
 		throw new IllegalStateException("Invalid session.");
 	}
+
 }

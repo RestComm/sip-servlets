@@ -58,7 +58,7 @@ public class ProxyImpl implements Proxy {
 	private boolean recurse;
 	private int proxyTimeout;
 	private int seqSearchTimeout;
-	private boolean supervised; 
+	private boolean supervised = true; 
 	private boolean recordRoutingEnabled;
 	private boolean parallel;
 	private boolean addToPath;
@@ -72,6 +72,7 @@ public class ProxyImpl implements Proxy {
 	
 	private Map<URI, ProxyBranch> proxyBranches;
 	private boolean started; 
+	private boolean ackReceived = false;
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
@@ -531,4 +532,12 @@ public class ProxyImpl implements Proxy {
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
 		outboundInterface = sipFactoryImpl.createSipURI(null, address);
 	}	
+	
+	public void setAckReceived(boolean received) {
+		this.ackReceived = received;
+	}
+	
+	public boolean getAckReceived() {
+		return this.ackReceived;
+	}
 }

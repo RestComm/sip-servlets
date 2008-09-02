@@ -47,6 +47,7 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -174,6 +175,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				// See if the subsequent request should go directly to the proxy
 				if(sipServletRequest.getSipSession().getProxyBranch() != null) {
 					ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
+					ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();
+					proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
 					if(proxyBranch.getProxy().getSupervised()) {
 						callServlet(sipServletRequest);
 					}
