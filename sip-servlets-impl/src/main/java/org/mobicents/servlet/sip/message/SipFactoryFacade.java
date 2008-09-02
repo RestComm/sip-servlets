@@ -107,7 +107,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createParameterable(java.lang.String)
 	 */
-	public Parameterable createParameterable(String s) {
+	public Parameterable createParameterable(String s) throws ServletParseException {
 		return sipFactoryImpl.createParameterable(s);
 	}
 

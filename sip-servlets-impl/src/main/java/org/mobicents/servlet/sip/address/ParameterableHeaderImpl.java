@@ -20,12 +20,8 @@ import gov.nist.core.NameValueList;
 
 import java.util.Map;
 
-import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
-
-import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 
 /**
  * This class is impl of Parameterable object returned
@@ -36,8 +32,6 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 public class ParameterableHeaderImpl extends ParameterableImpl {
 
 	protected String value = null;
-	//do not copy it during the clone that would be wrong
-	protected boolean isNotModifiable = false;
 	
 	public ParameterableHeaderImpl() {
 		super();
@@ -45,9 +39,8 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 
 	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, boolean isNotModifiable) {
 		// General form of parametrable header
-		super(header, params);
+		super(header, params, !isNotModifiable);
 		this.value = value;
-		this.isNotModifiable = isNotModifiable;
 	}
 
 	@Override
@@ -67,7 +60,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		if(value == null) {
 			throw new NullPointerException("value is null ! ");
 		}
-		if(isNotModifiable) {
+		if(!isModifiable) {
 			throw new IllegalStateException("it is forbidden for an application to set the From Header");
 		}
 		this.value = value;
@@ -104,5 +97,9 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return new String(value + ">" + ";" + super.toString()) ;
+	}
 	
 }

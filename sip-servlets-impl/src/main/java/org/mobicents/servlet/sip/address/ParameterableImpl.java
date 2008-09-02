@@ -47,6 +47,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	protected Parameters header = null;
 	
 	protected static final Log logger= LogFactory.getLog(ParameterableImpl.class.getCanonicalName());
+	protected transient boolean isModifiable = true;
 	
 	protected ParameterableImpl() {
 		this.parameters = new NameValueList();	
@@ -57,7 +58,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 * @param value - initial value of parametrable value
 	 * @param parameters - parameter map - it can be null;
 	 */
-	public ParameterableImpl(Header header, Map<String, String> params) {		
+	public ParameterableImpl(Header header, Map<String, String> params, boolean isModifiable) {
+		this.isModifiable = isModifiable;
 		this.header = (Parameters) header;
 		 if(params!=null) {			 
 			 Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
@@ -93,8 +95,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
 		}
-		if(name.equalsIgnoreCase("tag")) {
-			throw new IllegalStateException("it is forbidden for an application to remove the tag parameter");
+		if(!isModifiable) {
+			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
 		this.parameters.remove(name);
 		if(header != null) {
@@ -110,8 +112,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
 		}
-		if(name.equalsIgnoreCase("tag")) {
-			throw new IllegalStateException("it is forbidden for an application to set the tag parameter");
+		if(!isModifiable) {
+			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
 		this.parameters.put(name,new NameValue(name,value));
 		if(header != null) {

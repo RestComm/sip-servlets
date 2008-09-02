@@ -49,7 +49,6 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	private static final String Q_PARAM_NAME = "q";
 	private static final String EXPIRES_PARAM_NAME = "expires";
 	private javax.sip.address.Address address;	
-	private transient boolean isModifiable = true;
 	
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
 	private static AddressFactory addressFactory = SipFactories.addressFactory;
@@ -62,16 +61,17 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	
 	@SuppressWarnings("unchecked")
 	public AddressImpl (javax.sip.address.Address address, NameValueList parameters, boolean isModifiable) {
+		super();
+		super.isModifiable = isModifiable;
 		this.address = address;				
-		this.isModifiable = isModifiable;
-		if(parameters!= null) {
+		if(parameters != null) {
 			this.parameters = parameters;
 		}
 		Parameters uri = (Parameters) this.address.getURI();
 		Iterator<String> parameterNames = uri.getParameterNames();
 		while (parameterNames.hasNext()) {
 			String parameterName = (String) parameterNames.next();
-			parameters.set(parameterName, uri.getParameter(parameterName));		
+			this.parameters.set(parameterName, uri.getParameter(parameterName));		
 		}
 	}
 

@@ -196,7 +196,12 @@ public class SipFactoryImpl implements Serializable {
 
 		validateCreation(method, sipAppSession);
 
-		return createSipServletRequest(sipAppSession, method, from, to, handler);
+		try {
+			return createSipServletRequest(sipAppSession, method, from, to, handler);
+		} catch (ServletParseException e) {
+			logger.error("Error creating sipServletRequest", e);
+			return null;
+		}
 	}
 
 	/*
@@ -221,7 +226,12 @@ public class SipFactoryImpl implements Serializable {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
+		try {
+			return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
+		} catch (ServletParseException e) {
+			logger.error("Error creating sipServletRequest", e);
+			return null;
+		}
 
 	}
 
@@ -344,7 +354,7 @@ public class SipFactoryImpl implements Serializable {
 	 */
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
-			Address to, String handler) {
+			Address to, String handler) throws ServletParseException {
 		
 		MobicentsSipApplicationSession MobicentsSipApplicationSession = (MobicentsSipApplicationSession) sipAppSession;
 		
@@ -364,29 +374,32 @@ public class SipFactoryImpl implements Serializable {
 		// default for contact and via
 		String transport = ListeningPoint.UDP;
 
-		// LETS CREATE OUR HEADERS
-
+		// LETS CREATE OUR HEADERS			
 		try {
-			cseqHeader = SipFactories.headerFactory
-					.createCSeqHeader(1L, method);
-
 			javax.sip.address.Address fromAddres = SipFactories.addressFactory
 					.createAddress(from.getURI().toString());
 			fromAddres.setDisplayName(from.getDisplayName());
 
+			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, null);			
+		} catch (Exception pe) {
+			throw new ServletParseException("Impossoible to parse the given From " + from.toString(), pe);
+		}
+		try{
 			javax.sip.address.Address toAddress = SipFactories.addressFactory
-					.createAddress(to.getURI().toString());
+				.createAddress(to.getURI().toString());
+			
 			toAddress.setDisplayName(to.getDisplayName());
 
-
-			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);				
-			
-			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, null);
+			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);										
+		} catch (Exception pe) {
+			throw new ServletParseException("Impossoible to parse the given To " + to.toString(), pe);
+		}
+		try {
+			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
 					MobicentsSipApplicationSession.getKey().getId());
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
-
 			// FIXME: ADD ROUTE? HOW?
 			// Address routeAddress = sipAddressFactory.createAddress("sip:"
 			// + peerAddress + ":" + peerPort);
@@ -466,7 +479,7 @@ public class SipFactoryImpl implements Serializable {
 		} catch (Exception e) {
 			logger.error("Error creating sipServletRequest", e);
 		}
-
+ 
 		return null;
 
 	}
@@ -474,9 +487,13 @@ public class SipFactoryImpl implements Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Parameterable createParameterable(String s) {
-		// TODO Auto-generated method stub
-		return null;
+	public Parameterable createParameterable(String value) throws ServletParseException {
+		try {
+			Header header = SipFactories.headerFactory.createHeader(ContactHeader.NAME, value);
+			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
+		} catch (ParseException e) {
+			throw new ServletParseException("Impossible to parse the following parameterable "+ value , e);
+		} 		
 	}
 
 	/**

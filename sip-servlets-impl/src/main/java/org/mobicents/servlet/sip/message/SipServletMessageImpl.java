@@ -1325,7 +1325,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @param headerName
 	 * @return
 	 */
-	public static String getFullHeaderName(String headerName) {
+	protected static String getFullHeaderName(String headerName) {
 
 		String fullName = null;
 		if (headerCompact2FullNamesMappings.containsKey(headerName)) {
@@ -1367,11 +1367,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public String getCorrectHeaderName(String name) {
-		return this.getCorrectHeaderName(name, this.headerForm);
+		return getCorrectHeaderName(name, this.headerForm);
 
 	}
 
-	public String getCorrectHeaderName(String name, HeaderForm form) {
+	protected static String getCorrectHeaderName(String name, HeaderForm form) {
 
 		if (form == HeaderForm.DEFAULT) {
 			return name;
@@ -1464,7 +1464,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.transport = transport;
 	}
 
-	private Parameterable createParameterable(Header header, String hName)
+	protected static Parameterable createParameterable(Header header, String hName)
 			throws ServletParseException {
 		String whole = header.toString();
 		// FIXME: Not sure if this is correct ;/ Ranga?

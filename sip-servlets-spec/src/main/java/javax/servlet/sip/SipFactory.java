@@ -64,7 +64,7 @@ public interface SipFactory{
      * where the field-value may be in name-addr or addr-spec format as defined in 
      * RFC 3261 or may be any sequence of tokens till the first semicolon.
      */
-    javax.servlet.sip.Parameterable createParameterable(java.lang.String s);
+    javax.servlet.sip.Parameterable createParameterable(java.lang.String s) throws ServletParseException;
 
     /**
      * Returns a new request object with the specified request method, From, and To headers. The returned request object exists in a new SipSession which belongs to the specified SipApplicationSession.
