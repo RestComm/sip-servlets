@@ -76,13 +76,13 @@ public class ProxyBranchImpl implements ProxyBranch {
 	private boolean isAddToPath;
 	private List<ProxyBranch> recursedBranches;
 	
-	public ProxyBranchImpl(URI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI)
+	public ProxyBranchImpl(URI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI, SipURI pathURI)
 	{
 		this.targetURI = uri;
 		this.proxy = proxy;
 		this.originalRequest = (SipServletRequestImpl) proxy.getOriginalRequest();
-		this.recordRouteURI = proxy.getRecordRouteURI();
-		this.pathURI = proxy.getPathURI();
+		this.recordRouteURI = recordRouteURI;
+		this.pathURI = pathURI;
 		this.outboundInterface = proxy.getOutboundInterface();
 		this.sipFactoryImpl = sipFactoryImpl;
 		if(recordRouteURI != null) {
@@ -199,8 +199,8 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#setProxyBranchTimeout(int)
 	 */
 	public void setProxyBranchTimeout(int seconds) {
-		if(seconds<0) 
-			throw new IllegalArgumentException("Negative timeout not allowed");
+		if(seconds<=0) 
+			throw new IllegalArgumentException("Negative or zero timeout not allowed");
 		
 		this.proxyBranchTimeout = seconds;
 		if(this.started) updateTimer();

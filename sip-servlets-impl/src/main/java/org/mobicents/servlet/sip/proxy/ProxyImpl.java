@@ -55,12 +55,12 @@ public class ProxyImpl implements Proxy {
 	private SipServletRequestImpl originalRequest;
 	private SipServletResponseImpl bestResponse;
 	private ProxyBranchImpl bestBranch;
-	private boolean recurse;
+	private boolean recurse = true;
 	private int proxyTimeout;
 	private int seqSearchTimeout;
 	private boolean supervised = true; 
 	private boolean recordRoutingEnabled;
-	private boolean parallel;
+	private boolean parallel = true;
 	private boolean addToPath;
 	private SipURI pathURI;
 	private SipURI recordRouteURI;
@@ -80,7 +80,7 @@ public class ProxyImpl implements Proxy {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxyBranches = new HashMap<URI, ProxyBranch> ();
 		this.proxyUtils = new ProxyUtils(sipFactoryImpl, this);
-		this.proxyTimeout = 10; // 10 secs default
+		this.proxyTimeout = 180; // 180 secs default
 		this.outboundInterface = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
 		
 	}
@@ -115,7 +115,8 @@ public class ProxyImpl implements Proxy {
 		ArrayList<ProxyBranch> list = new ArrayList<ProxyBranch>();
 		for(URI target: targets)
 		{
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, sipFactoryImpl, this.recordRouteURI);
+			if(target == null) throw new NullPointerException("URI can't be null");
+			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			list.add(branch);
@@ -149,6 +150,7 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#getPathURI()
 	 */
 	public SipURI getPathURI() {
+		if(!this.addToPath) throw new IllegalStateException("You must setAddToPath(true) before getting URI");
 		return this.pathURI;
 	}
 
@@ -184,6 +186,7 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#getRecordRouteURI()
 	 */
 	public SipURI getRecordRouteURI() {
+		if(!this.recordRoutingEnabled) throw new IllegalStateException("You must setRecordRoute(true) before getting URI");
 		return this.recordRouteURI;
 	}
 
@@ -221,7 +224,8 @@ public class ProxyImpl implements Proxy {
 	public void proxyTo(List<? extends URI> uris) {
 		for (URI uri : uris)
 		{
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
+			if(uri == null) throw new NullPointerException("URI can't be null");
+			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			this.proxyBranches.put(uri, branch);
@@ -233,8 +237,9 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#proxyTo(javax.servlet.sip.URI)
 	 */
 	public void proxyTo(URI uri) {
+		if(uri == null) throw new NullPointerException("URI can't be null");
 		
-		ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI);
+		ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 		branch.setRecordRoute(recordRoutingEnabled);
 		branch.setRecurse(recurse);
 		this.proxyBranches.put(uri, branch);
@@ -262,7 +267,7 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#setProxyTimeout(int)
 	 */
 	public void setProxyTimeout(int seconds) {
-		if(seconds<0) throw new IllegalArgumentException("Negative timeout not allowed");
+		if(seconds<=0) throw new IllegalArgumentException("Negative or zero timeout not allowed");
 		
 		proxyTimeout = seconds;
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
@@ -324,6 +329,11 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#startProxy()
 	 */
 	public void startProxy() {
+		if(this.ackReceived) 
+			throw new IllegalStateException("Can't start. ACK has been received.");
+		if(this.started) 
+			throw new IllegalStateException("Can't start. Already started.");
+		
 		started = true;
 		if(this.parallel) {
 			for (ProxyBranch pb : this.proxyBranches.values()) {
@@ -368,7 +378,7 @@ public class ProxyImpl implements Proxy {
 							(javax.sip.address.TelURL) addressURI);
 
 				}
-				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this, sipFactoryImpl, this.recordRouteURI);
+				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 				recurseBranch.setRecordRoute(recordRoutingEnabled);
 				recurseBranch.setRecurse(recurse);
 				this.proxyBranches.put(contactURI, recurseBranch);
