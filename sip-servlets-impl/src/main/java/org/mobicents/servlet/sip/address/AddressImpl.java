@@ -227,7 +227,7 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 		// To/From are parametrable.
 		StringBuffer retval = new StringBuffer();
 		retval.append(address.toString());
-		if ( parameters.size() != 0 ) retval.append(";").append(parameters.toString());
+		if ( parameters!= null && parameters.size() > 0 ) retval.append(";").append(parameters.toString());
 		return retval.toString();
 	}
 

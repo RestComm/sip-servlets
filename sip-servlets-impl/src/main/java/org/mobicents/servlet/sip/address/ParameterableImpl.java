@@ -60,14 +60,16 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 	 */
 	public ParameterableImpl(Header header, Map<String, String> params, boolean isModifiable) {
 		this.isModifiable = isModifiable;
-		this.header = (Parameters) header;
-		 if(params!=null) {			 
-			 Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
-			 while (entries.hasNext()) {
-				 Map.Entry<String, String> e=entries.next();
-				 parameters.put(e.getKey(), new NameValue(e.getKey(),e.getValue()));
-			 }
-		 }
+		if(header instanceof Parameters) {
+			this.header = (Parameters) header;
+			if(params!=null) {			 
+				Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
+				while (entries.hasNext()) {
+					Map.Entry<String, String> e=entries.next();
+					parameters.put(e.getKey(), new NameValue(e.getKey(),e.getValue()));
+				}
+			}
+		}
 	}
 	
 	/*
@@ -136,6 +138,14 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 			retval.add(nameValue);
 		}
 		return retval;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Parameterable#getParameters()
+	 */
+	public NameValueList getInternalParameters() {
+		return parameters;
 	}
 
 	/*

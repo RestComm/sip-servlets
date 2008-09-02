@@ -41,6 +41,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
@@ -112,7 +113,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected SipFactoryImpl sipFactoryImpl;
 	protected MobicentsSipSession session;
 
-	protected Map<String, Object> attributes = new HashMap<String, Object>();
+	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 	private Transaction transaction;
 	protected TransactionApplicationData transactionApplicationData;	
 
@@ -448,13 +449,25 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getAcceptLanguage()
 	 */
 	public Locale getAcceptLanguage() {
-		AcceptLanguageHeader alh = (AcceptLanguageHeader) this.message
-				.getHeader(AcceptLanguageHeader.NAME);
-		if (alh == null)
-			return null;
-		else
-			return alh.getAcceptLanguage();
-
+		// See section 14.4 of RFC 2616 (HTTP/1.1) for more information about how the Accept-Language header 
+		// must interpreted to determine the preferred language of the client.
+		Locale preferredLocale = null;
+		float q = 0;
+		Iterator<Header> it = (Iterator<Header>) this.message
+			.getHeaders(AcceptLanguageHeader.NAME);
+		while (it.hasNext()) {
+			AcceptLanguageHeader alh = (AcceptLanguageHeader) it.next();
+			if(preferredLocale == null) {
+				preferredLocale = alh.getAcceptLanguage();
+				q = alh.getQValue();
+			} else {
+				if(alh.getQValue() > q) {
+					preferredLocale = alh.getAcceptLanguage();
+					q = alh.getQValue();
+				}
+			}
+		}
+		return preferredLocale;
 	}
 
 	/*
@@ -486,12 +499,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if (logger.isDebugEnabled())
 			logger.debug("Fetching address header for name [" + hName + "]");
 
-		if (!isAddressTypeHeader(hName)) {
-			logger.error("Header of name [" + hName
-					+ "] is not address type header!!!");
-			throw new ServletParseException("Header of type [" + hName
-					+ "] cant be parsed to address, wrong content type!!!");
-		}
+//		if (!isAddressTypeHeader(hName)) {
+//			logger.error("Header of name [" + hName
+//					+ "] is not address type header!!!");
+//			throw new ServletParseException("Header of type [" + hName
+//					+ "] cant be parsed to address, wrong content type!!!");
+//		}
 		String nameToSearch = getCorrectHeaderName(hName);
 		ListIterator<Header> headers = (ListIterator<Header>) this.message
 				.getHeaders(nameToSearch);
@@ -501,10 +514,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			Header first = lit.next();
 			if (first instanceof AddressParametersHeader) {
 				try {
-
 					return new AddressImpl((AddressParametersHeader) first);
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
+				}
+			} else {
+				Parameterable parametrable = createParameterable(first, first.getName());
+				try {
+					return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+				} catch (ParseException e) {
+					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
 				}
 			}
 		}
@@ -523,10 +542,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		String hName = getFullHeaderName(name);
 
 		// Fix from Thomas Leseney from Nexcom systems
-		if (!isAddressTypeHeader(hName)) {
-			throw new ServletParseException(
-					"Header [" + hName + "] is not address type header");
-		}
+//		if (!isAddressTypeHeader(hName)) {
+//			throw new ServletParseException(
+//					"Header [" + hName + "] is not address type header");
+//		}
 		LinkedList<Address> retval = new LinkedList<Address>();
 		String nameToSearch = getCorrectHeaderName(hName);
 
@@ -542,7 +561,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				} catch (ParseException ex) {
 					throw new ServletParseException("Bad header", ex);
 				}
-
+			}  else {
+				Parameterable parametrable = createParameterable(header, header.getName());
+				try {
+					AddressImpl addressImpl = new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+					retval.add(addressImpl);
+				} catch (ParseException e) {
+					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
+				}
 			}
 		}
 		return retval.listIterator();
@@ -648,7 +674,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if(contentTypeHeader!= null && CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
 			String content = null;
 			if(message.getRawContent() != null) {
-				content = new String(message.getRawContent());
+				if(message.getContentEncoding() == null) {
+					content = new String(message.getRawContent());	
+				} else {
+					content = new String(message.getRawContent(), message.getContentEncoding().getEncoding());
+				}
 			} else {
 				content = new String();
 			}
@@ -1490,11 +1520,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		String value = stringHeader;
 		// FIXME: This can be wrong ;/ Couldnt find list of parameterable
 		// headers
-		if(whole.trim().indexOf("<") == 0) {
-			stringHeader.replace("<", "");
+		if(stringHeader.trim().indexOf("<") == 0) {
+			stringHeader = stringHeader.substring(1);
 			String[] split = stringHeader.split(">");
 			value = split[0];			
-	
+			
 			if (split.length > 1 && split[1].contains(";")) {
 				// repleace first ";" with ""
 				split[1] = split[1].replaceFirst(";", "");
