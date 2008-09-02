@@ -348,18 +348,22 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 		String hName = getFullHeaderName(name);
 
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger.debug("Adding address header [" + hName + "] as first ["
 					+ first + "] value [" + addr + "]");
-
-		if (!isAddressTypeHeader(hName)) {
-			logger.error("Header [" + hName + "] is nto address type header");
-			throw new IllegalArgumentException("Header[" + hName
-					+ "] is not of an address type");
 		}
 
+		//we should test for 
+		//This method can be used with headers which are defined to contain one 
+		//or more entries matching (name-addr | addr-spec) *(SEMI generic-param) as defined in RFC 3261
+//		if (!isAddressTypeHeader(hName)) {
+//			logger.error("Header [" + hName + "] is not address type header");
+//			throw new IllegalArgumentException("Header[" + hName
+//					+ "] is not of an address type");
+//		}
+
 		if (isSystemHeader(hName)) {
-			logger.error("Error, cant add ssytem header [" + hName + "]");
+			logger.error("Error, can't add system header [" + hName + "]");
 			throw new IllegalArgumentException("Header[" + hName
 					+ "] is system header, cant add, modify it!!!");
 		}
@@ -435,7 +439,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			else
 				this.message.addLast(header);
 		} catch (Exception ex) {
-			throw new IllegalArgumentException("Illegal args supplied");
+			throw new IllegalArgumentException("Illegal args supplied", ex);
 		}
 	}
 
@@ -1473,39 +1477,43 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					+ whole + "]");
 		// Remove name
 		String stringHeader = whole.substring(whole.indexOf(":") + 1).trim();
-		if (!stringHeader.contains("<") || !stringHeader.contains(">")
-				|| !isParameterable(getFullHeaderName(hName))) {
+//		if (!stringHeader.contains("<") || !stringHeader.contains(">")
+//				|| !isParameterable(getFullHeaderName(hName))) {
+		if (!isParameterable(getFullHeaderName(hName))) {
 			logger
 					.error("Cant create parametrable - argument doesnt contain uri part, which it has to have!!!");
 			throw new ServletParseException("Header[" + hName
 					+ "] is not parametrable");
 		}
 
+		Map<String, String> paramMap = new HashMap<String, String>();
+		String value = stringHeader;
 		// FIXME: This can be wrong ;/ Couldnt find list of parameterable
 		// headers
-		stringHeader.replace("<", "");
-		String[] split = stringHeader.split(">");
-		String value = split[0];
-		Map<String, String> paramMap = new HashMap<String, String>();
-
-		if (split.length > 1 && split[1].contains(";")) {
-			// repleace first ";" with ""
-			split[1] = split[1].replaceFirst(";", "");
-			split = split[1].split(";");
-
-			for (String pair : split) {
-				String[] vals = pair.split("=");
-				if (vals.length != 2) {
-					logger
-							.error("Wrong parameter format, expected value and name, got ["
-									+ pair + "]");
-					throw new ServletParseException(
-							"Wrong parameter format, expected value or name["
-									+ pair + "]");
+		if(whole.trim().indexOf("<") == 0) {
+			stringHeader.replace("<", "");
+			String[] split = stringHeader.split(">");
+			value = split[0];			
+	
+			if (split.length > 1 && split[1].contains(";")) {
+				// repleace first ";" with ""
+				split[1] = split[1].replaceFirst(";", "");
+				split = split[1].split(";");
+	
+				for (String pair : split) {
+					String[] vals = pair.split("=");
+					if (vals.length != 2) {
+						logger
+								.error("Wrong parameter format, expected value and name, got ["
+										+ pair + "]");
+						throw new ServletParseException(
+								"Wrong parameter format, expected value or name["
+										+ pair + "]");
+					}
+					paramMap.put(vals[0], vals[1]);
 				}
-				paramMap.put(vals[0], vals[1]);
 			}
-		}
+		} 
 		boolean isNotModifiable = systemHeaders.contains(header.getName());
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
 				header, value, paramMap, isNotModifiable);

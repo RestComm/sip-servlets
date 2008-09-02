@@ -37,6 +37,7 @@ import javax.sip.ListeningPoint;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
@@ -48,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
@@ -309,12 +311,12 @@ public class SipFactoryImpl implements Serializable {
 			} else if (jainUri instanceof javax.sip.address.TelURL) {
 				return new TelURLImpl(
 						(javax.sip.address.TelURL) jainUri);
-
+			} else {
+				return new GenericURIImpl(jainUri);
 			}
 		} catch (ParseException ex) {
 			throw new ServletParseException("Bad param " + uri, ex);
 		}
-		throw new IllegalArgumentException("Unsupported Scheme : " + uri);
 	}
 
 	// ------------ HELPER METHODS
@@ -488,11 +490,16 @@ public class SipFactoryImpl implements Serializable {
 	 * {@inheritDoc}
 	 */
 	public Parameterable createParameterable(String value) throws ServletParseException {
-		try {
+		try {			 
 			Header header = SipFactories.headerFactory.createHeader(ContactHeader.NAME, value);
 			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
 		} catch (ParseException e) {
-			throw new ServletParseException("Impossible to parse the following parameterable "+ value , e);
+			try {
+				Header header = SipFactories.headerFactory.createHeader(ContentTypeHeader.NAME, value);
+				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
+			} catch (ParseException pe) {
+				throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe);
+			}
 		} 		
 	}
 

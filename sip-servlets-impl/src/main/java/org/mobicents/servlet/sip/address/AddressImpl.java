@@ -67,11 +67,13 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 		if(parameters != null) {
 			this.parameters = parameters;
 		}
-		Parameters uri = (Parameters) this.address.getURI();
-		Iterator<String> parameterNames = uri.getParameterNames();
-		while (parameterNames.hasNext()) {
-			String parameterName = (String) parameterNames.next();
-			this.parameters.set(parameterName, uri.getParameter(parameterName));		
+		if(this.address.getURI() instanceof Parameters) {
+			Parameters uri = (Parameters) this.address.getURI();
+			Iterator<String> parameterNames = uri.getParameterNames();
+			while (parameterNames.hasNext()) {
+				String parameterName = (String) parameterNames.next();
+				this.parameters.set(parameterName, uri.getParameter(parameterName));		
+			}
 		}
 	}
 
@@ -259,11 +261,13 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	@Override
 	public void setParameter(String name, String value) {		
 		super.setParameter(name, value);
-		Parameters uri = (Parameters) this.address.getURI();
-		try {
-			uri.setParameter(name, value);
-		} catch (ParseException e) {
-			throw new IllegalArgumentException("Problem setting parameter",e);
+		if(this.address.getURI() instanceof Parameters) {
+			Parameters uri = (Parameters) this.address.getURI();
+			try {
+				uri.setParameter(name, value);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Problem setting parameter",e);
+			}
 		}
 	}
 	
