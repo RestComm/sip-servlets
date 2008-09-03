@@ -117,7 +117,7 @@ public class ProxyImpl implements Proxy {
 		for(URI target: targets)
 		{
 			if(target == null) throw new NullPointerException("URI can't be null");
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI)target, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
+			ProxyBranchImpl branch = new ProxyBranchImpl(target, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			list.add(branch);
@@ -240,7 +240,7 @@ public class ProxyImpl implements Proxy {
 	public void proxyTo(URI uri) {
 		if(uri == null) throw new NullPointerException("URI can't be null");
 		
-		ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
+		ProxyBranchImpl branch = new ProxyBranchImpl(uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 		branch.setRecordRoute(recordRoutingEnabled);
 		branch.setRecurse(recurse);
 		this.proxyBranches.put(uri, branch);
@@ -252,6 +252,12 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#setAddToPath(boolean)
 	 */
 	public void setAddToPath(boolean p) {
+		if(started) {
+			throw new IllegalStateException("Cannot set a record route on an already started proxy");
+		}
+		if(this.pathURI == null) {
+			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null));
+		}		
 		addToPath = p;
 
 	}

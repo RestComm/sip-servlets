@@ -74,7 +74,21 @@ public class SipFactoryImpl implements Serializable {
 			return o1.compareToIgnoreCase(o2);
 		}
 	}
-
+	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels"};
+	
+	private static boolean checkScheme(String address) {
+		for(String scheme:allowedAddressSchemes) {
+			int start = address.indexOf("<");
+			if(start >= 0) {
+				int end = address.indexOf(">");
+				address = address.substring(start + 1, end);
+			}
+				
+			if(scheme.equalsIgnoreCase(address.substring(0, scheme.length())))
+				return true;
+		}
+		return false;
+	}
 	private static final TreeSet<String> forbbidenToHeaderParams = new TreeSet<String>(
 			new NamesComparator());
 
@@ -98,7 +112,6 @@ public class SipFactoryImpl implements Serializable {
 	 */
 	public Address createAddress(String sipAddress)
 			throws ServletParseException {
-
 		try {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Creating Address from [" + sipAddress + "]");
@@ -302,6 +315,9 @@ public class SipFactoryImpl implements Serializable {
 	}
 
 	public URI createURI(String uri) throws ServletParseException {
+		if(!checkScheme(uri))
+			throw new IllegalArgumentException("The uri " + uri + " is not valid");
+		
 		try {
 			javax.sip.address.URI jainUri = SipFactories.addressFactory
 					.createURI(uri);
