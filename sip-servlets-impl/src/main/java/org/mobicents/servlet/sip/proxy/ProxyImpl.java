@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class ProxyImpl implements Proxy {
 	{
 		this.originalRequest = request;
 		this.sipFactoryImpl = sipFactoryImpl;
-		this.proxyBranches = new HashMap<URI, ProxyBranch> ();
+		this.proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
 		this.proxyUtils = new ProxyUtils(sipFactoryImpl, this);
 		this.proxyTimeout = 180; // 180 secs default
 		this.outboundInterface = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
@@ -331,13 +332,13 @@ public class ProxyImpl implements Proxy {
 	public void startProxy() {
 		if(this.ackReceived) 
 			throw new IllegalStateException("Can't start. ACK has been received.");
-		if(this.started) 
-			throw new IllegalStateException("Can't start. Already started.");
+	
 		
 		started = true;
 		if(this.parallel) {
 			for (ProxyBranch pb : this.proxyBranches.values()) {
-				((ProxyBranchImpl)pb).start();
+				if(!((ProxyBranchImpl)pb).isStarted())
+					((ProxyBranchImpl)pb).start();
 			}
 		} else {
 			startNextUntriedBranch();
@@ -356,7 +357,9 @@ public class ProxyImpl implements Proxy {
 		if(!isNoCancel) {
 			if( (response.getStatus() >= 200 && response.getStatus() < 300) 
 					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
-				cancelAllExcept(branch, null, null, null);
+				if(this.getParallel()) {
+					cancelAllExcept(branch, null, null, null);
+				}
 			}
 		}
 		// Recurse if allowed
