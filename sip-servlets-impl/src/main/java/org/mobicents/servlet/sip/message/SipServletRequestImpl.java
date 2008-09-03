@@ -131,6 +131,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	private boolean isInitial;
 	
+	private boolean isFinalResponseGenerated;
+	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
@@ -140,6 +142,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if(RoutingState.INITIAL.equals(routingState)) {
 			isInitial = true;
 		}
+		isFinalResponseGenerated = false;
 	}
 
 	@Override
@@ -276,6 +279,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog());
 			newSipServletResponse.setOriginalRequest(this);
+			if(newSipServletResponse.getStatus() >= Response.OK && 
+					newSipServletResponse.getStatus() <= Response.SESSION_NOT_ACCEPTABLE) {	
+				isFinalResponseGenerated = true;
+			}
 			return newSipServletResponse;
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad status code" + statusCode,
@@ -408,7 +415,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public boolean isCommitted() {		
 		//the message is an incoming request for which a final response has been generated
-		if(getTransaction() instanceof ServerTransaction && RoutingState.FINAL_RESPONSE_SENT.equals(routingState)) {
+		if(getTransaction() instanceof ServerTransaction && 
+				(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) || isFinalResponseGenerated)) {
 			return true;
 		}
 		//the message is an outgoing request which has been sent
@@ -701,11 +709,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return 0;
 	}
 
-	public void removeAttribute(String arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
 	 * @return the routingDirective
 	 */
@@ -868,6 +871,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}			
+			isMessageSent = true;
 //			super.session.addOngoingTransaction(getTransaction());
 			//updating the last accessed times 
 			getSipSession().access();

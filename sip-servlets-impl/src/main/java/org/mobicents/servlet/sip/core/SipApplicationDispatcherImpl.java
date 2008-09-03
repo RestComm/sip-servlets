@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.core;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -390,7 +391,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						transaction,
 						requestEvent.getDialog(),
 						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));						
-			
+			sipServletRequest.setLocalAddr(InetAddress.getByName(sipProvider.getListeningPoint(JainSipUtils.findTransport(request)).getIPAddress()));
+			sipServletRequest.setLocalPort(sipProvider.getListeningPoint(JainSipUtils.findTransport(request)).getPort());
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
 			RouteHeader routeHeader = (RouteHeader) request

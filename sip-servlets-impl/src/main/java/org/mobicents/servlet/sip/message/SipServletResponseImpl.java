@@ -31,6 +31,7 @@ import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.Rel100Exception;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
@@ -41,6 +42,7 @@ import javax.sip.TransactionState;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentEncodingHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
@@ -73,6 +75,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	private boolean isBranchResponse;
 	private boolean isProxiedResponse;
 	private boolean isResponseForwardedUpstream;
+	private boolean isAckGenerated;
+	
 	/**
 	 * Constructor
 	 * @param response
@@ -94,6 +98,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		setProxiedResponse(false);
 		isBranchResponse = false;
 		isResponseForwardedUpstream = false;
+		isAckGenerated = false;
 	}
 	
 	/**
@@ -179,6 +184,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					this.getTransaction(), 
 					dialog, 
 					false); 
+			isAckGenerated = true;
 		} catch (InvalidArgumentException e) {
 			logger.error("Impossible to create the ACK",e);
 		} catch (SipException e) {
@@ -406,6 +412,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			
 			st.sendResponse( (Response)this.message );
+			isMessageSent = true;
 			if(isProxiedResponse) {
 				isResponseForwardedUpstream = true;
 			}
@@ -466,15 +473,15 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public boolean isCommitted() {
 		//the message is an incoming non-reliable provisional response received by a servlet acting as a UAC
-		if(getTransaction() instanceof ServerTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") == null) {
+		if(getTransaction() instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") == null) {
 			return true;
 		}
 		//the message is an incoming reliable provisional response for which PRACK has already been generated. (Note that this scenario applies to containers that support the 100rel extension.)
-		if(getTransaction() instanceof ServerTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") != null && TransactionState.TERMINATED.equals(getTransaction().getState())) {
+		if(getTransaction() instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") != null && TransactionState.TERMINATED.equals(getTransaction().getState())) {
 			return true;
 		}
 		//the message is an incoming final response received by a servlet acting as a UAC for a Non INVITE transaction
-		if(getTransaction() instanceof ServerTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(getTransaction().getRequest().getMethod())) {
+		if(getTransaction() instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(getTransaction().getRequest().getMethod())) {
 			return true;
 		}
 		//the message is a response which has been forwarded upstream
@@ -482,7 +489,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			return true;
 		}
 		//message is an incoming final response to an INVITE transaction and an ACK has been generated
-		if(getTransaction() instanceof ServerTransaction && getStatus() >= 200 && getStatus() <= 999 && TransactionState.TERMINATED.equals(getTransaction().getState())) {
+		if(getTransaction() instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && TransactionState.TERMINATED.equals(getTransaction().getState()) && isAckGenerated) {
 			return true;
 		}
 		return false;
@@ -513,4 +520,18 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return isProxiedResponse;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#setCharacterEncoding(java.lang.String)
+	 */
+	public void setCharacterEncoding(String enc) {		
+		try {			
+			new String("testEncoding".getBytes(),enc);
+			this.message.setContentEncoding(SipFactories.headerFactory
+					.createContentEncodingHeader(enc));
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Encoding " + enc + " not valid", ex);
+		}
+
+	}
 }

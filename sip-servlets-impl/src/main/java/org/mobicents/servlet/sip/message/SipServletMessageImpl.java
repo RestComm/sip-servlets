@@ -29,6 +29,7 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -50,8 +51,12 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
+import javax.sip.InvalidArgumentException;
+import javax.sip.ServerTransaction;
 import javax.sip.SipFactory;
 import javax.sip.Transaction;
+import javax.sip.header.AcceptEncodingHeader;
+import javax.sip.header.AcceptHeader;
 import javax.sip.header.AcceptLanguageHeader;
 import javax.sip.header.AlertInfoHeader;
 import javax.sip.header.AllowEventsHeader;
@@ -73,6 +78,7 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.ReplyToHeader;
+import javax.sip.header.RetryAfterHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubjectHeader;
 import javax.sip.header.SupportedHeader;
@@ -140,6 +146,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected String currentApplicationName = null;
 	
 	protected Principal userPrincipal;
+	
+	protected boolean isMessageSent;
 
 	/**
 	 * List of headers that ARE system at all times
@@ -189,6 +197,32 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			
 	}
 
+	protected static final HashSet<String> parameterableHeadersNames = new HashSet<String>();
+
+	static {
+
+		// All of the Address header fields are Parameterable, including Contact, From, To, Route, Record-Route, and Reply-To. 
+		// In addition, the header fields Accept, Accept-Encoding, Alert-Info, 
+		// Call-Info, Content-Disposition, Content-Type, Error-Info, Retry-After and Via are also Parameterable. 
+		parameterableHeadersNames.add(FromHeader.NAME);
+		parameterableHeadersNames.add(ToHeader.NAME);
+		parameterableHeadersNames.add(ContactHeader.NAME);
+		parameterableHeadersNames.add(RouteHeader.NAME);
+		parameterableHeadersNames.add(RecordRouteHeader.NAME);
+		parameterableHeadersNames.add(ReplyToHeader.NAME);
+		parameterableHeadersNames.add(AcceptHeader.NAME);
+		parameterableHeadersNames.add(AcceptEncodingHeader.NAME);
+		parameterableHeadersNames.add(AlertInfoHeader.NAME);
+		parameterableHeadersNames.add(CallInfoHeader.NAME);
+		parameterableHeadersNames.add(ContentDispositionHeader.NAME);
+		parameterableHeadersNames.add(ContentTypeHeader.NAME);
+		parameterableHeadersNames.add(ErrorInfoHeader.NAME);
+		parameterableHeadersNames.add(RetryAfterHeader.NAME);
+		parameterableHeadersNames.add(ViaHeader.NAME);
+			
+	}
+
+	
 	protected static final HashMap<String, String> headerCompact2FullNamesMappings = new HashMap<String, String>();
 
 	{ // http://www.iana.org/assignments/sip-parameters
@@ -303,7 +337,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.transaction = transaction;
 		this.session = sipSession;
 		this.transactionApplicationData = new TransactionApplicationData(this);
-
+		isMessageSent = false;
+		
 		if(sipSession != null && dialog != null) {
 			session.setSessionCreatingDialog(dialog);
 			if(dialog.getApplicationData() == null) {
@@ -324,9 +359,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 //				e.printStackTrace();
 //			}
 
-		if (transaction != null && transaction.getApplicationData() == null)
+		if (transaction != null && transaction.getApplicationData() == null) {
 			transaction.setApplicationData(transactionApplicationData);
-
+		}
 	}
 
 	/*
@@ -799,7 +834,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			ListIterator<Header> list = this.message.getHeaders(nameToSearch);
 			while (list.hasNext()) {
 				Header h = list.next();
-				result.add(h.toString());
+				result.add(((SIPHeader)h).getHeaderValue());
 			}
 		} catch (Exception e) {
 			logger.fatal("Couldnt fetch headers, original name[" + name
@@ -846,9 +881,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	public Parameterable getParameterableHeader(String name)
 			throws ServletParseException {
 
-		// FIXME:javadoc does not say that this object has to imply
-		// immutability, thats wierds
-		// as it suggests that its just a copy.... arghhhhhhhhhhh
 		if (name == null)
 			throw new NullPointerException(
 					"Parametrable header name cant be null!!!");
@@ -856,6 +888,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		String nameToSearch = getCorrectHeaderName(name);
 
 		Header h = this.message.getHeader(nameToSearch);
+		
+		if(!isParameterable(name)) {
+			throw new ServletParseException(name + " header is not parameterable !");
+		}
 
 		return createParameterable(h, getFullHeaderName(name));
 	}
@@ -876,6 +912,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			result.add(createParameterable(headers.next(),
 					getFullHeaderName(name)));
 
+		if(!isParameterable(name)) {
+			throw new ServletParseException(name + " header is not parameterable !");
+		}
+		
 		return result.listIterator();
 	}
 	
@@ -1134,7 +1174,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		AcceptLanguageHeader alh = headerFactory
 				.createAcceptLanguageHeader(locale);
 
-		this.message.addHeader(alh);
+		this.message.setHeader(alh);
 	}
 
 	/*
@@ -1154,12 +1194,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					"Cant set system header, it is maintained by container!!");
 		}
 
-		if (!isAddressTypeHeader(hName)) {
-			logger.error("Error, set header, its not address type header ["
-					+ hName + "]!!");
-			throw new IllegalArgumentException(
-					"This header is not address type header");
-		}
+//		if (!isAddressTypeHeader(hName)) {
+//			logger.error("Error, set header, its not address type header ["
+//					+ hName + "]!!");
+//			throw new IllegalArgumentException(
+//					"This header is not address type header");
+//		}
 		Header h;
 		String headerNameToAdd = getCorrectHeaderName(hName);
 		try {
@@ -1186,13 +1226,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#setCharacterEncoding(java.lang.String)
 	 */
-	public void setCharacterEncoding(String enc) {
-		try {
+	public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
+		new String("testEncoding".getBytes(),enc);
+		try {			
 			this.message.setContentEncoding(SipFactories.headerFactory
-					.createContentEncodingHeader(ContentEncodingHeader.NAME
-							+ ":" + enc));
+					.createContentEncodingHeader(enc));
 		} catch (Exception ex) {
-			throw new IllegalArgumentException("Unsupported encoding", ex);
+			throw new UnsupportedEncodingException(enc);
 		}
 
 	}
@@ -1203,14 +1243,21 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setContent(Object content, String contentType)
 			throws UnsupportedEncodingException {
+		if(isMessageSent) {
+			throw new IllegalStateException("the message has already been sent, cannot set the content anymore");
+		}
 		if(contentType != null && contentType.length() > 0) {
 			String type = contentType.split("/")[0];
 			String subtype = contentType.split("/")[1];			
 			try {
 				ContentTypeHeader contentTypeHeader = 
-					SipFactories.headerFactory.createContentTypeHeader(type, subtype);
+					SipFactories.headerFactory.createContentTypeHeader(type, subtype);				
+				
+				if(content instanceof String  && message.getContentEncoding() != null) {
+					content = new String(((String)content).getBytes(message.getContentEncoding().getEncoding()));
+				}
 				this.message.setContent(content, contentTypeHeader);
-			} catch (Exception e) {
+			} catch (ParseException e) {
 				throw new RuntimeException("Parse error reading content type", e);
 			}
 		}
@@ -1231,19 +1278,15 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setContentLength(int)
 	 */
 	public void setContentLength(int len) {
-
-		// this.message.setContentLength(new ContentLength(len));
-		String name = getCorrectHeaderName(ContentLengthHeader.NAME);
-
-		this.message.removeHeader(name);
-		try {
-			Header h = headerFactory.createHeader(name, len + "");
-			this.message.addHeader(h);
-		} catch (ParseException e) {
-			// Shouldnt happen ?
-			logger.error("Error while setting content length header !!!", e);
+		if(isMessageSent || (transaction != null && transaction instanceof ServerTransaction)) {
+			throw new IllegalStateException("Message already sent or incoming message");
 		}
-
+		try {
+			ContentLengthHeader h = headerFactory.createContentLengthHeader(len);
+			this.message.setHeader(h);
+		} catch (InvalidArgumentException e) {
+			throw new IllegalStateException("Impossible to set a content length lower than 0", e);
+		}
 	}
 
 	/*
@@ -1298,14 +1341,26 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setHeaderForm(HeaderForm form) {
 
+		this.headerForm = form;
 		// When form changes to HeaderForm.COMPACT or HeaderForm.LONG - all
 		// names must transition, if it is changed to HeaderForm.DEFAULT, no
 		// action is performed
 		if(form == HeaderForm.DEFAULT)
 			return;
 		
-		if(form == HeaderForm.COMPACT) {
-			//TODO If header has compact name - we must change name to compact, if not, its left as it is.
+		if(form == HeaderForm.COMPACT) {			 
+//			for(String fullName : headerFull2CompactNamesMappings.keySet()) {
+//				if(message.getHeader(fullName) != null) {
+//					try {
+						//Handle the case where mutliple headers for the same header name
+//						Header header = SipFactories.headerFactory.createHeader(headerCompact2FullNamesMappings.get(fullName), ((SIPHeader)message.getHeader(fullName)).getHeaderValue());
+//						message.removeHeader(fullName);
+//						message.addHeader(header);
+//					} catch (ParseException e) {
+//						logger.error("Impossible to parse the header " + fullName + " to its compact form");
+//					}
+//				}
+//			}
 		}
 	}
 	
@@ -1501,7 +1556,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected static Parameterable createParameterable(Header header, String hName)
 			throws ServletParseException {
 		String whole = header.toString();
-		// FIXME: Not sure if this is correct ;/ Ranga?
 		if (logger.isDebugEnabled())
 			logger.debug("Creating parametrable for [" + hName + "] from ["
 					+ whole + "]");
@@ -1509,17 +1563,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		String stringHeader = whole.substring(whole.indexOf(":") + 1).trim();
 //		if (!stringHeader.contains("<") || !stringHeader.contains(">")
 //				|| !isParameterable(getFullHeaderName(hName))) {
-		if (!isParameterable(getFullHeaderName(hName))) {
-			logger
-					.error("Cant create parametrable - argument doesnt contain uri part, which it has to have!!!");
-			throw new ServletParseException("Header[" + hName
-					+ "] is not parametrable");
-		}
-
+		
 		Map<String, String> paramMap = new HashMap<String, String>();
 		String value = stringHeader;
-		// FIXME: This can be wrong ;/ Couldnt find list of parameterable
-		// headers
+		
 		if(stringHeader.trim().indexOf("<") == 0) {
 			stringHeader = stringHeader.substring(1);
 			String[] split = stringHeader.split(">");
@@ -1543,17 +1590,39 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 					paramMap.put(vals[0], vals[1]);
 				}
 			}
-		} 
+		} else {
+			if (value.length() > 1 && value.contains(";")) {
+				// repleace first ";" with ""
+				String parameters = value.substring(value.indexOf(";") + 1);
+				value = value.substring(0, value.indexOf(";"));				
+				String[] split = parameters.split(";");
+	
+				for (String pair : split) {
+					String[] vals = pair.split("=");
+					if (vals.length != 2) {
+						logger
+								.error("Wrong parameter format, expected value and name, got ["
+										+ pair + "]");
+						throw new ServletParseException(
+								"Wrong parameter format, expected value or name["
+										+ pair + "]");
+					}
+					paramMap.put(vals[0], vals[1]);
+				}
+			}
+		}		
+
 		boolean isNotModifiable = systemHeaders.contains(header.getName());
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
 				header, value, paramMap, isNotModifiable);
 		return parameterable;
 	}
 
-	public static boolean isParameterable(String hName) {
-		// FIXME: Add cehck?
-		return true;
-
+	public static boolean isParameterable(String header) {
+		if(parameterableHeadersNames.contains(header)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

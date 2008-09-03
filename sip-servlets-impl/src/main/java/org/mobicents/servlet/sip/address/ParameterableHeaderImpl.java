@@ -101,10 +101,10 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	public String toString() {
 		String retVal = new String(value);
 		if(retVal.trim().startsWith("<") && !retVal.trim().endsWith(">")) {
-			retVal.concat(">");
+			retVal = retVal.concat(">");
 		}
 		if(!super.toString().trim().equals("")) {
-			retVal.concat(";" + super.toString());
+			retVal = retVal.concat(";" + super.toString());
 		}
 		return retVal;
 	}
