@@ -177,9 +177,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
 					ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();
 					proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
-					if(proxyBranch.getProxy().getSupervised()) {
-						callServlet(sipServletRequest);
-					}
+					
+					callServlet(sipServletRequest);
+				
 					proxyBranch.proxySubsequentRequest(sipServletRequest);
 				}
 				// If it's not for a proxy then it's just an AR, so go to the next application

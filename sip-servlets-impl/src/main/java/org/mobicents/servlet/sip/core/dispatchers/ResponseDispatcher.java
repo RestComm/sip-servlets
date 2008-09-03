@@ -185,7 +185,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 						if(logger.isDebugEnabled()) {
 							logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
 						}
-						if(proxyBranch.getProxy().getSupervised() || sipServletResponse.getStatus()>=200) {
+						if(proxyBranch.getProxy().getSupervised()) {
 							callServlet(sipServletResponse);
 						}
 						// Handle it at the branch

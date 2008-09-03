@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 
+import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
@@ -45,6 +46,7 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -290,6 +292,11 @@ public class ProxyBranchImpl implements ProxyBranch {
 		// Initialize the sip session for the new request if initial
 		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
 		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
+		try {
+			newSession.setHandler(((SipSessionImpl)this.originalRequest.getSession()).getHandler());
+		} catch (ServletException e) {
+			throw new RuntimeException(e);
+		}
 		
 		// Use the original dialog in the new session
 		newSession.setSessionCreatingDialog(originalRequest.getSipSession().getSessionCreatingDialog());

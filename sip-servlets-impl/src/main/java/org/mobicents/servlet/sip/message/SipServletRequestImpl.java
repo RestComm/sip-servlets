@@ -372,6 +372,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
 		if ( this.b2buaHelper != null ) throw new IllegalStateException("Cannot proxy request");
 		
+		MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
+		if(mfHeader.getMaxForwards()<=0) {
+			try {
+				this.createResponse(483, "Too many hops").send();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			throw new TooManyHopsException();
+		}
+		
 		if (create && transactionApplicationData.getProxy() == null) {
 			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
 			this.transactionApplicationData.setProxy(proxy);
