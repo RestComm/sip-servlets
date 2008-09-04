@@ -21,6 +21,7 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -190,6 +191,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				|| super.getTransaction() instanceof ServerTransaction)
 			throw new IllegalStateException("No client transaction found!");
 
+		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState)) {
+			throw new IllegalStateException("final response already sent!");
+		}
+		
 		try {
 			Request request = (Request) super.message;
 			String transport = JainSipUtils.findTransport(request);
@@ -438,7 +443,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 		return false;
 	}
-
+	
+	protected void checkMessageState() {
+		if(isMessageSent || getTransaction() instanceof ServerTransaction) {
+			throw new IllegalStateException("Message already sent or incoming message");
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -727,6 +738,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @return the routingDirective
 	 */
 	public SipApplicationRoutingDirective getRoutingDirective() {
+		if(!isInitial()) {
+			throw new IllegalStateException("the request is not initial");
+		}
 		return routingDirective;
 	}
 

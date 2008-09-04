@@ -38,6 +38,9 @@ public class TransactionApplicationData implements Serializable {
 	private transient Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
 	private transient B2buaHelper b2buaHelper;
+	private transient String initialRemoteHostAddress;
+	private transient int initialRemotePort;
+	private transient String initialRemoteTransport;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
@@ -106,5 +109,42 @@ public class TransactionApplicationData implements Serializable {
 	public Set<SipServletResponseImpl> getSipServletResponses() {
 		return sipServletResponses;
 	}
+	/**
+	 * @param initialRemoteHostAddress the initialRemoteHostAddress to set
+	 */
+	public void setInitialRemoteHostAddress(String initialRemoteHostAddress) {
+		this.initialRemoteHostAddress = initialRemoteHostAddress;
+	}
+	/**
+	 * @return the initialRemoteHostAddress
+	 */
+	public String getInitialRemoteHostAddress() {
+		return initialRemoteHostAddress;
+	}
+	/**
+	 * @param initialRemotePort the initialRemotePort to set
+	 */
+	public void setInitialRemotePort(int initialRemotePort) {
+		this.initialRemotePort = initialRemotePort;
+	}
+	/**
+	 * @return the initialRemotePort
+	 */
+	public int getInitialRemotePort() {
+		return initialRemotePort;
+	}
+	/**
+	 * @param initialRemoteTransport the initialRemoteTransport to set
+	 */
+	public void setInitialRemoteTransport(String initialRemoteTransport) {
+		this.initialRemoteTransport = initialRemoteTransport;
+	}
+	/**
+	 * @return the initialRemoteTransport
+	 */
+	public String getInitialRemoteTransport() {
+		return initialRemoteTransport;
+	}
+	
 
 }

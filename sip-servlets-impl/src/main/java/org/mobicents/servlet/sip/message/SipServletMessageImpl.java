@@ -29,7 +29,6 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.nio.charset.Charset;
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
-import javax.sip.ServerTransaction;
 import javax.sip.SipFactory;
 import javax.sip.Transaction;
 import javax.sip.header.AcceptEncodingHeader;
@@ -321,6 +319,25 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		// headerCompact2FullNamesMappings.put(SessionExpiresHeader,"x");
 		headerFull2CompactNamesMappings.put(SubjectHeader.NAME, "s");
 		headerFull2CompactNamesMappings.put(SupportedHeader.NAME, "k");
+	}
+	
+	protected static final HashSet<String> ianaAllowedContentTypes = new HashSet<String>();
+
+	static {
+
+		// All of the Address header fields are Parameterable, including Contact, From, To, Route, Record-Route, and Reply-To. 
+		// In addition, the header fields Accept, Accept-Encoding, Alert-Info, 
+		// Call-Info, Content-Disposition, Content-Type, Error-Info, Retry-After and Via are also Parameterable. 
+		ianaAllowedContentTypes.add("application");
+		ianaAllowedContentTypes.add("audio");
+		ianaAllowedContentTypes.add("example");
+		ianaAllowedContentTypes.add("image");
+		ianaAllowedContentTypes.add("message");
+		ianaAllowedContentTypes.add("model");
+		ianaAllowedContentTypes.add("multipart");
+		ianaAllowedContentTypes.add("text");
+		ianaAllowedContentTypes.add("video");
+			
 	}
 
 	protected SipServletMessageImpl(Message message,
@@ -744,11 +761,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#getContentLength()
 	 */
 	public int getContentLength() {
-		if (this.message.getContent() != null
-				&& this.message.getContentLength() != null)
+		if (this.message.getContentLength() != null) {
 			return this.message.getContentLength().getContentLength();
-		else
+		} else {
 			return 0;
+		}
 	}
 
 	/*
@@ -948,21 +965,21 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * {@inheritDoc}
 	 */
 	public String getInitialRemoteAddr() {
-		return remoteAddr.getHostAddress();
+		return transactionApplicationData.getInitialRemoteHostAddress();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getInitialRemotePort() {
-		return remotePort;
+		return transactionApplicationData.getInitialRemotePort();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public String getInitialTransport() {		
-		return transport;
+		return transactionApplicationData.getInitialRemoteTransport();
 	}
 	
 	/*
@@ -1248,25 +1265,48 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setContent(Object content, String contentType)
 			throws UnsupportedEncodingException {
-		if(isMessageSent) {
-			throw new IllegalStateException("the message has already been sent, cannot set the content anymore");
-		}
+		checkMessageState();
+		checkContentType(contentType);
+		
 		if(contentType != null && contentType.length() > 0) {
 			this.addHeader(ContentTypeHeader.NAME, contentType);
 			String charset = this.getCharacterEncoding();
-			try {
-				
+			try {				
 				if(content instanceof String  && charset != null) {
+					//test for unsupportedencoding exception
+					new String("testEncoding".getBytes(charset));
+					
 					content = new String(((String)content).getBytes());
 				}
 				ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);
 				this.message.setContent(content, contentTypeHeader);
 			} catch (ParseException e) {
-				throw new RuntimeException("Parse error reading content type", e);
+				throw new IllegalArgumentException("Parse error reading content type", e);
 			}
 		}
 	}
 	
+	protected abstract void checkMessageState();
+
+	/**
+	 * Check the content type against the list defined by the iana
+	 * http://www.iana.org/assignments/media-types/
+	 * @param contentType
+	 */
+	private void checkContentType(String contentType) {
+		if(contentType == null) {
+			throw new IllegalArgumentException("the content type cannot be null");
+		}
+		int indexOfSlash = contentType.indexOf("/");
+		if(indexOfSlash != -1) { 
+			if(!ianaAllowedContentTypes.contains(contentType.substring(0, indexOfSlash))) {
+				throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
+			}
+		} else if(!ianaAllowedContentTypes.contains(contentType.toLowerCase())) {
+			throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#setContentLanguage(java.util.Locale)
@@ -1282,9 +1322,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setContentLength(int)
 	 */
 	public void setContentLength(int len) {
-		if(isMessageSent || (transaction != null && transaction instanceof ServerTransaction)) {
-			throw new IllegalStateException("Message already sent or incoming message");
-		}
+		checkMessageState();
 		try {
 			ContentLengthHeader h = headerFactory.createContentLengthHeader(len);
 			this.message.setHeader(h);
@@ -1298,6 +1336,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setContentType(java.lang.String)
 	 */
 	public void setContentType(String type) {
+		checkContentType(type);
 		String name = getCorrectHeaderName(ContentTypeHeader.NAME);
 		try {
 			Header h = headerFactory.createHeader(name, type);
@@ -1330,6 +1369,15 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setHeader(java.lang.String, java.lang.String)
 	 */
 	public void setHeader(String name, String value) {
+		if(name == null) {
+			throw new NullPointerException ("name parameter is null");
+		}
+		if(value == null) {
+			throw new NullPointerException ("value parameter is null");
+		}
+		if(isSystemHeader(name)) {
+			throw new IllegalArgumentException(name + " is a system header !");
+		}
 		try {
 			Header header = SipFactory.getInstance().createHeaderFactory()
 					.createHeader(name, value);
@@ -1373,8 +1421,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setParameterableHeader(java.lang.String, javax.servlet.sip.Parameterable)
 	 */
 	public void setParameterableHeader(String name, Parameterable param) {
-		// TODO Auto-generated method stub
-
+		if(isSystemHeader(name)) {
+			throw new IllegalArgumentException(name + " is a system header !");
+		}
+		try {
+			this.message.setHeader(SipFactories.headerFactory.createHeader(name, param.toString()));
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Impossible to set this parameterable header", e);
+		}
 	}
 
 	/**
@@ -1543,14 +1597,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	public void setLocalPort(int localPort) {
 		this.localPort = localPort;
-	}
-
-	public void setRemoteAddr(InetAddress remoteAddr) {
-		this.remoteAddr = remoteAddr;
-	}
-
-	public void setRemotePort(int remotePort) {
-		this.remotePort = remotePort;
 	}
 
 	public void setTransport(String transport) {

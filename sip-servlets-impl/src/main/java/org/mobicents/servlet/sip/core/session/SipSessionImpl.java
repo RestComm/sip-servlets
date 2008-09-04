@@ -381,6 +381,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getAttribute(java.lang.String)
 	 */
 	public Object getAttribute(String name) {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		return sipSessionAttributeMap.get(name);
 	}
 
@@ -389,6 +392,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getAttributeNames()
 	 */
 	public Enumeration<String> getAttributeNames() {
+		if(!isValid) {
+			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		}
 		Vector<String> names = new Vector<String>(sipSessionAttributeMap.keySet());
 		return names.elements();
 	}

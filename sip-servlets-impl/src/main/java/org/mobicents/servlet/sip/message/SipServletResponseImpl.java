@@ -153,6 +153,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	@SuppressWarnings("unchecked")
 	public SipServletRequest createAck() {
+		if(!Request.INVITE.equals(getTransaction().getRequest().getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
+			throw new IllegalStateException("the transaction state is such that it doesn't allow an ACK to be sent now, e.g. the original request was not an INVITE, or this response is provisional only, or an ACK has already been generated");
+		}
 		Dialog dialog = super.session.getSessionCreatingDialog();
 		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		SipServletRequestImpl sipServletAckRequest = null; 
@@ -338,6 +341,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	@Override
 	public void send()  {
+		if(isMessageSent) {
+			throw new IllegalStateException("message already sent");
+		}
 		try {			
 			//if this is a final response
 			if(response.getStatusCode() >= Response.TRYING && 
@@ -492,6 +498,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		}
 		return false;
 	}
+	
+	@Override
+	protected void checkMessageState() {
+		if(isMessageSent || getTransaction() instanceof ClientTransaction) {
+			throw new IllegalStateException("Message already sent or incoming message");
+		}
+	}
 
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
@@ -517,7 +530,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setCharacterEncoding(String enc) {		
 		try {			
-			new String("testEncoding".getBytes(),enc);
 			this.message.setContentEncoding(SipFactories.headerFactory
 					.createContentEncodingHeader(enc));
 		} catch (Exception ex) {

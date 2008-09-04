@@ -78,6 +78,7 @@ import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
@@ -391,7 +392,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						null,
 						transaction,
 						requestEvent.getDialog(),
-						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));						
+						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));
+			if(transaction != null) {
+				TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
+				if(transactionApplicationData != null && transactionApplicationData.getInitialRemoteHostAddress() == null) {
+					ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);					
+					transactionApplicationData.setInitialRemoteHostAddress(viaHeader.getHost());
+					transactionApplicationData.setInitialRemotePort(viaHeader.getPort());
+					transactionApplicationData.setInitialRemoteTransport(viaHeader.getTransport());
+				}
+			}
 			sipServletRequest.setLocalAddr(InetAddress.getByName(sipProvider.getListeningPoint(JainSipUtils.findTransport(request)).getIPAddress()));
 			sipServletRequest.setLocalPort(sipProvider.getListeningPoint(JainSipUtils.findTransport(request)).getPort());
 			// Check if the request is meant for me. If so, strip the topmost
@@ -419,6 +429,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(!isRouteExternal(routeHeader)) {
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
+				if(sipServletRequest.getInitialPoppedRoute() == null) {
+					sipServletRequest.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, false));
+				}
 			}							
 			if(logger.isInfoEnabled()) {
 				logger.info("Routing State " + sipServletRequest.getRoutingState());
