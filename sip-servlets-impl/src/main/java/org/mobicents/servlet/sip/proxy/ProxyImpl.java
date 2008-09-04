@@ -413,8 +413,16 @@ public class ProxyImpl implements Proxy {
 		// Sort best do far		
 		if(bestResponse == null || bestResponse.getStatus() > response.getStatus())
 		{
-			bestResponse = response;
-			bestBranch = branch;
+			//Assume 600 and 400 are equally bad, the better one is the one that came first (TCK doBranchBranchTest)
+			if(bestResponse != null) {
+				if(response.getStatus()<400) {
+					bestResponse = response;
+					bestBranch = branch;
+				}
+			} else {
+				bestResponse = response;
+				bestBranch = branch;
+			}
 		}
 		
 		// Check if we are waiting for more response

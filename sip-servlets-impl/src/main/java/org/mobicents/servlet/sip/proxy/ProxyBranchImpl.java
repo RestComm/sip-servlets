@@ -319,8 +319,6 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 */
 	public void onResponse(SipServletResponseImpl response)
 	{
-		response.setIsBranchResponse(true);
-		
 		// We have already sent TRYING, don't send another one
 		if(response.getStatus() == 100)
 			return;

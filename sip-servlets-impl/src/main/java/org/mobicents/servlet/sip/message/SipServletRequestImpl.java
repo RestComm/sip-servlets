@@ -635,9 +635,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
 	 */
 	public String getParameter(String name) {
-		RecordRouteHeader rrh = (RecordRouteHeader) message
+		if(this.getPoppedRoute() != null) {
+			return this.getPoppedRoute().getParameter(name);
+		} else {
+			RecordRouteHeader rrh = (RecordRouteHeader) message
 				.getHeader(RecordRouteHeader.NAME);
-		return rrh.getParameter(name);
+			return rrh.getParameter(name);
+		}
 	}
 
 	/*

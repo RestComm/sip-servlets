@@ -72,7 +72,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	SipServletRequestImpl originalRequest;
 	ProxyBranch proxyBranch;
 
-	private boolean isBranchResponse;
 	private boolean isProxiedResponse;
 	private boolean isResponseForwardedUpstream;
 	private boolean isAckGenerated;
@@ -96,7 +95,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		super(response, sipFactoryImpl, transaction, session, dialog);
 		this.response = response;	
 		setProxiedResponse(false);
-		isBranchResponse = false;
 		isResponseForwardedUpstream = false;
 		isAckGenerated = false;
 	}
@@ -464,7 +462,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public boolean isBranchResponse() {		
-		return isBranchResponse;
+		return this.proxyBranch != null;
 	}
 
 	/*
@@ -493,13 +491,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * @param isBranchResponse the isBranchResponse to set
-	 */
-	public void setIsBranchResponse(boolean isBranchResponse) {
-		this.isBranchResponse = isBranchResponse;
 	}
 
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
