@@ -53,7 +53,11 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getHeader(java.lang.String)
 	 */
 	public String getHeader(String name) {
+		try {
 		return RFC2396UrlDecoder.decode(((javax.sip.address.SipURI) super.uri).getHeader(name));
+		} catch (NullPointerException e) {
+			return null;
+		}
 	}
 
 	/*
@@ -235,7 +239,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 */
 	public void setTransportParam(String transport) {
 		try {
-			getSipURI().setTransportParam(transport);
+			getSipURI().setParameter("transport",transport);
 		} catch (ParseException e) {
 			logger.error("error setting transport ", e);
 		}
