@@ -315,9 +315,9 @@ public class SipFactoryImpl implements Serializable {
 	}
 
 	public URI createURI(String uri) throws ServletParseException {
-		if(!checkScheme(uri))
-			throw new IllegalArgumentException("The uri " + uri + " is not valid");
-		
+		if(!checkScheme(uri)) {
+			throw new ServletParseException("The uri " + uri + " is not valid");
+		}
 		try {
 			javax.sip.address.URI jainUri = SipFactories.addressFactory
 					.createURI(uri);
