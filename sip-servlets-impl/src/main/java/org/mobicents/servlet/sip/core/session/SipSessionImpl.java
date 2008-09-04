@@ -202,6 +202,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	protected transient MobicentsSipSession parentSession = null;
 	
+	//parties used when this is an outgoing request that has not yet been sent 
+	private Address localParty = null;
+	private Address remoteParty = null;
+	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
 		setSipApplicationSession(mobicentsSipApplicationSession);
@@ -461,7 +465,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				throw new RuntimeException("Error creating Address", e);
 			}
 		} else {
-			throw new RuntimeException("Error creating Address, no transaction or dialog have been found");
+			return localParty;
 		}
 	}
 
@@ -518,7 +522,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				throw new RuntimeException("Error creating Address", e);
 			}
 		} else {
-			throw new RuntimeException("Error creating Address, no transaction or dialog have been found");
+			return remoteParty;
 		}
 	}
 
@@ -989,12 +993,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
     public void updateStateOnSubsequentRequest(
 			SipServletRequestImpl request, boolean receive) {
-		if(Request.BYE.equalsIgnoreCase(request.getMethod())) {			
-			this.setState(State.TERMINATED);
-			if(logger.isDebugEnabled()) {
-				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
-			}
-		}
+//		if(Request.BYE.equalsIgnoreCase(request.getMethod())) {			
+//			this.setState(State.TERMINATED);
+//			if(logger.isDebugEnabled()) {
+//				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+//			}
+//		}
 		//state updated to TERMINATED for CANCEL only if no final response had been received on the inviteTransaction
 		if(((Request.CANCEL.equalsIgnoreCase(request.getMethod())))) {
 			Transaction inviteTransaction = null;
@@ -1234,5 +1238,17 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public boolean getSupervisedMode() {
 		return supervisedMode;
+	}
+	/**
+	 * @param localParty the localParty to set
+	 */
+	public void setLocalParty(Address localParty) {
+		this.localParty = localParty;
+	}
+	/**
+	 * @param remoteParty the remoteParty to set
+	 */
+	public void setRemoteParty(Address remoteParty) {
+		this.remoteParty = remoteParty;
 	}
 }

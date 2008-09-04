@@ -393,17 +393,19 @@ public class SipFactoryImpl implements Serializable {
 		String transport = ListeningPoint.UDP;
 
 		// LETS CREATE OUR HEADERS			
+		javax.sip.address.Address fromAddress = null;
 		try {
-			javax.sip.address.Address fromAddres = SipFactories.addressFactory
+			fromAddress = SipFactories.addressFactory
 					.createAddress(from.getURI().toString());
-			fromAddres.setDisplayName(from.getDisplayName());
+			fromAddress.setDisplayName(from.getDisplayName());
 
-			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddres, null);			
+			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddress, null);			
 		} catch (Exception pe) {
 			throw new ServletParseException("Impossoible to parse the given From " + from.toString(), pe);
 		}
+		javax.sip.address.Address toAddress = null; 
 		try{
-			javax.sip.address.Address toAddress = SipFactories.addressFactory
+			toAddress = SipFactories.addressFactory
 				.createAddress(to.getURI().toString());
 			
 			toAddress.setDisplayName(to.getDisplayName());
@@ -488,6 +490,8 @@ public class SipFactoryImpl implements Serializable {
 			MobicentsSipSession session = ((SipManager)MobicentsSipApplicationSession.getSipContext().getManager()).
 				getSipSession(key, true, this, MobicentsSipApplicationSession);
 			session.setHandler(handler);
+			session.setLocalParty(new AddressImpl(fromAddress, null, false));
+			session.setRemoteParty(new AddressImpl(toAddress, null, false));
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,

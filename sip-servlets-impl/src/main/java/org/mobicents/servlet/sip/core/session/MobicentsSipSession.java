@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
@@ -128,5 +129,9 @@ public interface MobicentsSipSession extends SipSession {
 	Map<String, Object> getSipSessionAttributeMap();	
 
 	void setSipSessionAttributeMap(Map<String, Object> sipSessionAttributeMap);
+
+	void setLocalParty(Address addressImpl);
+
+	void setRemoteParty(Address addressImpl);
 
 }
