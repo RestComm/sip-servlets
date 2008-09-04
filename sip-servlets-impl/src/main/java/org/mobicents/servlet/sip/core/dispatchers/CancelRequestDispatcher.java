@@ -210,7 +210,10 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		} else if(RoutingState.INITIAL.equals(inviteRequest.getRoutingState()) ||
 				RoutingState.SUBSEQUENT.equals(inviteRequest.getRoutingState())) {			
 						    
-            if(inviteAppData.getTransaction() != null && inviteAppData.getTransaction() instanceof ClientTransaction) {
+            if(inviteAppData.getTransaction() != null && 
+            		inviteAppData.getTransaction() instanceof ClientTransaction && 
+            		!((SipServletRequestImpl)inviteAppData.getSipServletMessage()).is1xxResponseGenerated() &&
+            		((SipServletRequestImpl)inviteAppData.getSipServletMessage()).isFinalResponseGenerated()) {
             	if(logger.isDebugEnabled()) {
     				logger.debug("the app didn't do anything with the request, sending a new CANCEL as we are hop by hop");				
     			}

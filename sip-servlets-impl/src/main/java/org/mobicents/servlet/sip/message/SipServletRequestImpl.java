@@ -134,6 +134,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	private boolean isFinalResponseGenerated;
 	
+	private boolean is1xxResponseGenerated;
+	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
@@ -287,6 +289,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(newSipServletResponse.getStatus() >= Response.OK && 
 					newSipServletResponse.getStatus() <= Response.SESSION_NOT_ACCEPTABLE) {	
 				isFinalResponseGenerated = true;
+			}
+			if(newSipServletResponse.getStatus() >= Response.TRYING && 
+					newSipServletResponse.getStatus() < Response.OK) {	
+				is1xxResponseGenerated = true;
 			}
 			return newSipServletResponse;
 		} catch (ParseException ex) {
@@ -1196,6 +1202,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		//This part will be done in routeIntialRequest since this is where the Session Targeting retrieval is done
 		
 		return RoutingState.INITIAL;		
+	}
+
+	/**
+	 * @return the is1xxResponseGenerated
+	 */
+	public boolean is1xxResponseGenerated() {
+		return is1xxResponseGenerated;
+	}
+	
+	/**
+	 * @return the isFinalResponseGenerated
+	 */
+	public boolean isFinalResponseGenerated() {
+		return isFinalResponseGenerated;
 	}
 
 }
