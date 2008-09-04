@@ -559,18 +559,39 @@ public class ProxyImpl implements Proxy {
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
-		//TODO check against our defined outbound interfaces
 		String address = inetAddress.getHostAddress();
-		outboundInterface = sipFactoryImpl.createSipURI(null, address);
+		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI:list) {
+			if(networkInterfaceURI.toString().contains(address)) {
+				networkInterface = networkInterfaceURI;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				inetAddress.getHostAddress() + " not found");
+		
+		outboundInterface = networkInterface;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
-		//TODO check against our defined outbound interfaces		
-		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
-		outboundInterface = sipFactoryImpl.createSipURI(null, address);
+		String address = inetSocketAddress.getAddress().getHostAddress()
+			+ ":" + inetSocketAddress.getPort();
+		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI:list) {
+			if(networkInterfaceURI.toString().contains(address)) {
+				networkInterface = networkInterfaceURI;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				address + " not found");		
+		
+		outboundInterface = networkInterface;
 	}	
 	
 	public void setAckReceived(boolean received) {
