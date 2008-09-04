@@ -340,8 +340,12 @@ public class ProxyImpl implements Proxy {
 		if(this.ackReceived) 
 			throw new IllegalStateException("Can't start. ACK has been received.");
 
-		if(tryingSent) {
+		if(!tryingSent) {
 			// Send provisional TRYING. Chapter 10.2
+			// We must send only one TRYING no matter how many branches we spawn later.
+			// This is needed for tests like testProxyBranchRecurse
+			tryingSent = true;
+			logger.info("Sending 100 Trying to the source");
 			SipServletResponse trying =
 				originalRequest.createResponse(100);
 			try {
@@ -349,7 +353,6 @@ public class ProxyImpl implements Proxy {
 			} catch (IOException e) { 
 				logger.error("Cannot send the 100 Trying",e);
 			}
-			tryingSent = true;
 		}
 		
 		

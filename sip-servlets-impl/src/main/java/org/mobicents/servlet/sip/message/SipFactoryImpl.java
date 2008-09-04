@@ -316,8 +316,8 @@ public class SipFactoryImpl implements Serializable {
 
 	public URI createURI(String uri) throws ServletParseException {
 		if(!checkScheme(uri)) {
-			// testCreateProxyBranches101 needs this to be IllegalArgumentExcpetion, not ServletParseException
-			throw new IllegalArgumentException("The uri " + uri + " is not valid");
+			// testCreateProxyBranches101 needs this to be IllegalArgumentExcpetion, but the test is wrong
+			throw new ServletParseException("The uri " + uri + " is not valid");
 		}
 		try {
 			javax.sip.address.URI jainUri = SipFactories.addressFactory
