@@ -483,7 +483,7 @@ public class DigestAuthenticator
                 authorization.setAlgorithm(authHeader.getAlgorithm());
             }
 
-            if (authHeader.getOpaque() != null)
+            if (authHeader.getOpaque() != null && authHeader.getOpaque().length() > 0)
             {
                 authorization.setOpaque(authHeader.getOpaque());
             }
