@@ -191,7 +191,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				|| super.getTransaction() instanceof ServerTransaction)
 			throw new IllegalStateException("No client transaction found!");
 
-		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState)) {
+		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) || lastFinalResponse != null) {
 			throw new IllegalStateException("final response already sent!");
 		}
 		
