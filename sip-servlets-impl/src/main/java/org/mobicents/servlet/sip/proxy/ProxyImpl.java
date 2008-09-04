@@ -74,6 +74,7 @@ public class ProxyImpl implements Proxy {
 	private Map<URI, ProxyBranch> proxyBranches;
 	private boolean started; 
 	private boolean ackReceived = false;
+	private boolean tryingSent = false;
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
@@ -338,7 +339,19 @@ public class ProxyImpl implements Proxy {
 	public void startProxy() {
 		if(this.ackReceived) 
 			throw new IllegalStateException("Can't start. ACK has been received.");
-	
+
+		if(tryingSent) {
+			// Send provisional TRYING. Chapter 10.2
+			SipServletResponse trying =
+				originalRequest.createResponse(100);
+			try {
+				trying.send();
+			} catch (IOException e) { 
+				logger.error("Cannot send the 100 Trying",e);
+			}
+			tryingSent = true;
+		}
+		
 		
 		started = true;
 		if(this.parallel) {

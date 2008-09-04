@@ -94,6 +94,17 @@ public class ProxyBranchImpl implements ProxyBranch {
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
 		this.canceled = false;
 		this.recursedBranches = new ArrayList<ProxyBranch>();
+		
+		// Here we create a clone which is available through getRequest(), the user can add
+		// custom headers and push routes here. Later when we actually proxy the request we
+		// will clone this request (with it's custome headers and routes), but we will override
+		// the modified RR and Path parameters (as defined in the spec).
+		Request cloned = (Request)originalRequest.getMessage().clone();
+		this.outgoingRequest = new SipServletRequestImpl(
+				cloned,
+				sipFactoryImpl,
+				this.originalRequest.getSipSession(),
+				null, null, false);
 	}
 	
 	/* (non-Javadoc)
@@ -176,7 +187,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 	 * @see javax.servlet.sip.ProxyBranch#getRequest()
 	 */
 	public SipServletRequest getRequest() {
-		return originalRequest;
+		return outgoingRequest;
 	}
 
 	/* (non-Javadoc)
@@ -241,7 +252,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		}
 						
 		Request cloned = this.proxyUtils.createProxiedRequest(
-				originalRequest,
+				outgoingRequest,
 				this,
 				new ProxyParams(this.targetURI,
 				this.outboundInterface,
@@ -253,18 +264,6 @@ public class ProxyBranchImpl implements ProxyBranch {
 		
 		forwardRequest(cloned, false);					
 		started = true;
-		
-		if(cloned.getMethod().equalsIgnoreCase("INVITE"))
-		{
-			// Send provisional TRYING. Chapter 10.2
-			SipServletResponse trying =
-				originalRequest.createResponse(100);
-			try {
-				trying.send();
-			} catch (IOException e) { 
-				logger.error("Cannot send the 100 Trying",e);
-			}
-		}
 	}
 	
 	/**
@@ -425,12 +424,15 @@ public class ProxyBranchImpl implements ProxyBranch {
 				transport, false).getSipProvider();
 		
 		try {
+			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
+			proxy.setSupervised(true);
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK)) {
 				sipProvider.sendRequest(clonedRequest);
 			}
 			else {
 				forwardRequest(clonedRequest, true);
 			}
+			
 		} catch (SipException e) {
 			logger.error("A problem occured while proxying a subsequent request", e);
 		}
