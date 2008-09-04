@@ -53,8 +53,11 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getHeader(java.lang.String)
 	 */
 	public String getHeader(String name) {
+		if(name == null) {
+			throw new NullPointerException("header name is null");
+		}
 		try {
-		return RFC2396UrlDecoder.decode(((javax.sip.address.SipURI) super.uri).getHeader(name));
+			return RFC2396UrlDecoder.decode(((javax.sip.address.SipURI) super.uri).getHeader(name));
 		} catch (NullPointerException e) {
 			return null;
 		}

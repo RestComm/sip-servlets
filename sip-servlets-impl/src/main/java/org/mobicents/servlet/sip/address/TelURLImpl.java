@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.parser.Lexer;
+
 import java.text.ParseException;
 import java.util.Iterator;
 
@@ -65,8 +67,13 @@ public class TelURLImpl extends URIImpl implements TelURL {
 	 * @see javax.servlet.sip.TelURL#setPhoneNumber(java.lang.String)
 	 */
 	public void setPhoneNumber(String number) {
+		String phoneNumber = number;
+		if(number.startsWith("+")) {			
+			phoneNumber = phoneNumber.substring(1);
+		}
 		try {
-			telUrl.setPhoneNumber(number);
+			base_phone_number(phoneNumber);		
+			telUrl.setPhoneNumber(phoneNumber);
 		} catch (ParseException ex) {
 			logger.error("Error setting phone number " + number);
 			throw new java.lang.IllegalArgumentException("phone number " + number + " is invalid", ex);
@@ -174,12 +181,39 @@ public class TelURLImpl extends URIImpl implements TelURL {
 	 * {@inheritDoc}
 	 */
 	public void setPhoneNumber(String number, String phoneContext) {
+		setPhoneNumber(number);
 		try {
-			telUrl.setPhoneNumber(number);
 			telUrl.setPhoneContext(phoneContext);
 		} catch (ParseException ex) {
 			logger.error("Error setting phone number " + number);
 			throw new java.lang.IllegalArgumentException("phone number " + number + " is invalid", ex);
 		}
+	}
+	
+	// there might be a bug in the jsip impl in URLParser class need to check with ranga after TCK is done
+	// the part in comment 
+	private String base_phone_number(String number) throws ParseException {
+		StringBuffer s = new StringBuffer();
+		Lexer lexer = new Lexer("sip_urlLexer", number);
+		
+		int lc = 0;
+		while (lexer.hasMoreChars()) {
+			char w = lexer.lookAhead(0);
+			if (Lexer.isDigit(w)
+				|| w == '-'
+				|| w == '.'
+				|| w == '('
+				|| w == ')') {
+				lexer.consume(1);
+				s.append(w);
+				lc++;
+			}
+//				else if (lc > 0)
+//					break;
+			else
+				throw new IllegalArgumentException("unexpected " + w + " in the phone number");
+		}
+		return s.toString();
+
 	}
 }
