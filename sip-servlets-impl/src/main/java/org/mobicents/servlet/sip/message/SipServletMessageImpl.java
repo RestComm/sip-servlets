@@ -693,10 +693,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public String getCharacterEncoding() {
 
-		if (this.message.getContentEncoding() != null)
+		if (this.message.getContentEncoding() != null) {
 			return this.message.getContentEncoding().getEncoding();
-		else
-			return null;
+		} else {
+			ContentTypeHeader cth = (ContentTypeHeader)
+				this.message.getHeader(ContentTypeHeader.NAME);
+			if(cth == null) return null;
+			return cth.getParameter("charset");
+		}
 	}
 
 	/*
@@ -709,10 +713,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if(contentTypeHeader!= null && CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
 			String content = null;
 			if(message.getRawContent() != null) {
-				if(message.getContentEncoding() == null) {
+				String charset = this.getCharacterEncoding();
+				if(charset == null) {
 					content = new String(message.getRawContent());	
 				} else {
-					content = new String(message.getRawContent(), message.getContentEncoding().getEncoding());
+					content = new String(message.getRawContent(), charset);
 				}
 			} else {
 				content = new String();
@@ -1247,15 +1252,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			throw new IllegalStateException("the message has already been sent, cannot set the content anymore");
 		}
 		if(contentType != null && contentType.length() > 0) {
-			String type = contentType.split("/")[0];
-			String subtype = contentType.split("/")[1];			
+			this.addHeader(ContentTypeHeader.NAME, contentType);
+			String charset = this.getCharacterEncoding();
 			try {
-				ContentTypeHeader contentTypeHeader = 
-					SipFactories.headerFactory.createContentTypeHeader(type, subtype);				
 				
-				if(content instanceof String  && message.getContentEncoding() != null) {
-					content = new String(((String)content).getBytes(message.getContentEncoding().getEncoding()));
+				if(content instanceof String  && charset != null) {
+					content = new String(((String)content).getBytes());
 				}
+				ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);
 				this.message.setContent(content, contentTypeHeader);
 			} catch (ParseException e) {
 				throw new RuntimeException("Parse error reading content type", e);
