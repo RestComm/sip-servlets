@@ -91,6 +91,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.AddressReadOnlyImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -381,11 +382,17 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		}
 	}
 
+	private void checkCommitted() {
+		if(this.isCommitted()) {
+			throw new IllegalStateException("This message is in committed state. You can not modify it");
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#addAcceptLanguage(java.util.Locale)
 	 */
 	public void addAcceptLanguage(Locale locale) {
+		checkCommitted();
 		AcceptLanguageHeader ach = headerFactory
 				.createAcceptLanguageHeader(locale);
 		message.addHeader(ach);
@@ -399,6 +406,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	public void addAddressHeader(String name, Address addr, boolean first)
 			throws IllegalArgumentException {
 
+		checkCommitted();
 		String hName = getFullHeaderName(name);
 
 		if (logger.isDebugEnabled()) {
@@ -465,6 +473,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#addHeader(java.lang.String, java.lang.String)
 	 */
 	public void addHeader(String name, String value) {
+		checkCommitted();
 		addHeaderInternal(name, value, false);
 	}
 
@@ -474,6 +483,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void addParameterableHeader(String name, Parameterable param,
 			boolean first) {
+		checkCommitted();
 		try {
 			String hName = getFullHeaderName(name);
 
@@ -566,14 +576,22 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			Header first = lit.next();
 			if (first instanceof AddressParametersHeader) {
 				try {
-					return new AddressImpl((AddressParametersHeader) first);
+					if(this.isCommitted()) {
+						return new AddressReadOnlyImpl((AddressParametersHeader) first);
+					} else {
+						return new AddressImpl((AddressParametersHeader) first);
+					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
 				}
 			} else {
 				Parameterable parametrable = createParameterable(first, first.getName());
 				try {
-					return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+					if(this.isCommitted()) {
+						return new AddressReadOnlyImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+					} else {
+						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
 				}
@@ -1168,7 +1186,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#removeHeader(java.lang.String)
 	 */
 	public void removeHeader(String name) {
-
+		checkCommitted();
 		String hName = getFullHeaderName(name);
 
 		if (isSystemHeader(hName)) {
@@ -1193,6 +1211,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setAcceptLanguage(java.util.Locale)
 	 */
 	public void setAcceptLanguage(Locale locale) {
+		checkCommitted();
 		AcceptLanguageHeader alh = headerFactory
 				.createAcceptLanguageHeader(locale);
 
@@ -1204,6 +1223,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setAddressHeader(java.lang.String, javax.servlet.sip.Address)
 	 */
 	public void setAddressHeader(String name, Address addr) {
+		checkCommitted();
 		String hName = getFullHeaderName(name);
 
 		if (logger.isDebugEnabled())
@@ -1250,6 +1270,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
 		new String("testEncoding".getBytes(),enc);
+		checkCommitted();
 		try {			
 			this.message.setContentEncoding(SipFactories.headerFactory
 					.createContentEncodingHeader(enc));
@@ -1267,6 +1288,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			throws UnsupportedEncodingException {
 		checkMessageState();
 		checkContentType(contentType);
+		checkCommitted();
 		
 		if(contentType != null && contentType.length() > 0) {
 			this.addHeader(ContentTypeHeader.NAME, contentType);
@@ -1312,6 +1334,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setContentLanguage(java.util.Locale)
 	 */
 	public void setContentLanguage(Locale locale) {
+		checkCommitted();
 		ContentLanguageHeader contentLanguageHeader = 
 			SipFactories.headerFactory.createContentLanguageHeader(locale);
 		this.message.setContentLanguage(contentLanguageHeader);
@@ -1323,6 +1346,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setContentLength(int len) {
 		checkMessageState();
+		checkCommitted();
 		try {
 			ContentLengthHeader h = headerFactory.createContentLengthHeader(len);
 			this.message.setHeader(h);
@@ -1337,6 +1361,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 */
 	public void setContentType(String type) {
 		checkContentType(type);
+		checkCommitted();
 		String name = getCorrectHeaderName(ContentTypeHeader.NAME);
 		try {
 			Header h = headerFactory.createHeader(name, type);
@@ -1378,6 +1403,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		if(isSystemHeader(name)) {
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
+		checkCommitted();
+		
 		try {
 			Header header = SipFactory.getInstance().createHeaderFactory()
 					.createHeader(name, value);
@@ -1421,6 +1448,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	 * @see javax.servlet.sip.SipServletMessage#setParameterableHeader(java.lang.String, javax.servlet.sip.Parameterable)
 	 */
 	public void setParameterableHeader(String name, Parameterable param) {
+		checkCommitted();
 		if(isSystemHeader(name)) {
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
