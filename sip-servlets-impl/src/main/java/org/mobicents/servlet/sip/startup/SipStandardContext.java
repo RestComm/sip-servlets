@@ -287,6 +287,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
+			sipSessionsUtil.setApplicationName(applicationName);
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context started");
 			}

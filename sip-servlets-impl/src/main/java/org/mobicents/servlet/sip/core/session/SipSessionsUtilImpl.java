@@ -26,6 +26,7 @@ import javax.servlet.sip.SipSessionsUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.xbill.DNS.APLRecord;
 
 /**
  * @author Jean Deruelle
@@ -69,26 +70,14 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public SipApplicationSession getApplicationSessionByKey(String applicationSessionId,
+	public SipApplicationSession getApplicationSessionByKey(String applicationSessionKey,
 			boolean create) {
-		if(applicationSessionId == null) {
+		if(applicationSessionKey == null) {
 			throw new NullPointerException("the given key is null !");
 		}
-		SipApplicationSessionKey applicationSessionKey;
-		try {
-			applicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(applicationSessionId);
-		} catch (ParseException e) {
-			logger.error("the given application session id : " + applicationSessionId + 
-					" couldn't be parsed correctly ",e);
-			return null;
-		}
-		if(applicationSessionKey.getApplicationName().equals(applicationName)) {
-			return ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, create);
-		} else {
-			logger.warn("the given application session id : " + applicationSessionId + 
-					" tried to be retrieved from incorret application " + applicationName);
-			return null;
-		}
+		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(applicationSessionKey, applicationName, true);
+		
+		return ((SipManager)sipContext.getManager()).getSipApplicationSession(sipApplicationSessionKey, create);		
 	}
 
 	/**
@@ -96,6 +85,10 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	 */
 	public SipSession getCorrespondingSipSession(SipSession sipSession, String headerName) {
 		throw new UnsupportedOperationException("RFC 3911 and RFC 3891 are not currently supported");
+	}
+
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
 	}
 
 }
