@@ -371,6 +371,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 					transaction = sipProvider.getNewServerTransaction(request);
 				} catch ( TransactionUnavailableException tae) {
+					tae.printStackTrace();
 					// Sends a 500 Internal server error and stops processing.				
 					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);				
 	                return;

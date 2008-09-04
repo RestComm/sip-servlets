@@ -282,7 +282,8 @@ public class SipProtocolHandler implements ProtocolHandler {
 				
 			}
 			properties.setProperty("javax.sip.STACK_NAME", sipStackName);
-			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");			
+			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");		
+			properties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 			if(threadPoolSize != null && threadPoolSize.length() > 0) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The size of the nist sip stack's thread pool will be " + threadPoolSize);

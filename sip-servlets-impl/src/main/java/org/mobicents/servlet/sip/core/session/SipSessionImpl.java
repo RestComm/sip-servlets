@@ -292,7 +292,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 				logger.debug("The new request for the session is dialog creating (" + method + ")");
 			}
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
-			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)) {
+			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)
+					&& sessionCreatingTransaction instanceof ClientTransaction) {
 				Request request = (Request) sessionCreatingTransaction.getRequest().clone();				
 				
 				CSeqHeader cSeq = (CSeqHeader) request.getHeader((CSeqHeader.NAME));
@@ -500,8 +501,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 			return new AddressImpl(sessionCreatingDialog.getRemoteParty(), null, false);
 		} else if (sessionCreatingTransaction != null){
 			try {
-				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
-				return new AddressImpl(toHeader.getAddress(), ((To)toHeader).getParameters(),  false);
+				if(sessionCreatingTransaction instanceof ClientTransaction) {
+					ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
+					return new AddressImpl(toHeader.getAddress(), ((To)toHeader).getParameters(),  false);
+				} else {
+					FromHeader toHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
+					return new AddressImpl(toHeader.getAddress(), ((From)toHeader).getParameters(),  false);
+				}
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
