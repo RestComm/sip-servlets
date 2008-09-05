@@ -727,8 +727,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public String getScheme() {
-		// TODO Auto-generated method stub
-		return null;
+		return ((Request)message).getRequestURI().getScheme();
 	}
 
 	public String getServerName() {
