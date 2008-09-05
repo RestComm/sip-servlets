@@ -397,9 +397,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				// proxy branches, that eventually return error responses. When they return error response,
 				// some other branch must create the dialog, but this other ranch will have another tag.
 				// If this is not here, you will get tag mismatch from JSIP.
-				if(this.getStatus() < 200 && this.proxyBranch != null) {
+				if(this.getStatus() != Response.TRYING && this.proxyBranch == null) {
 					dialog = sipProvider.getNewDialog(this
 						.getTransaction());				
+				} else 
+				if(this.getStatus() < 200 && this.proxyBranch != null) {
+					dialog = sipProvider.getNewDialog(this
+							.getTransaction());
 				}
 				getSipSession().setSessionCreatingDialog(dialog);
 				if(logger.isDebugEnabled()) {

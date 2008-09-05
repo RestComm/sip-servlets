@@ -354,7 +354,7 @@ public class ProxyImpl implements Proxy {
 			tryingSent = true;
 			logger.info("Sending 100 Trying to the source");
 			SipServletResponse trying =
-				originalRequest.createResponse(100);
+				originalRequest.createResponse(100);			
 			try {
 				trying.send();
 			} catch (IOException e) { 
