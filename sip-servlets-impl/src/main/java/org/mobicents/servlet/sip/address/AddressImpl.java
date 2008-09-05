@@ -102,9 +102,10 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 *            </b>
 	 * @throws ParseException
 	 */
-	public AddressImpl(AddressParametersHeader header) throws ParseException {
+	public AddressImpl(AddressParametersHeader header, boolean modifiable) throws ParseException {
 		this.address = header.getAddress();
 		super.parameters = header.getParameters();
+		super.isModifiable = modifiable;
 
 	}
 	/*

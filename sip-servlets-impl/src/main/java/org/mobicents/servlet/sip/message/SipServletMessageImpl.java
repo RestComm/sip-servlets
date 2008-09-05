@@ -91,7 +91,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
-import org.mobicents.servlet.sip.address.AddressReadOnlyImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -577,9 +576,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 			if (first instanceof AddressParametersHeader) {
 				try {
 					if(this.isCommitted()) {
-						return new AddressReadOnlyImpl((AddressParametersHeader) first);
+						return new AddressImpl((AddressParametersHeader) first, false);
 					} else {
-						return new AddressImpl((AddressParametersHeader) first);
+						return new AddressImpl((AddressParametersHeader) first, true);
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
@@ -588,7 +587,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				Parameterable parametrable = createParameterable(first, first.getName());
 				try {
 					if(this.isCommitted()) {
-						return new AddressReadOnlyImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
 					} else {
 						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
 					}
@@ -626,7 +625,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 				AddressParametersHeader aph = (AddressParametersHeader) header;
 				try {
 					AddressImpl addressImpl = new AddressImpl(
-							(AddressParametersHeader) aph);
+							(AddressParametersHeader) aph, true);
 					retval.add(addressImpl);
 				} catch (ParseException ex) {
 					throw new ServletParseException("Bad header", ex);
