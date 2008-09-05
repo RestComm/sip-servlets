@@ -133,6 +133,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#getUserPassword()
 	 */
 	public String getUserPassword() {
+		if(getSipURI().getUserPassword() == null) return null;
 		return RFC2396UrlDecoder.decode(getSipURI().getUserPassword());
 	}
 
@@ -351,7 +352,14 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	}
 
 	@Override
-	public void setParameter(String name, String value) {		
+	public void setParameter(String name, String value) {
+		//Special case to pass Addressing spec test from 289 TCK
+		if("lr".equals(name)) {
+			if(value == null || value.length()<1) {
+				this.setLrParam(true);
+				return;
+			}
+		}
 		super.setParameter(name, value);
 		try {
 			((SipUri)getSipURI()).setParameter(name, value);

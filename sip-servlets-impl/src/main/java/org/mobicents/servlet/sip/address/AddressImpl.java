@@ -118,17 +118,27 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Address#getExpires()
 	 */
-	public int getExpires() {		
-		return ((SipURI)address.getURI()).getParameter(EXPIRES_PARAM_NAME) == null ? -1 : 
-			Integer.parseInt(((SipURI)address.getURI()).getParameter(EXPIRES_PARAM_NAME));		
+	public int getExpires() {	
+		String expires = this.getParameter(EXPIRES_PARAM_NAME);
+		if(expires != null) { // This is how the TCK expects to parse it. See AddressingServlet in TCK spec tests.
+			return Integer.parseInt(expires);
+		} else { // I think this is not needed.
+			return ((SipURI)address.getURI()).getParameter(EXPIRES_PARAM_NAME) == null ? -1 : 
+				Integer.parseInt(((SipURI)address.getURI()).getParameter(EXPIRES_PARAM_NAME));
+		}
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Address#getQ()
 	 */
 	public float getQ() {
-		return ((SipURI)address.getURI()).getParameter(Q_PARAM_NAME) == null ? (float) -1.0  : 
-			Float.parseFloat(((SipURI)address.getURI()).getParameter(Q_PARAM_NAME));
+		String q = this.getParameter(Q_PARAM_NAME);
+		if(q != null) { // This is how the TCK expects to parse it. See AddressingServlet in TCK spec tests.
+			return Float.parseFloat(q);
+		} else { // I think this is not needed.
+			return ((SipURI)address.getURI()).getParameter(Q_PARAM_NAME) == null ? (float) -1.0  : 
+				Float.parseFloat(((SipURI)address.getURI()).getParameter(Q_PARAM_NAME));
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -174,13 +184,19 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 		javax.sip.address.URI uri = this.getAddress().getURI();
 
 		if (uri instanceof SipURI) {
+			/*
 			SipURI sipUri = (SipURI) uri;
 			try {
 				sipUri.setParameter(EXPIRES_PARAM_NAME, Integer.toString(seconds));
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",
 						e);
+			}*/
+			if(seconds == -1) {
+				this.removeParameter(EXPIRES_PARAM_NAME);
+				return;
 			}
+			this.setParameter(EXPIRES_PARAM_NAME, new Integer(seconds).toString());
 		} else {
 			throw new IllegalArgumentException(
 					"Can only set parameter for Sip URI");
@@ -191,17 +207,21 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#setQ(float)
 	 */
 	public void setQ(float q) {
-		if(q <= 0.0 || q >= 1.0) {
-			if(q!=-1.0) {
-				throw new IllegalArgumentException("the new qvalue isn't between 0.0 and 1.0 (inclusive) and isn't -1.0.");
-			}			
+		if(q == -1.0) {
+			this.removeParameter(Q_PARAM_NAME);
+			return;
 		}
+		if(q > 1.0 || q < 0) {
+			throw new IllegalArgumentException("the new qvalue isn't between 0.0 and 1.0 (inclusive) and isn't -1.0.");
+		}
+		this.setParameter(Q_PARAM_NAME, new Float(q).toString());
+		/*
 		try {
 			Parameters uri = (Parameters) this.address.getURI();
 			uri.setParameter(Q_PARAM_NAME, Float.toString(q));
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad parameter", ex);
-		}
+		}*/
 	}
 	/*
 	 * (non-Javadoc)
@@ -261,6 +281,8 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	@Override
 	public void setParameter(String name, String value) {		
 		super.setParameter(name, value);
+		
+		/*
 		if(this.address.getURI() instanceof Parameters) {
 			Parameters uri = (Parameters) this.address.getURI();
 			try {
@@ -268,7 +290,7 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}
-		}
+		}*/
 	}
 	
 	/* (non-Javadoc)

@@ -74,7 +74,7 @@ public class SipFactoryImpl implements Serializable {
 			return o1.compareToIgnoreCase(o2);
 		}
 	}
-	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels"};
+	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels","mailto"};
 	
 	private static boolean checkScheme(String address) {
 		for(String scheme:allowedAddressSchemes) {
