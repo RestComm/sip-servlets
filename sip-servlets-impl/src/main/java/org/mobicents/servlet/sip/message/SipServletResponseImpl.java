@@ -391,8 +391,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				String transport = JainSipUtils.findTransport(st.getRequest());
 				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
-				Dialog dialog = sipProvider.getNewDialog(this
+				
+				Dialog dialog = null;
+				if(this.getStatus() < 200 && this.proxyBranch != null) {
+					dialog = sipProvider.getNewDialog(this
 						.getTransaction());				
+				}
 				getSipSession().setSessionCreatingDialog(dialog);
 				if(logger.isDebugEnabled()) {
 					logger.debug("created following dialog since the application is acting as an endpoint " + dialog);

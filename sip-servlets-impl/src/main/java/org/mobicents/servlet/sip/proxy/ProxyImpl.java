@@ -105,7 +105,11 @@ public class ProxyImpl implements Proxy {
 	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText) {
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
-				proxyBranch.cancel(protocol, reasonCode, reasonText);
+				try {
+					proxyBranch.cancel(protocol, reasonCode, reasonText);
+				} catch (Exception e) {
+					// TODO: Instead of catching excpetions here just determine if the branch is cancellable
+				}
 			}
 		}
 	}
