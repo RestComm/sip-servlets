@@ -478,7 +478,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	public boolean isCommitted() {
 		//the message is an incoming non-reliable provisional response received by a servlet acting as a UAC
 		if(getTransaction() instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") == null) {
-			return true;
+			if(this.proxyBranch == null) // Make sure this is not a proxy. Proxies are allowed to modify headers.
+				return true;
+			else return false;
 		}
 		//the message is an incoming reliable provisional response for which PRACK has already been generated. (Note that this scenario applies to containers that support the 100rel extension.)
 		if(getTransaction() instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") != null && TransactionState.TERMINATED.equals(getTransaction().getState())) {

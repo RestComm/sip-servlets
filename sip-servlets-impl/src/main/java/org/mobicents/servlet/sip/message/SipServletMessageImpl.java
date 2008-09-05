@@ -444,7 +444,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	}
 
-	protected void addHeaderInternal(String name, String value, boolean bypassSystemHeaderCheck) {
+	public void addHeaderInternal(String name, String value, boolean bypassSystemHeaderCheck) {
 		String hName = getFullHeaderName(name);
 
 		if (logger.isDebugEnabled())

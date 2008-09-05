@@ -129,7 +129,10 @@ public class ProxyBranchImpl implements ProxyBranch {
 					if(protocol != null && reasonCode != null && reasonText != null
 						&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
 						for (int i = 0; i < protocol.length; i++) {
-							cancelRequest.addHeader("Reason", protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"");
+							((SipServletRequestImpl)cancelRequest).
+								addHeaderInternal("Reason", 
+										protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"",
+										false);
 						}
 					}
 					cancelRequest.send();

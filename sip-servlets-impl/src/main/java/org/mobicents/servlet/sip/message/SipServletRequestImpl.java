@@ -444,9 +444,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if(getTransaction() instanceof ClientTransaction) {
 			return true;
 		}
+		/*
 		if(Request.ACK.equals((((Request)message).getMethod()))) {
 			return true;
-		}
+		}*/
 		return false;
 	}
 	
