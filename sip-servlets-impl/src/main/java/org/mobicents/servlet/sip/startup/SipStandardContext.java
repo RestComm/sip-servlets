@@ -507,8 +507,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}		
 	
 	public void addChild(SipServletImpl sipServletImpl) {
-		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
-		super.addChild(sipServletImpl);
+		if(children.get(sipServletImpl.getName()) == null) {
+			childrenMap.put(sipServletImpl.getName(), sipServletImpl);
+			super.addChild(sipServletImpl);
+		} else {
+			logger.warn(sipServletImpl.getName() + " servlet already present, not added. " +
+					"This might be due to the fact that the definition of the servlet " +
+					"is present both in annotations and in sip.xml");
+		}
 	}
 	
 	public void removeChild(SipServletImpl sipServletImpl) {
