@@ -993,12 +993,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
     public void updateStateOnSubsequentRequest(
 			SipServletRequestImpl request, boolean receive) {
-//		if(Request.BYE.equalsIgnoreCase(request.getMethod())) {			
-//			this.setState(State.TERMINATED);
-//			if(logger.isDebugEnabled()) {
-//				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
-//			}
-//		}
+
 		//state updated to TERMINATED for CANCEL only if no final response had been received on the inviteTransaction
 		if(((Request.CANCEL.equalsIgnoreCase(request.getMethod())))) {
 			Transaction inviteTransaction = null;

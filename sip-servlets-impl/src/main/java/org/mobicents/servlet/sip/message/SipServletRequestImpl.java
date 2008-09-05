@@ -353,7 +353,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public Address getPoppedRoute() {
 		AddressImpl addressImpl = null;
 		if (this.popedRouteHeader != null) {
-			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress(), ((Route)this.popedRouteHeader).getParameters(), getTransaction() == null ? true : false);			
+			addressImpl = new AddressImpl(this.popedRouteHeader.getAddress(), null, getTransaction() == null ? true : false);			
 		}
 		return addressImpl;
 	}
@@ -1118,14 +1118,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public Address getInitialPoppedRoute() {
-		return initialPoppedRoute;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setInitialPoppedRoute(Address address) {
-		this.initialPoppedRoute = address;;
+		return transactionApplicationData.getInitialPoppedRoute();
 	}
 
 	/**

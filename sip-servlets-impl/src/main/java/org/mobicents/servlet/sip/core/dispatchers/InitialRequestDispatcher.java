@@ -47,6 +47,7 @@ import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -233,9 +234,15 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				if(subscriberUri instanceof javax.sip.address.SipURI) {
 					javax.servlet.sip.URI uri = new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
 					sipServletRequest.setSubscriberURI(uri);
+					sipSessionImpl.setSipSubscriberURI(uri);
 				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
 					javax.servlet.sip.URI uri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
 					sipServletRequest.setSubscriberURI(uri);
+					sipSessionImpl.setSipSubscriberURI(uri);
+				} else {
+					javax.servlet.sip.URI uri = new GenericURIImpl(subscriberUri);
+					sipServletRequest.setSubscriberURI(uri);
+					sipSessionImpl.setSipSubscriberURI(uri);
 				}
 			} catch (ParseException pe) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 

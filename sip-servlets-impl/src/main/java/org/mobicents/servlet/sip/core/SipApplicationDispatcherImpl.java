@@ -16,6 +16,13 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.stack.SIPDialog;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.text.ParseException;
@@ -429,8 +436,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(!isRouteExternal(routeHeader)) {
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
-				if(sipServletRequest.getInitialPoppedRoute() == null) {
-					sipServletRequest.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, false));
+				if(transaction != null) {
+					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
+					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				
+						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, false));
+					}
 				}
 			}							
 			if(logger.isInfoEnabled()) {
@@ -806,7 +816,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Serializable stateInfo = null;
 		if(sipServletRequest.getSipSession() != null) {
 			routingRegion = sipServletRequest.getSipSession().getRegion();
-			stateInfo =sipServletRequest.getSipSession().getStateInfo(); 
+			//we serialize and deserailize in memory to get the same state info object but with a new reference
+			// so that the AR will not change the stateinfo, since this check is just to see if we have to route back to the 
+			//container and not a "real" call to the AR to select an application - needed by TCK AR test cases
+			stateInfo = serializeStateInfo(sipServletRequest.getSipSession().getStateInfo()); 
 		}
 		Request request = (Request) sipServletRequest.getMessage();
 		
@@ -856,6 +869,51 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					"into a compliant address",e);							
 		}
 		return applicationRouterInfo;
+	}
+
+	/**
+	 * Serialize the state info in memory and deserialize it and return the new object. 
+	 * Since there is no clone method this is the only way to get the same object with a new reference 
+	 * @param stateInfo the state info to serialize
+	 * @return the state info serialized and deserialized
+	 */
+	private Serializable serializeStateInfo(Serializable stateInfo) {
+		ByteArrayOutputStream baos = null;
+		ObjectOutputStream out = null;
+		ByteArrayInputStream bais = null;
+		ObjectInputStream in = null;
+		
+		try{
+			baos = new ByteArrayOutputStream();
+			out = new ObjectOutputStream(baos);
+			out.writeObject(stateInfo);					
+			bais = new ByteArrayInputStream(baos.toByteArray());
+			in =new ObjectInputStream(bais);
+			return (Serializable)in.readObject();			
+		} catch (IOException e) {
+			logger.error("Impossible to serialize the state info", e);
+			return stateInfo;
+		} catch (ClassNotFoundException e) {
+			logger.error("Impossible to serialize the state info", e);
+			return stateInfo;
+		} finally {
+			try {
+				if(out != null) {
+					out.close();
+				}
+				if(in != null) {
+					in.close();
+				}
+				if(baos != null) {
+					baos.close();
+				}
+				if(bais != null) {
+					bais.close();
+				}
+			} catch (IOException e) {
+				logger.error("Impossible to close the streams after serializing state info", e);
+			}
+		}
 	}
 
 	/*

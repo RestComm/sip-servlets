@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.servlet.sip.Address;
 import javax.servlet.sip.B2buaHelper;
 import javax.sip.Transaction;
 
@@ -41,6 +42,7 @@ public class TransactionApplicationData implements Serializable {
 	private transient String initialRemoteHostAddress;
 	private transient int initialRemotePort;
 	private transient String initialRemoteTransport;
+	private transient Address initialPoppedRoute;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
@@ -144,6 +146,15 @@ public class TransactionApplicationData implements Serializable {
 	 */
 	public String getInitialRemoteTransport() {
 		return initialRemoteTransport;
+	}
+	public Address getInitialPoppedRoute() {
+		return initialPoppedRoute;
+	}
+	/**
+	 * @param initialPoppedRoute the initialPoppedRoute to set
+	 */
+	public void setInitialPoppedRoute(Address initialPoppedRoute) {
+		this.initialPoppedRoute = initialPoppedRoute;
 	}
 	
 
