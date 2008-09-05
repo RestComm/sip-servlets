@@ -350,7 +350,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		cancelTimer();
 		
 		if(response.getStatus() >= 600) // Cancel all 10.2.4
-			this.proxy.cancelAllExcept(this, null, null, null);
+			this.proxy.cancelAllExcept(this, null, null, null, false);
 		
 		// FYI: ACK is sent automatically by jsip when needed
 		

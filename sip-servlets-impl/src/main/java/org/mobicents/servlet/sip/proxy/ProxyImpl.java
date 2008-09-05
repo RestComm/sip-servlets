@@ -91,7 +91,7 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#cancel()
 	 */
 	public void cancel() {
-		cancelAllExcept(null, null, null, null);
+		cancelAllExcept(null, null, null, null, true);
 	}
 	
 	/*
@@ -99,16 +99,17 @@ public class ProxyImpl implements Proxy {
 	 * @see javax.servlet.sip.Proxy#cancel(java.lang.String[], int[], java.lang.String[])
 	 */
 	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
-		cancelAllExcept(null, protocol, reasonCode, reasonText);
+		cancelAllExcept(null, protocol, reasonCode, reasonText, true);
 	}
 
-	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText) {
+	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText, boolean throwExceptionIfCannotCancel) {
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
 				try {
 					proxyBranch.cancel(protocol, reasonCode, reasonText);
-				} catch (Exception e) {
+				} catch (IllegalStateException e) {
 					// TODO: Instead of catching excpetions here just determine if the branch is cancellable
+					if(throwExceptionIfCannotCancel) throw e;
 				}
 			}
 		}
@@ -384,7 +385,7 @@ public class ProxyImpl implements Proxy {
 			if( (response.getStatus() >= 200 && response.getStatus() < 300) 
 					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
 				if(this.getParallel()) {
-					cancelAllExcept(branch, null, null, null);
+					cancelAllExcept(branch, null, null, null, false);
 				}
 			}
 		}
