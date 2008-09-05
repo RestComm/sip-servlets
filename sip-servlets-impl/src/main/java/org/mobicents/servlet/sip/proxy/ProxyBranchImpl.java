@@ -144,7 +144,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 			}
 		}
 		catch(Exception e) {
-			throw new RuntimeException("Failed canceling proxy branch", e);
+			throw new IllegalStateException("Failed canceling proxy branch", e);
 		}
 	}
 	

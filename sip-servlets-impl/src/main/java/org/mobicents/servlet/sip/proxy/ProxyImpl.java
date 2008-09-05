@@ -34,6 +34,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
+import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
@@ -345,7 +346,8 @@ public class ProxyImpl implements Proxy {
 		if(this.ackReceived) 
 			throw new IllegalStateException("Can't start. ACK has been received.");
 
-		if(!tryingSent) {
+		// Only send TRYING when the request is INVITE, needed by testProxyGen2xx form TCK (it sends MESSAGE)
+		if(this.originalRequest.getMethod().equals(Request.INVITE) && !tryingSent) {
 			// Send provisional TRYING. Chapter 10.2
 			// We must send only one TRYING no matter how many branches we spawn later.
 			// This is needed for tests like testProxyBranchRecurse
