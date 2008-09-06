@@ -146,6 +146,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	protected Principal userPrincipal;
 	
 	protected boolean isMessageSent;
+	
+	protected Dialog dialog;
 
 	/**
 	 * List of headers that ARE system at all times
@@ -355,6 +357,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 		this.session = sipSession;
 		this.transactionApplicationData = new TransactionApplicationData(this);
 		isMessageSent = false;
+		this.dialog = dialog;
 		
 		if(sipSession != null && dialog != null) {
 			session.setSessionCreatingDialog(dialog);
@@ -1603,6 +1606,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 	}
 
 	public Dialog getDialog() {
+		if (this.dialog != null) return dialog;
 		if (this.transaction != null)
 			return this.transaction.getDialog();
 		else

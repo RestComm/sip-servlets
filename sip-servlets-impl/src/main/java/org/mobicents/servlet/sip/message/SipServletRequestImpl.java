@@ -441,7 +441,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			return true;
 		}
 		//the message is an outgoing request which has been sent
-		if(getTransaction() instanceof ClientTransaction) {
+		if(getTransaction() instanceof ClientTransaction && this.isMessageSent) {
 			return true;
 		}
 		/*
