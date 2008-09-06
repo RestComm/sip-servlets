@@ -141,7 +141,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
 			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
-			responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
+			if(sipServletResponse.getContent() != null && sipServletResponse.getContentType() != null)
+				responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();
 		}			
 	}
