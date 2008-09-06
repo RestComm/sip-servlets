@@ -119,6 +119,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		proxy.setSupervised(true);
 		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
 		proxy.setParallel(true);
+		proxy.setProxyTimeout(4);
 		proxy.proxyTo(uris);
 	}
 

@@ -154,7 +154,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
 			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
-			responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
+			//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();
 		}			
 	}
