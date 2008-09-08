@@ -134,4 +134,6 @@ public interface MobicentsSipSession extends SipSession {
 
 	void setRemoteParty(Address addressImpl);
 
+	SipApplicationRoutingRegion getRegionInternal();
+
 }

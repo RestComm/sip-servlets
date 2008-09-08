@@ -480,6 +480,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public SipApplicationRoutingRegion getRegionInternal() {		
+		return routingRegion;
+	}
+
+	
+	/**
 	 * This method allows the application to set the region that the application 
 	 * is in with respect to this SipSession
 	 * @param routingRegion the region that the application is in  

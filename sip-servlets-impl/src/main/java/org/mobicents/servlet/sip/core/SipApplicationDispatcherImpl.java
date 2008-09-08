@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.core;
 
-import gov.nist.javax.sip.stack.SIPDialog;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -822,8 +820,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		SipApplicationRoutingRegion routingRegion = null;
 		Serializable stateInfo = null;
 		if(sipServletRequest.getSipSession() != null) {
-			routingRegion = sipServletRequest.getSipSession().getRegion();
 			//we serialize and deserailize in memory to get the same state info object but with a new reference
+			routingRegion = sipServletRequest.getSipSession().getRegionInternal();
 			// so that the AR will not change the stateinfo, since this check is just to see if we have to route back to the 
 			//container and not a "real" call to the AR to select an application - needed by TCK AR test cases
 			stateInfo = serializeStateInfo(sipServletRequest.getSipSession().getStateInfo()); 
