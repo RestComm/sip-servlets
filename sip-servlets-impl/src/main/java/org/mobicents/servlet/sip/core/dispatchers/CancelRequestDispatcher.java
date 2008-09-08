@@ -27,13 +27,11 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
-import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
@@ -138,21 +136,19 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
 		}				
 		Transaction inviteTransaction = ((SIPServerTransaction) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
-		TransactionApplicationData dialogAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
+		TransactionApplicationData inviteAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
 		SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
-			dialogAppData.getSipServletMessage();
+			inviteAppData.getSipServletMessage();
 		if(logger.isDebugEnabled()) {
-			logger.debug("message associated with the dialogAppData " +
+			logger.debug("message associated with the inviteAppData " +
 					"of the CANCEL " + inviteRequest);
 		}
 		if(logger.isDebugEnabled()) {
-			logger.debug("invite transaction associated with the dialogAppData " +
+			logger.debug("invite transaction associated with the inviteAppData " +
 					"of the CANCEL " + inviteTransaction);
 		}
-		TransactionApplicationData inviteAppData = (TransactionApplicationData) 
-			inviteTransaction.getApplicationData();
 		if(logger.isDebugEnabled()) {
-			logger.debug("app data of the invite transaction associated with the dialogAppData " +
+			logger.debug("app data of the invite transaction associated with the inviteAppData " +
 					"of the CANCEL " + inviteAppData);
 		}	
 		if(logger.isDebugEnabled()) {
@@ -188,11 +184,17 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 				return;
 			}
 			//Forwarding the cancel on the other B2BUA side
-			if(inviteRequest.getLinkedRequest() != null) {					
+			if(inviteRequest.getLinkedRequest() != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("sending CANCEL on the other B2BUA leg");
+				}
 				SipServletRequestImpl cancelRequest = (SipServletRequestImpl)
 					inviteRequest.getLinkedRequest().createCancel();
 				cancelRequest.send();
 			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("calling the B2BUA servlet");
+				}
 				MobicentsSipSession sipSession = inviteRequest.getSipSession();
 				sipServletRequest.setSipSession(sipSession);
 				try{
@@ -209,11 +211,20 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			}
 		} else if(RoutingState.INITIAL.equals(inviteRequest.getRoutingState()) ||
 				RoutingState.SUBSEQUENT.equals(inviteRequest.getRoutingState())) {			
-						    
+					
+			if(logger.isDebugEnabled()) {
+				logger.debug("invite transaction of the CANCEL " + inviteTransaction);
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("invite message : 1xx response was generated ? " + ((SipServletRequestImpl)inviteAppData.getSipServletMessage()).is1xxResponseGenerated());
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("invite message : Fina response was generated ? " + ((SipServletRequestImpl)inviteAppData.getSipServletMessage()).isFinalResponseGenerated());
+			}
             if(inviteAppData.getTransaction() != null && 
             		inviteAppData.getTransaction() instanceof ClientTransaction && 
             		!((SipServletRequestImpl)inviteAppData.getSipServletMessage()).is1xxResponseGenerated() &&
-            		((SipServletRequestImpl)inviteAppData.getSipServletMessage()).isFinalResponseGenerated()) {
+            		!((SipServletRequestImpl)inviteAppData.getSipServletMessage()).isFinalResponseGenerated()) {
             	if(logger.isDebugEnabled()) {
     				logger.debug("the app didn't do anything with the request, sending a new CANCEL as we are hop by hop");				
     			}
