@@ -421,22 +421,24 @@ public class ListenersSipServlet
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
 		logger.info("sip application session destroyed " +  ev.getApplicationSession());
 		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
-		SipApplicationSession sipApplicationSession = storedFactory.createApplicationSession();
-		try {
-			SipServletRequest sipServletRequest = storedFactory .createRequest(
-					sipApplicationSession, 
-					"MESSAGE", 
-					"sip:sender@sip-servlets.com", 
-					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
-			sipServletRequest.setRequestURI(sipUri);
-			sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
-			sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);
-			sipServletRequest.send();
-		} catch (ServletParseException e) {
-			logger.error("Exception occured while parsing the addresses",e);
-		} catch (IOException e) {
-			logger.error("Exception occured while sending the request",e);			
+		if(storedFactory != null) {
+			SipApplicationSession sipApplicationSession = storedFactory.createApplicationSession();
+			try {
+				SipServletRequest sipServletRequest = storedFactory .createRequest(
+						sipApplicationSession, 
+						"MESSAGE", 
+						"sip:sender@sip-servlets.com", 
+						"sip:receiver@sip-servlets.com");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+				sipServletRequest.setRequestURI(sipUri);
+				sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
+				sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);
+				sipServletRequest.send();
+			} catch (ServletParseException e) {
+				logger.error("Exception occured while parsing the addresses",e);
+			} catch (IOException e) {
+				logger.error("Exception occured while sending the request",e);			
+			}
 		}
 	}
 	/*

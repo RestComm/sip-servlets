@@ -56,8 +56,11 @@ public class ListenersSipServletTest extends SipServletTestCase {
 		
 	private static final String[] LISTENERS_TO_TEST_AFTER = new String[]{
 		//tested in TimersSipServletTest 
-//		"sipAppSessionExpired", 	
-		"sipAppSessionDestroyed", "sipSessionDestroyed"
+//		"sipAppSessionExpired",
+		//Cannot get this one below because the sipfactory has already been removed when we get the event
+		//so we cannot send the message
+//		"sipAppSessionDestroyed", 
+		"sipSessionDestroyed"
 	};
 	
 	private static final String[] LISTENERS_NOT_TESTED = new String[]{

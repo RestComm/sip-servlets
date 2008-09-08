@@ -31,6 +31,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.SipSession.State;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -120,7 +121,11 @@ public class SessionStateUASSipServlet
 				forbiddenResponse.send();
 				
 				// send message precising the current session state
-				sendMessage(request.getSession().getState().toString());
+				if(request.getSession().isValid()) {
+					sendMessage(request.getSession().getState().toString());
+				} else {
+					sendMessage(State.TERMINATED.toString());
+				}
 			}
 		}
 	}
@@ -132,11 +137,12 @@ public class SessionStateUASSipServlet
 			IOException {
 
 		logger.info("Got BYE request: " + request);
-		// send message precising the current session state
-		sendMessage(request.getSession().getState().toString());
 		
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-		sipServletResponse.send();				
+		sipServletResponse.send();
+		
+		// send message precising the current session state
+		sendMessage(request.getSession().getState().toString());
 	}	
 
 	/**
