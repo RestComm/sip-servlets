@@ -859,7 +859,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				while (derivedSessionsIterator.hasNext()) {
 					MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) derivedSessionsIterator
 							.next();
-					if(mobicentsSipSession.isReadyToInvalidate()) {
+					if(mobicentsSipSession.isValid() && !mobicentsSipSession.isReadyToInvalidate()) {
 						allDerivedSessionsTerminated = false;
 						break;
 					}
@@ -923,14 +923,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 				readyToInvalidate = true;
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 			}
 		}
 		// Mapping to the sip session state machine
 		if( State.INITIAL.equals(state) && response.getStatus() >= 100 && response.getStatus() < 200 ) {
 			this.setState(State.EARLY);
 			if(logger.isDebugEnabled()) {
-				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 			}
 		}		
 		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
@@ -950,7 +950,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				setState(State.INITIAL);
 //				readyToInvalidate = true; 
 				if(logger.isDebugEnabled()) {
-					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 				}
 			} 
 			// If the servlet acts as a UAS and receives a dialog creating request, 
@@ -970,7 +970,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				setState(State.TERMINATED);
 				readyToInvalidate =true;
 				if(logger.isDebugEnabled()) {
-					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 				}
 			}						
 		}
@@ -979,7 +979,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			readyToInvalidate =true;
 			
 			if(logger.isDebugEnabled()) {
-				logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 				logger.debug("the following sip session " + getKey() + " is ready to be invalidated ");
 			}
 		}
@@ -1010,7 +1010,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 						(proxy != null && proxy.getBestResponse() == null))  {
 				this.setState(State.TERMINATED);
 				if(logger.isDebugEnabled()) {
-					logger.debug("the following sip session " + getKey() + " has its state updated to " + getState());
+					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 				}
 			}
 		}

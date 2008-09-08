@@ -819,7 +819,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(isValid) {
 			boolean allSipSessionsReadyToInvalidate = true;			
 			for(MobicentsSipSession sipSession:this.sipSessions.values()) {
-				if(!sipSession.isReadyToInvalidate()) {
+				if(sipSession.isValid() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Session not ready to be invalidated : " + sipSession.getKey());
 					}

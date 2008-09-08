@@ -545,13 +545,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		try {
 			if(logger.isInfoEnabled()) {
-				logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+				logger.info("session " + sipSessionImpl.getId() + " already invalidated ? :" + sipSessionImpl.isValid());
+			}
+			if(sipSessionImpl.isValid()) {
+				if(logger.isInfoEnabled()) {
+					logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+				}
 			}
 			MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
-			if(sipSessionImpl.isReadyToInvalidate()) {				
+			if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
 				sipSessionImpl.onTerminatedState();
 			}
-			if(sipApplicationSession.isReadyToInvalidate()) {
+			if(sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {
 				sipApplicationSession.tryToInvalidate();
 			}
 		} finally {
@@ -598,26 +603,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(tad != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
-			sipSession.removeOngoingTransaction(transaction);			
-			//notifying SipErrorListener that no ACK has been received for a UAS only
-			if(sipServletMessage instanceof SipServletRequestImpl &&
-					tad.getProxy() == null &&
-					((SipServletRequestImpl)sipServletMessage).getLastFinalResponse() != null) {
-				List<SipErrorListener> sipErrorListeners = 
-					sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
-				
-				SipErrorEvent sipErrorEvent = new SipErrorEvent(
-						(SipServletRequest)sipServletMessage, 
-						((SipServletRequestImpl)sipServletMessage).getLastFinalResponse());
-				for (SipErrorListener sipErrorListener : sipErrorListeners) {
-					try {					
-						sipErrorListener.noAckReceived(sipErrorEvent);
-					} catch (Throwable t) {
-						logger.error("SipErrorListener threw exception", t);
+			if(sipSession != null) {
+				sipSession.removeOngoingTransaction(transaction);			
+				//notifying SipErrorListener that no ACK has been received for a UAS only
+				if(sipServletMessage instanceof SipServletRequestImpl &&
+						tad.getProxy() == null &&
+						((SipServletRequestImpl)sipServletMessage).getLastFinalResponse() != null) {
+					List<SipErrorListener> sipErrorListeners = 
+						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
+					
+					SipErrorEvent sipErrorEvent = new SipErrorEvent(
+							(SipServletRequest)sipServletMessage, 
+							((SipServletRequestImpl)sipServletMessage).getLastFinalResponse());
+					for (SipErrorListener sipErrorListener : sipErrorListeners) {
+						try {					
+							sipErrorListener.noAckReceived(sipErrorEvent);
+						} catch (Throwable t) {
+							logger.error("SipErrorListener threw exception", t);
+						}
 					}
 				}
+				tryToInvalidateSession(sipSession);
 			}
-			tryToInvalidateSession(sipSession);
 		}
 	}
 	

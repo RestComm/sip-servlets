@@ -393,17 +393,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						transport, false).getSipProvider();
 				
 				Dialog dialog = null;
-				// This ensures that the dialog is not created in terms of JSIP when responses arrive from
-				// proxy branches, that eventually return error responses. When they return error response,
-				// some other branch must create the dialog, but this other ranch will have another tag.
-				// If this is not here, you will get tag mismatch from JSIP.
-				if(this.getStatus() != Response.TRYING && this.proxyBranch == null) {
+				// Creates a dialog only for non trying responses
+				if(this.getStatus() != Response.TRYING) {
 					dialog = sipProvider.getNewDialog(this
 						.getTransaction());				
-				} else 
-				if(this.getStatus() < 200 && this.proxyBranch != null) {
-					dialog = sipProvider.getNewDialog(this
-							.getTransaction());
 				}
 				getSipSession().setSessionCreatingDialog(dialog);
 				if(logger.isDebugEnabled()) {
