@@ -53,19 +53,19 @@
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
-			<version>1.0.0.BETA3-SNAPSHOT</version>
+			<version>1.0.0.BETA4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
-			<version>1.0.0.BETA3-SNAPSHOT</version>
+			<version>1.0.0.BETA4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
-			<version>1.0.0.BETA3-SNAPSHOT</version>
+			<version>1.0.0.BETA4</version>
 		</dependency>
 		<!-- j2ee dependencies -->
 		<dependency>
