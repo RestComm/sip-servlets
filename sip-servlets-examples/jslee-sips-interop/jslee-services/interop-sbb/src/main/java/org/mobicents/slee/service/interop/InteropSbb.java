@@ -51,7 +51,7 @@ import org.mobicents.slee.service.events.InteropCustomEvent;
  */
 public abstract class InteropSbb implements Sbb { 
 
-	private static final String ENDPOINT_NAME = "media/trunk/IVR/1";
+	private static final String ENDPOINT_NAME = "media/endpoint/IVR";
 
 	private static final String OPENING_ANNOUNCEMENT = "Welcome to JavaOne 2008. Please enter your booth number followed by the pound sign to get some free beers.";
 	
@@ -202,12 +202,13 @@ public abstract class InteropSbb implements Sbb {
 				logger.error("Impossible to attach to Media Signal Generator activity", e);
 			}
 		}
+		MsConnection connection = getConnection();
 		String announcementFile = "file:" + audioFilePath;
-		generator.apply(EventID.PLAY,
+		generator.apply(EventID.PLAY, connection, 
 				new String[] { announcementFile });
 		
 		if(listenForDTMF) {
-			this.initDtmfDetector(getConnection(), ENDPOINT_NAME);
+			this.initDtmfDetector(connection, ENDPOINT_NAME);
 		}
 	}
 	
