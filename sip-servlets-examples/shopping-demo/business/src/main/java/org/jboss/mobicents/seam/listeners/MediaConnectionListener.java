@@ -26,6 +26,8 @@ import org.mobicents.mscontrol.MsSignalGenerator;
 public class MediaConnectionListener implements MsConnectionListener {
 	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
 	
+	public static final String IVR_JNDI_NAME = "media/endpoint/IVR";
+	
 	private SipServletRequest inviteRequest;	
 	
 	public void connectionCreated(MsConnectionEvent event) {		
@@ -59,13 +61,13 @@ public class MediaConnectionListener implements MsConnectionListener {
 				speech = new File("adminspeech.wav");	
 			}			
 			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
-			generator.apply(EventID.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+			generator.apply(EventID.PLAY, connection, new String[]{"file://" + speech.getAbsolutePath()});
 			logger.info("announcement confirmation played. waiting for DTMF ");
 			listenToDTMF(connection, pathToAudioDirectory);
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
 			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
 			logger.info("Playing Delivery Date Announcement : " + announcementFile);
-			generator.apply(EventID.PLAY, new String[]{announcementFile});
+			generator.apply(EventID.PLAY, connection, new String[]{announcementFile});
 			logger.info("Delivery Date Announcement played. waiting for DTMF ");
 			listenToDTMF(connection, pathToAudioDirectory);
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
@@ -73,7 +75,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
 			MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
 			generator.addResourceListener(mediaResourceListener);
-			generator.apply(EventID.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+			generator.apply(EventID.PLAY, connection, new String[]{"file://" + speech.getAbsolutePath()});
 			logger.info("shipping announcement played. tearing down the call");
 		}				
 	}

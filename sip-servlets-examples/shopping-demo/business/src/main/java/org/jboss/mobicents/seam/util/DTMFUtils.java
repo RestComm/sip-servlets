@@ -247,7 +247,7 @@ public class DTMFUtils {
 					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
 					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
 					generator.addResourceListener(mediaResourceListener);
-					generator.apply(EventID.PLAY, new String[]{"file://" + speech.getAbsolutePath()});
+					generator.apply(EventID.PLAY, connection, new String[]{"file://" + speech.getAbsolutePath()});
 					logger.info("delivery Date summary played. waiting for DTMF ");
 				} catch (Exception e) {
 					logger.error("An unexpected exception occured while generating the deliveryDate tts file");
@@ -271,7 +271,7 @@ public class DTMFUtils {
 		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);		
 		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
 		generator.addResourceListener(mediaResourceListener);
-		generator.apply(EventID.PLAY, new String[] { audioFile });
+		generator.apply(EventID.PLAY, connection, new String[] { audioFile });
 		session.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STOPPED);
 	}
 }
