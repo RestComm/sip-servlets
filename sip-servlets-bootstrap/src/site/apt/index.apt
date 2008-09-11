@@ -19,7 +19,7 @@ Goals
   
 Version 0.5.1 is out !
 
-	This version is an intermediate version in waiting for a 0.6 JSR 289 certified version providing more stability and fixing {{{http://code.google.com/p/mobicents/issues/list?q=label%3ASip-Servlets-Version-0.5&can=1}Issues}} that have been raised against the 0.5 version. 
+	This version is an intermediate version (in waiting for a 0.6 JSR 289 certified version) providing more stability and fixing {{{http://code.google.com/p/mobicents/issues/list?q=label%3ASip-Servlets-Version-0.5&can=1}some Issues}} that have been raised against the 0.5 version. 
 
 	The JBoss version has also been updated with the latest Mobicents Media Server release (1.0.0.BETA4)
 	

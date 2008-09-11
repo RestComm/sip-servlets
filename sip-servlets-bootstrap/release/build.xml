@@ -104,7 +104,10 @@
 	</target>
 	
 	<target name="deploy-mgmnt">
-		<ant dir="${base.path}/../../sip-servlets-management/" antfile="build.xml" target="war" />
+		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-management/">
+			<arg line="clean install"/>
+		</exec>
+
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
 			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
 		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
