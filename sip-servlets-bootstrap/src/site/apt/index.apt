@@ -17,6 +17,17 @@ Goals
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
   
+Version 0.5.1 is out !
+
+	This version is an intermediate version in waiting for a 0.6 JSR 289 certified version providing more stability and fixing {{{http://code.google.com/p/mobicents/issues/list?q=label%3ASip-Servlets-Version-0.5&can=1}Issues}} that have been raised against the 0.5 version. 
+
+	The JBoss version has also been updated with the latest Mobicents Media Server release (1.0.0.BETA4)
+	
+	To download this release and try it out, follow the following link : 
+
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=625266}Mobicents Sip Servlet 0.5.1 downloads}}
+	
+
 Version 0.5 is out !
 
 	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
