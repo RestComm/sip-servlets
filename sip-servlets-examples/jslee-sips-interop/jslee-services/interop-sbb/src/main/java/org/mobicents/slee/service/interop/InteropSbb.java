@@ -258,6 +258,7 @@ public abstract class InteropSbb implements Sbb {
 		} catch (IOException e) {
 			logger.error("Impossible to call back the EJB", e);    
 		}
+		getConnection().release();
 	}
 
 	
