@@ -49,7 +49,6 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.security.auth.spi.AnonLoginModule;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -148,6 +147,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		// is correctly initialized too
 		super.init();
 		
+		setApplicationDispatcher();		
+				
+		if(logger.isInfoEnabled()) {
+			logger.info("sip context Initialized");
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected void setApplicationDispatcher() throws LifecycleException {
 		Container container = getParent().getParent();
 		if(container instanceof Engine) {
 			Service service = ((Engine)container).getService();
@@ -157,9 +167,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 		if(sipApplicationDispatcher == null) {
-			throw new Exception("cannot find any application dispatcher for this context " + name);
-		}		
-		
+			throw new LifecycleException("cannot find any application dispatcher for this context " + name);
+		}
+	}
+
+	@Override
+	public synchronized void start() throws LifecycleException {
+		if(logger.isInfoEnabled()) {
+			logger.info("Starting the sip context");
+		}
+		if(sipApplicationDispatcher == null) {
+			setApplicationDispatcher();
+		}
 		sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
 		sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
@@ -174,16 +193,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				sipSessionsUtil);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 				sipApplicationDispatcher.getOutboundInterfaces());
-		if(logger.isInfoEnabled()) {
-			logger.info("sip context Initialized");
-		}
-	}
-
-	@Override
-	public synchronized void start() throws LifecycleException {
-		if(logger.isInfoEnabled()) {
-			logger.info("Starting the sip context");
-		}
+		
 		 // Add missing components as necessary
         if (getResources() == null) {   // (1) Required by Loader
             if (logger.isDebugEnabled())

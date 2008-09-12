@@ -52,8 +52,30 @@ public class SipHostConfig extends HostConfig {
 	
 	@Override
 	protected void deployApps(String name) {		
-		super.deployApps(name);
-		String docBase = getConfigFile(name);
+		File appBase = appBase();
+        File configBase = configBase();
+        String baseName = getConfigFile(name);
+        String docBase = getConfigFile(name);
+        
+        // Deploy XML descriptors from configBase
+        File xml = new File(configBase, baseName + ".xml");
+        if (xml.exists())
+            deployDescriptor(name, xml, baseName + ".xml");
+        // Deploy WARs, and loop if additional descriptors are found
+        File war = new File(appBase, docBase + ".war");
+        if (war.exists()) {
+        	boolean isSipServletApplication = isSipServletArchive(war);
+            if(isSipServletApplication) {  
+            	deploySAR(name, war, docBase + ".war");
+            } else {
+            	deployWAR(name, war, docBase + ".war");
+            }
+        }
+        // Deploy expanded folders
+        File dir = new File(appBase, docBase);
+        if (dir.exists()) {
+            deployDirectory(name, dir, docBase);
+        }
 		// Deploy SARs, and loop if additional descriptors are found
         File sar = new File(appBase, docBase + SAR_EXTENSION);
         if (sar.exists()) {
@@ -74,10 +96,24 @@ public class SipHostConfig extends HostConfig {
     		logger.debug(SipContext.APPLICATION_SIP_XML + " found in " 
     				+ sar + ". Enabling sip servlet archive deployment");
     	}
-		String initialHostConfigClass = host.getConfigClass();
+		String initialConfigClass = configClass;
+		String initialContextClass = contextClass;
 		host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
+		setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
+		setContextClass(SIP_CONTEXT_CLASS);
 		deployWAR(contextPath, sar, file);
-		host.setConfigClass(initialHostConfigClass);
+		host.setConfigClass(initialConfigClass);
+		configClass = initialConfigClass;
+        contextClass = initialContextClass;
+	}
+	
+	@Override
+	protected void deployWAR(String contextPath, File dir, String file) {
+		if(logger.isDebugEnabled()) {
+    		logger.debug("Context class used to deploy the WAR : " + contextClass);
+    		logger.debug("Context config class used to deploy the WAR : " + configClass);
+    	}
+		super.deployWAR(contextPath, dir, file);
 	}
 
 	@Override
