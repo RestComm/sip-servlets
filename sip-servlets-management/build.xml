@@ -52,9 +52,9 @@
 			<pathelement path="${project.modified.lib}/servlet-api.jar" />
 			<pathelement path="${project.public.lib}/gwt-dnd-2.0.7.jar"/>
 			<pathelement path="${project.public.lib}/gwtext.jar"/>
-			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/0.5.1/sip-servlets-impl-0.5.1.jar"/>
-			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-application-router/0.5.1/sip-servlets-application-router-0.5.1.jar"/>
-			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/0.5.1/sip-servlets-spec-0.5.1.jar"/>
+			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-impl/0.6-SNAPSHOT/sip-servlets-impl-0.6-SNAPSHOT.jar"/>
+			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-application-router/0.6-SNAPSHOT/sip-servlets-application-router-0.6-SNAPSHOT.jar"/>
+			<pathelement path="${system.M2_REPO}/org/mobicents/servlet/sip/sip-servlets-spec/0.6-SNAPSHOT/sip-servlets-spec-0.6-SNAPSHOT.jar"/>
 			<pathelement path="${system.M2_REPO}/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar"/>
 			<pathelement path="${system.M2_REPO}/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
 		</path>
