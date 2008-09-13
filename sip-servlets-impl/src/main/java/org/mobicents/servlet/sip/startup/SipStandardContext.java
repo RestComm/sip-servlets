@@ -517,14 +517,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}		
 	
 	public void addChild(SipServletImpl sipServletImpl) {
-		if(children.get(sipServletImpl.getName()) == null) {
-			childrenMap.put(sipServletImpl.getName(), sipServletImpl);
-			super.addChild(sipServletImpl);
-		} else {
-			logger.warn(sipServletImpl.getName() + " servlet already present, not added. " +
+		SipServletImpl existingSipServlet = (SipServletImpl )children.get(sipServletImpl.getName());
+		if(existingSipServlet != null) {			
+			logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. " +
 					"This might be due to the fact that the definition of the servlet " +
 					"is present both in annotations and in sip.xml");
+			//we remove the previous one (annoations) because it may not have init parameters that has been defined in sip.xml
+			//See TCK Test ContextTest.testContext1
+			childrenMap.remove(sipServletImpl.getName());
+			super.removeChild(existingSipServlet);
 		}
+		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
+		super.addChild(sipServletImpl);
 	}
 	
 	public void removeChild(SipServletImpl sipServletImpl) {
