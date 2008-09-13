@@ -85,18 +85,16 @@
 				<scope>provided</scope>
 			</dependency>
 		<dependency>
-			<groupId>gwtext</groupId>
-			<artifactId>gwtext</artifactId>
+			<groupId>gwt-ext</groupId>
+			<artifactId>gwt-ext</artifactId>
 			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/java/org/mobicents/servlet/management/public/lib/gwtext.jar</systemPath>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>gwt-dnd</groupId>
 			<artifactId>gwt-dnd</artifactId>
 			<version>2.0.7</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/java/org/mobicents/servlet/management/public/lib/gwt-dnd-2.0.7.jar</systemPath>
+			<scope>compile</scope>
 		</dependency>
 			<dependency>
 				<groupId>com.google.gwt</groupId>
@@ -130,6 +128,41 @@
 					<source>1.4</source>
 					<target>1.4</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>install-gwt-dnd</id>
+						<phase>validate</phase>
+						<goals><goal>install-file</goal></goals>
+						<configuration>
+							<file>${basedir}/src/main/java/org/mobicents/servlet/management/public/lib/gwt-dnd-2.0.7.jar</file>
+							<groupId>gwt-dnd</groupId>
+							<artifactId>gwt-dnd</artifactId>
+							<version>2.0.7</version>
+							<packaging>jar</packaging>
+							<generatePom>true</generatePom>
+							<createChecksum>true</createChecksum>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-gwt-ext</id>
+						<phase>validate</phase>
+						<goals><goal>install-file</goal></goals>
+						<configuration>
+							<file>${basedir}/src/main/java/org/mobicents/servlet/management/public/lib/gwtext.jar</file>
+							<groupId>gwt-ext</groupId>
+							<artifactId>gwt-ext</artifactId>
+							<version>1.0</version>
+							<packaging>jar</packaging>
+							<generatePom>true</generatePom>
+							<createChecksum>true</createChecksum>
+						</configuration>
+					</execution>
+					</executions>
 			</plugin>
 			<!-- All the fantastical settings that GWT needs -->
 			<plugin>
