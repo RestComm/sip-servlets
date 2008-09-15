@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -136,6 +139,80 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
+	private ThreadPoolExecutor requestExecutor;
+	
+	private ThreadPoolExecutor responseExecutor;
+	
+	/**
+	 * This class is the task that will be run by the request thread pool executor
+	 * Running the request dispatching in its own task is better since it won't block the thread from the sip stack.
+	 * Since the sip stack serializes on transaction if the listener blocks too much or takes too much time to process the request
+	 * (Sip Servlets accessing a DB or doing heavy computation) and retransmissions comes in and cannot get the jsip transaction lock a 503 Service Unavailable will be sent.
+	 * 
+	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+	 */
+	protected class RequestTask implements Runnable {
+		
+		private SipServletRequestImpl request;
+		private SipProvider sipProvider;
+		private SipApplicationDispatcherImpl sipApplicationDispatcher;
+
+		public RequestTask(SipApplicationDispatcherImpl sipApplicationDispatcher, SipProvider sipProvider, SipServletRequestImpl sipServletRequest) {
+			this.sipApplicationDispatcher = sipApplicationDispatcher;
+			this.sipProvider = sipProvider;
+			this.request = sipServletRequest;
+		}
+		
+		public void run() {
+			try {
+				MessageDispatcherFactory.getRequestDispatcher(request, sipApplicationDispatcher).
+					dispatchMessage(sipProvider, request);
+			} catch (DispatcherException e) {
+				logger.error("Unexpected exception while processing request " + request,e);
+				// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+				if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
+					MessageDispatcher.sendErrorResponse(e.getErrorCode(), (ServerTransaction) request.getTransaction(), (Request) request.getMessage(), sipProvider);
+				}
+				return;
+			} catch (Throwable e) {
+				logger.error("Unexpected exception while processing request " + request,e);
+				// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+				if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
+					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) request.getTransaction(), (Request) request.getMessage(), sipProvider);
+				}
+				return;
+			}
+		}		
+	}
+	
+	/**
+	 * This class is the task that will be run by the response thread pool executor
+	 * Running the response dispatching in its own task is better since it won't block the thread from the sip stack.
+	 * 
+	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+	 */
+	protected class ResponseTask implements Runnable {
+		
+		private SipServletResponseImpl response;
+		private SipApplicationDispatcherImpl sipApplicationDispatcher;
+
+		public ResponseTask(SipApplicationDispatcherImpl sipApplicationDispatcher, SipServletResponseImpl sipServletResponse) {
+			this.sipApplicationDispatcher = sipApplicationDispatcher;
+			this.response = sipServletResponse;
+		}
+		
+		public void run() {
+			try {
+				MessageDispatcherFactory.getResponseDispatcher(response, sipApplicationDispatcher).
+					dispatchMessage(null, response);
+			} catch (Throwable e) {
+				logger.error("An unexpected exception happened while routing the response " +  response, e);
+				return;
+			}
+		}
+		
+	}
+	
 	/**
 	 * 
 	 */
@@ -145,7 +222,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		sipFactoryImpl = new SipFactoryImpl(this);
 		sessionManager = new SessionManagerUtil();
 		hostNames = new CopyOnWriteArrayList<String>();
-		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();		
+		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
+		requestExecutor = new ThreadPoolExecutor(4, 64, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		responseExecutor = new ThreadPoolExecutor(4, 64, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	}
 	
 	/**
@@ -444,16 +523,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isInfoEnabled()) {
 				logger.info("Routing State " + sipServletRequest.getRoutingState());
 			}
-										
-			MessageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
-				dispatchMessage(sipProvider, sipServletRequest);
-		} catch (DispatcherException e) {
-			logger.error("Unexpected exception while processing request " + request,e);
-			// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
-			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
-				MessageDispatcher.sendErrorResponse(e.getErrorCode(), transaction, request, sipProvider);
-			}
-			return;
+			//run the dispatching in its own thread scheduled by an thread pool executor service
+			//to avoid blocking too much the jsip stack thread
+			requestExecutor.execute(new RequestTask(this, sipProvider, sipServletRequest));			
 		} catch (Throwable e) {
 			logger.error("Unexpected exception while processing request " + request,e);
 			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
@@ -507,13 +579,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				null, 
 				dialog);
 		
-		try {
-			MessageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
-				dispatchMessage(null, sipServletResponse);
-		} catch (Throwable e) {
-			logger.error("An unexpected exception happened while routing the response " +  response, e);
-			return;
-		}
+		//run the dispatching in its own thread scheduled by an thread pool executor service
+		//to avoid blocking too much the jsip stack thread
+		responseExecutor.execute(new ResponseTask(this, sipServletResponse));
 	}	
 
 	/*
