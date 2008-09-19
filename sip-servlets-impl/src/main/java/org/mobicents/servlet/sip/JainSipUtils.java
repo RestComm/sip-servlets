@@ -71,6 +71,8 @@ public class JainSipUtils {
 		dialogTerminatingMethods.add(Request.BYE);
 	}
 
+	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels","mailto"};
+	
 	public static final int MAX_FORWARD_HEADER_VALUE = 70;
 
 	// never instantiate a utility class : Enforce noninstantiability with private constructor
@@ -166,5 +168,19 @@ public class JainSipUtils {
 		}
 		 
 		return transport;
+	}
+	
+	public static boolean checkScheme(String address) {
+		for(String scheme:allowedAddressSchemes) {
+			int start = address.indexOf("<");
+			if(start >= 0) {
+				int end = address.indexOf(">");
+				address = address.substring(start + 1, end);
+			}
+				
+			if(scheme.equalsIgnoreCase(address.substring(0, scheme.length())))
+				return true;
+		}
+		return false;
 	}
 }
