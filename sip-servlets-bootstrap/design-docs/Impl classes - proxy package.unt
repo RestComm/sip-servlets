@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="xBGhNa/elUW2QC8NhJWHVgAA">
+<XPD:ATTR name="Name" type="string">proxy</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">4</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="jP7AhSlcPEyl038tNWd5mAAA">
+<XPD:ATTR name="Name" type="string">ProxyImpl</XPD:ATTR>
+<XPD:REF name="Namespace">xBGhNa/elUW2QC8NhJWHVgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">y+1OVlNol02reAMBtd9dpQAA</XPD:REF>
+<XPD:REF name="Views[1]">2qCVc3eCfkOy8ojuJ2b72QAA</XPD:REF>
+<XPD:REF name="Views[2]">LSduTRrO9ECXOaf503hZlwAA</XPD:REF>
+<XPD:REF name="Views[3]">Mr98cJf4jkSROSZkivn2HgAA</XPD:REF>
+<XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">gju+kYaGoUCaEOzQX3QYEgAA</XPD:REF>
+<XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">yasfhgT1fk+hYqX2BY+3eQAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">10</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="6yJHeHBg+UG/gWFPP1xldgAA">
+<XPD:ATTR name="Name" type="string">started</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">false</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="/sK3r+5igUmyY7TXw9eQKgAA">
+<XPD:ATTR name="Name" type="string">notSentBranches</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap&lt;URI,ProxyBranchImpl&gt;</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="4WIMPIzB8kCOlE57K57BlQAA">
+<XPD:ATTR name="Name" type="string">sentBranches</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap&lt;URI,ProxyBranchImpl&gt;</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="maAgH8XPGE64n/Yqgym8aAAA">
+<XPD:ATTR name="Name" type="string">addToPath</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="D5trJn+TGkCRHYW5r53Z1wAA">
+<XPD:ATTR name="Name" type="string">proxyTimeout</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">int</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="mRClhRpZhkWMptsVytI1jQAA">
+<XPD:ATTR name="Name" type="string">recordRoute</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">true</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="C78Jl9ZfK0y+lfn1E6KLDwAA">
+<XPD:ATTR name="Name" type="string">doRecurse</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">true</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="/fbAamblHUqYx6+WxZgEHwAA">
+<XPD:ATTR name="Name" type="string">isSupervised</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">true</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[8]" type="UMLAttribute" guid="vWq0IaOMTEOy9s/po1qx9QAA">
+<XPD:ATTR name="Name" type="string">isParallel</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">true</XPD:ATTR>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[9]" type="UMLAttribute" guid="XBlS5hmYdkOjG3KKOaUFzQAA">
+<XPD:ATTR name="Name" type="string">originalRequest</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPackage</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipServletRequest</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::SipServletRequest">U5Bj2anufUCAyesMTnbXrQAA</XPD:REF>
+<XPD:REF name="Owner">jP7AhSlcPEyl038tNWd5mAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="n5lBgJU1OEesUx5i1MmG1gAA">
+<XPD:ATTR name="Name" type="string">ProxyBranchImpl</XPD:ATTR>
+<XPD:REF name="Namespace">xBGhNa/elUW2QC8NhJWHVgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">Q4pORFQmckqIA4VUVpEdcAAA</XPD:REF>
+<XPD:REF name="Views[1]">zpkXsgsVYEeOIIk9BiknOAAA</XPD:REF>
+<XPD:REF name="Views[2]">TKOM/reeCEmuDc/2mHNUOgAA</XPD:REF>
+<XPD:REF name="Views[3]">b83aw/jKfkKs+VGtc+qySwAA</XPD:REF>
+<XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">f/lNycNPnkeIwEdFJECBhQAA</XPD:REF>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]">g+H69D/y8EmIPpZBP4cMXQAA</XPD:REF>
+<XPD:ATTR name="#Associations" type="integer">5</XPD:ATTR>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::proxy::">Jg22D8mUUkeO+PWix9P/BQAA</XPD:REF>
+<XPD:REF name="Associations[1]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">hbNaWGlyH0mLsFR8NNPGLgAA</XPD:REF>
+<XPD:REF name="Associations[2]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">+dcppItV+USYrTgnbaZZVAAA</XPD:REF>
+<XPD:REF name="Associations[3]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">w+E1DpKHskuRzU+E3qO9egAA</XPD:REF>
+<XPD:REF name="Associations[4]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">h+aXsdJNZECDNxd5PhZeJAAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">8</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="lRa32+KSs0adD8rxNa93SwAA">
+<XPD:ATTR name="Name" type="string">proxy</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPackage</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">Proxy</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::Proxy">aAno3Gq1O0+xEokONVJiXwAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="EDjIIUCOOUCdM4pRiOtt6gAA">
+<XPD:ATTR name="Name" type="string">timeout</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">int</XPD:ATTR>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="IST2tLbzikqGGk8j9uo1xgAA">
+<XPD:ATTR name="Name" type="string">recordRouteHeader</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipURI</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::SipURI">iCwjtGRbnES7D1jJIudrYgAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="b42C33ftGkmEiWNqmRGY9AAA">
+<XPD:ATTR name="Name" type="string">requestToBeSent</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipServletRequest</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::SipServletRequest">U5Bj2anufUCAyesMTnbXrQAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="N0M7sdhVx0uuHEc2b+f0EAAA">
+<XPD:ATTR name="Name" type="string">lastResponse</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPackage</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipServletResponse</XPD:ATTR>
+<XPD:REF name="Type_" pathname="::Specification Classes::javax::servlet::sip::SipServletResponse">6T7+ymclMEmw7DVF/vB5dgAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="ItZQ4hJ+E0iJAtd1fDbBAQAA">
+<XPD:ATTR name="Name" type="string">recursedBranches</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">List&lt;ProxyBranchImpl&gt;</XPD:ATTR>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[6]" type="UMLAttribute" guid="yoUluWwU6kOI1XPo/XJd/wAA">
+<XPD:ATTR name="Name" type="string">state</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">BranchState</XPD:ATTR>
+<XPD:REF name="Type_">tF8XAfZ2Z0Oh6/nRy9ad+AAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[7]" type="UMLAttribute" guid="g+H69D/y8EmIPpZBP4cMXQAA">
+<XPD:ATTR name="Name" type="string">parentBranch</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">ProxyBranchImpl</XPD:ATTR>
+<XPD:REF name="Type_">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+<XPD:REF name="Owner">n5lBgJU1OEesUx5i1MmG1gAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="xACqU8lynEqUOD7BCIMHKQAA">
+<XPD:ATTR name="Name" type="string">B2buaHelperImpl</XPD:ATTR>
+<XPD:REF name="Namespace">xBGhNa/elUW2QC8NhJWHVgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">FxzCfkaGgU+9tTLdW4VEogAA</XPD:REF>
+<XPD:REF name="Views[1]">P74DGu1eh0yy7xYyNzKX4gAA</XPD:REF>
+<XPD:REF name="Views[2]">h8Fy6bbwpkuGXOq6SW21LQAA</XPD:REF>
+<XPD:REF name="Views[3]">uMuAmDRBEE6jsKPTe5CSRAAA</XPD:REF>
+<XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::">GjlWBBC3j0qiFQRU8wL5PwAA</XPD:REF>
+<XPD:ATTR name="#Attributes" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="bckiMb6ZDka/7uzsSg8QyQAA">
+<XPD:ATTR name="Name" type="string">linkedSessions</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap&lt;SipSession,SipSession&gt;</XPD:ATTR>
+<XPD:REF name="Owner">xACqU8lynEqUOD7BCIMHKQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="r1/+AkwNQUGSbaHi5LTNDQAA">
+<XPD:ATTR name="Name" type="string">linkedRequests</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HashMap&lt;SipServletRequest,SipServletRequest&gt;</XPD:ATTR>
+<XPD:REF name="Owner">xACqU8lynEqUOD7BCIMHKQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLEnumeration" guid="tF8XAfZ2Z0Oh6/nRy9ad+AAA">
+<XPD:ATTR name="Name" type="string">BranchState</XPD:ATTR>
+<XPD:REF name="Namespace">xBGhNa/elUW2QC8NhJWHVgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">3</XPD:ATTR>
+<XPD:REF name="Views[0]">DQm12osxe0GA0EW0s2NLZwAA</XPD:REF>
+<XPD:REF name="Views[1]">5MRE0jXAQ0SQVVzl1YUglwAA</XPD:REF>
+<XPD:REF name="Views[2]">vfWy3uApNkCrkWtpPR0O3AAA</XPD:REF>
+<XPD:ATTR name="#TypedFeatures" type="integer">1</XPD:ATTR>
+<XPD:REF name="TypedFeatures[0]">yoUluWwU6kOI1XPo/XJd/wAA</XPD:REF>
+<XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::proxy overview diagrams::::">K0k3Vd+Q5kaZHnsa9kq9jwAA</XPD:REF>
+<XPD:ATTR name="#Literals" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="Literals[0]" type="UMLEnumerationLiteral" guid="JPYL6tgHSU+cov4fMk4ZiQAA">
+<XPD:ATTR name="Name" type="string">NotSent</XPD:ATTR>
+<XPD:REF name="Enumeration">tF8XAfZ2Z0Oh6/nRy9ad+AAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Literals[1]" type="UMLEnumerationLiteral" guid="g3GBvIvnOkKStrOTKXrUuQAA">
+<XPD:ATTR name="Name" type="string">Sent</XPD:ATTR>
+<XPD:REF name="Enumeration">tF8XAfZ2Z0Oh6/nRy9ad+AAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Literals[2]" type="UMLEnumerationLiteral" guid="k/hn2SNheU+UJ4e1wVh+zwAA">
+<XPD:ATTR name="Name" type="string">Terminated</XPD:ATTR>
+<XPD:REF name="Enumeration">tF8XAfZ2Z0Oh6/nRy9ad+AAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

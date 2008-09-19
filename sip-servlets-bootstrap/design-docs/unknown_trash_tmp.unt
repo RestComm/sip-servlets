@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLModel" guid="3vMpliadQUWq3DvnQl+3kQAA">
+<XPD:ATTR name="Name" type="string">unknown</XPD:ATTR>
+<XPD:ATTR name="StereotypeProfile" type="string">UMLStandard</XPD:ATTR>
+<XPD:ATTR name="StereotypeName" type="string">analysisModel</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">15</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLAssociation" guid="zfGvzqkiR0+DfKPVvC5gFQAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="WgApF+Cm1E6zJRg4I1kiGQAA">
+<XPD:REF name="Association">zfGvzqkiR0+DfKPVvC5gFQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::LoginConfig">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="4p1aocFdjUCVWsAZ5q4bOgAA">
+<XPD:REF name="Association">zfGvzqkiR0+DfKPVvC5gFQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLAssociation" guid="5mtR/n3IBUyk9sCWE0JxjQAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="xwhl1/d/x0GeKBiqrvJf1wAA">
+<XPD:REF name="Association">5mtR/n3IBUyk9sCWE0JxjQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::LoginConfig">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="gh8y8XbBq0GT6t8dM8GySAAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akAggregate</XPD:ATTR>
+<XPD:REF name="Association">5mtR/n3IBUyk9sCWE0JxjQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLAssociation" guid="5rBJJYutDUepPbCCkBNCFQAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">q6N/OljXwU2wQqGdRKmyXQAA</XPD:REF>
+<XPD:REF name="Views[1]">TXkJiJc/Z027m1x2JGh+UwAA</XPD:REF>
+<XPD:REF name="Views[2]">OWm/i14bJ0OK6Y6Apx/BeQAA</XPD:REF>
+<XPD:REF name="Views[3]">T0lRYVN2YE+kM8ZN7/qsSQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="qR/3V3vgiEmufcXTP1HYPwAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">5rBJJYutDUepPbCCkBNCFQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::LoginConfig">pttcyUPt4UCVbCx2zJVf1wAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">Op2Fe67KRUyMc57FlRn5yAAA</XPD:REF>
+<XPD:REF name="Views[1]">5JTxaBwWW0+3QE3Om6b/IwAA</XPD:REF>
+<XPD:REF name="Views[2]">alicZe3nwES/eXnnJXPG0wAA</XPD:REF>
+<XPD:REF name="Views[3]">iQGGklAhkUGxNJWowKIK1gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="dS0q/ur5xUmYgo/9SBCZJQAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">5rBJJYutDUepPbCCkBNCFQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">J9+OKBrXJkmBxsagViFDyQAA</XPD:REF>
+<XPD:REF name="Views[1]">4tCOeg3CO0+XF7F2zK6JlwAA</XPD:REF>
+<XPD:REF name="Views[2]">BXIZa+1VoEiodW1jsD6eSgAA</XPD:REF>
+<XPD:REF name="Views[3]">l/K/E0AJJkGPL3/A1KbN2AAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLAssociation" guid="FuzT345e3kat2nYg1UqKbwAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">KO+aIQWXKk2KcaQfR7Os1wAA</XPD:REF>
+<XPD:REF name="Views[1]">HgoZNtj890maEy+O6xpEagAA</XPD:REF>
+<XPD:REF name="Views[2]">/5+NKZBSHU+0ETP7GuXMMQAA</XPD:REF>
+<XPD:REF name="Views[3]">CaUCtXkOLUejuZTBjldf1QAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="TsLkEyxzNEquC6Yd2FBKDAAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">FuzT345e3kat2nYg1UqKbwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::EjbLocalReference">d3FvRLrz8E+q6AXqLe2HagAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">Oj5mxOpwrEmhl/2heb9iEwAA</XPD:REF>
+<XPD:REF name="Views[1]">Sn3QsbWChEWBKdGLoz93NAAA</XPD:REF>
+<XPD:REF name="Views[2]">1QsQQrch3EqU3D6Q+w6MGwAA</XPD:REF>
+<XPD:REF name="Views[3]">7+vEJoX2rUuenCng/kh6mwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="dFKYjDDfMEKnC5qpzQSxeAAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">FuzT345e3kat2nYg1UqKbwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">15gJR6R+tkWW6DG20AibWAAA</XPD:REF>
+<XPD:REF name="Views[1]">/MKrZd+2vkOPU7ifUIkrRwAA</XPD:REF>
+<XPD:REF name="Views[2]">PY3o7NELwEiyUjw6Opa+1wAA</XPD:REF>
+<XPD:REF name="Views[3]">a33AREzKcE2E3WKo6p3liQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[4]" type="UMLAssociation" guid="fZXZdoKUNUqRNhjb2bPt2gAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">CD3cf2fshUSPJE15IRFp6gAA</XPD:REF>
+<XPD:REF name="Views[1]">0axFBq7CZEya/BG6kz4WzwAA</XPD:REF>
+<XPD:REF name="Views[2]">JFLhGeQj4UKH09Zkfp5DDQAA</XPD:REF>
+<XPD:REF name="Views[3]">/3UVf2etLkacuaKa12sGMAAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="170QolowxkqI/ekPdyX20QAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">fZXZdoKUNUqRNhjb2bPt2gAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::EjbReference">Rz7E4G3+e0GC3rnCJwk1rAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">73WLsqwTAEGTKIcZR799VgAA</XPD:REF>
+<XPD:REF name="Views[1]">meJHDNDKxEK34ok13oPAiwAA</XPD:REF>
+<XPD:REF name="Views[2]">u7yniqsORkSTDXTECmW4agAA</XPD:REF>
+<XPD:REF name="Views[3]">i/AL1WCQGEyVhZyo1f4OKQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="3QCRqC7Uj0yHp7gyr2QGhwAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">fZXZdoKUNUqRNhjb2bPt2gAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">nSrWYyZa9UK6ufT7Vhk6EAAA</XPD:REF>
+<XPD:REF name="Views[1]">HzoGyzm4lkiiEWR6gz0QPgAA</XPD:REF>
+<XPD:REF name="Views[2]">sbIyq1+aiE+0n35fIPTDMwAA</XPD:REF>
+<XPD:REF name="Views[3]">O9i0UzNfXkODW/kAagpmCgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[5]" type="UMLAssociation" guid="TVZMN69cq0O1o80nWVpaigAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">RXm6/qoB20iS37zCNFQjFQAA</XPD:REF>
+<XPD:REF name="Views[1]">maBdRKWSsE6Yn6+EX4XvbgAA</XPD:REF>
+<XPD:REF name="Views[2]">IzWSPuEz40+KeHd75aIytAAA</XPD:REF>
+<XPD:REF name="Views[3]">l1PJQ08eK0iahY0LdghbBAAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="Pa4C+mU0qUC/rPxTxFhumAAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">TVZMN69cq0O1o80nWVpaigAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::EnvironmentEntry">kMDgA4MQUEibWnBH1yT2ggAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">KASjHk2VAUKGDTA8e1OxWwAA</XPD:REF>
+<XPD:REF name="Views[1]">fUyhh8kAbUyCpWASdhGUZgAA</XPD:REF>
+<XPD:REF name="Views[2]">aLpJwLMKN0SGsxCEO/3FLQAA</XPD:REF>
+<XPD:REF name="Views[3]">3ATMlnqft0CfILMSSd8XRAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="1NNVDUPVP0OuZJWHlxVZhAAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">TVZMN69cq0O1o80nWVpaigAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">kMcf9OTLTU20VT12VIzGYgAA</XPD:REF>
+<XPD:REF name="Views[1]">a2kHHX97Z0+EUA2t1Xz3tQAA</XPD:REF>
+<XPD:REF name="Views[2]">w3Oq4b54dE2ppNkQ/KYd1wAA</XPD:REF>
+<XPD:REF name="Views[3]">nRregR/mfkuduJjg1TouPgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[6]" type="UMLAssociation" guid="oQgHu6tcOU2gFFHRW0aXdQAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">w/5ljbM7+k2+SHP0f47oegAA</XPD:REF>
+<XPD:REF name="Views[1]">QzP0nGWLNEOlZn/Rq6uVNAAA</XPD:REF>
+<XPD:REF name="Views[2]">L/petnay2USqVVhEt7DDQwAA</XPD:REF>
+<XPD:REF name="Views[3]">edOx16oopk+CKqfUviaEHAAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="VpvH4RiO5kSzN1KLdDdQnQAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">oQgHu6tcOU2gFFHRW0aXdQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SecurityRoleRef">qtgzPR7To0+8CUvQ+yOtwgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">HVKdho5Z+0+9E+H2xkEiAwAA</XPD:REF>
+<XPD:REF name="Views[1]">s/fxzqSXHU6su16A4d2yPQAA</XPD:REF>
+<XPD:REF name="Views[2]">13fn+rQvMUS44rdlz44YfQAA</XPD:REF>
+<XPD:REF name="Views[3]">9rS66wY98k28s/5mjsSMwgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="GvqwgLEZUEGKWhFDT8a7fwAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">oQgHu6tcOU2gFFHRW0aXdQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">CrwvxeJsSkOX3AoVVle6FgAA</XPD:REF>
+<XPD:REF name="Views[1]">y2nBJ3hLf02Xkc+FHud89wAA</XPD:REF>
+<XPD:REF name="Views[2]">LG1DjHyjwkaBpp5X5oik9wAA</XPD:REF>
+<XPD:REF name="Views[3]">wh3TjSEhWUuNxenQsps45QAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[7]" type="UMLAssociation" guid="meQxBUP94USKtdhiEVI+DAAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">xH3Cs6nLD06n7s6MTBwklQAA</XPD:REF>
+<XPD:REF name="Views[1]">nQTj/7Xjm0msKo86ZJ3BwwAA</XPD:REF>
+<XPD:REF name="Views[2]">Jn+LAWXAP0OjGkNoCVbMPAAA</XPD:REF>
+<XPD:REF name="Views[3]">R1AwkYi36EKYNV4rYYHAtQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="4c209GPYKUG9mZu/bdiFtgAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">meQxBUP94USKtdhiEVI+DAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SecurityRole">h0N2eaB/UEeY9iZAD3qXnAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">S3vpK4RBWUejHPiZTSFRRgAA</XPD:REF>
+<XPD:REF name="Views[1]">HfqVHmet8kaP/eaxmuubZwAA</XPD:REF>
+<XPD:REF name="Views[2]">BHd3M1I73US3LvuIT8UCjAAA</XPD:REF>
+<XPD:REF name="Views[3]">Jy/rBe+NyECW4rKT+SU6bwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="EsdExrauUEKza13g/tsbqgAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">meQxBUP94USKtdhiEVI+DAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">3LojtwcmXUifTrjYOTTaxQAA</XPD:REF>
+<XPD:REF name="Views[1]">0FAXOayU/kyAXG2y+nN83wAA</XPD:REF>
+<XPD:REF name="Views[2]">X6XcrVMLAUypHXLpi63lAgAA</XPD:REF>
+<XPD:REF name="Views[3]">ZY0CrjrAGUGXzEef0XWLEAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[8]" type="UMLAssociation" guid="d6hKziWQsk2kfab7PqTVNwAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">zSBEr7m6EUCM72pX1ZvqnAAA</XPD:REF>
+<XPD:REF name="Views[1]">MeJLOafFnUuGacD80SFk9AAA</XPD:REF>
+<XPD:REF name="Views[2]">A9ZhK+bVsU2KeDFZBcMx0gAA</XPD:REF>
+<XPD:REF name="Views[3]">UKE5U3LhP0mWATuoEcw6lwAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="m4XuCMyAT0irt+zgRMWiAwAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">d6hKziWQsk2kfab7PqTVNwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletImpl">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">sPYSdyzoTESw+p1NC9SuDgAA</XPD:REF>
+<XPD:REF name="Views[1]">UUXCDM1yhUGkaP6cnkhBrQAA</XPD:REF>
+<XPD:REF name="Views[2]">mcUGqRpk40+hq51ZA0yuLQAA</XPD:REF>
+<XPD:REF name="Views[3]">6BNuJMmk8E2neaY9eBlvRQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="U62/0aa9q0y1fGSxdUMA5wAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">d6hKziWQsk2kfab7PqTVNwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">uWHYPwOSKUKuC+BwVccytgAA</XPD:REF>
+<XPD:REF name="Views[1]">mHQuEpVijECIZztrS5tfNwAA</XPD:REF>
+<XPD:REF name="Views[2]">ZBOdQFXBp0OSjyu+6eNeuAAA</XPD:REF>
+<XPD:REF name="Views[3]">4pnX4TH5YE2rVqs+3KucXwAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[9]" type="UMLAssociation" guid="1jSsgJC+N0CYSm07ocYcWwAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">k38qTtDfkkyWHWHEX1TWzwAA</XPD:REF>
+<XPD:REF name="Views[1]">7UK7qWv4BkOFPuwgfm4RhwAA</XPD:REF>
+<XPD:REF name="Views[2]">YAHWAg3jzkOZOWwNQmmweAAA</XPD:REF>
+<XPD:REF name="Views[3]">8DbMKJ2Ruk+GjPDLmsUsXQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="y9emf8ABmkyAsoGKXPA8dAAA">
+<XPD:ATTR name="Multiplicity" type="string">0..1</XPD:ATTR>
+<XPD:REF name="Association">1jSsgJC+N0CYSm07ocYcWwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::RunAs">6xQQY3KERE+yJI7lpiHjLQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">bCiqA0aRVEiTEEWR/9em9AAA</XPD:REF>
+<XPD:REF name="Views[1]">ePnm7i7ThkSAmLkeR0+61QAA</XPD:REF>
+<XPD:REF name="Views[2]">8ZqRa5fy3kyMdVoI6BvFWwAA</XPD:REF>
+<XPD:REF name="Views[3]">o10wBKgNC0OiCL1dOo8AJgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="Q5gYqBFRpkKIeIbblBn87AAA">
+<XPD:REF name="Association">1jSsgJC+N0CYSm07ocYcWwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletImpl">AXJ88RUUGk2bFOlDFaxC3gAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">aubm0hCd2U+pXnx7HKW6bgAA</XPD:REF>
+<XPD:REF name="Views[1]">4lQh1Zt6u0muY9adYIFW0wAA</XPD:REF>
+<XPD:REF name="Views[2]">vfSK8rJ7P06ea5jrqy4+pQAA</XPD:REF>
+<XPD:REF name="Views[3]">jiqu4ahbFES/1LMONk0SswAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[10]" type="UMLAssociation" guid="zYYQaAEqUEG1MDlSm8vRVwAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">p27unUrNREyjx9zuE/Zx2AAA</XPD:REF>
+<XPD:REF name="Views[1]">rt7kFCt/BEmUSIdZyfMHwwAA</XPD:REF>
+<XPD:REF name="Views[2]">zWLd2gT3JU6aGDPoxyqMYAAA</XPD:REF>
+<XPD:REF name="Views[3]">q/sPhnVupkqjGK3sB2lFKQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="M6+7G7OAO0KzvKoi//n+AgAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">zYYQaAEqUEG1MDlSm8vRVwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::ResourceRef">ISBNiGDSvkqPVn7IbgZ/owAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">SPB6xtv9KU+IgRhCv6LVowAA</XPD:REF>
+<XPD:REF name="Views[1]">XKdLMXA0tUai0UJWDWkfoAAA</XPD:REF>
+<XPD:REF name="Views[2]">l7Mh4AaYw0CjjkvB4vlx2AAA</XPD:REF>
+<XPD:REF name="Views[3]">WGkMeDBV5ECcYdO3lJCa5QAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="voJb2m/ZcUqyXZz1EWj3ZwAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">zYYQaAEqUEG1MDlSm8vRVwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">fGQ4HXNzWEy+j1dtXb6UYQAA</XPD:REF>
+<XPD:REF name="Views[1]">rWLD4xzw3EeKknPVYlrsJgAA</XPD:REF>
+<XPD:REF name="Views[2]">m4shLfqiA0iFbAFGzDp6wQAA</XPD:REF>
+<XPD:REF name="Views[3]">27jXUvRy8UqjM20x6GeH9QAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[11]" type="UMLAssociation" guid="UuxcuYVo/E6vFBZuCVg68QAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">t/lA6w1ucEa9IFRRtO1WFwAA</XPD:REF>
+<XPD:REF name="Views[1]">ZXsO0nK6+EKfbDvT/N8U1QAA</XPD:REF>
+<XPD:REF name="Views[2]">Vr8VnGyhFE2GhzCfE75qBAAA</XPD:REF>
+<XPD:REF name="Views[3]">lpDB/mFH3kSLUjm2UPosXgAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="HGWg+VVUV0KyyqYGN5ZHcAAA">
+<XPD:ATTR name="Multiplicity" type="string">0..*</XPD:ATTR>
+<XPD:REF name="Association">UuxcuYVo/E6vFBZuCVg68QAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SecurityConstraint">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">sXCVtKysLEWW1ZBjkj1TlgAA</XPD:REF>
+<XPD:REF name="Views[1]">xBoV6sj3u0CTWkZCwGNH8wAA</XPD:REF>
+<XPD:REF name="Views[2]">1UAsDPEAD0KGwGKRkYWzgAAA</XPD:REF>
+<XPD:REF name="Views[3]">AWnTYgtZBky+vG9Go8hYXAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="weQ3affNukKTY3sk6BZriwAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">UuxcuYVo/E6vFBZuCVg68QAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SipServletApplicationImpl">N/79IWincU6clojpU/dPwAAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">1/0F2lEepUKPu7IW+Io3RgAA</XPD:REF>
+<XPD:REF name="Views[1]">UyL09LLdBU6HaiTgGiD3xQAA</XPD:REF>
+<XPD:REF name="Views[2]">E+hVyephkECNIKs49NRp2AAA</XPD:REF>
+<XPD:REF name="Views[3]">5vPObp7xWkmgIWKSYOrToAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[12]" type="UMLAssociation" guid="pfaLAcuY1E68raACjki5iQAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">5+EssOsIHECGGbXTVdEl0QAA</XPD:REF>
+<XPD:REF name="Views[1]">sPPfypZcfE6ZusofpJkHVgAA</XPD:REF>
+<XPD:REF name="Views[2]">aKWtffkZn0qS9bVk+XFQbwAA</XPD:REF>
+<XPD:REF name="Views[3]">030ak0F6REqvFx9KZP661gAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="vM9hIj977UO+9ramG8TvsQAA">
+<XPD:REF name="Association">pfaLAcuY1E68raACjki5iQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::UserDataConstraint">+DWposgD9UGs66Y6E4yxxgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">m+XCKlsZ5kyj9024GZu8PgAA</XPD:REF>
+<XPD:REF name="Views[1]">IgXuDYMXzUubYRkbAafPKAAA</XPD:REF>
+<XPD:REF name="Views[2]">oVD4Mqd1vUehZvtU2EXcsgAA</XPD:REF>
+<XPD:REF name="Views[3]">NxeY8HTOEE+xq0LcrAw42AAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="LHVLwD37dUuXwn9pZfFHwwAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">pfaLAcuY1E68raACjki5iQAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SecurityConstraint">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">HWXMlRRlA0+6P/1IwCGTRQAA</XPD:REF>
+<XPD:REF name="Views[1]">NFEnvHDqSUmBMCZyRgU9wgAA</XPD:REF>
+<XPD:REF name="Views[2]">mvUBHHzUPk+3MiFfhM8+YQAA</XPD:REF>
+<XPD:REF name="Views[3]">yoCyP4afA0+wugIdy0aYgwAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[13]" type="UMLAssociation" guid="xbfsHv8fWUOHbcbLzk30WAAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">I/wry3j6PUW4ynvZsnl8uwAA</XPD:REF>
+<XPD:REF name="Views[1]">Za4WBWPeqUWBx/SLPC3abAAA</XPD:REF>
+<XPD:REF name="Views[2]">To5ZWzghYkeyXPhf+iHm0AAA</XPD:REF>
+<XPD:REF name="Views[3]">EhdshDHg/0CFhLPdDjgrlQAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="C15Myh0aA0uGTvwzc8AakgAA">
+<XPD:REF name="Association">xbfsHv8fWUOHbcbLzk30WAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::AuthorizationConstraint">5qg+YmITyU2pEKcXNLmgjQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">GkoZdCd/ck2DE4wUcODcQwAA</XPD:REF>
+<XPD:REF name="Views[1]">ujGubojZTEOTqt7o3btRuQAA</XPD:REF>
+<XPD:REF name="Views[2]">Fpzn3+ZAUkKaPKwdWEXzywAA</XPD:REF>
+<XPD:REF name="Views[3]">r6AlzgRTeEqNM3nw36JdGwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="uoY8X6uHaUKV6EoOaDpCSQAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">xbfsHv8fWUOHbcbLzk30WAAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SecurityConstraint">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">sauRVbpAH0u1gMHseQQ37gAA</XPD:REF>
+<XPD:REF name="Views[1]">zrb2bULGz0eoGGA30Wc93QAA</XPD:REF>
+<XPD:REF name="Views[2]">nZHYRLRE/kasLBGxmgD0rAAA</XPD:REF>
+<XPD:REF name="Views[3]">gfXwZEa8jUy4rVPdO8gB8gAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[14]" type="UMLAssociation" guid="8fPa1E6620uOJz0cJ7QZuwAA">
+<XPD:REF name="Namespace">3vMpliadQUWq3DvnQl+3kQAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">Rh7Jq17ekU6lZ9D7pz7wYgAA</XPD:REF>
+<XPD:REF name="Views[1]">czFoNnnbzUShB1rLSQ5AxQAA</XPD:REF>
+<XPD:REF name="Views[2]">XTy2CGdlx022HOy+Cfi+ugAA</XPD:REF>
+<XPD:REF name="Views[3]">ncdcArTDX0S8sT6LVJS7WAAA</XPD:REF>
+<XPD:ATTR name="#Connections" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Connections[0]" type="UMLAssociationEnd" guid="QpZEiHFwiUiYshgG4SFl2AAA">
+<XPD:REF name="Association">8fPa1E6620uOJz0cJ7QZuwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::ResourceCollection">2fkpRflLrU+YhKCbSCE9EgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">E9Gu1GbQbkqYtSpSKBWTvgAA</XPD:REF>
+<XPD:REF name="Views[1]">qrarO+pTfkOBfW2onyowXAAA</XPD:REF>
+<XPD:REF name="Views[2]">2tP0/bvb70a/QaB3kfdVhwAA</XPD:REF>
+<XPD:REF name="Views[3]">5+ngDuE1hkejVNYeu/CLFgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Connections[1]" type="UMLAssociationEnd" guid="kb7zwTXVS0O7m7VxTx5nUAAA">
+<XPD:ATTR name="Aggregation" type="UMLAggregationKind">akComposite</XPD:ATTR>
+<XPD:REF name="Association">8fPa1E6620uOJz0cJ7QZuwAA</XPD:REF>
+<XPD:REF name="Participant" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::startup::loading::SecurityConstraint">eR155daBDEWZ89Zj4Mi38gAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">gWRxNhm7m0+USbCuKhLXvQAA</XPD:REF>
+<XPD:REF name="Views[1]">b4SiUumCqkqmQogsQF0QiAAA</XPD:REF>
+<XPD:REF name="Views[2]">JSjcNarBK0yrHuomjmRCxAAA</XPD:REF>
+<XPD:REF name="Views[3]">pp4Wpe7BoUadMWj1B8ZgUgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

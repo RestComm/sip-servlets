@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+<XPD:UNIT owner="jrEh7JqvQE6EpIieRALNigAA" index="1">Impl classes - startup package.unt</XPD:UNIT>
+<XPD:UNIT owner="jrEh7JqvQE6EpIieRALNigAA" index="2">Impl classes - core package.unt</XPD:UNIT>
+<XPD:UNIT owner="jrEh7JqvQE6EpIieRALNigAA" index="3">Impl classes - proxy package.unt</XPD:UNIT>
+<XPD:UNIT owner="jrEh7JqvQE6EpIieRALNigAA" index="4">Impl classes - router package.unt</XPD:UNIT>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="jrEh7JqvQE6EpIieRALNigAA">
+<XPD:ATTR name="Name" type="string">sip</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="kZ7e0mFrU0OXVlaCsz6o9gAA">
+<XPD:ATTR name="Name" type="string">SipFactories</XPD:ATTR>
+<XPD:REF name="Namespace">jrEh7JqvQE6EpIieRALNigAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">Bk5GHD4UeUCz44GhALgMswAA</XPD:REF>
+<XPD:REF name="Views[1]">6IFsCnwL00mr8K9ef34ObQAA</XPD:REF>
+<XPD:REF name="Views[2]">O6tBopASNUikycqey11saQAA</XPD:REF>
+<XPD:REF name="Views[3]">lqM8JXW9OkWIRld1HP/zegAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="6kyrH1x89UuBUpLrt1MxEgAA">
+<XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+<XPD:ATTR name="#Parameters" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Parameters[0]" type="UMLParameter" guid="p9bVM5rMMka17fLk6kADfgAA">
+<XPD:ATTR name="Name" type="string">pathName</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">String</XPD:ATTR>
+<XPD:REF name="BehavioralFeature">6kyrH1x89UuBUpLrt1MxEgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">Mg1mEyapqkWf0EMpmj3lOgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Attributes" type="integer">6</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="zDO7tWFm3kSc89upWje2vgAA">
+<XPD:ATTR name="Name" type="string">logger</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">Log</XPD:ATTR>
+<XPD:ATTR name="InitialValue" type="string">LogFactory.getLog(SipFactories.class.getCanonicalName())</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[1]" type="UMLAttribute" guid="67VOWFmMf0aEO0PC5jbaoQAA">
+<XPD:ATTR name="Name" type="string">initialized</XPD:ATTR>
+<XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">boolean</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[2]" type="UMLAttribute" guid="Wv1rTxn8D06vJe3VyhgPoAAA">
+<XPD:ATTR name="Name" type="string">addressFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">AddressFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[3]" type="UMLAttribute" guid="6vwf5PB/NUuxEBIP1pGcRgAA">
+<XPD:ATTR name="Name" type="string">headerFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">HeaderFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[4]" type="UMLAttribute" guid="o/cQ+eYEIk+Va4Bp95ngTgAA">
+<XPD:ATTR name="Name" type="string">sipFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Attributes[5]" type="UMLAttribute" guid="n7FSYRI/gUCzLuxXrDCDEQAA">
+<XPD:ATTR name="Name" type="string">messageFactory</XPD:ATTR>
+<XPD:ATTR name="OwnerScope" type="UMLScopeKind">skClassifier</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">MessageFactory</XPD:ATTR>
+<XPD:REF name="Owner">kZ7e0mFrU0OXVlaCsz6o9gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">JLK7YswhXE2U48KcD3ZIUgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

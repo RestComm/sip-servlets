@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="LidzphR83ECCYvBEjlEKUgAA">
+<XPD:ATTR name="Name" type="string">timers</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">3</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="U9ch9wRskUeUZRa9VYW1HAAA">
+<XPD:ATTR name="Name" type="string">ExecutorServiceWrapper</XPD:ATTR>
+<XPD:REF name="Namespace">LidzphR83ECCYvBEjlEKUgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">A/AF13hAjUOE8eLwsHRqAgAA</XPD:REF>
+<XPD:REF name="Views[1]">7xnf6X1/m0GliRtOhhj7pQAA</XPD:REF>
+<XPD:REF name="Views[2]">LWNSb2WNm0KCa0IUK1pEJwAA</XPD:REF>
+<XPD:REF name="Views[3]">/ld7a0c9uU+d3mCiaeB+UAAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 9 - TimerService::Timer sequences::">MbGigrlQb0u+R417OfZ9pQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="dZzAw9AhsU2doVHUneWtIQAA">
+<XPD:ATTR name="Name" type="string">TimerServiceImpl</XPD:ATTR>
+<XPD:REF name="Namespace">LidzphR83ECCYvBEjlEKUgAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 9 - TimerService::Timer sequences::">Hf8r04TyKEWRHhC7HTrf5gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="uJEhjRwntEKwtVtJ+jVU+wAA">
+<XPD:ATTR name="Name" type="string">ServletTimerImpl</XPD:ATTR>
+<XPD:REF name="Namespace">LidzphR83ECCYvBEjlEKUgAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::chapter 9 - TimerService::Timer sequences::">JuXeSJ5FEU2onAPHEqB2dQAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

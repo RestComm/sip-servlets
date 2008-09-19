@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+<XPD:UNIT owner="KGBmSnbTlUadIk2096olrgAA" index="2">Impl classes - loading package.unt</XPD:UNIT>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="KGBmSnbTlUadIk2096olrgAA">
+<XPD:ATTR name="Name" type="string">startup</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">5</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="RjmF8NG/DkWbuKl98DZJ9wAA">
+<XPD:ATTR name="Name" type="string">SipContextConfig</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">8</XPD:ATTR>
+<XPD:REF name="Views[0]">bo5YdaCtlUa7ESN4m5T/sQAA</XPD:REF>
+<XPD:REF name="Views[1]">UF8A7U1KjECq5h+YxVnYugAA</XPD:REF>
+<XPD:REF name="Views[2]">elH0n+4GyUWPTE2nHWgNvwAA</XPD:REF>
+<XPD:REF name="Views[3]">wpcDfPIN1UOCEhrsYQRwDAAA</XPD:REF>
+<XPD:REF name="Views[4]">vFzX0hq2tU2er4xUu1URvAAA</XPD:REF>
+<XPD:REF name="Views[5]">IHufkPQc5kihqbdnuL6GDgAA</XPD:REF>
+<XPD:REF name="Views[6]">bh34onxY6U6Smnq70z+vJwAA</XPD:REF>
+<XPD:REF name="Views[7]">DO/qFB7DQESvQUq7Bg6vuQAA</XPD:REF>
+<XPD:ATTR name="#Generalizations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">Cvp+uQolqUeqqVGA79TMSwAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="uANpCLsBkUWkN0NhlasntwAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">RjmF8NG/DkWbuKl98DZJ9wAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">io39OCUxV0KCpXlRNpn3DwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">VpaysvTnmEiVwgeVpuSLygAA</XPD:REF>
+<XPD:REF name="Instances[1]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">xFvbhQF1HEew66U0xkpFVAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[1]" type="UMLClass" guid="Iyc1Y/jV3ki5roQcEvypPAAA">
+<XPD:ATTR name="Name" type="string">SipStandardContext</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">8</XPD:ATTR>
+<XPD:REF name="Views[0]">OaaoZh/kU0SLdUePhc/1xQAA</XPD:REF>
+<XPD:REF name="Views[1]">ng0KHdweFE+AMe2n5AiE5AAA</XPD:REF>
+<XPD:REF name="Views[2]">SYaI97Ck2ESUVBfHPUoO9gAA</XPD:REF>
+<XPD:REF name="Views[3]">CCtSY4Kp9k2rnanrE9j0fQAA</XPD:REF>
+<XPD:REF name="Views[4]">qhGUb2LnPkil+t/QHZBbBgAA</XPD:REF>
+<XPD:REF name="Views[5]">9h1pD4Fl3EakU/TMh4j8vgAA</XPD:REF>
+<XPD:REF name="Views[6]">AQtftzi/1EWkOVZSr1wUZgAA</XPD:REF>
+<XPD:REF name="Views[7]">NRL4wCdcf0uuxr/5bC+ZPgAA</XPD:REF>
+<XPD:ATTR name="#Generalizations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">p7Jpu44ja0eN+HtRKeZAAgAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">4</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="24pEMeBFhk6NTkyExrNOdAAA">
+<XPD:ATTR name="Name" type="string">getParent</XPD:ATTR>
+<XPD:REF name="Owner">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="YoqkpXwjBU2ET79e5P0eQwAA">
+<XPD:ATTR name="Name" type="string">startSipListeners</XPD:ATTR>
+<XPD:REF name="Owner">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">LleYP0ofDUmuOvc/Q+aDdwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[2]" type="UMLOperation" guid="nckQn+S3A0KwpZMayOtbOQAA">
+<XPD:ATTR name="Name" type="string">loadOnStartup</XPD:ATTR>
+<XPD:REF name="Owner">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">dxpDUPayZEG1jOnBvHJzpQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[3]" type="UMLOperation" guid="pg5kfe74NEKwgL9vhRsZXgAA">
+<XPD:ATTR name="Name" type="string">getServletContext</XPD:ATTR>
+<XPD:REF name="Owner">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">4jag81mMcESJupqmcgPDqQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Attributes" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Attributes[0]" type="UMLAttribute" guid="yNQDSIo1/0G3N4XpvxcTAwAA">
+<XPD:ATTR name="Name" type="string">sipServletApplication : SipServletApplication</XPD:ATTR>
+<XPD:REF name="Owner">Iyc1Y/jV3ki5roQcEvypPAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">2</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">MTQmK5Atk0OPL7CJHFJqYwAA</XPD:REF>
+<XPD:REF name="Instances[1]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">IPCrfn3iVUe8xLiy34yBrgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[2]" type="UMLClass" guid="KO3hjwm8bECLUP35PQLBHAAA">
+<XPD:ATTR name="Name" type="string">SipProtocolHandler</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">8</XPD:ATTR>
+<XPD:REF name="Views[0]">PhGQCFRHIkC5lf7Cl7IXwAAA</XPD:REF>
+<XPD:REF name="Views[1]">OlRKrGkrhUiDLGWu00QcpQAA</XPD:REF>
+<XPD:REF name="Views[2]">bFceMY8L3UClyZnICUfyxQAA</XPD:REF>
+<XPD:REF name="Views[3]">rYd7VSlg+EWMmxg6a82ptwAA</XPD:REF>
+<XPD:REF name="Views[4]">iu7YeMrSIkK5UJnHERW+VAAA</XPD:REF>
+<XPD:REF name="Views[5]">DUtxPbyM3E2LJBbAIwgtTgAA</XPD:REF>
+<XPD:REF name="Views[6]">BuGJ6QFplU2mgns5TBg6MAAA</XPD:REF>
+<XPD:REF name="Views[7]">gXXhtBqfikS/R45h0BJTqwAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="a6Ia5t7KAke3TcjVHde+UwAA">
+<XPD:ATTR name="Name" type="string">init</XPD:ATTR>
+<XPD:REF name="Owner">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="r0ZGfuv4FEmerWslyc3FFgAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">KO3hjwm8bECLUP35PQLBHAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">spbKzSeFO0CZHeG8hFb2CAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">me8cLy2ygU+ENnXegrx5CwAA</XPD:REF>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">C/FbtI6N3EK7CpXlrp4WYgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[3]" type="UMLClass" guid="X2ObIh0Bxk64zbvAIin5CAAA">
+<XPD:ATTR name="Name" type="string">SipStandardService</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
+<XPD:REF name="Views[0]">nNXfyTTOb0efEaamtqJsiQAA</XPD:REF>
+<XPD:REF name="Views[1]">5vg+kIRruEm5dcD8eEv6xQAA</XPD:REF>
+<XPD:REF name="Views[2]">+fihJJAjX0ummEcEEr0WmAAA</XPD:REF>
+<XPD:REF name="Views[3]">aTVtJjbznE+I/nz8ThcZiQAA</XPD:REF>
+<XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">EeEWNR/jtEmHj2Wve/itZAAA</XPD:REF>
+<XPD:ATTR name="#SupplierDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="SupplierDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">ousM27dOcUupSTMG4SdwbAAA</XPD:REF>
+<XPD:ATTR name="#Generalizations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Generalizations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">z0hHTu9QZEmW2P64OuaHUQAA</XPD:REF>
+<XPD:ATTR name="#Associations" type="integer">1</XPD:ATTR>
+<XPD:REF name="Associations[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::::">jQNt5phz30K3ZmfXn/gHHAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedElements[4]" type="UMLInterface" guid="uTveSh8AB0mjPeHSAahOEwAA">
+<XPD:ATTR name="Name" type="string">SipService</XPD:ATTR>
+<XPD:REF name="Namespace">KGBmSnbTlUadIk2096olrgAA</XPD:REF>
+<XPD:ATTR name="#Views" type="integer">3</XPD:ATTR>
+<XPD:REF name="Views[0]">RAISClKNfEmLIV8xARKfQwAA</XPD:REF>
+<XPD:REF name="Views[1]">j2860TJyEUSTlKCnPqi6bgAA</XPD:REF>
+<XPD:REF name="Views[2]">uZGHVv1sVk2REUxriCX31gAA</XPD:REF>
+<XPD:ATTR name="#ClientDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="ClientDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">ousM27dOcUupSTMG4SdwbAAA</XPD:REF>
+<XPD:ATTR name="#SupplierDependencies" type="integer">1</XPD:ATTR>
+<XPD:REF name="SupplierDependencies[0]" pathname="::Mobicents Implementation Classes::specfic diagrams::Sip Servlets Loading::">EeEWNR/jtEmHj2Wve/itZAAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">2</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="x9LyJjMZ3EiH+bBjmyTUjQAA">
+<XPD:ATTR name="Name" type="string">setSipApplicationDispatccher</XPD:ATTR>
+<XPD:REF name="Owner">uTveSh8AB0mjPeHSAahOEwAA</XPD:REF>
+<XPD:ATTR name="#Parameters" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="Parameters[0]" type="UMLParameter" guid="Ae63v96DPky9LZzJhTs7bgAA">
+<XPD:ATTR name="Name" type="string">sipApplicationDispatcher</XPD:ATTR>
+<XPD:ATTR name="TypeExpression" type="string">SipApplicationDispatcher</XPD:ATTR>
+<XPD:REF name="BehavioralFeature">x9LyJjMZ3EiH+bBjmyTUjQAA</XPD:REF>
+<XPD:REF name="Type_" pathname="::Mobicents Implementation Classes::org::mobicents::servlet::sip::core::SipApplicationDispatcher">PRXTJ8ZdwkSyT4nCj9qIgAAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="aMRGJ1isSkaF9fd9eETBzAAA">
+<XPD:ATTR name="Name" type="string">getSipApplicationDispatcher</XPD:ATTR>
+<XPD:REF name="Owner">uTveSh8AB0mjPeHSAahOEwAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">g8y/N6DjfEipql3a0bIExAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">9jsbtXDlNEWl02WaOEywegAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>

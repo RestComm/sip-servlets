@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XPD:UNIT xmlns:XPD="http://www.staruml.com" version="1">
+<XPD:HEADER>
+<XPD:SUBUNITS>
+</XPD:SUBUNITS>
+</XPD:HEADER>
+<XPD:BODY>
+<XPD:OBJ name="DocumentElement" type="UMLPackage" guid="go3VU3ITyEW8FGNCpKMN+gAA">
+<XPD:ATTR name="Name" type="string">router</XPD:ATTR>
+<XPD:ATTR name="#OwnedElements" type="integer">1</XPD:ATTR>
+<XPD:OBJ name="OwnedElements[0]" type="UMLClass" guid="+yBcVu/UbEeSFidInewxtAAA">
+<XPD:ATTR name="Name" type="string">DefaultApplicationRouter</XPD:ATTR>
+<XPD:REF name="Namespace">go3VU3ITyEW8FGNCpKMN+gAA</XPD:REF>
+<XPD:ATTR name="#Operations" type="integer">4</XPD:ATTR>
+<XPD:OBJ name="Operations[0]" type="UMLOperation" guid="GER/DaBCaU6PndtYfUpgywAA">
+<XPD:ATTR name="Name" type="string">init</XPD:ATTR>
+<XPD:REF name="Owner">+yBcVu/UbEeSFidInewxtAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">P/tl5/IABkOdRy+cIPTyaQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[1]" type="UMLOperation" guid="RJeT0c+VfEqoX2yDwHAOXQAA">
+<XPD:ATTR name="Name" type="string">start</XPD:ATTR>
+<XPD:REF name="Owner">+yBcVu/UbEeSFidInewxtAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Tomcat &amp; Sip Servlets Loading::::">QYrMtFm/B0mZw2LT1QnaIQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[2]" type="UMLOperation" guid="x8NRhMB0jUu5F8L8Ltp5gwAA">
+<XPD:ATTR name="Name" type="string">applicationDeployed</XPD:ATTR>
+<XPD:REF name="Owner">+yBcVu/UbEeSFidInewxtAAA</XPD:REF>
+<XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
+<XPD:REF name="CallActions[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::Context Initialization::::">46+r07pRnUadpHNoFuzFdwAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[3]" type="UMLOperation" guid="fdwmLyjSSUSUlPWjMcY4cwAA">
+<XPD:ATTR name="Name" type="string">new</XPD:ATTR>
+<XPD:REF name="Owner">+yBcVu/UbEeSFidInewxtAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:ATTR name="#Instances" type="integer">1</XPD:ATTR>
+<XPD:REF name="Instances[0]" pathname="::Sequence actions::Servlets Loading::Sip Servlets Loading::">ZRX4qQB3d0akqusps72WtgAA</XPD:REF>
+</XPD:OBJ>
+</XPD:OBJ>
+</XPD:BODY>
+</XPD:UNIT>
