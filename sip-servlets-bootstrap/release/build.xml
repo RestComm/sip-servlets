@@ -196,7 +196,7 @@
 	
 	<target name="set-src-excludes">
         <defaultexcludes add="**/target/**"/>
-        <defaultexcludes add="**/docs/**"/>
+        <defaultexcludes add="**/design-docs/**"/>
         <defaultexcludes add="**/legacy/**"/>
         <defaultexcludes add="**/release/**"/>
         <defaultexcludes add="**/logs/**"/>
