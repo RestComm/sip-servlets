@@ -8,8 +8,7 @@
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.6-SNAPSHOT/sip-servlets-spec-1.1.6-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.BETA2/mobicents-media-server-constants-1.0.0.BETA2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.BETA2/mobicents-media-server-msc-api-1.0.0.BETA2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.0.BETA2/mobicents-media-server-msc-api-local-impl-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.BETA4/mobicents-media-server-constants-1.0.0.BETA4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.BETA4/mobicents-media-server-msc-api-1.0.0.BETA4.jar"/>
 	<classpathentry kind="output" path="src/main/sipapp/WEB-INF/classes"/>
 </classpath>

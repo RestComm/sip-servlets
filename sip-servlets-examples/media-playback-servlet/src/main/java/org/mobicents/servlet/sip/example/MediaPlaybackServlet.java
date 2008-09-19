@@ -31,9 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
+import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.impl.MsPeerFactory;
 
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
@@ -46,6 +46,7 @@ import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
 public class MediaPlaybackServlet extends SipServlet {
 	private static Log logger = LogFactory.getLog(MediaPlaybackServlet.class);
 	
+	public static final String IVR_JNDI_NAME = "media/endpoint/IVR";
 	
 	public MediaPlaybackServlet() {
 	}
@@ -72,10 +73,10 @@ public class MediaPlaybackServlet extends SipServlet {
 			buildAudio("Hey " + request.getFrom().getDisplayName() +
 			". This is Mobicents Sip Servlets.", "speech.wav");
 			Thread.sleep(300);
-			MsPeer peer = MsPeerFactory.getPeer();
+			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
-			MsConnection connection = session.createNetworkConnection("media/trunk/IVR/1");
+			MsConnection connection = session.createNetworkConnection(IVR_JNDI_NAME);
 			MediaConnectionListener listener = new MediaConnectionListener();
 			listener.setInviteRequest(request);
 			connection.addConnectionListener(listener);
