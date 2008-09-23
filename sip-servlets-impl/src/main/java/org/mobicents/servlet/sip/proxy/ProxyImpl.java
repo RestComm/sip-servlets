@@ -124,7 +124,7 @@ public class ProxyImpl implements Proxy {
 		for(URI target: targets)
 		{
 			if(target == null) throw new NullPointerException("URI can't be null");
-			if(!JainSipUtils.checkScheme(target.getScheme())) {
+			if(!JainSipUtils.checkScheme(target.toString())) {
 				throw new IllegalArgumentException("Scheme " + target.getScheme() + " is not supported");
 			}
 			ProxyBranchImpl branch = new ProxyBranchImpl(target, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
@@ -236,7 +236,7 @@ public class ProxyImpl implements Proxy {
 		for (URI uri : uris)
 		{
 			if(uri == null) throw new NullPointerException("URI can't be null");
-			if(!JainSipUtils.checkScheme(uri.getScheme())) {
+			if(!JainSipUtils.checkScheme(uri.toString())) {
 				throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 			}
 			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
