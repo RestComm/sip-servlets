@@ -22,6 +22,7 @@ import java.io.IOException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.sound.sampled.AudioFileFormat;
@@ -72,7 +73,6 @@ public class MediaPlaybackServlet extends SipServlet {
 		try {
 			buildAudio("Hey " + request.getFrom().getDisplayName() +
 			". This is Mobicents Sip Servlets.", "speech.wav");
-			Thread.sleep(300);
 			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
