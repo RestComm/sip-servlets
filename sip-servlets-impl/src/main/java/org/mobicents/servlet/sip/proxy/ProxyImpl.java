@@ -252,7 +252,9 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void proxyTo(URI uri) {
 		if(uri == null) throw new NullPointerException("URI can't be null");
-		
+		if(!JainSipUtils.checkScheme(uri.toString())) {
+			throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
+		}
 		ProxyBranchImpl branch = new ProxyBranchImpl(uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
 		branch.setRecordRoute(recordRoutingEnabled);
 		branch.setRecurse(recurse);
