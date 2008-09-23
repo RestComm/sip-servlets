@@ -237,7 +237,6 @@ public class ShoppingSipServlet
 				stringBuffer.append(". Press 1 to approve and 2 to reject.");				
 				
 				TTSUtils.buildAudio(stringBuffer.toString(), "adminspeech.wav");
-				Thread.sleep(300);
 			}			
 			Address toAddress = sipFactory.createAddress(customerPhone);									
 			logger.info("preparing to call : "+ toAddress);
