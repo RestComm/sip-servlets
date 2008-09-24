@@ -32,8 +32,12 @@ import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 
 public class SipListenersHolder {
@@ -51,12 +55,15 @@ public class SipListenersHolder {
 	private List<SipErrorListener> sipErrorListeners;
 	private List<ServletContextListener> servletContextListeners;
 	// There may be at most one TimerListener defined.
-	private TimerListener timerListener;	
+	private TimerListener timerListener;
+	//the sip context the holder is attached to
+	private SipContext sipContext;	
 
 	/**
 	 * Default Constructor
 	 */
-	public SipListenersHolder() {
+	public SipListenersHolder(SipContext sipContext) {
+		this.sipContext = sipContext;
 		this.sipApplicationSessionAttributeListeners = new ArrayList<SipApplicationSessionAttributeListener>();
 		this.sipApplicationSessionBindingListeners = new ArrayList<SipApplicationSessionBindingListener>();
 		this.sipApplicationSessionListeners = new ArrayList<SipApplicationSessionListener>();
@@ -81,9 +88,21 @@ public class SipListenersHolder {
 		// Instantiate all the listeners
 		for (String className : listeners) {			
 			try {
-				EventListener listener = (EventListener) classLoader.loadClass(
-						className).newInstance();
-				//TODO Annotation processing                
+				Class listenerClass = Class.forName(className, false, classLoader);
+				EventListener listener = (EventListener) listenerClass.newInstance();
+				((SipStandardContext)sipContext).getAnnotationProcessor().processAnnotations(listener);
+				SipServletImpl sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(className);
+				if(sipServletImpl != null) {
+					listener = (EventListener) sipServletImpl.allocate();
+				} else {
+					SipServlet servlet = (SipServlet) listenerClass.getAnnotation(SipServlet.class);
+					if (servlet != null) {						
+						sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(servlet.name());
+						if(sipServletImpl != null) {
+							listener = (EventListener) sipServletImpl.allocate();
+						}
+					}					
+				}				             
 				addListenerToBunch(listener);
 
 			} catch (Exception e) {
@@ -281,6 +300,8 @@ public class SipListenersHolder {
 		// TODO: This will be different since we propably will need to remove
 		// also
 		// all other listeners from Session for instance
+		
+		//TODO need to deallocate listeners that are servlets...
 		this.sipApplicationSessionAttributeListeners.clear();
 		this.sipApplicationSessionBindingListeners.clear();
 		this.sipApplicationSessionActivationListeners.clear();

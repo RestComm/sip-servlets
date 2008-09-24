@@ -125,7 +125,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super();
 		sipApplicationSessionTimeout = DEFAULT_LIFETIME;
 		pipeline.setBasic(new SipStandardContextValve());
-		listeners = new SipListenersHolder();
+		listeners = new SipListenersHolder(this);
 		childrenMap = new HashMap<String, Container>();
 	}
 
