@@ -5,6 +5,7 @@ Download maven 2 from http://maven.apache.org/
  
 Checkout Mobicents Sip Servlets from http://mobicents.googlecode.com/svn/trunk/ with this command svn checkout http://mobicents.googlecode.com/svn/trunk/ mobicents-sip-servlets (this location will be referred as MSS_HOME)
 Follow the instructions from http://www.mobicents.org/installation-jboss.html to make the JBoss AS a converged sip container.
+Copy the server.xml located in this directory to $JBOSS_HOME/server/default/deploy/jboss-web.deployer/server.xml
 
 Run the following command to remove our application router jar from the JBoss AS with the following command rm $JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-0.6-SNAPSHOT.jar
 Copy the TCK app router jar to JBoss AS with the following command cp $TCK_DIRECTORY/dist/tck-approuter.jar $JBOSS_HOME/server/default/deploy/jboss-web.deployer/  
