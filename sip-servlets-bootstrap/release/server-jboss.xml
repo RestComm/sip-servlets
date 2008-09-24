@@ -94,6 +94,7 @@
            autoDeploy="false" deployOnStartup="false" deployXML="false"
            hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig"
            configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig"
+           xmlNamespaceAware="true"
            >
            <!-- 
                 configClass="org.jboss.web.tomcat.security.config.JBossContextConfig"
