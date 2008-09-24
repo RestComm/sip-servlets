@@ -12,6 +12,9 @@ Copy the TCK app router jar to JBoss AS with the following command cp $TCK_DIREC
 Copy the files from this directory (excludeList.properties and default.properties) to the $TCK_HOME/tck/conf directory
 Change the $TCK_HOME/tck/conf/signature.properties to point to your local version of the sip servlets specification jar (namely $MSS_HOME/sip-servlets-spec/target/sip-servlets-spec-1.1.6-SNAPSHOT.jar)
 
+In the TCK, Change the web.xml of the apitestapp so that the url-pattern tag is equals to /*, rebuild it to have a new apitestapp.sar and copy it to $TCK_HOME/tck/dist
+In the TCK, Rebuild the uas app to have a clean uas.sar (otherwise the ContextTest fails, it seems the sar shipped with the TCK is an old version of the servlet) and copy it to $TCK_HOME/tck/dist
+
 Change all the files present in $TCK_HOME/tck/dist that end with the .sar extension to end with .war extension instead (or .sar2) and copy them to $JBOSS_HOME/server/default/deploy/
 Start JBoss AS from $JBOSS_HOME/bin with the following command sh run.sh. Wait for it to start completely
 
