@@ -239,8 +239,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.info("Using the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property to load the application router provider");
 			}
 			try {
-				sipApplicationRouter = (SipApplicationRouter)
-					Class.forName(sipApplicationRouterProviderClassName).newInstance();
+				sipApplicationRouter = ((SipApplicationRouterProvider)
+					Class.forName(sipApplicationRouterProviderClassName).newInstance()).getSipApplicationRouter();
 			} catch (InstantiationException e) {
 				throw new LifecycleException("Impossible to load the Sip Application Router",e);
 			} catch (IllegalAccessException e) {
