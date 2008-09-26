@@ -437,6 +437,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		((SipManager)manager).dumpSipSessions();
 		((SipManager)manager).dumpSipApplicationSessions();
+		listeners.deallocateServletsActingAsListeners();
 		super.stop();
 		// this should happen after so that applications can still do some processing
 		// in destroy methods to notify that context is getting destroyed and app removed

@@ -300,57 +300,60 @@ public class SipListenersHolder {
 		return timerListener;
 	}
 
+	public void deallocateServletsActingAsListeners () {
+		//need to deallocate listeners that are servlets...
+		for(SipApplicationSessionAttributeListener sipApplicationSessionAttributeListener : sipApplicationSessionAttributeListeners) {
+			checkDeallocateServlet(sipApplicationSessionAttributeListener);
+		}
+		for(SipApplicationSessionBindingListener sipApplicationSessionBindingListener : sipApplicationSessionBindingListeners) {
+			checkDeallocateServlet(sipApplicationSessionBindingListener);
+		}
+		for(SipApplicationSessionActivationListener sipApplicationSessionActivationListener : sipApplicationSessionActivationListeners) {
+			checkDeallocateServlet(sipApplicationSessionActivationListener);
+		}
+		for(SipApplicationSessionListener sipApplicationSessionListener : sipApplicationSessionListeners) {
+			checkDeallocateServlet(sipApplicationSessionListener);
+		}
+		for(SipSessionActivationListener sipSessionActivationListener : sipSessionActivationListeners) {
+			checkDeallocateServlet(sipSessionActivationListener);
+		}
+		for(SipSessionAttributeListener sipSessionAttributeListener : sipSessionAttributeListeners) {
+			checkDeallocateServlet(sipSessionAttributeListener);
+		}
+		for(SipSessionBindingListener sipSessionBindingListener : sipSessionBindingListeners) {
+			checkDeallocateServlet(sipSessionBindingListener);
+		}
+		for(SipSessionListener sipSessionListener : sipSessionListeners) {
+			checkDeallocateServlet(sipSessionListener);
+		}
+		for(SipServletListener sipServletListener : sipServletsListeners) {
+			checkDeallocateServlet(sipServletListener);
+		}
+		for(SipErrorListener sipErrorListener : sipErrorListeners) {
+			checkDeallocateServlet(sipErrorListener);
+		}
+		for(ServletContextListener servletContextListener : servletContextListeners) {
+			checkDeallocateServlet(servletContextListener);
+		}
+		checkDeallocateServlet(timerListener);
+	}
+	
 	/**
 	 * Empty vectors to allow garbage collection
 	 */
 	public void clean() {
 		
-		//need to deallocate listeners that are servlets...
-		for(SipApplicationSessionAttributeListener sipApplicationSessionAttributeListener : sipApplicationSessionAttributeListeners) {
-			checkDeallocateServlet(sipApplicationSessionAttributeListener);
-		}
 		this.sipApplicationSessionAttributeListeners.clear();
-		for(SipApplicationSessionBindingListener sipApplicationSessionBindingListener : sipApplicationSessionBindingListeners) {
-			checkDeallocateServlet(sipApplicationSessionBindingListener);
-		}
 		this.sipApplicationSessionBindingListeners.clear();
-		for(SipApplicationSessionActivationListener sipApplicationSessionActivationListener : sipApplicationSessionActivationListeners) {
-			checkDeallocateServlet(sipApplicationSessionActivationListener);
-		}
 		this.sipApplicationSessionActivationListeners.clear();
-		for(SipApplicationSessionListener sipApplicationSessionListener : sipApplicationSessionListeners) {
-			checkDeallocateServlet(sipApplicationSessionListener);
-		}
 		this.sipApplicationSessionListeners.clear();
-		for(SipSessionActivationListener sipSessionActivationListener : sipSessionActivationListeners) {
-			checkDeallocateServlet(sipSessionActivationListener);
-		}
 		this.sipSessionActivationListeners.clear();
-		for(SipSessionAttributeListener sipSessionAttributeListener : sipSessionAttributeListeners) {
-			checkDeallocateServlet(sipSessionAttributeListener);
-		}
 		this.sipSessionAttributeListeners.clear();
-		for(SipSessionBindingListener sipSessionBindingListener : sipSessionBindingListeners) {
-			checkDeallocateServlet(sipSessionBindingListener);
-		}
 		this.sipSessionBindingListeners.clear();
-		for(SipSessionListener sipSessionListener : sipSessionListeners) {
-			checkDeallocateServlet(sipSessionListener);
-		}
 		this.sipSessionListeners.clear();
-		for(SipServletListener sipServletListener : sipServletsListeners) {
-			checkDeallocateServlet(sipServletListener);
-		}
 		this.sipServletsListeners.clear();
-		for(SipErrorListener sipErrorListener : sipErrorListeners) {
-			checkDeallocateServlet(sipErrorListener);
-		}
 		this.sipErrorListeners.clear();
-		for(ServletContextListener servletContextListener : servletContextListeners) {
-			checkDeallocateServlet(servletContextListener);
-		}
 		this.servletContextListeners.clear();
-		checkDeallocateServlet(timerListener);
 		this.timerListener = null;
 	}
 
