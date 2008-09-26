@@ -18,9 +18,12 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
@@ -34,6 +37,7 @@ import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.annotation.SipServlet;
 
+import org.apache.catalina.ContainerServlet;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -54,6 +58,7 @@ public class SipListenersHolder {
 	private List<SipServletListener> sipServletsListeners;
 	private List<SipErrorListener> sipErrorListeners;
 	private List<ServletContextListener> servletContextListeners;
+	private Map<EventListener, SipServletImpl> listenerServlets;
 	// There may be at most one TimerListener defined.
 	private TimerListener timerListener;
 	//the sip context the holder is attached to
@@ -75,6 +80,7 @@ public class SipListenersHolder {
 		this.sipServletsListeners = new ArrayList<SipServletListener>();
 		this.sipErrorListeners = new ArrayList<SipErrorListener>();
 		this.servletContextListeners = new ArrayList<ServletContextListener>();		
+		listenerServlets = new HashMap<EventListener, SipServletImpl>();
 	}
 	
 	/**
@@ -94,17 +100,18 @@ public class SipListenersHolder {
 				SipServletImpl sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(className);
 				if(sipServletImpl != null) {
 					listener = (EventListener) sipServletImpl.allocate();
+					listenerServlets.put(listener, sipServletImpl);
 				} else {
 					SipServlet servlet = (SipServlet) listenerClass.getAnnotation(SipServlet.class);
 					if (servlet != null) {						
 						sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(servlet.name());
 						if(sipServletImpl != null) {
 							listener = (EventListener) sipServletImpl.allocate();
+							listenerServlets.put(listener, sipServletImpl);
 						}
 					}					
 				}				             
-				addListenerToBunch(listener);
-
+				addListenerToBunch(listener);				
 			} catch (Exception e) {
 				logger.fatal("Cannot instantiate listener class " + className,
 						e);
@@ -297,23 +304,71 @@ public class SipListenersHolder {
 	 * Empty vectors to allow garbage collection
 	 */
 	public void clean() {
-		// TODO: This will be different since we propably will need to remove
-		// also
-		// all other listeners from Session for instance
 		
-		//TODO need to deallocate listeners that are servlets...
+		//need to deallocate listeners that are servlets...
+		for(SipApplicationSessionAttributeListener sipApplicationSessionAttributeListener : sipApplicationSessionAttributeListeners) {
+			checkDeallocateServlet(sipApplicationSessionAttributeListener);
+		}
 		this.sipApplicationSessionAttributeListeners.clear();
+		for(SipApplicationSessionBindingListener sipApplicationSessionBindingListener : sipApplicationSessionBindingListeners) {
+			checkDeallocateServlet(sipApplicationSessionBindingListener);
+		}
 		this.sipApplicationSessionBindingListeners.clear();
+		for(SipApplicationSessionActivationListener sipApplicationSessionActivationListener : sipApplicationSessionActivationListeners) {
+			checkDeallocateServlet(sipApplicationSessionActivationListener);
+		}
 		this.sipApplicationSessionActivationListeners.clear();
+		for(SipApplicationSessionListener sipApplicationSessionListener : sipApplicationSessionListeners) {
+			checkDeallocateServlet(sipApplicationSessionListener);
+		}
 		this.sipApplicationSessionListeners.clear();
+		for(SipSessionActivationListener sipSessionActivationListener : sipSessionActivationListeners) {
+			checkDeallocateServlet(sipSessionActivationListener);
+		}
 		this.sipSessionActivationListeners.clear();
+		for(SipSessionAttributeListener sipSessionAttributeListener : sipSessionAttributeListeners) {
+			checkDeallocateServlet(sipSessionAttributeListener);
+		}
 		this.sipSessionAttributeListeners.clear();
+		for(SipSessionBindingListener sipSessionBindingListener : sipSessionBindingListeners) {
+			checkDeallocateServlet(sipSessionBindingListener);
+		}
 		this.sipSessionBindingListeners.clear();
+		for(SipSessionListener sipSessionListener : sipSessionListeners) {
+			checkDeallocateServlet(sipSessionListener);
+		}
 		this.sipSessionListeners.clear();
+		for(SipServletListener sipServletListener : sipServletsListeners) {
+			checkDeallocateServlet(sipServletListener);
+		}
 		this.sipServletsListeners.clear();
+		for(SipErrorListener sipErrorListener : sipErrorListeners) {
+			checkDeallocateServlet(sipErrorListener);
+		}
 		this.sipErrorListeners.clear();
+		for(ServletContextListener servletContextListener : servletContextListeners) {
+			checkDeallocateServlet(servletContextListener);
+		}
 		this.servletContextListeners.clear();
+		checkDeallocateServlet(timerListener);
 		this.timerListener = null;
+	}
+
+	/**
+	 * @param sipApplicationSessionAttributeListener
+	 */
+	private void checkDeallocateServlet(
+			EventListener eventListener) {
+		if(eventListener instanceof javax.servlet.sip.SipServlet) {
+			try {
+				SipServletImpl wrapper = listenerServlets.get(eventListener);
+				if(wrapper != null) {
+					wrapper.deallocate((javax.servlet.sip.SipServlet)eventListener);
+				}
+			} catch (ServletException e) {
+				logger.error("couldn't deallocate listener " + eventListener.getClass().getName());
+			}
+		}
 	}
 
 }

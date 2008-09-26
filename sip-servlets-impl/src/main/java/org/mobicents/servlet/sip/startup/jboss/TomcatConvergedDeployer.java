@@ -84,7 +84,7 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 			NonSerializableFactory.rebind(applicationNameSubcontext, SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
 			NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME, timerService);
 			if(log.isDebugEnabled()) {
-				log.debug("Sip Objects made available to global JNDI under following conetxt : java:sip/" + applicationName + "/<ObjectName>");				
+				log.debug("Sip Objects made available to global JNDI under following context : java:sip/" + applicationName + "/<ObjectName>");				
 			}
 			Thread currentThread = Thread.currentThread();
 			ClassLoader currentLoader = currentThread.getContextClassLoader();
@@ -133,8 +133,8 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 					Util.unbind(applicationNameEnvCtx,SipNamingContextListener.SIP_FACTORY_JNDI_NAME);
 					Util.unbind(applicationNameEnvCtx, SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME);
 					Util.unbind(applicationNameEnvCtx,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME);
-					Context sipEnvCtx = (Context) iniCtx.lookup("java:/sip");				
-					sipEnvCtx.destroySubcontext(applicationName);
+					Context sipEnvCtx = (Context) iniCtx.lookup("java:/sip/");				
+					Util.unbind(sipEnvCtx, applicationName);
 				} catch (OperationNotSupportedException onse) {
 					log.warn("Could not remove the JNDI context java:/sip/" + applicationName);
 				}
