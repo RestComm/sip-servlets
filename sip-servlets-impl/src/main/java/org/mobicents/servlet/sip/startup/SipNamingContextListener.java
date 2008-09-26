@@ -23,10 +23,13 @@ import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
 import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.core.NamingContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.naming.ContextAccessController;
+import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 
 /**
  * Helper class used to initialize and populate the JNDI context associated
@@ -55,8 +58,19 @@ public class SipNamingContextListener extends NamingContextListener {
 	public static final String TIMER_SERVICE_JNDI_NAME = "TimerService";	
 	
 	@Override
+	public void lifecycleEvent(LifecycleEvent event) {
+		super.lifecycleEvent(event);
+		if (event.getType() == Lifecycle.START_EVENT) {
+			if (container instanceof SipStandardContext) {
+				((SipAnnotationProcessor)((SipStandardContext)container).getAnnotationProcessor()).setContext(envCtx);
+			}
+		}
+	}
+	
+	@Override
 	public void containerEvent(ContainerEvent event) {		
 		super.containerEvent(event);
+		
 		// Setting the context in read/write mode
         ContextAccessController.setWritable(getName(), container);        
         String type = event.getType();

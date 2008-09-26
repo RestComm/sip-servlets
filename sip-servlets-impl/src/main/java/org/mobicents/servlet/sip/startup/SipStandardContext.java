@@ -147,8 +147,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		// is correctly initialized too
 		super.init();
 		
-		setApplicationDispatcher();		
-				
+		setApplicationDispatcher();	
+		
 		if(logger.isInfoEnabled()) {
 			logger.info("sip context Initialized");
 		}
@@ -179,8 +179,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(sipApplicationDispatcher == null) {
 			setApplicationDispatcher();
 		}
-		sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
-		sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
+		if(sipFactoryFacade == null) {
+			sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
+		}
+		if(sipSessionsUtil == null) {
+			sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
+		}
+		//needed when restarting applications through the tomcat manager 
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipFactoryFacade);		
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
@@ -228,7 +233,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
         //activating our custom naming context to be able to set the sip factory in JNDI
         if (isUseNaming()) {    
         	if (getNamingContextListener() == null) {
-            	NamingContextListener namingContextListener = new SipNamingContextListener();
+            	NamingContextListener namingContextListener = new SipNamingContextListener();            	
                 namingContextListener.setName(getNamingContextName());
                 setNamingContextListener(namingContextListener);
                 addLifecycleListener(namingContextListener);
