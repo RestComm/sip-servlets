@@ -104,7 +104,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 	
 	//FIXME @jean.deruelle session map is never cleaned up => could lead to memory leak
 	//shall we have a thread scanning for invalid sessions and removing them accordingly ?
-	private Map<MobicentsSipSession, MobicentsSipSession> sessionMap = new ConcurrentHashMap<MobicentsSipSession, MobicentsSipSession>();
+	private Map<SipSessionKey, MobicentsSipSession> sessionMap = new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
 	//Map to handle responses to original request and cancel on original request
 	private Map<String, SipServletRequest> originalRequestMap = new ConcurrentHashMap<String, SipServletRequest>();
 
@@ -202,8 +202,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			originalRequestMap.put(session.getId(), newSipServletRequest);
 			
 			if (linked) {
-				sessionMap.put(originalSession, session);
-				sessionMap.put(session, originalSession);				
+				sessionMap.put(originalSession.getKey(), session);
+				sessionMap.put(session.getKey(), originalSession);				
 			}
 			newSipServletRequest.setB2buaHelper(this);
 			return newSipServletRequest;
@@ -259,8 +259,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			originalRequestMap.put(originalSession.getId(), origRequest);
 			originalRequestMap.put(session.getId(), newSubsequentServletRequest);
 			
-			sessionMap.put(originalSession, sessionImpl);
-			sessionMap.put(sessionImpl, originalSession);
+			sessionMap.put(originalSession.getKey(), sessionImpl);
+			sessionMap.put(sessionImpl.getKey(), originalSession);
 
 			newSubsequentServletRequest.setB2buaHelper(this);
 			return newSubsequentServletRequest;
@@ -342,7 +342,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 		if(!session.isValid()) {
 			throw new IllegalArgumentException("the session is invalid");
 		}
-		MobicentsSipSession linkedSession = this.sessionMap.get((MobicentsSipSession) session );
+		MobicentsSipSession linkedSession = this.sessionMap.get(((MobicentsSipSession)session).getKey());
 		if(logger.isDebugEnabled()) {
 			logger.debug("Linked Session found : " + linkedSession + " for this session " + session);
 		}
@@ -358,7 +358,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 		if ( req == null) { 
 			throw new NullPointerException("the argument is null");
 		}
-		MobicentsSipSession linkedSipSession = sessionMap.get(req.getSession());
+		MobicentsSipSession linkedSipSession = sessionMap.get(((MobicentsSipSession)req.getSession()).getKey());
 		SipServletRequest linkedSipServletRequest = originalRequestMap.get(linkedSipSession.getId());
 		return linkedSipServletRequest;
 	}
@@ -426,14 +426,14 @@ public class B2buaHelperImpl implements B2buaHelper {
 				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
 				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
 				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
-				sessionMap.get(session1) != null ||
-				sessionMap.get(session2) != null) {
+				sessionMap.get(((MobicentsSipSession)session1).getKey()) != null ||
+				sessionMap.get(((MobicentsSipSession)session2).getKey()) != null) {
 			throw new IllegalArgumentException("either of the specified sessions has been terminated " +
 					"or the sessions do not belong to the same application session or " +
 					"one or both the sessions are already linked with some other session(s)");
 		}
-		this.sessionMap.put((MobicentsSipSession)session1, (MobicentsSipSession)session2);
-		this.sessionMap.put((MobicentsSipSession) session2, (MobicentsSipSession) session1);
+		this.sessionMap.put(((MobicentsSipSession)session1).getKey(), (MobicentsSipSession)session2);
+		this.sessionMap.put(((MobicentsSipSession)session2).getKey(), (MobicentsSipSession) session1);
 
 	}
 	
@@ -447,15 +447,15 @@ public class B2buaHelperImpl implements B2buaHelper {
 		}
 		if(!session.isValid() || 
 				State.TERMINATED.equals(((MobicentsSipSession)session).getState()) ||
-				sessionMap.get(session) == null) {
+				sessionMap.get(((MobicentsSipSession)session).getKey()) == null) {
 			throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 		}
 		MobicentsSipSession key = (MobicentsSipSession) session;
-		MobicentsSipSession value  = this.sessionMap.get(key);
+		MobicentsSipSession value  = this.sessionMap.get(key.getKey());
 		if (value != null) {
-			this.sessionMap.remove(value);
+			this.sessionMap.remove(value.getKey());
 		}
-		this.sessionMap.remove(key);
+		this.sessionMap.remove(key.getKey());
 	}
 	
 	/**
@@ -518,8 +518,8 @@ public class B2buaHelperImpl implements B2buaHelper {
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			
-			sessionMap.put(originalSession, session);
-			sessionMap.put(session, originalSession);				
+			sessionMap.put(originalSession.getKey(), session);
+			sessionMap.put(session.getKey(), originalSession);				
 
 			originalRequestMap.put(originalSession.getId(), origRequest);
 			originalRequestMap.put(session.getId(), newSipServletRequest);						
