@@ -17,51 +17,26 @@ Goals
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
   
-Version 0.5.1 is out !
+Version 0.6 is out !
 
-	This version is an intermediate version (in waiting for a 0.6 JSR 289 certified version) providing more stability and fixing {{{http://code.google.com/p/mobicents/issues/list?q=label%3ASip-Servlets-Version-0.5&can=1}some Issues}} that have been raised against the 0.5 version. 
-
-	The JBoss version has also been updated with the latest Mobicents Media Server release (1.0.0.BETA4)
-	
-	To download this release and try it out, follow the following link : 
-
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=625266}Mobicents Sip Servlet 0.5.1 downloads}}
-	
-
-Version 0.5 is out !
-
-	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA provides new features :
-		
-		* {{{clustering.html}Clustering}} and {{{failover.html}mid-call failover support}} for UAS type of sip applications
-		
-		* JSR 289 Proposed Final Draft-2 API Alignment
-		
-		* 15.11 Encode URI and Session Targeting
-		
-		* 4.2.2 TelURL
-		
-		* 15.4.2 New Application Router Packaging and Deployment
-		
-		* 6.2.5 The RequestDispatcher Interface
-		
-		* More Extensions : REFER/PUBLISH/UPDATE
-		
-		* {{{roadmap.html}usual round of bug fixes}}
-				
+	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA doesn't provide new features but is JSR 289 certified :
+	 
+	Check the Roadmap to see {{{roadmap.html} the usual round of bug fixes}} too. 
+	 
 	It is shipped with :		
 	
 		* {{{sip-servlets-managment.htm}Management Console}}
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
 	
-		* For JBoss only, Mobicents Media Server 1.0.0-BETA3, the Mobicents SIP load Balancer 
-		and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
+		* For JBoss only, Mobicents Media Server 1.0.0-BETA4, the Mobicents SIP load Balancer and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
 		to test clustering and mid call failover. 
-	
+	 
 	To download this release and try it out, follow the following link : 
 
-	{{{http://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}Mobicents Sip Servlet 0.5 downloads}}
-
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=625266}Mobicents Sip Servlet 0.6 downloads}}
+					
+					
 Roadmap
 
   As the JSR 289 spec is not yet finalized and as we are in the process of implementing it,
