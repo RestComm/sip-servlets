@@ -185,6 +185,9 @@
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
 			</modules>
+			<properties>
+				 <maven.test.skip>true</maven.test.skip>
+			</properties>
 		</profile>
 	</profiles>
 	<!-- repositories -->
