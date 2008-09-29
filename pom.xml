@@ -170,6 +170,12 @@
 							</execution>
 						</executions>
 					</plugin>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagBase>https://mobicents.googlecode.com/svn/tags/sip-servlets</tagBase>
+          </configuration>
+        </plugin>
 				</plugins>
 			</build>
 		</profile>
