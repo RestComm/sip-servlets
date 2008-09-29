@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>0.6</version>
+		<version>0.7-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>sip-servlets-examples-parent</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Mobicents Sip Servlet Examples</name>
 	<url>http://www.mobicents.org/examples.html</url>
@@ -59,7 +59,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.6</version>
+			<version>1.1.7-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>		
 	</dependencies>	

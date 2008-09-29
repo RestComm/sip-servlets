@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>0.6</version>
+		<version>0.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>refer-sip-servlet</artifactId>
 	<packaging>war</packaging>
