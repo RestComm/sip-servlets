@@ -51,23 +51,23 @@
 		    verbose="true"
 		    usetimestamp="true"/>
 		
-		<exec executable="${mvn.executable}" dir="${base.path}/../..">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
-		<exec executable="${mvn.executable}" dir="${base.path}/../..">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
 		</exec>
 
-		<exec executable="${mvn.executable}" dir="${base.path}/../..">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
 		</exec>
 				
-		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install"/>
 		</exec>
 		
-		<exec executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install"/>
 		</exec>
 		
@@ -119,14 +119,14 @@
         <echo>Checking out Mobicents Media Server</echo>
 		<delete dir="mms"/>
 		<mkdir dir="mms"/>
-		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
             <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mms/mobicents-media-server-core"/>
         </exec>
 	</target>
 	
 	<target name="build-mobicents-media-server">
         <echo>Building Mobicents Media Server</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mms/mobicents-media-server-core">
+        <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mms/mobicents-media-server-core">
             <arg line="install -Djboss.home=${base.path}/jboss-${jboss.version}" />
         </exec>
 	</target>
@@ -173,11 +173,11 @@
 		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/jboss-service.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>
 		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/webserver-xmbean.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 		<echo>Done copying.</echo>
-		<exec executable="${mvn.executable}" dir="${this.path}/..">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${this.path}/..">
 			<arg line="clean install -Pjboss-distro -DJBOSS_HOME=${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
 		</exec>
 		
-		<exec executable="${mvn.executable}" dir="${this.path}/../../sip-servlets-examples/click-to-call">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${this.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install"/>
 		</exec>
 		
