@@ -147,11 +147,36 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		// is correctly initialized too
 		super.init();
 		
-		setApplicationDispatcher();	
+		prepareServletContext();
 		
 		if(logger.isInfoEnabled()) {
 			logger.info("sip context Initialized");
+		}	
+	}
+
+	protected void prepareServletContext() throws LifecycleException {
+		if(sipApplicationDispatcher == null) {
+			setApplicationDispatcher();
 		}
+		if(sipFactoryFacade == null) {
+			sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
+		}
+		if(sipSessionsUtil == null) {
+			sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
+		}
+		//needed when restarting applications through the tomcat manager 
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
+				sipFactoryFacade);		
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
+				TimerServiceImpl.getInstance());
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
+				Arrays.asList(SipApplicationDispatcher.EXTENSIONS_SUPPORTED));
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
+				Arrays.asList(SipApplicationDispatcher.RFC_SUPPORTED));
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
+				sipSessionsUtil);
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+				sipApplicationDispatcher.getOutboundInterfaces());
 	}
 
 	/**
@@ -176,29 +201,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(logger.isInfoEnabled()) {
 			logger.info("Starting the sip context");
 		}
-		if(sipApplicationDispatcher == null) {
-			setApplicationDispatcher();
-		}
-		if(sipFactoryFacade == null) {
-			sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
-		}
-		if(sipSessionsUtil == null) {
-			sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
-		}
-		//needed when restarting applications through the tomcat manager 
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
-				sipFactoryFacade);		
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
-				TimerServiceImpl.getInstance());
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
-				Arrays.asList(SipApplicationDispatcher.EXTENSIONS_SUPPORTED));
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
-				Arrays.asList(SipApplicationDispatcher.RFC_SUPPORTED));
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
-				sipSessionsUtil);
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-				sipApplicationDispatcher.getOutboundInterfaces());
-		
+		if( initialized ) { 
+			prepareServletContext();
+		}	
 		 // Add missing components as necessary
         if (getResources() == null) {   // (1) Required by Loader
             if (logger.isDebugEnabled())
@@ -233,7 +238,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
         //activating our custom naming context to be able to set the sip factory in JNDI
         if (isUseNaming()) {    
         	if (getNamingContextListener() == null) {
-            	NamingContextListener namingContextListener = new SipNamingContextListener();            	
+            	NamingContextListener namingContextListener = new SipNamingContextListener();
                 namingContextListener.setName(getNamingContextName());
                 setNamingContextListener(namingContextListener);
                 addLifecycleListener(namingContextListener);
@@ -315,7 +320,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}
 
 	@Override
-	public ServletContext getServletContext() {
+	public ServletContext getServletContext() {	
         if (context == null) {
             context = new ConvergedApplicationContext(getBasePath(), this);
             if (getAltDDName() != null)
@@ -523,7 +528,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}		
 	
 	public void addChild(SipServletImpl sipServletImpl) {
-		SipServletImpl existingSipServlet = (SipServletImpl )children.get(sipServletImpl.getName());
+				SipServletImpl existingSipServlet = (SipServletImpl )children.get(sipServletImpl.getName());
 		if(existingSipServlet != null) {			
 			logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. " +
 					"This might be due to the fact that the definition of the servlet " +
