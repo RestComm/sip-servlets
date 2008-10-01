@@ -26,5 +26,5 @@
   <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper-jdt/6.0.14/jasper-jdt-6.0.14.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper-el/6.0.14/jasper-el-6.0.14.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.3/sip-servlets-impl-0.2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.6-SNAPSHOT/sip-servlets-spec-1.1.6-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.7-SNAPSHOT/sip-servlets-spec-1.1.7-SNAPSHOT.jar"/>
 </classpath>

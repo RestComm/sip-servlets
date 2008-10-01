@@ -11,7 +11,7 @@ Goals
 
   Mobicents Sip Servlets delivers a consistent, open platform on which to develop and deploy portable 
   and distributable SIP and Converged JEE services. 
-  It is an implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss containers and 
+  It is a certified implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss containers and 
   strive to develop interoperability standards between Sip Servlets and JSLEE so that applications 
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
@@ -19,7 +19,13 @@ Goals
   
 Version 0.6 is out !
 
-	Our latest release working on top of both containers Tomcat 6.0.14 or JBoss AS 4.2.2.GA doesn't provide new features but is JSR 289 certified :
+	This release features the first open source containers certified for JSR 289 compliance !!! 
+	
+	Both containers Tomcat and Jboss passed the TCK tests : 
+	
+	See our {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsReleaseTest/76/testReport}TCK Jboss results}}
+	
+	See our {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsTomcatReleaseTest/13/testReport}TCK Tomcat results}}
 	 
 	Check the Roadmap to see {{{roadmap.html} the usual round of bug fixes}} too. 
 	 
@@ -34,15 +40,12 @@ Version 0.6 is out !
 	 
 	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=625266}Mobicents Sip Servlet 0.6 downloads}}
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=629778}Mobicents Sip Servlet 0.6 downloads}}
 					
 					
 Roadmap
 
-  As the JSR 289 spec is not yet finalized and as we are in the process of implementing it,
-  Please consider that this is still a work in progress and as such might be unstable. Look below to provide some feedback.
-
-  Please check out our {{{roadmap.html}roadmap}} to follow project progress and to know what will happen next.  
+  Now that we are Sip Servlets 1.1 certified, Please check out our {{{roadmap.html}roadmap}} to follow the project progress and to know what will happen next.  
 
   Here is a {{{http://spreadsheets.google.com/pub?key=pl-Xe-Wa5z7INjR4kdhxBEg&gid=1}document}} showing their approximative completion.
   

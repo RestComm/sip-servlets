@@ -218,7 +218,7 @@
         
         <copy todir="${base.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
             <fileset dir="${ant.file.mobicents.release}/../../.." 
-            	     includes="**/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/click-to-call/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
+            	     includes="**/pom.xml **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/click-to-call/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
                      excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**"/>
         </copy>
         

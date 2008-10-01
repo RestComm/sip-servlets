@@ -10,10 +10,11 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="src/org/mobicents/servlet/management/public/lib/gwtext.jar"/>
 	<classpathentry kind="lib" path="src/org/mobicents/servlet/management/public/lib/gwt-dnd-2.0.7.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.6-SNAPSHOT/sip-servlets-impl-0.6-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.7-SNAPSHOT/sip-servlets-impl-0.7-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar" sourcepath="/TOMCAT_HOME/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.6-SNAPSHOT/sip-servlets-spec-1.1.6-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/0.6-SNAPSHOT/sip-servlets-application-router-0.6-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.7-SNAPSHOT/sip-servlets-spec-1.1.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/0.7-SNAPSHOT/sip-servlets-application-router-0.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="GWT_HOME"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
