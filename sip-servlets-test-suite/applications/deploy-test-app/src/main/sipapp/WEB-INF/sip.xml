@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.SimpleSipServlet</app-name>
+	<display-name>Simple Sip Servlet</display-name>
+	<description>Simple Sip Servlet</description>
+	
+	<main-servlet>
+		SimpleSipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>SimpleSipServlet</servlet-name>
+		<display-name>SimpleSipServlet</display-name>
+		<description>Simple SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.SimpleSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.SimpleSipServlet
+		</listener-class>
+	</listener>
+	
+	<!-- Uncomment to enable security
+	<security-constraint>
+	   <display-name>REGISTER Method Security Constraint</display-name>
+	      <resource-collection>
+	          <resource-name>SimpleSipServlet</resource-name>
+	          <description>Require authenticated REGSITER requests</description>
+	          <servlet-name>SimpleSipServlet</servlet-name>
+	          <sip-method>REGISTER</sip-method>   
+	     </resource-collection>   
+	     <auth-constraint>      
+	           <role-name>caller</role-name>  
+	     </auth-constraint>
+	 </security-constraint>
+	 
+	 <login-config> 
+         	<auth-method>DIGEST</auth-method> 
+         	<realm-name>sip-servlets-realm</realm-name> 
+   	 </login-config> -->
+</sip-app>

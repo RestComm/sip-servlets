@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="deploy" name="click-to-call">
+	<property environment="system" />
+	<property name="manager.url" value="http://localhost:8080/manager" />
+	<property name="manager.username" value="jean" />
+	<property name="manager.password" value="jean" />
+	<property name="app.path" value="/click-to-call-servlet-1.1-SNAPSHOT" />
+	<property name="war.name" value="${basedir}/target/click-to-call-servlet-1.1-SNAPSHOT.war" />
+	<property name="config" value="${basedir}/context.xml" />
+	<property file="tomcat.properties"/>
+
+	<taskdef file="tomcat.properties">
+		<classpath>
+			<pathelement path="${system.CATALINA_HOME}/lib/catalina-ant.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="deploy" description="Deploy application to servlet container">		
+		<deploy url="${manager.url}" username="${manager.username}" password="${manager.password}" path="${app.path}" localWar="${war.name}" update="true" />
+		<!--deploy url="${manager.url}" username="${manager.username}" password="${manager.password}" path="${app.path}" localWar="${war.name}" update="true" config="${config}" /-->
+	</target>
+
+	<target name="undeploy">
+		<undeploy url="${manager.url}" username="${manager.username}" password="${manager.password}" path="${app.path}"/>
+	</target>
+
+	<target name="redeploy" depends="undeploy,deploy" />
+</project>

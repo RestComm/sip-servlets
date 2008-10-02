@@ -1,0 +1,9 @@
+<Context
+ className="org.mobicents.servlet.sip.startup.SipStandardContext"
+ configClass="org.mobicents.servlet.sip.startup.SipContextConfig"
+ >
+
+ <Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>
+
+ <Parameter name="foo" value="bar" />
+</Context>
