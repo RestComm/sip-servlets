@@ -1186,6 +1186,7 @@ public class TestSipListener implements SipListener {
 			this.requestURI = protocolObjects.addressFactory.createSipURI(
 					toSipUri.getUser(), peerHostPort);
 			((SipURI)this.requestURI).setPort(peerPort);
+			((SipURI)this.requestURI).setTransportParam(listeningPoint.getTransport());
 		}
 		if(useToURIasRequestUri) {
 			this.requestURI = toURI;
@@ -1196,7 +1197,7 @@ public class TestSipListener implements SipListener {
 		List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 		ViaHeader viaHeader = protocolObjects.headerFactory
 				.createViaHeader("127.0.0.1", sipProvider
-						.getListeningPoint(protocolObjects.transport).getPort(), protocolObjects.transport,
+						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
 						null);
 
 		// add via headers
@@ -1232,7 +1233,7 @@ public class TestSipListener implements SipListener {
 			 * either use tcp or udp
 			 */
 			((SipURI)contactUrl).setPort(listeningPoint.getPort());
-//				contactUrl.setTransportParam(protocolObjects.transport);		
+			((SipURI)contactUrl).setTransportParam(listeningPoint.getTransport());		
 			((SipURI)contactUrl).setLrParam();
 		} else {
 			contactUrl = fromURI;

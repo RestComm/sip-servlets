@@ -31,11 +31,10 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class ShootmeSipServletTest extends SipServletTestCase {
+public class ShootmeSipServletTestTcp extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(ShootmeSipServletTest.class);
+	private static Log logger = LogFactory.getLog(ShootmeSipServletTestTcp.class);
 
-	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 5000;	
 //	private static final int TIMEOUT = 100000000;
@@ -45,8 +44,9 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	ProtocolObjects senderProtocolObjects;	
 
 	
-	public ShootmeSipServletTest(String name) {
+	public ShootmeSipServletTestTcp(String name) {
 		super(name);
+		listeningPointTransport = ListeningPoint.TCP;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", listeningPointTransport, AUTODIALOG);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
@@ -94,7 +94,9 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	
 	public void testShootmeRegister() throws Exception {
+		
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -102,7 +104,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isFinalResponseReceived());
+		assertTrue(sender.isFinalResponseReceived());		
 	}
 	
 	public void testShootmeCancel() throws Exception {

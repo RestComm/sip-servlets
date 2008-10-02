@@ -152,6 +152,14 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		}
 	}
 
+	@Override
+	protected void doRegister(SipServletRequest req) throws ServletException,
+			IOException {
+		int response = SipServletResponse.SC_OK;
+		SipServletResponse resp = req.createResponse(response);
+		resp.send();
+	}
+	
 	// SipErrorListener methods
 
 	/**

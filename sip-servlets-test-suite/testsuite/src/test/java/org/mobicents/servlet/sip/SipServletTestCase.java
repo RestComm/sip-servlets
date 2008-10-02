@@ -41,6 +41,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String sipIpAddress = "127.0.0.1";
 	protected String serviceFullClassName = "org.mobicents.servlet.sip.startup.SipStandardService";
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
+	protected String listeningPointTransport = ListeningPoint.UDP;
 	protected boolean autoDeployOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
 		
@@ -94,7 +95,7 @@ public abstract class SipServletTestCase extends TestCase {
 		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
 		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 		 */
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.UDP);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
 		if(startTomcatOnStartup) {
 			tomcat.startTomcat();
 		}
