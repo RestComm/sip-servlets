@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
@@ -42,8 +43,8 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleWebServlet extends HttpServlet
 { 	
 	private static Log logger = LogFactory.getLog(SimpleWebServlet.class);
-	private SipFactory sipFactory;
-	
+	private SipFactory sipFactory;	
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {		
 		super.init(config);
@@ -53,7 +54,7 @@ public class SimpleWebServlet extends HttpServlet
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.example.SimpleSipServlet/SipFactory");
+			sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.example.SimpleApplication/SipFactory");
 			logger.info("Sip Factory ref from JNDI : " + sipFactory);
 		} catch (NamingException e) {
 			throw new ServletException("Uh oh -- JNDI problem !", e);

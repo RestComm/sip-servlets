@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sip-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.Click2DialSipServlet</app-name>
+	<app-name>org.mobicents.servlet.sip.testsuite.Click2DialApplication</app-name>
 	<display-name>Click2Dial Sip Servlet</display-name>
 	<description>Click2Dial Sip Servlet</description>
 	

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.B2BUASipServlet</app-name>
+	<app-name>org.mobicents.servlet.sip.testsuite.B2BUAApplication</app-name>
 	<display-name>B2BUA Sip Servlet</display-name>
 	<description>B2BUA Sip Servlet</description>
 	

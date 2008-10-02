@@ -2,7 +2,7 @@
 
 <sip-app>
 	<app-name>
-		org.mobicents.servlet.sip.testsuite.ServletMappingSipServlet
+		org.mobicents.servlet.sip.testsuite.ServletMappingApplication
 	</app-name>
 	<display-name>Servlet MappingServlet</display-name>
 	<description>Servlet MappingServlet</description>

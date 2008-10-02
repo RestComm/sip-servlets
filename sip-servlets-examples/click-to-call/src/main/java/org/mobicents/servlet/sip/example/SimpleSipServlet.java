@@ -42,7 +42,6 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
-	
 	private SipFactory sipFactory;
 	
 	public SimpleSipServlet() {
@@ -57,10 +56,10 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.example.SimpleSipServlet/SipFactory");
+			sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.example.SimpleApplication/SipFactory");
 			logger.info("Sip Factory ref from JNDI : " + sipFactory);
 		} catch (NamingException e) {
-			throw new ServletException("Uh oh -- JNDI problem !", e);
+			throw new ServletException("Uh oh -- JNDI problem !", e);			
 		}
 	}
 	

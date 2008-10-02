@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sip-app>
-	<app-name>org.mobicents.servlet.sip.example.CallForwardingB2BUASipServlet</app-name>
+	<app-name>org.mobicents.servlet.sip.example.CallForwardingB2BUAApplication</app-name>
 	<display-name>Call Forwarding B2BUA Sip Servlet</display-name>
 	<description>Call Forwarding B2BUA Sip Servlet</description>
 	

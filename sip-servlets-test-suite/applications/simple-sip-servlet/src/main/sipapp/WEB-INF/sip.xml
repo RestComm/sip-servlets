@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sip-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.SimpleSipServlet</app-name>
+	<app-name>org.mobicents.servlet.sip.testsuite.SimpleApplication</app-name>
 	<display-name>Simple Sip Servlet</display-name>
 	<description>Simple Sip Servlet</description>
 	

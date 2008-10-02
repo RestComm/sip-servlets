@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sip-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.ChatRoomSipServlet</app-name>
+	<app-name>org.mobicents.servlet.sip.testsuite.ChatRoomApplication</app-name>
 	<display-name>ChatRoom Test Sip Servlet</display-name>
 	<description>ChatRoom Test Sip Servlet</description>
 	

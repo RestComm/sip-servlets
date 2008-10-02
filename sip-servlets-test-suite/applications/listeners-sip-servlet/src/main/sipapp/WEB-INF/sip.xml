@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sip-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.ListenersSipServlet</app-name>
+	<app-name>org.mobicents.servlet.sip.testsuite.ListenersApplication</app-name>
 	<display-name>Listeners Test Sip Servlet</display-name>
 	<description>Listeners Test Sip Servlet</description>
 	

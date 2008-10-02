@@ -78,9 +78,9 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			sipFactoryJndi = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedServlet/SipFactory");
-			sipSessionsUtilJndi = (SipSessionsUtil) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedServlet/SipSessionsUtil");
-			timerServiceJndi = (TimerService) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedServlet/TimerService");
+			sipFactoryJndi = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedApplication/SipFactory");
+			sipSessionsUtilJndi = (SipSessionsUtil) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedApplication/SipSessionsUtil");
+			timerServiceJndi = (TimerService) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.AnnotatedApplication/TimerService");
 			logger.info("SipFactory injected resource" + sipFactory);
 			logger.info("SipSessionsUtil injected resource" + sipSessionsUtil);
 			logger.info("TimerService injected resource" + timerService);

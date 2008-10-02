@@ -1,1 +1,1 @@
-@javax.servlet.sip.annotation.SipApplication(name="org.mobicents.servlet.sip.testsuite.AnnotatedServlet") package org.mobicents.servlet.sip.testsuite;
+@javax.servlet.sip.annotation.SipApplication(name="org.mobicents.servlet.sip.testsuite.AnnotatedApplication") package org.mobicents.servlet.sip.testsuite;
