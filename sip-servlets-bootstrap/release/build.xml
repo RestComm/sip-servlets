@@ -52,23 +52,23 @@
 		    usetimestamp="true"/>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
+			<arg line="clean install -P set-svn-revision -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
+			<arg line="clean install -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
 		</exec>
 
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -P jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
+			<arg line="clean install -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
 		</exec>
 				
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install"/>
+			<arg line="clean install -P set-svn-revision"/>
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
-			<arg line="clean install"/>
+			<arg line="clean install -P set-svn-revision"/>
 		</exec>
 		
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
@@ -127,7 +127,7 @@
 	<target name="build-mobicents-media-server">
         <echo>Building Mobicents Media Server</echo>
         <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mms/mobicents-media-server-core">
-            <arg line="install -Djboss.home=${base.path}/jboss-${jboss.version}" />
+            <arg line="install -P set-svn-revision -Djboss.home=${base.path}/jboss-${jboss.version}" />
         </exec>
 	</target>
 		
@@ -174,11 +174,11 @@
 		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/webserver-xmbean.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>						
 		<echo>Done copying.</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${this.path}/..">
-			<arg line="clean install -Pjboss-distro -DJBOSS_HOME=${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
+			<arg line="clean install -P set-svn-revision,jboss-distro -DJBOSS_HOME=${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${this.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install"/>
+			<arg line="clean install -P set-svn-revision"/>
 		</exec>
 		
 		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" 
