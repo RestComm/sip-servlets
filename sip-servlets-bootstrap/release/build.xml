@@ -73,10 +73,10 @@
 		
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
 		
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.1-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties" />
 				
 		<ant target="deploy-mgmnt">
@@ -181,7 +181,7 @@
 			<arg line="clean install -P set-svn-revision"/>
 		</exec>
 		
-		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" 
+		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" 
 			tofile="${jboss.dir}/server/default/deploy/click2call.war" />
 		
 		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
