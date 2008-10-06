@@ -42,8 +42,8 @@
 			
 		<!-- The Sip Load Balancer -->
 		<mkdir dir="${base.path}/jboss-${jboss.version}/sip-balancer"/>
-		<get src="http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20080829.103906-21-jar-with-dependencies.jar" 
-		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-1.0-20080829.103906-21-jar-with-dependencies.jar" 
+		<get src="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0.BETA1/sip-balancer-1.0.BETA1-jar-with-dependencies.jar" 
+		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-1.0.BETA1-jar-with-dependencies.jar" 
 		    verbose="true"
 		    usetimestamp="true"/>
 		<get src="http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties" 
@@ -73,10 +73,10 @@
 		
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
 		
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.0.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
+		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties" />
 				
 		<ant target="deploy-mgmnt">
@@ -181,7 +181,7 @@
 			<arg line="clean install -P set-svn-revision"/>
 		</exec>
 		
-		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.0.war" 
+		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war" 
 			tofile="${jboss.dir}/server/default/deploy/click2call.war" />
 		
 		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
