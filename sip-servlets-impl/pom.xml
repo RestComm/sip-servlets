@@ -201,7 +201,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}\lib" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
 										<copy verbose="true" file="docs/logging.properties" todir="${CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
                                         <copy todir="${CATALINA_HOME}">

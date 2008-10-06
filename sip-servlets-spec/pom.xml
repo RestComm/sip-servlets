@@ -101,7 +101,6 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<echo message="${CATALINA_HOME}" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
 									</tasks>
 								</configuration>
