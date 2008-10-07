@@ -41,5 +41,9 @@
 	 <login-config> 
          <auth-method>DIGEST</auth-method> 
          <realm-name>sip-servlets-realm</realm-name> 
-   </login-config> 
+         <identity-assertion>
+    		<identity-assertion-scheme>P-Asserted-Identity</identity-assertion-scheme>
+    		<identity-assertion-support>SUPPORTED</identity-assertion-support>
+  		</identity-assertion>
+	 </login-config> 
 </sip-app>

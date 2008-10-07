@@ -140,6 +140,8 @@ public class TestSipListener implements SipListener {
 
 	private boolean okToByeReceived;
 	
+	private boolean authenticationErrorReceived;
+	
 	private URI requestURI;
 	
 	private Request inviteRequest;
@@ -1021,6 +1023,7 @@ public class TestSipListener implements SipListener {
 
 	public Request processResponseAuthorization(Response response, URI uriReq) {
 		Request requestauth = null;
+		this.authenticationErrorReceived = true;
 		try {
 			System.out.println("processResponseAuthorization()");
 			
@@ -1206,6 +1209,10 @@ public class TestSipListener implements SipListener {
 	}
 
 	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
+		sendSipRequest(method, fromURI, toURI, messageContent, route, useToURIasRequestUri, null, null);
+	}
+
+	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents) throws SipException, ParseException, InvalidArgumentException {
 		this.useToURIasRequestUri = useToURIasRequestUri;
 		// create >From Header
 		Address fromNameAddress = protocolObjects.addressFactory
@@ -1314,6 +1321,13 @@ public class TestSipListener implements SipListener {
 			byte[] contents = messageContent.getBytes();
 			request.setContent(contents, contentTypeHeader);
 			request.setContentLength(contentLengthHeader);
+		}
+		
+		if(headerNames != null) {
+			for(int q=0; q<headerNames.length; q++) {
+				Header h = protocolObjects.headerFactory.createHeader(headerNames[q], headerContents[q]);
+				request.addLast(h);
+			}
 		}
 		addSpecificHeaders(method, request);
 		// Create the client transaction.
@@ -1690,4 +1704,9 @@ public class TestSipListener implements SipListener {
 	public boolean isSendByeAfterTerminatingNotify() {
 		return sendByeAfterTerminatingNotify;
 	}	
+	
+	public boolean isAuthenticationErrorReceived() {
+		return authenticationErrorReceived;
+	}
+
 }
