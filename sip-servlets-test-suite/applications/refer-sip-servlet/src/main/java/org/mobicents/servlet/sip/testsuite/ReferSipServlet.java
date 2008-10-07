@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
@@ -29,6 +30,8 @@ import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
@@ -42,13 +45,18 @@ import org.apache.commons.logging.LogFactory;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class ReferSipServlet extends SipServlet implements SipServletListener, TimerListener {
+public class ReferSipServlet extends SipServlet implements SipServletListener, TimerListener, SipSessionListener {
 
 	private static final String REFER_SESSION = "referSession";
 	private static Log logger = LogFactory.getLog(ReferSipServlet.class);
 	private final static String TRYING_CONTENT = "SIP/2.0 100 Trying";
 	private final static String OK_CONTENT = "SIP/2.0 200 OK";
 	private final static String SUBSEQUENT_CONTENT = "SIP/2.0 100 Subsequent";
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	private static final String SIP_SESSION_READY_TO_BE_INVALIDATED = "sipSessionReadyToBeInvalidated";
+	
+	@Resource
+	SipFactory sipFactory;
 	
 	/** Creates a new instance of ReferSipServlet */
 	public ReferSipServlet() {
@@ -60,6 +68,32 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 		super.init(servletConfig);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void doInvite(SipServletRequest request) throws ServletException,
+			IOException {
+		logger.info("from : " + request.getFrom());
+		logger.info("Got request: "
+				+ request.getMethod());
+	
+		//If we receive an INVITE, we cancel the timer to avoid acting as UAC and sending REFER
+		ServletTimer servletTimer = (ServletTimer)getServletContext().getAttribute("servletTimer");
+		servletTimer.cancel();
+		
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+		sipServletResponse.send();
+		request.getSession().setAttribute("inviteReceived", "true");
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		sipServletResponse.send();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -78,7 +112,7 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 		SipServletRequest notifyRequest = request.getSession().createRequest("NOTIFY");
 		notifyRequest.addHeader("Subscription-State", "active;expires=3600");
 		notifyRequest.addHeader("Event", "refer");
-		if(request.isInitial()) {
+		if(request.isInitial() || request.getSession().getAttribute("inviteReceived") != null) {
 			notifyRequest.setContentLength(TRYING_CONTENT.length());
 			notifyRequest.setContent(TRYING_CONTENT, "message/sipfrag;version=2.0");
 		} else {
@@ -87,7 +121,8 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 		}
 		notifyRequest.send();
 
-		if(request.isInitial()) {
+		if(request.isInitial() || request.getSession().getAttribute("inviteReceived") != null) {
+			request.getSession().removeAttribute("inviteReceived");
 			SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			sipApplicationSession.setAttribute(REFER_SESSION, request.getSession());
@@ -112,12 +147,14 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 		if("INVITE".equals(resp.getMethod())) {
 			resp.createAck().send();
 			SipSession referSession = (SipSession) resp.getApplicationSession().getAttribute(REFER_SESSION);
-			SipServletRequest notifyRequest = referSession.createRequest("NOTIFY");
-			notifyRequest.addHeader("Subscription-State", "terminated;reason=noresource");
-			notifyRequest.addHeader("Event", "refer");
-			notifyRequest.setContentLength(OK_CONTENT.length());
-			notifyRequest.setContent(OK_CONTENT, "message/sipfrag;version=2.0");
-			notifyRequest.send();
+			if(referSession != null) {
+				SipServletRequest notifyRequest = referSession.createRequest("NOTIFY");
+				notifyRequest.addHeader("Subscription-State", "terminated;reason=noresource");
+				notifyRequest.addHeader("Event", "refer");
+				notifyRequest.setContentLength(OK_CONTENT.length());
+				notifyRequest.setContent(OK_CONTENT, "message/sipfrag;version=2.0");
+				notifyRequest.send();
+			}
 		}
 	}
 	
@@ -134,7 +171,7 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 	
 		if(req.getRawContent() != null) {
 			String content = new String(req.getRawContent());
-			if("SIP/2.0 200 OK".equals(content)) {
+			if("SIP/2.0 200 OK".equals(content) && req.getHeader("Out-Of-Dialog") == null) {
 				SipServletRequest sipServletRequest = req.getSession().createRequest("REFER");
 				SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 				SipURI requestURI = sipFactory.createSipURI("sender", "127.0.0.1:5080");
@@ -183,6 +220,35 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 			sipServletRequest.send();
 		} catch (IOException e) {
 			logger.error(e);
+		}
+	}
+
+	public void sessionCreated(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		logger.info("sip session expired " +  se.getSession());
+		
+		try {
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipFactory.createApplicationSession(), 
+					"MESSAGE", 
+					se.getSession().getLocalParty(), 
+					se.getSession().getRemoteParty());
+			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
+			sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
 		}
 	}
 }

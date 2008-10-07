@@ -18,11 +18,16 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSessionListener;
+import javax.servlet.sip.SipURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,10 +37,14 @@ import org.apache.commons.logging.LogFactory;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class NotifierSipServlet extends SipServlet {
+public class NotifierSipServlet extends SipServlet implements SipSessionListener {
 
 	private static Log logger = LogFactory.getLog(NotifierSipServlet.class);
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	private static final String SIP_SESSION_READY_TO_BE_INVALIDATED = "sipSessionReadyToBeInvalidated";
 	
+	@Resource
+	SipFactory sipFactory;
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public NotifierSipServlet() {
@@ -50,6 +59,39 @@ public class NotifierSipServlet extends SipServlet {
 	/**
 	 * {@inheritDoc}
 	 */
+	protected void doInvite(SipServletRequest request) throws ServletException,
+			IOException {
+		logger.info("from : " + request.getFrom());
+		logger.info("Got request: "
+				+ request.getMethod());
+	
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+		sipServletResponse.send();
+		request.getSession().setAttribute("inviteReceived", "true");
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		sipServletResponse.send();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	protected void doBye(SipServletRequest request) throws ServletException,
+			IOException {
+
+		logger.info("Got BYE request: " + request);
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		sipServletResponse.send();
+	}	
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	protected void doSubscribe(SipServletRequest request) throws ServletException,
 			IOException {
 
@@ -61,7 +103,8 @@ public class NotifierSipServlet extends SipServlet {
 		sipServletResponse.send();		
 		// send notify		
 		SipServletRequest notifyRequest = request.getSession().createRequest("NOTIFY");
-		if(request.isInitial()) {
+		if(request.isInitial() || request.getSession().getAttribute("inviteReceived") != null) {
+			request.getSession().removeAttribute("inviteReceived");
 			notifyRequest.addHeader("Subscription-State", "pending");
 			notifyRequest.addHeader("Event", "reg");
 			notifyRequest.send();
@@ -76,4 +119,32 @@ public class NotifierSipServlet extends SipServlet {
 		notifyRequest.send();
 	}
 
+	public void sessionCreated(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		logger.info("sip session expired " +  se.getSession());
+		
+		try {
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipFactory.createApplicationSession(), 
+					"MESSAGE", 
+					se.getSession().getLocalParty(), 
+					se.getSession().getRemoteParty());
+			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
+			sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
 }

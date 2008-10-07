@@ -42,7 +42,6 @@ import javax.sip.TransactionState;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.ContentEncodingHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
@@ -376,7 +375,11 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			ServerTransaction st = (ServerTransaction) getTransaction();
 			// Update Session state
 			session.updateStateOnResponse(this, false);						
-						
+			// RFC 3265 : If a 200-class response matches such a SUBSCRIBE request,
+			// it creates a new subscription and a new dialog.
+			if(Request.SUBSCRIBE.equals(getMethod()) && getStatus() >= 200 && getStatus() <= 300) {					
+				session.addSubscription(this);
+			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sending response "+ this.message);
 			}

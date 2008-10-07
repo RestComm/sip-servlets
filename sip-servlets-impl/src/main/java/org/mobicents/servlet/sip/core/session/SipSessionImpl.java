@@ -26,6 +26,7 @@ import java.net.InetSocketAddress;
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -60,6 +61,7 @@ import javax.sip.TransactionState;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -75,6 +77,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -206,6 +209,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	private Address localParty = null;
 	private Address remoteParty = null;
 	
+	//Subscriptions used for RFC 3265 compliance to be able to determine when the session can be invalidated
+	//  A subscription is destroyed when a notifier sends a NOTIFY request with a "Subscription-State" of "terminated".
+	// If a subscription's destruction leaves no other application state associated with the dialog, the dialog terminates
+	Set<EventHeader> subscriptions = null;
+	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
+	protected transient Transaction originalTransaction = null;
+	protected transient boolean okToByeSentOrReceived = false;
+	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
 		setSipApplicationSession(mobicentsSipApplicationSession);
@@ -217,6 +228,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
+		this.subscriptions = new HashSet<EventHeader>();
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -822,6 +834,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {
 		this.sessionCreatingTransaction = sessionCreatingTransaction;
+		if(originalTransaction == null) {
+			this.originalTransaction = sessionCreatingTransaction;
+		}
 		if(sessionCreatingTransaction != null) {
 			addOngoingTransaction(sessionCreatingTransaction);
 		}
@@ -881,10 +896,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * Add an ongoing tx to the session.
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
-		readyToInvalidate = false;
-		this.ongoingTransactions.add(transaction);
-		if(logger.isDebugEnabled()) {
-			logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
+		
+		if(!ongoingTransactions.contains(transaction)) { 
+			this.ongoingTransactions.add(transaction);
+			if(logger.isDebugEnabled()) {
+				logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
+			}
+			readyToInvalidate = false;
 		}
 	}
 	
@@ -983,8 +1001,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}						
 		}
 		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(cSeqHeader.getMethod())) || response.getStatus() == 487) {
-			setState(State.TERMINATED);
-			readyToInvalidate =true;
+			boolean hasOngoingSubscriptions = false;
+			synchronized (subscriptions) {
+				if(subscriptions.size() > 0) {
+					hasOngoingSubscriptions = true;
+				}
+			}
+			if(!hasOngoingSubscriptions) {
+				setState(State.TERMINATED);
+				readyToInvalidate =true;
+				if(sessionCreatingDialog != null) {
+					sessionCreatingDialog.delete();
+				}
+			}
+			okToByeSentOrReceived = true;
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
@@ -1253,5 +1283,63 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setRemoteParty(Address remoteParty) {
 		this.remoteParty = remoteParty;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addSubscription(SipServletMessageImpl sipServletMessageImpl) throws SipException {
+		EventHeader eventHeader = null;
+		if(sipServletMessageImpl instanceof SipServletResponseImpl) {
+			eventHeader =  (EventHeader) ((SipServletRequestImpl)((SipServletResponseImpl)sipServletMessageImpl).getRequest()).getMessage().getHeader(EventHeader.NAME);
+		} else {
+			eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("adding subscription " + eventHeader + " to sip session " + getId());
+		}
+		synchronized (subscriptions) {
+			subscriptions.add(eventHeader);	
+		}		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Request from Original Transaction is " + originalTransaction.getRequest());
+			logger.debug("Dialog is " + sessionCreatingDialog);
+		}
+		if(subscriptions.size() < 2 && originalTransaction != null && Request.INVITE.equals(originalTransaction.getRequest().getMethod())) {
+			sessionCreatingDialog.terminateOnBye(false);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeSubscription(SipServletMessageImpl sipServletMessageImpl) {
+		EventHeader eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
+		if(logger.isInfoEnabled()) {
+			logger.info("removing subscription " + eventHeader + " to sip session " + getId());
+		}
+		boolean hasOngoingSubscriptions = false;
+		synchronized (subscriptions) {
+			subscriptions.remove(eventHeader);
+			if(subscriptions.size() > 0) {
+				hasOngoingSubscriptions = true;
+			}
+		}
+		if(!hasOngoingSubscriptions) {		
+			if(subscriptions.size() < 1) {
+				if((originalTransaction != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalTransaction.getRequest().getMethod()) ) {
+					readyToInvalidate = true;
+					setState(State.TERMINATED);
+				}
+			}			
+		}
+		if(readyToInvalidate) {
+			if(logger.isInfoEnabled()) {
+				logger.info("no more subscriptions in session " + getId());
+			}
+			if(sessionCreatingDialog != null) {
+				sessionCreatingDialog.delete();
+			}
+		}
 	}
 }

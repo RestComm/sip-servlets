@@ -36,6 +36,8 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		SubscriptionState.PENDING.toLowerCase(), SubscriptionState.ACTIVE.toLowerCase(), SubscriptionState.TERMINATED.toLowerCase() 
 	};
 	
+	private static final String SESSION_INVALIDATED = new String("sipSessionReadyToBeInvalidated");	
+	
 	TestSipListener receiver;
 	
 	ProtocolObjects receiverProtocolObjects;
@@ -72,13 +74,23 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();			
 	}
 	
+	/*
+	 * Test the fact that a sip servlet send a SUBSCRIBE (here 2 subscribes for different event ie subscriptions)
+	 * and receive NOTIFYs. 
+	 * Check that everything works correctly included the Sip Session Termination upon receiving a NOTIFY
+	 * containing Subscription State of Terminated.
+	 */
 	public void testSipServletSendsSubscribe() throws InterruptedException {
 //		receiver.sendInvite();
-		Thread.sleep(TIMEOUT);
-		assertEquals(3, receiver.getAllSubscriptionState().size());
+		Thread.sleep(TIMEOUT*2);
+		assertEquals(6, receiver.getAllSubscriptionState().size());
 		for (String subscriptionState : SUBSCRIPTION_STATES) {
 			assertTrue(subscriptionState + " not present", receiver.getAllSubscriptionState().contains(subscriptionState));	
-		}		
+		}				
+		Thread.sleep(TIMEOUT);
+		assertEquals(1, receiver.getAllMessagesContent().size());
+		assertTrue("session not invalidated after receiving Terminated Subscription State", receiver.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		
 	}
 
 	@Override

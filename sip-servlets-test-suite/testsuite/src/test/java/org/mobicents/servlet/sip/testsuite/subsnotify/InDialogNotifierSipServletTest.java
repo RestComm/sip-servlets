@@ -32,9 +32,9 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class NotifierSipServletTest extends SipServletTestCase {
+public class InDialogNotifierSipServletTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(NotifierSipServletTest.class);
+	private static Log logger = LogFactory.getLog(InDialogNotifierSipServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
@@ -52,7 +52,7 @@ public class NotifierSipServletTest extends SipServletTestCase {
 	ProtocolObjects senderProtocolObjects;	
 
 	
-	public NotifierSipServletTest(String name) {
+	public InDialogNotifierSipServletTest(String name) {
 		super(name);
 	}
 
@@ -66,7 +66,7 @@ public class NotifierSipServletTest extends SipServletTestCase {
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/subsnotify/notifier-sip-servlet-dar.properties";
+				"org/mobicents/servlet/sip/testsuite/subsnotify/indialog-notifier-sip-servlet-dar.properties";
 	}
 	
 	@Override
@@ -77,7 +77,7 @@ public class NotifierSipServletTest extends SipServletTestCase {
 			senderProtocolObjects =new ProtocolObjects(
 					"sender", "gov.nist", TRANSPORT, AUTODIALOG);
 						
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+			sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 			SipProvider senderProvider = sender.createProvider();			
 			
 			senderProvider.addSipListener(sender);
@@ -90,11 +90,12 @@ public class NotifierSipServletTest extends SipServletTestCase {
 	}
 	
 	/*
-	 * Test the fact that a sip servlet receive SUBSCRIBEs and sends NOTIFYs in response. 
-	 * Check that everything works correctly included the Sip Session Termination upon sending a NOTIFY
-	 * containing Subscription State of Terminated.
+	 * Test the fact that a sip servlet receive SUBSCRIBE and sends NOTIFYs in response in an existing dialog (INVITE call). 
+	 * Check that everything works correctly included the Sip Session Termination.
+	 * Session Termination should occur only when the last NOTIFY comes in is since the NOTIFY
+	 * containing Subscription State of Terminated is sent after the BYE
 	 */
-	public void testNotify() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testInDialogSubscriptionByeSentBeforeTerminatingNotify() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -105,15 +106,62 @@ public class NotifierSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest(Request.SUBSCRIBE, fromAddress, toAddress, null, null, false);		
+		sender.sendSipRequest(Request.INVITE, fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		
+		sender.setSendByeBeforeTerminatingNotify(true);
+		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null);		
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(sender.getOkToByeReceived());
+		for (String subscriptionState : sender.getAllSubscriptionState()) {
+			logger.info("Subscription state :" + subscriptionState);	
+		}
 		assertEquals(3, sender.getAllSubscriptionState().size());
 		for (String subscriptionState : SUBSCRIPTION_STATES) {
 			assertTrue(subscriptionState + " not present",sender.getAllSubscriptionState().contains(subscriptionState));	
 		}				
 		Thread.sleep(TIMEOUT);
 		assertEquals(1, sender.getAllMessagesContent().size());
-		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
+		
+	}
+	
+	/*
+	 * Test the fact that a sip servlet receive SUBSCRIBE and sends NOTIFYs in response in an existing dialog (INVITE call). 
+	 * Check that everything works correctly included the Sip Session Termination.
+	 * Session Termination should occur only when the BYE is sent since the NOTIFY
+	 * containing Subscription State of Terminated is sent before the BYE
+	 */
+	public void testInDialogSubscriptionByeSentAfterTerminatingNotify() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest(Request.INVITE, fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		
+		sender.setSendByeAfterTerminatingNotify(true);
+		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null);		
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(sender.getOkToByeReceived());
+		for (String subscriptionState : sender.getAllSubscriptionState()) {
+			logger.info("Subscription state :" + subscriptionState);	
+		}
+		assertEquals(3, sender.getAllSubscriptionState().size());
+		for (String subscriptionState : SUBSCRIPTION_STATES) {
+			assertTrue(subscriptionState + " not present",sender.getAllSubscriptionState().contains(subscriptionState));	
+		}				
+		Thread.sleep(TIMEOUT);
+		assertEquals(1, sender.getAllMessagesContent().size());
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
 		
 	}
 

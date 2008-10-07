@@ -51,6 +51,7 @@ import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.ExpiresHeader;
+import javax.sip.header.ExtensionHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
@@ -90,6 +91,10 @@ public class TestSipListener implements SipListener {
 	private static final String APPLICATION_CONTENT_TYPE = "application";
 
 	private boolean sendBye;
+	
+	private boolean sendByeBeforeTerminatingNotify;
+	
+	private boolean sendByeAfterTerminatingNotify;
 	
 	private SipProvider sipProvider;
 
@@ -178,6 +183,10 @@ public class TestSipListener implements SipListener {
 	DigestServerAuthenticationMethod dsam;
 
 	private long timeToWaitBetweenProvisionnalResponse = 1000;
+	
+	private long timeToWaitBetweenSubsNotify = 1000;
+
+	private boolean byeSent;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -192,7 +201,7 @@ public class TestSipListener implements SipListener {
 			try {
 				for (int i = 0; i < 1; i++) {
 
-					Thread.sleep(1000);
+					Thread.sleep(timeToWaitBetweenSubsNotify);
 					Request request = this.notifier.dialog.createRequest(Request.NOTIFY);
 					SubscriptionStateHeader subscriptionState = protocolObjects.headerFactory
 							.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE);
@@ -209,6 +218,9 @@ public class TestSipListener implements SipListener {
 					this.notifier.dialog.sendRequest(ct);
 					logger.info("Dialog " + dialog);
 					logger.info("Dialog state after active NOTIFY: " + dialog.getState());
+					if(sendByeBeforeTerminatingNotify && !byeSent) {
+						sendBye();
+					}
 				}
 			} catch (Throwable ex) {
 				logger.info(ex.getMessage(), ex);
@@ -303,12 +315,18 @@ public class TestSipListener implements SipListener {
 				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
 				headers.add(subscriptionStateHeader);
+				allMessagesContent.add("SIP/2.0 100 Trying");
 				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Trying", "message", "sipfrag;version=2.0", headers);
 				Thread.sleep(1000);
 				headers.remove(subscriptionStateHeader);
 				subscriptionStateHeader = (SubscriptionStateHeader) 
 					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "terminated;reason=noresource");
 				headers.add(subscriptionStateHeader);
+				if(inviteRequest == null) {
+					ExtensionHeader extensionHeader = (ExtensionHeader) protocolObjects.headerFactory.createHeader("Out-Of-Dialog", "true");
+					headers.add(extensionHeader);
+				}
+				allMessagesContent.add("SIP/2.0 200 OK");
 				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 200 OK", "message", "sipfrag;version=2.0", headers);
 			} else {
 				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
@@ -442,6 +460,9 @@ public class TestSipListener implements SipListener {
 				this.dialog.terminateOnBye(false);
 			} else {
 				response = protocolObjects.messageFactory.createResponse(200, request);
+				this.dialog = st.getDialog();
+				// subscribe dialogs do not terminate on bye.
+				this.dialog.terminateOnBye(false);
 			}
 
 			// Both 2xx response to SUBSCRIBE and NOTIFY need a Contact
@@ -501,6 +522,9 @@ public class TestSipListener implements SipListener {
 			// notifyRequest.setHeader(routeHeader);
 			ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);
 
+			if(sstate.getState().equals(SubscriptionStateHeader.TERMINATED)) {
+				Thread.sleep(timeToWaitBetweenSubsNotify);
+			}
 			// Let the other side know that the tx is pending acceptance
 			//
 			dialog.sendRequest(ct);
@@ -563,8 +587,13 @@ public class TestSipListener implements SipListener {
 				if(subscriptionState.getReasonCode() == null) {
 					dialog.delete();
 				}
-			} else if (state.equalsIgnoreCase(SubscriptionStateHeader.ACTIVE)) {
+			} else if (state.equalsIgnoreCase(SubscriptionStateHeader.ACTIVE)) {				
 				if("reg".equalsIgnoreCase(((EventHeader)notify.getHeader(EventHeader.NAME)).getEventType())) {
+					if(sendByeBeforeTerminatingNotify) {
+						dialog.terminateOnBye(false);
+						sendBye();
+						Thread.sleep(1000);
+					}
 					logger.info("Subscriber: sending unSUBSCRIBE");
 					
 					// Else we end it ourselves
@@ -583,6 +612,12 @@ public class TestSipListener implements SipListener {
 					logger.info("unsubscribe dialog  " + dialog);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(unsubscribe);
 					dialog.sendRequest(ct);
+					if(sendByeAfterTerminatingNotify) {
+						Thread.sleep(1000);
+						sendBye();
+					}
+				} else if(sendByeBeforeTerminatingNotify) {
+					sendBye();
 				}
 			} else {
 				logger.info("Subscriber: state now " + state);// pending
@@ -856,6 +891,9 @@ public class TestSipListener implements SipListener {
 					// If the caller is supposed to send the bye
 					if(sendBye) {
 						sendBye();
+					}
+					if(sendByeAfterTerminatingNotify || sendByeAfterTerminatingNotify) {
+						this.dialog.terminateOnBye(false);
 					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					okToByeReceived = true;
@@ -1147,6 +1185,7 @@ public class TestSipListener implements SipListener {
 		Request byeRequest = this.dialog.createRequest(Request.BYE);
 		ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 		dialog.sendRequest(ct);
+		byeSent = true;
 	}
 
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
@@ -1276,6 +1315,21 @@ public class TestSipListener implements SipListener {
 			request.setContent(contents, contentTypeHeader);
 			request.setContentLength(contentLengthHeader);
 		}
+		addSpecificHeaders(method, request);
+		// Create the client transaction.
+		inviteClientTid = sipProvider.getNewClientTransaction(request);
+		// send the request out.
+		inviteClientTid.sendRequest();
+
+		this.transactionCount ++;
+		
+		logger.info("client tx = " + inviteClientTid);
+		dialog = inviteClientTid.getDialog();
+		this.dialogCount++;
+	}
+
+	private void addSpecificHeaders(String method, Request request)
+			throws ParseException, InvalidArgumentException {
 		if(Request.SUBSCRIBE.equals(method) || Request.PUBLISH.equals(method)) {
 			// Create an event header for the subscription.
 			EventHeader eventHeader = protocolObjects.headerFactory.createEventHeader(publishEvent);				
@@ -1301,16 +1355,6 @@ public class TestSipListener implements SipListener {
 			ReferToHeader referToHeader = (ReferToHeader) protocolObjects.headerFactory.createHeader(ReferToHeader.NAME, "sip:refer-to@nist.gov");
 			request.addHeader(referToHeader);
 		}
-		// Create the client transaction.
-		inviteClientTid = sipProvider.getNewClientTransaction(request);
-		// send the request out.
-		inviteClientTid.sendRequest();
-
-		this.transactionCount ++;
-		
-		logger.info("client tx = " + inviteClientTid);
-		dialog = inviteClientTid.getDialog();
-		this.dialogCount++;
 	}
 	
 	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects, boolean callerSendBye) {
@@ -1443,7 +1487,9 @@ public class TestSipListener implements SipListener {
 				message.addHeader(header);
 			}
 		}
-				
+		
+		addSpecificHeaders(method, message);
+		
 		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
 		dialog.sendRequest(clientTransaction);
 	}
@@ -1591,5 +1637,57 @@ public class TestSipListener implements SipListener {
 	 */
 	public long getTimeToWaitBetweenProvisionnalResponse() {
 		return timeToWaitBetweenProvisionnalResponse;
+	}
+
+	public long getTimeToWaitBetweenSubsNotify() {
+		return timeToWaitBetweenSubsNotify;
+	}
+
+	public void setTimeToWaitBetweenSubsNotify(long timeToWaitBetweenSubsNotify) {
+		this.timeToWaitBetweenSubsNotify = timeToWaitBetweenSubsNotify;
+	}
+
+	/**
+	 * @return the sendBye
+	 */
+	public boolean isSendBye() {
+		return sendBye;
+	}
+
+	/**
+	 * @param sendBye the sendBye to set
+	 */
+	public void setSendBye(boolean sendBye) {
+		this.sendBye = sendBye;
+	}
+
+	/**
+	 * @param sendByeBeforeTerminatingNotify the sendByeBeforeTerminatingNotify to set
+	 */
+	public void setSendByeBeforeTerminatingNotify(
+			boolean sendByeBeforeTerminatingNotify) {
+		this.sendByeBeforeTerminatingNotify = sendByeBeforeTerminatingNotify;
+	}
+
+	/**
+	 * @return the sendByeBeforeTerminatingNotify
+	 */
+	public boolean isSendByeBeforeTerminatingNotify() {
+		return sendByeBeforeTerminatingNotify;
+	}
+
+	/**
+	 * @param sendByeAfterTerminatingNotify the sendByeAfterTerminatingNotify to set
+	 */
+	public void setSendByeAfterTerminatingNotify(
+			boolean sendByeAfterTerminatingNotify) {
+		this.sendByeAfterTerminatingNotify = sendByeAfterTerminatingNotify;
+	}
+
+	/**
+	 * @return the sendByeAfterTerminatingNotify
+	 */
+	public boolean isSendByeAfterTerminatingNotify() {
+		return sendByeAfterTerminatingNotify;
 	}	
 }

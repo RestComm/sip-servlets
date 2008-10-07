@@ -28,8 +28,10 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
+import javax.sip.SipException;
 import javax.sip.Transaction;
 
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
@@ -135,5 +137,9 @@ public interface MobicentsSipSession extends SipSession {
 	void setRemoteParty(Address addressImpl);
 
 	SipApplicationRoutingRegion getRegionInternal();
+
+	//RFC 3265
+	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;
+	void removeSubscription(SipServletMessageImpl sipServletMessage);
 
 }

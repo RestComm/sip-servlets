@@ -27,6 +27,7 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
@@ -170,7 +171,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 					if(originalRequest != null) {				
 						originalRequest.setLastFinalResponse(sipServletResponse);					
 					}
-									
+					// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
+					// it creates a new subscription and a new dialog.
+					if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && sipServletResponse.getStatus() >= 200 && sipServletResponse.getStatus() <= 300) {					
+						session.addSubscription(sipServletResponse);
+					}
+					
 					// We can not use session.getProxyBranch() because all branches belong to the same session
 					// and the session.proxyBranch is overwritten each time there is activity on the branch.				
 					ProxyBranchImpl proxyBranch = null;

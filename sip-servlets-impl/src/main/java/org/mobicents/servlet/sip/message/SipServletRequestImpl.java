@@ -63,6 +63,7 @@ import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
@@ -882,8 +883,27 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					linkedRequest.setRoutingState(RoutingState.RELAYED);
 				}
 			}
+			getSipSession().addOngoingTransaction(getTransaction());
 			// Update Session state
 			super.session.updateStateOnSubsequentRequest(this, false);
+			// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
+			// a new subscription and a new dialog (unless they have already been
+			// created by a matching response, as described above).
+			SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+				getMessage().getHeader(SubscriptionStateHeader.NAME);		
+			if(Request.NOTIFY.equals(getMethod()) && 
+							(subscriptionStateHeader != null && 
+									SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+									SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
+				super.session.addSubscription(this);
+			}
+			// A subscription is destroyed when a notifier sends a NOTIFY request
+			// with a "Subscription-State" of "terminated".
+			if(Request.NOTIFY.equals(getMethod()) && 
+							(subscriptionStateHeader != null && 
+									SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
+				session.removeSubscription(this);
+			}
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
@@ -905,8 +925,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}			
-			isMessageSent = true;
-//			super.session.addOngoingTransaction(getTransaction());
+			isMessageSent = true;			
 			//updating the last accessed times 
 			getSipSession().access();
 			getSipSession().getSipApplicationSession().access();			

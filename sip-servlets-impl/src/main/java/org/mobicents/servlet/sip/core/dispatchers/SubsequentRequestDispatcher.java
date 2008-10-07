@@ -22,8 +22,10 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -162,7 +164,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
 				}
-			}
+			}			
+			
 			sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 			sipServletRequest.setSipSession(sipSession);			
 			// JSR 289 Section 6.2.1 :
@@ -170,8 +173,26 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			// the state change must be accomplished by the container before calling 
 			// the service() method of any SipServlet to handle the incoming message.
 			sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
-			
 			try {
+				// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
+				// a new subscription and a new dialog (unless they have already been
+				// created by a matching response, as described above).
+				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+					sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);		
+				if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+								(subscriptionStateHeader != null && 
+										SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+										SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
+					sipSession.addSubscription(sipServletRequest);
+				}
+				// A subscription is destroyed when a notifier sends a NOTIFY request
+				// with a "Subscription-State" of "terminated".			
+				if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+								(subscriptionStateHeader != null && 
+										SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
+					sipSession.removeSubscription(sipServletRequest);
+				}
+						
 				// See if the subsequent request should go directly to the proxy
 				if(sipServletRequest.getSipSession().getProxyBranch() != null) {
 					ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
@@ -199,6 +220,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					callServlet(sipServletRequest);				
 				}
 			} catch (ServletException e) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+			} catch (SipException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
 			} catch (IOException e) {				
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);

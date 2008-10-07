@@ -56,6 +56,8 @@ import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeTelURLSipServletTest;
+import org.mobicents.servlet.sip.testsuite.subsnotify.InDialogNotifierSipServletTest;
+import org.mobicents.servlet.sip.testsuite.subsnotify.InDialogSubscriberSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.NotifierSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.SubscriberSipServletTest;
 import org.mobicents.servlet.sip.testsuite.targeting.SessionKeyTargetingSipServletTest;
@@ -100,6 +102,8 @@ public class AllTests {
 		suite.addTestSuite(ServletMappingSipServletTest.class);
 		suite.addTestSuite(SubscriberSipServletTest.class);
 		suite.addTestSuite(NotifierSipServletTest.class);
+		suite.addTestSuite(InDialogNotifierSipServletTest.class);
+		suite.addTestSuite(InDialogSubscriberSipServletTest.class);
 		suite.addTestSuite(ReInviteSipServletTest.class);
 		suite.addTestSuite(UpdateSipServletTest.class);
 		suite.addTestSuite(PublishSipServletTest.class);

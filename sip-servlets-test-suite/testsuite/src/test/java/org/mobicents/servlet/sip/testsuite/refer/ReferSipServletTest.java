@@ -57,6 +57,8 @@ public class ReferSipServletTest extends SipServletTestCase {
 		"SIP/2.0 100 Subsequent" 
 	};
 	
+	private static final String SESSION_INVALIDATED = new String("sipSessionReadyToBeInvalidated");	
+	
 	
 	TestSipListener sender;
 	ProtocolObjects senderProtocolObjects;	
@@ -103,10 +105,10 @@ public class ReferSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
-	 * Call flow tested : See RFC 3515 Page 11-15
+	 * Call flow tested : See RFC 3515 Page 11-13
 	 * in this test, Sip Servlet is receiving the REFERs (Acts as Agent B in the RFC) 
 	 */
-	public void testSipServletsReceivesRefer() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testSipServletsReceivesReferOutOfDialog() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -118,6 +120,52 @@ public class ReferSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest(Request.REFER, fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT*2);		
+		assertTrue(referTo.isAckReceived());
+		assertEquals(3, sender.getAllMessagesContent().size());
+		for (String subscriptionState : NOTIFICATIONS) {
+			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
+		}
+		assertTrue(referTo.getOkToByeReceived());
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		
+	}
+	
+	/**
+	 * Call flow tested : See RFC 3515 Page 11-13
+	 * in this test, Sip Servlet is sending the REFERs (Acts as Agent A in the RFC) 
+	 */
+	public void testSipServletsSendsReferOutOfDialog() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		
+		Thread.sleep(TIMEOUT * 2);		
+		assertEquals(NOTIFICATIONS.length + 1, sender.getAllMessagesContent().size());
+		for (String subscriptionState : NOTIFICATIONS) {
+			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
+		}
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		
+	}
+	
+	/**
+	 * Call flow tested : See RFC 3515 Page 13-15
+	 * in this test, Sip Servlet is receiving the REFERs (Acts as Agent B in the RFC) 
+	 */
+	public void testSipServletsReceivesReferInDialog() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest(Request.INVITE, fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);		
 		Thread.sleep(TIMEOUT);		
 		assertTrue(referTo.isAckReceived());
 		assertEquals(NOTIFICATIONS.length, sender.getAllMessagesContent().size());
@@ -126,29 +174,47 @@ public class ReferSipServletTest extends SipServletTestCase {
 		}
 		assertTrue(referTo.getOkToByeReceived());
 		sender.getAllMessagesContent().clear();
-		ReferToHeader referToHeader = (ReferToHeader) 
-			senderProtocolObjects.headerFactory.createHeader(ReferToHeader.NAME, "sip:refer-to@nist.gov");
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(referToHeader);
-		sender.sendInDialogSipRequest(Request.REFER, null, null, null, headers);
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertEquals(INDIALOG_NOTIFICATIONS.length, sender.getAllMessagesContent().size());
 		for (String subscriptionState : INDIALOG_NOTIFICATIONS) {
 			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
 		}
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);	
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
 	}
 	
 	/**
-	 * Call flow tested : See RFC 3515 Page 11-15
-	 * in this test, Sip Servlet is sending the REFERs (Acts as Agent A in the RFC) 
+	 * Call flow tested : See RFC 3515 Page 13-15
+	 * in this test, Sip Servlet is receiving the REFERs (Acts as Agent B in the RFC) 
 	 */
-	public void testSipServletsSendsRefer() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testSipServletsReceivesReferInDialogByeSentBeforeTermSubscription() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
 		
-		Thread.sleep(TIMEOUT * 2);		
-		assertEquals(INDIALOG_NOTIFICATIONS.length, sender.getAllMessagesContent().size());
-		for (String subscriptionState : INDIALOG_NOTIFICATIONS) {
+		sender.sendSipRequest(Request.INVITE, fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		
+		sender.setSendByeBeforeTerminatingNotify(true);
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);		
+		Thread.sleep(TIMEOUT*2);		
+		assertTrue(referTo.isAckReceived());
+		assertEquals(3, sender.getAllMessagesContent().size());
+		for (String subscriptionState : NOTIFICATIONS) {
 			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
-		}
+		}						
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
 	}
 
 	@Override
