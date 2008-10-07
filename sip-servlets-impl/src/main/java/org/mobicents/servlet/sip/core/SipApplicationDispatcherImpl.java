@@ -70,6 +70,7 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -611,7 +612,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		try {
 			if(logger.isInfoEnabled()) {
-				logger.info("session " + sipSessionImpl.getId() + " already invalidated ? :" + sipSessionImpl.isValid());
+				logger.info("session " + sipSessionImpl.getId() + " is valid ? :" + sipSessionImpl.isValid());
 			}
 			if(sipSessionImpl.isValid()) {
 				if(logger.isInfoEnabled()) {
@@ -707,11 +708,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		if(logger.isInfoEnabled()) {
 			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
-		}
+		}		
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		if(tad != null) {
-			MobicentsSipSession sipSessionImpl = tad.getSipServletMessage().getSipSession();
+			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
+			MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
 			if(sipSessionImpl == null) {
 				if(logger.isInfoEnabled()) {
 					logger.info("no sip session were returned for this transaction " + transaction);
@@ -719,7 +721,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} else {
 				if(logger.isInfoEnabled()) {
 					logger.info("sip session " + sipSessionImpl.getId() + " returned for this transaction " + transaction);
-				}
+				}							
+				
 //				sipSessionImpl.removeOngoingTransaction(transaction);
 				tryToInvalidateSession(sipSessionImpl);
 			}
