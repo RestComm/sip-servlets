@@ -427,7 +427,7 @@ public class ProxyBranchImpl implements ProxyBranch {
 		try {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
-			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK)) {
+			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) || clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
 				sipProvider.sendRequest(clonedRequest);
 			}
 			else {

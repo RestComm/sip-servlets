@@ -171,6 +171,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				TimerServiceImpl.getInstance());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
 				Arrays.asList(SipApplicationDispatcher.EXTENSIONS_SUPPORTED));
+		this.getServletContext().setAttribute("javax.servlet.sip.100rel", Boolean.TRUE);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
 				Arrays.asList(SipApplicationDispatcher.RFC_SUPPORTED));
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,

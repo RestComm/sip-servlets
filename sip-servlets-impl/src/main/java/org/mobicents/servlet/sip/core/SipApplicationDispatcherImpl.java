@@ -70,7 +70,6 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RouteHeader;
-import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -449,7 +448,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isInfoEnabled()) {
 				logger.info("Got a request event "  + request.toString());
 			}
-			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
+			if (!Request.ACK.equals(request.getMethod()) && !Request.PRACK.equals(request.getMethod())  && transaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
 				    if(request.getHeader(MaxForwardsHeader.NAME)==null){
@@ -663,7 +662,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			transaction = timeoutEvent.getClientTransaction();
 		}
 		if(logger.isInfoEnabled()) {
-			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
+			logger.info("transaction " + transaction + " timed out => " + transaction.getRequest().toString());
 		}
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
@@ -673,18 +672,45 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(sipSession != null) {
 				sipSession.removeOngoingTransaction(transaction);			
 				//notifying SipErrorListener that no ACK has been received for a UAS only
+				SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
+					((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
+				if(logger.isInfoEnabled()) {
+					logger.info("last Final Response" + lastFinalResponse);
+				}
 				if(sipServletMessage instanceof SipServletRequestImpl &&
 						tad.getProxy() == null &&
-						((SipServletRequestImpl)sipServletMessage).getLastFinalResponse() != null) {
+						lastFinalResponse != null) {
 					List<SipErrorListener> sipErrorListeners = 
 						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
 					
 					SipErrorEvent sipErrorEvent = new SipErrorEvent(
 							(SipServletRequest)sipServletMessage, 
-							((SipServletRequestImpl)sipServletMessage).getLastFinalResponse());
+							lastFinalResponse);
 					for (SipErrorListener sipErrorListener : sipErrorListeners) {
 						try {					
 							sipErrorListener.noAckReceived(sipErrorEvent);
+						} catch (Throwable t) {
+							logger.error("SipErrorListener threw exception", t);
+						}
+					}
+				}
+				SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
+					((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
+				if(logger.isInfoEnabled()) {
+					logger.info("last Informational Response" + lastInfoResponse);
+				}
+				if(sipServletMessage instanceof SipServletRequestImpl &&
+						tad.getProxy() == null &&
+						 lastInfoResponse != null) {
+					List<SipErrorListener> sipErrorListeners = 
+						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
+					
+					SipErrorEvent sipErrorEvent = new SipErrorEvent(
+							(SipServletRequest)sipServletMessage, 
+							lastInfoResponse);
+					for (SipErrorListener sipErrorListener : sipErrorListeners) {
+						try {					
+							sipErrorListener.noPrackReceived(sipErrorEvent);
 						} catch (Throwable t) {
 							logger.error("SipErrorListener threw exception", t);
 						}

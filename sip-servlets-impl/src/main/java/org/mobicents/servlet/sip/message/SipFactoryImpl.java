@@ -335,6 +335,10 @@ public class SipFactoryImpl implements Serializable {
 			throw new IllegalArgumentException(
 					"Wrong method to create request with[" + Request.ACK + "]!");
 		}
+		if (method.equals(Request.PRACK)) {
+			throw new IllegalArgumentException(
+					"Wrong method to create request with[" + Request.PRACK + "]!");
+		}
 		if (method.equals(Request.CANCEL)) {
 			throw new IllegalArgumentException(
 					"Wrong method to create request with[" + Request.CANCEL

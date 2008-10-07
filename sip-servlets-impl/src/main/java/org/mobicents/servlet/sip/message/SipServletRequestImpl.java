@@ -122,6 +122,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	private SipServletResponse lastFinalResponse;
 	
+	private SipServletResponse lastInformationalResponse;
+	
 	/**
 	 * Routing region.
 	 */
@@ -287,7 +289,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
 					(ServerTransaction) getTransaction(), session, getDialog());
 			newSipServletResponse.setOriginalRequest(this);
-			if(newSipServletResponse.getStatus() >= Response.OK && 
+			if(!Request.PRACK.equals(request.getMethod()) && newSipServletResponse.getStatus() >= Response.OK && 
 					newSipServletResponse.getStatus() <= Response.SESSION_NOT_ACCEPTABLE) {	
 				isFinalResponseGenerated = true;
 			}
@@ -873,6 +875,31 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 				super.setTransaction(ctx);
 
+			} else if (Request.PRACK.equals(request.getMethod())) {
+				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();				
+				ClientTransaction ctx = sipProvider.getNewClientTransaction(request);
+				//Keeping the transactions mapping in application data for CANCEL handling
+				if(linkedRequest != null) {
+					//keeping the client transaction in the server transaction's application data
+					((TransactionApplicationData)linkedRequest.getTransaction().getApplicationData()).setTransaction(ctx);
+					if(linkedRequest.getDialog() != null && linkedRequest.getDialog().getApplicationData() != null) {
+						((TransactionApplicationData)linkedRequest.getDialog().getApplicationData()).setTransaction(ctx);
+					}
+					//keeping the server transaction in the client transaction's application data
+					this.transactionApplicationData.setTransaction(linkedRequest.getTransaction());
+					if(dialog!= null && dialog.getApplicationData() != null) {
+						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
+					}
+				}
+				transactionApplicationData.setB2buaHelper(b2buaHelper);
+				// SIP Request is ALWAYS pointed to by the client tx.
+				// Notice that the tx appplication data is cached in the request
+				// copied over to the tx so it can be quickly accessed when response
+				// arrives.				
+				ctx.setApplicationData(this.transactionApplicationData);
+				
+				setTransaction(ctx);
 			}
 
 			//tells the application dispatcher to stop routing the linked request
@@ -912,7 +939,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
-					|| getDialog().getState() == DialogState.EARLY) {
+					|| (getDialog().getState() == DialogState.EARLY && !Request.PRACK.equals(request.getMethod()))) {
 				if(logger.isInfoEnabled()) {
 					logger.info("Sending the request " + request);
 				}
@@ -1126,10 +1153,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/**
 	 * @param finalResponse the finalResponse to set
 	 */
-	public void setLastFinalResponse(SipServletResponse finalResponse) {
-		if(finalResponse.getStatus() >= 200 && 
-				(lastFinalResponse == null || lastFinalResponse.getStatus() < finalResponse.getStatus())) {
-			this.lastFinalResponse = finalResponse;
+	public void setResponse(SipServletResponse response) {
+		if(response.getStatus() >= 200 && 
+				(lastFinalResponse == null || lastFinalResponse.getStatus() < response.getStatus())) {
+			this.lastFinalResponse = response;
+		}
+		if((response.getStatus() > 100 && response.getStatus() < 200) && 
+				(lastInformationalResponse == null || lastInformationalResponse.getStatus() < response.getStatus())) {
+			this.lastInformationalResponse = response;
 		}
 	}
 
@@ -1230,4 +1261,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return isFinalResponseGenerated;
 	}
 
+	/**
+	 * @return the lastInformationalResponse
+	 */
+	public SipServletResponse getLastInformationalResponse() {
+		return lastInformationalResponse;
+	}
 }

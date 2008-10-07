@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.Supported;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -42,9 +44,12 @@ import javax.sip.TransactionState;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.Header;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.RequireHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.SupportedHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
@@ -65,6 +70,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
  */
 public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
+	private static final String REL100_OPTION_TAG = "100rel";
+
 	private static Log logger =  LogFactory.getLog(SipServletResponseImpl.class);
 	
 	Response response;
@@ -74,6 +81,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	private boolean isProxiedResponse;
 	private boolean isResponseForwardedUpstream;
 	private boolean isAckGenerated;
+	private boolean isPrackGenerated;
 	
 	/**
 	 * Constructor
@@ -193,9 +201,46 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		return sipServletAckRequest;
 	}
 
-	public SipServletRequest createPrack() {
-		// TODO Auto-generated method stub
-		return null;
+	public SipServletRequest createPrack() throws Rel100Exception {
+		if((response.getStatusCode() == 100 && response.getStatusCode() >= 200) || isPrackGenerated) {
+			throw new IllegalStateException("the transaction state is such that it doesn't allow a PRACK to be sent now, or this response is provisional only, or a PRACK has already been generated");
+		}
+		if(!Request.INVITE.equals(getTransaction().getRequest().getMethod())) {
+			throw new Rel100Exception(Rel100Exception.NOT_INVITE);
+		}		
+		Dialog dialog = super.session.getSessionCreatingDialog();
+		SipServletRequestImpl sipServletPrackRequest = null; 
+		try {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dialog to create the prack Request " + dialog);
+			}
+			Request prackRequest = dialog.createPrack(response);
+			if(logger.isInfoEnabled()) {
+				logger.info("prackRequest just created " + prackRequest);
+			}
+			//Application Routing to avoid going through the same app that created the ack
+			ListIterator<RouteHeader> routeHeaders = prackRequest.getHeaders(RouteHeader.NAME);
+			prackRequest.removeHeader(RouteHeader.NAME);
+			while (routeHeaders.hasNext()) {
+				RouteHeader routeHeader = routeHeaders.next();
+				String routeAppName = ((SipURI)routeHeader .getAddress().getURI()).
+					getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
+				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
+					prackRequest.addHeader(routeHeader);
+				}
+			}
+			sipServletPrackRequest = new SipServletRequestImpl(
+					prackRequest,
+					this.sipFactoryImpl, 
+					this.getSipSession(), 
+					this.getTransaction(), 
+					dialog, 
+					false); 
+			isPrackGenerated = true;
+		} catch (SipException e) {
+			logger.error("Impossible to create the ACK",e);
+		}		
+		return sipServletPrackRequest;
 	}
 
 	/*
@@ -257,8 +302,17 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletResponse#sendReliably()
 	 */
 	public void sendReliably() throws Rel100Exception {
-		//FIXME add support for it
-		throw new Rel100Exception(Rel100Exception.NOT_SUPPORTED);
+		final int statusCode = getStatus();
+		if(statusCode == 100 || statusCode >= 200) {
+			throw new Rel100Exception(Rel100Exception.NOT_1XX);
+		}
+		if(!Request.INVITE.equals(originalRequest.getMethod())) {
+			throw new Rel100Exception(Rel100Exception.NOT_INVITE);
+		}
+		if(!REL100_OPTION_TAG.equals(originalRequest.getHeader(RequireHeader.NAME)) && !REL100_OPTION_TAG.equals(originalRequest.getHeader(SupportedHeader.NAME))) {
+			throw new Rel100Exception(Rel100Exception.NO_REQ_SUPPORT);
+		}
+		send(true);
 	}
 	
 	/*
@@ -340,6 +394,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	@Override
 	public void send()  {
+		send(false);
+	}
+
+	public void send(boolean sendReliably) {
 		if(isMessageSent) {
 			throw new IllegalStateException("message already sent");
 		}
@@ -379,6 +437,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			// it creates a new subscription and a new dialog.
 			if(Request.SUBSCRIBE.equals(getMethod()) && getStatus() >= 200 && getStatus() <= 300) {					
 				session.addSubscription(this);
+			}
+			// RFC 3262 Section 3 UAS Behavior
+			if(sendReliably) {
+				Header requireHeader = SipFactories.headerFactory.createRequireHeader(REL100_OPTION_TAG);
+				response.addHeader(requireHeader);
+				Header rseqHeader = SipFactories.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
+				response.addHeader(rseqHeader);
 			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sending response "+ this.message);
@@ -422,8 +487,14 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
 			}
-			
-			st.sendResponse( (Response)this.message );
+			if(originalRequest != null) {				
+				originalRequest.setResponse(this);					
+			}
+			if(sendReliably) {
+				getTransaction().getDialog().sendReliableProvisionalResponse((Response)this.message);
+			} else {
+				st.sendResponse( (Response)this.message );
+			}
 			isMessageSent = true;
 			if(isProxiedResponse) {
 				isResponseForwardedUpstream = true;
@@ -436,7 +507,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException(e);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletResponse#getChallengeRealms()

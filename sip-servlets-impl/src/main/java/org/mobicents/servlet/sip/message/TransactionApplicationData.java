@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.message;
 import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.B2buaHelper;
@@ -43,10 +44,12 @@ public class TransactionApplicationData implements Serializable {
 	private transient int initialRemotePort;
 	private transient String initialRemoteTransport;
 	private transient Address initialPoppedRoute;
-	
+	private transient AtomicInteger rseqNumber;
+		
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
 		sipServletResponses = new CopyOnWriteArraySet<SipServletResponseImpl>();
+		rseqNumber = new AtomicInteger(1);
 	}
 	/**
 	 * set proxy
@@ -157,5 +160,16 @@ public class TransactionApplicationData implements Serializable {
 		this.initialPoppedRoute = initialPoppedRoute;
 	}
 	
-
+	/**
+	 * @return the rseqNumber
+	 */
+	public AtomicInteger getRseqNumber() {
+		return rseqNumber;
+	}
+	/**
+	 * @param rseqNumber the rseqNumber to set
+	 */
+	public void setRseqNumber(AtomicInteger rseqNumber) {
+		this.rseqNumber = rseqNumber;
+	}
 }

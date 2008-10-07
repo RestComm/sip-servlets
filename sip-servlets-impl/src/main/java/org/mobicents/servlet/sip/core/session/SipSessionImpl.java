@@ -269,10 +269,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#createRequest(java.lang.String)
 	 */
 	public SipServletRequest createRequest(final String method) {
-		if(method.equalsIgnoreCase(Request.ACK)
+		if(method.equalsIgnoreCase(Request.ACK) || method.equalsIgnoreCase(Request.PRACK)
 				|| method.equalsIgnoreCase(Request.CANCEL)) {
 			throw new IllegalArgumentException(
-					"Can not create ACK or CANCEL requests with this method");
+					"Can not create ACK, PRACK or CANCEL requests with this method");
 		}
 		if(!isValid()) {
 			throw new IllegalStateException("cannot create a request because the session is invalid");

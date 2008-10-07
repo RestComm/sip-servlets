@@ -167,16 +167,15 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 				
 				try {
-					// See if this is a response to a proxied request
 					if(originalRequest != null) {				
-						originalRequest.setLastFinalResponse(sipServletResponse);					
+						originalRequest.setResponse(sipServletResponse);					
 					}
 					// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
 					// it creates a new subscription and a new dialog.
 					if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && sipServletResponse.getStatus() >= 200 && sipServletResponse.getStatus() <= 300) {					
 						session.addSubscription(sipServletResponse);
 					}
-					
+					// See if this is a response to a proxied request
 					// We can not use session.getProxyBranch() because all branches belong to the same session
 					// and the session.proxyBranch is overwritten each time there is activity on the branch.				
 					ProxyBranchImpl proxyBranch = null;

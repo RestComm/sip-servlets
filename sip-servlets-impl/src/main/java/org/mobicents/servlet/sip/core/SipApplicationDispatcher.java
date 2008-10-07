@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
@@ -45,10 +44,10 @@ public interface SipApplicationDispatcher extends SipListener {
 
 	// List of sip extensions supported by the container
 	public static final String[] EXTENSIONS_SUPPORTED = 
-		new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER"};
+		new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel"};
 	// List of sip rfcs supported by the container
 	public static final String[] RFC_SUPPORTED = 
-		new String[] {"3261", "3428", "2976", "3265", "3311", "3903", "3515"};
+		new String[] {"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262"};
 	
 	/**
 	 * Initialize the sip application dispatcher. <br/>
