@@ -400,7 +400,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			// Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.
 			throw new DispatcherException(Response.NOT_FOUND, "the Request-URI does not point to another domain, and there is no Route header," + 
 					"the container should not send the request as it will cause a loop. " +
-					"Instead, the container must reject the request with 404 Not Found final response with no Retry-After header.");				
+					"Instead, the container must reject the request with 404 Not Found final response with no Retry-After header. You may want to check your dar configuration file to see if the request can be handled or make sure you use the correct Application Router jar.");				
 		}
 	}
 
