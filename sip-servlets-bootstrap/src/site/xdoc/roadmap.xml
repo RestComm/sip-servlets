@@ -522,7 +522,7 @@
 						More Extensions : PRACK, OPTIONS, INFO
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -533,7 +533,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=362">
 									Incorrect Session Invalidation for SUBSCRIBE/NOTIFY
