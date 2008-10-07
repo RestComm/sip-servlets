@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.startup.loading;
 
+import java.util.HashMap;
+
 import org.apache.catalina.deploy.LoginConfig;
 /**
  * 
@@ -25,4 +27,20 @@ public class SipLoginConfig extends LoginConfig {
 	public static final String BASIC_AUTHENTICATION_METHOD = "BASIC";
 	public static final String DIGEST_AUTHENTICATION_METHOD = "DIGEST";
 	public static final String CLIENT_CERT_AUTHENTICATION_METHOD = "CLIENT_CERT";
+	
+	public static final String IDENTITY_SCHEME_SUPPORTED = "SUPPORTED";
+	public static final String IDENTITY_SCHEME_REQUIRED = "REQUIRED";
+	
+	public static final String IDENTITY_SCHEME_P_ASSERTED = "P-Asserted-Identity";
+	public static final String IDENTITY_SCHEME_IDENTITY = "Identity";
+	
+	private HashMap<String, String> identityAssertionSchemes = new HashMap<String, String>();
+	
+	public void addIdentityAssertion(String scheme, String support) {
+		identityAssertionSchemes.put(scheme, support);
+	}
+	
+	public String getIdetitySchemeSettings(String scheme) {
+		return identityAssertionSchemes.get(scheme);
+	}
 }

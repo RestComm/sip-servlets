@@ -301,6 +301,10 @@ public class SipRuleSet extends RuleSetBase {
                                "setAuthMethod", 0);
         digester.addCallMethod(prefix + "sip-app/login-config/realm-name",
                                "setRealmName", 0);
+        digester.addCallMethod(prefix + "sip-app/login-config/identity-assertion",
+                "addIdentityAssertion", 2);
+        digester.addCallParam(prefix + "sip-app/login-config/identity-assertion/identity-assertion-scheme", 0);
+        digester.addCallParam(prefix + "sip-app/login-config/identity-assertion/identity-assertion-support", 1);
         //Handles Security Role
         digester.addCallMethod(prefix + "sip-app/security-role/role-name",
                                "addSecurityRole", 0);
