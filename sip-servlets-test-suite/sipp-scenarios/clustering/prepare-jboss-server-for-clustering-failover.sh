@@ -22,7 +22,7 @@ mkdir $JBOSS_HOME/server/port-1/conf/dars
 mkdir $JBOSS_HOME/server/port-2/conf/dars
 
 mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.0.war $JBOSS_HOME/server/port-1/deploy
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.0.war $JBOSS_HOME/server/port-2/deploy
+cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
 cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-1/conf/dars
 cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars

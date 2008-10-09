@@ -12,5 +12,5 @@ mvn clean install -f ../../../pom.xml -P jboss -Dnode=all
 mkdir $JBOSS_HOME/server/all/conf/dars
 
 mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.0.war $JBOSS_HOME/server/all/deploy
+cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
 cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/all/conf/dars

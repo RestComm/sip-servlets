@@ -18,8 +18,6 @@ package org.mobicents.servlet.sip.startup.failover;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -111,6 +109,11 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     
     @Override
     public void stop() throws LifecycleException {
+    	// Force removal from load balancer upon shutdown 
+    	// added for Issue 308 (http://code.google.com/p/mobicents/issues/detail?id=308)
+    	ArrayList<SIPNode> info = getConnectorsAsSIPNode();
+    	removeNodesFromBalancers(info);
+    	//cleaning 
     	balancerNames.clear();
     	register.clear();
     	this.hearBeatTaskToRun.cancel();
@@ -297,6 +300,99 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		return this.removeBalancerAddress(address.getHostAddress());
 	}
 
+	private ArrayList<SIPNode> getConnectorsAsSIPNode() {
+		ArrayList<SIPNode> info = new ArrayList<SIPNode>();
+		// Gathering info about server' sip listening points
+		for (Connector connector : connectors) {
+			ProtocolHandler protocolHandler = connector.getProtocolHandler();
+			if(protocolHandler instanceof SipProtocolHandler) {
+				SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) protocolHandler;
+				String address = sipProtocolHandler.getIpAddress();
+				int port = sipProtocolHandler.getPort();
+				String transport = sipProtocolHandler.getSignalingTransport();
+				String[] transports = new String[] {transport};
+				
+				String hostName = null;
+				try {
+					InetAddress[] aArray = InetAddress
+							.getAllByName(address);
+					if (aArray != null && aArray.length > 0) {
+						// Damn it, which one we should pick?
+						hostName = aArray[0].getCanonicalHostName();
+					}
+				} catch (UnknownHostException e) {
+					logger.error("An exception occurred while trying to retrieve the hostname of a sip connector", e);
+				}
+
+				SIPNode node = new SIPNode(hostName, address, port,
+						transports);
+
+				info.add(node);
+			}
+		}
+		return info;
+	}
+	
+	/**
+	 * @param info
+	 */
+	private void sendKeepAliveToBalancers(ArrayList<SIPNode> info) {
+		for(InetAddress ah:new HashSet<InetAddress>(register.values())) {
+			try {
+				Registry registry = LocateRegistry.getRegistry(ah.getHostAddress(),2000);
+				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
+				reg.handlePing(info);
+				displayBalancerWarining = true;
+				if(displayBalancerFound) {
+					logger.info("SIP Load Balancer Found!");
+					displayBalancerFound = false;
+				}
+			} catch (Exception e) {
+				if(displayBalancerWarining) {
+					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
+							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
+					logger.debug("Cannot access the SIP load balancer RMI registry: " , e);
+					displayBalancerWarining = false;
+				}
+				displayBalancerFound = true;
+			}
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Finished gathering");
+			logger.debug("Gathered info[" + info + "]");
+		}
+	}
+	
+	/**
+	 * @param info
+	 */
+	private void removeNodesFromBalancers(ArrayList<SIPNode> info) {
+		for(InetAddress ah:new HashSet<InetAddress>(register.values())) {
+			try {
+				Registry registry = LocateRegistry.getRegistry(ah.getHostAddress(),2000);
+				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
+				reg.forceRemoval(info);
+				displayBalancerWarining = true;
+				if(displayBalancerFound) {
+					logger.info("SIP Load Balancer Found!");
+					displayBalancerFound = false;
+				}
+			} catch (Exception e) {
+				if(displayBalancerWarining) {
+					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
+							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
+					logger.debug("Cannot access the SIP load balancer RMI registry: " , e);
+					displayBalancerWarining = false;
+				}
+				displayBalancerFound = true;
+			}
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Finished gathering");
+			logger.debug("Gathered info[" + info + "]");
+		}
+	}
+	
 	/**
 	 * 
 	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -310,60 +406,8 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			if(logger.isDebugEnabled()) {
 				logger.debug("Start");
 			}
-			ArrayList<SIPNode> info = new ArrayList<SIPNode>();
-			// Gathering info about server' sip listening points
-			for (Connector connector : connectors) {
-				ProtocolHandler protocolHandler = connector.getProtocolHandler();
-				if(protocolHandler instanceof SipProtocolHandler) {
-					SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) protocolHandler;
-					String address = sipProtocolHandler.getIpAddress();
-					int port = sipProtocolHandler.getPort();
-					String transport = sipProtocolHandler.getSignalingTransport();
-					String[] transports = new String[] {transport};
-					
-					String hostName = null;
-					try {
-						InetAddress[] aArray = InetAddress
-								.getAllByName(address);
-						if (aArray != null && aArray.length > 0) {
-							// Damn it, which one we should pick?
-							hostName = aArray[0].getCanonicalHostName();
-						}
-					} catch (UnknownHostException e) {
-						logger.error("An exception occurred while trying to retrieve the hostname of a sip connector", e);
-					}
-	
-					SIPNode node = new SIPNode(hostName, address, port,
-							transports);
-	
-					info.add(node);
-				}
-			}
-						
-			for(InetAddress ah:new HashSet<InetAddress>(register.values())) {
-				try {
-					Registry registry = LocateRegistry.getRegistry(ah.getHostAddress(),2000);
-					NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
-					reg.handlePing(info);
-					displayBalancerWarining = true;
-					if(displayBalancerFound) {
-						logger.info("SIP Load Balancer Found!");
-						displayBalancerFound = false;
-					}
-				} catch (Exception e) {
-					if(displayBalancerWarining) {
-						logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
-								"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
-						logger.debug("Cannot access the SIP load balancer RMI registry: " , e);
-						displayBalancerWarining = false;
-					}
-					displayBalancerFound = true;
-				}
-			}
-			if(logger.isDebugEnabled()) {
-				logger.debug("Finished gathering");
-				logger.debug("Gathered info[" + info + "]");
-			}
+			ArrayList<SIPNode> info = getConnectorsAsSIPNode();						
+			sendKeepAliveToBalancers(info);
 		}
 	}
 
