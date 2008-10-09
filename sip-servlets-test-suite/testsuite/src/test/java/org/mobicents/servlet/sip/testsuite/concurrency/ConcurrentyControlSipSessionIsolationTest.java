@@ -77,7 +77,7 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		senderProtocolObjects.start();			
 	}
 	
-	public void testElapsedTime() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testElapsedTimeAndSessionOverlapping() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -95,9 +95,8 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null);
 		sender.sendInDialogSipRequest("INFO", "2", "text", "plain", null);
 		sender.sendInDialogSipRequest("INFO", "3", "text", "plain", null);
-		Thread.sleep(30000);
 		sender.sendBye();
-		Thread.sleep(3000);
+		Thread.sleep(30000);
 		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
 		assertTrue(elapsedTime<15000);
 		assertTrue(!sender.isServerErrorReceived());
