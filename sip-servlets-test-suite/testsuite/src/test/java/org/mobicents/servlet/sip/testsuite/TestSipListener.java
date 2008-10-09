@@ -189,6 +189,10 @@ public class TestSipListener implements SipListener {
 	private long timeToWaitBetweenSubsNotify = 1000;
 
 	private boolean byeSent;
+	
+	private boolean serverErrorReceived;
+	
+	private long lastInfoResponseTime = -1;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -860,6 +864,12 @@ public class TestSipListener implements SipListener {
 	public void processResponse(ResponseEvent responseReceivedEvent) {
 		logger.info("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
+		if(response.getStatusCode() > 500 && response.getStatusCode() < 510) {
+			this.serverErrorReceived = true;
+		}
+		if(response.toString().toLowerCase().contains("INFO")) {
+			lastInfoResponseTime = System.currentTimeMillis();
+		}
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
@@ -1019,6 +1029,10 @@ public class TestSipListener implements SipListener {
 			logger.error("An unexpected exception occured while processing the response" , ex);
 		}
 
+	}
+
+	public long getLastInfoResponseTime() {
+		return lastInfoResponseTime;
 	}
 
 	public Request processResponseAuthorization(Response response, URI uriReq) {
@@ -1570,6 +1584,14 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isFinalResponseReceived() {
 		return finalResponseReceived;
+	}
+
+	public boolean isServerErrorReceived() {
+		return serverErrorReceived;
+	}
+
+	public void setServerErrorReceived(boolean serverErrorReceived) {
+		this.serverErrorReceived = serverErrorReceived;
 	}
 
 	/**

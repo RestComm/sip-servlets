@@ -160,6 +160,25 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		resp.send();
 	}
 	
+	@Override
+	protected void doInfo(SipServletRequest req) throws ServletException,
+			IOException {
+		String content = (String) req.getContent();
+		req.getSession().setAttribute("mutable", content);
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int response = SipServletResponse.SC_OK;
+		if(!content.equals(req.getSession().getAttribute("mutable")))
+			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+		
+		SipServletResponse resp = req.createResponse(response);
+		resp.send();
+	}
+	
 	// SipErrorListener methods
 
 	/**
