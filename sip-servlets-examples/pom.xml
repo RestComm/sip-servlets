@@ -26,6 +26,12 @@
 		<module>speed-dial</module>
 		<module>uac-register</module>
 	</modules>
+
+	<properties>
+		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
+		<mms.version>1.0.0.BETA4</mms.version>
+	</properties>
+
 	<dependencies>
 		<!-- test dependencies -->
 		<dependency>
