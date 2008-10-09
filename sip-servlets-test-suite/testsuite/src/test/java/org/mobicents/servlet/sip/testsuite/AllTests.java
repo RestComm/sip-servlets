@@ -36,6 +36,7 @@ import org.mobicents.servlet.sip.testsuite.click2call.Click2CallBasicTest;
 import org.mobicents.servlet.sip.testsuite.composition.NoApplicationDeployedJunitTest;
 import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJunitTest;
 import org.mobicents.servlet.sip.testsuite.concurrency.ConcurrentyControlSipSessionIsolationTest;
+import org.mobicents.servlet.sip.testsuite.concurrency.CongestionControlTest;
 import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
@@ -91,6 +92,7 @@ public class AllTests {
 		suite.addTestSuite(ParallelProxyTelURLWithRecordRouteTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteUseHostNameTest.class);
 		suite.addTestSuite(ConcurrentyControlSipSessionIsolationTest.class);
+		suite.addTestSuite(CongestionControlTest.class);
 		suite.addTestSuite(ProxyBranchTimeoutTest.class);
 		suite.addTestSuite(PAssertedIdentityAuthTest.class);
 		suite.addTestSuite(SpeedDialLocationServiceJunitTest.class);
