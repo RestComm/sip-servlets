@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 
+import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -66,6 +67,6 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	
 	void tryToInvalidate();
 	
-	ExecutorService getExecutorService();
+	ThreadPoolQueueExecutor getExecutorService();
 
 }

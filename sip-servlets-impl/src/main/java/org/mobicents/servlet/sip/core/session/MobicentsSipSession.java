@@ -32,6 +32,7 @@ import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
 
+import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -139,7 +140,7 @@ public interface MobicentsSipSession extends SipSession {
 
 	SipApplicationRoutingRegion getRegionInternal();
 	
-	ExecutorService getExecutorService();
+	ThreadPoolQueueExecutor getExecutorService();
 
 	//RFC 3265
 	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;

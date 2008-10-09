@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -78,6 +79,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -123,7 +125,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient Principal userPrincipal;
 	
-	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
+	protected ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
+			new LinkedBlockingQueue<Runnable>());
 	
 	/**
 	 * Creation time.
@@ -561,7 +564,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return this.state;
 	}
 
-	public ExecutorService getExecutorService() {
+	public ThreadPoolQueueExecutor getExecutorService() {
 		return executorService;
 	}
 	/**

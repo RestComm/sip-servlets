@@ -164,5 +164,9 @@ public interface SipApplicationDispatcher extends SipListener {
 	public ConcurrencyControlMode getConcurrencyControlMode();
 	
 	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode);
+
+	public int getQueueSize();
+
+	public void setQueueSize(int queueSize);
     
 }

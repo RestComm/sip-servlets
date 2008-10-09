@@ -24,8 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +43,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -151,7 +151,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected boolean readyToInvalidate = false;
 	
-	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
+	protected ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
+			new LinkedBlockingQueue<Runnable>());
 
 	/**
 	 * The first sip application for subsequent requests.
@@ -897,7 +898,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return currentRequestHandler;
 	}
 
-	public ExecutorService getExecutorService() {
+	public ThreadPoolQueueExecutor getExecutorService() {
 		return executorService;
 	}
 	

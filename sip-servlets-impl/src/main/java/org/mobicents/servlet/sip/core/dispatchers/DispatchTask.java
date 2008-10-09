@@ -33,7 +33,8 @@ public abstract class DispatchTask implements Runnable {
 			
 			if(sipServletMessage instanceof SipServletRequestImpl) {
 				SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
-				if(!Request.ACK.equalsIgnoreCase(sipServletRequest.getMethod())) {
+				if(!Request.ACK.equalsIgnoreCase(sipServletRequest.getMethod()) ||
+						!Request.PRACK.equalsIgnoreCase(sipServletRequest.getMethod())) {
 					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 				}
 			}

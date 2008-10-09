@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -89,11 +90,13 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
+import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -138,11 +141,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
-	private ConcurrencyControlMode concurrencyControlMode = ConcurrencyControlMode.SipSession;
+	private ConcurrencyControlMode concurrencyControlMode;
+	
+	private long requestsProcessed = 0;
+	
+	private boolean rejectRequests = false;
+	
+	int queueSize;
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
-	private ExecutorService asynchronousExecutor = Executors.newCachedThreadPool();
+	private ThreadPoolQueueExecutor asynchronousExecutor = new ThreadPoolQueueExecutor(4, 32,
+			new LinkedBlockingQueue<Runnable>());
 	
 	/**
 	 * 
@@ -365,11 +375,56 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		// TODO Auto-generated method stub
 		
 	}
+	
+	/*
+	 * Gives the number of pending messages in all queues for all concurrency control modes.
+	 */
+	public int getNumberOfPendingMessages() {
+		int size = 0;
+		Iterator<SipContext> app = this.applicationDeployed.values().iterator();
+		if(this.getConcurrencyControlMode().equals(ConcurrencyControlMode.None)) {
+			size = this.asynchronousExecutor.getQueue().size();
+		} else {
+			while(app.hasNext()) {
+				SipContext context = app.next();
+				SipStandardManager manager = (SipStandardManager)context.getManager();
+				if(this.getConcurrencyControlMode().equals(ConcurrencyControlMode.AppSession)) {
+					Iterator<MobicentsSipApplicationSession> sessionIterator = manager.getAllSipApplicationSessions();
+					while(sessionIterator.hasNext()) {
+						size += sessionIterator.next().getExecutorService().getQueue().size();
+					}
+				} else if(this.getConcurrencyControlMode().equals(ConcurrencyControlMode.SipSession)) {
+					Iterator<MobicentsSipSession> sessionIterator = manager.getAllSipSessions();
+					while(sessionIterator.hasNext()) {
+						size += sessionIterator.next().getExecutorService().getQueue().size();
+					}
+				}
+			}
+		}
+		return size;
+	}
+	
+	private void analyzeQueueCongestionState() {
+		if(rejectRequests) {
+			int queuedMessages = getNumberOfPendingMessages();
+			if(queuedMessages<queueSize) {
+				rejectRequests = false;
+			}
+		} else if(requestsProcessed%5 == 0) {
+			int queuedMessages = getNumberOfPendingMessages();
+			if(queuedMessages>queueSize) {
+				rejectRequests = true;
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
-	public void processRequest(RequestEvent requestEvent) {		
+	public void processRequest(RequestEvent requestEvent) {	
+		requestsProcessed++;
+		analyzeQueueCongestionState();
 		SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
 		Request request = requestEvent.getRequest();
@@ -454,6 +509,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			
 			try {
+				if(rejectRequests) {
+					if(!Request.ACK.equals(request.getMethod()) && !Request.PRACK.equals(request.getMethod())) {
+						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+					}
+				}
 				MessageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 					dispatchMessage(sipProvider, sipServletRequest);
 			} catch (DispatcherException e) {
@@ -922,11 +982,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		return applicationRouterInfo;
 	}
 
-	public ExecutorService getAsynchronousExecutor() {
+	public ThreadPoolQueueExecutor getAsynchronousExecutor() {
 		return asynchronousExecutor;
 	}
 
-	public void setAsynchronousExecutor(ExecutorService asynchronousExecutor) {
+	public void setAsynchronousExecutor(ThreadPoolQueueExecutor asynchronousExecutor) {
 		this.asynchronousExecutor = asynchronousExecutor;
 	}
 
@@ -1078,5 +1138,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode) {
 		this.concurrencyControlMode = concurrencyControlMode;
+	}
+
+	public int getQueueSize() {
+		return queueSize;
+	}
+
+	public void setQueueSize(int queueSize) {
+		this.queueSize = queueSize;
 	}
 }
