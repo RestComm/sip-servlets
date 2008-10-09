@@ -52,23 +52,23 @@
 		    usetimestamp="true"/>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -P set-svn-revision -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
+			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
 		</exec>
 			 
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
+			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
 		</exec>
 
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
+			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
 		</exec>
 				
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -P set-svn-revision"/>
+			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
-			<arg line="clean install -P set-svn-revision"/>
+			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
 		
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>

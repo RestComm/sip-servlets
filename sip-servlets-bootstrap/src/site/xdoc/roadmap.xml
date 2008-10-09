@@ -480,7 +480,7 @@
 			<subsection name="Planned Versions">																
 				<subsection name="Version 0.7 - 11/01/2008">
 					<p>
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=133">
 						Concurrency Control
@@ -522,11 +522,11 @@
 						More Extensions : PRACK, OPTIONS, INFO
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=308">
 									MSS CLustering improvements
