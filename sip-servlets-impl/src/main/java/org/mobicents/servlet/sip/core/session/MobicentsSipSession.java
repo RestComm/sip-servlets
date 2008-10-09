@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipSession;
@@ -137,6 +138,8 @@ public interface MobicentsSipSession extends SipSession {
 	void setRemoteParty(Address addressImpl);
 
 	SipApplicationRoutingRegion getRegionInternal();
+	
+	ExecutorService getExecutorService();
 
 	//RFC 3265
 	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;

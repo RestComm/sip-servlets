@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -148,6 +150,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	protected boolean invalidateWhenReady = true;
 	
 	protected boolean readyToInvalidate = false;
+	
+	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	/**
 	 * The first sip application for subsequent requests.
@@ -891,6 +895,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public String getCurrentRequestHandler() {
 		return currentRequestHandler;
+	}
+
+	public ExecutorService getExecutorService() {
+		return executorService;
 	}
 	
 }

@@ -160,5 +160,9 @@ public interface SipApplicationDispatcher extends SipListener {
 	SipApplicationRouter getSipApplicationRouter();
 
 	public Map<String, String> getMdToApplicationName();
+	
+	public ConcurrencyControlMode getConcurrencyControlMode();
+	
+	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode);
     
 }

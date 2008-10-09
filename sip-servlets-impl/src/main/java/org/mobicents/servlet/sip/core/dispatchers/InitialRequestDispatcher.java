@@ -192,13 +192,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @param sipFactoryImpl the sip factory
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
-	private void dispatchInsideContainer(SipProvider sipProvider, SipApplicationRouterInfo applicationRouterInfo, SipServletRequestImpl sipServletRequest, SipFactoryImpl sipFactoryImpl) throws DispatcherException {
+	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl) throws DispatcherException {
 		if(logger.isInfoEnabled()) {
 			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 		}
 		final Request request = (Request) sipServletRequest.getMessage();
 		sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
-		SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationRouterInfo.getNextApplicationName());
+		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationRouterInfo.getNextApplicationName());
 		// follow the procedures of Chapter 16 to select a servlet from the application.									
 		//no matching deployed apps
 		if(sipContext == null) {
@@ -208,162 +208,172 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			// and stops processing.
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "No matching deployed application has been found !");
 		}
-		boolean isDistributable = sipContext.getDistributable();
+		final boolean isDistributable = sipContext.getDistributable();
 		if(isDistributable) {
 			ConvergedSessionReplicationContext.enterSipapp(sipServletRequest, null, true);
 		}
-		try {
-			SipManager sipManager = (SipManager)sipContext.getManager();
-			//sip appliation session association
-			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
-					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
-			MobicentsSipApplicationSession appSession = sipManager.getSipApplicationSession(
-					sipApplicationSessionKey, true);
-			//sip session association
-			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
-			MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
-			sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());
-			sipServletRequest.setSipSession(sipSessionImpl);						
-			
-			// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
-			sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
-			sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
-			sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
-			try {
-				URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
-				if(subscriberUri instanceof javax.sip.address.SipURI) {
-					javax.servlet.sip.URI uri = new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
-					sipServletRequest.setSubscriberURI(uri);
-					sipSessionImpl.setSipSubscriberURI(uri);
-				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
-					javax.servlet.sip.URI uri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
-					sipServletRequest.setSubscriberURI(uri);
-					sipSessionImpl.setSipSubscriberURI(uri);
-				} else {
-					javax.servlet.sip.URI uri = new GenericURIImpl(subscriberUri);
-					sipServletRequest.setSubscriberURI(uri);
-					sipSessionImpl.setSipSubscriberURI(uri);
-				}
-			} catch (ParseException pe) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 
-						+ applicationRouterInfo.getSubscriberURI() +
-						", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
-			} 									
-			String sipSessionHandlerName = sipSessionImpl.getHandler();						
-			if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
-				String mainServlet = appSession.getCurrentRequestHandler();
-				if(mainServlet != null && mainServlet.length() > 0) {
-					sipSessionHandlerName = mainServlet;				
-				} else {
-					SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
-					if(sipServletMapping == null) {
-						logger.error("Sending 404 because no matching servlet found for this request ");
-						sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
-						return;
-					} else {
-						sipSessionHandlerName = sipServletMapping.getServletName();
-					}
-				}
-				try {
-					sipSessionImpl.setHandler(sipSessionHandlerName);
-				} catch (ServletException e) {
-					// this should never happen
-					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing an initial request",e);
-				} 
-			}
-			try {
-				callServlet(sipServletRequest);
-				if(logger.isInfoEnabled()) {
-					logger.info("Request event dispatched to " + sipContext.getApplicationName());
-				}
-			} catch (ServletException e) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following initial request " + request, e);
-			} catch (IOException e) {				
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following initial request " + request, e);
-			}
-		} finally {
-			if (isDistributable) {
-				if(logger.isInfoEnabled()) {
-					logger.info("We are now after the servlet invocation, We replicate no matter what");
-				}
-				try {
-					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-							.exitSipapp();
+		final SipManager sipManager = (SipManager)sipContext.getManager();
+		//sip appliation session association
+		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
+				sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
+		final MobicentsSipApplicationSession appSession = sipManager.getSipApplicationSession(
+				sipApplicationSessionKey, true);
+		//sip session association
+		SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
+		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
+		sipServletRequest.setSipSession(sipSessionImpl);
+		
+		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
-					if(logger.isInfoEnabled()) {
-						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-						logger.info("Snapshot Sole Sip Session" + ctx.getSoleSipSession());
-						logger.info("Snapshot Sole Sip App Session " + ctx.getSoleSipApplicationSession());
+			public void dispatch() throws DispatcherException {
+				try {
+					sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());
+					
+					// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
+					sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
+					sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
+					sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
+					try {
+						URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
+						if(subscriberUri instanceof javax.sip.address.SipURI) {
+							javax.servlet.sip.URI uri = new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
+							sipServletRequest.setSubscriberURI(uri);
+							sipSessionImpl.setSipSubscriberURI(uri);
+						} else if (subscriberUri instanceof javax.sip.address.TelURL) {
+							javax.servlet.sip.URI uri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
+							sipServletRequest.setSubscriberURI(uri);
+							sipSessionImpl.setSipSubscriberURI(uri);
+						} else {
+							javax.servlet.sip.URI uri = new GenericURIImpl(subscriberUri);
+							sipServletRequest.setSubscriberURI(uri);
+							sipSessionImpl.setSipSubscriberURI(uri);
+						}
+					} catch (ParseException pe) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 
+								+ applicationRouterInfo.getSubscriberURI() +
+								", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
+					} 									
+					String sipSessionHandlerName = sipSessionImpl.getHandler();						
+					if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
+						String mainServlet = appSession.getCurrentRequestHandler();
+						if(mainServlet != null && mainServlet.length() > 0) {
+							sipSessionHandlerName = mainServlet;				
+						} else {
+							SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
+							if(sipServletMapping == null) {
+								logger.error("Sending 404 because no matching servlet found for this request ");
+								sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
+								return;
+							} else {
+								sipSessionHandlerName = sipServletMapping.getServletName();
+							}
+						}
+						try {
+							sipSessionImpl.setHandler(sipSessionHandlerName);
+						} catch (ServletException e) {
+							// this should never happen
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing an initial request",e);
+						} 
 					}
-					if (ctx.getSoleSnapshotManager() != null) {
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipSession());
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipApplicationSession());
-					} 
+					try {
+						callServlet(sipServletRequest);
+						if(logger.isInfoEnabled()) {
+							logger.info("Request event dispatched to " + sipContext.getApplicationName());
+						}
+					} catch (ServletException e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following initial request " + request, e);
+					} catch (IOException e) {				
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following initial request " + request, e);
+					}
 				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
-				}
-			}
-		}
-		//if a final response has been sent, or if the request has 
-		//been proxied or relayed we stop routing the request
-		RoutingState routingState = sipServletRequest.getRoutingState();			
-		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
-				RoutingState.PROXIED.equals(routingState) ||
-				RoutingState.RELAYED.equals(routingState) ||
-				RoutingState.CANCELLED.equals(routingState)) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-						"The Container hence stops routing the initial request.");
-				sipContext.getSipManager().dumpSipSessions();
-			}
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-						"The Container hence continue routing the initial request.");
-			}
-			try {
-				// the app that was called didn't do anything with the request
-				// in any case we should route back to container statefully 
-//				sipServletRequest.addAppCompositionRRHeader();
-				SipApplicationRouterInfo routerInfo = sipApplicationDispatcher.getNextInterestedApplication(sipServletRequest);
-				if(routerInfo.getNextApplicationName() != null) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("routing back to the container " +
-								"since the following app is interested " + routerInfo.getNextApplicationName());
+					if (isDistributable) {
+						if(logger.isInfoEnabled()) {
+							logger.info("We are now after the servlet invocation, We replicate no matter what");
+						}
+						try {
+							ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+									.exitSipapp();
+
+							if(logger.isInfoEnabled()) {
+								logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+								logger.info("Snapshot Sole Sip Session" + ctx.getSoleSipSession());
+								logger.info("Snapshot Sole Sip App Session " + ctx.getSoleSipApplicationSession());
+							}
+							if (ctx.getSoleSnapshotManager() != null) {
+								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+										ctx.getSoleSipSession());
+								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+										ctx.getSoleSipApplicationSession());
+							} 
+						} finally {
+							ConvergedSessionReplicationContext.finishSipCacheActivity();
+						}
 					}
-					//add a route header to direct the request back to the container 
-					//to check if there is any other apps interested in it
-					sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
+				}
+				//if a final response has been sent, or if the request has 
+				//been proxied or relayed we stop routing the request
+				RoutingState routingState = sipServletRequest.getRoutingState();			
+				if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+						RoutingState.PROXIED.equals(routingState) ||
+						RoutingState.RELAYED.equals(routingState) ||
+						RoutingState.CANCELLED.equals(routingState)) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+								"The Container hence stops routing the initial request.");
+						sipContext.getSipManager().dumpSipSessions();
+					}
 				} else {
 					if(logger.isDebugEnabled()) {
-						logger.debug("routing outside the container " +
-								"since no more apps are is interested.");
+						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+								"The Container hence continue routing the initial request.");
 					}
-					// If a servlet does not generate final response the routing process
-					// will continue (non-terminating routing state). This code stops
-					// routing these requests.
-					javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
-					String host = sipRequestUri.getHost();
-					int port = sipRequestUri.getPort();
-					String transport = JainSipUtils.findTransport(request);
-					boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
-					if(!isAnotherDomain) return ;
+					try {
+						// the app that was called didn't do anything with the request
+						// in any case we should route back to container statefully 
+//						sipServletRequest.addAppCompositionRRHeader();
+						SipApplicationRouterInfo routerInfo = sipApplicationDispatcher.getNextInterestedApplication(sipServletRequest);
+						if(routerInfo.getNextApplicationName() != null) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("routing back to the container " +
+										"since the following app is interested " + routerInfo.getNextApplicationName());
+							}
+							//add a route header to direct the request back to the container 
+							//to check if there is any other apps interested in it
+							sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
+						} else {
+							if(logger.isDebugEnabled()) {
+								logger.debug("routing outside the container " +
+										"since no more apps are is interested.");
+							}
+							// If a servlet does not generate final response the routing process
+							// will continue (non-terminating routing state). This code stops
+							// routing these requests.
+							javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+							String host = sipRequestUri.getHost();
+							int port = sipRequestUri.getPort();
+							String transport = JainSipUtils.findTransport(request);
+							boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+							if(!isAnotherDomain) return ;
+						}
+						try {
+							forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
+						} catch (Exception e) {
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+						}
+					} 
+//					catch (SipException e) {
+//						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "an exception has occured when trying to forward statefully", e);
+//					} 
+					catch (ParseException e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);					
+					}	
 				}
-				try {
-					forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
-				} catch (Exception e) {
-					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
-				}
-			} 
-//			catch (SipException e) {
-//				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "an exception has occured when trying to forward statefully", e);
-//			} 
-			catch (ParseException e) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);					
-			}	
-		}
+				
+			}
+			
+		};
+		getExecutorModelService(sipServletRequest).execute(dispatchTask);
+
 	}
 
 	/**

@@ -66,9 +66,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
+	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
 		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
-		SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
+		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
 		final Response response = sipServletResponse.getResponse();
 		final ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
 		final ViaHeader viaHeader = viaHeaders.next();
@@ -81,11 +81,11 @@ public class ResponseDispatcher extends MessageDispatcher {
 			final Dialog dialog = sipServletResponse.getDialog();
 			
 			TransactionApplicationData applicationData = null;
-			SipServletRequestImpl originalRequest = null;
+			SipServletRequestImpl tmpOriginalRequest = null;
 			if(clientTransaction != null) {
 				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
-					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+					tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 				}
 				//add the response for access from B2BUAHelper.getPendingMessages
 				applicationData.addSipServletResponse(sipServletResponse);
@@ -93,7 +93,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			else if(dialog != null) {				
 				applicationData = (TransactionApplicationData)dialog.getApplicationData();
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
-					originalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+					tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 				}
 				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
 				if(proxyBranch == null) {
@@ -104,6 +104,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					return ;
 				}
 			}
+			final SipServletRequestImpl originalRequest = tmpOriginalRequest;
 			sipServletResponse.setOriginalRequest(originalRequest);
 			
 			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
@@ -132,114 +133,127 @@ public class ResponseDispatcher extends MessageDispatcher {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Trying to find session with following session key " + sessionKey);
 			}
-			boolean isDistributable = sipContext.getDistributable();
+			final boolean isDistributable = sipContext.getDistributable();
 			if(isDistributable) {
 				ConvergedSessionReplicationContext.enterSipapp(null, sipServletResponse, true);
 			} 
+			MobicentsSipSession tmpSession = null;
 			try {
-				MobicentsSipSession session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+				tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
 				//needed in the case of RE-INVITE by example
-				if(session == null) {
+				if(tmpSession == null) {
 					sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, !inverted);
 					if(logger.isDebugEnabled()) {
 						logger.debug("Trying to find session with following session key " + sessionKey);
 					}
-					session = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);				
+					tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);				
 				}
 				if(logger.isDebugEnabled()) {
-					logger.debug("session found is " + session);
-					if(session == null) {
+					logger.debug("session found is " + tmpSession);
+					if(tmpSession == null) {
 						sipManager.dumpSipSessions();
 					}
 				}					
 				
-				if(session == null) {
+				if(tmpSession == null) {
 					logger.error("Dropping the response since no active sip session has been found for it : " + response);
 					return ;
 				} else {
-					sipServletResponse.setSipSession(session);
-					session.setSessionCreatingTransaction(clientTransaction);
-					session.setSessionCreatingDialog(dialog);
+					sipServletResponse.setSipSession(tmpSession);
+					tmpSession.setSessionCreatingTransaction(clientTransaction);
+					tmpSession.setSessionCreatingDialog(dialog);
 				}			
 				
 				if(logger.isInfoEnabled()) {
-					logger.info("route response on following session " + session.getId());
+					logger.info("route response on following session " + tmpSession.getId());
 				}
-				
-				try {
-					if(originalRequest != null) {				
-						originalRequest.setResponse(sipServletResponse);					
-					}
-					// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
-					// it creates a new subscription and a new dialog.
-					if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && sipServletResponse.getStatus() >= 200 && sipServletResponse.getStatus() <= 300) {					
-						session.addSubscription(sipServletResponse);
-					}
-					// See if this is a response to a proxied request
-					// We can not use session.getProxyBranch() because all branches belong to the same session
-					// and the session.proxyBranch is overwritten each time there is activity on the branch.				
-					ProxyBranchImpl proxyBranch = null;
-					if(applicationData != null) proxyBranch = applicationData.getProxyBranch();
-					if(proxyBranch != null) {
-						sipServletResponse.setProxyBranch(proxyBranch);
-						// Update Session state
-						session.updateStateOnResponse(sipServletResponse, true);
-						proxyBranch.setResponse(sipServletResponse);
-						
-						// Notfiy the servlet
-						if(logger.isDebugEnabled()) {
-							logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
-						}
-						if(proxyBranch.getProxy().getSupervised()) {
-							callServlet(sipServletResponse);
-						}
-						// Handle it at the branch
-						proxyBranch.onResponse(sipServletResponse); 
-						//we don't forward the response here since this has been done by the proxy
-					}
-					else {
-						// Update Session state
-						session.updateStateOnResponse(sipServletResponse, true);
-	
-						callServlet(sipServletResponse);
-						forwardResponseStatefully(sipServletResponse);
-					}
-				} catch (ServletException e) {				
-					logger.error("Unexpected servlet exception while processing the response : " + response, e);
-					// Sends a 500 Internal server error and stops processing.				
-		//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				} catch (IOException e) {				
-					logger.error("Unexpected io exception while processing the response : " + response, e);
-					// Sends a 500 Internal server error and stops processing.				
-		//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				} catch (Throwable e) {				
-					logger.error("Unexpected exception while processing response : " + response, e);
-					// Sends a 500 Internal server error and stops processing.				
-		//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
-				}
-			} finally {
-				if (isDistributable) {
-					if(logger.isInfoEnabled()) {
-						logger.info("We are now after the servlet invocation, We replicate no matter what");
-					}
-					try {
-						ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-								.exitSipapp();
-						if(logger.isInfoEnabled()) {
-							logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-						}
-						if (ctx.getSoleSnapshotManager() != null) {
-							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-									ctx.getSoleSipSession());
-							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-									ctx.getSoleSipApplicationSession());
-						} 
-					} finally {
-						ConvergedSessionReplicationContext.finishSipCacheActivity();
-					}
-				}
+			} catch (Exception e) {
+				// Ignore for now, it will fail something later and throw DispatcherException
 			}
+			final MobicentsSipSession session = tmpSession;
+			final TransactionApplicationData finalApplicationData = applicationData;
+			DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
+
+				public void dispatch() throws DispatcherException {
+					try {
+						try {
+							if(originalRequest != null) {				
+								originalRequest.setResponse(sipServletResponse);					
+							}
+							// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
+							// it creates a new subscription and a new dialog.
+							if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && sipServletResponse.getStatus() >= 200 && sipServletResponse.getStatus() <= 300) {					
+								session.addSubscription(sipServletResponse);
+							}
+							// See if this is a response to a proxied request
+							// We can not use session.getProxyBranch() because all branches belong to the same session
+							// and the session.proxyBranch is overwritten each time there is activity on the branch.				
+							ProxyBranchImpl proxyBranch = null;
+							if(finalApplicationData != null) proxyBranch = finalApplicationData.getProxyBranch();
+							if(proxyBranch != null) {
+								sipServletResponse.setProxyBranch(proxyBranch);
+								// Update Session state
+								session.updateStateOnResponse(sipServletResponse, true);
+								proxyBranch.setResponse(sipServletResponse);
+
+								// Notfiy the servlet
+								if(logger.isDebugEnabled()) {
+									logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
+								}
+								if(proxyBranch.getProxy().getSupervised()) {
+									callServlet(sipServletResponse);
+								}
+								// Handle it at the branch
+								proxyBranch.onResponse(sipServletResponse); 
+								//we don't forward the response here since this has been done by the proxy
+							}
+							else {
+								// Update Session state
+								session.updateStateOnResponse(sipServletResponse, true);
+
+								callServlet(sipServletResponse);
+								forwardResponseStatefully(sipServletResponse);
+							}
+						} catch (ServletException e) {				
+							logger.error("Unexpected servlet exception while processing the response : " + response, e);
+							// Sends a 500 Internal server error and stops processing.				
+							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+						} catch (IOException e) {				
+							logger.error("Unexpected io exception while processing the response : " + response, e);
+							// Sends a 500 Internal server error and stops processing.				
+							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+						} catch (Throwable e) {				
+							logger.error("Unexpected exception while processing response : " + response, e);
+							// Sends a 500 Internal server error and stops processing.				
+							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
+						}
+					} finally {
+						if (isDistributable) {
+							if(logger.isInfoEnabled()) {
+								logger.info("We are now after the servlet invocation, We replicate no matter what");
+							}
+							try {
+								ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+								.exitSipapp();
+								if(logger.isInfoEnabled()) {
+									logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+								}
+								if (ctx.getSoleSnapshotManager() != null) {
+									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+											ctx.getSoleSipSession());
+									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+											ctx.getSoleSipApplicationSession());
+								} 
+							} finally {
+								ConvergedSessionReplicationContext.finishSipCacheActivity();
+							}
+						}
+					}
+				}
+			};
+			getExecutorModelService(sipServletMessage).execute(dispatchTask);
 		} else {
+			// No sessions here and no servlets called, no need for asynchronicity
 			forwardResponseStatefully(sipServletResponse);
 		}
 	}

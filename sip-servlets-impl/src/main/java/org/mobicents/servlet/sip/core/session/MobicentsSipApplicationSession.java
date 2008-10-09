@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -63,5 +65,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	void setCurrentRequestHandler(String currentRequestHandler);
 	
 	void tryToInvalidate();
+	
+	ExecutorService getExecutorService();
 
 }

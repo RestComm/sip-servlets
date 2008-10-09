@@ -75,16 +75,16 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
+	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
 		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
-		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
+		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isInfoEnabled()) {
 			logger.info("Routing of Subsequent Request " + sipServletRequest);
 		}	
 		
-		ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
-		Request request = (Request) sipServletRequest.getMessage();
-		Dialog dialog = sipServletRequest.getDialog();
+		final ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
+		final Request request = (Request) sipServletRequest.getMessage();
+		final Dialog dialog = sipServletRequest.getDialog();
 		
 		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
 				
@@ -101,7 +101,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		//Extract information from the Record Route Header		
 		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
-		String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
+		final String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
 		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
 		if(generatedApplicationKey != null) {
 			generatedApplicationKey = RFC2396UrlDecoder.decode(generatedApplicationKey);
@@ -131,10 +131,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
 		}
-		boolean isDistributable = sipContext.getDistributable();
+		final boolean isDistributable = sipContext.getDistributable();
 		if(isDistributable) {
 			ConvergedSessionReplicationContext.enterSipapp(sipServletRequest, null, true);
 		}
+		
+		MobicentsSipSession tmpSipSession = null;
 		try {
 			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 			if(sipApplicationSession == null) {
@@ -144,173 +146,185 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
-			MobicentsSipSession sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+			tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 			
 			// Added by Vladimir because the inversion detection on proxied requests doesn't work
-			if(sipSession == null) {
+			if(tmpSipSession == null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 							" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
 				}
 				key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
-				sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+				tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 			}
 			
-			if(sipSession == null) {
+			if(tmpSipSession == null) {
 				sipManager.dumpSipSessions();
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 						" with the following popped route header " + sipServletRequest.getPoppedRoute());
 			} else {
 				if(logger.isDebugEnabled()) {
-					logger.debug("Inverted try worked. sip session found : " + sipSession.getId());
+					logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
 				}
 			}			
-			
-			sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
-			sipServletRequest.setSipSession(sipSession);			
-			// JSR 289 Section 6.2.1 :
-			// any state transition caused by the reception of a SIP message, 
-			// the state change must be accomplished by the container before calling 
-			// the service() method of any SipServlet to handle the incoming message.
-			sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
-			try {
-				// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
-				// a new subscription and a new dialog (unless they have already been
-				// created by a matching response, as described above).
-				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-					sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);		
-				if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
-								(subscriptionStateHeader != null && 
-										SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-										SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
-					sipSession.addSubscription(sipServletRequest);
-				}
-				// A subscription is destroyed when a notifier sends a NOTIFY request
-				// with a "Subscription-State" of "terminated".			
-				if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
-								(subscriptionStateHeader != null && 
-										SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
-					sipSession.removeSubscription(sipServletRequest);
-				}
-						
-				// See if the subsequent request should go directly to the proxy
-				if(sipServletRequest.getSipSession().getProxyBranch() != null) {
-					ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
-					ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();
-					proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
-					
-					callServlet(sipServletRequest);
-				
-					proxyBranch.proxySubsequentRequest(sipServletRequest);
-				}
-				// If it's not for a proxy then it's just an AR, so go to the next application
-				else {
-					if(dialog != null) {	
-						TransactionApplicationData applicationData = (TransactionApplicationData) dialog.getApplicationData();
-						if(applicationData != null) {
-							sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
-						}
-					} else if(transaction != null) {
-						TransactionApplicationData applicationData = (TransactionApplicationData) transaction.getApplicationData();
-						if(applicationData != null) {
-							sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
-						}
-					} 
-					
-					callServlet(sipServletRequest);				
-				}
-			} catch (ServletException e) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-			} catch (SipException e) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-			} catch (IOException e) {				
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-			} 	 
-		} finally {
-			if (isDistributable) {
-				if(logger.isInfoEnabled()) {
-					logger.info("We are now after the servlet invocation, We replicate no matter what");
-				}
-				try {
-					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-							.exitSipapp();
-
-					if(logger.isInfoEnabled()) {
-						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-					}
-					if (ctx.getSoleSnapshotManager() != null) {
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipSession());
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipApplicationSession());
-					} 
-				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
-				}
-			}
+		} catch (Exception e) { 
+			// ignore for now, the next try block will handle it if anything goes wrong
 		}
 		
-		//if a final response has been sent, or if the request has 
-		//been proxied or relayed we stop routing the request
-		RoutingState routingState = sipServletRequest.getRoutingState();
-		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
-				RoutingState.PROXIED.equals(routingState) ||
-				RoutingState.RELAYED.equals(routingState) ||
-				RoutingState.CANCELLED.equals(routingState)) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-						"The Container hence stops routing the subsequent request.");
-			}
-		} 
-		else {					
-			if(finalResponse != null && finalResponse.length() > 0) {
-				if(logger.isInfoEnabled()) {
-					logger.info("Subsequent Request reached the servlet application " +
-						"that sent a final response, stop routing the subsequent request " + request.toString());
-				}
-				return ;
-			}
-			// Check if the request is meant for me. 
-			RouteHeader routeHeader = (RouteHeader) request
-					.getHeader(RouteHeader.NAME);
-			
-			if(logger.isInfoEnabled()) {
-				logger.info("Checking route header " + routeHeader + " to know what to do next with the subsequent request " + request.toString());
-			}
-			if(routeHeader == null || sipApplicationDispatcher.isRouteExternal(routeHeader)) {
-				// no route header or external, send outside the container
-				// FIXME send it statefully
-				if(dialog == null && transaction == null) {
-					try{
-						sipProvider.sendRequest((Request)request.clone());
-						if(logger.isInfoEnabled()) {
-							logger.info("Subsequent Request dispatched outside the container " + request.toString());
+		final MobicentsSipSession sipSession = tmpSipSession;
+		sipServletRequest.setSipSession(sipSession);
+		
+		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
+
+			public void dispatch() throws DispatcherException {
+				try {
+					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
+					// JSR 289 Section 6.2.1 :
+					// any state transition caused by the reception of a SIP message, 
+					// the state change must be accomplished by the container before calling 
+					// the service() method of any SipServlet to handle the incoming message.
+					sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
+					try {
+						// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
+						// a new subscription and a new dialog (unless they have already been
+						// created by a matching response, as described above).
+						SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+							sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);		
+						if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+										(subscriptionStateHeader != null && 
+												SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
+							sipSession.addSubscription(sipServletRequest);
 						}
-					} catch (Exception ex) {			
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Error sending request",ex);
-					}	
-				} else {
-					try{
+						// A subscription is destroyed when a notifier sends a NOTIFY request
+						// with a "Subscription-State" of "terminated".			
+						if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+										(subscriptionStateHeader != null && 
+												SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
+							sipSession.removeSubscription(sipServletRequest);
+						}
+								
+						// See if the subsequent request should go directly to the proxy
+						if(sipServletRequest.getSipSession().getProxyBranch() != null) {
+							ProxyBranchImpl proxyBranch = sipServletRequest.getSipSession().getProxyBranch();
+							ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();
+							proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
+							
+							callServlet(sipServletRequest);
+						
+							proxyBranch.proxySubsequentRequest(sipServletRequest);
+						}
+						// If it's not for a proxy then it's just an AR, so go to the next application
+						else {
+							if(dialog != null) {	
+								TransactionApplicationData applicationData = (TransactionApplicationData) dialog.getApplicationData();
+								if(applicationData != null) {
+									sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
+								}
+							} else if(transaction != null) {
+								TransactionApplicationData applicationData = (TransactionApplicationData) transaction.getApplicationData();
+								if(applicationData != null) {
+									sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
+								}
+							} 
+							
+							callServlet(sipServletRequest);				
+						}
+					} catch (ServletException e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+					} catch (SipException e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+					} catch (IOException e) {				
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+					} 	 
+				} finally {
+					if (isDistributable) {
+						if(logger.isInfoEnabled()) {
+							logger.info("We are now after the servlet invocation, We replicate no matter what");
+						}
+						try {
+							ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+									.exitSipapp();
+
+							if(logger.isInfoEnabled()) {
+								logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+							}
+							if (ctx.getSoleSnapshotManager() != null) {
+								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+										ctx.getSoleSipSession());
+								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+										ctx.getSoleSipApplicationSession());
+							} 
+						} finally {
+							ConvergedSessionReplicationContext.finishSipCacheActivity();
+						}
+					}
+				}
+				
+				//if a final response has been sent, or if the request has 
+				//been proxied or relayed we stop routing the request
+				RoutingState routingState = sipServletRequest.getRoutingState();
+				if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+						RoutingState.PROXIED.equals(routingState) ||
+						RoutingState.RELAYED.equals(routingState) ||
+						RoutingState.CANCELLED.equals(routingState)) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+								"The Container hence stops routing the subsequent request.");
+					}
+				} 
+				else {					
+					if(finalResponse != null && finalResponse.length() > 0) {
+						if(logger.isInfoEnabled()) {
+							logger.info("Subsequent Request reached the servlet application " +
+								"that sent a final response, stop routing the subsequent request " + request.toString());
+						}
+						return ;
+					}
+					// Check if the request is meant for me. 
+					RouteHeader routeHeader = (RouteHeader) request
+							.getHeader(RouteHeader.NAME);
+					
+					if(logger.isInfoEnabled()) {
+						logger.info("Checking route header " + routeHeader + " to know what to do next with the subsequent request " + request.toString());
+					}
+					if(routeHeader == null || sipApplicationDispatcher.isRouteExternal(routeHeader)) {
+						// no route header or external, send outside the container
+						// FIXME send it statefully
+						if(dialog == null && transaction == null) {
+							try{
+								sipProvider.sendRequest((Request)request.clone());
+								if(logger.isInfoEnabled()) {
+									logger.info("Subsequent Request dispatched outside the container " + request.toString());
+								}
+							} catch (Exception ex) {			
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Error sending request",ex);
+							}	
+						} else {
+							try{
+								if(logger.isInfoEnabled()) {
+									logger.info("Subsequent Request forwarded statefully " + request.toString());
+								}
+								forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
+							} catch (Exception e) {
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+							}
+						}
+					} else {
 						if(logger.isInfoEnabled()) {
 							logger.info("Subsequent Request forwarded statefully " + request.toString());
 						}
-						forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
-					} catch (Exception e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+						//route header is meant for the container hence we continue
+						try {
+							forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
+						} catch (Exception e) {
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+						}
 					}
-				}
-			} else {
-				if(logger.isInfoEnabled()) {
-					logger.info("Subsequent Request forwarded statefully " + request.toString());
-				}
-				//route header is meant for the container hence we continue
-				try {
-					forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
-				} catch (Exception e) {
-					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
-				}
+				}		
 			}
-		}		
+		};
+		getExecutorModelService(sipServletRequest).execute(dispatchTask);
 	}	
 
 }

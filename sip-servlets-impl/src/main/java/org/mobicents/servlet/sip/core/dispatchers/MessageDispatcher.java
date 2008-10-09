@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.ExecutorService;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -32,7 +33,9 @@ import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -239,4 +242,29 @@ public abstract class MessageDispatcher {
 	 * @throws Exception if anything wrong happens
 	 */
 	public abstract void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException;
+	
+	/**
+	 * This method return an ExecutorService depending on the current concurrency strategy. It can return the
+	 * executor of a sip session, app session or just threadpool executor which doesn't limit concurrent processing
+	 * of requests per app or sip session.
+	 * 
+	 * Currently it only allows locking based on Sip Session.
+	 * 
+	 * TODO: Implement other strategies.
+	 * 
+	 * @param sipServletMessage the request you put here must have app and sip session associated
+	 * @return
+	 */
+	public final ExecutorService getExecutorModelService(SipServletMessageImpl sipServletMessage) {
+		ConcurrencyControlMode concurrencyControlMode = this.sipApplicationDispatcher.getConcurrencyControlMode();
+		switch(concurrencyControlMode) {
+		case SipSession:
+			return sipServletMessage.getSipSession().getExecutorService();
+		case AppSession:
+			return ((MobicentsSipApplicationSession)sipServletMessage.getApplicationSession()).getExecutorService();
+		case None:
+			return ((SipApplicationDispatcherImpl)this.sipApplicationDispatcher).getAsynchronousExecutor();
+		}
+		throw new IllegalStateException("This concurrency model is not supported: " + concurrencyControlMode);
+	}
 }

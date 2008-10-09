@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -120,6 +122,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected SipSessionKey key;
 	
 	protected transient Principal userPrincipal;
+	
+	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
 	
 	/**
 	 * Creation time.
@@ -557,6 +561,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return this.state;
 	}
 
+	public ExecutorService getExecutorService() {
+		return executorService;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
