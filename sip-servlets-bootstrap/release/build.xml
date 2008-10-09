@@ -42,8 +42,8 @@
 			
 		<!-- The Sip Load Balancer -->
 		<mkdir dir="${base.path}/jboss-${jboss.version}/sip-balancer"/>
-		<get src="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0.BETA1/sip-balancer-1.0.BETA1-jar-with-dependencies.jar" 
-		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-1.0.BETA1-jar-with-dependencies.jar" 
+		<get src="http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20081009.142921-22-jar-with-dependencies.jar" 
+		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-1.0-20081009.142921-22-jar-with-dependencies.jar" 
 		    verbose="true"
 		    usetimestamp="true"/>
 		<get src="http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties" 
