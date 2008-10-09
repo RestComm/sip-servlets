@@ -29,6 +29,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -56,6 +57,9 @@ public class SipStandardService extends StandardService implements SipService {
 	private String sipApplicationDispatcherClassName;
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 
 	private SipApplicationDispatcher sipApplicationDispatcher;
+	private int sipMessageQueueSize = 1500;
+
+	private String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	//the sip application router class name defined in the server.xml
 //	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
@@ -119,6 +123,10 @@ public class SipStandardService extends StandardService implements SipService {
  		}		
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.domain);
+		
+		sipApplicationDispatcher.setQueueSize(getSipMessageQueueSize());
+		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));
+
 		sipApplicationDispatcher.init();
 	}
 	
@@ -165,6 +173,10 @@ public class SipStandardService extends StandardService implements SipService {
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.start();
 		}
+		
+		if(this.getSipMessageQueueSize() <= 0)
+			throw new IllegalArgumentException("Message queue size can not be 0 or less");
+
 	}
 
 	@Override
@@ -245,4 +257,43 @@ public class SipStandardService extends StandardService implements SipService {
 	public void setDarConfigurationFileLocation(String darConfigurationFileLocation) {
 		this.darConfigurationFileLocation = darConfigurationFileLocation;
 	}
+	
+	/**
+	 * Message queue size. If the number of pending requests exceeds this number they are rejected.
+	 * 
+	 * @return
+	 */
+	public int getSipMessageQueueSize() {
+		return sipMessageQueueSize;
+	}
+
+	/**
+	 * Message queue size. If the number of pending requests exceeds this number they are rejected.
+	 * 
+	 * @return
+	 */
+	public void setSipMessageQueueSize(int sipMessageQueueSize) {
+		this.sipMessageQueueSize = sipMessageQueueSize;
+	}
+
+	/**
+	 * Concurrency control mode is SipSession, AppSession or None
+	 * Specifies the isolation level of concurrently executing requests.
+	 * 
+	 * @return
+	 */
+	public String getConcurrencyControlMode() {
+		return concurrencyControlMode;
+	}
+
+	/**
+	 * Concurrency control mode is SipSession, AppSession or None
+	 * Specifies the isolation level of concurrently executing requests.
+	 * 
+	 * @return
+	 */
+	public void setConcurrencyControlMode(String concurrencyControlMode) {
+		this.concurrencyControlMode = concurrencyControlMode;
+	}
+
 }
