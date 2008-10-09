@@ -159,7 +159,7 @@
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
-			<version>1.0.0.BETA4</version>
+			<version>${mms.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.mobicents.servers.media</groupId>
@@ -176,7 +176,7 @@
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
-			<version>1.0.0.BETA4</version>
+			<version>${mms.version}</version>
 			<scope>provided</scope>
 		</dependency>		
 	</dependencies>
