@@ -323,7 +323,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				}		
 			}
 		};
-		getExecutorModelService(sipServletRequest).execute(dispatchTask);
+		getConcurrencyModelExecutorService(sipServletRequest).execute(dispatchTask);
 	}	
 
 }

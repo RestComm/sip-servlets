@@ -372,7 +372,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			}
 			
 		};
-		getExecutorModelService(sipServletRequest).execute(dispatchTask);
+		getConcurrencyModelExecutorService(sipServletRequest).execute(dispatchTask);
 
 	}
 

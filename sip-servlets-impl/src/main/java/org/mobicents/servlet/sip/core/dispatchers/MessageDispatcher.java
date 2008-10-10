@@ -248,21 +248,25 @@ public abstract class MessageDispatcher {
 	 * executor of a sip session, app session or just threadpool executor which doesn't limit concurrent processing
 	 * of requests per app or sip session.
 	 * 
-	 * Currently it only allows locking based on Sip Session.
-	 * 
 	 * @param sipServletMessage the request you put here must have app and sip session associated
 	 * @return
 	 */
-	public final ExecutorService getExecutorModelService(SipServletMessageImpl sipServletMessage) {
-		ConcurrencyControlMode concurrencyControlMode = this.sipApplicationDispatcher.getConcurrencyControlMode();
-		switch(concurrencyControlMode) {
+	public final ExecutorService getConcurrencyModelExecutorService(
+			SipServletMessageImpl sipServletMessage) {
+		ConcurrencyControlMode concurrencyControlMode = this.sipApplicationDispatcher
+				.getConcurrencyControlMode();
+		switch (concurrencyControlMode) {
 		case SipSession:
 			return sipServletMessage.getSipSession().getExecutorService();
-		case AppSession:
-			return ((MobicentsSipApplicationSession)sipServletMessage.getApplicationSession()).getExecutorService();
+		case SipApplicationSession:
+			return ((MobicentsSipApplicationSession) sipServletMessage
+					.getApplicationSession()).getExecutorService();
 		case None:
-			return ((SipApplicationDispatcherImpl)this.sipApplicationDispatcher).getAsynchronousExecutor();
+			return ((SipApplicationDispatcherImpl) this.sipApplicationDispatcher)
+					.getAsynchronousExecutor();
 		}
-		throw new IllegalStateException("This concurrency model is not supported: " + concurrencyControlMode);
+		throw new IllegalStateException(
+				"This concurrency model is not supported: "
+						+ concurrencyControlMode);
 	}
 }

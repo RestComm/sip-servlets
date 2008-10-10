@@ -391,7 +391,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				SipStandardManager manager = (SipStandardManager) context
 						.getManager();
 				if (this.getConcurrencyControlMode().equals(
-						ConcurrencyControlMode.AppSession)) {
+						ConcurrencyControlMode.SipApplicationSession)) {
 					Iterator<MobicentsSipApplicationSession> sessionIterator = manager
 							.getAllSipApplicationSessions();
 					while (sessionIterator.hasNext()) {
