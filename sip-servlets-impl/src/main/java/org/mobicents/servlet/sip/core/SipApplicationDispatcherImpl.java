@@ -381,22 +381,31 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public int getNumberOfPendingMessages() {
 		int size = 0;
-		Iterator<SipContext> app = this.applicationDeployed.values().iterator();
-		if(this.getConcurrencyControlMode().equals(ConcurrencyControlMode.None)) {
+		Iterator<SipContext> applicationsIterator = this.applicationDeployed
+				.values().iterator();
+		if (this.getConcurrencyControlMode()
+				.equals(ConcurrencyControlMode.None)) {
 			size = this.asynchronousExecutor.getQueue().size();
 		} else {
-			while(app.hasNext()) {
-				SipContext context = app.next();
-				SipStandardManager manager = (SipStandardManager)context.getManager();
-				if(this.getConcurrencyControlMode().equals(ConcurrencyControlMode.AppSession)) {
-					Iterator<MobicentsSipApplicationSession> sessionIterator = manager.getAllSipApplicationSessions();
-					while(sessionIterator.hasNext()) {
-						size += sessionIterator.next().getExecutorService().getQueue().size();
+			while (applicationsIterator.hasNext()) {
+				SipContext context = applicationsIterator.next();
+				SipStandardManager manager = (SipStandardManager) context
+						.getManager();
+				if (this.getConcurrencyControlMode().equals(
+						ConcurrencyControlMode.AppSession)) {
+					Iterator<MobicentsSipApplicationSession> sessionIterator = manager
+							.getAllSipApplicationSessions();
+					while (sessionIterator.hasNext()) {
+						size += sessionIterator.next().getExecutorService()
+								.getQueue().size();
 					}
-				} else if(this.getConcurrencyControlMode().equals(ConcurrencyControlMode.SipSession)) {
-					Iterator<MobicentsSipSession> sessionIterator = manager.getAllSipSessions();
-					while(sessionIterator.hasNext()) {
-						size += sessionIterator.next().getExecutorService().getQueue().size();
+				} else if (this.getConcurrencyControlMode().equals(
+						ConcurrencyControlMode.SipSession)) {
+					Iterator<MobicentsSipSession> sessionIterator = manager
+							.getAllSipSessions();
+					while (sessionIterator.hasNext()) {
+						size += sessionIterator.next().getExecutorService()
+								.getQueue().size();
 					}
 				}
 			}
