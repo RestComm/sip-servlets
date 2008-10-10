@@ -205,7 +205,6 @@ public abstract class SipManagerDelegate {
 		// clone the session and add it to the map of derived sessions
 		MobicentsSipSession sipSessionImpl = getNewMobicentsSipSession(sessionKey, sipFactoryImpl, parentSipSession.getSipApplicationSession());
 		sipSessionImpl.setSipSessionAttributeMap(parentSipSession.getSipSessionAttributeMap());
-		sipSessionImpl.setSupervisedMode(parentSipSession.getSupervisedMode());
 		try {
 			sipSessionImpl.setHandler(new String(parentSipSession.getHandler()));
 		} catch (ServletException e) {
@@ -217,7 +216,7 @@ public abstract class SipManagerDelegate {
 //		sipSessionImpl.sessionCreatingDialog = dialog;
 		sipSessionImpl.setState(parentSipSession.getState());
 		sipSessionImpl.setStateInfo(parentSipSession.getStateInfo());
-		sipSessionImpl.setSupervisedMode(parentSipSession.getSupervisedMode());
+		sipSessionImpl.setProxy(parentSipSession.getProxy());
 		if(parentSipSession.getSipSubscriberURI() != null) {
 			sipSessionImpl.setSipSubscriberURI(parentSipSession.getSipSubscriberURI().clone());
 		}

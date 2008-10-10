@@ -19,9 +19,9 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.Proxy;
 import javax.sip.ClientTransaction;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
@@ -161,7 +161,8 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 				if(logger.isDebugEnabled()) {
 					logger.debug("routing state of the INVITE request for the CANCEL = " + inviteRequest.getRoutingState());
 				}
-				if(inviteAppData.getProxy() != null) {
+				Proxy proxy = sipSession.getProxy();
+				if(proxy != null) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("proxying the CANCEL " + sipServletRequest);
 					}			
@@ -177,7 +178,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 						}
 					} else {
 						// otherwise, all branches are cancelled, and response processing continues as usual
-						inviteAppData.getProxy().cancel();
+						proxy.cancel();
 					}
 				} else if(RoutingState.RELAYED.equals(inviteRequest.getRoutingState())) {
 					if(logger.isDebugEnabled()) {

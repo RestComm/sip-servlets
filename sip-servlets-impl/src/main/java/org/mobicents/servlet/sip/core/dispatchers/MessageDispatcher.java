@@ -250,8 +250,6 @@ public abstract class MessageDispatcher {
 	 * 
 	 * Currently it only allows locking based on Sip Session.
 	 * 
-	 * TODO: Implement other strategies.
-	 * 
 	 * @param sipServletMessage the request you put here must have app and sip session associated
 	 * @return
 	 */

@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.management.MBeanRegistration;
@@ -103,6 +101,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -695,8 +694,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(logger.isInfoEnabled()) {
 					logger.info("last Final Response" + lastFinalResponse);
 				}
+				ProxyImpl proxy = sipSession.getProxy();
 				if(sipServletMessage instanceof SipServletRequestImpl &&
-						tad.getProxy() == null &&
+						proxy == null &&
 						lastFinalResponse != null) {
 					List<SipErrorListener> sipErrorListeners = 
 						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
@@ -718,7 +718,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					logger.info("last Informational Response" + lastInfoResponse);
 				}
 				if(sipServletMessage instanceof SipServletRequestImpl &&
-						tad.getProxy() == null &&
+						proxy == null &&
 						 lastInfoResponse != null) {
 					List<SipErrorListener> sipErrorListeners = 
 						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			

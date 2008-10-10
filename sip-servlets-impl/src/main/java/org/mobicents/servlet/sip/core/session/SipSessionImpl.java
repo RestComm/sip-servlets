@@ -35,8 +35,6 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletContext;
@@ -85,7 +83,6 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
-import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -117,7 +114,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient MobicentsSipApplicationSession sipApplicationSession;			
 	
-	protected transient ProxyBranchImpl proxyBranch;
+	protected ProxyImpl proxy;
 
 	protected Map<String, Object> sipSessionAttributeMap;
 	
@@ -125,7 +122,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient Principal userPrincipal;
 	
-	protected ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
+	protected transient ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
 			new LinkedBlockingQueue<Runnable>());
 	
 	/**
@@ -194,8 +191,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 	protected transient Set<Transaction> ongoingTransactions;
 	
-	protected boolean supervisedMode;
-
 	protected transient ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
 
 	/*
@@ -231,7 +226,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.creationTime = this.lastAccessedTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
 		this.isValid = true;
-		this.supervisedMode = true;
 		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
@@ -609,7 +603,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		sipSessionAttributeMap = null;
-		proxyBranch = null;
 		//key = null;
 		sessionCreatingDialog = null;
 		sessionCreatingTransaction = null;
@@ -853,11 +846,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	public boolean isSupervisedMode() {
-		return this.supervisedMode;
-	}
-
-	public void setSupervisedMode(boolean supervisedMode) {
-		this.supervisedMode = supervisedMode;
+		if(proxy == null) {
+			return true;
+		} else {
+			return this.proxy.getSupervised();
+		}
 	}
 
 	public void setSipSubscriberURI(URI subscriberURI) {
@@ -955,7 +948,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				response.getStatus() >= 200 && response.getStatus() < 300 && 
 				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
 			this.setState(State.CONFIRMED);
-			if(this.proxyBranch != null && !this.proxyBranch.getRecordRoute()) {
+			if(this.proxy != null && this.proxy.getFinalBranchForSubsequentRequests() != null && !this.proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
 				readyToInvalidate = true;
 			}
 			if(logger.isDebugEnabled()) {
@@ -1051,8 +1044,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				return ;
 			}
 			TransactionApplicationData inviteAppData = (TransactionApplicationData) 
-				inviteTransaction.getApplicationData();
-			ProxyImpl proxy = inviteAppData.getProxy();
+				inviteTransaction.getApplicationData();			
 			SipServletRequestImpl inviteRequest = (SipServletRequestImpl)inviteAppData.getSipServletMessage();
 			if((inviteRequest != null && inviteRequest.getLastFinalResponse() == null) || 
 						(proxy != null && proxy.getBestResponse() == null))  {
@@ -1097,14 +1089,18 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.key = key;
 	}
 
-	public ProxyBranchImpl getProxyBranch() {
-		return proxyBranch;
+	/**
+	 * {@inheritDoc}
+	 */
+	public ProxyImpl getProxy() {
+		return proxy;
 	}
-
-	public void setProxyBranch(ProxyBranchImpl proxyBranch) {
-		this.proxyBranch = proxyBranch;
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setProxy(ProxyImpl proxy) {
+		this.proxy = proxy;
 	}
-	
 	/**
      * Perform the internal processing required to passivate
      * this session.
@@ -1275,12 +1271,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Map<String, Object> getSipSessionAttributeMap() {
 		return sipSessionAttributeMap;
-	}
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean getSupervisedMode() {
-		return supervisedMode;
 	}
 	/**
 	 * @param localParty the localParty to set

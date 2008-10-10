@@ -16,12 +16,10 @@
  */
 package org.mobicents.servlet.sip.message;
 
-import gov.nist.javax.sip.header.Route;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -82,6 +80,7 @@ import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
@@ -305,7 +304,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public B2buaHelper getB2buaHelper() {
-		if (this.transactionApplicationData.getProxy() != null)
+		if (session.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
 		if (this.b2buaHelper != null)
 			return this.b2buaHelper;
@@ -396,12 +395,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new TooManyHopsException();
 		}
 		
-		if (create && transactionApplicationData.getProxy() == null) {
+		if (create && session.getProxy() == null) {
 			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
-			this.transactionApplicationData.setProxy(proxy);
-			getSipSession().setSupervisedMode(proxy.getSupervised());
+			this.session.setProxy(proxy);
 		}
-		return this.transactionApplicationData.getProxy();
+		return this.session.getProxy();
 	}
 
 	/**
@@ -765,14 +763,27 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = (Request) super.message;
 			String transport = JainSipUtils.findTransport(request);
 			//Issue 112 fix by folsson
-		    if(!request.getMethod().equalsIgnoreCase(Request.CANCEL) && (getSipSession().getProxyBranch() == null
-			    || (transactionApplicationData.getProxy() != null && transactionApplicationData.getProxy().getRecordRoute()))){
-
-		    	if(message.getHeader(ViaHeader.NAME) == null) {
-		    		ViaHeader viaHeader = JainSipUtils.createViaHeader(
-		    				sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
-		    		message.addHeader(viaHeader);
+		    if(!request.getMethod().equalsIgnoreCase(Request.CANCEL)) {
+		    	boolean addViaHeader = false;
+		    	if(session.getProxy() == null) {
+		    		addViaHeader = true;
+		    	} else if(isInitial) {
+		    		if(session.getProxy().getRecordRoute()) {
+		    			addViaHeader = true;
+		    		}
+		    	} else if(session.getProxy().getFinalBranchForSubsequentRequests() != null && session.getProxy().getFinalBranchForSubsequentRequests().getRecordRoute()) {
+		    		addViaHeader = true;
 		    	}
+		    	if(addViaHeader) {
+		    		if(logger.isDebugEnabled()) {
+				    	logger.debug("Adding via Header");
+				    }
+		    		if(message.getHeader(ViaHeader.NAME) == null) {
+			    		ViaHeader viaHeader = JainSipUtils.createViaHeader(
+			    				sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
+			    		message.addHeader(viaHeader);
+			    	}
+		    	}		    			    	
 		    }
 		    
 		    if(logger.isDebugEnabled()) {
@@ -785,16 +796,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(request.getMethod())) {
 				// Additional checks for https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29
-				if(transactionApplicationData.getProxy() != null &&
-						transactionApplicationData.getProxy().getRecordRoute()) // If the app is proxying it already does that
-				{
-					if(logger.isDebugEnabled()) {
-						logger.debug("Add a record route header for app composition ");
-					}
-					getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
-					//Add a record route header for app composition		
-					addAppCompositionRRHeader();	
-				}
+//				if(session.getProxy() != null &&
+//						session.getProxy().getRecordRoute()) // If the app is proxying it already does that
+//				{
+//					if(logger.isDebugEnabled()) {
+//						logger.debug("Add a record route header for app composition ");
+//					}
+//					getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
+//					//Add a record route header for app composition		
+//					addAppCompositionRRHeader();	
+//				}
 				SipApplicationRouterInfo routerInfo = sipFactoryImpl.getNextInterestedApplication(this);
 				if(routerInfo.getNextApplicationName() != null) {
 					if(logger.isDebugEnabled()) {

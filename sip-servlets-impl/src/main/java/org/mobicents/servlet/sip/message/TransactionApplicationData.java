@@ -26,7 +26,6 @@ import javax.servlet.sip.B2buaHelper;
 import javax.sip.Transaction;
 
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
-import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * A container for holding branch specific data.
@@ -34,7 +33,6 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  *@author mranga
  */
 public class TransactionApplicationData implements Serializable {
-	private transient ProxyImpl proxy;
 	private transient ProxyBranchImpl proxyBranch;	
 	private transient SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
@@ -51,22 +49,16 @@ public class TransactionApplicationData implements Serializable {
 		sipServletResponses = new CopyOnWriteArraySet<SipServletResponseImpl>();
 		rseqNumber = new AtomicInteger(1);
 	}
-	/**
-	 * set proxy
-	 */
-	public void setProxy(ProxyImpl proxy) {
-		this.proxy = proxy;
-	}
 	
 	public void setProxyBranch(ProxyBranchImpl proxyBranch) {
 		this.proxyBranch = proxyBranch;
 	}
 	
 	/**
-	 * @return the proxy
+	 * @return the proxyBranch
 	 */
-	public ProxyImpl getProxy() {
-		return proxy;
+	public ProxyBranchImpl getProxyBranch() {
+		return proxyBranch;
 	}
 	
 	/**
@@ -81,12 +73,7 @@ public class TransactionApplicationData implements Serializable {
 	public B2buaHelper getB2buaHelper() {
 		return b2buaHelper;
 	}
-	/**
-	 * @return the proxyBranch
-	 */
-	public ProxyBranchImpl getProxyBranch() {
-		return proxyBranch;
-	}
+	
 		
 	public SipServletMessageImpl getSipServletMessage() {
 		return this.sipServletMessage;

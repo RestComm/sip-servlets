@@ -151,7 +151,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected boolean readyToInvalidate = false;
 	
-	protected ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
+	protected transient ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
 			new LinkedBlockingQueue<Runnable>());
 
 	/**

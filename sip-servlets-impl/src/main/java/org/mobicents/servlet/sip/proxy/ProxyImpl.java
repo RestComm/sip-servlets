@@ -17,10 +17,10 @@
 package org.mobicents.servlet.sip.proxy;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -51,11 +51,11 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  * @author root
  *
  */
-public class ProxyImpl implements Proxy {
-	private static Log logger = LogFactory.getLog(ProxyImpl.class);
+public class ProxyImpl implements Proxy, Serializable {
+	private transient static Log logger = LogFactory.getLog(ProxyImpl.class);
 	
-	private SipServletRequestImpl originalRequest;
-	private SipServletResponseImpl bestResponse;
+	private transient SipServletRequestImpl originalRequest;
+	private transient SipServletResponseImpl bestResponse;
 	private ProxyBranchImpl bestBranch;
 	private boolean recurse = true;
 	private int proxyTimeout;
@@ -64,18 +64,21 @@ public class ProxyImpl implements Proxy {
 	private boolean recordRoutingEnabled;
 	private boolean parallel = true;
 	private boolean addToPath;
-	private SipURI pathURI;
-	private SipURI recordRouteURI;
-	private SipURI outboundInterface;
-	private SipFactoryImpl sipFactoryImpl;
+	private transient SipURI pathURI;
+	private transient SipURI recordRouteURI;
+	private transient SipURI outboundInterface;
+	private transient SipFactoryImpl sipFactoryImpl;
 	private boolean isNoCancel;
 	
-	private ProxyUtils proxyUtils;
+	private transient ProxyUtils proxyUtils;
 	
-	private Map<URI, ProxyBranch> proxyBranches;
+	private transient Map<URI, ProxyBranch> proxyBranches;
 	private boolean started; 
 	private boolean ackReceived = false;
 	private boolean tryingSent = false;
+	// This branch is the final branch (set when the final response has been sent upstream by the proxy) 
+	// that will be used for proxying subsequent requests
+	private ProxyBranchImpl finalBranchForSubsequentRequests;
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
@@ -177,6 +180,13 @@ public class ProxyImpl implements Proxy {
 	 */
 	public List<ProxyBranch> getProxyBranches() {
 		return new ArrayList<ProxyBranch>(this.proxyBranches.values());
+	}
+
+	/**
+	 * @return the finalBranchForSubsequentRequest
+	 */
+	public ProxyBranchImpl getFinalBranchForSubsequentRequests() {
+		return finalBranchForSubsequentRequests;
 	}
 
 	/* (non-Javadoc)
@@ -344,7 +354,6 @@ public class ProxyImpl implements Proxy {
 	 */
 	public void setSupervised(boolean supervised) {
 		this.supervised = supervised;
-		originalRequest.getSipSession().setSupervisedMode(supervised);
 	}
 
 	/* (non-Javadoc)
@@ -444,17 +453,11 @@ public class ProxyImpl implements Proxy {
 		}
 		
 		// Check if we are waiting for more response
-		if(allResponsesHaveArrived())
-		{
-			bestResponse.getSipSession().setProxyBranch(branch);
+		if(allResponsesHaveArrived()) {
+			finalBranchForSubsequentRequests = bestBranch;
 			sendFinalResponse(bestResponse, bestBranch);
-		}
-		else
-		{
-			if(!parallel)
-			{
-				startNextUntriedBranch();
-			}
+		} else if(!parallel) {
+			startNextUntriedBranch();
 		}
 
 	}
@@ -539,6 +542,8 @@ public class ProxyImpl implements Proxy {
 
 		try {
 			proxiedResponse.send();
+			bestBranch = null;
+			bestResponse = null;
 		} catch (IOException e) {
 			logger.error("A problem occured while proxying the final response", e);
 		}

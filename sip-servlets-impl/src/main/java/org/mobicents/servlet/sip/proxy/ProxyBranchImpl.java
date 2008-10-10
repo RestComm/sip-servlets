@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.proxy;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -34,14 +35,12 @@ import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.header.ContactHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
@@ -55,25 +54,25 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  * @author root
  *
  */
-public class ProxyBranchImpl implements ProxyBranch {
-	private static Log logger = LogFactory.getLog(ProxyBranchImpl.class);
+public class ProxyBranchImpl implements ProxyBranch, Serializable {
+	private transient static Log logger = LogFactory.getLog(ProxyBranchImpl.class);
 	private ProxyImpl proxy;
-	private SipServletRequestImpl originalRequest;
-	private SipServletRequestImpl outgoingRequest;
-	private SipServletResponseImpl lastResponse;
-	private URI targetURI;
-	private SipURI outboundInterface;
-	private SipURI recordRouteURI;
+	private transient SipServletRequestImpl originalRequest;
+	private transient SipServletRequestImpl outgoingRequest;
+	private transient SipServletResponseImpl lastResponse;
+	private transient URI targetURI;
+	private transient SipURI outboundInterface;
+	private transient SipURI recordRouteURI;
 	private boolean recordRoutingEnabled;
 	private boolean recurse;
-	private SipURI pathURI;
+	private transient SipURI pathURI;
 	private boolean started;
-	private SipFactoryImpl sipFactoryImpl;
-	private ProxyUtils proxyUtils;
+	private transient SipFactoryImpl sipFactoryImpl;
+	private transient ProxyUtils proxyUtils;
 	private boolean timedOut;
 	private int proxyBranchTimeout;
-	private Timer proxyBranchTimer;
-	private ProxyBranchTimerTask proxyTimeoutTask;
+	private transient Timer proxyBranchTimer;
+	private transient ProxyBranchTimerTask proxyTimeoutTask;
 	private boolean canceled;
 	private boolean isAddToPath;
 	private List<ProxyBranch> recursedBranches;
@@ -303,15 +302,15 @@ public class ProxyBranchImpl implements ProxyBranch {
 		// Use the original dialog in the new session
 		newSession.setSessionCreatingDialog(originalRequest.getSipSession().getSessionCreatingDialog());
 		
-		// And set a reference to the proxy branch
-		newSession.setProxyBranch(this);
+		// And set a reference to the proxy		
+		newSession.setProxy(proxy);		
 				
 		//JSR 289 Section 15.1.6
 		if(!subsequent) {
 			// Subsequent requests can't have a routing directive?
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
-		}			
-		clonedRequest.getTransactionApplicationData().setProxyBranch(this);
+		}
+		clonedRequest.getTransactionApplicationData().setProxyBranch(this);			
 		clonedRequest.send();
 	}
 	

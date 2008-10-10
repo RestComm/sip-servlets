@@ -1027,7 +1027,6 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				}
 			}
 			sessionCreatingDialog = (SIPDialog) in.readObject();
-			supervisedMode = in.readBoolean();
 			invalidateWhenReady = in.readBoolean();
 			readyToInvalidate = in.readBoolean();
 			
@@ -1109,7 +1108,6 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				out.writeUTF("");
 			}
 			out.writeObject((SIPDialog)sessionCreatingDialog);
-			out.writeBoolean(supervisedMode);
 			out.writeBoolean(invalidateWhenReady);
 			out.writeBoolean(readyToInvalidate);
 			

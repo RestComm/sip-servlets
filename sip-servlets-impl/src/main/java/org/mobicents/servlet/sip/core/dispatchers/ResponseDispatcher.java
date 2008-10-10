@@ -187,11 +187,11 @@ public class ResponseDispatcher extends MessageDispatcher {
 							}
 							// See if this is a response to a proxied request
 							// We can not use session.getProxyBranch() because all branches belong to the same session
-							// and the session.proxyBranch is overwritten each time there is activity on the branch.				
+							// and the session.proxyBranch is overwritten each time there is activity on the branch.
 							ProxyBranchImpl proxyBranch = null;
 							if(finalApplicationData != null) proxyBranch = finalApplicationData.getProxyBranch();
 							if(proxyBranch != null) {
-								sipServletResponse.setProxyBranch(proxyBranch);
+								sipServletResponse.setProxyBranch(proxyBranch);								
 								// Update Session state
 								session.updateStateOnResponse(sipServletResponse, true);
 								proxyBranch.setResponse(sipServletResponse);

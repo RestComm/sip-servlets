@@ -21,7 +21,6 @@ import java.security.Principal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipSession;
@@ -37,6 +36,7 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * 
@@ -98,16 +98,20 @@ public interface MobicentsSipSession extends SipSession {
 	
 	void setRoutingRegion(SipApplicationRoutingRegion routingRegion);
 
-	ProxyBranchImpl getProxyBranch();
+	/**
+	 * Retieves the proxy of the sip session if any
+	 * @return
+	 */
+	ProxyImpl getProxy();
 
-	void setProxyBranch(ProxyBranchImpl branch);
+	/**
+	 * Set the proxy of the sip session
+	 * @param proxy
+	 */
+	void setProxy(ProxyImpl proxy);
 	
 	void access();
 
-	void setSupervisedMode(boolean supervised);
-
-	boolean getSupervisedMode();
-	
 	void updateStateOnResponse(SipServletResponseImpl sipServletResponseImpl,
 			boolean receive);
 

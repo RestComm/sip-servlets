@@ -20,6 +20,7 @@ import gov.nist.javax.sip.Utils;
 import gov.nist.javax.sip.header.HeaderFactoryImpl;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import javax.sip.ListeningPoint;
@@ -45,9 +46,9 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  * listening point addresses.
  *
  */
-public class ProxyUtils {
-	private static Log logger = LogFactory.getLog(ProxyUtils.class);
-	private SipFactoryImpl sipFactoryImpl;
+public class ProxyUtils implements Serializable {
+	private transient static Log logger = LogFactory.getLog(ProxyUtils.class);
+	private transient SipFactoryImpl sipFactoryImpl;
 	private ProxyImpl proxy;
 	
 	public ProxyUtils(SipFactoryImpl sipFactoryImpl, ProxyImpl proxy)
