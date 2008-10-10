@@ -28,6 +28,7 @@ import javax.sip.address.SipURI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -88,18 +89,46 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		long startTime = System.currentTimeMillis();
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(3000);
+		Thread.sleep(2000);
+		long startTime = System.currentTimeMillis();
 		sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null);
 		sender.sendInDialogSipRequest("INFO", "2", "text", "plain", null);
 		sender.sendInDialogSipRequest("INFO", "3", "text", "plain", null);
 		sender.sendBye();
-		Thread.sleep(30000);
+		Thread.sleep(20000);
 		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
-		assertTrue(elapsedTime<15000);
+		assertTrue(elapsedTime>15000);
 		assertTrue(!sender.isServerErrorReceived());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	public void testElapsedTimeAndSessionOverlappingWithNoConcurrencyControl() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setConcurrencyControlMode(ConcurrencyControlMode.None);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(3000);
+		long startTime = System.currentTimeMillis();
+		sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null);
+		sender.sendInDialogSipRequest("INFO", "2", "text", "plain", null);
+		sender.sendInDialogSipRequest("INFO", "3", "text", "plain", null);
+		sender.sendBye();
+		Thread.sleep(10000);
+		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
+		assertTrue(elapsedTime<7000);
+		assertTrue(sender.isServerErrorReceived());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
 	}

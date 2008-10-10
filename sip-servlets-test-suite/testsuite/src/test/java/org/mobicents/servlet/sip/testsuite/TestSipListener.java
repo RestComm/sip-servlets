@@ -864,10 +864,10 @@ public class TestSipListener implements SipListener {
 	public void processResponse(ResponseEvent responseReceivedEvent) {
 		logger.info("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
-		if(response.getStatusCode() > 500 && response.getStatusCode() < 510) {
+		if(response.getStatusCode() >= 500 && response.getStatusCode() < 510) {
 			this.serverErrorReceived = true;
 		}
-		if(response.toString().toLowerCase().contains("INFO")) {
+		if(response.toString().toLowerCase().contains("info")) {
 			lastInfoResponseTime = System.currentTimeMillis();
 		}
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
