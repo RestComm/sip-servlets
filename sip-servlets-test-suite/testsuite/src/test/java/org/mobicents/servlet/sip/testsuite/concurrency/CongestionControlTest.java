@@ -88,7 +88,6 @@ public class CongestionControlTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		long startTime = System.currentTimeMillis();
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(3000);
@@ -99,8 +98,6 @@ public class CongestionControlTest extends SipServletTestCase {
 		}
 		sender.sendBye();
 		Thread.sleep(10000);
-		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
-		assertTrue(elapsedTime<15000);
 		assertTrue(sender.isServerErrorReceived());
 		assertTrue(sender.isAckSent());		
 	}
