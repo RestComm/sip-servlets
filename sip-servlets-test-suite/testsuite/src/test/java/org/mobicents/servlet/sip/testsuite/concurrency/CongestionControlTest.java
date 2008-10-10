@@ -73,11 +73,11 @@ public class CongestionControlTest extends SipServletTestCase {
 		senderProvider.addSipListener(sender);
 		
 		senderProtocolObjects.start();	
-		
-		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(5);
+
 	}
 	
-	public void testElapsedTimeAndSessionOverlapping() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testCongestedQueueErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(5);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -92,6 +92,8 @@ public class CongestionControlTest extends SipServletTestCase {
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(3000);
+		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
+		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
 		}
