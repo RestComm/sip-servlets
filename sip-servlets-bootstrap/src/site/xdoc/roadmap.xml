@@ -486,7 +486,7 @@
 						Concurrency Control
 						</a>						
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=395">
 						Congestion Control
@@ -516,13 +516,13 @@
 						User Guide with DocBook Documentation
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=320">
 						Mid Call Failover Support for Proxy Applications
 						</a>
 						<br />																				
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=127">
 						More Extensions : PRACK, OPTIONS, INFO
