@@ -208,13 +208,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient MobicentsSipSession parentSession = null;
 	
 	//parties used when this is an outgoing request that has not yet been sent 
-	private Address localParty = null;
-	private Address remoteParty = null;
+	protected transient Address localParty = null;
+	protected transient Address remoteParty = null;
 	
 	//Subscriptions used for RFC 3265 compliance to be able to determine when the session can be invalidated
 	//  A subscription is destroyed when a notifier sends a NOTIFY request with a "Subscription-State" of "terminated".
 	// If a subscription's destruction leaves no other application state associated with the dialog, the dialog terminates
-	Set<EventHeader> subscriptions = null;
+	protected transient Set<EventHeader> subscriptions = null;
 	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
 	protected transient Transaction originalTransaction = null;
 	protected transient boolean okToByeSentOrReceived = false;

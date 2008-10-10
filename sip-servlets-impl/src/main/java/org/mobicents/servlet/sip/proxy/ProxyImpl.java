@@ -56,7 +56,7 @@ public class ProxyImpl implements Proxy, Serializable {
 	
 	private transient SipServletRequestImpl originalRequest;
 	private transient SipServletResponseImpl bestResponse;
-	private ProxyBranchImpl bestBranch;
+	private transient ProxyBranchImpl bestBranch;
 	private boolean recurse = true;
 	private int proxyTimeout;
 	private int seqSearchTimeout;
@@ -64,12 +64,12 @@ public class ProxyImpl implements Proxy, Serializable {
 	private boolean recordRoutingEnabled;
 	private boolean parallel = true;
 	private boolean addToPath;
-	private transient SipURI pathURI;
-	private transient SipURI recordRouteURI;
+	protected transient SipURI pathURI;
+	protected transient SipURI recordRouteURI;
 	private transient SipURI outboundInterface;
 	private transient SipFactoryImpl sipFactoryImpl;
 	private boolean isNoCancel;
-	
+	// clustering : will be recreated when loaded from the cache
 	private transient ProxyUtils proxyUtils;
 	
 	private transient Map<URI, ProxyBranch> proxyBranches;
@@ -107,6 +107,7 @@ public class ProxyImpl implements Proxy, Serializable {
 	}
 
 	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText, boolean throwExceptionIfCannotCancel) {
+		if(ackReceived) throw new IllegalStateException("There has been an ACK received on this branch. Can not cancel.");
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
 				try {
@@ -130,7 +131,7 @@ public class ProxyImpl implements Proxy, Serializable {
 			if(!JainSipUtils.checkScheme(target.toString())) {
 				throw new IllegalArgumentException("Scheme " + target.getScheme() + " is not supported");
 			}
-			ProxyBranchImpl branch = new ProxyBranchImpl(target, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
+			ProxyBranchImpl branch = new ProxyBranchImpl(target, this);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			list.add(branch);
@@ -249,7 +250,7 @@ public class ProxyImpl implements Proxy, Serializable {
 			if(!JainSipUtils.checkScheme(uri.toString())) {
 				throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 			}
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
+			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			this.proxyBranches.put(uri, branch);
@@ -265,7 +266,7 @@ public class ProxyImpl implements Proxy, Serializable {
 		if(!JainSipUtils.checkScheme(uri.toString())) {
 			throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 		}
-		ProxyBranchImpl branch = new ProxyBranchImpl(uri, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
+		ProxyBranchImpl branch = new ProxyBranchImpl(uri, this);
 		branch.setRecordRoute(recordRoutingEnabled);
 		branch.setRecurse(recurse);
 		this.proxyBranches.put(uri, branch);
@@ -427,7 +428,7 @@ public class ProxyImpl implements Proxy, Serializable {
 							(javax.sip.address.TelURL) addressURI);
 
 				}
-				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this, sipFactoryImpl, this.recordRouteURI, this.pathURI);
+				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this);
 				recurseBranch.setRecordRoute(recordRoutingEnabled);
 				recurseBranch.setRecurse(recurse);
 				this.proxyBranches.put(contactURI, recurseBranch);
@@ -534,7 +535,7 @@ public class ProxyImpl implements Proxy, Serializable {
 		
 		//Otherwise proceed with proxying the response
 		SipServletResponse proxiedResponse = 
-			proxyUtils.createProxiedResponse(response, proxyBranch);
+			getProxyUtils().createProxiedResponse(response, proxyBranch);
 		
 		if(proxiedResponse == null) {
 			return; // this response was addressed to this proxy
@@ -542,6 +543,8 @@ public class ProxyImpl implements Proxy, Serializable {
 
 		try {
 			proxiedResponse.send();
+			proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
+			originalRequest = null;
 			bestBranch = null;
 			bestResponse = null;
 		} catch (IOException e) {
@@ -550,6 +553,9 @@ public class ProxyImpl implements Proxy, Serializable {
 	}
 	
 	ProxyUtils getProxyUtils() {
+		if(proxyUtils == null) {
+			proxyUtils = new ProxyUtils(sipFactoryImpl, this);
+		}
 		return proxyUtils;
 	}
 
@@ -560,7 +566,7 @@ public class ProxyImpl implements Proxy, Serializable {
 		return bestResponse;
 	}
 	
-	void setOriginalRequest(SipServletRequestImpl originalRequest) {
+	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
 	}
 
@@ -576,6 +582,20 @@ public class ProxyImpl implements Proxy, Serializable {
 	 */
 	public void setNoCancel(boolean isNoCancel) {
 		this.isNoCancel = isNoCancel;
+	}
+
+	/**
+	 * @return the sipFactoryImpl
+	 */
+	public SipFactoryImpl getSipFactoryImpl() {
+		return sipFactoryImpl;
+	}
+
+	/**
+	 * @param sipFactoryImpl the sipFactoryImpl to set
+	 */
+	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl) {
+		this.sipFactoryImpl = sipFactoryImpl;
 	}
 
 	/**

@@ -46,7 +46,6 @@ import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -67,29 +66,25 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private boolean recurse;
 	private transient SipURI pathURI;
 	private boolean started;
-	private transient SipFactoryImpl sipFactoryImpl;
-	private transient ProxyUtils proxyUtils;
 	private boolean timedOut;
 	private int proxyBranchTimeout;
 	private transient Timer proxyBranchTimer;
 	private transient ProxyBranchTimerTask proxyTimeoutTask;
 	private boolean canceled;
 	private boolean isAddToPath;
-	private List<ProxyBranch> recursedBranches;
+	private transient List<ProxyBranch> recursedBranches;
 	
-	public ProxyBranchImpl(URI uri, ProxyImpl proxy, SipFactoryImpl sipFactoryImpl, SipURI recordRouteURI, SipURI pathURI)
+	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
 		this.targetURI = uri;
 		this.proxy = proxy;
 		this.originalRequest = (SipServletRequestImpl) proxy.getOriginalRequest();
-		this.recordRouteURI = recordRouteURI;
-		this.pathURI = pathURI;
+		this.recordRouteURI = proxy.recordRouteURI;
+		this.pathURI = proxy.pathURI;
 		this.outboundInterface = proxy.getOutboundInterface();
-		this.sipFactoryImpl = sipFactoryImpl;
 		if(recordRouteURI != null) {
 			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();			
 		}
-		this.proxyUtils = proxy.getProxyUtils();
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
 		this.canceled = false;
 		this.recursedBranches = new ArrayList<ProxyBranch>();
@@ -101,7 +96,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		Request cloned = (Request)originalRequest.getMessage().clone();
 		this.outgoingRequest = new SipServletRequestImpl(
 				cloned,
-				sipFactoryImpl,
+				proxy.getSipFactoryImpl(),
 				this.originalRequest.getSipSession(),
 				null, null, false);
 	}
@@ -167,7 +162,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	public SipURI getRecordRouteURI() {
 		if(this.getRecordRoute()) {
 			if(this.recordRouteURI == null) 
-				this.recordRouteURI = this.sipFactoryImpl.createSipURI("proxy", "localhost");
+				this.recordRouteURI = proxy.getSipFactoryImpl().createSipURI("proxy", "localhost");
 			return this.recordRouteURI;
 		}
 		
@@ -248,12 +243,12 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		// will be ignored in the Proxying
 		if(proxy.getRecordRoute() || this.getRecordRoute()) {
 			if(recordRouteURI == null) {
-				recordRouteURI = this.sipFactoryImpl.createSipURI("proxy", "localhost");
+				recordRouteURI = proxy.getSipFactoryImpl().createSipURI("proxy", "localhost");
 			}
 			recordRoute = recordRouteURI;
 		}
 						
-		Request cloned = this.proxyUtils.createProxiedRequest(
+		Request cloned = proxy.getProxyUtils().createProxiedRequest(
 				outgoingRequest,
 				this,
 				new ProxyParams(this.targetURI,
@@ -280,7 +275,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		}
 		SipServletRequestImpl clonedRequest = new SipServletRequestImpl(
 				request,
-				sipFactoryImpl,
+				proxy.getSipFactoryImpl(),
 				null,
 				null, null, false);
 		
@@ -330,7 +325,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		{
 
 			SipServletResponse proxiedResponse = 
-				proxyUtils.createProxiedResponse(response, this);
+				proxy.getProxyUtils().createProxiedResponse(response, this);
 			
 			if(proxiedResponse == null) 
 				return; // this response was addressed to this proxy
@@ -361,7 +356,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 				int start = contact.indexOf('<');
 				int end = contact.indexOf('>');
 				contact = contact.substring(start + 1, end);
-				URI uri = sipFactoryImpl.createURI(contact);
+				URI uri = proxy.getSipFactoryImpl().createURI(contact);
 				ArrayList<SipURI> list = new ArrayList<SipURI>();
 				list.add((SipURI)uri);
 				List<ProxyBranch> pblist = proxy.createProxyBranches(list);
@@ -410,17 +405,17 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		// No proxy params, sine the target is already in the Route headers
 		ProxyParams params = new ProxyParams(null, null, null, null);
 		Request clonedRequest = 
-			proxyUtils.createProxiedRequest(request, this, params);
+			proxy.getProxyUtils().createProxiedRequest(request, this, params);
 
 		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 		if(routeHeader != null) {
-			if(!((SipApplicationDispatcherImpl)sipFactoryImpl.getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
+			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
 				clonedRequest.removeFirst(RouteHeader.NAME);	
 			}
 		}		
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
-		SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 				transport, false).getSipProvider();
 		
 		try {
@@ -533,7 +528,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		//TODO check against our defined outbound interfaces
 		checkSessionValidity();
 		String address = inetAddress.getHostAddress();
-		outboundInterface = sipFactoryImpl.createSipURI(null, address);		
+		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address);		
 	}
 
 	/**
@@ -543,7 +538,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		//TODO check against our defined outbound interfaces		
 		checkSessionValidity();
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
-		outboundInterface = sipFactoryImpl.createSipURI(null, address);		
+		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address);		
 	}
 
 	/**

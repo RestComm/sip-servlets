@@ -58,6 +58,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -1032,6 +1033,12 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			
 			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();
+			
+			boolean proxySerialized = in.readBoolean();
+			if(proxySerialized) {
+				proxy = (ProxyImpl) in.readObject();
+			} 
+			
 //			maxInactiveInterval = in.readInt();
 //			isNew = in.readBoolean();
 			isValid = in.readBoolean();
@@ -1118,6 +1125,13 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			out.writeBoolean(isValid);
 			out.writeLong(lastAccessedTime);
 
+			if(proxy == null) {
+				out.writeBoolean(false);
+			} else {
+				out.writeBoolean(true);
+				out.writeObject(proxy);
+			}
+			
 			// From ClusteredSession
 			out.writeInt(invalidationPolicy);
 			out.writeInt(version);

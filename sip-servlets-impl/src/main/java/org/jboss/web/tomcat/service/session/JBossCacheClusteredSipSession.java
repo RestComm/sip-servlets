@@ -65,6 +65,9 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 */
 	public void initAfterLoad(JBossCacheSipManager manager) {
 		sipFactory = manager.getSipFactoryImpl();
+		if(proxy != null) {
+			proxy.setSipFactoryImpl(sipFactory);
+		}
 		//inject the dialog into the available sip stacks
 		Container context = manager.getContainer();
 		Container container = context.getParent().getParent();
