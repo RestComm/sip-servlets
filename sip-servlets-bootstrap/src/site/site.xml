@@ -35,6 +35,7 @@
 			</item>
 		</menu>
 		<menu name="Advanced Features">
+			<item name="SIP Extensions" href="mss-sip-extensions.html" />
 			<item name="Media support" href="media.html" />
 			<item name="Security" href="security.html" />
 			<item name="STUN suport" href="stun.html" />
