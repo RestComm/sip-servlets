@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -142,6 +143,44 @@ public final class ConvergedSessionReplicationContext
       ctx.sipappCount++;
       if (startCacheActivity)
          ctx.sipActivityCount++;
+   }
+   
+   /**
+    * Associate a SessionReplicationContext with the current thread, if
+    * there isn't one already.  If there isn't one, associate the 
+    * given request and response with the context.
+    * <p/>
+    * <strong>NOTE:</strong> Nested calls to this method and {@link #exitWebapp()}
+    * are supported; once a context is established the number of calls to this
+    * method and <code>exitWebapp()</code> are tracked.
+    * 
+    * @param request
+    * @param response
+    */
+   public static void enterSipappAndBindSessions(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity)
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx == null)
+      {
+         ctx = new ConvergedSessionReplicationContext(request, response);
+         sipReplicationContext.set(ctx);
+      }
+      
+      ctx.sipappCount++;
+      if (startCacheActivity)
+         ctx.sipActivityCount++;
+      
+      ClusteredSipApplicationSession clusteredSipApplicationSession = null;
+      ClusteredSipSession clusteredSipSession = null; 
+      if(request != null) {
+    	  clusteredSipSession = (ClusteredSipSession)request.getSipSession();    	  
+      } else {
+    	  clusteredSipSession = (ClusteredSipSession)response.getSipSession();
+      }
+      clusteredSipApplicationSession = (ClusteredSipApplicationSession) clusteredSipSession.getSipApplicationSession();
+      
+      bindSipApplicationSession(clusteredSipApplicationSession, ((JBossCacheSipManager)manager).getSnapshotManager());
+      bindSipSession(clusteredSipSession, ((JBossCacheSipManager)manager).getSnapshotManager());
    }
    
    /**

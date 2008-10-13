@@ -2913,4 +2913,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void removeAllSessions() {
 		sipManagerDelegate.removeAllSessions();
 	}
+
+	/**
+	 * @return the snapshotManager_
+	 */
+	public SnapshotManager getSnapshotManager() {
+		return snapshotManager_;
+	}
 }

@@ -207,11 +207,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			// in the JSR 289 EG, (for reference thread "Questions regarding AR" initiated by Uri Segev)
 			// and stops processing.
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "No matching deployed application has been found !");
-		}
-		final boolean isDistributable = sipContext.getDistributable();
-		if(isDistributable) {
-			ConvergedSessionReplicationContext.enterSipapp(sipServletRequest, null, true);
-		}
+		}			
 		final SipManager sipManager = (SipManager)sipContext.getManager();
 		//sip appliation session association
 		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
@@ -226,6 +222,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
 			public void dispatch() throws DispatcherException {
+				final boolean isDistributable = sipContext.getDistributable();
+				if(isDistributable) {
+					ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipServletRequest, null, sipManager, true);
+				}
 				try {
 					sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					

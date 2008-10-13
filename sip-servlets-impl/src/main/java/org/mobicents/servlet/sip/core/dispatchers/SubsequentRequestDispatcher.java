@@ -115,12 +115,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			inverted = true;
 		}
 		
-		SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationName);
+		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationName);
 		if(sipContext == null) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
-		SipManager sipManager = (SipManager)sipContext.getManager();
+		final SipManager sipManager = (SipManager)sipContext.getManager();		
 		SipApplicationSessionKey sipApplicationSessionKey = null;
 		if(generatedApplicationKey != null && generatedApplicationKey.length() > 0) {
 			sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
@@ -130,11 +130,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		} else {
 			sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);
-		}
-		final boolean isDistributable = sipContext.getDistributable();
-		if(isDistributable) {
-			ConvergedSessionReplicationContext.enterSipapp(sipServletRequest, null, true);
-		}
+		}		
 		
 		MobicentsSipSession tmpSipSession = null;
 		try {
@@ -177,6 +173,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
 			public void dispatch() throws DispatcherException {
+				final boolean isDistributable = sipContext.getDistributable();
+				if(isDistributable) {
+					ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipServletRequest, null, sipManager, true);
+				}
 				try {
 					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					// JSR 289 Section 6.2.1 :

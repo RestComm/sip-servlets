@@ -127,16 +127,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 			if(dialog != null && dialog.isServer()) {
 				inverted = true;
 			}
-			SipContext sipContext = sipApplicationDispatcher.findSipApplication(appName);
-			SipManager sipManager = (SipManager)sipContext.getManager();
+			final SipContext sipContext = sipApplicationDispatcher.findSipApplication(appName);
+			final SipManager sipManager = (SipManager)sipContext.getManager();
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, inverted);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Trying to find session with following session key " + sessionKey);
-			}
-			final boolean isDistributable = sipContext.getDistributable();
-			if(isDistributable) {
-				ConvergedSessionReplicationContext.enterSipapp(null, sipServletResponse, true);
-			} 
+			}			
 			MobicentsSipSession tmpSession = null;
 			try {
 				tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
@@ -175,6 +171,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 			DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
 
 				public void dispatch() throws DispatcherException {
+					final boolean isDistributable = sipContext.getDistributable();
+					if(isDistributable) {
+						ConvergedSessionReplicationContext.enterSipapp(null, sipServletResponse, true);
+					} 
 					try {
 						try {
 							if(originalRequest != null) {				

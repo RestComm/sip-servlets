@@ -1034,10 +1034,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();
 			
-			boolean proxySerialized = in.readBoolean();
-			if(proxySerialized) {
-				proxy = (ProxyImpl) in.readObject();
-			} 
+//			boolean proxySerialized = in.readBoolean();
+//			if(proxySerialized) {
+//				proxy = (ProxyImpl) in.readObject();
+//			} 
 			
 //			maxInactiveInterval = in.readInt();
 //			isNew = in.readBoolean();
@@ -1125,12 +1125,12 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			out.writeBoolean(isValid);
 			out.writeLong(lastAccessedTime);
 
-			if(proxy == null) {
-				out.writeBoolean(false);
-			} else {
-				out.writeBoolean(true);
-				out.writeObject(proxy);
-			}
+//			if(proxy == null) {
+//				out.writeBoolean(false);
+//			} else {
+//				out.writeBoolean(true);
+//				out.writeObject(proxy);
+//			}
 			
 			// From ClusteredSession
 			out.writeInt(invalidationPolicy);
