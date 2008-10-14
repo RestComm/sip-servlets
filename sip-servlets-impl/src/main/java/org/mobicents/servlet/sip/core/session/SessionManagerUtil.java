@@ -155,7 +155,8 @@ public class SessionManagerUtil {
 		if(indexOfRightParenthesis == -1) {
 			throw new ParseException("The right parenthesis could not be found in the following key " + sipSessionKey, 0);
 		}
-		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKey, ",");
+		String sipSessionKeyToParse = sipSessionKey.substring(indexOfLeftParenthesis+1, indexOfRightParenthesis-1);
+		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, ",");
 		String fromAddress = stringTokenizer.nextToken();
 		String fromTag = stringTokenizer.nextToken();
 		String toAddress = stringTokenizer.nextToken();

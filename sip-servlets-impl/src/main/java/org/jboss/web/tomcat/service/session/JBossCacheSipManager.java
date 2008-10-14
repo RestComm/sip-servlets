@@ -658,8 +658,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			ClusteredSession session = (ClusteredSession) baseSession;
 
 			synchronized (session) {
-				if (trace) {
-					log_.trace("check to see if needs to store and replicate "
+				if (logger.isDebugEnabled()) {
+					log_.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getIdInternal());
 				}
 
@@ -694,8 +694,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			ClusteredSipSession session = (ClusteredSipSession) baseSession;
 
 			synchronized (session) {
-				if (trace) {
-					log_.trace("check to see if needs to store and replicate "
+				if (logger.isDebugEnabled()) {
+					logger.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
 				}
 
@@ -733,8 +733,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) baseSession;
 
 			synchronized (session) {
-				if (trace) {
-					log_.trace("check to see if needs to store and replicate "
+				if (logger.isDebugEnabled()) {
+					log_.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
 				}
 
@@ -964,8 +964,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (session == null
 				&& !ConvergedSessionReplicationContext
 						.isSessionBoundAndExpired(realId, snapshotManager_)) {
-			if (trace)
-				log_.trace("Checking for session " + realId
+			if (logger.isDebugEnabled())
+				log_.debug("Checking for session " + realId
 						+ " in the distributed cache");
 
 			session = loadSession(realId);
@@ -975,8 +975,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				// tellNew();
 			}
 		} else if (session != null && session.isOutdated()) {
-			if (trace)
-				log_.trace("Updating session " + realId
+			if (logger.isDebugEnabled())
+				log_.debug("Updating session " + realId
 						+ " from the distributed cache");
 
 			// Need to update it from the cache
@@ -1383,9 +1383,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// a replication message from another server
 			mustAdd = true;
 			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
-		}
-		ClusteredSipSession sessionInCache = null;
+		}		
 		synchronized (session) {
+			ClusteredSipSession sessionInCache = null;
 			boolean doTx = false;
 			try {
 				// We need transaction so any data gravitation replication
@@ -1482,9 +1482,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// a replication message from another server
 			mustAdd = true;
 			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
-		}
-		ClusteredSipApplicationSession sessionInCache = null; 
+		}		
 		synchronized (session) {
+			ClusteredSipApplicationSession sessionInCache = null;
 			boolean doTx = false;
 			try {
 				// We need transaction so any data gravitation replication
@@ -1888,9 +1888,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
 				}
-				if (trace)
+				if (logger.isDebugEnabled())
 					log_
-							.trace("processRemoteAttributeRemoval: removed attribute "
+							.debug("processRemoteAttributeRemoval: removed attribute "
 									+ attrKey + " from " + realId);
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTcl);
@@ -1923,9 +1923,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
 				}
-				if (trace)
+				if (logger.isDebugEnabled())
 					log_
-							.trace("processRemoteAttributeRemoval: removed attribute "
+							.debug("processRemoteAttributeRemoval: removed attribute "
 									+ attrKey + " from " + realId);
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTcl);
@@ -1958,9 +1958,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
 				}
-				if (trace)
+				if (logger.isDebugEnabled())
 					log_
-							.trace("processRemoteAttributeRemoval: removed attribute "
+							.debug("processRemoteAttributeRemoval: removed attribute "
 									+ attrKey + " from " + realId);
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTcl);
@@ -1975,8 +1975,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// We weren't managing the session anyway. But remove it
 			// from the list of cached sessions we haven't loaded
 			if (unloadedSessions_.remove(realId) != null) {
-				if (trace)
-					log_.trace("Removed entry for session " + realId
+				if (logger.isDebugEnabled())
+					log_.debug("Removed entry for session " + realId
 							+ " from unloaded session map");
 			}
 		} else {
@@ -2026,8 +2026,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// We weren't managing the session anyway. But remove it
 			// from the list of cached sessions we haven't loaded
 			if (unloadedSipApplicationSessions_.remove(realId) != null) {
-				if (trace)
-					log_.trace("Removed entry for session " + realId
+				if (logger.isDebugEnabled())
+					log_.debug("Removed entry for session " + realId
 							+ " from unloaded session map");
 			}
 		} else {
@@ -2076,8 +2076,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// We weren't managing the session anyway. But remove it
 			// from the list of cached sessions we haven't loaded
 			if (unloadedSipSessions_.remove(realId) != null) {
-				if (trace)
-					log_.trace("Removed entry for session " + realId
+				if (logger.isDebugEnabled())
+					log_.debug("Removed entry for session " + realId
 							+ " from unloaded session map");
 			}
 		} else {
@@ -2118,8 +2118,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void processLocalPojoModification(String realId) {
 		ClusteredSession session = findLocalSession(realId);
 		if (session != null) {
-			if (trace) {
-				log_.trace("Marking attributes of session " + realId
+			if (logger.isDebugEnabled()) {
+				log_.debug("Marking attributes of session " + realId
 						+ " dirty due to POJO modification");
 			}
 			session.sessionAttributesDirty();
@@ -2136,8 +2136,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 		ClusteredSipApplicationSession session = findLocalSipApplicationSession(sipApplicationSessionKey, false);
 		if (session != null) {
-			if (trace) {
-				log_.trace("Marking attributes of session " + realId
+			if (logger.isDebugEnabled()) {
+				log_.debug("Marking attributes of session " + realId
 						+ " dirty due to POJO modification");
 			}
 			session.sessionAttributesDirty();
@@ -2154,8 +2154,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 		ClusteredSipSession session = findLocalSipSession(sipSessionKey, false, null);
 		if (session != null) {
-			if (trace) {
-				log_.trace("Marking attributes of session " + realId
+			if (logger.isDebugEnabled()) {
+				log_.debug("Marking attributes of session " + realId
 						+ " dirty due to POJO modification");
 			}
 			session.sessionAttributesDirty();
@@ -2186,12 +2186,12 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	protected void unloadedSessionChanged(String realId, String dataOwner) {
 		Object obj = unloadedSessions_.put(realId, new OwnedSessionUpdate(
 				dataOwner, System.currentTimeMillis()));
-		if (trace) {
+		if (logger.isDebugEnabled()) {
 			if (obj == null) {
-				log_.trace("New session " + realId
+				log_.debug("New session " + realId
 						+ " added to unloaded session map");
 			} else {
-				log_.trace("Updated timestamp for unloaded session " + realId);
+				log_.debug("Updated timestamp for unloaded session " + realId);
 			}
 		}
 	}
@@ -2209,12 +2209,12 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	protected void unloadedSipSessionChanged(String realId, String dataOwner) {
 		Object obj = unloadedSipSessions_.put(realId, new OwnedSessionUpdate(
 				dataOwner, System.currentTimeMillis()));
-		if (trace) {
+		if (logger.isDebugEnabled()) {
 			if (obj == null) {
-				log_.trace("New session " + realId
+				log_.debug("New session " + realId
 						+ " added to unloaded session map");
 			} else {
-				log_.trace("Updated timestamp for unloaded session " + realId);
+				log_.debug("Updated timestamp for unloaded session " + realId);
 			}
 		}
 	}
@@ -2232,12 +2232,12 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	protected void unloadedSipApplicationSessionChanged(String realId, String dataOwner) {
 		Object obj = unloadedSessions_.put(realId, new OwnedSessionUpdate(
 				dataOwner, System.currentTimeMillis()));
-		if (trace) {
+		if (logger.isDebugEnabled()) {
 			if (obj == null) {
-				log_.trace("New session " + realId
+				log_.debug("New session " + realId
 						+ " added to unloaded session map");
 			} else {
-				log_.trace("Updated timestamp for unloaded session " + realId);
+				log_.debug("Updated timestamp for unloaded session " + realId);
 			}
 		}
 	}
@@ -2803,8 +2803,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (session == null
 				&& !ConvergedSessionReplicationContext
 						.isSipApplicationSessionBoundAndExpired(key.toString(), snapshotManager_)) {
-			if (trace)
-				log_.trace("Checking for session " + key
+			if (logger.isDebugEnabled())
+				log_.debug("Checking for sip app session " + key
 						+ " in the distributed cache");
 
 			session = loadSipApplicationSession(key, create);
@@ -2814,8 +2814,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				// tellNew();
 			}
 		} else if (session != null && session.isOutdated()) {
-			if (trace)
-				log_.trace("Updating session " + key
+			if (logger.isDebugEnabled())
+				log_.debug("Updating session " + key
 						+ " from the distributed cache");
 
 			// Need to update it from the cache
@@ -2856,8 +2856,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (session == null
 				&& !ConvergedSessionReplicationContext
 						.isSipSessionBoundAndExpired(key.toString(), snapshotManager_)) {
-			if (trace)
-				log_.trace("Checking for session " + key
+			if (logger.isDebugEnabled())
+				logger.debug("Checking for sip session " + key
 						+ " in the distributed cache");
 
 			session = loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
@@ -2867,8 +2867,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				// tellNew();
 			}
 		} else if (session != null && session.isOutdated()) {
-			if (trace)
-				log_.trace("Updating session " + key
+			if (logger.isDebugEnabled())
+				logger.debug("Updating session " + key
 						+ " from the distributed cache");
 
 			// Need to update it from the cache

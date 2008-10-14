@@ -622,46 +622,49 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	private void tryToInvalidateSession(MobicentsSipSession sipSessionImpl) {
 		SipContext sipContext = findSipApplication(sipSessionImpl.getKey().getApplicationName());
-		boolean isDistributable = sipContext.getDistributable();
-		if(isDistributable) {
-			ConvergedSessionReplicationContext.enterSipapp(null, null, true);
-		}
-		try {
-			if(logger.isInfoEnabled()) {
-				logger.info("session " + sipSessionImpl.getId() + " is valid ? :" + sipSessionImpl.isValid());
+		//the context can be null if the server is being shutdown
+		if(sipContext != null) {		
+			boolean isDistributable = sipContext.getDistributable();
+			if(isDistributable) {
+				ConvergedSessionReplicationContext.enterSipapp(null, null, true);
 			}
-			if(sipSessionImpl.isValid()) {
+			try {
 				if(logger.isInfoEnabled()) {
-					logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+					logger.info("session " + sipSessionImpl.getId() + " is valid ? :" + sipSessionImpl.isValid());
 				}
-			}
-			MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
-			if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
-				sipSessionImpl.onTerminatedState();
-			}
-			if(sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {
-				sipApplicationSession.tryToInvalidate();
-			}
-		} finally {
-			if (isDistributable) {
-				if(logger.isInfoEnabled()) {
-					logger.info("We are now after the servlet invocation, We replicate no matter what");
-				}
-				try {
-					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-							.exitSipapp();
-	
+				if(sipSessionImpl.isValid()) {
 					if(logger.isInfoEnabled()) {
-						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+						logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 					}
-					if (ctx.getSoleSnapshotManager() != null) {
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipSession());
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipApplicationSession());
-					} 
-				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
+				}
+				MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
+				if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
+					sipSessionImpl.onTerminatedState();
+				}
+				if(sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {
+					sipApplicationSession.tryToInvalidate();
+				}
+			} finally {
+				if (isDistributable) {
+					if(logger.isInfoEnabled()) {
+						logger.info("We are now after the servlet invocation, We replicate no matter what");
+					}
+					try {
+						ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+								.exitSipapp();
+		
+						if(logger.isInfoEnabled()) {
+							logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+						}
+						if (ctx.getSoleSnapshotManager() != null) {
+							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+									ctx.getSoleSipSession());
+							((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+									ctx.getSoleSipApplicationSession());
+						} 
+					} finally {
+						ConvergedSessionReplicationContext.finishSipCacheActivity();
+					}
 				}
 			}
 		}

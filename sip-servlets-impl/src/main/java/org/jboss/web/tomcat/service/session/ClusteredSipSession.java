@@ -989,6 +989,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 */
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("reading sip session from the cache ");
+		}
 		synchronized (this) {
 			// From SipSessionImpl
 			String fromAddress = in.readUTF();
@@ -1001,12 +1004,17 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			String callId = in.readUTF();
 			String applicationName = in.readUTF();
 			key = new SipSessionKey(fromAddress,fromTag,toAddress, toTag, callId, applicationName);
-			
+			if(logger.isDebugEnabled()) {
+				logger.debug("reading sip session from the cache. sip session key = " + key);
+			}
 			String parentAppSessionKey = in.readUTF();
 			try {
 				sipAppSessionParentKey = SessionManagerUtil.parseSipApplicationSessionKey(parentAppSessionKey);
 			} catch (ParseException e) {
 				logger.error("Couldn't parse the store parent app session key " + parentAppSessionKey, e);
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("reading sip session from the cache. sip app session key = " + sipAppSessionParentKey);
 			}
 			routingRegion = (SipApplicationRoutingRegion) in.readObject();
 			stateInfo = (Serializable) in.readObject();
@@ -1028,22 +1036,26 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				}
 			}
 			sessionCreatingDialog = (SIPDialog) in.readObject();
+			if(logger.isDebugEnabled()) {
+				logger.debug("deserialized dialog for the sip session "+ sessionCreatingDialog);
+			}
 			invalidateWhenReady = in.readBoolean();
 			readyToInvalidate = in.readBoolean();
 			
 			creationTime = in.readLong();
-			lastAccessedTime = in.readLong();
-			
-//			boolean proxySerialized = in.readBoolean();
-//			if(proxySerialized) {
-//				proxy = (ProxyImpl) in.readObject();
-//			} 
+			lastAccessedTime = in.readLong();					
 			
 //			maxInactiveInterval = in.readInt();
 //			isNew = in.readBoolean();
 			isValid = in.readBoolean();
 			lastAccessedTime = in.readLong();
 
+			boolean proxySerialized = in.readBoolean();
+			logger.info("proxy Serialized ? "+ proxySerialized);
+			if(proxySerialized) {
+				proxy = (ProxyImpl) in.readObject();
+			} 
+			logger.info("proxy "+ proxy);
 			// From ClusteredSession
 			invalidationPolicy = in.readInt();
 			version = in.readInt();
@@ -1058,6 +1070,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// access cannot be the first.
 			this.firstAccess = false;
 
+			if(logger.isDebugEnabled()) {
+				logger.debug("sip session has just been read from the cache ");
+				logger.debug("sip session executor service " + executorService);
+			}
 			// TODO uncomment when work on JBAS-1900 is completed
 			// // Session notes -- for FORM auth apps, allow replicated session
 			// // to be used without requiring a new login
@@ -1114,6 +1130,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			} else {
 				out.writeUTF("");
 			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("serializing dialog for the sip session "+ sessionCreatingDialog);
+			}
 			out.writeObject((SIPDialog)sessionCreatingDialog);
 			out.writeBoolean(invalidateWhenReady);
 			out.writeBoolean(readyToInvalidate);
@@ -1124,13 +1143,16 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //			out.writeBoolean(isNew);
 			out.writeBoolean(isValid);
 			out.writeLong(lastAccessedTime);
-
-//			if(proxy == null) {
-//				out.writeBoolean(false);
-//			} else {
-//				out.writeBoolean(true);
-//				out.writeObject(proxy);
-//			}
+			
+			if(proxy == null) {
+//				logger.info("proxy to Serialize ? "+ false);
+				out.writeBoolean(false);
+			} else {
+//				logger.info("proxy to Serialize ? "+ true);
+				out.writeBoolean(true);
+//				logger.info("proxy Serialized : "+ proxy);
+				out.writeObject(proxy);
+			}
 			
 			// From ClusteredSession
 			out.writeInt(invalidationPolicy);

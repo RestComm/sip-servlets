@@ -155,15 +155,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 					logger.error("Dropping the response since no active sip session has been found for it : " + response);
 					return ;
 				} else {
-					sipServletResponse.setSipSession(tmpSession);
-					tmpSession.setSessionCreatingTransaction(clientTransaction);
-					tmpSession.setSessionCreatingDialog(dialog);
+					sipServletResponse.setSipSession(tmpSession);					
 				}			
 				
 				if(logger.isInfoEnabled()) {
 					logger.info("route response on following session " + tmpSession.getId());
 				}
 			} catch (Exception e) {
+				logger.error("unexpected exception happened while trying to get the sessions" ,e);
 				// Ignore for now, it will fail something later and throw DispatcherException
 			}
 			final MobicentsSipSession session = tmpSession;
@@ -173,10 +172,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 				public void dispatch() throws DispatcherException {
 					final boolean isDistributable = sipContext.getDistributable();
 					if(isDistributable) {
-						ConvergedSessionReplicationContext.enterSipapp(null, sipServletResponse, true);
+						ConvergedSessionReplicationContext.enterSipappAndBindSessions(null, sipServletResponse, sipManager, true);
 					} 
 					try {
 						try {
+							session.setSessionCreatingTransaction(clientTransaction);
+							session.setSessionCreatingDialog(dialog);
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					
 							}
@@ -238,11 +239,11 @@ public class ResponseDispatcher extends MessageDispatcher {
 								if(logger.isInfoEnabled()) {
 									logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
 								}
-								if (ctx.getSoleSnapshotManager() != null) {
-									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-											ctx.getSoleSipSession());
+								if (ctx.getSoleSnapshotManager() != null) {									
 									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
 											ctx.getSoleSipApplicationSession());
+									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+											ctx.getSoleSipSession());
 								} 
 							} finally {
 								ConvergedSessionReplicationContext.finishSipCacheActivity();

@@ -983,12 +983,14 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 */
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		logger.info("reading sip app session from the cache ");
 		synchronized (this) {
 			// From SipApplicationSessionImpl
 			String id = in.readUTF();
 			String applicationName = in.readUTF();
 			boolean isAppGeneratedKey = in.readBoolean();
 			key = new SipApplicationSessionKey(id, applicationName, isAppGeneratedKey);
+			logger.info("reading sip app session from the cache. key = " + key);
 			
 			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();

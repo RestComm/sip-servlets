@@ -304,6 +304,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSession loadSession(String realId, ClusteredSession toLoad)
    {
+	  log_.info("loading session from the cache " + realId);
       Fqn fqn = getSessionFqn(realId);
    
       
@@ -372,12 +373,14 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSipSession loadSipSession(String id, String realId, ClusteredSipSession toLoad)
    {
+	  log_.info("loading sip session from the cache " + id + " / " + realId);
       Fqn fqn = getSipSessionFqn(id, realId);
    
       
       Object sessionData = cacheWrapper_.get(fqn, realId, true);
       
       if (sessionData == null) {
+    	  log_.info("sip session " + id + " / " + realId + " is no longer in the cache. FQN = "+ fqn);
          // Requested session is no longer in the cache; return null
          return null;
       }
@@ -440,12 +443,14 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSipApplicationSession loadSipApplicationSession(String realId, ClusteredSipApplicationSession toLoad)
    {
+	  log_.info("loading sip app session from the cache " + realId);
       Fqn fqn = getSipApplicationSessionFqn(realId);
    
       
       Object sessionData = cacheWrapper_.get(fqn, realId, true);
       
       if (sessionData == null) {
+    	  log_.info("sip app session " + realId + " is no longer in the cache. FQN = "+ fqn);
          // Requested session is no longer in the cache; return null
          return null;
       }

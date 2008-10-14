@@ -142,6 +142,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
+			if(logger.isDebugEnabled()) {
+				logger.debug("Trying to find the corresponding sip session with key " + key + " to this subsequent request " + request +
+						" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			}
 			tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 			
 			// Added by Vladimir because the inversion detection on proxied requests doesn't work
@@ -163,7 +167,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
 				}
 			}			
-		} catch (Exception e) { 
+		} catch (Exception e) {
+			logger.error("unexpected exception happened while trying to get the sessions" ,e);
 			// ignore for now, the next try block will handle it if anything goes wrong
 		}
 		
@@ -251,9 +256,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							}
 							if (ctx.getSoleSnapshotManager() != null) {
 								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipSession());
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
 										ctx.getSoleSipApplicationSession());
+								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+										ctx.getSoleSipSession());								
 							} 
 						} finally {
 							ConvergedSessionReplicationContext.finishSipCacheActivity();

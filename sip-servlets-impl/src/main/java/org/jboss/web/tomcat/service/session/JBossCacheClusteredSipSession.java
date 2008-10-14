@@ -69,6 +69,9 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 			proxy.setSipFactoryImpl(sipFactory);
 		}
 		//inject the dialog into the available sip stacks
+		if(logger.isDebugEnabled()) {
+			logger.debug("dialog to inject " + sessionCreatingDialog);
+		}
 		Container context = manager.getContainer();
 		Container container = context.getParent().getParent();
 		if(container instanceof Engine) {
@@ -78,7 +81,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 				for (Connector connector : connectors) {
 					SipStack sipStack = (SipStack)
 						connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-					if(sipStack != null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
+					if(sipStack != null && sessionCreatingDialog!= null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
 						((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
 					}
 				}

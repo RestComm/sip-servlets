@@ -301,9 +301,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							}
 							if (ctx.getSoleSnapshotManager() != null) {
 								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipSession());
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
 										ctx.getSoleSipApplicationSession());
+								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+										ctx.getSoleSipSession());								
 							} 
 						} finally {
 							ConvergedSessionReplicationContext.finishSipCacheActivity();
