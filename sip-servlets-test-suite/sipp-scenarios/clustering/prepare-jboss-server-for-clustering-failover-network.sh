@@ -11,6 +11,25 @@ mvn clean install -f ../../../pom.xml -P jboss -Dnode=all
 
 mkdir $JBOSS_HOME/server/all/conf/dars
 
-mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/all/conf/dars
+if [ $# -ne 0 ]; then
+	case $1 in	
+	    proxy)
+	    		echo "Distributed example used is proxy";
+	    		mvn clean install -f ../../../sip-servlets-examples/location-service-distributable/pom.xml
+				cp ../../../sip-servlets-examples/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/all/deploy
+				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
+	            ;;
+	    b2bua)
+	            echo "Distributed example used is b2bua";
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
+	            ;;
+	    *)
+	            echo "Distributed example used is uas";
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
+	            ;;
+    esac
+fi

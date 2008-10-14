@@ -15,7 +15,7 @@
   		balancers="127.0.0.1"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="conf/dars/distributable-simple-dar.properties">
+  		darConfigurationFileLocation="conf/dars/distributable-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
@@ -52,8 +52,8 @@
 	     threadPoolSize="64"
 		 isReentrantListener="true"  
     	 logLevel="DEBUG"
-	     debugLog = "logs/jsip-debug-cluster-port-2.txt" 
-		 serverLog = "logs/jsip-log-cluster-port-2.xml"
+	     debugLog = "log/jsip-debug-cluster-port-2.txt" 
+		 serverLog = "log/jsip-log-cluster-port-2.xml"
 	     sipStackName="SIP-Servlet-Jboss-Server-Port-2" 
 	     sipPathName="gov.nist"/>
 

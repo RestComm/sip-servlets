@@ -1,5 +1,13 @@
 export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster
 
+#echo "Script name is		[$0]"
+#echo "First Parameter is		[$1]"
+#echo "Second Parameter is		[$2]"
+#echo "This Process ID is		[$$]"
+#echo "This Parameter Count is	[$#]"
+#echo "All Parameters		[$@]"
+#echo "The FLAGS are			[$-]"
+
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
 cp jboss-service-port-1.xml $JBOSS_HOME/server/port-1/conf/jboss-service.xml
@@ -21,8 +29,31 @@ mvn clean install -f ../../../pom.xml -P jboss -Dnode=port-2
 mkdir $JBOSS_HOME/server/port-1/conf/dars
 mkdir $JBOSS_HOME/server/port-2/conf/dars
 
-mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-1/conf/dars
-cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars
+if [ $# -ne 0 ]; then
+	case $1 in	
+	    proxy)
+	    		echo "Distributed example used is proxy";
+	    		mvn clean install -f ../../../sip-servlets-examples/location-service-distributable/pom.xml
+				cp ../../../sip-servlets-examples/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+	            ;;
+	    b2bua)
+	            echo "Distributed example used is b2bua";
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+	            ;;
+	    *)
+	            echo "Distributed example used is uas";
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+	            ;;
+    esac
+fi

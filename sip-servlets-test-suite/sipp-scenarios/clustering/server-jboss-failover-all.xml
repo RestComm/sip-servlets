@@ -15,7 +15,7 @@
   		balancers="192.168.1.21"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="conf/dars/distributable-simple-dar.properties">
+  		darConfigurationFileLocation="conf/dars/distributable-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
