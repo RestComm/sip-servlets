@@ -64,13 +64,13 @@ public class AppKeySipServlet
 		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			ackRequest.send();
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {				
-				logger.error("unexpected exception", e);
-			}
-			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-			sipServletRequest.send();
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e) {				
+//				logger.error("unexpected exception", e);
+//			}
+//			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
+//			sipServletRequest.send();
 		}
 		
 		if (status == SipServletResponse.SC_OK && "REGISTER".equalsIgnoreCase(sipServletResponse.getMethod())) {
@@ -94,6 +94,12 @@ public class AppKeySipServlet
 				throw new ServletException("Call Id for different requests within the same application session whose the key is app generated are the same!");
 			}
 		}
+	}
+	
+	@Override
+	protected void doBye(SipServletRequest req) throws ServletException,
+			IOException {
+		req.createResponse(SipServletResponse.SC_OK).send();
 	}
 
 	// SipServletListener methods

@@ -66,7 +66,7 @@ public class AppKeySipServletTest extends SipServletTestCase {
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
 					
-		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
 		SipProvider senderProvider = receiver.createProvider();			
 		
 		senderProvider.addSipListener(receiver);
@@ -84,7 +84,7 @@ public class AppKeySipServletTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.getByeReceived());		
+		assertTrue(receiver.getOkToByeReceived());		
 	}
 
 	@Override
