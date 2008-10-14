@@ -19,6 +19,7 @@
 		<module>click-to-call</module>
 		<module>facebook-c2c</module>
 		<module>location-service</module>
+		<module>location-service-distributable</module>
 		<module>media-playback-servlet</module>
 		<module>shopping-demo</module>
 		<module>simple-sip-servlet</module>
