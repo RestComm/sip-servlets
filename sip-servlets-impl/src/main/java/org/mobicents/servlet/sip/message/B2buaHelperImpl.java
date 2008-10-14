@@ -486,7 +486,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 				newRequest.removeHeader(ContactHeader.NAME);
 			}
 			//Creating new call id
-			ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false);
+			ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
 			CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			

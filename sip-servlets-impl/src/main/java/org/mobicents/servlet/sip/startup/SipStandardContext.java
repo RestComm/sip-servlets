@@ -162,7 +162,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
 		}
 		if(sipSessionsUtil == null) {
-			sipSessionsUtil = new SipSessionsUtilImpl(this, applicationName);
+			sipSessionsUtil = new SipSessionsUtilImpl(this);
 		}
 		//needed when restarting applications through the tomcat manager 
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
@@ -308,7 +308,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
-			sipSessionsUtil.setApplicationName(applicationName);
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context started");
 			}

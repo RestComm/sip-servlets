@@ -169,7 +169,7 @@ public class SipFactoryImpl implements Serializable {
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
-				sipApplicationDispatcher.getSipNetworkInterfaceManager().findMatchingListeningPoint(ListeningPoint.UDP, false)
+				sipApplicationDispatcher.getSipNetworkInterfaceManager().getExtendedListeningPoints().next()
 					.getSipProvider().getNewCallId().getCallId(),
 				false);		
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
@@ -365,7 +365,7 @@ public class SipFactoryImpl implements Serializable {
 			SipApplicationSession sipAppSession, String method, Address from,
 			Address to, String handler) throws ServletParseException {
 		
-		MobicentsSipApplicationSession MobicentsSipApplicationSession = (MobicentsSipApplicationSession) sipAppSession;
+		MobicentsSipApplicationSession mobicentsSipApplicationSession = (MobicentsSipApplicationSession) sipAppSession;
 		
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
@@ -407,8 +407,15 @@ public class SipFactoryImpl implements Serializable {
 		}
 		try {
 			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
-			callIdHeader = SipFactories.headerFactory.createCallIdHeader(
-					MobicentsSipApplicationSession.getKey().getId());
+			// Fix provided by Hauke D. Issue 411
+			SipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
+			if(sipApplicationSessionKey.isAppGeneratedKey()) {				
+				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+						getSipNetworkInterfaceManager().getExtendedListeningPoints().next().getSipProvider().getNewCallId().getCallId());	
+			} else {
+				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+						sipApplicationSessionKey.getId());
+			}
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 			// FIXME: ADD ROUTE? HOW?
@@ -469,7 +476,7 @@ public class SipFactoryImpl implements Serializable {
 //			}
 			
 			SipApplicationDispatcher dispatcher = 
-				MobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
+				mobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher.getMdToApplicationName());
 			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
@@ -477,9 +484,9 @@ public class SipFactoryImpl implements Serializable {
 			fromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
-					MobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
-			MobicentsSipSession session = ((SipManager)MobicentsSipApplicationSession.getSipContext().getManager()).
-				getSipSession(key, true, this, MobicentsSipApplicationSession);
+					mobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
+			MobicentsSipSession session = ((SipManager)mobicentsSipApplicationSession.getSipContext().getManager()).
+				getSipSession(key, true, this, mobicentsSipApplicationSession);
 			session.setHandler(handler);
 			session.setLocalParty(new AddressImpl(fromAddress, null, false));
 			session.setRemoteParty(new AddressImpl(toAddress, null, false));
@@ -574,7 +581,6 @@ public class SipFactoryImpl implements Serializable {
 	 * @see javax.servlet.sip.SipFactory#createAuthInfo()
 	 */
 	public AuthInfo createAuthInfo() {
-		// FIXME
 		return new AuthInfoImpl();
 	}
 

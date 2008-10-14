@@ -16,18 +16,13 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import gov.nist.javax.sip.address.SipUri;
-
 import java.text.ParseException;
 import java.util.StringTokenizer;
 
-import javax.sip.address.URI;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
-
-import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 
 /**
  * This class is used as a central place to get a session be it a sip session

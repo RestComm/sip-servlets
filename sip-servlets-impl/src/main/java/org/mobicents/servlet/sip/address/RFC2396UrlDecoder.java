@@ -131,7 +131,7 @@ public class RFC2396UrlDecoder {
     		logger.debug("uri to decode " + uri);
     	}
     	if(uri == null) {
-    		// fix by Hauke D.
+    		// fix by Hauke D. Issue 410
 //    		throw new NullPointerException("uri cannot be null !");
     		return null;
     	}

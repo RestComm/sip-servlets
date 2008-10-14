@@ -26,7 +26,6 @@ import javax.servlet.sip.SipSessionsUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.xbill.DNS.APLRecord;
 
 /**
  * @author Jean Deruelle
@@ -36,11 +35,9 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	private static transient Log logger = LogFactory.getLog(SipSessionsUtilImpl.class);
 	
 	private transient SipContext sipContext;
-	private String applicationName;
 
-	public SipSessionsUtilImpl(SipContext sipContext, String applicationName) {
+	public SipSessionsUtilImpl(SipContext sipContext) {
 		this.sipContext = sipContext;
-		this.applicationName = applicationName;
 	}
 	
 	/**
@@ -58,11 +55,11 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 					" couldn't be parsed correctly ",e);
 			return null;
 		}
-		if(applicationSessionKey.getApplicationName().equals(applicationName)) {
+		if(applicationSessionKey.getApplicationName().equals(sipContext.getApplicationName())) {
 			return ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, false);
 		} else {
 			logger.warn("the given application session id : " + applicationSessionId + 
-					" tried to be retrieved from incorret application " + applicationName);
+					" tried to be retrieved from incorret application " + sipContext.getApplicationName());
 			return null;
 		}
 	}
@@ -75,7 +72,7 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		if(applicationSessionKey == null) {
 			throw new NullPointerException("the given key is null !");
 		}
-		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(applicationSessionKey, applicationName, true);
+		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(applicationSessionKey, sipContext.getApplicationName(), true);
 		
 		return ((SipManager)sipContext.getManager()).getSipApplicationSession(sipApplicationSessionKey, create);		
 	}
@@ -86,9 +83,4 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	public SipSession getCorrespondingSipSession(SipSession sipSession, String headerName) {
 		throw new UnsupportedOperationException("RFC 3911 and RFC 3891 are not currently supported");
 	}
-
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
-
 }
