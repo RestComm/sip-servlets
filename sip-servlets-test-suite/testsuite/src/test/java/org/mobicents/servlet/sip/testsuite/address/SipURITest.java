@@ -73,4 +73,13 @@ public class SipURITest extends junit.framework.TestCase {
 //		assertTrue(uri1.getParameter("content-type") + " is different as video/mpeg;encode=314M-25/625-50" , uri1.getParameter("content-type").equals("video/mpeg;encode=314M-25/625-50"));
 //		assertTrue(uri1.toString() + " is different as sip:annc@ms.example.net;play=file://fs.example.net//clips/my-intro.dvi;content-type=video/mpeg%3bencode%3d314M-25/625-50" , uri1.equals(uri2));
 	}	
+	
+	public void testNullUser() throws Exception {
+		SipURI uri1 = sipUri("sip:atlanta.com;transport=TCP?Subject=SIP%20Servlets");
+		assertNotNull(uri1);
+		assertNull(uri1.getUser());
+		assertNotNull(uri1.getHost());
+		assertEquals("TCP", uri1.getTransportParam());
+		assertTrue(uri1.getHeader("Subject") + " is different as SIP Servlets" , uri1.getHeader("Subject").equals("SIP Servlets"));
+	}
 }
