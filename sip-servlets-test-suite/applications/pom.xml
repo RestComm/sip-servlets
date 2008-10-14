@@ -12,6 +12,7 @@
 		<module>simple-sip-servlet</module>
 		<module>shootme-sip-servlet-auth</module>
 		<module>shootist-sip-servlet</module>
+		<module>appkey-sip-servlet</module>
 		<module>shootist-sip-servlet-auth</module>
 		<module>proxy-sip-servlet</module>		
 		<module>b2bua-sip-servlet</module>		
