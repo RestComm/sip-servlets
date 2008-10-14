@@ -516,7 +516,7 @@
 						User Guide with DocBook Documentation
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=320">
 						Mid Call Failover Support for Proxy Applications
@@ -550,6 +550,20 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=245">
 									Implementation of 17.8 P-Asserted Identity Security 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=410">
+									SipURIImpl.getUser() throws NullPointerException instead of returning null 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=411">
+									SipFactoryImpl.createSipServletRequest(...) uses App. Session key as Call-ID instead of random, unique ID
 								</a>
 							</li>
 						</ul>
