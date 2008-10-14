@@ -133,44 +133,39 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}		
 		
 		MobicentsSipSession tmpSipSession = null;
-		try {
-			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
-			if(sipApplicationSession == null) {
-				sipManager.dumpSipApplicationSessions();
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
-						" with the following popped route header " + sipServletRequest.getPoppedRoute());
-			}
-			
-			SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
-			if(logger.isDebugEnabled()) {
-				logger.debug("Trying to find the corresponding sip session with key " + key + " to this subsequent request " + request +
-						" with the following popped route header " + sipServletRequest.getPoppedRoute());
-			}
-			tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
-			
-			// Added by Vladimir because the inversion detection on proxied requests doesn't work
-			if(tmpSipSession == null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
-							" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
-				}
-				key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
-				tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
-			}
-			
-			if(tmpSipSession == null) {
-				sipManager.dumpSipSessions();
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
-						" with the following popped route header " + sipServletRequest.getPoppedRoute());
-			} else {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
-				}
-			}			
-		} catch (Exception e) {
-			logger.error("unexpected exception happened while trying to get the sessions" ,e);
-			// ignore for now, the next try block will handle it if anything goes wrong
+		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
+		if(sipApplicationSession == null) {
+			sipManager.dumpSipApplicationSessions();
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 		}
+		
+		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Trying to find the corresponding sip session with key " + key + " to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+		}
+		tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+		
+		// Added by Vladimir because the inversion detection on proxied requests doesn't work
+		if(tmpSipSession == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
+						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
+			}
+			key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
+			tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+		}
+		
+		if(tmpSipSession == null) {
+			sipManager.dumpSipSessions();
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
+					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
+			}
+		}			
 		
 		final MobicentsSipSession sipSession = tmpSipSession;
 		sipServletRequest.setSipSession(sipSession);

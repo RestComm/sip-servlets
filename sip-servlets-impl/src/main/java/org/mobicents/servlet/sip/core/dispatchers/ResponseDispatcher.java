@@ -134,37 +134,34 @@ public class ResponseDispatcher extends MessageDispatcher {
 				logger.debug("Trying to find session with following session key " + sessionKey);
 			}			
 			MobicentsSipSession tmpSession = null;
-			try {
-				tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
-				//needed in the case of RE-INVITE by example
-				if(tmpSession == null) {
-					sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, !inverted);
-					if(logger.isDebugEnabled()) {
-						logger.debug("Trying to find session with following session key " + sessionKey);
-					}
-					tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);				
-				}
+
+			tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+			//needed in the case of RE-INVITE by example
+			if(tmpSession == null) {
+				sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, !inverted);
 				if(logger.isDebugEnabled()) {
-					logger.debug("session found is " + tmpSession);
-					if(tmpSession == null) {
-						sipManager.dumpSipSessions();
-					}
-				}					
-				
-				if(tmpSession == null) {
-					logger.error("Dropping the response since no active sip session has been found for it : " + response);
-					return ;
-				} else {
-					sipServletResponse.setSipSession(tmpSession);					
-				}			
-				
-				if(logger.isInfoEnabled()) {
-					logger.info("route response on following session " + tmpSession.getId());
+					logger.debug("Trying to find session with following session key " + sessionKey);
 				}
-			} catch (Exception e) {
-				logger.error("unexpected exception happened while trying to get the sessions" ,e);
-				// Ignore for now, it will fail something later and throw DispatcherException
+				tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);				
 			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("session found is " + tmpSession);
+				if(tmpSession == null) {
+					sipManager.dumpSipSessions();
+				}
+			}					
+			
+			if(tmpSession == null) {
+				logger.error("Dropping the response since no active sip session has been found for it : " + response);
+				return ;
+			} else {
+				sipServletResponse.setSipSession(tmpSession);					
+			}			
+			
+			if(logger.isInfoEnabled()) {
+				logger.info("route response on following session " + tmpSession.getId());
+			}
+
 			final MobicentsSipSession session = tmpSession;
 			final TransactionApplicationData finalApplicationData = applicationData;
 			DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {

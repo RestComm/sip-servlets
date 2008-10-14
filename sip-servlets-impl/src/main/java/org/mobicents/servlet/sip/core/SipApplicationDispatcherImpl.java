@@ -494,7 +494,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
 						JainSipUtils.findTransport(request));
 				if(arText != null) {
-					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getLast().getApplication());
+					localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getApplicationName());
+					if(ar.getAppGeneratedApplicationSessionId() != null && ar.getAppGeneratedApplicationSessionId().length() > 1) {
+						localUri.setParameter(MessageDispatcher.GENERATED_APP_KEY, ar.getAppGeneratedApplicationSessionId());
+					}
 					javax.sip.address.Address address = 
 						SipFactories.addressFactory.createAddress(localUri);
 					routeHeader = SipFactories.headerFactory.createRouteHeader(address);

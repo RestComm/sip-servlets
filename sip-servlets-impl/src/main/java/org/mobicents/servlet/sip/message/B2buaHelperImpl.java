@@ -35,7 +35,6 @@ import javax.servlet.sip.UAMode;
 import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
-import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.Transaction;
 import javax.sip.header.CSeqHeader;
@@ -174,8 +173,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) appSession.getSipContext().getSipApplicationDispatcher();
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher.getMdToApplicationName(), oldFromHeader.getTag());
-			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
-					originalSession.getKey().getApplicationName()));
+			stack.setApplicationName(originalSession.getKey().getApplicationName());
 			newFromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
@@ -500,8 +498,7 @@ public class B2buaHelperImpl implements B2buaHelper {
 			SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) originalAppSession.getSipContext().getSipApplicationDispatcher();
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher.getMdToApplicationName(), oldFromHeader.getTag());
-			stack.addNode(new ApplicationRoutingHeaderComposer.ApplicationRouterNode(
-					originalSession.getKey().getApplicationName()));
+			stack.setApplicationName(originalSession.getKey().getApplicationName());
 			newFromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
