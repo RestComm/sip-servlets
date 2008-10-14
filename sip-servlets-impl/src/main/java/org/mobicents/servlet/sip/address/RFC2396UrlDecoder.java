@@ -31,6 +31,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Copied from Apache Excalibur project.
  * Source code available at http://www.google.com/codesearch?hl=en&q=+excalibur+decodePath+show:sK_gDY0W5Rw:OTjCHAiSuF0:th3BdHtpX20&sa=N&cd=1&ct=rc&cs_p=http://apache.edgescape.com/excalibur/excalibur-sourceresolve/source/excalibur-sourceresolve-1.1-src.zip&cs_f=excalibur-sourceresolve-1.1/src/java/org/apache/excalibur/source/SourceUtil.java
@@ -41,7 +44,8 @@ public class RFC2396UrlDecoder {
 
 	static BitSet charactersDontNeedingEncoding;
 	static final int characterCaseDiff = ('a' - 'A');
-
+	private static Log logger = LogFactory.getLog(RFC2396UrlDecoder.class.getCanonicalName());
+	
 	/** Initialize the BitSet */
 	static {
 		charactersDontNeedingEncoding = new BitSet(256);
@@ -123,8 +127,13 @@ public class RFC2396UrlDecoder {
      * @return the decoded path
      */
     public static String decode(String uri) {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("uri to decode " + uri);
+    	}
     	if(uri == null) {
-    		throw new NullPointerException("uri cannot be null !");
+    		// fix by Hauke D.
+//    		throw new NullPointerException("uri cannot be null !");
+    		return null;
     	}
         StringBuffer translatedUri = new StringBuffer(uri.length());
         byte[] encodedchars = new byte[uri.length() / 3];

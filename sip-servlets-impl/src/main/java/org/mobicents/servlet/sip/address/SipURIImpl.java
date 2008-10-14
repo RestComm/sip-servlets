@@ -37,7 +37,7 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class SipURIImpl extends URIImpl implements SipURI {
 
-	private static Log logger = LogFactory.getLog(SipFactories.class.getCanonicalName());
+	private static Log logger = LogFactory.getLog(SipURIImpl.class.getCanonicalName());
 
 	public SipURIImpl(javax.sip.address.SipURI sipUri) {
 		super(sipUri);
