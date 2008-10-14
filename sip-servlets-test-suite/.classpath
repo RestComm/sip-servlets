@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/appkey-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/appkey-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/shootme-sip-servlet-auth/src/main/sipapp/WEB-INF/classes" path="applications/shootme-sip-servlet-auth/src/main/java"/>
 	<classpathentry kind="src" output="applications/shootist-sip-servlet-auth/src/main/sipapp/WEB-INF/classes" path="applications/shootist-sip-servlet-auth/src/main/java"/>
 	<classpathentry kind="src" output="applications/refer-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/refer-sip-servlet/src/main/java"/>

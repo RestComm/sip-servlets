@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.AppKeyApplication</app-name>
+	<display-name>AppKey Sip Servlet</display-name>
+	<description>AppKey Sip Servlet</description>
+	
+	<main-servlet>
+		AppKeySipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>AppKeySipServlet</servlet-name>
+		<display-name>AppKeySipServlet</display-name>
+		<description>AppKey SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.AppKeySipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.AppKeySipServlet
+		</listener-class>
+	</listener>
+</sip-app>

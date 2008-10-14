@@ -246,7 +246,7 @@ public class TestSipListener implements SipListener {
 		if (request.getMethod().equals(Request.INVITE)) {
 			processInvite(requestReceivedEvent, serverTransactionId);
 		}
-				
+		
 		if (request.getMethod().equals(Request.BYE)) {
 			processBye(request, serverTransactionId);
 		}
@@ -261,6 +261,10 @@ public class TestSipListener implements SipListener {
 		
 		if (request.getMethod().equals(Request.MESSAGE)) {
 			processMessage(request, serverTransactionId);
+		}
+
+		if (request.getMethod().equals(Request.REGISTER)) {
+			processRegister(request, serverTransactionId);
 		}
 		
 		if (request.getMethod().equals(Request.NOTIFY)) {
@@ -660,6 +664,31 @@ public class TestSipListener implements SipListener {
 			allMessagesContent.add(new String(lastMessageContent));
 		}
 		try {
+			Response okResponse = protocolObjects.messageFactory.createResponse(
+					Response.OK, request);			
+			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
+			if (toHeader.getTag() == null) {
+				toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+			}
+//			okResponse.addHeader(contactHeader);
+			serverTransaction.sendResponse(okResponse);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error("error sending OK response to message", ex);
+		}		
+	}
+	
+	private void processRegister(Request request,
+			ServerTransaction serverTransactionId) {
+		
+		ServerTransaction serverTransaction = null;
+
+        try {
+
+            serverTransaction = 
+            	(serverTransactionId == null? 
+            			sipProvider.getNewServerTransaction(request): 
+            				serverTransactionId);
 			Response okResponse = protocolObjects.messageFactory.createResponse(
 					Response.OK, request);			
 			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
