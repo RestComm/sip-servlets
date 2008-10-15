@@ -9,6 +9,14 @@
 		<attribute name="managedResource"
 			description="The managed resource this MBean is associated with"
 			type="java.lang.Object" />
+			
+		<attribute name="concurrencyControlMode"
+			description="Concurrent control mode specifies if requests should be executed sequentially"
+			type="org.mobicents.servlet.sip.core.ConcurrencyControlMode" />
+			
+		<attribute name="queueSize"
+			description="Maximum number of pending messages allowed to wait in a queue to be executed"
+			type="int" />
 
 		<operation name="findInstalledSipApplications"
 			description="Enumerate applications"
@@ -26,6 +34,14 @@
 			<parameter name="configuration"
 				description="the configuration (AR specific)"
 				type="java.lang.Object" />
+		</operation>
+		
+		<operation name="setConcurrencyControlModeByName"
+			description="set concurrency control mode by the string value of the mode, this is needed because you can't set Enum value types from the JMX console"
+			impact="ACTION" returnType="void">
+			<parameter name="concurrencyControlMode"
+				description="the concurrency mode, must be one of the following - None, SipSession or SipApplicationSession"
+				type="java.lang.String" />
 		</operation>
 		
 		<operation name="init"
