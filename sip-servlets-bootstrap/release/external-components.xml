@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+
+	<artifactId>sip-servlets-external-modules-checkout</artifactId>
+	<groupId>org.mobicents.servlet.sip</groupId>
+	<version>0.6-SNAPSHOT</version>
+	
+     <properties>
+         <checkout.basedir>${basedir}/target/dependencies</checkout.basedir>
+         <checkout.username>mobicents-read-only</checkout.username>
+         <checkout.password></checkout.password>
+         
+         <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/mobicents-media-server-core-1.0.0.BETA4</media.core.connectionURL>
+         <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL>
+     </properties>
+     
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+                        <id>media-core-checkout</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<configuration>
+							<checkoutDirectory>
+                                ${checkout.basedir}/media/core
+							</checkoutDirectory>
+                            <skipCheckoutIfExists>true</skipCheckoutIfExists>
+							<connectionUrl>
+								${media.core.connectionURL}
+							</connectionUrl>
+                            <username>${checkout.username}</username>
+                            <password>${checkout.password}</password>
+						</configuration>
+					</execution>
+                    <execution>
+                        <id>sip-balancer-checkout</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>
+                                ${checkout.basedir}/sip-balancer
+                            </checkoutDirectory>
+                            <skipCheckoutIfExists>true</skipCheckoutIfExists>
+                            <connectionUrl>
+                                ${sip.balancer.connectionURL}
+                            </connectionUrl>
+                            <username>${checkout.username}</username>
+                            <password>${checkout.password}</password>
+                        </configuration>
+                    </execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

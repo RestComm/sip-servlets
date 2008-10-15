@@ -39,17 +39,6 @@
 		<copy file="${base.path}/context-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/context.xml"/>
 		<copy file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml"/>
 		<copy file="${base.path}/webserver-xmbean.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml"/>
-			
-		<!-- The Sip Load Balancer -->
-		<mkdir dir="${base.path}/jboss-${jboss.version}/sip-balancer"/>
-		<get src="http://snapshots.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0-SNAPSHOT/sip-balancer-1.0-20081009.142921-22-jar-with-dependencies.jar" 
-		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-1.0-20081009.142921-22-jar-with-dependencies.jar" 
-		    verbose="true"
-		    usetimestamp="true"/>
-		<get src="http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties" 
-		    dest="${base.path}/jboss-${jboss.version}/sip-balancer/lb-configuration.properties" 
-		    verbose="true"
-		    usetimestamp="true"/>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
@@ -73,10 +62,18 @@
 		
 		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
 		
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war" />
-		<copy file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-1.1-SNAPSHOT.war" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war" />
+		<copy  tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war">
+            <fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+        </copy>
+		<copy tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war">
+            <fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+        </copy>
+		<copy tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war">
+            <fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+        </copy>
+		<copy tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war">
+            <fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
+        </copy>
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties" />
 				
 		<ant target="deploy-mgmnt">
@@ -87,7 +84,10 @@
 		    <fileset dir="${base.path}/jboss-${jboss.version}/server/default/deploy/" includes="*media*.sar/**"/>
 		</copy>
 
-		<ant target="deploy-media"/>
+		<ant target="get-deps" />
+		<ant target="build-mobicents-media-server"/>
+		<ant target="build-mobicents-sip-load-balancer"/>
+		
 		<copy todir="${base.path}/jboss-${jboss.version}/server/all/deploy/">
 		    <fileset dir="${base.path}/jboss-${jboss.version}/server/default/deploy/" includes="sip-servlets-manage*"/>
 		</copy>
@@ -114,25 +114,26 @@
 			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
 	</target>
 	
-	<available file="${ant.file.mobicents.release}/../mobicents-media-server-core" property="mobicents.media.server.checked.out"/>
-	<target name="get-mobicents-media-server" unless="mobicents.media.server.checked.out">
-        <echo>Checking out Mobicents Media Server</echo>
-		<delete dir="mms"/>
-		<mkdir dir="mms"/>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
-            <arg line="-f external-components-checkout.xml install -Dexternal.modules.basedir=mms/mobicents-media-server-core"/>
-        </exec>
-	</target>
 	
 	<target name="build-mobicents-media-server">
         <echo>Building Mobicents Media Server</echo>
-        <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../mms/mobicents-media-server-core">
+        <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../target/dependencies/media/core">
             <arg line="install -P set-svn-revision -Djboss.home=${base.path}/jboss-${jboss.version}" />
         </exec>
 	</target>
-		
-	<target name="deploy-media" depends="get-mobicents-media-server,build-mobicents-media-server" />
 	
+   <target name="build-mobicents-sip-load-balancer">
+        <echo>Building Mobicents SIP Load Balancer</echo>
+        <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../target/dependencies/sip-balancer">
+            <arg line="install -P set-svn-revision" />
+        </exec>
+        <copy tofile="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
+            <fileset dir="${ant.file.mobicents.release}/../target/dependencies/sip-balancer/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
+        </copy>
+        <copy file="${ant.file.mobicents.release}/../target/dependencies/sip-balancer/src/test/resources/lb-configuration.properties"
+            tofile="${base.path}/jboss-${jboss.version}/sip-balancer/lb-configuration.properties" />
+    </target>
+
 	<target name="make-final-zip-jboss">
 		<fixcrlf srcdir="${base.path}/jboss-${jboss.version}/bin" includes="*.sh" eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}-${time.stamp}.zip" filesonly="false">
@@ -181,8 +182,9 @@
 			<arg line="clean install -P set-svn-revision"/>
 		</exec>
 		
-		<copy file="${this.path}/../../sip-servlets-examples/click-to-call/target/click-to-call-servlet-1.1-SNAPSHOT.war" 
-			tofile="${jboss.dir}/server/default/deploy/click2call.war" />
+        <copy tofile="${jboss.dir}/server/default/deploy/click2call.war">
+            <fileset dir="${this.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+        </copy>
 		
 		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
             <property name="system.JBOSS_HOME" value="${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
@@ -193,6 +195,32 @@
 			tofile="${jboss.dir}/server/default/deploy/sip-servlets-management.war"/>
 		
 	</target>
+	
+    <!-- get dependencies -->
+
+    <condition property="dependencies.checkedout">
+        <and>
+            <available file="${ant.file.mobicents.all.release}/../target/dependencies/media/core/.svn/entries" />
+            <available file="${ant.file.mobicents.all.release}/../target/dependencies/sip-balancer/.svn/entries" />
+        </and>
+    </condition>
+    <target name="get-deps" depends="checkout-deps,update-deps" />
+
+    <target name="checkout-deps" unless="dependencies.checkedout">
+        <echo>Checking out dependencies</echo>
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
+            <arg line="-f external-components.xml validate -P checkout" />
+        </exec>
+    </target>
+
+    <target name="update-deps">
+        <echo>Updating dependencies</echo>
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
+            <arg line="-f external-components.xml validate -P update" />
+        </exec>
+    </target>
+
+    <!-- ### ############ -->
 	
 	<target name="set-src-excludes">
         <defaultexcludes add="**/target/**"/>
