@@ -22,7 +22,7 @@ Configuration
     <<<logLevel="DEBUG">>>\
 	<<<debugLog = "logs/debuglog.txt">>>\ 
 	<<<serverLog = "logs/serverlog.txt">>>\
-	<<<sipStackName="SIP-Servlet-Tomcat-Server">>>\ 
+	<<<sipStackName="SIP-Servlet-Server">>>\ 
 	<<<sipPathName="gov.nist"/>>>>
 	
 	Here is a description of the sip Connector tag's attributes :
@@ -70,7 +70,6 @@ Configuration
 	<<<<Service name="Sip-Servlets">>>\
   	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>\
   	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>\
-  	<<<sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">>>\
   	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/reinvite-demo/reinvite-dar.properties">>>>
   	
   	Here is a description of the sip Service tag's attributes :
@@ -78,8 +77,6 @@ Configuration
   	* <<<className>>> : This attribute specifies that the servlet container will be a converged (sip + http) servlet container. You can also use it to handle {{{failover.html}load balancing and failover}}
   	
   	* <<<sipApplicationDispatcherClassName>>> : This attribute specifies the class name of the <<<org.mobicents.servlet.sip.core.SipApplicationDispatcher>>> implementation to use. The routing algorithm and application selection process is done in that class.
-  	
-  	* <<<sipApplicationRouterClassName>>> : (removed starting from 0.5 version since the JSR 289 PFD-2 defines a mechanism to package and load an application router) This attribute specifies the class name of the <<<javax.servlet.sip.SipApplicationRouter>>> implementation. This allows to plug any Application Router to change the application selection logic.
   	
   	* <<<darConfigurationFileLocation>>> : The default application router file location. Used by our default application router to know the application selection logic. Check JSR 289 Spec Appendix C.
   	
