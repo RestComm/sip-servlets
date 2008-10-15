@@ -3,16 +3,17 @@ Mobicents Sip Servlets Concurrency and Congestion Control
 * Description
 	
 	
-	Concurrency and congestion control modes define the way messages are processed under real-world load. Although the JSR 289 Expert Group couldn't agree on a concurrency control mechanism in JSR 289, we believe this feature together with congestion control is often desired in production environments.
+	Concurrency and congestion control settings define the way messages are processed under heavy load. Although the JSR 289 Expert Group couldn't agree on a concurrency control mechanism for JSR 289, we believe this feature together with congestion control is often required in production environments.
 	The concurrency control modes supported in Mobicents Sip Servlets are the following:
 
 	*	None - In this mode all SIP messages are processed as soon as possible in a thread from the global thread-pool. In this mode two messages belonging to the same SipSession can be processed simultaneously, so you must take measures to ensure that access to a shared resource like the session attributes is synchronized in a thread-safe way.
 	
-	*	SipSession - This mode guarantees that two messages belonging to the same SipSession will never be processed simultaneously. Note that if the messages are from different SipSession in the same SipApplicationSession they might be processed simultaneously and you must take care of the synchronization. Pay special attention to B2BUA cases where each leg of the B2BUA is a different SipSession in the same SipApplicationSession. 
+	*	SipSession - This mode guarantees that two messages from the same SipSession will never be processed simultaneously. These messages will be processed sequentially in the order of arrival. Note that if the messages are from different SipSession in the same SipApplicationSession they might be processed simultaneously and you must take care of the synchronization. Pay special attention to B2BUA cases where each leg of the B2BUA is a different SipSession in the same SipApplicationSession. 
 	
-	*	SipApplicationSession - This mode guarantees that two messages belonging to the same SipApplicationSession will never execute simultaneously. They will be executed sequentially in order of arrival. This case is the most thread-safe, but you still need to be careful if you are accessing shared resources in an unmanaged way, for example if you access a SipSession attribute from an unmanaged thread or from EJB this access will not be synchronized.
+	*	SipApplicationSession - This mode guarantees that two from the same SipApplicationSession will never be processed simultaneously. They will be processed sequentially in the order of arrival. This case is the most thread-safe, but you still need to be careful if you are accessing shared resources in an unmanaged way, for example if you access a SipSession attribute from an unmanaged thread or from EJB this access will not be synchronized.
 	
-	
+	 
+	 
 	The messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released. If this queue gets full the container will start rejecting any new SIP requests with SIP error code 503 until the server catches up. Note that only SIP requests will be rejected, the SIP responses that arrive at a full queue will be stored and processed sooner or later.
 
 * Configuration
