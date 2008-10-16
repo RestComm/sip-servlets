@@ -22,7 +22,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.sip.Address;
-import javax.servlet.sip.B2buaHelper;
 import javax.sip.Transaction;
 
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
@@ -37,7 +36,6 @@ public class TransactionApplicationData implements Serializable {
 	private transient SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
-	private transient B2buaHelper b2buaHelper;
 	private transient String initialRemoteHostAddress;
 	private transient int initialRemotePort;
 	private transient String initialRemoteTransport;
@@ -61,20 +59,6 @@ public class TransactionApplicationData implements Serializable {
 		return proxyBranch;
 	}
 	
-	/**
-	 * @param b2buaHelperImpl the b2buaHelperImpl to set
-	 */
-	public void setB2buaHelper(B2buaHelper b2buaHelper) {
-		this.b2buaHelper = b2buaHelper;
-	}
-	/**
-	 * @return the b2buaHelperImpl
-	 */
-	public B2buaHelper getB2buaHelper() {
-		return b2buaHelper;
-	}
-	
-		
 	public SipServletMessageImpl getSipServletMessage() {
 		return this.sipServletMessage;
 	}

@@ -27,6 +27,7 @@ import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.security.Principal;
@@ -106,22 +107,21 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author mranga
  * 
  */
-public abstract class SipServletMessageImpl implements SipServletMessage {
+public abstract class SipServletMessageImpl implements SipServletMessage, Serializable {
 
-	private static Log logger = LogFactory.getLog(SipServletMessageImpl.class
+	private transient static Log logger = LogFactory.getLog(SipServletMessageImpl.class
 			.getCanonicalName());
 	
-	private static final String CONTENT_TYPE_TEXT = "text";
+	private transient static final String CONTENT_TYPE_TEXT = "text";
+	private transient static HeaderFactory headerFactory = SipFactories.headerFactory;
 	
 	protected Message message;
-	protected SipFactoryImpl sipFactoryImpl;
+	protected transient SipFactoryImpl sipFactoryImpl;
 	protected MobicentsSipSession session;
 
 	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 	private Transaction transaction;
-	protected TransactionApplicationData transactionApplicationData;	
-
-	private static HeaderFactory headerFactory = SipFactories.headerFactory;
+	protected TransactionApplicationData transactionApplicationData;		
 
 	protected String defaultEncoding = "UTF8";
 
@@ -143,7 +143,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage {
 
 	protected String currentApplicationName = null;
 	
-	protected Principal userPrincipal;
+	protected transient Principal userPrincipal;
 	
 	protected boolean isMessageSent;
 	

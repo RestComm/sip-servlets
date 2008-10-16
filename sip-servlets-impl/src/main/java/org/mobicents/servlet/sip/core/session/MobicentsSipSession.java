@@ -32,10 +32,10 @@ import javax.sip.SipException;
 import javax.sip.Transaction;
 
 import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
-import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
@@ -110,6 +110,9 @@ public interface MobicentsSipSession extends SipSession {
 	 */
 	void setProxy(ProxyImpl proxy);
 	
+	public void setB2buaHelper(B2buaHelperImpl helperImpl);
+	
+	public B2buaHelperImpl getB2buaHelper();	
 	void access();
 
 	void updateStateOnResponse(SipServletResponseImpl sipServletResponseImpl,

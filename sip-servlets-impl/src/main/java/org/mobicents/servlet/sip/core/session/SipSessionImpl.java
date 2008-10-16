@@ -78,6 +78,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -115,6 +116,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient MobicentsSipApplicationSession sipApplicationSession;			
 	
 	protected ProxyImpl proxy;
+	
+	protected B2buaHelperImpl b2buaHelper;
 
 	protected Map<String, Object> sipSessionAttributeMap;
 	
@@ -1101,6 +1104,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public void setProxy(ProxyImpl proxy) {
 		this.proxy = proxy;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setB2buaHelper(B2buaHelperImpl helperImpl) {
+		this.b2buaHelper = helperImpl;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public B2buaHelperImpl getB2buaHelper() {
+		return this.b2buaHelper;
+	}
+	
 	/**
      * Perform the internal processing required to passivate
      * this session.

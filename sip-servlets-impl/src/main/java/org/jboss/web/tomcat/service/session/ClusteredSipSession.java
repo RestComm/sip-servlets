@@ -57,6 +57,7 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
@@ -1051,11 +1052,13 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			lastAccessedTime = in.readLong();
 
 			boolean proxySerialized = in.readBoolean();
-			logger.info("proxy Serialized ? "+ proxySerialized);
 			if(proxySerialized) {
 				proxy = (ProxyImpl) in.readObject();
 			} 
-			logger.info("proxy "+ proxy);
+			boolean b2buaSerialized = in.readBoolean();
+			if(b2buaSerialized) {
+				b2buaHelper = (B2buaHelperImpl) in.readObject();
+			}
 			// From ClusteredSession
 			invalidationPolicy = in.readInt();
 			version = in.readInt();
@@ -1145,13 +1148,17 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			out.writeLong(lastAccessedTime);
 			
 			if(proxy == null) {
-//				logger.info("proxy to Serialize ? "+ false);
 				out.writeBoolean(false);
 			} else {
-//				logger.info("proxy to Serialize ? "+ true);
 				out.writeBoolean(true);
-//				logger.info("proxy Serialized : "+ proxy);
 				out.writeObject(proxy);
+			}
+			
+			if(b2buaHelper == null) {
+				out.writeBoolean(false);
+			} else {
+				out.writeBoolean(true);
+				out.writeObject(b2buaHelper);
 			}
 			
 			// From ClusteredSession

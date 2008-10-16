@@ -70,9 +70,9 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
  */
 public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
-	private static final String REL100_OPTION_TAG = "100rel";
+	private transient static final String REL100_OPTION_TAG = "100rel";
 
-	private static Log logger =  LogFactory.getLog(SipServletResponseImpl.class);
+	private transient static Log logger =  LogFactory.getLog(SipServletResponseImpl.class);
 	
 	Response response;
 	SipServletRequestImpl originalRequest;

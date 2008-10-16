@@ -43,11 +43,9 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -215,19 +213,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							proxyBranch.proxySubsequentRequest(sipServletRequest);
 						}
 						// If it's not for a proxy then it's just an AR, so go to the next application
-						else {
-							if(dialog != null) {	
-								TransactionApplicationData applicationData = (TransactionApplicationData) dialog.getApplicationData();
-								if(applicationData != null) {
-									sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
-								}
-							} else if(transaction != null) {
-								TransactionApplicationData applicationData = (TransactionApplicationData) transaction.getApplicationData();
-								if(applicationData != null) {
-									sipServletRequest.setB2buaHelper((B2buaHelperImpl)applicationData.getB2buaHelper());
-								}
-							} 
-							
+						else {							
 							callServlet(sipServletRequest);				
 						}
 					} catch (ServletException e) {

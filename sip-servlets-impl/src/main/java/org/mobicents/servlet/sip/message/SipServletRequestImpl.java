@@ -80,7 +80,6 @@ import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
-import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
@@ -89,9 +88,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
-	private static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
+	private transient static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
 		
-	public static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
+	public transient static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
 		nonInitialSipRequestMethods.add("CANCEL");
@@ -117,20 +116,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private RoutingState routingState;
 	
-	private B2buaHelper b2buaHelper;
+	private transient SipServletResponse lastFinalResponse;
 	
-	private SipServletResponse lastFinalResponse;
-	
-	private SipServletResponse lastInformationalResponse;
+	private transient SipServletResponse lastInformationalResponse;
 	
 	/**
 	 * Routing region.
 	 */
 	private SipApplicationRoutingRegion routingRegion;
 
-	private URI subscriberURI;
+	private transient URI subscriberURI;
 
-	private Address initialPoppedRoute;
+	private transient Address initialPoppedRoute;
 	
 	private boolean isInitial;
 	
@@ -306,10 +303,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public B2buaHelper getB2buaHelper() {
 		if (session.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
-		if (this.b2buaHelper != null)
-			return this.b2buaHelper;
+		B2buaHelperImpl b2buaHelper = session.getB2buaHelper();
+		if (b2buaHelper != null)
+			return b2buaHelper;
 		try {
-			this.b2buaHelper = new B2buaHelperImpl(this);
+			b2buaHelper = new B2buaHelperImpl();
+			b2buaHelper.setSipFactoryImpl(sipFactoryImpl);
+			b2buaHelper.setSipManager(session.getSipApplicationSession().getSipContext().getSipManager());
 			Request request = (Request) super.message;
 			if (this.getTransaction() != null
 					&& this.getTransaction().getDialog() == null
@@ -322,21 +322,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
 				this.session.setSessionCreatingDialog(dialog);
-				transactionApplicationData.setB2buaHelper(b2buaHelper);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}			
 			if(JainSipUtils.dialogCreatingMethods.contains(request.getMethod())) {
 				this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			}
-			return this.b2buaHelper;
+			session.setB2buaHelper(b2buaHelper);
+			return b2buaHelper;
 		} catch (SipException ex) {
 			throw new IllegalStateException("Cannot get B2BUAHelper", ex);
 		}
-	}
-	
-	public void setB2buaHelper(B2buaHelperImpl helperImpl) {
-		this.b2buaHelper = helperImpl;
-	}	
+	}		
 
 	public ServletInputStream getInputStream() throws IOException {
 		return null;
@@ -372,10 +368,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	/**
 	 * {@inheritDoc}
-	 * @TODO -- deal with maxforwards header.
 	 */
 	public Proxy getProxy() throws TooManyHopsException {
-		if ( this.b2buaHelper != null ) throw new IllegalStateException("Cannot proxy request");
+		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		return getProxy(true);
 	}
 
@@ -383,7 +378,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
-		if ( this.b2buaHelper != null ) throw new IllegalStateException("Cannot proxy request");
+		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		
 		MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
 		if(mfHeader.getMaxForwards()<=0) {
@@ -871,7 +866,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
 					}
 				}
-				transactionApplicationData.setB2buaHelper(b2buaHelper);
 				// Make the dialog point here so that when the dialog event
 				// comes in we can find the session quickly.
 				if (dialog != null) {
@@ -903,7 +897,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
 					}
 				}
-				transactionApplicationData.setB2buaHelper(b2buaHelper);
 				// SIP Request is ALWAYS pointed to by the client tx.
 				// Notice that the tx appplication data is cached in the request
 				// copied over to the tx so it can be quickly accessed when response

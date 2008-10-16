@@ -495,7 +495,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
 			servletTimerEntry.getValue().cancel();
 		}		
-		if(!expired) {
+		if(!expired && expirationTimerFuture != null) {
 			expirationTimerFuture.cancel(false);			
 		}
 		sipContext.getSipManager().removeSipApplicationSession(key);		
@@ -505,7 +505,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //		key = null;
 		servletTimers.clear();
 		sipApplicationSessionAttributeMap.clear();
-		sipSessions.clear();			
+		sipSessions.clear();
+		httpSessions.clear();
 	}
 
 	/*
