@@ -17,7 +17,7 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 
 public final class RequestColumnsContainer extends AbsolutePanel {
 
-	private static final String[] COLUMNS = new String[] {"INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE"};
+	private static final String[] COLUMNS = new String[] {"INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH"};
 
 	private static final String CSS_SSM = "ssm";
 
@@ -63,7 +63,7 @@ public final class RequestColumnsContainer extends AbsolutePanel {
 	private void populateRouterNodes(DARRoute[] routes) {
 		AbsolutePanel boundaryPanel = this;
 		boundaryPanel.add(buildTitles());
-		boundaryPanel.setSize("1000", "1500");
+		boundaryPanel.setSize("1700", "1500");
 		addStyleName(CSS_SSM);
 		routeColumns = new VerticalPanel[COLUMNS.length];
 		PickupDragController columnDragController = new PickupDragController(boundaryPanel, false);

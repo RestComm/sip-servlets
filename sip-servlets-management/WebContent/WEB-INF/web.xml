@@ -11,6 +11,16 @@
 		<servlet-name>DARConfigurationService</servlet-name>
 		<url-pattern>/DARConfigurationService</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ConfigurationService</servlet-name>
+		<servlet-class>
+		org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ConfigurationService</servlet-name>
+		<url-pattern>/ConfigurationService</url-pattern>
+	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>SipServletsManagement.html</welcome-file>
 	</welcome-file-list>

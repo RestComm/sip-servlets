@@ -73,6 +73,9 @@ HTML { /* Workaround for GWT issue 1932 */
   background-color: #000000;
 }
 
+.ssm-collapsed-background {
+}
+
 .ytb-text {
   font-size: 125% !important;
   font-weight: 600 !important;

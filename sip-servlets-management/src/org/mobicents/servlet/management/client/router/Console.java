@@ -29,11 +29,15 @@ public class Console extends Window{
 	public static void error(Object object) {
 		instance.show(); // Pop the window on error.
 		println("<b>[ERROR] " + object.toString() + "</b>");
+		instance.setVisible(true);
+		instance.setActive();
 	}
 	
 	public static void warn(Object object) {
 		instance.show(); // Pop the window on warning.
 		println("[WARN] " + object.toString());
+		instance.setVisible(true);
+		instance.setActive();
 	}
 	
 	public static void info(Object object) {
@@ -43,5 +47,7 @@ public class Console extends Window{
 	public static void fatal(Object object) {
 		instance.show(); // Pop the window on fatal error.
 		println("[FATAL] " + object.toString());
+		instance.setVisible(true);
+		instance.setActive();
 	}
 }

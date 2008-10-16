@@ -1,11 +1,11 @@
 package org.mobicents.servlet.management.client.router;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.ArrayReader;
 import com.gwtext.client.data.FieldDef;
 import com.gwtext.client.data.MemoryProxy;
@@ -13,7 +13,9 @@ import com.gwtext.client.data.RecordDef;
 import com.gwtext.client.data.SimpleStore;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.StringFieldDef;
+import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.ComboBox;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
@@ -81,7 +83,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		
 		applicationName.setEditable(true);
 		applicationName.setHideLabel(true);
-		applicationName.setWidth(160); 
+		applicationName.setWidth(188); 
 		applicationName.setHideTrigger(false);
 		final Store appsStore = new SimpleStore(new String[]{"apps"}, new Object[][]{{}});  
 		appsStore.load();  
@@ -170,25 +172,34 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		formPanel.setWidth(200);  
 		formPanel.setLabelWidth(75);   
 		
-		final Panel collapsedPanel = formPanel; // collapsedPanel doesn't work. TODO: FIXME
+		final Panel collapsedPanel = new Panel(); // collapsedPanel doesn't work. TODO: FIXME
 		addLabeledControl("Application Name", applicationName, formPanel);
 		addLabeledControl("Subscriber Identity", subscriberIdentity, collapsedPanel);
 		addLabeledControl("Routing region", routingRegion, collapsedPanel);
 		addLabeledControl("Route", route, collapsedPanel);
 		addLabeledControl("Route modifiers", routeModified, collapsedPanel);
 		addLabeledControl("Order", order, collapsedPanel);
+		collapsedPanel.setCollapsible(true);
+		collapsedPanel.setTitle("Options");
+		collapsedPanel.setCollapsed(true);
+		collapsedPanel.addStyleName("ssm-collapsed-background");
+		formPanel.add(collapsedPanel);
 
 		// Add delete button to remove this item from the app list
 		Button deleteButton = new Button("Delete");
 		final ApplicationRouteNodeEditor finalThis = this;
 		
-		deleteButton.addClickListener(new ClickListener() {
-			public void onClick(Widget arg0) {
+		deleteButton.addListener(new ButtonListenerAdapter() {
+			public void onClick(Button button, EventObject e) {
 				final VerticalPanel parent = (VerticalPanel) finalThis.getParent();
 				parent.remove((Widget)finalThis);
 			}
 		});
-		
+		//deleteButton.setWidth("188px");
+		Panel space = new Panel();
+		space.setWidth(100);
+		space.setHeight(15);
+		formPanel.add(space);
 		formPanel.add(deleteButton);
 
 		// Set up the top level panel

@@ -1,5 +1,7 @@
 package org.mobicents.servlet.management.client.router;
 
+import org.mobicents.servlet.management.client.UserInterface;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
@@ -102,6 +104,8 @@ public class RouterToolbar extends Toolbar {
 		addButton(logErrorButton);
 		addSeparator();
 		addButton(helpButton);
+		this.setWidth(UserInterface.WIDTH);
+		this.setHeight(25);
 		
 	}
 }
