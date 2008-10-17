@@ -1,324 +1,320 @@
 <?xml version="1.0"?>
-<project name="MobicentsSipServlets" default="release" basedir=".">
+<project name="mobicents.sipservlets.release" default="release" basedir=".">
 	<property environment="sys"/>
-	<property name="this.path" value="${ant.file.MobicentsSipServlets}/../"></property>
-	<property name="base.path" value="${basedir}"></property>
-	<property file="build.properties" />
-
+	<property name="release.path" location="${ant.file.mobicents.sipservlets.release}/../target" />
+	<property name="base.path" location="${ant.file.mobicents.sipservlets.release}/.." />
+	
+	<property name="mss.release.version" value="0.7-SNAPSHOT" />
+	<property name="mss.release.configurations" value="all,default" />
+	
+	<property name="jboss.version" value="4.2.2.GA" />
+	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
+	
+	<property name="tomcat.version" value="6.0.14" />
+	<property name="tomcat.download.url" value="http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
+	
+	<property name="gwt.version" value="1.4.62" />
+	<property name="gwt.download.url" value="http://google-web-toolkit.googlecode.com/files/gwt-linux-${gwt.version}.tar.gz" />
+	
+	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
+	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
+	<property name="gwt.distro.zip.path" value="${base.path}/gwt-linux-${gwt.version}.tar.gz" />
+	
+	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
+	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
+	<property name="gwt.home" value="${release.path}/gwt-linux-${gwt.version}" />
+	
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
-	    <os family="windows"/>
+		<os family="windows"/>
 	</condition>
 	
-	<target name="release">
-		<antcall target="extract"/>
+	<taskdef onerror="fail" resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${ant.file.mobicents.release}/../ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	
+	<!-- Release target -->
+	
+	<target name="release" depends="release-tomcat,release-jboss,make-src-zip,clean" />
+	
+	<!-- Tomcat version -->
+	
+	<target name="release-tomcat" depends="extract-tomcat,extract-gwt">
+		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${tomcat.home}" />
 		
-		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${base.path}/apache-tomcat-${tomcat.version}"/>
-		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${base.path}/jboss-${jboss.version}"/>
+		<mkdir dir="${tomcat.home}/conf/dars"/>
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" tofile="${tomcat.home}/conf/dars/mobicents-dar.properties" />
 		
-		<mkdir dir="${base.path}/apache-tomcat-${tomcat.version}/conf/dars"/>
-		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
-			tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/dars/mobicents-dar.properties"/>
-			
-		<mkdir dir="${base.path}/jboss-${jboss.version}/server/default/conf/dars"/>
-		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
-			tofile="${base.path}/jboss-${jboss.version}/server/default/conf/dars/mobicents-dar.properties"/>
-		
-		<mkdir dir="${base.path}/jboss-${jboss.version}/server/all/conf/dars"/>
-		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" 
-			tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties"/>
-			
-		<copy file="${base.path}/server-tomcat-6.xml" tofile="${base.path}/apache-tomcat-${tomcat.version}/conf/server.xml"/>
-		
-		<copy file="${base.path}/server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/server.xml"/>
-		<copy file="${base.path}/context-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/context.xml"/>
-		<copy file="${base.path}/jboss-service.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml"/>
-		<copy file="${base.path}/webserver-xmbean.xml" tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml"/>						
-
-		<copy file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/server.xml"/>
-		<!-- <copy file="${base.path}/server-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/server.xml"/> -->
-		<copy file="${base.path}/context-jboss.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/context.xml"/>
-		<copy file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml"/>
-		<copy file="${base.path}/webserver-xmbean.xml" tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml"/>
+		<copy file="${base.path}/server-tomcat-6.xml" tofile="${tomcat.home}/conf/server.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${base.path}/apache-tomcat-${tomcat.version}"/>
+			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home}" />
 		</exec>
-			 
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version}"/>
-		</exec>
-
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${base.path}/jboss-${jboss.version} -Dnode=all"/>
-		</exec>
-				
+		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-svn-revision"/>
+			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
+		
+		<copy tofile="${tomcat.home}/webapps/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>
+		
+		<antcall target="deploy-mgmnt">
+			<param name="management.deploy.folder" value="${tomcat.home}/webapps" />
+		</antcall>
+		
+		<antcall target="make-final-zip-tomcat" />
+	</target>
+	
+	<!-- JBoss version -->
+
+	<target name="release-jboss" depends="extract-jboss">
+		<for delimiter="," param="jboss.config" list="${mss.release.configurations}">
+			<sequential>
+				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-node">
+					<property name="jboss.home" value="${jboss.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>
+			</sequential>
+		</for>
+		
+		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
+		<antcall target="build-mobicents-sip-load-balancer"/>
+		<antcall target="make-final-zip-jboss" />
+		
+	</target>
+	
+	<target name="release-jboss-node">
+		<mkdir dir="${jboss.home}/server/${jboss.config}/conf/dars" />
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		
+		<copy file="${base.path}/server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
+		<copy file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
+		<copy file="${base.path}/jboss-service.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
+		<copy file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>
+		
+		<antcall target="deploy-mgmnt" >
+			<param name="management.deploy.folder" value="${jboss.home}/server/${jboss.config}/deploy" />
+		</antcall>
+		
+		<antcall target="build-mobicents-media-server" />
+		
+		<condition property="ha.capable">
+			<or>
+				<equals arg1="${jboss.config}" arg2="all" />
+				<equals arg1="${jboss.config}" arg2="production" />
+			</or>
+		</condition>
+		
+		<antcall target="release-jboss-node-ha" />
+		
+	</target>
+	
+	<target name="release-jboss-node-ha" if="ha.capable">
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
+		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
+		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
 		
-		<delete failonerror="false" verbose="true" dir="${base.path}/jboss-${jboss.version}/server/minimal"/>
-		
-		<copy  tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/click2call.war">
-            <fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
-        </copy>
-		<copy tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/click2call.war">
-            <fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
-        </copy>
-		<copy tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/click2call.war">
-            <fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
-        </copy>
-		<copy tofile="${base.path}/jboss-${jboss.version}/server/all/deploy/simple-distributable.war">
-            <fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
-        </copy>
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${base.path}/jboss-${jboss.version}/server/all/conf/dars/mobicents-dar.properties" />
-				
-		<ant target="deploy-mgmnt">
-            <property name="system.JBOSS_HOME" value="${base.path}/jboss-${jboss.version}"/>
-            <property name="system.GWT_HOME" value="${base.path}/gwt-linux-${gwt.version}"/>
-        </ant>
-		<copy todir="${base.path}/jboss-${jboss.version}/server/all/deploy/">
-		    <fileset dir="${base.path}/jboss-${jboss.version}/server/default/deploy/" includes="*media*.sar/**"/>
+		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/simple-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
 		</copy>
-
-		<ant target="get-deps" />
-		<ant target="build-mobicents-media-server"/>
-		<ant target="build-mobicents-sip-load-balancer"/>
 		
-		<copy todir="${base.path}/jboss-${jboss.version}/server/all/deploy/">
-		    <fileset dir="${base.path}/jboss-${jboss.version}/server/default/deploy/" includes="sip-servlets-manage*"/>
-		</copy>
-
-        <delete dir="." includes="mss-${mss.release.version}-*.zip"/>
-        <tstamp>
-            <format property="time.stamp" pattern="yyMMddHHmm" />
-        </tstamp>
-		<ant target="make-final-zip-jboss"></ant>
-		<ant target="make-final-zip-tomcat"></ant>
-        <ant target="make-src-zip"></ant>
-		
-        <ant target="clean"></ant>
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
 	</target>
 	
-	<target name="deploy-mgmnt">
-		<ant dir="${base.path}/../../sip-servlets-management/" antfile="build.xml" target="war" />
-
-		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
-			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
-		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
-			tofile="${base.path}/jboss-${jboss.version}/server/default/deploy/sip-servlets-management.war"/>
-		<copy file="${base.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
-			tofile="${base.path}/apache-tomcat-${tomcat.version}/webapps/sip-servlets-management.war"/>
-	</target>
+	<!-- MSS Management Console -->
 	
-	
-	<target name="build-mobicents-media-server">
-        <echo>Building Mobicents Media Server</echo>
-        <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../target/dependencies/media/core">
-            <arg line="install -P set-svn-revision -Djboss.home=${base.path}/jboss-${jboss.version}" />
-        </exec>
-	</target>
-	
-   <target name="build-mobicents-sip-load-balancer">
-        <echo>Building Mobicents SIP Load Balancer</echo>
-        <exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../target/dependencies/sip-balancer">
-            <arg line="install -P set-svn-revision" />
-        </exec>
-        <copy tofile="${base.path}/jboss-${jboss.version}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
-            <fileset dir="${ant.file.mobicents.release}/../target/dependencies/sip-balancer/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
-        </copy>
-        <copy file="${ant.file.mobicents.release}/../target/dependencies/sip-balancer/src/test/resources/lb-configuration.properties"
-            tofile="${base.path}/jboss-${jboss.version}/sip-balancer/lb-configuration.properties" />
-    </target>
-
-	<target name="make-final-zip-jboss">
-		<fixcrlf srcdir="${base.path}/jboss-${jboss.version}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}-${time.stamp}.zip" filesonly="false">
-			<zipfileset dir="${base.path}/jboss-${jboss.version}/bin" filemode="755" prefix="bin">
-		        <include name="*.sh" />
-			</zipfileset>
-         	<zipfileset dir="${base.path}/jboss-${jboss.version}/bin" prefix="bin">
-            	<exclude name="*.sh" />
-         	</zipfileset>
-         	<zipfileset dir="${base.path}/jboss-${jboss.version}" prefix="" 
-                excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
-		</zip>
-	</target>
-
-	<target name="make-final-zip-tomcat">
-		<fixcrlf srcdir="${base.path}/apache-tomcat-${tomcat.version}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}-${time.stamp}.zip" filesonly="false">
-			<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin" filemode="755" prefix="bin">
-		        <include name="*.sh" />
-			</zipfileset>
-         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}/bin" prefix="bin">
-            	<exclude name="*.sh" />
-         	</zipfileset>
-         	<zipfileset dir="${base.path}/apache-tomcat-${tomcat.version}" prefix="">
-            	<exclude name="bin/**"/>
-         	</zipfileset>
-		</zip>
-	</target>
-	
-	<target name="release-mc-distro" depends="extract-gwt">
-		<echo>Base path: ${this.path}</echo>
-		<mkdir dir="${jboss.dir}/server/default/conf/dars"/>
-		<copy verbose="true" failonerror="true" file="${this.path}/../src/site/resources/click2call-dar.properties" 
-			todir="${jboss.dir}/server/default/conf/dars"/>
-			
-		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/server-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/server.xml"/>
-		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/context-jboss.xml" tofile="${jboss.dir}/server/default/deploy/jboss-web.deployer/context.xml"/>
-		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/jboss-service.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>
-		<copy verbose="true" overwrite="true" failonerror="true" file="${this.path}/webserver-xmbean.xml" todir="${jboss.dir}/server/default/deploy/jboss-web.deployer/META-INF"/>						
-		<echo>Done copying.</echo>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${this.path}/..">
-			<arg line="clean install -P set-svn-revision,jboss-distro -DJBOSS_HOME=${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
-		</exec>
+	<target name="deploy-mgmnt" depends="extract-gwt">
+		<property name="management.home" location="${base.path}/../../sip-servlets-management/"/>
 		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${this.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -P set-svn-revision"/>
-		</exec>
-		
-        <copy tofile="${jboss.dir}/server/default/deploy/click2call.war">
-            <fileset dir="${this.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
-        </copy>
-		
-		<ant dir="${this.path}/../../sip-servlets-management/" antfile="build.xml" target="war">
-            <property name="system.JBOSS_HOME" value="${basedir}/../../../../release/output/jboss-${jboss.version}/"/>
-            <property name="system.GWT_HOME" value="${base.path}/gwt-linux-${gwt.version}"/>
+		<ant dir="${management.home}" antfile="build.xml" target="war">
+			<property name="system.GWT_HOME" value="${gwt.home}"/>
 		</ant>
 		
-		<copy file="${this.path}/../../sip-servlets-management/build/tmp/sip-servlets-management.war"
-			tofile="${jboss.dir}/server/default/deploy/sip-servlets-management.war"/>
-		
+		<copy file="${management.home}/build/tmp/sip-servlets-management.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
 	</target>
 	
-    <!-- get dependencies -->
-
-    <condition property="dependencies.checkedout">
-        <and>
-            <available file="${ant.file.mobicents.all.release}/../target/dependencies/media/core/.svn/entries" />
-            <available file="${ant.file.mobicents.all.release}/../target/dependencies/sip-balancer/.svn/entries" />
-        </and>
-    </condition>
-    <target name="get-deps" depends="checkout-deps,update-deps" />
-
-    <target name="checkout-deps" unless="dependencies.checkedout">
-        <echo>Checking out dependencies</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
-            <arg line="-f external-components.xml validate -P checkout" />
-        </exec>
-    </target>
-
-    <target name="update-deps">
-        <echo>Updating dependencies</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
-            <arg line="-f external-components.xml validate -P update" />
-        </exec>
-    </target>
-
-    <!-- ### ############ -->
+	<!-- Get dependencies -->
+	
+	<condition property="dependencies.checkedout">
+		<and>
+			<available file="${base.path}/target/dependencies/media/core/.svn/entries" />
+			<available file="${base.path}/target/dependencies/sip-balancer/.svn/entries" />
+		</and>
+	</condition>
+	<target name="get-deps" depends="checkout-deps,update-deps" />
+	
+	<target name="checkout-deps" unless="dependencies.checkedout">
+		<echo>Checking out dependencies</echo>
+		<exec executable="${mvn.executable}" dir="${base.path}">
+			<arg line="-f external-components.xml validate -P checkout" />
+		</exec>
+	</target>
+	
+	<target name="update-deps">
+		<echo>Updating dependencies</echo>
+		<exec executable="${mvn.executable}" dir="${base.path}">
+			<arg line="-f external-components.xml validate -P update" />
+		</exec>
+	</target>
+	
+	<!-- Buil dependencies-->
+	
+	<target name="build-mobicents-media-server" depends="get-deps">
+		<echo>Building Mobicents Media Server</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/core">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+	</target>
+	
+	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
+		<echo>Building Mobicents SIP Load Balancer</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer">
+			<arg line="clean install -P set-svn-revision" />
+		</exec>
+		<copy tofile="${jboss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
+			<fileset dir="${base.path}/target/dependencies/sip-balancer/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
+		</copy>
+		<copy file="${base.path}/target/dependencies/sip-balancer/src/test/resources/lb-configuration.properties"
+			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
+	</target>
+	
+	<!-- zip source project that can be used to build release -->
 	
 	<target name="set-src-excludes">
-        <defaultexcludes add="**/target/**"/>
-        <defaultexcludes add="**/design-docs/**"/>
-        <defaultexcludes add="**/legacy/**"/>
-        <defaultexcludes add="**/release/**"/>
-        <defaultexcludes add="**/logs/**"/>
-        <defaultexcludes add="**/tests/**"/>
-        <defaultexcludes add="**/build/**"/>
-        <defaultexcludes add="**/GWT/**"/>
-        <defaultexcludes add="**/${*}/**"/>
-        <defaultexcludes add="**/*JBOSS_HOME*/**"/>
-        <defaultexcludes add="**/*CATALINA_HOME*/**"/>
-        <defaultexcludes add="**/.gwt-cache/**"/>
-        <defaultexcludes add="**/.settings/**"/>
-        <defaultexcludes add="**/.project"/>
-        <defaultexcludes add="**/.classpath"/>
-        <defaultexcludes add="**/*.class" echo="true"/>
-    </target>
-    
-    <target name="make-src-zip" depends="set-src-excludes">
-        <property name="zip.filename" value="mss-${mss.release.version}-${time.stamp}-src.zip" />
-        
-        <copy todir="${base.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
-            <fileset dir="${ant.file.mobicents.release}/../../.." 
-            	     includes="**/pom.xml **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/click-to-call/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
-                     excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**"/>
-        </copy>
-        
-        <zip destfile="${ant.file.mobicents.release}/../${zip.filename}" basedir="${base.path}/src"/>
-        <delete dir="${base.path}/src"/>
-        
-        <defaultexcludes default="true"/>
-    </target>
-
+		<defaultexcludes add="**/target/**" />
+		<defaultexcludes add="**/design-docs/**" />
+		<defaultexcludes add="**/legacy/**" />
+		<defaultexcludes add="**/release/**" />
+		<defaultexcludes add="**/logs/**" />
+		<defaultexcludes add="**/tests/**" />
+		<defaultexcludes add="**/build/**" />
+		<defaultexcludes add="**/GWT/**" />
+		<defaultexcludes add="**/${*}/**" />
+		<defaultexcludes add="**/*JBOSS_HOME*/**" />
+		<defaultexcludes add="**/*CATALINA_HOME*/**" />
+		<defaultexcludes add="**/.gwt-cache/**" />
+		<defaultexcludes add="**/.settings/**" />
+		<defaultexcludes add="**/.project" />
+		<defaultexcludes add="**/.classpath" />
+		<defaultexcludes add="**/*.class" echo="true"/>
+	</target>
+	
+	<target name="make-src-zip"  depends="set-time-stamp,set-src-excludes">
+		<property name="zip.filename" value="mss-${mss.release.version}-${time.stamp}-src.zip" />
+		
+		<copy todir="${release.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
+			<fileset dir="${base.path}/../.."
+				includes="**/pom.xml **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
+				excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**" />
+		</copy>
+		
+		<zip destfile="${base.path}/${zip.filename}" basedir="${release.path}/src"/>
+		<delete dir="${release.path}/src"/>
+		
+		<defaultexcludes default="true"/>
+	</target>
+	
+	<!-- zip binary distributions -->
+	
+	<target name="make-final-zip-jboss" depends="set-time-stamp">
+		<fixcrlf srcdir="${jboss.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${jboss.home}/bin" filemode="755" prefix="bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss.home}/bin" prefix="bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss.home}" prefix="" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+		</zip>
+	</target>
+	
+	<target name="make-final-zip-tomcat" depends="set-time-stamp">
+		<fixcrlf srcdir="${tomcat.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${tomcat.home}/bin" filemode="755" prefix="bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${tomcat.home}/bin" prefix="bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${tomcat.home}" prefix="" excludes="**/bin/**"/>
+		</zip>
+	</target>
+	
+	<target name="set-time-stamp" unless="skip.timestamp">
+		<tstamp>
+			<format property="time.stamp" pattern="yyMMddHHmm" />
+		</tstamp>
+	</target>
+	
+	<!-- The cleanup target -->
+	
 	<target name="clean">
-		<delete dir="${base.path}/jboss-${jboss.version}" />
-        <delete dir="${base.path}/apache-tomcat-${tomcat.version}" />
-		<delete dir="${base.path}/gwt-linux-${gwt.version}" />
+		<delete dir="${jboss.home}" />
+		<delete dir="${tomcat.home}" />
+		<delete dir="${gwt.home}" />
 	</target>
-
+	
 	<!-- Download and dependency building -->
-	<target name="proxyflags">
-		<!-- check proxy parameters. -->
-		<condition property="useproxy">
-			<equals arg1="${proxy.use}" arg2="on" />
-		</condition>
-	</target>
-
-	<target name="setproxy" depends="proxyflags" if="useproxy">
-		<taskdef name="setproxy" classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
-		<setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
-		<echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}" />
-	</target>
-
-	<target name="downloadgz" depends="setproxy">
-		<!-- Download and extract the package -->
-		<get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
-		<gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar" />
-		<untar src="${base.path}/file.tar" dest="${base.path}" />
-		<delete file="${base.path}/file.tar" />
-		<delete file="${base.path}/file.tar.gz" />
-	</target>
-
-	<target name="downloadzip" depends="setproxy">
-		<!-- Download and extract the package -->
-		<get src="${sourcefile}" dest="${base.path}/file.zip" />
-		<mkdir dir="${destdir}" />
-		<unzip src="${base.path}/file.zip" dest="${destdir}" />
-		<delete file="${base.path}/file.zip" />
-	</target>
-
-	<target name="downloadfile" depends="setproxy">
-		<!-- Download extract the file -->
-		<mkdir dir="${destdir}" />
-		<get src="${sourcefile}" dest="${destfile}" />
-	</target>		
-
-	<target name="extractzip" depends="setproxy">			
-		<mkdir dir="${destdir}" />
-		<unzip src="${sourcefile}" dest="${destdir}" />		
+	
+	<available file="${jboss.distro.zip.path}" property="got.jboss" />
+	<target name="get-jboss" unless="got.jboss">
+		<echo>Downloading JBoss AS</echo>
+		<get dest="${jboss.distro.zip.path}" src="${jboss.download.url}"/>
 	</target>
 	
-	<target name="extract" description="Builds and download dependent components">		
-		<antcall target="extractzip">
-			<param name="sourcefile" value="${tomcat-path}" />			
-			<param name="destdir" value="${base.path}" />
-		</antcall>				
-		<antcall target="extractzip">
-			<param name="sourcefile" value="${jboss-path}" />			
-			<param name="destdir" value="${base.path}" />
-		</antcall>
-		<antcall target="extract-gwt" />
+	<target name="extract-jboss" depends="get-jboss">
+		<delete dir="${jboss.home}" failonerror="true" />
+		<unzip src="${jboss.distro.zip.path}" dest="${jboss.home}/.." />
+		
+		<propertyregex input="${mss.release.configurations}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations" />
+		<echo>Included configurations: ${release.configurations} -&gt; Excludes list: ${used.configurations}</echo>
+		
+		<delete includeemptydirs="true" failonerror="false" verbose="false">
+			<fileset dir="${jboss.home}/server" excludes="${used.configurations}" />
+		</delete>
 	</target>
 	
-   <target name="extract-gwt" depends="setproxy" >
-       <mkdir dir="${base.path}" />
-       <untar compression="gzip" src="${gwt-path}" dest="${base.path}" />
-    </target>
+	<available file="${tomcat.distro.zip.path}" property="got.tomcat" />
+	<target name="get-tomcat" unless="got.tomcat">
+		<echo>Downloading Apache Tomcat</echo>
+		<get dest="${tomcat.distro.zip.path}" src="${tomcat.download.url}"/>
+	</target>
+	
+	<target name="extract-tomcat" depends="get-tomcat">
+		<delete dir="${tomcat.home}" failonerror="true" />
+		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
+	</target>
+	
+	<available file="${gwt.distro.zip.path}" property="got.gwt" />
+	<target name="get-gwt" unless="got.gwt">
+		<echo>Downloading Google Web toolkit</echo>
+		<get dest="${gwt.distro.zip.path}" src="${gwt.download.url}"/>
+	</target>
+	
+	<target name="extract-gwt" depends="get-gwt">
+		<delete dir="${gwt.home}" failonerror="true" />
+		<untar compression="gzip" src="${gwt.distro.zip.path}" dest="${gwt.home}/.." />
+	</target>
 	
 </project>
