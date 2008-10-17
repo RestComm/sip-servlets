@@ -30,7 +30,7 @@
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>1.0.0.BETA4</mms.version>
+		<mms.version>1.0.0.CR1</mms.version>
 	</properties>
 
 	<dependencies>
