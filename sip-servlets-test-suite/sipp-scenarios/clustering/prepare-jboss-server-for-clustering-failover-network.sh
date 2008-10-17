@@ -21,9 +21,9 @@ if [ $# -ne 0 ]; then
 	            ;;
 	    b2bua)
 	            echo "Distributed example used is b2bua";
-	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
-				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
-				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
+	    		mvn clean install -f ../../../sip-servlets-examples/call-forwarding-distributable/pom.xml
+				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/all/deploy
+				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 	            ;;
 	    *)
 	            echo "Distributed example used is uas";
