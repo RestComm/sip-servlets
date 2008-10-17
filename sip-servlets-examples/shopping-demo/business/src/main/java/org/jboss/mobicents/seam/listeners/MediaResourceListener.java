@@ -51,11 +51,11 @@ public class MediaResourceListener implements MsNotificationListener {
 	 * @see org.mobicents.mscontrol.MsResourceListener#update(org.mobicents.mscontrol.MsNotifyEvent)
 	 */	
 	public void update(MsNotifyEvent event) {
-		logger.info("event ID " + event.getEventID());
+		logger.info("event ID " + event.getEventID()); 
 //		logger.info("event cause " + event.getCause());
 //		logger.info("event message " + event.getMessage());
 		//  
-		if(session != null && connection != null && event.getEventID() == MsAnnouncement.COMPLETED) {						
+		if(session != null && connection != null && event.getEventID().equals(MsAnnouncement.COMPLETED)) {						
 			try {
 				SipServletRequest byeRequest = session.createRequest("BYE");				
 				byeRequest.send();																	
