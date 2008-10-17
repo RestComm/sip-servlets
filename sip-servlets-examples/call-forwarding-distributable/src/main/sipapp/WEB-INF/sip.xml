@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.DistributableCallForwardingB2BUAApplication</app-name>
+	<display-name>Distributable Call Forwarding B2BUA Sip Servlet</display-name>
+	<description>Distributable Call Forwarding B2BUA Sip Servlet</description>
+	<distributable/>
+	
+	<main-servlet>
+		DistributableCallForwardingB2BUASipServlet
+	</main-servlet>
+
+	<servlet>
+		<servlet-name>DistributableCallForwardingB2BUASipServlet</servlet-name>
+		<display-name>DistributableCallForwardingB2BUASipServlet</display-name>
+		<description>Distributable Call Forwarding B2BUA SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.DistributableCallForwardingB2BUASipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>	
+</sip-app>
