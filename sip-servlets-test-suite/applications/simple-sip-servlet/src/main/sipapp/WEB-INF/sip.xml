@@ -5,9 +5,9 @@
 	<display-name>Simple Sip Servlet</display-name>
 	<description>Simple Sip Servlet</description>
 	
-	<main-servlet>
+	<!--main-servlet>
 		SimpleSipServlet
-	</main-servlet>
+	</main-servlet-->
 
 	<servlet>
 		<servlet-name>SimpleSipServlet</servlet-name>

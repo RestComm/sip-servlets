@@ -491,19 +491,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=395">
 						Congestion Control
 						</a>						
-						<br />							
-						<img src="orange.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=122">
-						Basic IPBX
-						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=125">
-						JBON Integration
-						</a>
-						<br />	
+						<br />													
 						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=119">
@@ -566,29 +554,49 @@
 									SipFactoryImpl.createSipServletRequest(...) uses App. Session key as Call-ID instead of random, unique ID
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=413">
+									One SipServlet and no main-handler tag in sip.xml doesn't work
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>
 				<subsection name="Version 0.8 - 12/01/2008">
-					<p>
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=347">
-						Port to JBoss AS 5
-						</a>
-						<br />						
+					<p>																	
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
 						Mobicents Application Router
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=321">
 						Mid Call Failover Support for B2BUA Applications
 						</a>
-						<br />	
+						<br />
+						<img src="red.jpeg" />
+						<!--<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=321">
+						Mid Call Failover Support for UAC Applications
+						</a>-->
+						Mid Call Failover Support for UAC Applications
+						<br />
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=122">
+						Basic IPBX
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=125">
+						JBON Integration
+						</a>
+						<br />							
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=229">
@@ -605,6 +613,12 @@
 				</subsection>
 				<subsection name="Version 0.9 - 01/01/2009">
 					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=347">
+						Port to JBoss AS 5
+						</a>
+						<br />	
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=322">

@@ -305,6 +305,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
 				((SipManager)manager).setContainer(this);
 			}
+			// JSR 289 16.2 Servlet Selection
+			// When using this mechanism (the main-servlet) for servlet selection, 
+			// if there is only one servlet in the application then this
+			// declaration is optional and the lone servlet becomes the main servlet
+			if((mainServlet == null || mainServlet.length() < 1) && childrenMap.size() == 1) {
+				mainServlet = childrenMap.keySet().iterator().next();
+			}
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);

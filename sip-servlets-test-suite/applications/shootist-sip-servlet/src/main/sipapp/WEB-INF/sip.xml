@@ -5,9 +5,9 @@
 	<display-name>Shootist Sip Servlet</display-name>
 	<description>Shootist Sip Servlet</description>
 	
-	<main-servlet>
+	<!--main-servlet>
 		ShootistSipServlet
-	</main-servlet>
+	</main-servlet-->
 
 	<servlet>
 		<servlet-name>ShootistSipServlet</servlet-name>
