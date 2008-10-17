@@ -109,6 +109,34 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
+	
+	public void testSpeedDialLocationServiceErrorResponse() throws Exception {		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+		receiver.setRespondWithError(408);
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "sender-expect-408";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "1";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isServerErrorReceived());
+	}
 
 	public void testSpeedDialLocationServiceCalleeSendBye() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);

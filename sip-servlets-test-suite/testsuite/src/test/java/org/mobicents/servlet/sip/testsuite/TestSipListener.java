@@ -193,6 +193,8 @@ public class TestSipListener implements SipListener {
 	private boolean serverErrorReceived;
 	
 	private long lastInfoResponseTime = -1;
+	
+	private Integer respondWithError = null;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -792,7 +794,12 @@ public class TestSipListener implements SipListener {
 					Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
 				}
 			}								
-						
+			if(respondWithError != null) {
+				Response response = protocolObjects.messageFactory.createResponse(
+						respondWithError, request);
+				st.sendResponse(response);
+				return;
+			}
 			if(!waitForCancel) {
 				Address address = protocolObjects.addressFactory
 				.createAddress("Shootme <sip:127.0.0.1:" + myPort
@@ -893,7 +900,7 @@ public class TestSipListener implements SipListener {
 	public void processResponse(ResponseEvent responseReceivedEvent) {
 		logger.info("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
-		if(response.getStatusCode() >= 500 && response.getStatusCode() < 510) {
+		if(response.getStatusCode() >= 400 && response.getStatusCode() < 510) {
 			this.serverErrorReceived = true;
 		}
 		if(response.toString().toLowerCase().contains("info")) {
@@ -1758,6 +1765,10 @@ public class TestSipListener implements SipListener {
 	
 	public boolean isAuthenticationErrorReceived() {
 		return authenticationErrorReceived;
+	}
+	
+	public void setRespondWithError(int errorCode) {
+		this.respondWithError = errorCode;
 	}
 
 }
