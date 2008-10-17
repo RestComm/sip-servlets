@@ -33,6 +33,14 @@ public class GenericUtils {
 		return buf.toString();
 	}
 	
+	public static String reduceHash(String hash, int maxChars) {
+		if(hash.length() > maxChars) {
+			return hash.substring(0, maxChars);
+		} else {
+			return hash;
+		}
+	}
+	
 	/**
 	 * Compute hash value of a string
 	 * 
@@ -49,6 +57,7 @@ public class GenericUtils {
 		byte[] bytes = input.getBytes();
 		md.update(bytes);
 		String hashed =  convertToHex(md.digest());
+		hashed = reduceHash(hashed, 8);
 		return hashed;
 	}
 }

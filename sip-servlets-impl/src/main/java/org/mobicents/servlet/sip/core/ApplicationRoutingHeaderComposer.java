@@ -25,9 +25,17 @@ public class ApplicationRoutingHeaderComposer {
 	private static Random random = new Random();
 	private static final String TOKEN_SEPARATOR = "_";
 	
+	private static String reduceRandomValue(String str, int maxChars) {
+		int len = str.length();
+		if(len > maxChars) {
+			return str.substring(len-maxChars, len);
+		} else {
+			return str;
+		}
+	}
 	private static String randomString() {
-		long randValue = Math.abs(random.nextInt() ^ System.currentTimeMillis());
-		return String.valueOf(randValue);
+		long randValue = Math.abs(random.nextInt(1211111) ^ System.nanoTime());
+		return reduceRandomValue(String.valueOf(randValue), 8);
 	}
 	
 	private String uniqueValue;
