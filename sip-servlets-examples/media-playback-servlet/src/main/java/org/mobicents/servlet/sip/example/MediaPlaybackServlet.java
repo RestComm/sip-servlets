@@ -47,7 +47,7 @@ import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
 public class MediaPlaybackServlet extends SipServlet {
 	private static Log logger = LogFactory.getLog(MediaPlaybackServlet.class);
 	
-	public static final String IVR_JNDI_NAME = "media/endpoint/IVR";
+	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
 	
 	public MediaPlaybackServlet() {
 	}

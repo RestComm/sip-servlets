@@ -252,9 +252,11 @@ public class ShoppingSipServlet
 			MsConnection connection = session.createNetworkConnection(MediaConnectionListener.IVR_JNDI_NAME);
 			MediaConnectionListener listener = new MediaConnectionListener();
 			listener.setInviteRequest(sipServletRequest);
+//			provider.addConnectionListener(listener);
 			connection.addConnectionListener(listener);
 			sipApplicationSession.setAttribute("connection", connection);
 			connection.modify("$", null);
+			logger.info("waiting to get the SDP from Media Server before sending the INVITE to " + callerAddress + "@" + callerDomain);
 		} catch (Exception e) {
 			logger.error("An unexpected exception occured while creating the request for delivery date", e);
 		}

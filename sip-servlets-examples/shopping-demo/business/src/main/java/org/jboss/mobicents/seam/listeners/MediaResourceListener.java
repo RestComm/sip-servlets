@@ -23,16 +23,16 @@ import javax.servlet.sip.SipSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
-import org.mobicents.mscontrol.MsResourceListener;
+import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
-public class MediaResourceListener implements MsResourceListener {
+public class MediaResourceListener implements MsNotificationListener {
 	private static Log logger = LogFactory.getLog(MediaResourceListener.class);
 	private SipSession session;
 	private MsConnection connection;
@@ -52,10 +52,10 @@ public class MediaResourceListener implements MsResourceListener {
 	 */	
 	public void update(MsNotifyEvent event) {
 		logger.info("event ID " + event.getEventID());
-		logger.info("event cause " + event.getCause());
-		logger.info("event message " + event.getMessage());
+//		logger.info("event cause " + event.getCause());
+//		logger.info("event message " + event.getMessage());
 		//  
-		if(session != null && connection != null && event.getEventID() == EventID.COMPLETE) {						
+		if(session != null && connection != null && event.getEventID() == MsAnnouncement.COMPLETED) {						
 			try {
 				SipServletRequest byeRequest = session.createRequest("BYE");				
 				byeRequest.send();																	

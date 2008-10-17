@@ -195,7 +195,9 @@ public class CheckoutAction implements Checkout, Serializable {
 			MsConnection connection = session.createNetworkConnection(MediaConnectionListener.IVR_JNDI_NAME);
 			MediaConnectionListener listener = new MediaConnectionListener();
 			listener.setInviteRequest(sipServletRequest);
+//			provider.addConnectionListener(listener);
 			connection.addConnectionListener(listener);
+			log.info("waiting to get the SDP from Media Server before sending the INVITE to " + callerAddress + "@" + callerDomain);
 			connection.modify("$", null);
 			sipApplicationSession.setAttribute("customerName", customerName);
 			sipApplicationSession.setAttribute("customerPhone", customerPhone);

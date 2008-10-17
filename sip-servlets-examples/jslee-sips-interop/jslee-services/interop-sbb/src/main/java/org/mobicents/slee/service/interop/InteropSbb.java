@@ -30,14 +30,20 @@ import javax.slee.UnrecognizedActivityException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.mobicents.seam.CallManager;
-import org.mobicents.media.server.impl.common.events.EventCause;
-import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.MsProvider;
-import org.mobicents.mscontrol.MsSignalDetector;
-import org.mobicents.mscontrol.MsSignalGenerator;
+import org.mobicents.mscontrol.events.MsEventAction;
+import org.mobicents.mscontrol.events.MsEventFactory;
+import org.mobicents.mscontrol.events.MsEventIdentifier;
+import org.mobicents.mscontrol.events.MsRequestedEvent;
+import org.mobicents.mscontrol.events.MsRequestedSignal;
+import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
+import org.mobicents.mscontrol.events.dtmf.MsDtmfNotifyEvent;
+import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
+import org.mobicents.mscontrol.events.pkg.DTMF;
+import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 import org.mobicents.slee.resource.media.ratype.MediaRaActivityContextInterfaceFactory;
 import org.mobicents.slee.resource.tts.ratype.TTSActivityContextInterfaceFactory;
 import org.mobicents.slee.resource.tts.ratype.TTSProvider;
@@ -51,7 +57,7 @@ import org.mobicents.slee.service.events.InteropCustomEvent;
  */
 public abstract class InteropSbb implements Sbb { 
 
-	private static final String ENDPOINT_NAME = "media/endpoint/IVR";
+	private static final String ENDPOINT_NAME = "media/trunk/IVR/$";
 
 	private static final String OPENING_ANNOUNCEMENT = "Welcome to JavaOne 2008. Please enter your booth number followed by the pound sign to get some free beers.";
 	
@@ -190,22 +196,37 @@ public abstract class InteropSbb implements Sbb {
 		
 		ttsSession.textToAudioFile(announcement);		
 		
-		MsSignalGenerator generator = msProvider
-			.getSignalGenerator(ENDPOINT_NAME);
+		MsEventFactory eventFactory = msProvider
+			.getEventFactory();
 		
+		MsConnection connection = getConnection();
 		if(attachToGeneratorActivity) {
 			try {
 				ActivityContextInterface generatorActivity = mediaAcif
-						.getActivityContextInterface(generator);
+						.getActivityContextInterface(connection.getSession());
 				generatorActivity.attach(getSbbContext().getSbbLocalObject());				
 			} catch (javax.slee.UnrecognizedActivityException e) {
 				logger.error("Impossible to attach to Media Signal Generator activity", e);
 			}
 		}
-		MsConnection connection = getConnection();
+		
 		String announcementFile = "file:" + audioFilePath;
-		generator.apply(EventID.PLAY, connection, 
-				new String[] { announcementFile });
+		// Let us request for Announcement Complete event or Failure
+		// in case if it happens
+		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
+		onCompleted.setEventAction(MsEventAction.NOTIFY);
+
+		MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
+		onFailed.setEventAction(MsEventAction.NOTIFY);
+		
+		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+		
+		play.setURL(announcementFile);
+		
+		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
+		
+        connection.getEndpoint().execute(requestedSignals, requestedEvents, connection);	
 		
 		if(listenForDTMF) {
 			this.initDtmfDetector(connection, ENDPOINT_NAME);
@@ -263,77 +284,85 @@ public abstract class InteropSbb implements Sbb {
 
 	
 	private void initDtmfDetector(MsConnection connection, String endpointName) {
-		MsSignalDetector dtmfDetector = msProvider
-				.getSignalDetector(endpointName);
+		MsEventFactory eventFactory = msProvider
+				.getEventFactory();
 		try {
 			ActivityContextInterface dtmfAci = mediaAcif
-					.getActivityContextInterface(dtmfDetector);
+					.getActivityContextInterface(connection.getSession());
 			dtmfAci.attach(getSbbContext().getSbbLocalObject());
-			dtmfDetector.receive(EventID.DTMF, connection, new String[] {});
+			
+			MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
+			MsRequestedSignal[] signals = new MsRequestedSignal[] {};
+			MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
+
+			connection.getEndpoint().execute(signals, events, connection);
 		} catch (UnrecognizedActivityException e) {
 			logger.error("Internal Server Erro", e);
 		}
 	}
 	
 	public void onDtmf(MsNotifyEvent evt, ActivityContextInterface aci) {
-		EventCause eventCause = evt.getCause();
-		logger.info("org.mobicents.slee.media.dtmf.DTMF " + eventCause);
-		String signal = evt.getMessage();			
+		MsEventIdentifier identifier = evt.getEventID();
+        if (identifier.equals(DTMF.TONE)) {
+            MsDtmfNotifyEvent event = (MsDtmfNotifyEvent) evt;
+            String signal = event.getSequence();
+            logger.info("org.mobicents.slee.media.dtmf.DTMF " + signal);            			
 		
-		int cause = -1;
-		
-		try {
-			cause = Integer.parseInt(signal);
-		} catch (java.lang.NumberFormatException e) {
-			//user entered a # sign 
-			String announcement = generateConfirmationAnnouncement(getBoothNumber());
-			playAnnouncement(announcement, true, false);
-			return ;
-		}				
-		
-		String boothNumber = getBoothNumber();
-		if(boothNumber == null) {
-			boothNumber = "";
-		}
-		
-		switch (cause) {
-			case 0:
-				boothNumber = boothNumber + "0";
-				break;
-			case 1:
-				boothNumber = boothNumber + "1";
-				break;
-			case 2:
-				boothNumber = boothNumber + "2";
-				break;
-			case 3:
-				boothNumber = boothNumber + "3";
-				break;
-			case 4:
-				boothNumber = boothNumber + "4";
-				break;
-			case 5:
-				boothNumber = boothNumber + "5";
-				break;
-			case 6:
-				boothNumber = boothNumber + "6";
-				break;
-			case 7:
-				boothNumber = boothNumber + "7";
-				break;
-			case 8:
-				boothNumber = boothNumber + "8";
-				break;
-			case 9:
-				boothNumber = boothNumber + "9";
-				break;
-			default:
-				break;
-		}
-		
-		setBoothNumber(boothNumber);
-		
-		this.initDtmfDetector(getConnection(), ENDPOINT_NAME);
+			int cause = -1;
+			
+			try {
+				cause = Integer.parseInt(signal);
+			} catch (java.lang.NumberFormatException e) {
+				//user entered a # sign 
+				String announcement = generateConfirmationAnnouncement(getBoothNumber());
+				playAnnouncement(announcement, true, false);
+				return ;
+			}				
+			
+			String boothNumber = getBoothNumber();
+			if(boothNumber == null) {
+				boothNumber = "";
+			}
+			
+			switch (cause) {
+				case 0:
+					boothNumber = boothNumber + "0";
+					break;
+				case 1:
+					boothNumber = boothNumber + "1";
+					break;
+				case 2:
+					boothNumber = boothNumber + "2";
+					break;
+				case 3:
+					boothNumber = boothNumber + "3";
+					break;
+				case 4:
+					boothNumber = boothNumber + "4";
+					break;
+				case 5:
+					boothNumber = boothNumber + "5";
+					break;
+				case 6:
+					boothNumber = boothNumber + "6";
+					break;
+				case 7:
+					boothNumber = boothNumber + "7";
+					break;
+				case 8:
+					boothNumber = boothNumber + "8";
+					break;
+				case 9:
+					boothNumber = boothNumber + "9";
+					break;
+				default:
+					break;
+			}
+			
+			setBoothNumber(boothNumber);
+			
+			this.initDtmfDetector(getConnection(), ENDPOINT_NAME);
+        }
 	}
 
 	public abstract void setInteropCustomEvent(InteropCustomEvent customEvent);

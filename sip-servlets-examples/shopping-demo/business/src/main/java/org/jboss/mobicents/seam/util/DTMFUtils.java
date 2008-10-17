@@ -27,9 +27,14 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaResourceListener;
-import org.mobicents.media.server.impl.common.events.EventID;
 import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsSignalGenerator;
+import org.mobicents.mscontrol.MsEndpoint;
+import org.mobicents.mscontrol.events.MsEventAction;
+import org.mobicents.mscontrol.events.MsEventFactory;
+import org.mobicents.mscontrol.events.MsRequestedEvent;
+import org.mobicents.mscontrol.events.MsRequestedSignal;
+import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
+import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
@@ -240,14 +245,33 @@ public class DTMFUtils {
 				logger.info(stringBuffer.toString());
 				try {
 					TTSUtils.buildAudio(stringBuffer.toString(), "deliveryDate.wav");
-					MsConnection connection = (MsConnection) session.getApplicationSession().getAttribute("connection");
-					String endpoint = connection.getEndpoint();
-					MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);
+					MsConnection connection = (MsConnection) session
+							.getApplicationSession().getAttribute("connection");
+					MsEndpoint endpoint = connection.getEndpoint();
+					MsEventFactory eventFactory = connection.getSession()
+							.getProvider().getEventFactory();
 					java.io.File speech = new File("deliveryDate.wav");
 					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
 					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
-					generator.addResourceListener(mediaResourceListener);
-					generator.apply(EventID.PLAY, connection, new String[]{"file://" + speech.getAbsolutePath()});
+					connection.getSession().getProvider().addNotificationListener(mediaResourceListener);
+
+					// Let us request for Announcement Complete event or Failure
+					// in case if it happens
+					MsRequestedEvent onCompleted = eventFactory
+							.createRequestedEvent(MsAnnouncement.COMPLETED);
+					onCompleted.setEventAction(MsEventAction.NOTIFY);
+
+					MsRequestedEvent onFailed = eventFactory
+							.createRequestedEvent(MsAnnouncement.FAILED);
+					onFailed.setEventAction(MsEventAction.NOTIFY);
+
+					MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+			        play.setURL("file://"+ speech.getAbsolutePath());
+					
+					MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+			        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
+										
+			        endpoint.execute(requestedSignals, requestedEvents, connection);
 					logger.info("delivery Date summary played. waiting for DTMF ");
 				} catch (Exception e) {
 					logger.error("An unexpected exception occured while generating the deliveryDate tts file");
@@ -267,11 +291,31 @@ public class DTMFUtils {
 	public static void playFileInResponseToDTMFInfo(SipSession session,
 			String audioFile) {
 		MsConnection connection = (MsConnection)session.getApplicationSession().getAttribute("connection");
-		String endpoint = connection.getEndpoint();
-		MsSignalGenerator generator = connection.getSession().getProvider().getSignalGenerator(endpoint);		
+		MsEndpoint endpoint = connection.getEndpoint();
+		MsEventFactory eventFactory = connection.getSession().getProvider().getEventFactory();		
 		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
-		generator.addResourceListener(mediaResourceListener);
-		generator.apply(EventID.PLAY, connection, new String[] { audioFile });
+		connection.getSession().getProvider().addNotificationListener(mediaResourceListener);
+
+		// Let us request for Announcement Complete event or Failure
+		// in case if it happens
+		MsRequestedEvent onCompleted = null;
+		MsRequestedEvent onFailed = null;
+
+		onCompleted = eventFactory
+				.createRequestedEvent(MsAnnouncement.COMPLETED);
+		onCompleted.setEventAction(MsEventAction.NOTIFY);
+
+		onFailed = eventFactory
+				.createRequestedEvent(MsAnnouncement.FAILED);
+		onFailed.setEventAction(MsEventAction.NOTIFY);
+
+		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+        play.setURL(audioFile);
+		
+		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
+							
+        endpoint.execute(requestedSignals, requestedEvents, connection);
 		session.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STOPPED);
 	}
 }
