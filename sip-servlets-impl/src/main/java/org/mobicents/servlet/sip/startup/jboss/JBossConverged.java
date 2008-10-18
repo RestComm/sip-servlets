@@ -68,17 +68,7 @@ public class JBossConverged extends JBossWeb {
 	 * @return true if the service being deployed contains WEB-INF/sip.xml, false otherwise 
 	 */
 	public static boolean isSipServletApplication(DeploymentInfo di) {
-		URL url = di.localCl.findResource(SipContext.APPLICATION_SIP_XML);
-		if(url != null) {
-			try {
-				url.openStream();
-				return true;
-			} catch (IOException e) {
-				return false;
-			}		
-		} else {
-			return false;
-		}
+		return JBossSip.isSipServletApplication(di);
 		
 	}
 }

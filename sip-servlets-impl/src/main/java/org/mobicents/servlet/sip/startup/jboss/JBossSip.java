@@ -17,7 +17,10 @@
 package org.mobicents.servlet.sip.startup.jboss;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Properties;
@@ -38,6 +41,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.deployment.SubDeployerExt;
+import org.jboss.ejb.plugins.cmp.jdbc2.FindByPrimaryKeyCommand;
 import org.jboss.mx.util.MBeanProxyExt;
 import org.jboss.security.plugins.JaasSecurityManagerServiceMBean;
 import org.jboss.system.ServiceControllerMBean;
@@ -48,6 +52,7 @@ import org.jboss.web.tomcat.security.HttpServletRequestPolicyContextHandler;
 import org.jboss.web.tomcat.service.DeployerConfig;
 import org.jboss.web.tomcat.service.JBossWebMBean;
 import org.jboss.web.tomcat.service.session.SessionIDGenerator;
+import org.mobicents.servlet.sip.annotations.SipApplicationAnnotationUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
 
@@ -771,10 +776,15 @@ public class JBossSip extends AbstractConvergedContainer
 		String urlPath = sdi.url.getPath();
         String shortName = sdi.shortName;
         boolean checkDir = sdi.isDirectory && !(sdi.isXML || sdi.isScript);
-        
+        boolean fff = isSipServletApplication(sdi);
+        if(fff) {
+        	fff=fff;
+        }
         //if this is a .sar2 file and it contains a sip.xml file then we accept it 
 		if ((urlPath.endsWith(SAR_SUFFIX) || 
-				(checkDir && shortName.endsWith(SAR_SUFFIX))) &&
+				(checkDir && shortName.endsWith(SAR_SUFFIX))
+				|| urlPath.endsWith("war") || 
+						(checkDir && shortName.endsWith("war")))&&
 				isSipServletApplication(sdi)) {
 			return true;
 	    }
@@ -799,8 +809,13 @@ public class JBossSip extends AbstractConvergedContainer
 				return false;
 			}		
 		} else {
-			return false;
+			File deploymentPath;
+			try {
+			  deploymentPath = new File(di.url.toURI());
+			} catch(URISyntaxException e) {
+			  deploymentPath = new File(di.url.getPath());
+			}
+			return SipApplicationAnnotationUtils.findPackageInfo(deploymentPath);
 		}
-		
 	}
 }

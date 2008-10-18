@@ -18,6 +18,8 @@ package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -25,6 +27,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.annotations.SipApplicationAnnotationUtils;
 
 /**
  * @author Jean Deruelle
@@ -203,6 +206,14 @@ public class SipHostConfig extends HostConfig {
 				if(entry != null) {
 					return true;
 				}
+				Enumeration<JarEntry> jarEntries = jar.entries();
+				while(jarEntries.hasMoreElements()) {
+					JarEntry f = jarEntries.nextElement();
+					if(f.getName().contains("package-info.class")) {
+						InputStream  stream = jar.getInputStream(f);
+						if(SipApplicationAnnotationUtils.findPackageInfo(stream)) return true;
+					}
+				}
 			} catch (IOException e) {
 				logger.error("An unexpected Exception occured " +
 						"while trying to check if a sip.xml file exists in " + file, e);
@@ -225,6 +236,7 @@ public class SipHostConfig extends HostConfig {
 			if(sipXmlFile.exists()) {
 				return true;
 			}
+			if(SipApplicationAnnotationUtils.findPackageInfo(dir)) return true;
 		}		
 		return false;
 	}
