@@ -4,12 +4,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+/**
+ * Utils for parwing SipApplication annotation without a classloader
+ * 
+ * @author Vladimir Ralev
+ *
+ */
 public class SipApplicationAnnotationUtils {
 	
 	private final static byte[] SIP_APPLICATION_BYTES = "SipApplication".getBytes();
 	private final static byte[] ANNOTATION_BYTES = "annotation".getBytes();
+	
 	private static boolean contains(byte[] text, byte[] subtext) {
+		if(text.length<subtext.length) return false;
 		for(int q=0; q<text.length-subtext.length; q++) {
 			boolean found = true;
 			for(int w=0; w<subtext.length; w++) {
