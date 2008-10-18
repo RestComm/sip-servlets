@@ -776,10 +776,6 @@ public class JBossSip extends AbstractConvergedContainer
 		String urlPath = sdi.url.getPath();
         String shortName = sdi.shortName;
         boolean checkDir = sdi.isDirectory && !(sdi.isXML || sdi.isScript);
-        boolean fff = isSipServletApplication(sdi);
-        if(fff) {
-        	fff=fff;
-        }
         //if this is a .sar2 file and it contains a sip.xml file then we accept it 
 		if ((urlPath.endsWith(SAR_SUFFIX) || 
 				(checkDir && shortName.endsWith(SAR_SUFFIX))
