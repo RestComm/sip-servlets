@@ -69,15 +69,6 @@ public class MediaConnectionListener implements MsConnectionListener {
 		logger.error("connection created " + event);
 	}
 
-	public void connectionDeleted(MsConnectionEvent event) {
-		logger.info("Local Media Connection deleted " + event.getEventID());
-		
-	}
-
-	public void connectionModifed(MsConnectionEvent event) {
-		logger.error("connection modified" + event);
-	}
-
 	public void connectionInitialized(MsConnectionEvent arg0) {
 		logger.error("connection initialized " + arg0);
 	}

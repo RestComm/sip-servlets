@@ -5,18 +5,8 @@ Instructions to build and deploy
 --------------------------------
 
 To build:
-0. Install media server in JBoss AS. Follow Oleg's instructions from the google repository.
-1. If the media server's jboss-service.xml doesnt have an IVR endpoint add one like this:
-   <mbean code="org.mobicents.media.server.impl.ivr.IVREndpointManagement" 
-           name="media.mobicents:endpoint=ivr"> 
-        <attribute name="JndiName">media/trunk/IVR/1</attribute>
-        <attribute name="BindAddress">${jboss.bind.address}</attribute>
-        <attribute name="Jitter">60</attribute>
-        <attribute name="PacketizationPeriod">20</attribute>
-        <attribute name="PortRange">1024-65535</attribute>
-        <attribute name="PCMA">true</attribute>
-    </mbean>
-2. Install Mobicents, Mobicents TTS RA and Mobicents Media RA
+1. Install media server and Mobicents Media Server MSC Controller (Media RA) in JBoss AS
+2. Install Mobicents, Mobicents TTS RA in JBoss AS
     
 mvn clean install from jslee-sips dir
 

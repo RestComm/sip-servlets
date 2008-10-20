@@ -200,6 +200,16 @@ public abstract class InteropSbb implements Sbb {
 			.getEventFactory();
 		
 		MsConnection connection = getConnection();
+		if(connection == null) {
+			logger.error("Connection could not be created, closing the call ");
+			CallManager callManagerRef = (CallManager)this.getInteropCustomEvent().getCallManagerRef();
+			try {
+				callManagerRef.endCall(null, false);
+			} catch (IOException e) {
+				logger.error("Impossible to call back the EJB", e);				
+			}
+			return;
+		}
 		if(attachToGeneratorActivity) {
 			try {
 				ActivityContextInterface generatorActivity = mediaAcif
@@ -240,10 +250,11 @@ public abstract class InteropSbb implements Sbb {
 				return (MsConnection) activities[i].getActivity();
 			}
 		}
+		logger.info("Connection is null...");
 		return null;
 	}
 	
-	public void onConnectionCreated(MsConnectionEvent evt,
+	public void onConnectionHalfOpened(MsConnectionEvent evt,
 			ActivityContextInterface aci) {
 		logger.info("Connection Created");
 		logger.info("user name : " + this.getInteropCustomEvent().getBoothNumber());
@@ -259,7 +270,7 @@ public abstract class InteropSbb implements Sbb {
 		}
 	}
 	
-	public void onConnectionModified(MsConnectionEvent evt,
+	public void onConnectionOpened(MsConnectionEvent evt,
 			ActivityContextInterface aci) {
 		logger.info("Connection Modified");
 		logger.info("user name : " + this.getInteropCustomEvent().getBoothNumber());

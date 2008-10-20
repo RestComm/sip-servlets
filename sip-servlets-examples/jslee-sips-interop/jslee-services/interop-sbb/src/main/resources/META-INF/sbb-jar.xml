@@ -60,10 +60,10 @@
 		</event>
 
 		<event event-direction="Receive" initial-event="False">
-			<event-name>ConnectionCreated</event-name>
+			<event-name>ConnectionHalfOpened</event-name>
 			<event-type-ref>
 				<event-type-name>
-					org.mobicents.slee.media.CONNECTION_CREATED
+					org.mobicents.slee.media.CONNECTION_HALF_OPEN
 				</event-type-name>
 				<event-type-vendor>
 					org.mobicents.media
@@ -73,10 +73,10 @@
 		</event>
 		
 		<event event-direction="Receive" initial-event="False">
-			<event-name>ConnectionModified</event-name>
+			<event-name>ConnectionOpened</event-name>
 			<event-type-ref>
 				<event-type-name>
-					org.mobicents.slee.media.CONNECTION_MODIFIED
+					org.mobicents.slee.media.CONNECTION_OPEN
 				</event-type-name>
 				<event-type-vendor>
 					org.mobicents.media
@@ -89,7 +89,7 @@
 			<event-name>AnnouncementComplete</event-name>
 			<event-type-ref>
 				<event-type-name>
-					org.mobicents.slee.media.announcement.COMPLETE
+					org.mobicents.media.events.announcement.COMPLETED
 				</event-type-name>
 				<event-type-vendor>
 					org.mobicents.media
@@ -101,7 +101,7 @@
 		<event event-direction="Receive" initial-event="False">
             <event-name>Dtmf</event-name>
             <event-type-ref>
-                <event-type-name>org.mobicents.slee.media.dtmf.DTMF</event-type-name>
+                <event-type-name>org.mobicents.media.events.dtmf.DTMF</event-type-name>
                 <event-type-vendor>org.mobicents.media</event-type-vendor>
                 <event-type-version>1.0</event-type-version>
             </event-type-ref>

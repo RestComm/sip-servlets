@@ -70,7 +70,7 @@ public class CallManagerBean implements CallManager, Serializable {
 			conn1.close();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("unexpected exception while firing the event " + eventType + " into jslee", e);
 		}
 	}
 	
