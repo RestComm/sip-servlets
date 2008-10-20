@@ -41,9 +41,10 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
+	TestSipListener registerReciever;
 	
 	ProtocolObjects senderProtocolObjects;	
-
+	ProtocolObjects registerRecieverProtocolObjects;	
 	
 	public ShootmeSipServletTest(String name) {
 		super(name);
@@ -68,13 +69,24 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		
 		senderProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
-					
+		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
 		
 		senderProvider.addSipListener(sender);
 		
-		senderProtocolObjects.start();			
+		senderProtocolObjects.start();		
+		
+		
+		registerRecieverProtocolObjects =new ProtocolObjects(
+				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG);
+		
+		registerReciever = new TestSipListener(5058, 5070, registerRecieverProtocolObjects, true);
+		SipProvider registerRecieverProvider = registerReciever.createProvider();			
+		
+		registerRecieverProvider.addSipListener(registerReciever);
+		
+		registerRecieverProtocolObjects.start();		
 	}
 	
 	public void testShootme() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -102,6 +114,18 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isFinalResponseReceived());
+	}
+	
+	public void testShootmeRegisterCSeqIncrease() throws Exception {
+		String fromName = "testRegisterCSeq";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(70000);
+		assertTrue(registerReciever.getLastRegisterCSeqNumber() == 4);
 		assertTrue(sender.isFinalResponseReceived());
 	}
 	

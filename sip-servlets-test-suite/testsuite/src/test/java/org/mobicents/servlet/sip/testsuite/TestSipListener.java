@@ -195,6 +195,8 @@ public class TestSipListener implements SipListener {
 	private long lastInfoResponseTime = -1;
 	
 	private Integer respondWithError = null;
+	
+	private long lastRegisterCSeqNumber = -1;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -687,6 +689,7 @@ public class TestSipListener implements SipListener {
 
         try {
 
+        	lastRegisterCSeqNumber = ((CSeqHeader)request.getHeader("CSeq")).getSeqNumber();
             serverTransaction = 
             	(serverTransactionId == null? 
             			sipProvider.getNewServerTransaction(request): 
@@ -1505,6 +1508,10 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isWaitForCancel() {
 		return waitForCancel;
+	}
+
+	public long getLastRegisterCSeqNumber() {
+		return lastRegisterCSeqNumber;
 	}
 
 	/**

@@ -18,10 +18,12 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -29,6 +31,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.SipSession.State;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +42,9 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
+	
+	@Resource
+	SipFactory sipFactory;
 	
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
@@ -69,6 +75,18 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("from : " + request.getFrom());
 		logger.info("Got request: "
 				+ request.getMethod());
+		
+		// Test register cseq issue http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
+		if(request.getFrom().toString().contains("testRegisterCSeq")) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			sipServletResponse.send();
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+			
+			SipApplicationSession app = sipFactory.createApplicationSession();
+			sipFactory.createRequest(app, "REGISTER", "sip:me@simple-servlet.com", "sip:you@localhost:5058").send();
+			return;
+		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			sipServletResponse.send();
@@ -107,6 +125,23 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	@Override
 	protected void doSuccessResponse(SipServletResponse resp)
 			throws ServletException, IOException {
+		// This is for the REGISTER CSeq test
+		if(resp.getMethod().equalsIgnoreCase("REGISTER")) {
+			int cseq = Integer.parseInt(resp.getRequest().getHeader("CSeq").substring(0,1));
+			if(cseq < 4) {
+				try {
+					// Put some delay as per http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
+					Thread.sleep(15000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// Check if the session remains in INITIAL state, if not, the test will fail for missing registers
+				if(resp.getSession().getState().equals(State.INITIAL))
+					resp.getSession().createRequest("REGISTER").send();
+			}
+			return;
+		}
 		if(!"BYE".equalsIgnoreCase(resp.getMethod())) {
 			resp.createAck().send();
 			resp.getSession(false).createRequest("BYE").send();
