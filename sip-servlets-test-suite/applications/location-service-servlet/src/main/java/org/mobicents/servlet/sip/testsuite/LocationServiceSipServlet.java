@@ -76,7 +76,7 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 			proxy.setProxyTimeout(3);
 			proxy.setRecordRoute(true);
 			proxy.setParallel(true);
-			proxy.setSupervised(false);
+			proxy.setSupervised(true);
 			proxy.proxyTo(contactAddresses);		
 		} else {
 			logger.info(request.getRequestURI().toString() + " is not currently registered");
@@ -84,6 +84,12 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 				request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
 			sipServletResponse.send();
 		}
+	}
+	
+	@Override
+	protected void doErrorResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		logger.info("Got response " + resp);
 	}
 
 	@Override
