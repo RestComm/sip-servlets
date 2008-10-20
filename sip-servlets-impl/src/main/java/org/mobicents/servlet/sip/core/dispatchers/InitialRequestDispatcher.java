@@ -340,11 +340,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							//add a route header to direct the request back to the container 
 							//to check if there is any other apps interested in it
 							sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
-						} else {
-							if(logger.isDebugEnabled()) {
-								logger.debug("routing outside the container " +
-										"since no more apps are is interested.");
-							}
+						} else {							
 							// If a servlet does not generate final response the routing process
 							// will continue (non-terminating routing state). This code stops
 							// routing these requests.
@@ -353,7 +349,18 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							int port = sipRequestUri.getPort();
 							String transport = JainSipUtils.findTransport(request);
 							boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
-							if(!isAnotherDomain) return ;
+							if(!isAnotherDomain) {
+								if(logger.isDebugEnabled()) {
+									logger.debug("stop routing the request " +
+											"since no more apps are is interested and the request uri points to the container.");
+								}
+								return ;
+							} else {
+								if(logger.isDebugEnabled()) {
+									logger.debug("routing outside the container " +
+											"since no more apps are is interested.");
+								}
+							}
 						}
 						try {
 							forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
