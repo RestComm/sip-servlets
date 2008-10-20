@@ -55,7 +55,7 @@ public class MediaResourceListener implements MsNotificationListener {
 //		logger.info("event cause " + event.getCause());
 //		logger.info("event message " + event.getMessage());
 		//  
-		if(session != null && connection != null && event.getEventID().equals(MsAnnouncement.COMPLETED)) {						
+		if(session != null && connection != null && event.getEventID().getFqn().equals(MsAnnouncement.COMPLETED.getFqn())) {						
 			try {
 				SipServletRequest byeRequest = session.createRequest("BYE");				
 				byeRequest.send();																	
