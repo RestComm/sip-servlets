@@ -17,3 +17,5 @@ Acknowledgements
 		* IPBX : {{{http://code.google.com/p/mobicents/issues/detail?id=122}issue 122}}
 		
 	* Eelco Cramer from {{{http://www.tno.nl}TNO ICT}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=280}Issue 280}} and contributed fix for it
+	
+	* {{{mailto:haukex@zero-g.net}Hauke D\xE4mpfling}} : reportted {{{http://code.google.com/p/mobicents/issues/detail?id=410}Issue 410}} and {{{http://code.google.com/p/mobicents/issues/detail?id=411}Issue 411}} and contributed fixes for them
