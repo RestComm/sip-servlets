@@ -75,11 +75,11 @@ public class MediaConnectionListener implements MsConnectionListener{
 	}
 
 	public void connectionInitialized(MsConnectionEvent arg0) {
-		logger.error("connection initialized " + arg0);
+		logger.info("connection initialized " + arg0);
 	}
 
 	public void connectionDisconnected(MsConnectionEvent arg0) {
-		logger.error("connection disconnected " + arg0);
+		logger.info("connection disconnected " + arg0);
 	}
 
 	public void connectionFailed(MsConnectionEvent arg0) {
@@ -92,13 +92,11 @@ public class MediaConnectionListener implements MsConnectionListener{
 	}
 	
 	public void connectionHalfOpen(MsConnectionEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		logger.info("connection half opened" + arg0);
 	}
 
 	public void connectionOpen(MsConnectionEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		logger.info("connection opened " + arg0);
 	}
 
 	public SipServletRequest getInviteRequest() {
