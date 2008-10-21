@@ -37,20 +37,32 @@
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
-			<version>${mms.version}</version>
-			<scope>provided</scope>			
+			<version>${mms.version}</version>			
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
 			<version>${mms.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.external.freetts</groupId>
 			<artifactId>freetts</artifactId>
 			<version>${freetts.version}</version>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+			<version>${mms.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-ri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mobicents.servers.media</groupId>
+					<artifactId>mobicents-media-server-spi</artifactId>
+				</exclusion>
+			</exclusions>		
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.external.freetts</groupId>
