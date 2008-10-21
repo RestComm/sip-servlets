@@ -4,6 +4,7 @@ Then, you should do "mvn clean install" at this example location.
 
 To deploy:
 Drop the generated war file (diameter-event-charging-<version>.war) in JBoss deploy directory.
+copy the diametereventcharging-dar.properties to $JBOSS_HOME/server/default/conf/dars and modify your server.xml to point to this dar file.
 
 To use:
 This example must be run under JBoss.
