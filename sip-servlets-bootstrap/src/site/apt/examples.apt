@@ -26,6 +26,8 @@ Examples
 	* {{{jslee-sips-interop-demo.html}JSLEE/Sip servlets Interoperability Demo}} : a Converged JEE/Sip-Servlets/JSLEE Application showing how Sip Servlets and JSLEE can play along together to leverage standards everywhere
 
 	* {{{facebook-c2c.html}Facebook Click To Call}} : a Facebook plugin application that makes calls between real phones through a PSTN gateway
+	
+	* {{{diameter_event_charging.html}Diameter Example}} : a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)
 
 	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)

@@ -2,7 +2,7 @@ Location Service
 
 * Service Description
 
-  Diameter Event Charging service based on Location that performs call charging
+  Diameter Event Charging service based on Location Service that performs call charging
   at a fixed-rate (event charging).  When the call is initiated there's  a debit
   of 10.0 euros. In case of the call being rejected or the caller hangs up before
   that value is refunded into the user account.
