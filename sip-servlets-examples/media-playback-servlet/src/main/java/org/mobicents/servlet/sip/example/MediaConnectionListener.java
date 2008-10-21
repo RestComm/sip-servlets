@@ -36,6 +36,32 @@ public class MediaConnectionListener implements MsConnectionListener{
 	private SipServletRequest inviteRequest;
 	
 	public void connectionCreated(MsConnectionEvent event) {
+		logger.info("connection created " + event);
+	}
+
+	public void connectionInitialized(MsConnectionEvent arg0) {
+		logger.info("connection initialized " + arg0);
+	}
+
+	public void connectionDisconnected(MsConnectionEvent arg0) {
+		logger.info("connection disconnected " + arg0);
+	}
+
+	public void connectionFailed(MsConnectionEvent arg0) {
+		logger.error("connection failed " + arg0);
+		try {
+			inviteRequest.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+		} catch (IOException e) {
+			logger.error("Unexpected exception while sending the error response", e);
+		}
+	}
+	
+	public void connectionHalfOpen(MsConnectionEvent arg0) {
+		logger.info("connection half opened" + arg0);
+	}
+
+	public void connectionOpen(MsConnectionEvent event) {
+		logger.info("connection opened " + event);
 		String sdp = event.getConnection().getLocalDescriptor();
 		SipServletResponse sipServletResponse = inviteRequest.createResponse(SipServletResponse.SC_OK);
 		try {
@@ -72,31 +98,6 @@ public class MediaConnectionListener implements MsConnectionListener{
 		MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
 
 		endpoint.execute(signals, events, connection);
-	}
-
-	public void connectionInitialized(MsConnectionEvent arg0) {
-		logger.info("connection initialized " + arg0);
-	}
-
-	public void connectionDisconnected(MsConnectionEvent arg0) {
-		logger.info("connection disconnected " + arg0);
-	}
-
-	public void connectionFailed(MsConnectionEvent arg0) {
-		logger.error("connection failed " + arg0);
-		try {
-			inviteRequest.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
-		} catch (IOException e) {
-			logger.error("Unexpected exception while sending the error response", e);
-		}
-	}
-	
-	public void connectionHalfOpen(MsConnectionEvent arg0) {
-		logger.info("connection half opened" + arg0);
-	}
-
-	public void connectionOpen(MsConnectionEvent arg0) {
-		logger.info("connection opened " + arg0);
 	}
 
 	public SipServletRequest getInviteRequest() {
