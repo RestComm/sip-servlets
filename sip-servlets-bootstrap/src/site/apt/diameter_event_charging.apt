@@ -1,7 +1,7 @@
 Location Service
 
 * Service Description
-
+  
   Diameter Event Charging service based on Location Service that performs call charging
   at a fixed-rate (event charging).  When the call is initiated there's  a debit
   of 10.0 euros. In case of the call being rejected or the caller hangs up before
@@ -54,6 +54,8 @@ Location Service
     Realm: mobicents.org
     Host IP: 127.0.0.1
   
+[config_options.png]
+  
   Start two SIP Phones.
   One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090
   The other phone can be setup as anything.
@@ -66,6 +68,8 @@ Location Service
   In case the call is rejected, or the caller gives up, there's a new Diameter Request sent which will be the refund of the unused value. In case the call is accepted, nothing else will happen, related to Diameter.
   
   You can see the user balance in the emulator: in the menu Config > Account > Click on "00001000-Klas Svensson" and watch the balance. Stretch the window down to see the history.
+  
+[config_account.png]
   
   Please note that this is not the most correct way to do charging, as Diameter provides other means such as unit reservation, but only as purpose of a demo, where you can see debit and refund working.
   Also, this is a fixed price call, no matter what the duration. You can also have it using time-based charging.
