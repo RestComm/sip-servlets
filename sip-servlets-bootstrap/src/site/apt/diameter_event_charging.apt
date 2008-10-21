@@ -1,15 +1,15 @@
-Location Service
+Diameter Event Charging Service
 
 * Service Description
   
   Diameter Event Charging service based on Location Service that performs call charging
   at a fixed-rate (event charging).  When the call is initiated there's  a debit
-  of 10.0 euros. In case of the call being rejected or the caller hangs up before
+  of 10.0 euros. In case of the call being rejected or the caller hangs up before an answer is received,
   that value is refunded into the user account.
 	
 	The steps performed by the application and container are as follows:
 
-	    * Alice makes a call to sip:receiver@sip-servlets.com. The INVITE is received by the servlet container which sends the debit request to the Charging Server and invokes the location service
+	    * Alice makes a call to sip:receiver@sip-servlets.com. The INVITE is received by the servlet container <<which sends the debit request to the Charging Server>> and invokes the location service
 	    
 	    * The location service determines, using non-SIP means, where the callee (receiver) is registered with two locations, identified by, say, two SIP URIs (sip:receiver@127.0.0.1:5090 and sip:receiver@127.0.0.1:6090).
 	    
@@ -19,7 +19,7 @@ Location Service
  
 	    * The 200 is forwarded upstream to Alice and the call setup is completed as per usual.
 
-	    * If none of the destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to credit the 10.0 euros debited.
+	    * <<If none of the destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to credit the 10.0 euros debited.>>
 	 
 * How to activate it
 
@@ -47,20 +47,21 @@ Location Service
 * How to play with it
 
   This example must be run under JBoss.
+  
   You will also need {{{http://www.ericsson.com/mobilityworld/developerszonedown/downloads/tools/charging_solutions/ChargingSDK-1_0_D31E.zip}Ericsson SDK Charging Emulator v1.0}}.
   
-  Run the Charging Emulator (PPSDiamEmul.jar) and configure it like this:
-    Peer Id: aaa://127.0.0.1:21812
-    Realm: mobicents.org
-    Host IP: 127.0.0.1
+  Run the Charging Emulator (PPSDiamEmul.jar) and configure it like this:\
+    Peer Id: aaa://127.0.0.1:21812\
+    Realm: mobicents.org\
+    Host IP: 127.0.0.1\
   
 [config_options.png]
   
-  Start two SIP Phones.
-  One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090
-  The other phone can be setup as anything.
-  The SIP phone doesn't have to be registered.
-  We recommend using 3CX Phone, SJ Phone or WengoPhone. 
+  Start two SIP Phones.\
+  One phone should be setup as sip:receiver@sip-servlets.com on ip address 127.0.0.1 and port 5090\
+  The other phone can be setup as anything.\
+  The SIP phone doesn't have to be registered.\
+  We recommend using 3CX Phone, SJ Phone or WengoPhone.\ 
   
   From the second phone, make a call to sip:receiver@sip-servlets.com you should have the other phone ringing.
   
