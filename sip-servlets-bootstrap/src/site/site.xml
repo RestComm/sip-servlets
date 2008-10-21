@@ -39,6 +39,7 @@
 			<item name="Media support" href="media.html" />
 			<item name="Security" href="security.html" />
 			<item name="STUN suport" href="stun.html" />
+			<item name="Diameter suport" href="diameter_event_charging.html" />
 			<item name="Concurrency and Congestion Control" href="concurrency.html" />
 			<item name="Management Console" href="sip-servlets-managment.htm" />
 		</menu>
