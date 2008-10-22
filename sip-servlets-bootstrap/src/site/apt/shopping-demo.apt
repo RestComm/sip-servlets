@@ -43,15 +43,13 @@ Shopping Demo
 	 
 * How to activate it
 
-** From the binary (only available starting from the 0.3 binary)
+** From the binary
 
 	You can find the ear file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0.2.1/shopping-demo-ear-1.0.2.ear}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0/shopping-demo-ear-1.0.ear}here}}.\
  	It's working with the Mobicents Media Server 1.0.0.BETA4.\
  	Rename it to shopping-demo.ear\
- 	Drop the renamed shopping-demo.ear file into your <<<jboss_home/server/default/deploy>>> directory. 
- 	If you need this example for Mobicents SipServlets 0.4.1 you should use this EAR
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/shopping-demo-ear/1.0.1/shopping-demo-ear-1.0.1.ear}here}}.	 	 
+ 	Drop the renamed shopping-demo.ear file into your <<<jboss_home/server/default/deploy>>> directory. 	 
  	
  	Get the corresponding {{{/shopping-demo-dar.properties}dar configuration file}}.\
  	Drop it in your <<<jboss_home/server/default/conf/dars>>> directory.\
