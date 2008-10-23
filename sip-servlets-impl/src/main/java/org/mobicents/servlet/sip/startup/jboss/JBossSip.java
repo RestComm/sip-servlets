@@ -811,7 +811,10 @@ public class JBossSip extends AbstractConvergedContainer
 			} catch(URISyntaxException e) {
 			  deploymentPath = new File(di.url.getPath());
 			}
-			return SipApplicationAnnotationUtils.findPackageInfo(deploymentPath);
+			if(deploymentPath.isDirectory())
+				return SipApplicationAnnotationUtils.findPackageInfoinDirectory(deploymentPath);
+			else
+				return SipApplicationAnnotationUtils.findPackageInfoInArchive(deploymentPath);
 		}
 	}
 }

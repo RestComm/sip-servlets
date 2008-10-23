@@ -4,6 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 /**
  * Utils for parwing SipApplication annotation without a classloader
  * 
@@ -11,6 +18,7 @@ import java.io.InputStream;
  *
  */
 public class SipApplicationAnnotationUtils {
+	private static transient Log logger = LogFactory.getLog(SipApplicationAnnotationUtils.class);
 	
 	private final static byte[] SIP_APPLICATION_BYTES = "SipApplication".getBytes();
 	private final static byte[] ANNOTATION_BYTES = "annotation".getBytes();
@@ -28,6 +36,31 @@ public class SipApplicationAnnotationUtils {
 		}
 		return false;
 	}
+	
+	public static boolean findPackageInfoInArchive(File archive) {
+		ZipFile zipFile = null;
+		try {
+			zipFile = new ZipFile(archive);
+		} catch (Exception e1) {
+			logger.error("Unable to open " + archive.getAbsolutePath() + ". No sip applications were parsed.");
+			return false;
+		}
+		
+		Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zipFile.entries();;
+		while (entries.hasMoreElements())  {
+			ZipEntry entry = entries.nextElement();
+			if(entry.getName().contains("package-info.class")) {
+				try {
+					if(findSipApplicationAnnotation(zipFile.getInputStream(entry))) {
+						return true;
+					}
+				} catch (IOException e) {
+				}
+			}
+		}
+		return false;
+		
+	}
 
 	/**
 	 * Determine if there is a sip application in this folder.
@@ -37,12 +70,12 @@ public class SipApplicationAnnotationUtils {
 	 * than using a classloader, but can be reviewed in the future especially when
 	 * JBoss AS 5.0 is available with the new deployer.
 	 */
-	public static boolean findPackageInfo(File file) {
+	public static boolean findPackageInfoinDirectory(File file) {
 		if(file.getName().equals("package-info.class")) {
 			FileInputStream stream = null;
 			try {
 				stream = new FileInputStream (file);
-				if(findPackageInfo(stream)) return true;
+				if(findSipApplicationAnnotation(stream)) return true;
 			} catch (Exception e) {}
 			finally {
 				try {
@@ -53,7 +86,7 @@ public class SipApplicationAnnotationUtils {
 		}
 		if(file.isDirectory()) {
 			for(File subFile:file.listFiles()) {
-				if(findPackageInfo(subFile)) return true;
+				if(findPackageInfoinDirectory(subFile)) return true;
 			}
 		}
 		return false;
@@ -67,7 +100,7 @@ public class SipApplicationAnnotationUtils {
 	 * than using a classloader, but can be reviewed in the future especially when
 	 * JBoss AS 5.0 is available with the new deployer.
 	 */
-	public static boolean findPackageInfo(InputStream stream) {
+	public static boolean findSipApplicationAnnotation(InputStream stream) {
 		try {
 			byte[] rawClassBytes;
 			rawClassBytes = new byte[stream.available()];

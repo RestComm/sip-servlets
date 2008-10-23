@@ -200,25 +200,7 @@ public class SipHostConfig extends HostConfig {
 		if (file.getName().toLowerCase().endsWith(SAR_EXTENSION)) {
 			return true;
 		} else if (file.getName().toLowerCase().endsWith(WAR_EXTENSION)) {
-			try{
-				JarFile jar = new JarFile(file);			          
-				JarEntry entry = jar.getJarEntry(SipContext.APPLICATION_SIP_XML);
-				if(entry != null) {
-					return true;
-				}
-				Enumeration<JarEntry> jarEntries = jar.entries();
-				while(jarEntries.hasMoreElements()) {
-					JarEntry f = jarEntries.nextElement();
-					if(f.getName().contains("package-info.class")) {
-						InputStream  stream = jar.getInputStream(f);
-						if(SipApplicationAnnotationUtils.findPackageInfo(stream)) return true;
-					}
-				}
-			} catch (IOException e) {
-				logger.error("An unexpected Exception occured " +
-						"while trying to check if a sip.xml file exists in " + file, e);
-				return false;
-			}
+			return SipApplicationAnnotationUtils.findPackageInfoInArchive(file);
 		} 		
 		return false;
 	}
@@ -236,7 +218,7 @@ public class SipHostConfig extends HostConfig {
 			if(sipXmlFile.exists()) {
 				return true;
 			}
-			if(SipApplicationAnnotationUtils.findPackageInfo(dir)) return true;
+			if(SipApplicationAnnotationUtils.findPackageInfoinDirectory(dir)) return true;
 		}		
 		return false;
 	}
