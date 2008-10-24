@@ -89,7 +89,7 @@ public class MediaPlaybackServlet extends SipServlet {
 	
 	private void buildAudio(String text, String filename) throws Exception {
 		VoiceManager mgr = VoiceManager.getInstance();
-		Voice voice = mgr.getVoice("kevin16");
+		Voice voice = mgr.getVoice("kevin");
 		voice.allocate();
 		File speech = new File(filename);
 		SingleFileAudioPlayer player = new SingleFileAudioPlayer(getBasename(speech.getAbsolutePath()), getAudioType(filename));
