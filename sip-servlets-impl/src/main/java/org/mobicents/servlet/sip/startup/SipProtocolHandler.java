@@ -21,12 +21,17 @@ import gov.nist.javax.sip.SipStackImpl;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
@@ -39,6 +44,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
+import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
@@ -58,10 +64,13 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  * @author Jean Deruelle
  * 
  */
-public class SipProtocolHandler implements ProtocolHandler {
+public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	// the logger
 	private static transient Log logger = LogFactory.getLog(SipProtocolHandler.class.getName());
-
+	// *
+    protected ObjectName tpOname = null;
+    // *
+    protected ObjectName rgOname = null;
 	/**
      * The random port number generator that we use in getRandomPortNumer()
      */
@@ -184,7 +193,11 @@ public class SipProtocolHandler implements ProtocolHandler {
 			sipStack.stop();
 			sipStack = null;
 			logger.info("Sip stack stopped");
-		}				
+		}		
+		if (tpOname!=null)
+            Registry.getRegistry(null, null).unregisterComponent(tpOname);
+        if (rgOname != null)
+            Registry.getRegistry(null, null).unregisterComponent(rgOname);
 	}
 
 	public Adapter getAdapter() {		
@@ -375,6 +388,21 @@ public class SipProtocolHandler implements ProtocolHandler {
 			
 			logger.info("Sip Connector started on ip address : " + ipAddress
 					+ ",port " + port + ", useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);
+			
+			if (this.domain != null) {
+//	            try {
+//	                tpOname = new ObjectName
+//	                    (domain + ":" + "type=ThreadPool,name=" + getName());
+//	                Registry.getRegistry(null, null)
+//	                    .registerComponent(endpoint, tpOname, null );
+//	            } catch (Exception e) {
+//	                logger.error("Can't register endpoint");
+//	            }
+	            rgOname=new ObjectName
+	                (domain + ":type=GlobalRequestProcessor,name=" + getName());
+	            Registry.getRegistry(null, null).registerComponent
+	                ( sipStack, rgOname, null );
+	        }
 		} catch (Exception ex) {
 			logger.fatal(
 					"Bad shit happened -- check server.xml for tomcat. ", ex);
@@ -623,4 +651,56 @@ public class SipProtocolHandler implements ProtocolHandler {
 		this.isReentrantListener = isReentrantListener;
 	}
 
+	public InetAddress getAddress() {
+		try {
+			return InetAddress.getByName(ipAddress);
+		} catch (UnknownHostException e) {
+			logger.error("unexpected exception while getting the ipaddress of the sip protocol handler", e);
+			return null;
+		}
+	}
+    public void setAddress(InetAddress ia) { ipAddress = ia.getHostAddress(); }
+
+    public String getName() {
+        String encodedAddr = "";
+        if (getAddress() != null) {
+            encodedAddr = "" + getAddress();
+            if (encodedAddr.startsWith("/"))
+                encodedAddr = encodedAddr.substring(1);
+            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
+        }
+        return ("sip-" + encodedAddr + getPort());
+    }
+    
+    // -------------------- JMX related methods --------------------
+
+    // *
+    protected String domain;
+    protected ObjectName oname;
+    protected MBeanServer mserver;
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public ObjectName preRegister(MBeanServer server,
+                                  ObjectName name) throws Exception {
+        oname=name;
+        mserver=server;
+        domain=name.getDomain();
+        return name;
+    }
+
+    public void postRegister(Boolean registrationDone) {
+    }
+
+    public void preDeregister() throws Exception {
+    }
+
+    public void postDeregister() {
+    }
 }
