@@ -27,6 +27,34 @@
                 http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/
             </url>
 		</repository>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>			
+			<id>JbossRepository</id>
+			<name>Jboss Repository</name>
+			<url>http://repository.jboss.org/maven2</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>jboss-snapshots</id>
+			<name>JBoss Snapshot Repository</name>
+			<url>http://snapshots.jboss.org/maven2</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<!--  convenience to define GWT version in one place -->
@@ -72,13 +100,13 @@
 				<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
-			<version>1.0.0.CR2-SNAPSHOT</version>
+			<version>1.0.0.CR2</version>
 			<scope>provided</scope>			
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
-			<version>1.0.0.CR2-SNAPSHOT</version>
+			<version>1.0.0.CR2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -97,7 +125,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>1.1.6</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -197,6 +225,34 @@
 
 	<!--  profiles (with activation per platform) -->
 	<profiles>
+			<profile>			
+			<id>deploy</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>			
+			<build>			
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<configuration>
+									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/default/deploy" />
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>gwt-dev-windows</id>
 			<properties>
