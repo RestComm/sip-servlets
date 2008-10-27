@@ -26,11 +26,12 @@
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
 		<module>uac-register</module>
+		<module>conference-demo</module>
 	</modules>
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>1.0.0.CR1</mms.version>
+		<mms.version>1.0.0.CR2</mms.version>
 	</properties>
 
 	<dependencies>
