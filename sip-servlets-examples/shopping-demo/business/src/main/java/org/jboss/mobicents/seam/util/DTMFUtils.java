@@ -51,27 +51,13 @@ public class DTMFUtils {
 			logger.info("Order approved !");
 			String audioFile = pathToAudioDirectory + "OrderApproved.wav";					
 			
-			playFileInResponseToDTMFInfo(session, audioFile);
-//			try {
-//				InitialContext ctx = new InitialContext();
-//				OrderApproval orderApproval = (OrderApproval) ctx.lookup("shopping-demo/OrderApprovalAction/remote");
-//				orderApproval.fireOrderApprovedEvent();
-//			} catch (NamingException e) {
-//				logger.error("An exception occured while retrieving the EJB OrderApproval",e);
-//			}					
+			playFileInResponseToDTMFInfo(session, audioFile);					
 		} else if("2".equalsIgnoreCase(signal)) {
 			// Order Rejected
 			logger.info("Order rejected !");
 			String audioFile = pathToAudioDirectory + "OrderCancelled.wav";					
 			
 			playFileInResponseToDTMFInfo(session, audioFile);
-//			try {
-//				InitialContext ctx = new InitialContext();
-//				OrderApproval orderApproval = (OrderApproval) ctx.lookup("shopping-demo/OrderApprovalAction/remote");
-//				orderApproval.fireOrderRejectedEvent();
-//			} catch (NamingException e) {
-//				logger.error("An exception occured while retrieving the EJB OrderApproval",e);
-//			}
 		}
 	}
 
@@ -107,12 +93,12 @@ public class DTMFUtils {
 		}
 	}
 
-	public static void updateDeliveryDate(SipSession session, String signal) {
+	public static boolean updateDeliveryDate(SipSession session, String signal) {
 		int cause = -1;
 		try {
 			cause = Integer.parseInt(signal);
 		} catch (java.lang.NumberFormatException e) {
-			return;
+			return false;
 		}
 
 		synchronized(session) {
@@ -253,7 +239,7 @@ public class DTMFUtils {
 					java.io.File speech = new File("deliveryDate.wav");
 					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
 					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
-					connection.getSession().getProvider().addNotificationListener(mediaResourceListener);
+					connection.addNotificationListener(mediaResourceListener);
 
 					// Let us request for Announcement Complete event or Failure
 					// in case if it happens
@@ -272,12 +258,15 @@ public class DTMFUtils {
 			        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
 										
 			        endpoint.execute(requestedSignals, requestedEvents, connection);
-					logger.info("delivery Date summary played. waiting for DTMF ");
+					logger.info("delivery Date summary played. not waiting for DTMF anymore");
+					return true;
 				} catch (Exception e) {
 					logger.error("An unexpected exception occured while generating the deliveryDate tts file");
+					return true;
 				}							
 			} else {
 				session.setAttribute("dateAndTime", dateAndTime);
+				return false;
 			}
 		}	
 	}
@@ -294,7 +283,7 @@ public class DTMFUtils {
 		MsEndpoint endpoint = connection.getEndpoint();
 		MsEventFactory eventFactory = connection.getSession().getProvider().getEventFactory();		
 		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
-		connection.getSession().getProvider().addNotificationListener(mediaResourceListener);
+		connection.addNotificationListener(mediaResourceListener);
 
 		// Let us request for Announcement Complete event or Failure
 		// in case if it happens

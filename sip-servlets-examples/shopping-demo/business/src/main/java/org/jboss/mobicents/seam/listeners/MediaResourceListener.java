@@ -51,11 +51,8 @@ public class MediaResourceListener implements MsNotificationListener {
 	 * @see org.mobicents.mscontrol.MsResourceListener#update(org.mobicents.mscontrol.MsNotifyEvent)
 	 */	
 	public void update(MsNotifyEvent event) {
-		logger.info("event ID " + event.getEventID()); 
-//		logger.info("event cause " + event.getCause());
-//		logger.info("event message " + event.getMessage());
-		//  
-		if(session != null && connection != null && event.getEventID().getFqn().equals(MsAnnouncement.COMPLETED.getFqn())) {						
+		logger.info("resource updated : event FQN " + event.getEventID().getFqn());
+		if(session != null && connection != null && event.getEventID().equals(MsAnnouncement.COMPLETED)) {						
 			try {
 				SipServletRequest byeRequest = session.createRequest("BYE");				
 				byeRequest.send();																	
@@ -66,13 +63,11 @@ public class MediaResourceListener implements MsNotificationListener {
 		}
 	}
 
-	public void resourceCreated(MsNotifyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void resourceCreated(MsNotifyEvent event) {
+		logger.info("resource created : event FQN " + event.getEventID().getFqn());
 	}
 
-	public void resourceInvalid(MsNotifyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void resourceInvalid(MsNotifyEvent event) {
+		logger.info("resource invalid : event FQN " + event.getEventID().getFqn());
 	}
 }

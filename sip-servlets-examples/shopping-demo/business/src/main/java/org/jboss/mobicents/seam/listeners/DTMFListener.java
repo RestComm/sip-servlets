@@ -34,6 +34,7 @@ public class DTMFListener implements MsNotificationListener{
 	}
 	
 	public void update(MsNotifyEvent evt) {
+		logger.info("event FQN " + evt.getEventID().getFqn());
 		MsEventIdentifier identifier = evt.getEventID();
         if (identifier.equals(DTMF.TONE)) {
             MsDtmfNotifyEvent event = (MsDtmfNotifyEvent) evt;
@@ -49,14 +50,15 @@ public class DTMFListener implements MsNotificationListener{
 				}
 			} else if(session.getApplicationSession().getAttribute("deliveryDate") != null) {
 				logger.info("delivery date update in progress.");
-				DTMFUtils.updateDeliveryDate(session, signal);
+				if(!DTMFUtils.updateDeliveryDate(session, signal)) {				
+					MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
+					MsRequestedSignal[] signals = new MsRequestedSignal[] {};
+					MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
+	
+					connection.getEndpoint().execute(signals, events, connection);
+				}
 			}				
-        }
-        MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
-		MsRequestedSignal[] signals = new MsRequestedSignal[] {};
-		MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
-
-		connection.getEndpoint().execute(signals, events, connection);
+        }       
 	}
 
 	public void resourceCreated(MsNotifyEvent arg0) {

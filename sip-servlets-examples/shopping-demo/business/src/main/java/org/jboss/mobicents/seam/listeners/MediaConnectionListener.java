@@ -42,7 +42,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 		MsProvider msProvider = connection.getSession().getProvider();
 		MsEventFactory eventFactory = msProvider.getEventFactory();
 		DTMFListener dtmfListener = new DTMFListener(eventFactory, connection, inviteRequest.getSession(), pathToAudioDirectory);
-		msProvider.addNotificationListener(dtmfListener);
+		connection.addNotificationListener(dtmfListener);
 		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
 		MsRequestedSignal[] signals = new MsRequestedSignal[] {};
 		MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
@@ -66,19 +66,19 @@ public class MediaConnectionListener implements MsConnectionListener {
 	}
 	
 	public void connectionCreated(MsConnectionEvent event) {		
-		logger.error("connection created " + event);
+		logger.info("connection created " + event);
 	}
 
 	public void connectionInitialized(MsConnectionEvent arg0) {
-		logger.error("connection initialized " + arg0);
+		logger.info("connection initialized " + arg0);
 	}
 
 	public void connectionDisconnected(MsConnectionEvent arg0) {
-		logger.error("connection disconnected " + arg0);
+		logger.info("connection disconnected " + arg0);
 	}
 
 	public void connectionFailed(MsConnectionEvent arg0) {
-		logger.error("connection failed " + arg0);
+		logger.info("connection failed " + arg0);
 	}
 
 	public void connectionHalfOpen(MsConnectionEvent event) {
@@ -142,7 +142,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 			java.io.File speech = new File("shipping.wav");
 			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
 			MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
-			connection.getSession().getProvider().addNotificationListener(mediaResourceListener);
+			connection.addNotificationListener(mediaResourceListener);
 			play.setURL("file://"+ speech.getAbsolutePath());
 			endpoint.execute(requestedSignals, requestedEvents, connection);
 			
