@@ -110,7 +110,7 @@ public class Conference extends VerticalPanel{
 			userLabel.setStyleName("userLabel");
 			HorizontalPanel commands = new HorizontalPanel();
 			commands.add(kickLink);
-			commands.add(muteLink);
+			//commands.add(muteLink);
 			participants.setWidget(q, 1, userLabel);
 			participants.setWidget(q, 2, commands);
 		}
