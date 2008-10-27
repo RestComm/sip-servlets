@@ -29,6 +29,8 @@ Examples
 	
 	* {{{diameter_event_charging.html}Diameter Example}} : a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)
 
+	* {{{conference-demo.html}Conference Demo}} : a conference media server demo application built on GWT with server-push updates.
+
 	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)
 	

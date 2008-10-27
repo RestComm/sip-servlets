@@ -1,0 +1,36 @@
+Sip Servlets Conference Demo
+
+* Service Description
+
+	This example is focusing on the interaction with the more advanced features in Mobicents Media Server - endpoint composition and conferencing.
+	It is using the {{{http://code.google.com/webtoolkit/}Google's GWT}} Ajax framework with {{{http://code.google.com/p/google-web-toolkit-incubator/wiki/ServerPushFAQ}server-push}}
+	updates (a.k.a "reverse Ajax" or comet) to provide desktop-like experience when interacting with the user interface.
+	The application is demonstrating how Sip Servlets can work seamlessly with any third-party web framework without any need of repackaging or modifying the deployment descriptors.
+	All that is needed are a two Java annotations in the code to specify the application name and the servlet name, nothing else.
+
+	
+* Building from source code
+
+	You can get the source code by executing the following command:
+	
+	<<<svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/conference-demo>>>
+	
+	To build it you need Maven 2. If you set the JBOSS_HOME environment variable to a location with Mobicents Sip Servlets 0.7 server the following command will build and deploy the application:
+	
+	<<<mvn install -Pdeploy>>>
+
+* How to activate it
+
+	Navigate you browser to the {{{http://localhost:8080/sip-servlets-management}Sip Servlets Management console}} and select the Conferen application to receive the INVITE requests. Then save the configuration.
+	
+* How to use it
+
+	Once the application is deployed it is ready to serve requests. You can navigate to the {{{http://localhost:8080/conference-demo-1.0-SNAPSHOT}application homepage}} (your URL may be different) to observe the conference status.
+	There are two way to join the conference:
+	
+	[[1]] You can dial "sip-servlets-conference@localhost:5080" from a SIP Phone in order to join the conference. 
+	
+	[[2]] You can dial a SIP Phone from the form in the web application.
+	
+	
+	Additionally once the conference is started you can play an announcement by typing a file name in the respetive text-box and pressing "Play file". The file must be PCM, mono, 16 bits, 8KHz WAV.
