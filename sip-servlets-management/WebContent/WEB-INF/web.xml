@@ -7,16 +7,16 @@
 		<servlet-class>
 		org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>DARConfigurationService</servlet-name>
-		<url-pattern>/DARConfigurationService</url-pattern>
-	</servlet-mapping>
-	
 	<servlet>
 		<servlet-name>ConfigurationService</servlet-name>
 		<servlet-class>
 		org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl</servlet-class>
 	</servlet>
+	<servlet-mapping>
+		<servlet-name>DARConfigurationService</servlet-name>
+		<url-pattern>/DARConfigurationService</url-pattern>
+	</servlet-mapping>
+		
 	<servlet-mapping>
 		<servlet-name>ConfigurationService</servlet-name>
 		<url-pattern>/ConfigurationService</url-pattern>
