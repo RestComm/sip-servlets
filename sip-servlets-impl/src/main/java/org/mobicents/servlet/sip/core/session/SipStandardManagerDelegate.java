@@ -25,15 +25,26 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipStandardManagerDelegate extends SipManagerDelegate {
 
-
 	@Override
 	protected MobicentsSipSession getNewMobicentsSipSession(SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+		if ((maxActiveSipSessions >= 0) && (sipSessions.size() >= maxActiveSipSessions)) {
+			rejectedSipSessions++;
+            throw new IllegalStateException
+                ("could not create a new sip session because there is currently too many active sip sessions");
+		}
+		sipSessionCounter++;
 		return new SipSessionImpl(key, sipFactoryImpl, mobicentsSipApplicationSession);
 	}
 
 	@Override
 	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
 			SipApplicationSessionKey key, SipContext sipContext) {
+		if ((maxActiveSipApplicationSessions >= 0) && (sipApplicationSessions.size() >= maxActiveSipApplicationSessions)) {
+			rejectedSipApplicationSessions++;
+            throw new IllegalStateException
+                ("could not create a new sip application session because there is currently too many active sip application sessions");
+		}
+		sipApplicationSessionCounter++;
 		return new SipApplicationSessionImpl(key, sipContext);
 	}
 

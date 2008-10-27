@@ -16,9 +16,13 @@
  */
 package org.mobicents.servlet.sip.startup.loading;
 
+import javax.management.Notification;
+import javax.management.ObjectName;
 import javax.servlet.ServletException;
 
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardWrapper;
+import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * Sip implementation of the <b>Wrapper</b> interface that represents
@@ -28,6 +32,17 @@ import org.apache.catalina.core.StandardWrapper;
  * @author Jean Deruelle
  */
 public class SipServletImpl extends StandardWrapper {
+	/**
+     * The descriptive information string for this implementation.
+     */
+    protected static final String info =
+        "org.mobicents.servlet.sip.startup.loading.SipServletImpl/1.0";
+    
+    protected static final String[] DEFAULT_SIP_SERVLET_METHODS = new String[] {
+        "INVITE", "ACK", "BYE", "CANCEL", "INFO", "MESSAGE", "SUBSCRIBE", "NOTIFY",
+        "OPTIONS", "PRACK", "PUBLISH", "REFER", "REGISTER", "UPDATE", 
+        "SUCESS_RESPONSE", "ERROR_RESPONSE", "BRANCN_RESPONSE", "REDIRECT_RESPONSE", "PROVISIONAL_RESPONSE" };
+    
 	private String icon;
 	private String servletName;
 	private String displayName;
@@ -97,4 +112,63 @@ public class SipServletImpl extends StandardWrapper {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	//copied over from super class changing the JMX name being registered j2eeType is now SipServlet instead of Servlet
+	protected void registerJMX(StandardContext ctx) {
+
+        String parentName = ctx.getName();
+        parentName = ("".equals(parentName)) ? "/" : parentName;
+
+        String hostName = ctx.getParent().getName();
+        hostName = (hostName==null) ? "DEFAULT" : hostName;
+
+        String domain = ctx.getDomain();
+
+        String webMod= "//" + hostName + parentName;
+        String onameStr = domain + ":j2eeType=SipServlet,name=" + getName() +
+                          ",WebModule=" + webMod + ",J2EEApplication=" +
+                          ctx.getJ2EEApplication() + ",J2EEServer=" +
+                          ctx.getJ2EEServer();
+        try {
+            oname=new ObjectName(onameStr);
+            controller=oname;
+            Registry.getRegistry(null, null)
+                .registerComponent(this, oname, null );
+            
+            // Send j2ee.object.created notification 
+            if (this.getObjectName() != null) {
+                Notification notification = new Notification(
+                                                "j2ee.object.created", 
+                                                this.getObjectName(), 
+                                                sequenceNumber++);
+                broadcaster.sendNotification(notification);
+            }
+        } catch( Exception ex ) {
+            log.info("Error registering servlet with jmx " + this);
+        }
+    }
+	
+	 /**
+     * Return descriptive information about this Container implementation and
+     * the corresponding version number, in the format
+     * <code>&lt;description&gt;/&lt;version&gt;</code>.
+     */
+    public String getInfo() {
+        return (info);
+    }
+    
+    /**
+     * Gets the names of the methods supported by the underlying servlet.
+     *
+     * This is the same set of methods included in the Allow response header
+     * in response to an OPTIONS request method processed by the underlying
+     * servlet.
+     *
+     * @return Array of names of the methods supported by the underlying
+     * servlet
+     */
+    public String[] getServletMethods() throws ServletException {
+        return DEFAULT_SIP_SERVLET_METHODS;
+    }
+
 }

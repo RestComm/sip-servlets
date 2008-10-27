@@ -603,6 +603,26 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		derivedSipSessions.clear();
 		derivedSipSessions = null;
+		
+		/*
+         * Compute how long this session has been alive, and update
+         * session manager's related properties accordingly
+         */
+        long timeNow = System.currentTimeMillis();
+        int timeAlive = (int) ((timeNow - creationTime)/1000);
+        SipManager manager = sipApplicationSession.getSipContext().getSipManager();
+        synchronized (manager) {
+            if (timeAlive > manager.getSipSessionMaxAliveTime()) {
+                manager.setSipSessionMaxAliveTime(timeAlive);
+            }
+            int numExpired = manager.getExpiredSipSessions();
+            numExpired++;
+            manager.setExpiredSessions(numExpired);
+            int average = manager.getSipSessionAverageAliveTime();
+            average = ((average * (numExpired-1)) + timeAlive)/numExpired;
+            manager.setSipSessionAverageAliveTime(average);
+        }
+		
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		sipSessionAttributeMap = null;

@@ -76,6 +76,11 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public class JBossCacheSipManager extends JBossCacheManager implements
 		SipManager {
 
+	/**
+     * The descriptive information about this implementation.
+     */
+    protected static final String info = "JBossCacheSipManager/1.0";
+    
 	protected static Logger logger = Logger.getLogger(JBossCacheSipManager.class);
 	
 	private SipManagerDelegate sipManagerDelegate;
@@ -2919,5 +2924,247 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 */
 	public SnapshotManager getSnapshotManager() {
 		return snapshotManager_;
+	}
+	
+	// JMX Statistics
+	/**
+	 * Return descriptive information about this Manager implementation and the
+	 * corresponding version number, in the format
+	 * <code>&lt;description&gt;/&lt;version&gt;</code>.
+	 */
+	public String getInfo() {
+		return (info);
+	}
+
+	/**
+	 * Return the maximum number of active Sessions allowed, or -1 for no limit.
+	 */
+	public int getMaxActiveSipSessions() {
+		return (this.sipManagerDelegate.getMaxActiveSipSessions());
+	}
+
+	/**
+	 * Set the maximum number of actives Sip Sessions allowed, or -1 for no
+	 * limit.
+	 * 
+	 * @param max
+	 *            The new maximum number of sip sessions
+	 */
+	public void setMaxActiveSipSessions(int max) {
+		this.sipManagerDelegate.setMaxActiveSipSessions(max);		
+	}
+
+	/**
+	 * Return the maximum number of active Sessions allowed, or -1 for no limit.
+	 */
+	public int getMaxActiveSipApplicationSessions() {
+		return (this.sipManagerDelegate.getMaxActiveSipApplicationSessions());
+	}
+
+	/**
+	 * Set the maximum number of actives Sip Application Sessions allowed, or -1
+	 * for no limit.
+	 * 
+	 * @param max
+	 *            The new maximum number of sip application sessions
+	 */
+	public void setMaxActiveSipApplicationSessions(int max) {
+		this.sipManagerDelegate.setMaxActiveSipApplicationSessions(max);
+	}
+
+	/**
+	 * Number of sip session creations that failed due to maxActiveSipSessions
+	 * 
+	 * @return The count
+	 */
+	public int getRejectedSipSessions() {
+		return sipManagerDelegate.getRejectedSipSessions();
+	}
+
+	public void setRejectedSipSessions(int rejectedSipSessions) {
+		this.sipManagerDelegate.setRejectedSipSessions(rejectedSipSessions);
+	}
+
+	/**
+	 * Number of sip session creations that failed due to maxActiveSipSessions
+	 * 
+	 * @return The count
+	 */
+	public int getRejectedSipApplicationSessions() {
+		return sipManagerDelegate.getRejectedSipApplicationSessions();
+	}
+
+	public void setRejectedSipApplicationSessions(
+			int rejectedSipApplicationSessions) {
+		this.sipManagerDelegate.setRejectedSipApplicationSessions(rejectedSipApplicationSessions);
+	}
+
+	public void setSipSessionCounter(int sipSessionCounter) {
+		this.sipManagerDelegate.setSipSessionCounter(sipSessionCounter);
+	}
+
+	/**
+	 * Total sessions created by this manager.
+	 * 
+	 * @return sessions created
+	 */
+	public int getSipSessionCounter() {
+		return sipManagerDelegate.getSipSessionCounter();
+	}
+
+	/**
+	 * Returns the number of active sessions
+	 * 
+	 * @return number of sessions active
+	 */
+	public int getActiveSipSessions() {
+		return sipManagerDelegate.getNumberOfSipSessions();
+	}
+
+	/**
+	 * Gets the longest time (in seconds) that an expired session had been
+	 * alive.
+	 * 
+	 * @return Longest time (in seconds) that an expired session had been alive.
+	 */
+	public int getSipSessionMaxAliveTime() {
+		return sipManagerDelegate.getSipSessionMaxAliveTime();
+	}
+
+	/**
+	 * Sets the longest time (in seconds) that an expired session had been
+	 * alive.
+	 * 
+	 * @param sessionMaxAliveTime
+	 *            Longest time (in seconds) that an expired session had been
+	 *            alive.
+	 */
+	public void setSipSessionMaxAliveTime(int sipSessionMaxAliveTime) {
+		this.sipManagerDelegate.setSipSessionMaxAliveTime(sipSessionMaxAliveTime);
+	}
+
+	/**
+	 * Gets the average time (in seconds) that expired sessions had been alive.
+	 * 
+	 * @return Average time (in seconds) that expired sessions had been alive.
+	 */
+	public int getSipSessionAverageAliveTime() {
+		return sipManagerDelegate.getSipSessionAverageAliveTime();
+	}
+
+	/**
+	 * Sets the average time (in seconds) that expired sessions had been alive.
+	 * 
+	 * @param sessionAverageAliveTime
+	 *            Average time (in seconds) that expired sessions had been
+	 *            alive.
+	 */
+	public void setSipSessionAverageAliveTime(int sipSessionAverageAliveTime) {
+		this.sipManagerDelegate.setSipSessionAverageAliveTime(sipSessionAverageAliveTime);
+	}
+
+	public void setSipApplicationSessionCounter(int sipApplicationSessionCounter) {
+		this.sipManagerDelegate.setSipApplicationSessionCounter(sipApplicationSessionCounter);
+	}
+
+	/**
+	 * Total sessions created by this manager.
+	 * 
+	 * @return sessions created
+	 */
+	public int getSipApplicationSessionCounter() {
+		return sipManagerDelegate.getSipApplicationSessionCounter();
+	}
+
+	/**
+	 * Returns the number of active sessions
+	 * 
+	 * @return number of sessions active
+	 */
+	public int getActiveSipApplicationSessions() {
+		return sipManagerDelegate.getNumberOfSipApplicationSessions();
+	}
+
+	/**
+	 * Gets the longest time (in seconds) that an expired session had been
+	 * alive.
+	 * 
+	 * @return Longest time (in seconds) that an expired session had been alive.
+	 */
+	public int getSipApplicationSessionMaxAliveTime() {
+		return sipManagerDelegate.getSipApplicationSessionMaxAliveTime();
+	}
+
+	/**
+	 * Sets the longest time (in seconds) that an expired session had been
+	 * alive.
+	 * 
+	 * @param sessionMaxAliveTime
+	 *            Longest time (in seconds) that an expired session had been
+	 *            alive.
+	 */
+	public void setSipApplicationSessionMaxAliveTime(
+			int sipApplicationSessionMaxAliveTime) {
+		this.sipManagerDelegate.setSipApplicationSessionMaxAliveTime(sipApplicationSessionMaxAliveTime);
+	}
+
+	/**
+	 * Gets the average time (in seconds) that expired sessions had been alive.
+	 * 
+	 * @return Average time (in seconds) that expired sessions had been alive.
+	 */
+	public int getSipApplicationSessionAverageAliveTime() {
+		return sipManagerDelegate.getSipApplicationSessionAverageAliveTime();
+	}
+
+	/**
+	 * Sets the average time (in seconds) that expired sessions had been alive.
+	 * 
+	 * @param sessionAverageAliveTime
+	 *            Average time (in seconds) that expired sessions had been
+	 *            alive.
+	 */
+	public void setSipApplicationSessionAverageAliveTime(
+			int sipApplicationSessionAverageAliveTime) {
+		this.sipManagerDelegate.setSipApplicationSessionAverageAliveTime(sipApplicationSessionAverageAliveTime);
+	}
+
+	/**
+	 * Gets the number of sessions that have expired.
+	 * 
+	 * @return Number of sessions that have expired
+	 */
+	public int getExpiredSipSessions() {
+		return sipManagerDelegate.getExpiredSipSessions();
+	}
+
+	/**
+	 * Sets the number of sessions that have expired.
+	 * 
+	 * @param expiredSessions
+	 *            Number of sessions that have expired
+	 */
+	public void setExpiredSipSessions(int expiredSipSessions) {
+		this.sipManagerDelegate.setExpiredSipSessions(expiredSipSessions);
+	}
+
+	/**
+	 * Gets the number of sessions that have expired.
+	 * 
+	 * @return Number of sessions that have expired
+	 */
+	public int getExpiredSipApplicationSessions() {
+		return sipManagerDelegate.getExpiredSipApplicationSessions();
+	}
+
+	/**
+	 * Sets the number of sessions that have expired.
+	 * 
+	 * @param expiredSessions
+	 *            Number of sessions that have expired
+	 */
+	public void setExpiredSipApplicationSessions(
+			int expiredSipApplicationSessions) {
+		this.sipManagerDelegate.setExpiredSipApplicationSessions(expiredSipApplicationSessions);
 	}
 }
