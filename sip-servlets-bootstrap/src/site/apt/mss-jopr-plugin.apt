@@ -1,0 +1,69 @@
+Jopr Integration
+
+* Description
+
+	Jopr is an enterprise management solution for JBoss middleware projects and other application technologies. 
+	This pluggable project provides administration, monitoring, alerting, operational control and configuration 
+	in an enterprise setting with fine-grained security and an advanced extension model. 
+	It provides support for monitoring base operating system information on six operating systems as well as 
+	management of Apache, JBoss Application Server and other related projects.
+	
+	See the jopr website for more information
+	
+	This documentation provides information on how to enable the management of Mobicents Sip Servlets Servers through our jopr plugin. 
+	
+* Features
+  
+	With the Mobicents Sip Servlet jopr plugin, you can currently manage the SipApplicationDispatcher which is a central piece in the Mobicents Sip Servlets Architecture since 
+	it has the responsibility of dispatching the SIP requests and responses (that is gets from the underlying jain-sip stack) to the deployed Sip Servlets applications.
+
+	You can define the Concurrency and congestion control settings (More information on {{{./concurrency.html}Mobicents Sip Servlets Concurrency and Congestion Control}}) 
+
+[mss-jopr-concurrency.png]
+
+[mss-jopr-queue.png]	
+	
+	and get the total number of SIP requests processed by the server and the number of pending messages to be processed in all queues.
+	
+[mss-jopr-metrics.png] 	    	
+  
+* Installation and Running Instructions
+
+		* Follow the {{{http://jboss.org/community/docs/DOC-12828}jopr installation instructions}} to install the latest version of jopr.
+	
+		* Make sure the jopr server and agent are running
+	
+		* Start your JBoss Application Server in making sure that you specify the binding address when starting such <<<sh run.sh -b 192.168.0.10>>> 
+		(the JBoss AS will not get recognized on localhost)
+
+		* Get the Mobicents Sip Servlets Jopr Plugin from the source code : <<<svn checkout http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/jopr-plugin mss-jopr-plugin>>>
+		
+		* In mss-jopr-plugin, do a mvn clean install
+	
+		* Then copy the generated <<<jopr-mobicents-sip-servlets-plugin-1.0-SNAPSHOT.jar>>> in the target directory to the <<<jopr-server-2.1.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/>>>
+	
+		* Wait a bit, 20 seconds maybe or as soon as you see the following message on the jopr server console : [ProductPluginDeployer] Deploying RHQ plugin MobicentsSipServlets (Mobicents Sip Servlets Application Container), undefined version...
+		and then from the jopr agent, run the command <<<plugins update>>>, it will get the newly deployed plugin from the jopr server and start collecting data about the SipApplicationDispatcher
+	
+		* Log in to the jopr console on <<<http://localhost:7080/>>> and from the Dashboard, in the Auto Discovery portlet, import your server (by example <<<deruelle-laptop JBossAS 4.2.2.GA default (192.168.0.12:1099)>>>) from under localhost.
+		
+[mss-jopr-auto-disc.png]		
+	
+		* Then from the Dashboard, in the Recently Added Resources portlet, click on the server, 
+		
+[mss-jopr-resources.png]
+		
+		* Then on the new Monitor view click on the JBossWeb Server link
+		
+[mss-jopr-monitor.png]
+		
+		* Then on the SipApplicationDispatcher link to see the metrics coming in.
+		
+[mss-jopr-jboss-web.png]
+	
+		* To get the metrics coming in, you will need to use an example application such as location service by example so that the SipApplicationDispatcher process requests.
+		
+[mss-jopr-metrics.png]		   
+	
+	
+	

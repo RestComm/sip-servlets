@@ -509,7 +509,13 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=320">
 						Mid Call Failover Support for Proxy Applications
 						</a>
-						<br />																				
+						<br />		
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=125">
+						JOPR Integration
+						</a>
+						<br />																		
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=127">
@@ -597,13 +603,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=122">
 						Basic IPBX
 						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=125">
-						JBON Integration
-						</a>
-						<br />							
+						<br />													
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=229">
