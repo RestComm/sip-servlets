@@ -80,7 +80,7 @@
 				
 				<li>Then on the SipApplicationDispatcher link to see the metrics coming in.</li>
 				
-				<a href="./mss-jopr-web.png"><img src="small-mss-jopr-jboss-web.png"/></a>
+				<a href="./mss-jopr-jboss-web.png"><img src="small-mss-jopr-jboss-web.png"/></a>
 			
 				<li>To get the metrics coming in, you will need to use an example application such as location service by example so that the SipApplicationDispatcher process requests.</li>
 				
