@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.mobicents.servlet.sip</groupId>
+	<artifactId>jopr-mobicents-sip-servlets-plugin</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Jopr Mobicents Sip Servlets Plugin</name>
+	<description>A plugin for managing Mobicents Sip Servlets servers</description>
+
+	<dependencies>
+
+		<!-- logging dependency -->
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>mc4j</groupId>
+			<artifactId>org-mc4j-ems</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.rhq</groupId>
+			<artifactId>rhq-core-plugin-api</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
+			<scope>provided</scope> <!-- by PC -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.rhq</groupId>
+			<artifactId>rhq-jmx-plugin</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
+			<scope>provided</scope> <!-- by PC -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.rhq</groupId>
+			<artifactId>rhq-core-domain</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
+			<scope>provided</scope> <!-- by PC -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.rhq</groupId>
+			<artifactId>rhq-core-domain</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
+			<scope>provided</scope> <!-- by PC -->
+		</dependency>
+
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>			
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>			
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.3.0.ga</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-commons-annotations</artifactId>
+			<version>3.3.0.ga</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<compilerArguments>
+						<g />
+					</compilerArguments>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

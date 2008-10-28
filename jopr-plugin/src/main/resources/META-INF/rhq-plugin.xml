@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<plugin name="MobicentsSipServlets"
+        displayName="Mobicents Sip Servlets Application Container"
+        package="org.rhq.plugins.mobicents.servlet.sip"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:xmlns:rhq-plugin"
+        xmlns:c="urn:xmlns:rhq-configuration">
+
+   	<depends plugin="JMX" />
+   	<depends plugin="JBossAS" useClasses="true"/>
+   
+	<service name="MobicentsSipServlets"
+         discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+          	 class="SipApplicationDispatcherComponent"
+         description="Statistics for SipapplicationDispatcher"
+         >
+
+		<runs-inside>
+   			<parent-resource-type name="Embedded Tomcat Server" plugin="JBossAS"/>
+      	</runs-inside>
+
+
+        	<plugin-configuration>
+           	<c:simple-property name="objectName" readOnly="true" default="jboss.web:type=SipApplicationDispatcher"/>            	
+        	</plugin-configuration>
+        
+         <operation name="resetStatistics" displayName="Reset Statistics" description="Resets all statistics" />
+         
+         <!--metric property=":numberOfNodes" displayName="Number of Nodes" displayType="summary" />
+   
+         <metric property="ActivationInterceptor:activations" displayName="Activations" 
+                 description="Number of passivated nodes that have been activated."/>
+         
+         <metric property="CacheLoaderInterceptor:cacheLoaderLoads" displayName="Cache Loader Loads" 
+                 measurementType="trendsup" description="Number of nodes loaded through a cache loader."/>
+         <metric property="CacheLoaderInterceptor:cacheLoaderMisses" displayName="Cache Loader Misses"
+                 measurementType="trendsup" description="Number of unsuccessful attempts to load a node through a cache loader."/>
+         
+         <metric property="CacheMgmtInterceptor:hits" displayName="Cache Hits" category="performance" 
+                 measurementType="trendsup" description="Number of successful attribute retrievals."/>
+         <metric property="CacheMgmtInterceptor:misses" displayName="Cache Misses" category="performance"
+                 measurementType="trendsup" description="Number of unsuccessful attribute retrievals."/>
+         <metric property="CacheMgmtInterceptor:hitMissRatio" displayName="Hit-miss-ratio" displayType="summary"
+                 description="Ratio of hits to hits and misses. A hit is a get attribute operation that results in an object being returned to the client. The retrieval may be from a cache loader if the entry isn't in the local cache."/>
+         <metric property="CacheMgmtInterceptor:readWriteRatio" displayName="Read-write-ratio" displayType="summary"
+                 description="Ratio of read operations to write operations. This is the ratio of cache hits and misses to cache stores."/>
+         <metric property="CacheMgmtInterceptor:stores" displayName="Cache Stores" category="performance" 
+                 measurementType="trendsup" description="Number of attribute store operations."/>
+         <metric property="CacheMgmtInterceptor:evictions" displayName="Cache Evictions" category="performance" 
+                 measurementType="trendsup" description="Number of node evictions."/>
+         <metric property="CacheMgmtInterceptor:numberOfAttributes" displayName="Number of Attributes" 
+                 category="performance" description="Number of attributes currently cached." />
+         <metric property="CacheMgmtInterceptor:numberOfNodes" displayName="Number of Nodes cached" 
+                 category="performance" description="Number of nodes currently cached."/>
+         <metric property="CacheMgmtInterceptor:elapsedTime" displayName="Elapsed Time" category="utilization" 
+                 measurementType="trendsup" description="Number of seconds that the cache has been running." 
+                 units="seconds"/>
+         <metric property="CacheMgmtInterceptor:timeSinceReset" displayName="Time since reset" category="utilization" 
+                 measurementType="trendsup" description="Number of seconds since the cache statistics have been reset." 
+                 units="seconds"/>
+         <metric property="CacheMgmtInterceptor:averageReadTime" displayName="Average Read Time" category="performance" 
+                 description="Average time in milliseconds to retrieve a cache attribute, including unsuccessful attribute retrievals." 
+                 units="milliseconds"/>
+         <metric property="CacheMgmtInterceptor:averageWriteTime" displayName="Average Write Time" 
+                 category="performance" description="Average time in milliseconds to write a cache attribute." 
+                 units="milliseconds"/>
+   
+         <metric property="CacheStoreInterceptor:cacheLoaderStores" displayName="Cache Loader Stores" 
+                 category="utilization" description="Number of nodes written to the cache loader." measurementType="trendsup" />
+   
+         <metric property="InvalidationInterceptor:invalidations" displayName="Invalidataions" 
+                 category="utilization" description="Number of cached nodes that have been invalidated." 
+                 measurementType="trendsup" />
+   
+         <metric property="PassivationInterceptor:passivations" displayName="Passivations" category="utilization" 
+                 description="Number of cached nodes that have been passivated." measurementType="trendsup"/>
+   
+         <metric property="TxInterceptor:prepares" displayName="Tx prepares" 
+                 description="Number of transaction prepare operations performed." measurementType="trendsup" />       
+         <metric property="TxInterceptor:commits" displayName="Tx commits" 
+                 description="Number of transaction commit operations performed." measurementType="trendsup" />       
+         <metric property="TxInterceptor:rollbacks" displayName="Tx rollbacks" 
+                 description="Number of transaction rollback operations performed." measurementType="trendsup" /-->       
+    
+                 
+    </service>
+</plugin>
