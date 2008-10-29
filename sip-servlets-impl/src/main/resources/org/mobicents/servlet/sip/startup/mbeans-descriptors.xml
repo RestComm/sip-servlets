@@ -343,55 +343,6 @@
       
   </mbean>
   
-  <!--mbean name="SipStandardEngine"
-         type="org.mobicents.servlet.sip.startup.SipStandardEngine"
-         description="Sip Standard Engine Component"
-         domain="Catalina"
-         group="Engine">
-    
-    <attribute name="defaultHost"
-               description="Name of the default Host for this Engine"
-               type="java.lang.String"/>
-      
-    <attribute   name="managedResource"
-               description="The managed resource this MBean is associated with"
-               type="java.lang.Object"/>
-      
-    <attribute   name="name"
-               description="Unique name of this Engine"
-               type="java.lang.String"/>
-      
-    <attribute   name="baseDir"
-               description="Base dir for this engine, typically same as catalina.base system property"
-               type="java.lang.String"/>
-      
-    <attribute   name="jvmRoute"
-               description="Route used for load balancing"
-               type="java.lang.String"/>
-      
-    <attribute name="realm"
-               description="Associated realm."
-               type="org.apache.catalina.Realm" />
-      
-    <attribute name="valveObjectNames"
-               description="ObjectNames for the valves associated with this container"
-               type="[Ljavax.management.ObjectName;"
-               writeable="false"/>
-
-    <operation name="addChild"
-               description="Add a virtual host"
-               impact="ACTION"
-               returnType="void">
-      <parameter name="child"
-                 description="Host object"
-                 type="org.apache.catalina.Container"/>
-    </operation>
-    
-    <operation name="start" description="Start" impact="ACTION" returnType="void" />
-    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
-      
-  </mbean-->
-  
   <!--mbean name="SipStandardService"
          description="Sip Standard Service Component"
          domain="Catalina"

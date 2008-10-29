@@ -18,14 +18,20 @@ package org.mobicents.servlet.sip.core.session;
 
 import java.util.Iterator;
 
+import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 /**
  * Extension of the Standard implementation of the <b>Manager</b> interface provided by Tomcat
@@ -44,6 +50,12 @@ public class SipStandardManager extends StandardManager implements SipManager {
      */
     protected static final String info = "SipStandardManager/1.0";
     
+    /**
+     * The descriptive name of this Manager implementation (for logging).
+     */
+    protected static String name = "SipStandardManager";
+
+    
 	/**
 	 * 
 	 * @param sipFactoryImpl
@@ -51,6 +63,32 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	public SipStandardManager() {
 		super();
 		sipManagerDelegate = new SipStandardManagerDelegate();
+	}
+
+	@Override
+	public void init() {
+		if( initialized ) return;	                
+	        
+        if(oname==null && this.getContainer() instanceof SipContext) {
+            SipStandardContext ctx=(SipStandardContext)this.getContainer();
+            domain=ctx.getEngineName();
+            distributable = ctx.getDistributable();
+            StandardHost hst=(StandardHost)ctx.getParent();
+            String path = ctx.getPath();
+            if (path.equals("")) {
+                path = "/";
+            }   
+            String objectNameString = domain + ":type=SipManager,path="
+            	+ path + ",host=" + hst.getName();
+            try {
+                oname=new ObjectName(objectNameString);
+                Registry.getRegistry(null, null).registerComponent(this, oname, null );
+            } catch (Exception e) {
+                throw new IllegalStateException("error registering the mbean " + objectNameString, e);
+            }
+        }
+
+		super.init();
 	}
 	
 	@Override
@@ -187,6 +225,13 @@ public class SipStandardManager extends StandardManager implements SipManager {
 		return (info);
 	}
 
+	/**
+     * Return the descriptive short name of this Manager implementation.
+     */
+    public String getName() {
+        return (name);
+    }
+	
 	/**
 	 * Return the maximum number of active Sessions allowed, or -1 for no limit.
 	 */
@@ -429,5 +474,31 @@ public class SipStandardManager extends StandardManager implements SipManager {
 			int expiredSipApplicationSessions) {
 		this.sipManagerDelegate.expiredSipApplicationSessions = expiredSipApplicationSessions;
 	}
-  
+
+	/** 
+     * For debugging: return a list of all session ids currently active
+     *
+     */
+    public String listSipSessionIds() {
+        StringBuffer sb=new StringBuffer();
+        Iterator<MobicentsSipSession> sipSessions = sipManagerDelegate.getAllSipSessions();
+        while (sipSessions.hasNext()) {
+            sb.append(sipSessions.next().getKey()).append(" ");
+        }
+        return sb.toString();
+    }
+    
+    /** 
+     * For debugging: return a list of all session ids currently active
+     *
+     */
+    public String listSipApplicationSessionIds() {
+    	StringBuffer sb=new StringBuffer();
+        Iterator<MobicentsSipApplicationSession> sipApplicationSessions = sipManagerDelegate.getAllSipApplicationSessions();
+        while (sipApplicationSessions.hasNext()) {
+            sb.append(sipApplicationSessions.next().getKey()).append(" ");
+        }
+        return sb.toString();
+    }
+	
 }

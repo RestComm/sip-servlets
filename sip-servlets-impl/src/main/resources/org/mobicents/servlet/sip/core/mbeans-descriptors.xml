@@ -8,15 +8,27 @@
 
 		<attribute name="managedResource"
 			description="The managed resource this MBean is associated with"
-			type="java.lang.Object" />
+			type="java.lang.Object"
+			writeable="false" />
 			
 		<attribute name="concurrencyControlMode"
 			description="Concurrent control mode specifies if requests should be executed sequentially"
-			type="org.mobicents.servlet.sip.core.ConcurrencyControlMode" />
+			type="org.mobicents.servlet.sip.core.ConcurrencyControlMode" 
+			writeable="false"/>
 			
 		<attribute name="queueSize"
 			description="Maximum number of pending messages allowed to wait in a queue to be executed"
 			type="int" />
+			
+		<attribute name="requestsProcessed"
+			description="number of requests processed by the sip application dispatcher"
+			type="long"
+			writeable="false" />
+
+		<attribute name="numberOfPendingMessages"
+			description="number of pending messages in all queues for all concurrency control modes."
+			type="int"
+			writeable="false" />
 
 		<operation name="findInstalledSipApplications"
 			description="Enumerate applications"

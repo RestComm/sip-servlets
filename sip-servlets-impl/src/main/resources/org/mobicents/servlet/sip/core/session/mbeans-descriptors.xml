@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean         name="SipStandardManager"
+          description="Standard implementation of the SipManager interface"
+               domain="Catalina"
+                group="SipManager"
+                 type="org.mobicents.servlet.sip.core.session.SipStandardManager">
+
+    <attribute   name="algorithm"
+          description="The message digest algorithm to be used when generating
+                       session identifiers"
+                 type="java.lang.String"/>
+
+
+    <attribute   name="randomFile"
+          description="File source of random - /dev/urandom or a pipe"
+                 type="java.lang.String"/>
+
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="distributable"
+          description="The distributable flag for Sessions created by this
+                       Manager"
+                 type="boolean"/>
+
+    <attribute   name="entropy"
+          description="A String initialization parameter used to increase the
+                       entropy of the initialization of our random number
+                       generator"
+                 type="java.lang.String"/>
+
+    <attribute   name="maxActiveSessions"
+          description="The maximum number of active Sessions allowed, or -1
+                       for no limit"
+                 type="int"/>
+
+    <attribute   name="maxInactiveInterval"
+          description="The default maximum inactive interval for Sessions
+                       created by this Manager"
+                 type="int"/>
+                 
+    <attribute   name="maxActiveSipSessions"
+          description="The maximum number of active Sip Sessions allowed, or -1
+                       for no limit"
+                 type="int"/>
+                 
+    <attribute   name="maxActiveSipApplicationSessions"
+          description="The maximum number of active sip Application Sessions allowed, or -1
+                       for no limit"
+                 type="int"/>
+
+    <attribute   name="maxInactiveInterval"
+          description="The default maximum inactive interval for Sessions
+                       created by this Manager"
+                 type="int"/>
+
+    <attribute name="processExpiresFrequency"
+               description="The frequency of the manager checks (expiration and passivation)"
+               type="int"/>
+               
+    <attribute   name="sessionIdLength"
+          description="The session id length (in bytes) of Sessions
+                       created by this Manager"
+                 type="int"/>
+
+    <attribute   name="name"
+          description="The descriptive name of this Manager implementation
+                       (for logging)"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="pathname"
+          description="Path name of the disk file in which active sessions"
+                 type="java.lang.String"/>
+
+    <attribute   name="activeSessions"
+          description="Number of active sessions at this moment"
+                 type="int" 
+            writeable="false"/>
+            
+    <attribute   name="activeSipSessions"
+          description="Number of active sip sessions at this moment"
+                 type="int" 
+            writeable="false"/>
+            
+    <attribute   name="activeSipApplicationSessions"
+          description="Number of active sip application sessions at this moment"
+                 type="int" 
+            writeable="false"/>
+
+    <attribute   name="sessionCounter"
+          description="Total number of sessions created by this manager"
+                 type="int" />
+                 
+	<attribute   name="sipSessionCounter"
+          description="Total number of sip sessions created by this manager"
+                 type="int" />
+                 
+	<attribute   name="sipApplicationSessionCounter"
+          description="Total number of sip application sessions created by this manager"
+                 type="int" />                                  
+
+    <attribute   name="maxActive"
+          description="Maximum number of active sessions so far"
+                 type="int" />
+                 
+	<attribute   name="maxActiveSipSessions"
+          description="Maximum number of active sip sessions so far"
+                 type="int" />
+                 
+	<attribute   name="maxActiveSipApplicationSessions"
+          description="Maximum number of active sip application sessions so far"
+                 type="int" />                                
+
+    <attribute   name="sessionMaxAliveTime"
+          description="Longest time an expired session had been alive"
+                 type="int" />
+
+	<attribute   name="sipSessionMaxAliveTime"
+          description="Longest time an expired sip session had been alive"
+                 type="int" />
+
+	<attribute   name="sipApplicationSessionMaxAliveTime"
+          description="Longest time an expired sip application session had been alive"
+                 type="int" />
+
+    <attribute   name="sessionAverageAliveTime"
+          description="Average time an expired session had been alive"
+                 type="int" />
+                 
+	<attribute   name="sipSessionAverageAliveTime"
+          description="Average time an expired sip session had been alive"
+                 type="int" />
+                 
+	<attribute   name="sipApplicationSessionAverageAliveTime"
+          description="Average time an expired sip application session had been alive"
+                 type="int" />
+
+    <attribute   name="rejectedSessions"
+          description="Number of sessions we rejected due to maxActive beeing reached"
+                 type="int" />
+                 
+	<attribute   name="rejectedSipSessions"
+          description="Number of sip sessions we rejected due to maxActive beeing reached"
+                 type="int" />
+                 
+	<attribute   name="rejectedSipApplicationSessions"
+          description="Number of sip application sessions we rejected due to maxActive beeing reached"
+                 type="int" />                                  
+
+    <attribute   name="expiredSessions"
+          description="Number of sessions that expired ( doesn't include explicit invalidations )"
+                 type="int" />
+                 
+	<attribute   name="expiredSipSessions"
+          description="Number of sip sessions that expired ( doesn't include explicit invalidations )"
+                 type="int" />
+                 
+	<attribute   name="expiredSipApplicationSessions"
+          description="Number of sip application sessions that expired ( doesn't include explicit invalidations )"
+                 type="int" />                                  
+
+    <attribute   name="processingTime"
+          description="Time spent doing housekeeping and expiration"
+                 type="long" />
+
+    <attribute   name="duplicates"
+          description="Number of duplicated session ids generated"
+                 type="int" />
+
+    <operation   name="listSessionIds"
+          description="Return the list of active session ids"
+               impact="ACTION"
+           returnType="java.lang.String">
+    </operation>
+
+	<operation   name="listSipSessionIds"
+          description="Return the list of active session ids"
+               impact="ACTION"
+           returnType="java.lang.String">
+    </operation>
+    
+    <operation   name="listSipApplicationSessionIds"
+          description="Return the list of active session ids"
+               impact="ACTION"
+           returnType="java.lang.String">
+    </operation>
+
+    <operation   name="getSessionAttribute"
+          description="Return a session attribute"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+      <parameter name="key"
+          description="key of the attribute"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="expireSession"
+          description="Expire a session"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getLastAccessedTime"
+          description="Get the last access time"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+
+  </mbean>
+</mbeans-descriptors>
