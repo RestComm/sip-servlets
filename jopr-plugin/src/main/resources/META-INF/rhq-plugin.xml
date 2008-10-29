@@ -9,7 +9,7 @@
         xmlns="urn:xmlns:rhq-plugin"
         xmlns:c="urn:xmlns:rhq-configuration">
 
-   	<depends plugin="JMX" />
+   	<depends plugin="JMX"/>
    	<depends plugin="JBossAS" useClasses="true"/>
    
 	<service name="MobicentsSipServlets"
@@ -41,4 +41,197 @@
      	<metric displayName="Number of pending messages in all queues" property="numberOfPendingMessages"
              defaultOn="true" defaultInterval="500" displayType="summary"/>
     </service>
+    
+    <service name="Converged SIP/Web Application (WAR/SAR)"
+               subCategory="Applications"
+               class="org.rhq.plugins.mobicents.servlet.sip.ConvergedWarComponent"
+               discovery="org.rhq.plugins.mobicents.servlet.sip.ConvergedWarDiscoveryComponent"
+               description="Converged Web Application"
+               createDeletePolicy="both"
+               creationDataType="content">
+
+         <!-- jboss.management.local:J2EEApplication=null,J2EEServer=Local,j2eeType=WebModule,name=<NAME> -->
+		<runs-inside>
+   			<parent-resource-type name="JBossAS Server" plugin="JBossAS"/>
+      	</runs-inside>
+      	
+         <plugin-configuration>
+            <c:group name="General">
+               <c:simple-property name="name" description="The name of this WAR/SAR" readOnly="true"/>
+               <c:simple-property name="filename" readOnly="true"/>
+               <c:simple-property name="objectName" readOnly="true"
+                                  default="jboss.management.local:J2EEApplication=null,J2EEServer=Local,j2eeType=WebModule,name=%name%"/>
+               <c:simple-property name="contextRoot" readOnly="true" required="false"
+                                  description="this WAR/SAR's context root - used as a unique path prefix for URLs corresponding to this WAR"/>
+               <c:simple-property name="vHost" displayName="Virtual Host" readOnly="true" required="false"
+                                  description="The (virtual) host that this application is running on. If no virtual host is set, this defaults to 'localhost'"/>                   
+               <c:simple-property name="jbossWebName" readOnly="true" required="false"
+                                  description="the objectName for the jboss.web WebModule that will be used to fire operations"/>
+            </c:group>
+            <c:group name="ResponseTime">
+               <c:simple-property name="responseTimeLogFile" required="false"
+                                  description="the full path to the log file containing response-time stats for this sipapp"/>
+               <c:simple-property name="responseTimeUrlExcludes" required="false"
+                                  description="a space-delimited list of regular expressions specifying URLs that should be excluded from response-time stats collection"/>
+               <c:simple-property name="responseTimeUrlTransforms" required="false"
+                                  description="a space-delimited list of Perl-style substitution expressions that should be applied to all URLs for which response-time stats are collected (e.g. |^/dept/finance/.*|/dept/finance/*|)"/>
+            </c:group>
+            <c:group name="Advanced" hiddenByDefault="true">
+               <c:simple-property name="nameTemplate" default="{name}"/>
+               <c:simple-property name="extension" default="war" readOnly="true"/>
+               <c:simple-property name="descriptionTemplate" default="Web Application" readOnly="true"/>
+            </c:group>
+         </plugin-configuration>
+
+         <operation name="start"
+                    description="starts this sipapp; NOTE: this operation is *not* supported for JBossAS versions prior to 4.2.2.GA"/>
+         <operation name="stop"
+                    description="stops this sipapp; NOTE: this operation is *not* supported for JBossAS versions prior to 4.2.2.GA"/>
+         <operation name="reload"
+                    description="reloads this sipapp; NOTE: if the sipapp is not in the started state, this operation will fail"/>                                   
+
+         <metric property="ContextRoot" displayName="Context Root"
+                 dataType="trait" displayType="summary"
+                 description="this WAR/SAR's context root - used as a unique path prefix for URLs corresponding to this WAR/SAR"/>
+         
+         <metric property="ResponseTime" displayName="HTTP Response Time"
+                 dataType="calltime" defaultOn="false" units="milliseconds" destinationType="URL"
+                 description="the minimum, maximum, and average response times for HTTP requests serviced by this sipapp"/>
+
+            <metric property="Servlet.MinResponseTime" displayName="Min. Servlet Resp. Time"
+                    units="milliseconds"
+                    description="Minimum response time of a servlet"/>
+
+            <metric property="Servlet.AvgResponseTime" displayName="Avg. Servlet Resp. Time"
+                    units="milliseconds"
+                    description="Average response time of a servlet"/>
+
+            <metric property="Servlet.MaxResponseTime" displayName="Max. Servlet Resp. Time"
+                    units="milliseconds"
+                    description="Maximum response time of a servlet"/>
+                    
+            <metric property="Servlet.TotalTime" displayName="Total processing time" 
+                 units="milliseconds"
+                 description="Total processing time of the sipapp" measurementType="trendsup"/>                    
+                    
+            <metric property="Servlet.NumRequests" displayName="Requests served" 
+                    units="none" description="Number of requests served by servlets"
+                    measurementType="trendsup" displayType="summary"/>
+                    
+            <metric property="Servlet.NumErrors" displayName="Errors while processing"
+                    units="none" description="Number of errors while processing"
+                    measurementType="trendsup" displayType="summary"/>
+                    
+            <metric property="SipSession.activeSessions" displayName="Currently Active Sessions"
+                    units="none" description="Number active sessions for the sipapp right now" />
+
+            <metric property="SipSession.maxActive" displayName="Maximum number of Active Sessions"
+                    units="none" description="Maximum number of active sessions for the sipapp" />
+
+            <metric property="SipSession.sessionCounter" displayName="Sessions created"
+                    units="none" description="Number of sessions created for the sipapp"
+                    measurementType="trendsup" />
+
+            <metric property="SipSession.expiredSessions" displayName="Expired Sessions"
+                    units="none" description="Number of expired sessions for the sipapp"
+                    measurementType="trendsup" />
+                    
+            <metric property="SipSession.rejectedSessions" displayName="Rejected Sessions"
+                    units="none" description="Number of sessions rejected for the sipapp"
+                    measurementType="trendsup" />
+
+            <metric property="SipSession.sessionAverageAliveTime" displayName="Session Average alive time"
+                    units="seconds" description="Average alive time of a Sessions" />
+
+            <metric property="SipSession.sessionMaxAliveTime" displayName="Max Session alive time"
+                    units="seconds" description="Maximum alive time of a Sessions" />
+                    
+            <metric property="SipServlet.MinResponseTime" displayName="Min. Servlet Resp. Time"
+                    units="milliseconds"
+                    description="Minimum response time of a sip servlet"/>
+
+            <metric property="SipServlet.AvgResponseTime" displayName="Avg. Servlet Resp. Time"
+                    units="milliseconds"
+                    description="Average response time of a sip servlet"/>
+
+            <metric property="SipServlet.MaxResponseTime" displayName="Max. Servlet Resp. Time"
+                    units="milliseconds"
+                    description="Maximum response time of a sip servlet"/>
+                    
+            <metric property="SipServlet.TotalTime" displayName="Total processing time" 
+                 units="milliseconds"
+                 description="Total processing time of the sipapp" measurementType="trendsup"/>                    
+                    
+            <metric property="SipServlet.NumRequests" displayName="Requests served" 
+                    units="none" description="Number of requests served by sip servlets"
+                    measurementType="trendsup" displayType="summary"/>
+                    
+            <metric property="SipServlet.NumErrors" displayName="Errors while processing"
+                    units="none" description="Number of errors while processing"
+                    measurementType="trendsup" displayType="summary"/>
+                                
+            <metric property="SipSession.activeSipSessions" displayName="Currently Active Sip Sessions"
+                    units="none" description="Number active sip sessions for the sipapp right now" />
+
+            <metric property="SipSession.maxActiveSipSessions" displayName="Maximum number of Active Sip Sessions"
+                    units="none" description="Maximum number of active sip sessions for the sipapp" />
+
+            <metric property="SipSession.sipSessionCounter" displayName="Sip Sessions created"
+                    units="none" description="Number of sip sessions created for the sipapp"
+                    measurementType="trendsup" />
+
+            <metric property="SipSession.expiredSipSessions" displayName="Expired Sip Sessions"
+                    units="none" description="Number of expired  sip sessions for the sipapp"
+                    measurementType="trendsup" />
+                    
+            <metric property="SipSession.rejectedSipSessions" displayName="Rejected Sip Sessions"
+                    units="none" description="Number of sip sessions rejected for the sipapp"
+                    measurementType="trendsup" />
+
+            <metric property="SipSession.sipSessionAverageAliveTime" displayName="Sip Session Average alive time"
+                    units="seconds" description="Average alive time of a Sip Sessions" />
+
+            <metric property="SipSession.sipSessionMaxAliveTime" displayName="Max Sip Session alive time"
+                    units="seconds" description="Maximum alive time of a Sip Sessions" />
+
+			<metric property="SipSession.activeSipApplicationSessions" displayName="Currently Active Sip Application Sessions"
+                    units="none" description="Number active sip application sessions for the sipapp right now" />
+
+            <metric property="SipSession.maxActiveSipApplications" displayName="Maximum number of Active Sip Application Sessions"
+                    units="none" description="Maximum number of active sip application sessions for the sipapp" />
+
+            <metric property="SipSession.sipApplicationSessionCounter" displayName="Sip Application Sessions created"
+                    units="none" description="Number of sip application sessions created for the sipapp"
+                    measurementType="trendsup" />
+
+            <metric property="SipSession.expiredSipApplicationSessions" displayName="Expired Sip Application Sessions"
+                    units="none" description="Number of expired Sip Application sessions for the sipapp"
+                    measurementType="trendsup" />
+                    
+            <metric property="SipSession.rejectedSipApplicationSessions" displayName="Rejected Sip Application Sessions"
+                    units="none" description="Number of Sip Application sessions rejected for the sipapp"
+                    measurementType="trendsup" />
+
+            <metric property="SipSession.sipApplicationSessionAverageAliveTime" displayName="Sip Application Session Average alive time"
+                    units="seconds" description="Average alive time of a Sip Application Sessions" />
+
+            <metric property="SipSession.sipApplicationSessionMaxAliveTime" displayName="Max Sip Application Session alive time"
+                    units="seconds" description="Maximum alive time of a Sip Application Sessions" />
+                    
+            <metric property="Vhost.name" displayName="Vhost" dataType="trait" defaultOn="true"
+                    description="Virtual hosts this app runs on"/>
+                 
+         <content name="file" displayName="WAR File" category="deployable" isCreationType="true">
+            <configuration>
+               <c:group name="deployment" displayName="Deployment Options">
+                  <c:simple-property name="deployZipped" displayName="Deploy Zipped" type="boolean" default="false" required="true"
+                                     description="Indicates if the WAR is deployed either zipped or exploded."/>
+                  <c:simple-property name="deployDirectory" displayName="Deploy Directory" type="string" default="deploy" required="true"
+                                     description="Path to deploy the file. This must be a path relative to the AS configuration set in use."/>
+               </c:group>
+            </configuration>
+         </content>
+
+      </service>
+    
 </plugin>

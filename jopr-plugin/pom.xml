@@ -35,8 +35,33 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.jboss.on</groupId>
+		   	<artifactId>jopr-jboss-as-plugin</artifactId>
+		   	<version>2.2.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.on</groupId>
+		   	<artifactId>jopr-tomcat-plugin</artifactId>
+		   	<version>2.2.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+		   	<artifactId>annotations</artifactId>
+		   	<version>7.0.2</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.rhq</groupId>
 			<artifactId>rhq-core-plugin-api</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
+			<scope>provided</scope> <!-- by PC -->
+		</dependency>
+		
+		<dependency>
+			<groupId>org.rhq</groupId>
+			<artifactId>rhq-core-native-system</artifactId>
 			<version>1.2.0-SNAPSHOT</version>
 			<scope>provided</scope> <!-- by PC -->
 		</dependency>
