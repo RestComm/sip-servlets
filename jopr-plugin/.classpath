@@ -11,7 +11,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-commons-annotations/3.3.0.ga/hibernate-commons-annotations-3.3.0.ga.jar"/>
 	<classpathentry kind="var" path="M2_REPO/mc4j/org-mc4j-ems/1.2.5/org-mc4j-ems-1.2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-domain/1.2.0-SNAPSHOT/rhq-core-domain-1.2.0-SNAPSHOT.jar" sourcepath="/RHQ_HOME/modules/core/domain/src"/>
-	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-plugin-api/1.2.0-SNAPSHOT/rhq-core-plugin-api-1.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-plugin-api/1.2.0-SNAPSHOT/rhq-core-plugin-api-1.2.0-SNAPSHOT.jar" sourcepath="/RHQ_HOME/modules/core/plugin-api/src"/>
 	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-jmx-plugin/1.2.0-SNAPSHOT/rhq-jmx-plugin-1.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jetbrains/annotations/7.0.2/annotations-7.0.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/on/jopr-jboss-as-plugin/2.2.0-SNAPSHOT/jopr-jboss-as-plugin-2.2.0-SNAPSHOT.jar"/>

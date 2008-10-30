@@ -45,8 +45,13 @@ import org.rhq.plugins.jmx.MBeanResourceComponent;
 /**
  * Provides helper methods that are used by both {@link WarDiscoveryComponent} and {@link EmbeddedWarDiscoveryComponent}
  *
+ * Original file copied over from jopr jboss as plugin trunk rev 26
+ * It has been copied because it uses ConvergedDeploymentUtility and 
+ * since methods in this class are static they couldn't be extended by inheritance
+ *
  * @author Ian Springer
  * @author Heiko W. Rupp
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class ConvergedWarDiscoveryHelper {
     private static final Log LOG = LogFactory.getLog(ConvergedWarDiscoveryHelper.class);
@@ -155,7 +160,7 @@ public class ConvergedWarDiscoveryHelper {
         WarDeploymentInformation deploymentInformation) {
         // JBNADM-3420 - These are being set incorrectly. Specifically, the incorrect file name is causing invalid
         // file names on windows and thus breaking WAR updates.
-        //        pluginConfig.put(new PropertySimple(WarComponent.FILE_NAME, deploymentInformation.getFileName()));
+        pluginConfig.put(new PropertySimple(ConvergedWarComponent.FILE_NAME, deploymentInformation.getFileName()));
         pluginConfig.put(new PropertySimple(ConvergedWarComponent.JBOSS_WEB_NAME, deploymentInformation
             .getJbossWebModuleMBeanObjectName()));
         pluginConfig.put(new PropertySimple(ConvergedWarComponent.CONTEXT_ROOT_CONFIG_PROP, deploymentInformation

@@ -56,8 +56,14 @@ import org.rhq.plugins.jmx.ObjectNameQueryUtility;
 /**
  * A JON plugin resource component for managing a webapp deployed to a JBossAS server.
  *
+ * Original file copied over from jopr jboss as plugin trunk rev 26.
+ * 
+ * Sip Session and Sip Application Session metrics specific to sip application are collected
+ * Manager has been changed to SipManager in the object name JMX fecthing
+ *
  * @author Ian Springer
  * @author Heiko W. Rupp
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class ConvergedWarComponent extends ApplicationResourceComponent<JBossASServerComponent> implements OperationFacet {
     private static final String SERVLET_PREFIX = "Servlet.";

@@ -35,7 +35,12 @@ import org.rhq.plugins.jmx.JMXComponent;
 /**
  * A JON plugin discovery component for discovering standalone webapps deployed to a JBossAS server.
  *
+ * Original file copied over from jopr jboss as plugin trunk rev 26
+ * It has been copied because it uses ConvergedWarDiscoveryHelper and 
+ * since methods in this class are static they couldn't be extended by inheritance
+ *
  * @author Ian Springer
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class ConvergedWarDiscoveryComponent extends ApplicationDiscoveryComponent {
 	private static final Log log = LogFactory.getLog(ConvergedWarDiscoveryComponent.class);

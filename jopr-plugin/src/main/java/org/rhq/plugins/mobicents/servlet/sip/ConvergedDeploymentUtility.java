@@ -3,6 +3,7 @@
  */
 package org.rhq.plugins.mobicents.servlet.sip;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,8 +23,13 @@ import org.rhq.plugins.jbossas.util.WarDeploymentInformation;
 import org.rhq.plugins.jmx.ObjectNameQueryUtility;
 
 /**
- * @author deruelle
+ * Accesses the MainDeployer mbean to find the deployment files behind services.
  *
+ * Original file copied over from jopr jboss as plugin trunk rev 26. 
+ * getVHosts method has been modified to fetch SipManager instead of Manager
+ * 
+ * @author Greg Hinkle
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class ConvergedDeploymentUtility {
 	private static Log log = LogFactory.getLog(ConvergedDeploymentUtility.class);
@@ -67,6 +73,9 @@ public class ConvergedDeploymentUtility {
             return null;
         }
 
+        String separator = System.getProperty("file.separator");
+        boolean isOnWin = separator.equals("\\");
+        
         // Loop through the deployments, get the name information and compare it to the collection
         // of strings passed into this method
         //        Interpreter i = new Interpreter();
@@ -93,7 +102,14 @@ public class ConvergedDeploymentUtility {
 
                             String file = getFieldValue(sdi, "url", URL.class).toString();
                             if (file.startsWith("file:/")) {
-                                file = file.substring(5);
+                                if (isOnWin) {
+                                   file = file.substring(6);
+                                   // listDeployed() always delivers / as path separator, so we need to correct this.
+                                   File tmp = new File(file);
+                                   file = tmp.getCanonicalPath();
+                                }
+                                else
+                                   file = file.substring(5);
                             }
 
                             /*
