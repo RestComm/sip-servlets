@@ -25,22 +25,7 @@
 			<p>
 				With the Mobicents Sip Servlet jopr plugin, you can currently see metrics related to your deployed applications and manage the SipApplicationDispatcher which is a central piece in the Mobicents Sip Servlets Architecture since 
 				it has the responsibility of dispatching the SIP requests and responses (that is gets from the underlying jain-sip stack) to the deployed Sip Servlets applications.<br/>
-			</p>
-			<p>
-				On your deployed applications, you can see http (since your applications can be converged applications) and sip metrics.<br/>
-				Regarding the http metrics, you can get the same ones as those provided by the <a href="http://www.jboss.org/community/docs/DOC-12829">Tomcat Jopr plugin</a><br/>
-				Regarding the SIP metrics, for each application be it a pure SIP application, a converged HTTP/SIP application or a SIP application embedded in an EAR :<br/>
-				<ul>
-					<li>Currently Active Sip Sessions and Sip Application Sessions</li>
-            		<li>Maximum number of Active Sip Sessions and Sip Application Sessions</li>
-                    <li>Number of sip sessions created for the sipapp and Sip Application Sessions</li>
-                    <li>Number of expired sip sessions and Sip Application Sessions</li>
-                    <li>Number of sip sessions and Sip Application Sessions rejected</li>
-            		<li>Sip Session and Sip Application Sessions Average alive time</li>
-					<li>Max Sip Session and Sip Application Sessions alive time</li>
-				</ul>
-				<a href="./mss-jopr-concurrency.png"><img src="small-mss-jopr-concurrency.png" /></a>
-			</p>
+			</p>			
 			<p>
 				On the SipApplicationDispatcher, you can define the Concurrency
 			</p>
@@ -60,6 +45,21 @@
 			</p>
 			<p>
 				<a href="./mss-jopr-metrics.png"><img src="small-mss-jopr-metrics.png" /></a>
+			</p>
+			<p>
+				On your deployed applications, you can see http (since your applications can be converged applications) and sip metrics.<br/>
+				Regarding the http metrics, you can get the same ones as those provided by the <a href="http://www.jboss.org/community/docs/DOC-12829">Tomcat Jopr plugin</a><br/>
+				Regarding the SIP metrics, for each application, be it a pure SIP application, a converged HTTP/SIP application or a SIP application embedded in an EAR, you can see the following metrics :<br/>
+				<ul>
+					<li>Currently Active Sip Sessions and Sip Application Sessions</li>
+            		<li>Maximum number of Active Sip Sessions and Sip Application Sessions</li>
+                    <li>Number of sip sessions created for the sipapp and Sip Application Sessions</li>
+                    <li>Number of expired sip sessions and Sip Application Sessions</li>
+                    <li>Number of sip sessions and Sip Application Sessions rejected</li>
+            		<li>Sip Session and Sip Application Sessions Average alive time</li>
+					<li>Max Sip Session and Sip Application Sessions alive time</li>
+				</ul>	
+				<a href="./mss-jopr-session-metrics.png"><img src="small-mss-jopr-session-metrics.png"/>	</a>			
 			</p>
 		</section>
 		<section name="Installation and Running Instructions">
@@ -103,7 +103,7 @@
 				
 				<li>To see Metrics about your application, click on the <b>Converged SIP/Web Application (SAR/WAR)</b> link.</li>
 				
-				<a href="./mss-jopr-sipapps.png"><img src="small-mss-jopr-sipapps.png"/>	</a>
+				<a href="./mss-jopr-sip-apps.png"><img src="small-mss-jopr-sip-apps.png"/>	</a>
 				
 				<li>Then click on your application.</li>
 				
