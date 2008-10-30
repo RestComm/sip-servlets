@@ -363,6 +363,11 @@ public class ProxyImpl implements Proxy, Serializable {
 	public void startProxy() {
 		if(this.ackReceived) 
 			throw new IllegalStateException("Can't start. ACK has been received.");
+		if(!this.originalRequest.isInitial())
+			throw new IllegalStateException("Applications should not attepmt to " +
+					"proxy subsequent requests. Proxying the initial request is " +
+					"sufficient to carry all subsequent requests through the same" +
+					" path.");
 
 		// Only send TRYING when the request is INVITE, needed by testProxyGen2xx form TCK (it sends MESSAGE)
 		if(this.originalRequest.getMethod().equals(Request.INVITE) && !tryingSent) {
