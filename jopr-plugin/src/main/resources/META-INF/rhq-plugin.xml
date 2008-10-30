@@ -120,29 +120,29 @@
                     units="none" description="Number of errors while processing"
                     measurementType="trendsup" displayType="summary"/>
                     
-            <metric property="SipSession.activeSessions" displayName="Currently Active Sessions"
-                    units="none" description="Number active sessions for the sipapp right now" />
+            <metric property="SipSession.activeSessions" displayName="Currently Active Http Sessions"
+                    units="none" description="Number active Http sessions for the sipapp right now" />
 
-            <metric property="SipSession.maxActive" displayName="Maximum number of Active Sessions"
-                    units="none" description="Maximum number of active sessions for the sipapp" />
+            <metric property="SipSession.maxActive" displayName="Maximum number of Active Http Sessions"
+                    units="none" description="Maximum number of active Http sessions for the sipapp" />
 
-            <metric property="SipSession.sessionCounter" displayName="Sessions created"
-                    units="none" description="Number of sessions created for the sipapp"
+            <metric property="SipSession.sessionCounter" displayName="Http Sessions created"
+                    units="none" description="Number of Http sessions created for the sipapp"
                     measurementType="trendsup" />
 
-            <metric property="SipSession.expiredSessions" displayName="Expired Sessions"
-                    units="none" description="Number of expired sessions for the sipapp"
+            <metric property="SipSession.expiredSessions" displayName="Expired Http Sessions"
+                    units="none" description="Number of expired Http sessions for the sipapp"
                     measurementType="trendsup" />
                     
-            <metric property="SipSession.rejectedSessions" displayName="Rejected Sessions"
-                    units="none" description="Number of sessions rejected for the sipapp"
+            <metric property="SipSession.rejectedSessions" displayName="Rejected Http Sessions"
+                    units="none" description="Number of Http sessions rejected for the sipapp"
                     measurementType="trendsup" />
 
-            <metric property="SipSession.sessionAverageAliveTime" displayName="Session Average alive time"
-                    units="seconds" description="Average alive time of a Sessions" />
+            <metric property="SipSession.sessionAverageAliveTime" displayName="Http Session Average alive time"
+                    units="seconds" description="Average alive time of a Http Sessions" />
 
-            <metric property="SipSession.sessionMaxAliveTime" displayName="Max Session alive time"
-                    units="seconds" description="Maximum alive time of a Sessions" />
+            <metric property="SipSession.sessionMaxAliveTime" displayName="Max Http Session alive time"
+                    units="seconds" description="Maximum alive time of a Http Sessions" />
                                                         
             <metric property="SipSession.activeSipSessions" displayName="Currently Active Sip Sessions"
                     units="none" description="Number active sip sessions for the sipapp right now" />
@@ -277,29 +277,29 @@
                     units="none" description="Number of errors while processing"
                     measurementType="trendsup" displayType="summary"/>
                     
-            <metric property="SipSession.activeSessions" displayName="Currently Active Sessions"
-                    units="none" description="Number active sessions for the sipapp right now" />
+            <metric property="SipSession.activeSessions" displayName="Currently Active Http Sessions"
+                    units="none" description="Number active Http sessions for the sipapp right now" />
 
-            <metric property="SipSession.maxActive" displayName="Maximum number of Active Sessions"
-                    units="none" description="Maximum number of active sessions for the sipapp" />
+            <metric property="SipSession.maxActive" displayName="Maximum number of Active Http Sessions"
+                    units="none" description="Maximum number of active Http sessions for the sipapp" />
 
-            <metric property="SipSession.sessionCounter" displayName="Sessions created"
-                    units="none" description="Number of sessions created for the sipapp"
+            <metric property="SipSession.sessionCounter" displayName="Http Sessions created"
+                    units="none" description="Number of Http sessions created for the sipapp"
                     measurementType="trendsup" />
 
-            <metric property="SipSession.expiredSessions" displayName="Expired Sessions"
-                    units="none" description="Number of expired sessions for the sipapp"
+            <metric property="SipSession.expiredSessions" displayName="Expired Http Sessions"
+                    units="none" description="Number of expired Http sessions for the sipapp"
                     measurementType="trendsup" />
                     
-            <metric property="SipSession.rejectedSessions" displayName="Rejected Sessions"
-                    units="none" description="Number of sessions rejected for the sipapp"
+            <metric property="SipSession.rejectedSessions" displayName="Rejected Http Sessions"
+                    units="none" description="Number of Http sessions rejected for the sipapp"
                     measurementType="trendsup" />
 
-            <metric property="SipSession.sessionAverageAliveTime" displayName="Session Average alive time"
-                    units="seconds" description="Average alive time of a Sessions" />
+            <metric property="SipSession.sessionAverageAliveTime" displayName="Http Session Average alive time"
+                    units="seconds" description="Average alive time of a Http Sessions" />
 
-            <metric property="SipSession.sessionMaxAliveTime" displayName="Max Session alive time"
-                    units="seconds" description="Maximum alive time of a Sessions" />                 
+            <metric property="SipSession.sessionMaxAliveTime" displayName="Max Http Session alive time"
+                    units="seconds" description="Maximum alive time of a Http Sessions" />                 
                                 
             <metric property="SipSession.activeSipSessions" displayName="Currently Active Sip Sessions"
                     units="none" description="Number active sip sessions for the sipapp right now" />
