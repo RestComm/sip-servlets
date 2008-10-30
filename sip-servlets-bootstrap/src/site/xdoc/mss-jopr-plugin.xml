@@ -65,27 +65,6 @@
 			</p>
 		</section>
 		<section name="Installation Instructions">
-			<subsection name="Jopr for Production">
-				<p>
-					<ul>
-					<li>Follow the <a href="http://jboss.org/community/docs/DOC-12828">jopr installation instructions</a> to install the latest version of jopr.</li>
-		
-					<li>Make sure the jopr server and agent are running</li>
-				
-					<li>Start your JBoss Application Server in making sure that you specify the binding address when starting such <code>sh run.sh -b 192.168.0.10</code> 
-					(the JBoss AS will not get recognized on localhost)</li>
-			
-					<li>Get the Mobicents Sip Servlets Jopr Plugin from the source code : <code>svn checkout http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/jopr-plugin mss-jopr-plugin</code></li>
-					
-					<li>In mss-jopr-plugin, do a mvn clean install</li>
-				
-					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.0-SNAPSHOT.jar</code> in the target directory to the <code>jopr-server-2.1.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</code></li>
-				
-					<li>Wait a bit, 20 seconds maybe or as soon as you see the following message on the jopr server console : [ProductPluginDeployer] Deploying RHQ plugin MobicentsSipServlets (Mobicents Sip Servlets Application Container), undefined version...
-					and then from the jopr agent, run the command <code>plugins update</code>, it will get the newly deployed plugin from the jopr server and start collecting data about the SipApplicationDispatcher</li>
-					</ul>
-				</p>
-			</subsection>
 			<subsection name="Jopr for Development">
 				<p>
 					The Embedded Jopr called also JBoss Administration console is bundled by default with Mobicents Sip Servlets for JBoss binary, starting from version 0.7.<br/>
@@ -106,8 +85,53 @@
 					</ul>
 				</p>
 			</subsection>
+			<subsection name="Jopr for Production">
+				<p>
+					<ul>
+					<li>Follow the <a href="http://jboss.org/community/docs/DOC-12828">jopr installation instructions</a> to install the latest version of jopr.</li>
+		
+					<li>Make sure the jopr server and agent are running</li>
+				
+					<li>Start your JBoss Application Server in making sure that you specify the binding address when starting such <code>sh run.sh -b 192.168.0.10</code> 
+					(the JBoss AS will not get recognized on localhost)</li>
+			
+					<li>Get the Mobicents Sip Servlets Jopr Plugin from the source code : <code>svn checkout http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/jopr-plugin mss-jopr-plugin</code></li>
+					
+					<li>In mss-jopr-plugin, do a mvn clean install</li>
+				
+					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.0-SNAPSHOT.jar</code> in the target directory to the <code>jopr-server-2.1.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</code></li>
+				
+					<li>Wait a bit, 20 seconds maybe or as soon as you see the following message on the jopr server console : [ProductPluginDeployer] Deploying RHQ plugin MobicentsSipServlets (Mobicents Sip Servlets Application Container), undefined version...
+					and then from the jopr agent, run the command <code>plugins update</code>, it will get the newly deployed plugin from the jopr server and start collecting data about the SipApplicationDispatcher</li>
+					</ul>
+				</p>
+			</subsection>			
 		</section>
 		<section name="Usage Instructions">
+			<subsection name="Jopr for Development">
+				<p>
+					<ul>
+					<li>Log in to the jopr console on <a href="http://localhost:8080/embedded-jopr"/> and login as admin (user=admin, password=admin)</li> 
+					
+					<li>From the tree on the left side of the screen, under <b>Services</b>, click on <b>MobicentsSipServlets</b> link then click on the <b>jboss.web:type=SipApplicationDispatcher</b> link to see the metrics coming in.</li>
+					
+					<a href="./mss-embjopr-home.png"><img src="small-mss-embjopr-home.png"/></a>
+				
+					<li>To get the metrics coming in, you will need to use an example application such as location service by example so that the SipApplicationDispatcher process requests.</li>
+					
+					<a href="./mss-embjopr-metrics.png"><img src="small-mss-embjopr-metrics.png"/>	</a>
+					
+					<li>To see Metrics about your application, click on your application under <b>Converged SIP/Web Application (SAR/WAR)</b> link.</li>
+					
+					<a href="./mss-embjopr-applications.png"><img src="small-mss-embjopr-applications.png"/>	</a>
+										
+					<li>Then select the <b>Metrics</b> tab to actually see the metrics of your application.</li>
+					
+					<a href="./mss-embjopr-session-metrics.png"><img src="small-mss-embjopr-session-metrics.png"/>	</a>
+					
+					</ul>
+				</p>
+			</subsection> 
 			<subsection name="Jopr for Production">
 			<p>
 				<ul>
@@ -149,31 +173,7 @@
 				
 				</ul>
 			</p>
-			</subsection>
-			<subsection name="Jopr for Development">
-				<p>
-					<ul>
-					<li>Log in to the jopr console on <a href="http://localhost:8080/embedded-jopr"/> and login as admin (user=admin, password=admin)</li> 
-					
-					<li>From the tree on the left side of the screen, under <b>Services</b>, click on <b>MobicentsSipServlets</b> link then click on the <b>jboss.web:type=SipApplicationDispatcher</b> link to see the metrics coming in.</li>
-					
-					<a href="./mss-embjopr-home.png"><img src="small-mss-embjopr-home.png"/></a>
-				
-					<li>To get the metrics coming in, you will need to use an example application such as location service by example so that the SipApplicationDispatcher process requests.</li>
-					
-					<a href="./mss-embjopr-metrics.png"><img src="small-mss-embjopr-metrics.png"/>	</a>
-					
-					<li>To see Metrics about your application, click on your application under <b>Converged SIP/Web Application (SAR/WAR)</b> link.</li>
-					
-					<a href="./mss-embjopr-applications.png"><img src="small-mss-embjopr-applications.png"/>	</a>
-										
-					<li>Then select the <b>Metrics</b> tab to actually see the metrics of your application.</li>
-					
-					<a href="./mss-embjopr-session-metrics.png"><img src="small-mss-embjopr-session-metrics.png"/>	</a>
-					
-					</ul>
-				</p>
-			</subsection> 
+			</subsection>			
 		</section>				
 	</body>
 </document>
