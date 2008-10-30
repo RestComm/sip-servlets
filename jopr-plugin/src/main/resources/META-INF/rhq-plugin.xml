@@ -3,7 +3,7 @@
 <plugin name="MobicentsSipServlets"
         displayName="Mobicents Sip Servlets Application Container"
         package="org.rhq.plugins.mobicents.servlet.sip"
-        version="1.0.1"
+        version="1.0"
         description="Statistics for SipApplicationDispatcher"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:xmlns:rhq-plugin"
@@ -143,31 +143,7 @@
 
             <metric property="SipSession.sessionMaxAliveTime" displayName="Max Session alive time"
                     units="seconds" description="Maximum alive time of a Sessions" />
-                 
-            <metric property="SipServlet.MinResponseTime" displayName="Min. Servlet Resp. Time"
-                    units="milliseconds"
-                    description="Minimum response time of a sip servlet"/>
-
-            <metric property="SipServlet.AvgResponseTime" displayName="Avg. Servlet Resp. Time"
-                    units="milliseconds"
-                    description="Average response time of a sip servlet"/>
-
-            <metric property="SipServlet.MaxResponseTime" displayName="Max. Servlet Resp. Time"
-                    units="milliseconds"
-                    description="Maximum response time of a sip servlet"/>
-                    
-            <metric property="SipServlet.TotalTime" displayName="Total processing time" 
-                 units="milliseconds"
-                 description="Total processing time of the sipapp" measurementType="trendsup"/>                    
-                    
-            <metric property="SipServlet.NumRequests" displayName="Requests served" 
-                    units="none" description="Number of requests served by sip servlets"
-                    measurementType="trendsup" displayType="summary"/>
-                    
-            <metric property="SipServlet.NumErrors" displayName="Errors while processing"
-                    units="none" description="Number of errors while processing"
-                    measurementType="trendsup" displayType="summary"/>
-                                
+                                                        
             <metric property="SipSession.activeSipSessions" displayName="Currently Active Sip Sessions"
                     units="none" description="Number active sip sessions for the sipapp right now" />
 
@@ -323,31 +299,7 @@
                     units="seconds" description="Average alive time of a Sessions" />
 
             <metric property="SipSession.sessionMaxAliveTime" displayName="Max Session alive time"
-                    units="seconds" description="Maximum alive time of a Sessions" />
-                    
-            <metric property="SipServlet.MinResponseTime" displayName="Min. Servlet Resp. Time"
-                    units="milliseconds"
-                    description="Minimum response time of a sip servlet"/>
-
-            <metric property="SipServlet.AvgResponseTime" displayName="Avg. Servlet Resp. Time"
-                    units="milliseconds"
-                    description="Average response time of a sip servlet"/>
-
-            <metric property="SipServlet.MaxResponseTime" displayName="Max. Servlet Resp. Time"
-                    units="milliseconds"
-                    description="Maximum response time of a sip servlet"/>
-                    
-            <metric property="SipServlet.TotalTime" displayName="Total processing time" 
-                 units="milliseconds"
-                 description="Total processing time of the sipapp" measurementType="trendsup"/>                    
-                    
-            <metric property="SipServlet.NumRequests" displayName="Requests served" 
-                    units="none" description="Number of requests served by sip servlets"
-                    measurementType="trendsup" displayType="summary"/>
-                    
-            <metric property="SipServlet.NumErrors" displayName="Errors while processing"
-                    units="none" description="Number of errors while processing"
-                    measurementType="trendsup" displayType="summary"/>
+                    units="seconds" description="Maximum alive time of a Sessions" />                 
                                 
             <metric property="SipSession.activeSipSessions" displayName="Currently Active Sip Sessions"
                     units="none" description="Number active sip sessions for the sipapp right now" />
