@@ -12,7 +12,7 @@
    	<depends plugin="JMX"/>
    	<depends plugin="JBossAS" useClasses="true"/>
    
-	<service name="MobicentsSipServlets"
+	<service name="Mobicents Sip Servlets"
          discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
          class="org.rhq.plugins.jmx.MBeanResourceComponent"
          description="Statistics for SipApplicationDispatcher"
@@ -29,7 +29,7 @@
            	<c:simple-property name="queueSize" type="integer" description="Maximum number of pending messages allowed to wait in a queue to be executed." defaultValue="1500"/>
         </plugin-configuration>
         
-        <operation name="setConcurrencyControlModeByName" displayName="Defines the Concurrency Control Mode" description="Sets the concurrency mode, must be one of the following - None, SipSession or SipApplicationSession">
+        <operation name="setConcurrencyControlModeByName" displayName="Set the Concurrency Control Mode" description="Sets the concurrency mode, must be one of the following - None, SipSession or SipApplicationSession">
         	<parameters>
         		<c:simple-property name="concurrencyControlMode" defaultValue="SipSession"/>
         	</parameters>
