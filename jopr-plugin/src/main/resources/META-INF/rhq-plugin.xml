@@ -42,7 +42,8 @@
              defaultOn="true" defaultInterval="500" displayType="summary"/>
     </service>
     
-    <service name="Embedded Converged Sip/Web Application (SAR/WAR)"                  
+    <service name="Embedded Converged Sip/Web Application (SAR/WAR)"    
+    			  subCategory="Applications"                  
                   class="org.rhq.plugins.mobicents.servlet.sip.ConvergedWarComponent"
                   discovery="org.rhq.plugins.mobicents.servlet.sip.EmbeddedConvergedWarDiscoveryComponent"
                   description="SIP/Web Application embedded inside of an Enterprise Application"
