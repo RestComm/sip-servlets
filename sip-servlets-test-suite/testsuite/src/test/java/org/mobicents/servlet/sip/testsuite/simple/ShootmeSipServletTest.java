@@ -20,7 +20,6 @@ import java.text.ParseException;
 import java.util.Iterator;
 
 import javax.sip.InvalidArgumentException;
-import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -37,7 +36,8 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
+	private static final int TIMEOUT_CSEQ_INCREASE = 100000;
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
@@ -124,7 +124,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 				fromName, fromSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
-		Thread.sleep(70000);
+		Thread.sleep(TIMEOUT_CSEQ_INCREASE);
 		assertTrue(registerReciever.getLastRegisterCSeqNumber() == 4);
 		assertTrue(sender.isFinalResponseReceived());
 	}
@@ -157,7 +157,8 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 
 	@Override
 	protected void tearDown() throws Exception {					
-		senderProtocolObjects.destroy();			
+		senderProtocolObjects.destroy();	
+		registerRecieverProtocolObjects.destroy();
 		logger.info("Test completed");
 		super.tearDown();
 	}
