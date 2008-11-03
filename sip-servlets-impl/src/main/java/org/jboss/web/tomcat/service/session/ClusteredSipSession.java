@@ -153,9 +153,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	protected transient long lastReplicated;
 
 	/**
-	 * Maximum percentage of the inactive interval this session should be
-	 * allowed to go unreplicated if access to the session doesn't mark it as
-	 * dirty. Drives the calculation of maxUnreplicatedInterval.
+	 * @deprecated Not used
 	 */
 	protected transient int maxUnreplicatedFactor = 80;
 
@@ -163,7 +161,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * Maximum number of milliseconds this session should be allowed to go
 	 * unreplicated if access to the session doesn't mark it as dirty.
 	 */
-	protected transient long maxUnreplicatedInterval;
+	protected transient long maxUnreplicatedInterval = 0;
+	
+	/** True if maxUnreplicatedInterval is 0 or less than maxInactiveInterval */
+	protected transient boolean alwaysReplicateMetadata = true;
 
 	/**
 	 * Whether any of this session's attributes implement
@@ -190,7 +191,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		invalidationPolicy = ((AbstractJBossManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getInvalidateSessionPolicy();
 		this.useJK = useJK;
 		this.firstAccess = true;
-		calcMaxUnreplicatedInterval();
+		checkAlwaysReplicateMetadata();
 	}
 
 	/**
@@ -323,39 +324,19 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	}
 
 	/**
-	 * Gets the maximum percentage of the <code>maxInactiveInterval</code>
-	 * beyond which a session should be replicated upon access even if it isn't
-	 * dirty. Used to ensure that even a read-only session gets replicated
-	 * before it expires, so that it isn't removed from other nodes.
-	 * 
-	 * @return an int between 1 and 100, or -1 if replicating on access is
-	 *         disabled
+	 * @deprecated Returns a meaningless value; use
+	 *             {@link #setMaxUnreplicatedInterval(int)}
 	 */
 	public int getMaxUnreplicatedFactor() {
-		return maxUnreplicatedFactor;
+		return 80;
 	}
 
 	/**
-	 * Sets the maximum percentage of the <code>maxInactiveInterval</code>
-	 * beyond which a session should be replicated upon access even if it isn't
-	 * dirty. Used to ensure that even a read-only session gets replicated
-	 * before it expires, so that it isn't removed from other nodes.
-	 * 
-	 * @param maxUnreplicatedFactor
-	 *            an int between 1 and 100, or -1 to disable replicating on
-	 *            access
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the factor isn't -1 or between 1 and 100
+	 * @deprecated Ignored; use {@link #setMaxUnreplicatedInterval(int)}
 	 */
 	public void setMaxUnreplicatedFactor(int factor) {
-		if ((factor != -1 && factor < 1) || factor > 100)
-			throw new IllegalArgumentException("Invalid factor " + factor
-					+ " -- must be between 1 and 100 or -1");
-		this.maxUnreplicatedFactor = factor;
-		calcMaxUnreplicatedInterval();
 	}
-
+	
 	/**
 	 * Gets the time {@link #updateLastReplicated()} was last called, or
 	 * <code>0</code> if it has never been called.
@@ -372,30 +353,71 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		lastReplicated = System.currentTimeMillis();
 	}
 
+	/**
+	 * Get the maximum interval between requests, in
+	 * <strong>milliseconds</strong>, after which a request will trigger
+	 * replication of the session's metadata regardless of whether the request
+	 * has otherwise made the session dirty.
+	 * <p/>
+	 * <strong>NOTE:</strong> This value is in milliseconds while the equivalent
+	 * property in JBossCacheManager is in seconds.
+	 * 
+	 * @return the maximum interval since last replication after which a request
+	 *         will trigger session metadata replication. A value of
+	 *         <code>0</code> means replicate metadata on every request; a value
+	 *         of <code>-1</code> means never replicate metadata unless the
+	 *         session is otherwise dirty.
+	 */
 	public long getMaxUnreplicatedInterval() {
 		return maxUnreplicatedInterval;
 	}
 
-	public boolean getExceedsMaxUnreplicatedInterval() {
-		boolean result = false;
+	/**
+	 * Sets the maximum interval between requests, in
+	 * <strong>milliseconds</strong>, after which a request will trigger
+	 * replication of the session's metadata regardless of whether the request
+	 * has otherwise made the session dirty.
+	 * <p/>
+	 * <strong>NOTE:</strong> This value is in milliseconds while the equivalent
+	 * property in JBossCacheManager is in seconds.
+	 * 
+	 * @param maxUnreplicatedInterval
+	 *            the maximum interval since last replication after which a
+	 *            request will trigger session metadata replication. A value of
+	 *            <code>0</code> means replicate metadata on every request; a
+	 *            value of <code>-1</code> means never replicate metadata unless
+	 *            the session is otherwise dirty. A value less than
+	 *            <code>-1</code> is treated as <code>-1</code>.
+	 */
+	public void setMaxUnreplicatedInterval(long interval) {
+		this.maxUnreplicatedInterval = Math.max(interval, -1);
+		checkAlwaysReplicateMetadata();
+	}
 
-		if (maxUnreplicatedInterval > 0) // -1 means ignore; 0 means expire now
+	public boolean getExceedsMaxUnreplicatedInterval() {
+		boolean exceeds = alwaysReplicateMetadata;
+
+		if (!exceeds && maxUnreplicatedInterval > 0) // -1 means ignore
 		{
-			result = ((System.currentTimeMillis() - lastReplicated) >= maxUnreplicatedInterval);
+			long unrepl = System.currentTimeMillis() - lastReplicated;
+			exceeds = (unrepl >= maxUnreplicatedInterval);
 		}
 
-		return result;
+		return exceeds;
 	}
 
-	private void calcMaxUnreplicatedInterval() {
-//		if (maxInactiveInterval < 0 || maxUnreplicatedFactor < 0)
-			maxUnreplicatedInterval = -1;
-//		else {
-//			// Ignoring casting would be (mII * 1000) * (mUF / 100)
-//			maxUnreplicatedInterval = maxInactiveInterval
-//					* maxUnreplicatedFactor * 10;
-//		}
+	private void checkAlwaysReplicateMetadata() {
+		boolean was = this.alwaysReplicateMetadata;
+		this.alwaysReplicateMetadata = (maxUnreplicatedInterval == 0 || (maxUnreplicatedInterval > 0));
+
+		if (this.alwaysReplicateMetadata && !was && logger.isTraceEnabled()) {
+			logger
+					.trace(key
+							+ " will always replicate metadata; maxUnreplicatedInterval="
+							+ maxUnreplicatedInterval);
+		}
 	}
+
 
 	/**
 	 * This is called after loading a session to initialize the transient
@@ -898,8 +920,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //		version = 0;
 //		hasActivationListener = null;
 //		lastReplicated = 0;
-//		maxUnreplicatedFactor = 80;
-//		calcMaxUnreplicatedInterval();
+//		maxUnreplicatedInterval = 0;
+//      this.alwaysReplicateMetadata = true;
 //	}
 
 	/**
@@ -1072,6 +1094,12 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// If the session has been replicated, any subsequent
 			// access cannot be the first.
 			this.firstAccess = false;
+
+			// Assume deserialization means replication and use thisAccessedTime
+			// as a proxy for when replication occurred
+			updateLastReplicated();
+
+			checkAlwaysReplicateMetadata();
 
 			if(logger.isDebugEnabled()) {
 				logger.debug("sip session has just been read from the cache ");
@@ -1381,7 +1409,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	}
 
 	public boolean getReplicateSessionBody() {
-		return sessionMetadataDirty || getExceedsMaxUnreplicatedInterval();
+		return sessionMetadataDirty || getExceedsMaxUnreplicatedInterval() || 
+			(maxUnreplicatedInterval == -1 && sessionAttributesDirty);
 	}
 
 	protected boolean isGetDirty(Object attribute) {

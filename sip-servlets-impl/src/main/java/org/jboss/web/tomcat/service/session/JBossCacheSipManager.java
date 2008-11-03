@@ -45,6 +45,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.ContainerBase;
 import org.jboss.cache.CacheException;
+import org.jboss.cache.aop.PojoCacheMBean;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.jboss.mx.util.MBeanServerLocator;
@@ -163,12 +164,25 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 */
 	private boolean trace;
 
+	private int maxUnreplicatedInterval_ = WebMetaData.DEFAULT_MAX_UNREPLICATED_INTERVAL;
+	
 	// ---------------------------------------------------------- Constructors
 
 	public JBossCacheSipManager() {
 		super();		
 	}
 
+	/** 
+    * Create a new JBossCacheManager using the given cache. For use in unit testing.
+    * 
+    * @param pojoCache
+    */
+   public JBossCacheSipManager(PojoCacheMBean pojoCache)
+   {
+      super();
+      this.proxy_ = new ConvergedJBossCacheService(pojoCache);
+   }
+	
 	/**
 	 * Initializes this Manager when running in embedded mode.
 	 * <p>
@@ -198,7 +212,13 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		this.useJK_ = useJK;
 		this.replicationFieldBatchMode_ = webMetaData
 				.getReplicationFieldBatchMode() ? Boolean.TRUE : Boolean.FALSE;
+		
+		Integer maxUnrep = webMetaData.getMaxUnreplicatedInterval();
+		if (maxUnrep != null) {
+			this.maxUnreplicatedInterval_ = maxUnrep.intValue();
+		}
 
+		if (proxy_ == null)
 		proxy_ = new ConvergedJBossCacheService(cacheObjectNameString_);
 
 		// Confirm our replication granularity is compatible with the cache
@@ -402,6 +422,14 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		this.useLocalCache_ = useLocalCache;
 	}
 
+	public int getMaxUnreplicatedInterval() {
+		return maxUnreplicatedInterval_;
+	}
+
+	public void setMaxUnreplicatedInterval(int maxUnreplicatedInterval) {
+		this.maxUnreplicatedInterval_ = maxUnreplicatedInterval;
+	}
+	
 	// JBossCacheManagerMBean-methods -------------------------------------
 
 	public void expireSession(String sessionId) {
@@ -1851,11 +1879,19 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			long now = System.currentTimeMillis();
 			Map unloaded = new HashMap(unloadedSessions_);
 			Set entries = unloaded.entrySet();
+			// We may have not gotten replication of a timestamp for requests 
+			// that occurred w/in maxUnreplicatedInterval_ of the previous
+			// request. So we add a grace period to avoid flushing a session
+			// early
+			// and permanently losing part of its node structure in JBoss Cache.
+			long maxUnrep = maxUnreplicatedInterval_ < 0 ? 60
+					: maxUnreplicatedInterval_;
+			long maxUnused = maxInactiveInterval_ + maxUnrep;
 			for (Iterator it = entries.iterator(); it.hasNext();) {
 				Map.Entry entry = (Map.Entry) it.next();
 				OwnedSessionUpdate osu = (OwnedSessionUpdate) entry.getValue();
 				int elapsed = (int) ((now - osu.updateTime) / 1000L);
-				if (elapsed >= maxInactiveInterval_) {
+				if (elapsed >= maxUnused) {
 					String realId = (String) entry.getKey();
 					try {
 						proxy_.removeSessionLocal(realId, osu.owner);
@@ -2545,7 +2581,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 
 		// Add clustered session valve
-		ConvergedClusteredSessionValve valve = new ConvergedClusteredSessionValve();
+		ConvergedClusteredSessionValve valve = new ConvergedClusteredSessionValve(this);
 		installContextValve(valve);
 	}
 

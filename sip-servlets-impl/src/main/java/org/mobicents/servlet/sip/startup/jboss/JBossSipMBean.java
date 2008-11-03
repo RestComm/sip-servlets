@@ -119,6 +119,45 @@ public interface JBossSipMBean extends AbstractWebContainerMBean
    public void setCacheName(String cacheName);
 
    /**
+    * Get the maximum interval between requests, in seconds, after which a
+    * request will trigger replication of the session's metadata regardless
+    * of whether the request has otherwise made the session dirty. Such 
+    * replication ensures that other nodes in the cluster are aware of a 
+    * relatively recent value for the session's timestamp and won't incorrectly
+    * expire an unreplicated session upon failover.
+    * <p/>
+    * Default value is {@link #DEFAULT_MAX_UNREPLICATED_INTERVAL}.
+    * <p/>
+    * The cost of the metadata replication depends on the configured
+    * {@link #setReplicationGranularityString(String) replication granularity}.
+    * With <code>SESSION</code>, the sesssion's attribute map is replicated 
+    * along with the metadata, so it can be fairly costly.  With other 
+    * granularities, the metadata object is replicated separately from the
+    * attributes and only contains a String, and a few longs, ints and booleans.
+    * 
+    * @return the maximum interval since last replication after which a request
+    *         will trigger session metadata replication. A value of 
+    *         <code>0</code> means replicate metadata on every request; a value 
+    *         of <code>-1</code> means never replicate metadata unless the 
+    *         session is otherwise dirty.
+    */
+   public int getMaxUnreplicatedInterval();
+
+   /**
+    * Sets the maximum interval between requests, in seconds, after which a
+    * request will trigger replication of the session's metadata regardless
+    * of whether the request has otherwise made the session dirty.
+    * 
+    * @param  maxUnreplicatedInterval  
+    *         the maximum interval since last replication after which a request
+    *         will trigger session metadata replication. A value of 
+    *         <code>0</code> means replicate metadata on every request; a value 
+    *         of <code>-1</code> means never replicate metadata unless the 
+    *         session is otherwise dirty.
+    */
+   public void setMaxUnreplicatedInterval(int maxUnreplicatedInterval);
+   
+   /**
     * Get the JBoss UCL use flag
     */
    public boolean getUseJBossWebLoader();

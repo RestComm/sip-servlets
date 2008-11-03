@@ -46,6 +46,8 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 	protected JBossCacheClusteredSipApplicationSession(SipApplicationSessionKey key,
 			SipContext sipContext) {
 		super(key, sipContext, ((JBossCacheSipManager)sipContext.getSipManager()).getUseJK());
+		int maxUnrep = ((JBossCacheSipManager)sipContext.getSipManager()).getMaxUnreplicatedInterval() * 1000;
+	    setMaxUnreplicatedInterval(maxUnrep);
 		establishProxy();
 	}
 	

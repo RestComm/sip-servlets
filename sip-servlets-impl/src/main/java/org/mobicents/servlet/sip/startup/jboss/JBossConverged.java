@@ -16,13 +16,9 @@
  */
 package org.mobicents.servlet.sip.startup.jboss;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.web.AbstractWebDeployer;
 import org.jboss.web.tomcat.service.JBossWeb;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
 
 /**

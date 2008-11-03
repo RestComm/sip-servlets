@@ -42,6 +42,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.deployment.SubDeployerExt;
 import org.jboss.ejb.plugins.cmp.jdbc2.FindByPrimaryKeyCommand;
+import org.jboss.metadata.WebMetaData;
 import org.jboss.mx.util.MBeanProxyExt;
 import org.jboss.security.plugins.JaasSecurityManagerServiceMBean;
 import org.jboss.system.ServiceControllerMBean;
@@ -131,6 +132,12 @@ public class JBossSip extends AbstractConvergedContainer
     */
    private boolean useLocalCache = true;
 
+   /**
+    * Maximum interval a clustered session should allow request to not
+    * replicate the session timestamp. 
+    */
+   private int maxUnreplicatedInterval = WebMetaData.DEFAULT_MAX_UNREPLICATED_INTERVAL;
+   
    /**
     * Whether we are using Apache MOD_JK(2) module or not
     */
@@ -307,6 +314,16 @@ public class JBossSip extends AbstractConvergedContainer
    {
       this.useJK = useJK;
    } 
+   
+   public int getMaxUnreplicatedInterval()
+   {
+      return maxUnreplicatedInterval;
+   }
+
+   public void setMaxUnreplicatedInterval(int maxUnreplicatedInterval)
+   {
+      this.maxUnreplicatedInterval = maxUnreplicatedInterval;
+   }
 
    public boolean getDeleteWorkDirOnContextDestroy()
    {
@@ -665,6 +682,7 @@ public class JBossSip extends AbstractConvergedContainer
       config.setSnapshotMode(this.snapshotMode);
       config.setUseLocalCache(this.useLocalCache);
       config.setUseJK(this.useJK);
+      config.setMaxUnreplicatedInterval(this.maxUnreplicatedInterval);
       config.setSubjectAttributeName(this.subjectAttributeName);
       config.setUseJBossWebLoader(this.useJBossWebLoader);
       config.setAllowSelfPrivilegedWebApps(this.allowSelfPrivilegedWebApps);

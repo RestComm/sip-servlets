@@ -70,11 +70,10 @@ public class ConvergedJBossCacheService extends JBossCacheService
    public static final String SIPSESSION = "SIPSESSION";
    public static final String ATTRIBUTE = "ATTRIBUTE";
    // Needed for cache invalidation
-   static final String VERSION_KEY = "VERSION";
+   public static final String VERSION_KEY = "VERSION";
    static final String FQN_DELIMITER = "/";
    
    private PojoCacheMBean proxy_;
-   private ObjectName cacheServiceName_;
    
    // name of webapp's virtual host(JBAS-2194). 
    // Idea is host_name + web_app_path + session id is a unique combo.
@@ -97,39 +96,46 @@ public class ConvergedJBossCacheService extends JBossCacheService
    
    private WeakHashMap typeMap = new WeakHashMap();
    
-   public ConvergedJBossCacheService(String treeCacheObjectName) throws ClusteringNotSupportedException
+   /**
+    * Creates a JMX proxy PojoCacheMBean for the given object name.
+    * 
+    * @param objectName the object name
+    * @return the proxy
+    * @throws ClusteringNotSupportedException if there is a problem
+    */
+   private static PojoCacheMBean getPojoCacheMBean(String objectName)
+      throws ClusteringNotSupportedException
    {
-	  super(treeCacheObjectName);
-      // Find JBossCacheService
       try
       {
-         cacheServiceName_ = new ObjectName(treeCacheObjectName);
+         ObjectName cacheServiceName = new ObjectName(objectName);
          // Create Proxy-Object for this service
-         proxy_ = (PojoCacheMBean) MBeanProxyExt.create(PojoCacheMBean.class,
-                                                        cacheServiceName_);
+         return (PojoCacheMBean) MBeanProxyExt.create(PojoCacheMBean.class,
+                                                        cacheServiceName);
       }
       catch (Throwable t)
       {
-
          String str = "Could not access TreeCache service " + 
-                     (cacheServiceName_ == null ? "<null>" : cacheServiceName_.toString()) + 
+                     (objectName == null ? "<null>" : objectName) + 
                      " for Tomcat clustering";
          log_.debug(str);
          throw new ClusteringNotSupportedException(str, t);
-      }
-      
-      if (proxy_ == null)
-      {
-         String str = "Could not access TreeCache service " + 
-                     (cacheServiceName_ == null ? "<null>" : cacheServiceName_.toString()) + 
-                     " for Tomcat clustering";
-         log_.debug(str);
-         throw new ClusteringNotSupportedException(str);
-      }
+      }  
+   }
+   
+   public ConvergedJBossCacheService(PojoCacheMBean pojoCache)
+   {
+	  super(pojoCache);
+      this.proxy_ = pojoCache;
 
       cacheWrapper_ = new JBossCacheWrapper(proxy_);
       
       useTreeCacheMarshalling_ = proxy_.getUseRegionBasedMarshalling();
+   }
+   
+   public ConvergedJBossCacheService(String treeCacheObjectName) throws ClusteringNotSupportedException
+   {
+      this(getPojoCacheMBean(treeCacheObjectName));
    }
 
    public void start(ClassLoader tcl, JBossCacheSipManager manager)

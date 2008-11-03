@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Manager;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -37,6 +38,13 @@ public class ConvergedClusteredSessionValve extends ClusteredSessionValve {
 	// The info string for this Valve
 	private static final String info = "ConvergedClusteredSessionValve/1.0";
 
+	/**
+	 * Create a new Valve.
+	 */
+	public ConvergedClusteredSessionValve(Manager manager) {
+		super(manager);
+	}
+	
 	/**
 	 * Get information about this Valve.
 	 */
@@ -59,6 +67,13 @@ public class ConvergedClusteredSessionValve extends ClusteredSessionValve {
 		// for any clustering code that has no direct access to these objects
 		ConvergedSessionReplicationContext.enterWebapp(request, response, true);
 		try {
+			// Workaround to JBAS-5735. Ensure we get the session from the manager
+	         // rather than a cached ref from the Request.
+	         String requestedId = request.getRequestedSessionId();
+	         if (requestedId != null)
+	         {
+	            super.manager.findSession(requestedId);
+	         }
 			// let the servlet invocation go through
 			getNext().invoke(request, response);
 		} finally // We replicate no matter what

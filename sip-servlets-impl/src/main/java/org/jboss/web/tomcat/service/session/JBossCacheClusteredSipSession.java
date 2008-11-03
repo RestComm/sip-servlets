@@ -53,6 +53,8 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession, 
 				((JBossCacheSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getUseJK());
+		int maxUnrep = ((JBossCacheSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getMaxUnreplicatedInterval() * 1000;
+	    setMaxUnreplicatedInterval(maxUnrep);
 		establishProxy();
 	}
 	

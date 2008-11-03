@@ -89,7 +89,7 @@
 			<artifactId>jbossweb-service</artifactId>
 			<version>${jboss.version}</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/jbossweb-service.jar</systemPath>
+			<systemPath>${basedir}/lib/jbossweb-service-4.2.3.GA.jar</systemPath>
 		</dependency>
 		
 		<dependency>
@@ -112,13 +112,14 @@
 			<version>${jboss.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+	
 		<dependency>
-			<groupId>jboss</groupId>
+			<groupId>jboss.common</groupId>
 			<artifactId>jboss-common</artifactId>
-			<version>${jboss.version}</version>
+			<version>1.2.1.GA</version>
 			<scope>provided</scope>
-		</dependency>						
+		</dependency>
+				
 		
 		<dependency>
 			<groupId>jboss</groupId>
