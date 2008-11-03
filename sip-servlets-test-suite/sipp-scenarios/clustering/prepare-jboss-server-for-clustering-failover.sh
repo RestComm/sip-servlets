@@ -1,4 +1,4 @@
-export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster
+#export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster
 
 #echo "Script name is		[$0]"
 #echo "First Parameter is		[$1]"

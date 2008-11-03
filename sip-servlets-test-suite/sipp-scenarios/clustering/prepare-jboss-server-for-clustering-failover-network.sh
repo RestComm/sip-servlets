@@ -1,4 +1,4 @@
-export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster-network
+#export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster-network
 
 cp jboss-service-all.xml $JBOSS_HOME/server/all/conf/jboss-service.xml
 cp server-jboss-failover-all.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml
