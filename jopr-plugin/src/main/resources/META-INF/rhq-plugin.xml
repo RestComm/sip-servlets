@@ -31,9 +31,21 @@
         
         <operation name="setConcurrencyControlModeByName" displayName="Set the Concurrency Control Mode" description="Sets the concurrency mode, must be one of the following - None, SipSession or SipApplicationSession">
         	<parameters>
-        		<c:simple-property name="concurrencyControlMode" defaultValue="SipSession"/>
+        		<c:simple-property name="concurrencyControlMode" defaultValue="SipSession">
+        			<c:property-options>
+	                   <c:option value="None"/>
+	                   <c:option value="SipSession" default="true"/>
+	                   <c:option value="SipApplicationSession"/>	                   
+	                </c:property-options>        		
+        		</c:simple-property>
         	</parameters>
         </operation>
+        
+        <!--operation name="setMessageQueueSize" displayName="Set the Congestion Control" description="Sets the number of pending messages allowed to wait in a queue to be executed.">
+        	<parameters>
+        		<c:simple-property name="queueSize" type="integer" defaultValue="1500"/>        			
+        	</parameters>
+        </operation-->
         
         <metric displayName="Number of SIP requests processed" property="requestsProcessed"
              defaultOn="true" defaultInterval="1000" displayType="summary"/>
