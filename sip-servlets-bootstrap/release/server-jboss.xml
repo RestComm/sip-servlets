@@ -12,8 +12,7 @@
    -->
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
-  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
+  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received

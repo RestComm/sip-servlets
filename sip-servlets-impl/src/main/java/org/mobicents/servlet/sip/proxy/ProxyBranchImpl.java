@@ -287,6 +287,9 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		
 		// Initialize the sip session for the new request if initial
 		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
+		if(clonedRequest.getCurrentApplicationName() == null && subsequent) {
+			clonedRequest.setCurrentApplicationName(originalRequest.getSipSession().getSipApplicationSession().getApplicationName());
+		}
 		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
 		try {
 			newSession.setHandler(((SipSessionImpl)this.originalRequest.getSession()).getHandler());
@@ -401,6 +404,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
 		proxy.setOriginalRequest(request);
+		this.originalRequest = request;
 		
 		// No proxy params, sine the target is already in the Route headers
 		ProxyParams params = new ProxyParams(null, null, null, null);
@@ -424,7 +428,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) || clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
 				sipProvider.sendRequest(clonedRequest);
 			}
-			else {
+			else {				
 				forwardRequest(clonedRequest, true);
 			}
 			

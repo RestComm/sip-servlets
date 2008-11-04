@@ -42,8 +42,7 @@
   <!-- Define the Tomcat Stand-Alone Service -->
   <Service name="Sip-Servlets" 
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
-  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
+  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
