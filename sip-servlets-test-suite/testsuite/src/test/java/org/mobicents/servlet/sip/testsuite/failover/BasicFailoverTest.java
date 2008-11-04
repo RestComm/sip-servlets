@@ -61,7 +61,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 15000;
 	InetAddress balancerAddress = null;
 	private final static int BALANCER_EXTERNAL_PORT = 5060;
 	private final static int BALANCER_INTERNAL_PORT = 5065;

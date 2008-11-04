@@ -82,6 +82,11 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     }
     
     @Override
+    public void initialize() throws LifecycleException {
+    	super.initialize();    	
+    }
+    
+    @Override
     public void start() throws LifecycleException {
     	super.start();
     	if (!started) {
@@ -219,6 +224,11 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		BalancerDescription balancerDescription = new BalancerDescription(address, sipPort);
 		register.put(balancerName, balancerDescription);
 
+		//notify the sip factory 
+		if(sipApplicationDispatcher.getSipFactory().getLoadBalancerToUse() == null) {
+			sipApplicationDispatcher.getSipFactory().setLoadBalancerToUse(balancerDescription);
+		}
+		
 		return true;
 	}
 
@@ -261,6 +271,11 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				logger.debug("Removing following balancer name : " + keyToRemove +"/address:"+ addr);
 			}
 			register.remove(keyToRemove);
+			
+			if(sipApplicationDispatcher.getSipFactory().getLoadBalancerToUse() != null && 
+					sipApplicationDispatcher.getSipFactory().getLoadBalancerToUse().equals(balancerDescription)) {
+				sipApplicationDispatcher.getSipFactory().setLoadBalancerToUse(null);
+			}
 			return true;
 		}
 

@@ -54,18 +54,18 @@ public class SipStandardService extends StandardService implements SipService {
     private static final String info =
         "org.mobicents.servlet.sip.startup.SipStandardService/1.0";
 	//the sip application dispatcher class name defined in the server.xml
-	private String sipApplicationDispatcherClassName;
+	protected String sipApplicationDispatcherClassName;
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 
-	private SipApplicationDispatcher sipApplicationDispatcher;
-	private int sipMessageQueueSize = 1500;
+	protected SipApplicationDispatcher sipApplicationDispatcher;
+	protected int sipMessageQueueSize = 1500;
 
-	private String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
+	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	//the sip application router class name defined in the server.xml
 //	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
-	private String darConfigurationFileLocation;
+	protected String darConfigurationFileLocation;
 	//
-	private boolean connectorsStartedExternally = false;
+	protected boolean connectorsStartedExternally = false;
 	
 	@Override
     public String getInfo() {

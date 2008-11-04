@@ -159,6 +159,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				newRequest.removeHeader(ContactHeader.NAME);
 			}
 
+			//Adding Route Header for LB if we are in a HA configuration
+//			if(sipFactoryImpl.isUseLoadBalancer()) {
+//				sipFactoryImpl.addLoadBalancerRouteHeader(newRequest);
+//			}
+			
 			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);			
 			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
@@ -499,6 +504,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
 			CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
+			
+			//Adding Route Header for LB if we are in a HA configuration
+//			if(sipFactoryImpl.isUseLoadBalancer()) {
+//				sipFactoryImpl.addLoadBalancerRouteHeader(newRequest);
+//			}
 			
 			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			MobicentsSipApplicationSession originalAppSession = originalSession

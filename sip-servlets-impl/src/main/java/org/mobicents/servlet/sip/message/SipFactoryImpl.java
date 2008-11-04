@@ -41,6 +41,7 @@ import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 
@@ -64,11 +65,15 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
 public class SipFactoryImpl implements Serializable {
 	private static final transient Log logger = LogFactory.getLog(SipFactoryImpl.class
 			.getCanonicalName());
 
+	private boolean useLoadBalancer = false;
+	private BalancerDescription loadBalancerToUse = null;
+	
 	public static class NamesComparator implements Comparator<String> {
 		public int compare(String o1, String o2) {
 			return o1.compareToIgnoreCase(o2);
@@ -418,13 +423,7 @@ public class SipFactoryImpl implements Serializable {
 			}
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
-			// FIXME: ADD ROUTE? HOW?
-			// Address routeAddress = sipAddressFactory.createAddress("sip:"
-			// + peerAddress + ":" + peerPort);
-
-			// routeHeader = sipHeaderFactory.createRouteHeader(routeAddress);
-
-			URIImpl requestURI = (URIImpl)to.getURI().clone();
+						URIImpl requestURI = (URIImpl)to.getURI().clone();
 
 			// now lets put header params into headers.
 			Iterator<String> keys = to.getParameterNames();
@@ -471,9 +470,9 @@ public class SipFactoryImpl implements Serializable {
 			if(contactHeader != null) {
 				requestToWrap.addHeader(contactHeader);
 			}
-//			if(routeHeader != null) {
-//				requestToWrap.addHeader(routeHeader);
-//			}
+			if(useLoadBalancer) {
+				addLoadBalancerRouteHeader(requestToWrap);
+			}
 			
 			SipApplicationDispatcher dispatcher = 
 				mobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
@@ -607,5 +606,42 @@ public class SipFactoryImpl implements Serializable {
 	 */
 	public SipNetworkInterfaceManager getSipNetworkInterfaceManager() {
 		return sipApplicationDispatcher.getSipNetworkInterfaceManager();
+	}
+
+	/**
+	 * @return the loadBalancerToUse
+	 */
+	public BalancerDescription getLoadBalancerToUse() {
+		return loadBalancerToUse;
+	}
+
+	/**
+	 * @param loadBalancerToUse the loadBalancerToUse to set
+	 */
+	public void setLoadBalancerToUse(BalancerDescription loadBalancerToUse) {
+		if(loadBalancerToUse == null) {
+			useLoadBalancer = false;
+		} else {
+			useLoadBalancer = true;
+		}
+		this.loadBalancerToUse = loadBalancerToUse;
+	}
+
+	/**
+	 * @return the useLoadBalancer
+	 */
+	public boolean isUseLoadBalancer() {
+		return useLoadBalancer;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @throws ParseException
+	 */
+	public void addLoadBalancerRouteHeader(Request request) throws ParseException {
+		javax.sip.address.Address address = SipFactories.addressFactory.createAddress("sip:" + loadBalancerToUse.getAddress().getHostAddress()+ ":" + loadBalancerToUse.getSipPort());
+		RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(address);
+		request.addHeader(routeHeader);
 	}
 }

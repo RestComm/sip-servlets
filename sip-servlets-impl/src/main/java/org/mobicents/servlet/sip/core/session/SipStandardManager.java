@@ -56,7 +56,6 @@ public class SipStandardManager extends StandardManager implements SipManager {
     
 	/**
 	 * 
-	 * @param sipFactoryImpl
 	 */
 	public SipStandardManager() {
 		super();
