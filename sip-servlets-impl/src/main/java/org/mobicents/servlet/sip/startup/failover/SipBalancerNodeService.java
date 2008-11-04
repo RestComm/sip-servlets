@@ -1,3 +1,19 @@
+/*
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.servlet.sip.startup.failover;
 
 import java.io.IOException;
@@ -20,7 +36,7 @@ public interface SipBalancerNodeService {
 	 */
 	public String[] getBalancers();
 
-	public boolean addBalancerAddress(String addr)
+	public boolean addBalancer(String addr, int sipPort)
 			throws IllegalArgumentException, NullPointerException, IOException;
 
 	/**
@@ -39,7 +55,7 @@ public interface SipBalancerNodeService {
 	 *            </ul>
 	 * @throws IllegalArgumentException if something goes wrong when adding the balancer address or while trying to connect to it
 	 */
-	public boolean addBalancerAddress(String hostName, int index)
+	public boolean addBalancer(String hostName, int sipPort, int index)
 			throws IllegalArgumentException;
 
 	/**
@@ -58,14 +74,12 @@ public interface SipBalancerNodeService {
 	 * @throws IllegalArgumentException -
 	 *             if there is no balancer with that name on the list.
 	 */
-	public boolean removeBalancerAddress(String addr)
+	public boolean removeBalancer(String addr, int sipPort)
 			throws IllegalArgumentException;
 
-	public boolean removeBalancerAddress(String hostName, int index)
+	public boolean removeBalancer(String hostName, int sipPort, int index)
 			throws IllegalArgumentException;
 
-	public void removeBalancerAddress(int index)
-			throws IllegalArgumentException;
 	
 	// --------------- GETTERS AND SETTERS
 

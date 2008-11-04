@@ -21,12 +21,12 @@ import java.net.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
@@ -51,6 +51,9 @@ import org.mobicents.tools.sip.balancer.SIPNode;
  *
  */
 public class SipStandardBalancerNodeService extends SipStandardService implements SipBalancerNodeService {
+	private static final String BALANCER_SIP_PORT_CHAR_SEPARATOR = ":";
+	private static final String BALANCERS_CHAR_SEPARATOR = ";";
+	private static final int DEFAULT_LB_SIP_PORT = 5065;
 	//the logger
 	private static Log logger = LogFactory.getLog(SipStandardBalancerNodeService.class);
 	/**
@@ -62,8 +65,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     //the balancers to send heartbeat to and our health info
 	private String balancers;
     //the balancers names to send heartbeat to and our health info
-	private List<String> balancerNames = new ArrayList<String>();
-	private Map<String, InetAddress> register = new HashMap<String, InetAddress>();
+	private Map<String, BalancerDescription> register = new ConcurrentHashMap<String, BalancerDescription>();
 	//heartbeat interval, can be modified through JMX
 	private long heartBeatInterval = 5000;
 	private Timer heartBeatTimer = new Timer();
@@ -84,16 +86,27 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     	super.start();
     	if (!started) {
 			if (balancers != null && balancers.length() > 0) {
-				String[] balancerAddresses = balancers.split(";");
-				for (String balancerAddress : balancerAddresses) {
+				String[] balancerDescriptions = balancers.split(BALANCERS_CHAR_SEPARATOR);
+				for (String balancerDescription : balancerDescriptions) {
+					String balancerAddress = balancerDescription;
+					int sipPort = DEFAULT_LB_SIP_PORT;
+					if(balancerDescription.indexOf(BALANCER_SIP_PORT_CHAR_SEPARATOR) != -1) {
+						String[] balancerDescriptionSplitted = balancerDescription.split(BALANCER_SIP_PORT_CHAR_SEPARATOR);
+						balancerAddress = balancerDescriptionSplitted[0];
+						try {
+							sipPort = Integer.parseInt(balancerDescriptionSplitted[1]);
+						} catch (NumberFormatException e) {
+							throw new LifecycleException("Impossible to parse the following sip balancer port " + balancerDescriptionSplitted[1], e);
+						}
+					} 
 					if(Inet6Util.isValidIP6Address(balancerAddress) || Inet6Util.isValidIPV4Address(balancerAddress)) {
 						try {
-							this.addBalancerAddress(InetAddress.getByName(balancerAddress).getHostAddress());
+							this.addBalancer(InetAddress.getByName(balancerAddress).getHostAddress(), sipPort);
 						} catch (UnknownHostException e) {
 							throw new LifecycleException("Impossible to parse the following sip balancer address " + balancerAddress, e);
 						}
 					} else {
-						this.addBalancerAddress(balancerAddress, 0);
+						this.addBalancer(balancerAddress, sipPort, 0);
 					}
 				}
 			}		
@@ -114,7 +127,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     	ArrayList<SIPNode> info = getConnectorsAsSIPNode();
     	removeNodesFromBalancers(info);
     	//cleaning 
-    	balancerNames.clear();
+//    	balancerNames.clear();
     	register.clear();
     	this.hearBeatTaskToRun.cancel();
 		this.hearBeatTaskToRun = null;
@@ -175,46 +188,13 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
      * {@inheritDoc}
      */
 	public String[] getBalancers() {
-		return this.balancerNames.toArray(new String[balancerNames.size()]);
+		return this.register.keySet().toArray(new String[register.keySet().size()]);
 	}
 
 	/**
      * {@inheritDoc}
      */
-	public void removeBalancerAddress(int index)
-			throws IllegalArgumentException {
-		if(logger.isDebugEnabled()) {
-			logger.debug("[removeBalancerAddress]");
-		}
-		if (index < 0 || index >= this.balancerNames.size())
-			throw new IllegalArgumentException(
-					"Index is wrong, it should be [0]<x<["
-							+ balancerNames.size() + "] and it is ["
-							+ index + "]");
-
-		// This code is clone, as this is ultimate cleaner method to get rid
-		// of
-		// errors
-		String balancerName = null;
-
-		balancerName = balancerNames.get(index);
-
-		if(logger.isDebugEnabled()) {
-			logger.debug("Removing following balancer " + balancerName);
-		}
-		balancerNames.remove(balancerName);
-		register.remove(balancerName);
-
-		// balancerInfoSources.remove(balancerName);
-		if(logger.isDebugEnabled()) {
-			logger.debug("[removeBalancerAddress] END");
-		}
-	}
-
-	/**
-     * {@inheritDoc}
-     */
-	public boolean addBalancerAddress(String addr) {
+	public boolean addBalancer(String addr, int sipPort) {
 		if (addr == null)
 			throw new NullPointerException("addr cant be null!!!");
 
@@ -227,15 +207,17 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		}		
 		String balancerName = address.getCanonicalHostName();
 
-		if (balancerNames.contains(balancerName))
+		if (register.get(balancerName) != null) {
+			logger.info("Sip balancer " + balancerName + " already present, not added");
 			return false;
+		}
 
 		if(logger.isDebugEnabled()) {
 			logger.debug("Adding following balancer name : " + balancerName +"/address:"+ addr);
 		}
-		balancerNames.add(balancerName);
 
-		register.put(balancerName, address);
+		BalancerDescription balancerDescription = new BalancerDescription(address, sipPort);
+		register.put(balancerName, balancerDescription);
 
 		return true;
 	}
@@ -243,15 +225,15 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 	/**
      * {@inheritDoc}
      */
-	public boolean addBalancerAddress(String hostName, int index) {
-		return this.addBalancerAddress(fetchHostAddress(hostName, index)
-				.getHostAddress());
+	public boolean addBalancer(String hostName, int sipPort, int index) {
+		return this.addBalancer(fetchHostAddress(hostName, index)
+				.getHostAddress(), sipPort);
 	}
 
 	/**
      * {@inheritDoc}
      */
-	public boolean removeBalancerAddress(String addr) {
+	public boolean removeBalancer(String addr, int sipPort) {
 		if (addr == null)
 			throw new NullPointerException("addr cant be null!!!");
 
@@ -263,23 +245,32 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 					"Something wrong with host creation.", e);
 		}
 
-		String balancerName = address.getCanonicalHostName();
+		BalancerDescription balancerDescription = new BalancerDescription(address, sipPort);
 
-		if(logger.isDebugEnabled()) {
-			logger.debug("Removing following balancer name : " + balancerName +"/address:"+ addr);
+		String keyToRemove = null;
+		Iterator<String> keyIterator = register.keySet().iterator();
+		while (keyIterator.hasNext() && keyToRemove ==null) {
+			String key = keyIterator.next();
+			if(register.get(key).equals(balancerDescription)) {
+				keyToRemove = key;
+			}
 		}
-		if (!balancerNames.contains(balancerName))
-			return false;
+		
+		if(keyToRemove !=null ) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Removing following balancer name : " + keyToRemove +"/address:"+ addr);
+			}
+			register.remove(keyToRemove);
+			return true;
+		}
 
-		this.removeBalancerAddress(this.balancerNames.indexOf(balancerName));
-
-		return true;
+		return false;
 	}
 
 	/**
      * {@inheritDoc}
      */
-	public boolean removeBalancerAddress(String hostName, int index) {
+	public boolean removeBalancer(String hostName, int sipPort, int index) {
 		InetAddress[] hostAddr = null;
 		try {
 			hostAddr = InetAddress.getAllByName(hostName);
@@ -297,7 +288,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 
 		InetAddress address = hostAddr[index];
 
-		return this.removeBalancerAddress(address.getHostAddress());
+		return this.removeBalancer(address.getHostAddress(), sipPort);
 	}
 
 	private ArrayList<SIPNode> getConnectorsAsSIPNode() {
@@ -337,9 +328,9 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 	 * @param info
 	 */
 	private void sendKeepAliveToBalancers(ArrayList<SIPNode> info) {
-		for(InetAddress ah:new HashSet<InetAddress>(register.values())) {
+		for(BalancerDescription  balancerDescription:new HashSet<BalancerDescription>(register.values())) {
 			try {
-				Registry registry = LocateRegistry.getRegistry(ah.getHostAddress(),2000);
+				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.handlePing(info);
 				displayBalancerWarining = true;
@@ -367,9 +358,9 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 	 * @param info
 	 */
 	private void removeNodesFromBalancers(ArrayList<SIPNode> info) {
-		for(InetAddress ah:new HashSet<InetAddress>(register.values())) {
+		for(BalancerDescription balancerDescription:new HashSet<BalancerDescription>(register.values())) {
 			try {
-				Registry registry = LocateRegistry.getRegistry(ah.getHostAddress(),2000);
+				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.forceRemoval(info);
 				displayBalancerWarining = true;
