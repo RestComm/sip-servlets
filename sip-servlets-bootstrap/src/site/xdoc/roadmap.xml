@@ -578,13 +578,13 @@
 					</p>
 				</subsection>
 				<subsection name="Version 0.8 - 12/01/2008">
-					<p>																	
+					<p>
 						<img src="red.jpeg" />
 						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=109">
-						Mobicents Application Router
+							href="http://code.google.com/p/mobicents/issues/detail?id=347">
+						Port to JBoss AS 5
 						</a>
-						<br />
+						<br />							
 						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=321">
@@ -592,11 +592,10 @@
 						</a>
 						<br />
 						<img src="red.jpeg" />
-						<!--<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=321">
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=454">
 						Mid Call Failover Support for UAC Applications
-						</a>-->
-						Mid Call Failover Support for UAC Applications
+						</a>>
 						<br />
 						<img src="orange.jpeg" />
 						<a
@@ -619,13 +618,13 @@
 					</p>
 				</subsection>
 				<subsection name="Version 0.9 - 01/01/2009">
-					<p>
+					<p>	
 						<img src="red.jpeg" />
 						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=347">
-						Port to JBoss AS 5
+							href="http://code.google.com/p/mobicents/issues/detail?id=132">
+						Parlay X support
 						</a>
-						<br />	
+						<br />				
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=322">
@@ -662,10 +661,10 @@
 						<br />
 						<img src="red.jpeg" />
 						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=132">
-						Parlay X support
+							href="http://code.google.com/p/mobicents/issues/detail?id=109">
+						Mobicents Application Router
 						</a>
-						<br />				
+						<br />
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=323">
@@ -674,7 +673,7 @@
 						<br />
 						<img src="red.jpeg" />
 						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=325">
+							href="http://code.google.com/p/mobicents/issues/detail?id=324">
 						Sip Servlets working as IMS node (HSS or CSCF)
 						</a>
 						<br />
