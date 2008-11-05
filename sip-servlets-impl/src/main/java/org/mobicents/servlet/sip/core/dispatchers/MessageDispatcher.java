@@ -84,6 +84,14 @@ public abstract class MessageDispatcher {
 	 * This parameter is to know when the AR returned an external route instead of an app
 	 */
 	public static final String MODIFIER = "modifier";
+
+	/*
+	 * Those parameters is to indicate to the SIP Load Balancer, from which node comes from the request
+	 * so that it can stick the Call Id to this node and correctly route the subsequent requests. 
+	 */
+	public static final String ROUTE_PARAM_NODE_HOST = "node_host";
+
+	public static final String ROUTE_PARAM_NODE_PORT = "node_port";
 	
 	
 	protected SipApplicationDispatcher sipApplicationDispatcher = null;

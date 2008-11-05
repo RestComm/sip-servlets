@@ -264,6 +264,10 @@ public class ExtendedListeningPoint {
 		return ipAddresses;
 	}
 	
+	public String getHost(){
+		return host;
+	}
+	
 	/**
 	 * Retrieve the port associated with this listening point
 	 * @return port associated with this listening point

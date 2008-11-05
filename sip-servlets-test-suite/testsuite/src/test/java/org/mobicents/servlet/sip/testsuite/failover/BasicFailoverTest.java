@@ -139,6 +139,20 @@ public class BasicFailoverTest extends SipServletTestCase {
 				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-forwarding-b2bua-servlet-dar.properties";
 	}
 	
+	public void deployShootistApplication(SipEmbedded sipEmbedded) {
+		assertTrue(sipEmbedded.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp",
+				"sip-test-context", 
+				"sip-test"));
+	}
+
+	protected String getDarConfigurationFileShootist() {
+		return "file:///"
+				+ projectHome
+				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
+				+ "org/mobicents/servlet/sip/testsuite/simple/shootist-sip-servlet-dar.properties";
+	}
+	
 	@Override
 	public void setUp() throws Exception {
 		System.setProperty("java.util.logging.config.file", projectHome + File.separatorChar + "sip-servlets-test-suite" + 
@@ -208,6 +222,47 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());
 		sender.setOkToByeReceived(false);
 		secondTomcatServer.stopTomcat();
+	}
+	
+	public void testBasicFailoverUAC() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG);
+		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();	
+		//start the sip balancer
+		startSipBalancer();				
+		//starts the first server
+		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		tomcat.startTomcat();			
+		//starts the second server
+		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
+		secondTomcatServer.setLoggingFilePath(  
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
+		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFile());
+		getTomcatBackupHomePath();
+		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
+		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
+		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		secondTomcatServer.startTomcat();
+		//first test
+		Thread.sleep(TIMEOUT);
+		deployShootistApplication(tomcat);
+		Thread.sleep(TIMEOUT);
+		
+		assertTrue(receiver.getByeReceived());
+		
+		tomcat.stopTomcat();
+		receiver.setByeReceived(false);
+		deployShootistApplication(secondTomcatServer);	
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
 	}
 	
 	public void testBasicFailoverCancelTest() throws Exception {
@@ -732,7 +787,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		fwd = null;
 		undoRegister(reg);
 		reg =null;
-		senderProtocolObjects.destroy();
+		if(senderProtocolObjects != null) {
+			senderProtocolObjects.destroy();	
+		}		
 		if(receiverProtocolObjects != null) {
 			receiverProtocolObjects.destroy();
 		}

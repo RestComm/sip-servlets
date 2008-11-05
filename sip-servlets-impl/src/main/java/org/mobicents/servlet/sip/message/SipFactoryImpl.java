@@ -55,8 +55,10 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -463,13 +465,29 @@ public class SipFactoryImpl implements Serializable {
 					fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();
 				}										
 				// Create the contact name address.
-				contactHeader = 
-					JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);
+				contactHeader = null;
+				// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
+				// so that the subsequent requests can be failed over
+				if(useLoadBalancer) {
+					javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+					sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+					sipURI.setPort(loadBalancerToUse.getSipPort());			
+					sipURI.setTransportParam(transport);
+					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
+					if(fromName != null && fromName.length() > 0) {
+						contactAddress.setDisplayName(fromName);
+					}
+					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
+				} else {
+					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);
+				}
 			}
 			// Add all headers		
 			if(contactHeader != null) {
 				requestToWrap.addHeader(contactHeader);
 			}
+			// if a sip load balancer is present in front of the server, add a route header to go through it
+			// so that the subsequent requests can be failed over
 			if(useLoadBalancer) {
 				addLoadBalancerRouteHeader(requestToWrap);
 			}
@@ -640,8 +658,21 @@ public class SipFactoryImpl implements Serializable {
 	 * @throws ParseException
 	 */
 	public void addLoadBalancerRouteHeader(Request request) throws ParseException {
-		javax.sip.address.Address address = SipFactories.addressFactory.createAddress("sip:" + loadBalancerToUse.getAddress().getHostAddress()+ ":" + loadBalancerToUse.getSipPort());
-		RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(address);
-		request.addHeader(routeHeader);
+		javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, loadBalancerToUse.getAddress().getHostAddress());
+		sipUri.setPort(loadBalancerToUse.getSipPort());
+		sipUri.setLrParam();
+		String transport = JainSipUtils.findTransport(request);
+		sipUri.setTransportParam(transport);
+		ExtendedListeningPoint listeningPoint = 
+			getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
+		sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
+				listeningPoint.getHost());
+		sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
+				"" + listeningPoint.getPort());
+		javax.sip.address.Address routeAddress = 
+			SipFactories.addressFactory.createAddress(sipUri);
+		RouteHeader routeHeader = 
+			SipFactories.headerFactory.createRouteHeader(routeAddress);
+		request.addHeader(routeHeader);		
 	}
 }
