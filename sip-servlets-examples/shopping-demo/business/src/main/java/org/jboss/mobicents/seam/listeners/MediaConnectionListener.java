@@ -37,21 +37,6 @@ public class MediaConnectionListener implements MsConnectionListener {
 	
 	private SipServletRequest inviteRequest;	
 
-	private void listenToDTMF(MsConnection connection, String pathToAudioDirectory) {
-		MsEndpoint endpoint = connection.getEndpoint();
-		MsProvider msProvider = connection.getSession().getProvider();
-		MsEventFactory eventFactory = msProvider.getEventFactory();
-		DTMFListener dtmfListener = new DTMFListener(eventFactory, connection, inviteRequest.getSession(), pathToAudioDirectory);
-		connection.addNotificationListener(dtmfListener);
-		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
-		MsRequestedSignal[] signals = new MsRequestedSignal[] {};
-		MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
-
-		endpoint.execute(signals, events, connection);
-		
-		inviteRequest.getSession().setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STARTED);
-	}
-
 	public void txFailed(MsConnectionEvent event) {
 		logger.info("Transaction failed on event "+ event.getEventID() + "with message " + event.getMessage());
 		
@@ -115,9 +100,12 @@ public class MediaConnectionListener implements MsConnectionListener {
 		
 		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
         
-		
+		DTMFListener dtmfListener = new DTMFListener(eventFactory, connection, inviteRequest.getSession(), pathToAudioDirectory);
+		connection.addNotificationListener(dtmfListener);
+		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
+	
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
 		
 		if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
 			java.io.File speech = new File("speech.wav");
@@ -126,18 +114,17 @@ public class MediaConnectionListener implements MsConnectionListener {
 			}			
 			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
 	        play.setURL("file://"+ speech.getAbsolutePath());
+
 	        endpoint.execute(requestedSignals, requestedEvents, connection);
 	        
-			logger.info("announcement confirmation played. waiting for DTMF ");
-			listenToDTMF(connection, pathToAudioDirectory);
+			logger.info("Waiting for DTMF at the same time..");
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
 			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
 			logger.info("Playing Delivery Date Announcement : " + announcementFile);
 			play.setURL(announcementFile);
 			endpoint.execute(requestedSignals, requestedEvents, connection);
 			
-			logger.info("Delivery Date Announcement played. waiting for DTMF ");
-			listenToDTMF(connection, pathToAudioDirectory);
+			logger.info("Waiting for DTMF at the same time..");
 		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
 			java.io.File speech = new File("shipping.wav");
 			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
