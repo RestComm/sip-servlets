@@ -86,18 +86,14 @@ public class MediaConnectionListener implements MsConnectionListener{
 		
 		play.setURL("file://" + speech.getAbsolutePath());
 		
-		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
-		
-		endpoint.execute(requestedSignals, requestedEvents, connection);		
-
 		DTMFListener dtmfListener = new DTMFListener(eventFactory, connection);
 		provider.addNotificationListener(dtmfListener);
 		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
-		MsRequestedSignal[] signals = new MsRequestedSignal[] {};
-		MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
-
-		endpoint.execute(signals, events, connection);
+		
+		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
+		
+		endpoint.execute(requestedSignals, requestedEvents, connection);		
 	}
 
 	public SipServletRequest getInviteRequest() {
