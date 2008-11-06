@@ -47,6 +47,15 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 	            ;;
+	    uac)
+	            echo "Distributed example used is uac";
+	    		mvn clean process-resources -Dsend.on.init=true install -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				mvn clean process-resources -Dsend.on.init=false install -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+	            ;;
 	    *)
 	            echo "Distributed example used is uas";
 	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml

@@ -25,6 +25,12 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/all/deploy
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 	            ;;
+	    uac)
+	            echo "Distributed example used is uac";
+	    		mvn clean install -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
+				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
+	            ;;
 	    *)
 	            echo "Distributed example used is uas";
 	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
