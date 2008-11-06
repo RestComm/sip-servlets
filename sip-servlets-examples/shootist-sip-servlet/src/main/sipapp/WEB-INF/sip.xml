@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.ShootistApplication</app-name>
+	<display-name>Shootist Sip Servlet</display-name>
+	<description>Shootist Sip Servlet</description>
+
+	<servlet>
+		<servlet-name>ShootistSipServlet</servlet-name>
+		<display-name>ShootistSipServlet</display-name>
+		<description>Shootist SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.ShootistSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.ShootistSipServlet
+		</listener-class>
+	</listener>
+</sip-app>
