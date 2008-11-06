@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app>
+	<app-name>org.mobicents.servlet.sip.example.DistributableShootistApplication</app-name>
+	<display-name>Distributable Shootist Sip Servlet</display-name>
+	<description>Distributable Shootist Sip Servlet</description>
+	<distributable/>
+</web-app>

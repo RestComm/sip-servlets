@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.DistributableShootistApplication</app-name>
+	<display-name>Distributable Shootist Sip Servlet</display-name>
+	<description>Distributable Shootist Sip Servlet</description>
+	<distributable/>
+
+	<context-param>
+    	<param-name>send-on-init</param-name>
+        <param-value>${send.on.init}</param-value>
+  	</context-param>
+
+	<servlet>
+		<servlet-name>DistributableShootistSipServlet</servlet-name>
+		<display-name>DistributableShootistSipServlet</display-name>
+		<description>Distributable Shootist SIP servlet</description>		
+		<servlet-class>
+			org.mobicents.servlet.sip.example.DistributableShootistSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.DistributableShootistSipServlet
+		</listener-class>
+	</listener>	
+</sip-app>
