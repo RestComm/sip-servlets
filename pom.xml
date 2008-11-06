@@ -76,6 +76,7 @@
 		<module>sip-servlets-spec</module>
 		<module>sip-servlets-impl</module>
 		<module>sip-servlets-application-router</module>
+		<module>sip-servlets-management</module>
 	</modules>
 	
 	<properties>
