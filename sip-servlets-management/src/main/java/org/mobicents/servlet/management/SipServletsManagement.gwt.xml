@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<inherits name='com.google.gwt.user.User'/>
+    <inherits name="com.google.gwt.user.theme.chrome.Chrome"/>
+	<inherits name='com.gwtext.GwtExt' />
+	<!-- Inherit gwt-dnd 2.x support               -->
+	<inherits name="com.allen_sauer.gwt.dnd.gwt-dnd" />
+	
+	<!-- Specify the app entry point class.                   -->
+	<entry-point
+		class="org.mobicents.servlet.management.client.SipServletsManagement" />
+	<servlet
+		class="org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl"
+		path="/DARConfigurationService" />
+</module>
