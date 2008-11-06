@@ -1410,14 +1410,15 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
 		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
+		ClusteredSipSession newTempSession = session;
 		if (session == null) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
-			session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+			newTempSession = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
 		}		
-		synchronized (session) {
+		synchronized (newTempSession) {
 			ClusteredSipSession sessionInCache = null;
 			boolean doTx = false;
 			try {
@@ -1435,7 +1436,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				// session if data gravitation occurs.
 				ConvergedSessionReplicationContext.startSipCacheActivity();
 
-				sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), session);
+				sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
 			} catch (Exception ex) {
 				try {
 					// if(doTx)
@@ -1471,7 +1472,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 				if (log_.isDebugEnabled()) {
 					log_.debug("loadSession(): id= " + key.toString() + ", session="
-							+ session);
+							+ newTempSession);
 				}
 				return sessionInCache;
 			} else if (log_.isDebugEnabled()) {
@@ -1479,8 +1480,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 						+ " not found in distributed cache");
 			}
 		}
-		ConvergedSessionReplicationContext.bindSipSession(session,
+		if(session != null) {
+			ConvergedSessionReplicationContext.bindSipSession(session,
 				snapshotManager_);
+		}
 		return session;
 	}
 	

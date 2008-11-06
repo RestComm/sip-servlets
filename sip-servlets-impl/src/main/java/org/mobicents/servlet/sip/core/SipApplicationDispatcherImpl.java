@@ -262,43 +262,71 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isDebugEnabled()) {
 			logger.debug(children.length + " container to notify of servlet initialization");
 		}
-		for (Container container : children) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
-			}
-			if(container instanceof Wrapper) {			
-				Wrapper wrapper = (Wrapper) container;
-				Servlet sipServlet = null;
-				try {
-					sipServlet = wrapper.allocate();
-					if(sipServlet instanceof SipServlet) {
-						SipServletContextEvent sipServletContextEvent = 
-							new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
-						for (SipServletListener sipServletListener : sipServletListeners) {					
-							sipServletListener.servletInitialized(sipServletContextEvent);					
+		final boolean isDistributable = sipContext.getDistributable();
+		if(isDistributable) {
+			ConvergedSessionReplicationContext.enterSipapp(null, null, true);
+		}
+		try {
+			for (Container container : children) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
+				}
+				if(container instanceof Wrapper) {			
+					Wrapper wrapper = (Wrapper) container;
+					Servlet sipServlet = null;
+					try {
+						sipServlet = wrapper.allocate();
+						if(sipServlet instanceof SipServlet) {
+							SipServletContextEvent sipServletContextEvent = 
+								new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
+							for (SipServletListener sipServletListener : sipServletListeners) {					
+								sipServletListener.servletInitialized(sipServletContextEvent);					
+							}
+						}					
+					} catch (ServletException e) {
+						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
+								"that it has been initialized", e);
+						ok = false; 
+					} catch (Throwable e) {
+						logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
+						ok = false; 
+					} 
+					try {
+						if(sipServlet != null) {
+							wrapper.deallocate(sipServlet);
 						}
-					}					
-				} catch (ServletException e) {
-					logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
-							"that it has been initialized", e);
-					ok = false; 
-				} catch (Throwable e) {
-					logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
-					ok = false; 
-				} 
-				try {
-					if(sipServlet != null) {
-						wrapper.deallocate(sipServlet);
+					} catch (ServletException e) {
+			            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+			            ok = false;
+					} catch (Throwable e) {
+						logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+			            ok = false;
 					}
-				} catch (ServletException e) {
-		            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-		            ok = false;
-				} catch (Throwable e) {
-					logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-		            ok = false;
 				}
 			}
-		}			
+		} finally {
+			if (isDistributable) {
+				if(logger.isInfoEnabled()) {
+					logger.info("We are now after the servlet invocation, We replicate no matter what");
+				}
+				try {
+					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+							.exitSipapp();
+	
+					if(logger.isInfoEnabled()) {
+						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+					}
+					if (ctx.getSoleSnapshotManager() != null) {
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipSession());
+						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+								ctx.getSoleSipApplicationSession());
+					} 
+				} finally {
+					ConvergedSessionReplicationContext.finishSipCacheActivity();
+				}
+			}
+		}
 		return ok;
 	}
 	

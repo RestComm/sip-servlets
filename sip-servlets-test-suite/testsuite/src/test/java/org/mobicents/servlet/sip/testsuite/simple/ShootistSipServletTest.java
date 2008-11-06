@@ -55,8 +55,11 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();						
-		
+		super.setUp();												
+	}
+	
+	public void testShootist() throws Exception {
+//		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
 					
@@ -65,15 +68,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		
 		senderProvider.addSipListener(receiver);
 		
-		receiverProtocolObjects.start();			
-	}
-	
-	public void testShootist() throws Exception {
-//		receiver.sendInvite();
+		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
+	}
+	
+	public void testShootistCallerSendsBye() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());		
 	}
 
 	@Override

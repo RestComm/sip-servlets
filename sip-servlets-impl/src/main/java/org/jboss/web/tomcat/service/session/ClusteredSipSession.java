@@ -190,7 +190,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
 		invalidationPolicy = ((AbstractJBossManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getInvalidateSessionPolicy();
 		this.useJK = useJK;
-		this.firstAccess = true;
+		this.firstAccess = true;	
+		// it starts with true so that it gets replicated when first created
+		sessionMetadataDirty = true;
 		checkAlwaysReplicateMetadata();
 	}
 
@@ -1042,6 +1044,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			routingRegion = (SipApplicationRoutingRegion) in.readObject();
 			stateInfo = (Serializable) in.readObject();
 			handlerServlet = in.readUTF();
+			if(logger.isDebugEnabled()) {
+				logger.debug("reading handlerServlet "+ handlerServlet);
+			}
 			String subscriberURIStringified = in.readUTF();
 			if("".equals(subscriberURIStringified)) {
 				subscriberURIStringified = null;
@@ -1094,7 +1099,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// If the session has been replicated, any subsequent
 			// access cannot be the first.
 			this.firstAccess = false;
-
+			sessionMetadataDirty = false;
+			sessionAttributesDirty = false;
+			
 			// Assume deserialization means replication and use thisAccessedTime
 			// as a proxy for when replication occurred
 			updateLastReplicated();
@@ -1155,6 +1162,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			out.writeUTF(sipApplicationSession.getKey().toString());
 			out.writeObject(routingRegion);
 			out.writeObject(stateInfo);
+			if(logger.isDebugEnabled()) {
+				logger.debug("writing handlerServlet "+ handlerServlet);
+			}
 			out.writeUTF(handlerServlet);
 			if(subscriberURI != null) {
 				out.writeUTF(subscriberURI.toString());

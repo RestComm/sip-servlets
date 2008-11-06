@@ -310,18 +310,20 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSession loadSession(String realId, ClusteredSession toLoad)
    {
-	  log_.info("loading session from the cache " + realId);
-      Fqn fqn = getSessionFqn(realId);
+	   if(log_.isDebugEnabled()) {
+		   log_.debug("loading session from the cache " + realId);
+	   }
+	   Fqn fqn = getSessionFqn(realId);
    
       
-      Object sessionData = cacheWrapper_.get(fqn, realId, true);
+	   Object sessionData = cacheWrapper_.get(fqn, realId, true);
       
-      if (sessionData == null) {
-         // Requested session is no longer in the cache; return null
-         return null;
-      }
+	   if (sessionData == null) {
+		   // Requested session is no longer in the cache; return null
+		   return null;
+	   }
       
-      boolean firstLoad = (toLoad.getVersion() == 0);
+	   boolean firstLoad = (toLoad.getVersion() == 0);
       
 //      if (useTreeCacheMarshalling_)
 //      {
@@ -329,44 +331,39 @@ public class ConvergedJBossCacheService extends JBossCacheService
 //      }
 //      else
 //      {
-         byte[] sessionBytes = (byte[]) sessionData;
+       byte[] sessionBytes = (byte[]) sessionData;
          
-         // Swap in/out the webapp classloader so we can deserialize
-         // attributes whose classes are only available to the webapp
-         ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
-         Thread.currentThread().setContextClassLoader(manager_.getWebappClassLoader());
-         try
-         {
-            ByteArrayInputStream bais = new ByteArrayInputStream(sessionBytes);
-            // Use MarshalledValueInputStream instead of superclass ObjectInputStream
-            // or else there are problems finding classes with scoped loaders
-            MarshalledValueInputStream input = new MarshalledValueInputStream(bais);
-            toLoad.readExternal(input);
-            input.close();
-         }
-         catch (Exception e)
-         {
-            log_.error("loadSession(): id: " + realId + " exception occurred during deserialization", e);
-            return null;
-         }
-         finally {
-            Thread.currentThread().setContextClassLoader(prevTCL);
-         }
+       // Swap in/out the webapp classloader so we can deserialize
+       // attributes whose classes are only available to the webapp
+       ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+       Thread.currentThread().setContextClassLoader(manager_.getWebappClassLoader());
+       try {
+    	   ByteArrayInputStream bais = new ByteArrayInputStream(sessionBytes);
+    	   // Use MarshalledValueInputStream instead of superclass ObjectInputStream
+    	   // or else there are problems finding classes with scoped loaders
+    	   MarshalledValueInputStream input = new MarshalledValueInputStream(bais);
+    	   toLoad.readExternal(input);
+    	   input.close();
+       } catch (Exception e) {
+    	   log_.error("loadSession(): id: " + realId + " exception occurred during deserialization", e);
+    	   return null;
+       } finally {
+    	   Thread.currentThread().setContextClassLoader(prevTCL);
+       }
 //      }
       
-      // The internal version of the serialized session may be less than the
-      // real one due to not replicating metadata.  If our listener hasn't 
-      // been keeping the outdatedVersion of the session up to date because
-      // the session has never been loaded into the JBCManager cache, we 
-      // need to fix the version
-      if (firstLoad)
-      {         
-         Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
-         if (ver != null)
-            toLoad.setVersion(ver.intValue());
-      }
+       // The internal version of the serialized session may be less than the
+       // real one due to not replicating metadata.  If our listener hasn't 
+       // been keeping the outdatedVersion of the session up to date because
+       // the session has never been loaded into the JBCManager cache, we 
+       // need to fix the version
+       if (firstLoad) {         
+    	   Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
+    	   if (ver != null)
+    		   toLoad.setVersion(ver.intValue());
+       }
       
-      return toLoad;
+       return toLoad;
    }
    
    /**
@@ -379,14 +376,18 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSipSession loadSipSession(String id, String realId, ClusteredSipSession toLoad)
    {
-	  log_.info("loading sip session from the cache " + id + " / " + realId);
+	  if(log_.isDebugEnabled()) {
+		  log_.debug("loading sip session from the cache " + id + " / " + realId);
+	  }
       Fqn fqn = getSipSessionFqn(id, realId);
    
       
       Object sessionData = cacheWrapper_.get(fqn, realId, true);
       
       if (sessionData == null) {
-    	  log_.info("sip session " + id + " / " + realId + " is no longer in the cache. FQN = "+ fqn);
+    	  if(log_.isDebugEnabled()) {
+    		  log_.debug("sip session " + id + " / " + realId + " is no longer in the cache. FQN = "+ fqn);
+    	  }
          // Requested session is no longer in the cache; return null
          return null;
       }
@@ -449,14 +450,18 @@ public class ConvergedJBossCacheService extends JBossCacheService
     */
    public ClusteredSipApplicationSession loadSipApplicationSession(String realId, ClusteredSipApplicationSession toLoad)
    {
-	  log_.info("loading sip app session from the cache " + realId);
+	   if(log_.isDebugEnabled()) {
+		   log_.debug("loading sip app session from the cache " + realId);
+	   }
       Fqn fqn = getSipApplicationSessionFqn(realId);
    
       
       Object sessionData = cacheWrapper_.get(fqn, realId, true);
       
       if (sessionData == null) {
-    	  log_.info("sip app session " + realId + " is no longer in the cache. FQN = "+ fqn);
+    	  if(log_.isDebugEnabled()) {
+    		  log_.debug("sip app session " + realId + " is no longer in the cache. FQN = "+ fqn);
+    	  }
          // Requested session is no longer in the cache; return null
          return null;
       }
@@ -1895,9 +1900,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
          
          byte[] bytes = baos.toByteArray();
          
-         if (log_.isInfoEnabled())
+         if (log_.isDebugEnabled())
          {
-            log_.info("marshalled object to size " + bytes.length + " bytes");
+            log_.debug("marshalled object to size " + bytes.length + " bytes");
          }
 
          return bytes;
@@ -1924,9 +1929,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
          
          byte[] bytes = baos.toByteArray();
          
-         if (log_.isInfoEnabled())
+         if (log_.isDebugEnabled())
          {
-            log_.info("marshalled object to size " + bytes.length + " bytes");
+            log_.debug("marshalled object to size " + bytes.length + " bytes");
          }
 
          return bytes;

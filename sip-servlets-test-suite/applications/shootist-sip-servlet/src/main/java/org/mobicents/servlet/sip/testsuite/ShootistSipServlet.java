@@ -17,11 +17,13 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.io.Serializable;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
@@ -30,6 +32,8 @@ import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
@@ -37,10 +41,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class ShootistSipServlet 
 		extends SipServlet 
-		implements SipServletListener {
+		implements SipServletListener,TimerListener {
 
 	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);
-	
+	@Resource
+	TimerService timerService;
 	
 	/** Creates a new instance of ShootistSipServlet */
 	public ShootistSipServlet() {
@@ -61,16 +66,20 @@ public class ShootistSipServlet
 		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			ackRequest.send();
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {				
-				logger.error("unexpected exception", e);
-			}
 			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-			sipServletRequest.send();
+			ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), 2000, false, (Serializable)sipServletRequest);
+			sipServletResponse.getApplicationSession().setAttribute("timer", timer);
 		}
 	}
 
+	@Override
+	protected void doBye(SipServletRequest req) throws ServletException,
+			IOException {
+		ServletTimer timer = (ServletTimer) req.getApplicationSession().getAttribute("timer");
+		timer.cancel();
+		req.createResponse(SipServletResponse.SC_OK).send();
+	}
+	
 	// SipServletListener methods
 	/*
 	 * (non-Javadoc)
@@ -98,7 +107,16 @@ public class ShootistSipServlet
 		try {			
 			sipServletRequest.send();
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error("Unexpected exception while sending the INVITE request",e);
 		}		
+	}
+
+	public void timeout(ServletTimer timer) {
+		SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
+		try {
+			sipServletRequest.send();
+		} catch (IOException e) {
+			logger.error("Unexpected exception while sending the BYE request",e);
+		}
 	}
 }

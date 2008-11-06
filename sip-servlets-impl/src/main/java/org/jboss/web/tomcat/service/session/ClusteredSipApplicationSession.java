@@ -194,6 +194,8 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		invalidationPolicy = ((AbstractJBossManager)sipContext.getSipManager()).getInvalidateSessionPolicy();
 		this.useJK = useJK;
 		this.firstAccess = true;
+		// it starts with true so that it gets replicated when first created
+		sessionMetadataDirty = true;
 		checkAlwaysReplicateMetadata();
 		sipSessionsOnPassivation = new HashSet<SipSessionKey>();
 		httpSessionsOnPassivation = new HashSet<String>();
@@ -1004,14 +1006,18 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 */
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		logger.info("reading sip app session from the cache ");
+		if(logger.isDebugEnabled()) {
+			logger.debug("reading sip app session from the cache ");
+		}
 		synchronized (this) {
 			// From SipApplicationSessionImpl
 			String id = in.readUTF();
 			String applicationName = in.readUTF();
 			boolean isAppGeneratedKey = in.readBoolean();
 			key = new SipApplicationSessionKey(id, applicationName, isAppGeneratedKey);
-			logger.info("reading sip app session from the cache. key = " + key);
+			if(logger.isDebugEnabled()) {
+				logger.debug("reading sip app session from the cache. key = " + key);
+			}
 			
 			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();
@@ -1032,6 +1038,9 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 				String sipSessionKeyStringified = in.readUTF();
 				try {
 					SipSessionKey sipSessionKey = SessionManagerUtil.parseSipSessionKey(sipSessionKeyStringified);
+					if(logger.isDebugEnabled()) {
+						logger.debug("reading sip session from the cached sip appsession . sip session key = " + sipSessionKey);
+					}
 					sipSessionsOnPassivation.add(sipSessionKey);
 				} catch (ParseException e) {
 					logger.error("Unexpected exception while parsing the sip session key that has been previously passivated " + sipSessionKeyStringified, e);
@@ -1064,6 +1073,8 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			// If the session has been replicated, any subsequent
 			// access cannot be the first.
 			this.firstAccess = false;
+			sessionMetadataDirty = false;
+			sessionAttributesDirty = false;
 
 			// TODO uncomment when work on JBAS-1900 is completed
 			// // Session notes -- for FORM auth apps, allow replicated session

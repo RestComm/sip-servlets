@@ -24,6 +24,9 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This class is used as a central place to get a session be it a sip session
  * or an sip application session. 
@@ -39,7 +42,8 @@ import javax.sip.message.Message;
  * remove methods when the sessions are no longer used.
  */
 public class SessionManagerUtil {
-
+	private transient static final Log logger = LogFactory.getLog(SessionManagerUtil.class);
+	
 	public final static String TAG_PARAMETER_NAME = "tag";
 	
 	/**
@@ -150,7 +154,10 @@ public class SessionManagerUtil {
 		if(indexOfRightParenthesis == -1) {
 			throw new ParseException("The right parenthesis could not be found in the following key " + sipSessionKey, 0);
 		}
-		String sipSessionKeyToParse = sipSessionKey.substring(indexOfLeftParenthesis+1, indexOfRightParenthesis-1);
+		String sipSessionKeyToParse = sipSessionKey.substring(indexOfLeftParenthesis+1, indexOfRightParenthesis);
+		if(logger.isInfoEnabled()) {
+			logger.info("sipSession key to parse " + sipSessionKeyToParse );
+		}
 		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, ",");
 		String fromAddress = stringTokenizer.nextToken();
 		String fromTag = stringTokenizer.nextToken();
