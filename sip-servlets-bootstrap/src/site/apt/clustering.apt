@@ -38,4 +38,4 @@ Mobicents Sip Servlets Clustering support
 		
 * Limitations
 
-	Mobicents Sip Servlets doesn't currently support clustering of 2BUA sip applications and converged applications only UA and proxy pure sip applications. 
+	Mobicents Sip Servlets doesn't currently support mid call failover for converged applications only pure sip applications (Uas, Uac, B2BUA, Proxy). 

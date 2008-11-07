@@ -36,7 +36,20 @@ Mobicents SIP Load Balancer
 	
 	As said above, the different nodes are responsible for contacting the Mobicents Sip Load Balancer and sending to it liveness heartbeats and status health.
 	
-	For Mobicents Sip Servlets this is done in extending the 
+	This has the following advantages compared to standard implementations where the Load Balancer is reponsible for pinging the cluster nodes :
+        
+		* Dynamic configuration of the nodes : Traditional SIP-based load balancers require explicit configuration of the nodes available. 
+		In Mobicents SIP Load Balancer, the bulk of the configuration resides on the application server nodes. 
+		The set of SIP load balancers to which an application server will communicate is determined by a static list. 
+		The application server relays lifecycle events (e.g. server startup/shutdown) to the load balancers allowing them to effectively auto-configure themselves. 
+		They also send keep alives to the Load Balancers so that if the application server crashes, the load balancer autmatically remove the node after receiving no keep alives from the node.  
+		
+		* Server-side load balance factor calculation : In contrast with traditional SIP-based load balancers, 
+		the Mobicents SIP load Balance uses load balance factors calculated and provided by the application server nodes, 
+		rather than computing these in the load balancer. Consequently, it offers a more robust and accurate set 
+		of load metrics than is available from the load balancer.  
+		
+	To configure Mobicents Sip Servlets cluster node to contact the SIP Load Baalncer, this is done in extending the 
 	<<<SipStandardService>>> class which already extends the Tomcat <<<StandardService>>> class implementing the Tomcat <<<Service>>> interface.\
 	In Tomcat's Architecture, a <<<Service>>> is an intermediate component which lives inside a Server and 
 	ties one or more Connectors to exactly one Engine.
