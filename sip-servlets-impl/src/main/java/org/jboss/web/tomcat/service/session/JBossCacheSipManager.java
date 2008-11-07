@@ -1411,73 +1411,75 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		boolean mustAdd = false;
 		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		ClusteredSipSession newTempSession = session;
-		if (session == null) {
+		if (session == null && sipApplicationSessionImpl != null) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
 			newTempSession = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
 		}		
-		synchronized (newTempSession) {
-			ClusteredSipSession sessionInCache = null;
-			boolean doTx = false;
-			try {
-				// We need transaction so any data gravitation replication
-				// is sent in batch.
-				// Don't do anything if there is already transaction context
-				// associated with this thread.
-				if (tm.getTransaction() == null)
-					doTx = true;
-
-				if (doTx)
-					tm.begin();
-
-				// Ignore cache notifications we may generate for this
-				// session if data gravitation occurs.
-				ConvergedSessionReplicationContext.startSipCacheActivity();
-
-				sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
-			} catch (Exception ex) {
+		if(newTempSession != null) {
+			synchronized (newTempSession) {
+				ClusteredSipSession sessionInCache = null;
+				boolean doTx = false;
 				try {
-					// if(doTx)
-					// Let's set it no matter what.
-					tm.setRollbackOnly();
-				} catch (Exception exn) {
-					log_.error("Problem rolling back session mgmt transaction",
-							exn);
-				}
-
-				// We will need to alert Tomcat of this exception.
-				if (ex instanceof RuntimeException)
-					throw (RuntimeException) ex;
-
-				throw new RuntimeException("Failed to load session " + key.toString(),
-						ex);
-			} finally {
-				try {
+					// We need transaction so any data gravitation replication
+					// is sent in batch.
+					// Don't do anything if there is already transaction context
+					// associated with this thread.
+					if (tm.getTransaction() == null)
+						doTx = true;
+	
 					if (doTx)
-						endTransaction(key.toString());
+						tm.begin();
+	
+					// Ignore cache notifications we may generate for this
+					// session if data gravitation occurs.
+					ConvergedSessionReplicationContext.startSipCacheActivity();
+	
+					sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
+				} catch (Exception ex) {
+					try {
+						// if(doTx)
+						// Let's set it no matter what.
+						tm.setRollbackOnly();
+					} catch (Exception exn) {
+						log_.error("Problem rolling back session mgmt transaction",
+								exn);
+					}
+	
+					// We will need to alert Tomcat of this exception.
+					if (ex instanceof RuntimeException)
+						throw (RuntimeException) ex;
+	
+					throw new RuntimeException("Failed to load session " + key.toString(),
+							ex);
 				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
+					try {
+						if (doTx)
+							endTransaction(key.toString());
+					} finally {
+						ConvergedSessionReplicationContext.finishSipCacheActivity();
+					}
 				}
-			}
-
-			if (sessionInCache != null) {
-				// Need to initialize.
-				sessionInCache.initAfterLoad(this);
-				if (mustAdd)
-					add(sessionInCache, false); // don't replicate
-				long elapsed = System.currentTimeMillis() - begin;
-				stats_.updateLoadStats(key.toString(), elapsed);
-
-				if (log_.isDebugEnabled()) {
-					log_.debug("loadSession(): id= " + key.toString() + ", session="
-							+ newTempSession);
+	
+				if (sessionInCache != null) {
+					// Need to initialize.
+					sessionInCache.initAfterLoad(this);
+					if (mustAdd)
+						add(sessionInCache, false); // don't replicate
+					long elapsed = System.currentTimeMillis() - begin;
+					stats_.updateLoadStats(key.toString(), elapsed);
+	
+					if (log_.isDebugEnabled()) {
+						log_.debug("loadSession(): id= " + key.toString() + ", session="
+								+ newTempSession);
+					}
+					return sessionInCache;
+				} else if (log_.isDebugEnabled()) {
+					log_.debug("loadSession(): session " + key.toString()
+							+ " not found in distributed cache");
 				}
-				return sessionInCache;
-			} else if (log_.isDebugEnabled()) {
-				log_.debug("loadSession(): session " + key.toString()
-						+ " not found in distributed cache");
 			}
 		}
 		if(session != null) {

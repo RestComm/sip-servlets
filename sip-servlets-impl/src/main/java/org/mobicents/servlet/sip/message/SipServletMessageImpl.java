@@ -117,7 +117,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 	protected Message message;
 	protected transient SipFactoryImpl sipFactoryImpl;
-	protected MobicentsSipSession session;
+	protected transient MobicentsSipSession session;
 
 	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 	private Transaction transaction;

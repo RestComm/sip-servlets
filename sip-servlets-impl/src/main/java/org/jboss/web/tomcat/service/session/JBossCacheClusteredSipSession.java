@@ -16,6 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.stack.SIPDialog;
 
@@ -87,8 +88,12 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 				for (Connector connector : connectors) {
 					SipStack sipStack = (SipStack)
 						connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-					if(sipStack != null && sessionCreatingDialog!= null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
+					if(sipStack != null && sessionCreatingDialog!= null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null && sipStack.getSipProviders().hasNext()) {
+						((SIPDialog)sessionCreatingDialog).setSipProvider((SipProviderImpl)sipStack.getSipProviders().next());
 						((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
+						if(logger.isDebugEnabled()) {
+							logger.debug("dialog injected " + sessionCreatingDialog);
+						}
 					}
 				}
 			}

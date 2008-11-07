@@ -63,7 +63,13 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		//TODO get the sip and http sessions from the cache
 		for (SipSessionKey sipSessionKey : sipSessionsOnPassivation) {
 			MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
-			sipSessions.put(sipSessionKey.toString(), sipSession);
+			if(sipSession != null) {
+				sipSessions.put(sipSessionKey.toString(), sipSession);	
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.warn("Impossible to get the sip session passivated from the cache " + sipSessionKey.toString());
+				}
+			}
 		}
 		
 		for (String httpSessionKey : httpSessionsOnPassivation) {

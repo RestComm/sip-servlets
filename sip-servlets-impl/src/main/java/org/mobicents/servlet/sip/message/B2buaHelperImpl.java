@@ -107,7 +107,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private Map<SipSessionKey, SipSessionKey> sessionMap = null;	
 
 	//Map to handle responses to original request and cancel on original request
-	private Map<SipSessionKey, SipServletRequest> originalRequestMap = null;
+	private transient Map<SipSessionKey, SipServletRequest> originalRequestMap = null;
 
 	private transient SipFactoryImpl sipFactoryImpl;
 	
@@ -160,9 +160,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			}
 
 			//Adding Route Header for LB if we are in a HA configuration
-//			if(sipFactoryImpl.isUseLoadBalancer()) {
-//				sipFactoryImpl.addLoadBalancerRouteHeader(newRequest);
-//			}
+			if(sipFactoryImpl.isUseLoadBalancer()) {
+				sipFactoryImpl.addLoadBalancerRouteHeader(newRequest);
+			}
 			
 			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);			
@@ -506,9 +506,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			newRequest.setHeader(callIdHeader);
 			
 			//Adding Route Header for LB if we are in a HA configuration
-//			if(sipFactoryImpl.isUseLoadBalancer()) {
-//				sipFactoryImpl.addLoadBalancerRouteHeader(newRequest);
-//			}
+			if(sipFactoryImpl.isUseLoadBalancer()) {
+				sipFactoryImpl.addLoadBalancerRouteHeader(newRequest);
+			}
 			
 			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			MobicentsSipApplicationSession originalAppSession = originalSession
