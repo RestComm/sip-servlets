@@ -13,20 +13,15 @@
 	<property name="tomcat.version" value="6.0.14" />
 	<property name="tomcat.download.url" value="http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
 	
-	<property name="gwt.version" value="1.4.62" />
-	<property name="gwt.download.url" value="http://google-web-toolkit.googlecode.com/files/gwt-linux-${gwt.version}.tar.gz" />
-	
 	<property name="embjopr.version" value="1.0.0.GA" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
-	<property name="gwt.distro.zip.path" value="${base.path}/gwt-linux-${gwt.version}.tar.gz" />
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	
 	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
 	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
-	<property name="gwt.home" value="${release.path}/gwt-linux-${gwt.version}" />
 	<property name="embjopr.war" value="embedded-jopr.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
 	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
@@ -47,7 +42,7 @@
 	
 	<!-- Tomcat version -->
 	
-	<target name="release-tomcat" depends="extract-tomcat,extract-gwt">
+	<target name="release-tomcat" depends="extract-tomcat">
 		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${tomcat.home}" />
 		
 		<mkdir dir="${tomcat.home}/conf/dars"/>
@@ -150,12 +145,8 @@
 	
 	<!-- MSS Management Console -->
 	
-	<target name="deploy-mgmnt" depends="extract-gwt">
+	<target name="deploy-mgmnt">
 		<property name="management.home" location="${base.path}/../../sip-servlets-management/"/>
-		
-		<!--ant dir="${management.home}" antfile="build.xml" target="war">
-			<property name="system.GWT_HOME" value="${gwt.home}"/>
-		</ant-->		
 		
 		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
 	</target>
@@ -294,7 +285,6 @@
 	<target name="clean">
 		<delete dir="${jboss.home}" />
 		<delete dir="${tomcat.home}" />
-		<delete dir="${gwt.home}" />
 	</target>
 	
 	<!-- Download and dependency building -->
@@ -327,18 +317,7 @@
 		<delete dir="${tomcat.home}" failonerror="true" />
 		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
 	</target>
-	
-	<available file="${gwt.distro.zip.path}" property="got.gwt" />
-	<target name="get-gwt" unless="got.gwt">
-		<echo>Downloading Google Web toolkit</echo>
-		<get dest="${gwt.distro.zip.path}" src="${gwt.download.url}"/>
-	</target>
-	
-	<target name="extract-gwt" depends="get-gwt">
-		<delete dir="${gwt.home}" failonerror="true" />
-		<untar compression="gzip" src="${gwt.distro.zip.path}" dest="${gwt.home}/.." />
-	</target>
-	
+		
 	<target name="get-embjopr" unless="got.jopr">
 		<echo>Downloading Embedded Jopr</echo>
 		<get dest="${embjopr.distro.zip.path}" src="${embjopr.download.url}"/>
