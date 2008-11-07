@@ -317,12 +317,13 @@
 		<delete dir="${tomcat.home}" failonerror="true" />
 		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
 	</target>
-		
+	
+	<available file="${embjopr.distro.zip.path}" property="got.jopr" />
 	<target name="get-embjopr" unless="got.jopr">
 		<echo>Downloading Embedded Jopr</echo>
 		<get dest="${embjopr.distro.zip.path}" src="${embjopr.download.url}"/>
 	</target>
-		
+	
 	<target name="extract-embjopr" depends="get-embjopr">
 		<delete dir="${embjopr.home}" failonerror="true" />
 		<unzip src="${embjopr.distro.zip.path}" dest="${embjopr.home}/.." />
