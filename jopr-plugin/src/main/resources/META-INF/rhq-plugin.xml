@@ -25,8 +25,7 @@
 
 		<!-- Discovery of Sip Application Dispatcher object is done through JMX -->
         <plugin-configuration>
-           	<c:simple-property name="objectName" readOnly="true" default="jboss.web:type=SipApplicationDispatcher"/>
-           	<c:simple-property name="queueSize" type="integer" description="Maximum number of pending messages allowed to wait in a queue to be executed." defaultValue="1500"/>
+           	<c:simple-property name="objectName" readOnly="true" default="jboss.web:type=SipApplicationDispatcher"/>           	
         </plugin-configuration>
         
         <operation name="setConcurrencyControlModeByName" displayName="Set the Concurrency Control Mode" description="Sets the concurrency mode, must be one of the following - None, SipSession or SipApplicationSession">
@@ -52,6 +51,10 @@
 
      	<metric displayName="Number of pending messages in all queues" property="numberOfPendingMessages"
              defaultOn="true" defaultInterval="500" displayType="summary"/>
+             
+        <resource-configuration>
+        	<c:simple-property name="queueSize" type="integer" description="Maximum number of pending messages allowed to wait in a queue to be executed." defaultValue="1500"/>
+        </resource-configuration>
     </service>
     
     <service name="Embedded Converged Sip/Web Application (SAR/WAR)"    
