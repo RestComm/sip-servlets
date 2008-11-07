@@ -655,6 +655,75 @@ public class BasicFailoverTest extends SipServletTestCase {
 		secondTomcatServer.stopTomcat();
 	}
 	
+	public void testBasicFailoverCallForwardingB2BUACalleeSendsBye() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);
+		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		senderProvider.addSipListener(sender);
+		senderProtocolObjects.start();	
+		receiverProtocolObjects = new ProtocolObjects("cfb2bua-failover-receiver",
+				"gov.nist", TRANSPORT, AUTODIALOG);			
+		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, true);
+		SipProvider receiverProvider = receiver.createProvider();
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		//start the sip balancer
+		startSipBalancer();				
+		//starts the first server
+		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		tomcat.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
+		tomcat.initTomcat(tomcatBasePath);
+		tomcat.startTomcat();
+		deployCallForwardingApplication(tomcat);
+		//starts the second server
+		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
+		secondTomcatServer.setLoggingFilePath(  
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
+		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
+		getTomcatBackupHomePath();
+		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
+		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
+		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		secondTomcatServer.startTomcat();
+		deployCallForwardingApplication(secondTomcatServer);
+		//first test
+		Thread.sleep(TIMEOUT);
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());
+		assertTrue(sender.getByeReceived());
+		receiver.setOkToByeReceived(false);
+		sender.setByeReceived(false);
+		tomcat.stopTomcat();
+		Thread.sleep(TIMEOUT);
+		toUser = "receiver2";
+		toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());
+		assertTrue(sender.getByeReceived());
+		receiver.setOkToByeReceived(false);
+		sender.setByeReceived(false);
+		secondTomcatServer.stopTomcat();
+	}
+	
 	public void testBasicFailoverCancelCallForwardingB2BUA() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
 				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);
