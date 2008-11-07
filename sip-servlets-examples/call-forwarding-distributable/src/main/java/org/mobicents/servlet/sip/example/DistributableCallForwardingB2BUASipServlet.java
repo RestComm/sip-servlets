@@ -99,6 +99,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			
 			logger.info("forkedRequest = " + forkedRequest);
 			forkedRequest.getSession().setAttribute("originalRequest", request);
+			forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
 			
 			forkedRequest.send();
 		} else {
@@ -110,25 +111,32 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got BYE: " + request.toString());
+		//we forward the BYE
+		if(helper == null) {
+			helper = request.getB2buaHelper();
+		}
+		SipSession linkedSipSession = helper.getLinkedSession(request.getSession());
+		String linkedSipSessionInviteAttribute  = (String) linkedSipSession.getAttribute("INVITE");
 		String sipSessionInviteAttribute  = (String) request.getSession().getAttribute("INVITE");
-		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");
+		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");		
 		if(logger.isInfoEnabled()) {			
+			logger.info("Distributable Simple Servlet: attributes previously set in linked sip session INVITE : "+ linkedSipSessionInviteAttribute);
 			logger.info("Distributable Simple Servlet: attributes previously set in sip session INVITE : "+ sipSessionInviteAttribute);
 			logger.info("Distributable Simple Servlet: attributes previously set in sip application session INVITE : "+ sipApplicationSessionInviteAttribute);
 		}
 		
 		//we send the OK directly to the first call leg if the attributes have been correctly replicated
-//		if(sipSessionInviteAttribute == null  || sipApplicationSessionInviteAttribute == null 
-//				|| !RECEIVED.equalsIgnoreCase(sipSessionInviteAttribute) 
-//				|| !RECEIVED.equalsIgnoreCase(sipApplicationSessionInviteAttribute)) {
-//			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
-//			return;
-//		}
+		if(sipSessionInviteAttribute == null  || sipApplicationSessionInviteAttribute == null || linkedSipSessionInviteAttribute == null
+				|| !RECEIVED.equalsIgnoreCase(sipSessionInviteAttribute)
+				|| !RECEIVED.equalsIgnoreCase(linkedSipSessionInviteAttribute) 
+				|| !RECEIVED.equalsIgnoreCase(sipApplicationSessionInviteAttribute)) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+			sipServletResponse.send();
+			return;
+		}
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 		
-		
-		//we forward the BYE
 		SipSession session = request.getSession();		
 		SipSession linkedSession = helper.getLinkedSession(session);		
 		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			

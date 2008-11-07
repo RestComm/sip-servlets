@@ -131,8 +131,8 @@ public class DistributableLocationServiceSipServlet extends SipServlet {
 		String sipSessionInviteAttribute  = (String) request.getSession().getAttribute("INVITE");
 		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");
 		if(logger.isInfoEnabled()) {			
-			logger.info("Distributable Simple Servlet: attributes previously set in sip session INVITE : "+ sipSessionInviteAttribute);
-			logger.info("Distributable Simple Servlet: attributes previously set in sip application session INVITE : "+ sipApplicationSessionInviteAttribute);
+			logger.info("Distributable Location Service : attributes previously set in sip session INVITE : "+ sipSessionInviteAttribute);
+			logger.info("Distributable Location Service : attributes previously set in sip application session INVITE : "+ sipApplicationSessionInviteAttribute);
 		}
 		if(sipSessionInviteAttribute == null  || sipApplicationSessionInviteAttribute == null 
 				|| !RECEIVED.equalsIgnoreCase(sipSessionInviteAttribute) 
