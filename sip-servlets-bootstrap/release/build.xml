@@ -153,11 +153,11 @@
 	<target name="deploy-mgmnt" depends="extract-gwt">
 		<property name="management.home" location="${base.path}/../../sip-servlets-management/"/>
 		
-		<ant dir="${management.home}" antfile="build.xml" target="war">
+		<!--ant dir="${management.home}" antfile="build.xml" target="war">
 			<property name="system.GWT_HOME" value="${gwt.home}"/>
-		</ant>
+		</ant-->		
 		
-		<copy file="${management.home}/build/tmp/sip-servlets-management.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
+		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
 	</target>
 	
 	<!-- Get dependencies -->
