@@ -113,7 +113,7 @@
 		</antcall>
 		
 		<antcall target="build-mobicents-media-server" />
-		<antcall target="build-mobicents-jopr-plugin" />
+		<!--antcall target="build-mobicents-jopr-plugin" /-->
 		
 		<condition property="ha.capable">
 			<or>
@@ -317,7 +317,6 @@
 		<delete dir="${tomcat.home}" failonerror="true" />
 		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
 	</target>
-	
 	<available file="${embjopr.distro.zip.path}" property="got.jopr" />
 	<target name="get-embjopr" unless="got.jopr">
 		<echo>Downloading Embedded Jopr</echo>
