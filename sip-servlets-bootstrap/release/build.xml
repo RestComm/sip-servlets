@@ -196,7 +196,7 @@
 			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
 	</target>
 	
-	<target name="build-mobicents-jopr-plugin" depends="get-deps">
+	<target name="build-mobicents-jopr-plugin">
 		<echo>Building Mobicents Jopr Plugin</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin">
 			<arg line="clean install" />
@@ -204,8 +204,8 @@
 		<copy todir="${embjopr.home.contents}/plugins/">
 			<fileset dir="${base.path}/../../jopr-plugin/target/" includes="jopr-mobicents-sip-servlets-plugin-*.jar" />
 		</copy>
-		<mkdir dir="${jboss.home}/server/default/deploy/${embjopr.war}"/>
-		<copy todir="${jboss.home}/server/default/deploy/${embjopr.war}">
+		<mkdir dir="${jboss.home}/server/${jboss.config}/deploy/${embjopr.war}"/>
+		<copy todir="${jboss.home}/server/${jboss.config}/deploy/${embjopr.war}">
 			<fileset dir="${embjopr.home.contents}" includes="**/*" />
 		</copy>
 	</target>
@@ -317,6 +317,7 @@
 		<delete dir="${tomcat.home}" failonerror="true" />
 		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
 	</target>
+	
 	<available file="${embjopr.distro.zip.path}" property="got.jopr" />
 	<target name="get-embjopr" unless="got.jopr">
 		<echo>Downloading Embedded Jopr</echo>
