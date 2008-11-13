@@ -236,12 +236,12 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					String debugLog = sipStackProperties.getProperty("gov.nist.javax.sip.DEBUG_LOG");
 					if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
 						sipStackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-							catalinaHome + "/" + debugLog);
+								"file:///" + catalinaHome + "/" + debugLog);
 					}
 					String serverLog = sipStackProperties.getProperty("gov.nist.javax.sip.SERVER_LOG");
 					if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
 						sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-							catalinaHome + "/" + serverLog);
+								"file:///" + catalinaHome + "/" + serverLog);
 					}
 					isPropsLoaded = true;
 				} else {
@@ -259,9 +259,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 						"32");
 				sipStackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-debug.txt");
+						"file:///" + catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-debug.txt");
 				sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-messages.xml");
+						"file:///" + catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-messages.xml");
 				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + ipAddress + "-" + port);
 				sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");		
 				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
