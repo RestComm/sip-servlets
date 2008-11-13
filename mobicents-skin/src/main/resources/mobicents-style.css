@@ -8,25 +8,29 @@
 body { 
 	padding: 0; 
 	margin: 0; 
-	font: 0.7em Tahoma, sans-serif; 
+	font-family: 'Lucida Grande', Geneva, Verdana, Arial, sans-serif;
+	font-size:11px;
 	line-height: 1.5em;
-	background: #fff; 
-	color: #454545; 
+	background-color:#e6e7e8;
+	color: #454545;
+	background-color:#e6e7e8;
+	background-image:url(bkg_left.gif);
+	background-repeat:repeat-x; 
 }
 
 a {	color: #E0691A;	background: inherit;}
 a:hover { color: #6C757A; background: inherit; }
 
-h1 { font: normal 2.1em Arial, Sans-Serif; letter-spacing: -1px; padding: 7px 0 0 8px; margin: 0; }
+h1 { font: normal 1.5em Arial, Sans-Serif; letter-spacing: -1px; padding: 7px 0 0 8px; margin: 0; }
 .dark  { color: #737373; background: inherit; font-weight: bold; }
 h1 a, h2 a { text-decoration: none; }
 h1 a:hover, h2 a:hover { color: #FF6600; background: inherit; }
-h2 { margin: 10px 0 5px 0; padding: 0; font: bold 1.7em Arial, Sans-Serif; letter-spacing: -1px; }
-h2 { font-size: 1.5em; margin-bottom: 5px; color: #FFF; background: #6C757A }
+h2 { margin: 10px 0 5px 0; padding: 0; font: bold 1.2em Arial, Sans-Serif; letter-spacing: -1px; }
+h2 { font-size: 1.2em; margin-bottom: 5px; color: #000; background: inherit; }
 img { border: 0; }
 p {	margin: 0 0 5px 0; }
 
-
+ul { margin: 0; padding : 0; list-style : none; }
 
 form { 	margin: 0; }
 
@@ -59,97 +63,124 @@ input.login {
 /* layout
    ------ */
 
-.content { 
+.content {
 	margin: 0 auto;
 	width: 780px;
-	padding: 10px; 
+	background-color: #FFFFFF;
+
 }
 
 .header { 
-	height: 55px;
-	background: #eee;
+	height: 65px;
+	background-image:url(bkgheader_noleft.gif);
+	background-repeat:repeat-x;
+	background-color:#3b4f66;
 	color: #808080;
-	margin: 3px 0;
-	padding: 10px 0 0 0;
-	border-bottom: 1px solid #ccc;
+	padding: 0px;
+	border-bottom: 1px solid #FFFFFF;
 }
+
+.contentwrapper {
+	clear:both;
+	padding: 6px 10px 0px 10px;
+	background-color: #FFFFFF;
+	overflow: hidden;
+
+}
+
+/* ------------ utility navigation ----------------- */
 
 .top_info {
 	float: right;
-	width: 555px;
-	padding: 12px 0 4px 0;
-	border-bottom: 1px solid #eee;
-	background: #eee;
-	color: #808080;
+	width: 530px;
+	padding-top: 20px;
+	color: #FFFFFF;
 }
 
-.top_info_left {
-	width: 220px;
-	float: left;
-	padding: 5px 0 0 20px;
+	.top_info_left {
+		float: left;
+		padding-top: 5px;
+	}
+
+	.top_info_right {
+		float: right;
+		padding-right: 20px;
+	}
+
+
+
+/* ------------ logo placement in header   ---------------- */
+
+#logo { 
+	height: 65px;
+	background-image:url(mobicents_logo.gif);
+	background-repeat:no-repeat; 
 }
 
-.top_info_right {
-	float: right;
-	width: 200px;
-	padding: 0 0 0 35px;
-	border-left: 1px solid #eee;
+#logo H1 {
+	visibility:hidden;
 }
 
-.browse_category  {
-	font-size: 0.9em;
-	width: 190px;
-	color: #FFF;
-	background: inherit;
-}
+/* --------------------- Primary Navigation styles ------------------ */
 
 .bar { 
 	clear: both;
-	font-size: 1.1em;
-	height: 30px; 
-	color: #FFF;
-	margin: 0 0 3px 0px; 
-	background: #FF9148;
 }
 
 .bar ul {
-	margin: 0; 
-	padding : 0; 
-	list-style : none; 
+	font-size: 1.1em;
+	color: #FFF;
+	margin: 0 0 3px 0px; 
+	background: #FF9148;
+	margin: 0;	
+	padding: 5px 0px;
+	list-style: none;
+
 }
 
 .bar li { 
-	margin: 0; 
-	padding: 7px 12px 5px 12px;
 	color: #FFEADC;
 	background: #FF9148;
-	float: left; 
+	display: inline;
+
 }
 	
-.bar li.active { 
+.bar li.active {
 	background: #E0691A url(bar.gif) no-repeat center top; 
 	color: #fff;
 	font-weight: bold; 
-	padding: 7px 10px 6px 10px;
+ padding: 5px 0px;
 }
 	
-		
 .bar li a { 
 	font-weight: bold;
 	color: #FFF; 
 	background: none;
 	text-decoration: none;
+	padding: 7px 12px 5px 12px;
+
 } 
 	
 .bar li a:hover { 
 	color: #E0691A; 
-	background: inherit;
+ /*   background: inherit; */
 }
 
 .bar li.active a:hover { 
 	color: #FF9148; 
-	background: inherit;
+/*	background: inherit; */
 } 	
+
+.browse_category  {
+	font-size: 0.9em;
+	padding-right: 40px;
+	padding-left: 10px;
+	color: #FFF;
+/*	background: inherit; */
+}
+
+/*  ----------  misc styles ---------------- */
+
 
 .search_field { 
 	background: #fff url(searchbg.gif) no-repeat right; 
@@ -176,27 +207,56 @@ input.login {
 	color: #fff;
 }
 
-/* left side
-   --------- */
+
+/* ---------------------- Left side content layout  --------- */
 
 .left {
 	float: left;
-	width: 65%;
+	width: 63%;
 	margin: 0 0 10px 0;
 }
 
-.left tt {	
-	font-size : 11px;
+#h3_1 {
+	clear: both;
+	color: #3B4E65;
+	padding: 7px 0 7px 5px;
+	font: bold 1.2 em Tahoma, Arial, Sans-Serif;
+	margin: 0 0 0px 0;
+	border-bottom: 1px solid #3B4E65;
+	background-image:url(H3_hdrbkg1.gif);
+	background-repeat:repeat-x;
+}
+#h3_2 {
+	clear: both;
+	color: #3B4E65;
+	padding: 7px 0 7px 5px;
+	font: bold 1.2 em Tahoma, Arial, Sans-Serif;
+	margin: 0 0 0px 0;
+	border-bottom: 1px solid #3B4E65;
+	background-image:url(H3_hdrbkg2.gif);
+	background-repeat:repeat-x;
+}
+#h3_3 {
+	clear: both;
+	color: #3B4E65;
+	padding: 7px 0 7px 5px;
+	font: bold 1.2 em Tahoma, Arial, Sans-Serif;
+	margin: 0 0 0px 0;
+	border-bottom: 1px solid #3B4E65;
+	background-image:url(H3_hdrbkg3.gif);
+	background-repeat:repeat-x;
+}
+#h3_4 {
+	clear: both;
+	color: #3B4E65;
+	padding: 7px 0 7px 5px;
+	font: bold 1.2 em Tahoma, Arial, Sans-Serif;
+	margin: 0 0 0px 0;
+	border-bottom: 1px solid #3B4E65;
+	background-image:url(H3_hdrbkg4.gif);
+	background-repeat:repeat-x;
 }
 
-.left h3 {
-	clear: both;
-	background: #A9C0CE url(corner.gif) no-repeat top right;
-	color: #FFF;
-	padding: 7px 0 7px 5px;
-	font: bold 1em Tahoma, Arial, Sans-Serif;
-	margin: 0 0 0px 0;
-}
 .left_side {
 	float: left;
 	width: 180px;
@@ -205,40 +265,45 @@ input.login {
 }
 		
 .left_side a, .right_side a { color: #414141; background: #FFF; }
-	
+		
 .right_side {
 	float: right;
 	width: 220px;
-	background: #FFF url(dotted.gif) repeat-y;
 	color: #414141;
 	padding: 0 0 0 40px;
 	margin: 10px 0;
 }
 		
-.left_box { margin: 0 0 10px 0; color: #000; background: #FFF; padding: 3px 0; }
+.left_box { 
+	margin: 0 0 10px 0; 
+	color: #000; 
+	background: #FFF; 
+	padding: 3px 0;
+}
 	
 		
-/* right side
-   ---------- */
+/* ------------------- Right side content layout ---------------------- */
 		
 .right {
 	float: right;
-	width: 34.6%;
-	margin: 0 0 10px 0;
+	width: 35%;
+	background-image:url(bkg_home_2ndcol.gif);
+	background-repeat:repeat-y;	
 }
 
 .right h3 {
-	background: #6C757A  url(corner.gif) no-repeat top right;;
+	background: #3B4E65;
+	background-image:url(portlethdr_home.gif);
+	background-repeat:repeat-x;
 	color: #FFF;
 	padding: 7px 0 7px 5px;
-	font: bold 1em Tahoma, Arial, Sans-Serif;
+	font: bold 1 em Tahoma, Arial, Sans-Serif;
 	margin: 0 0 3px 0;
 }
 
 .right_articles {
-	background: #f5f5f5;
-	color: #414141;
-	padding: 8px;	
+	
+	padding: 10px;	
 	margin: 0 0 3px 0;
 }
 	
@@ -253,8 +318,13 @@ input.login {
 	margin: 0 0 3px 0;
 }
 
-/* footer
-   ------ */
+/* ---------------------------  Column Balancer ----------------------------------- */
+.left, .right {
+	padding-bottom: 30005px;
+	margin-bottom: -30000px;
+	}
+
+/* ---------------------------   footer  ---------------------------------------- */
 
 .footer { 
 	clear: both;
@@ -265,51 +335,6 @@ input.login {
 	line-height: 1.8em;
 }
 
-.footer a { color: #808080; background: #fff; }
-
-/* maven specifics */
-
-.right_articles ul {
-  margin: 0;
-  padding: 0;
-  font-size: 13px;
-}
-.right_articles li {
-  list-style-type: none;
-  background-image: none;
-  background-repeat: no-repeat;
-  background-position: 0 0.4em;
-  padding-left: 16px;
-  list-style-position: outside;
-  line-height: 1.2em;
-  font-size: 11px;
-}
-
-.right_articles li.expanded {
-  /*background-image: url(../images/expanded.gif);*/
-}
-.right_articles li.collapsed {
-  /*background-image: url(../images/collapsed.gif);*/
-}
-
-.section {
-  padding: 4px;
-}
-
-.section h3 {
-  	clear: both;
-	background: #A9C0CE url(corner.gif) no-repeat top right;
-	color: #FFF;
-	padding: 7px 0 7px 5px;
-	font: bold 1em Tahoma, Arial, Sans-Serif;
-	margin: 0 0 0px 0;
-}
-
-.source {
-  padding: 12px;
-  margin: 1em 7px 1em 7px;
-}
-.source pre {
-  margin: 0px;
-  padding: 0px;
+.footer a { 
+	color: #808080;
 }

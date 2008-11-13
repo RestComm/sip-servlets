@@ -8,7 +8,8 @@
 body { 
 	padding: 0; 
 	margin: 0; 
-	font: 0.7em Tahoma, sans-serif; 
+	font-family: 'Lucida Grande', Geneva, Verdana, Arial, sans-serif;
+	font-size:11px;
 	line-height: 1.5em;
 	background-color:#e6e7e8;
 	color: #454545;
@@ -78,6 +79,7 @@ input.login {
 }
 
 .contentwrapper {
+	clear:both;
 	padding: 6px 10px 0px 10px;
 	background-color: #FFFFFF;
 	overflow: hidden;
@@ -103,12 +105,7 @@ input.login {
 		padding-right: 20px;
 	}
 
-.browse_category  {
-	font-size: 0.9em;
-	width: 190px;
-	color: #FFF;
-	background: inherit;
-}
+
 
 /* ------------ logo placement in header   ---------------- */
 
@@ -126,32 +123,31 @@ input.login {
 
 .bar { 
 	clear: both;
-	font-size: 1.1em;
-	height: 30px; 
-	color: #FFF;
-	margin: 0 0 3px 0px; 
-	background: #FF9148;
 }
 
 .bar ul {
-	margin: 0; 
-	padding : 0; 
-	list-style : none; 
+	font-size: 1.1em;
+	color: #FFF;
+	margin: 0 0 3px 0px; 
+	background: #FF9148;
+	margin: 0;	
+	padding: 5px 0px;
+	list-style: none;
+
 }
 
 .bar li { 
-	margin: 0; 
-	padding: 7px 12px 5px 12px;
 	color: #FFEADC;
 	background: #FF9148;
-	float: left; 
+	display: inline;
+
 }
 	
 .bar li.active {
 	background: #E0691A url(bar.gif) no-repeat center top; 
 	color: #fff;
 	font-weight: bold; 
-	padding: 7px 10px 6px 10px;
+ padding: 5px 0px;
 }
 	
 .bar li a { 
@@ -159,18 +155,27 @@ input.login {
 	color: #FFF; 
 	background: none;
 	text-decoration: none;
+	padding: 7px 12px 5px 12px;
+
 } 
 	
 .bar li a:hover { 
 	color: #E0691A; 
-	background: inherit;
+ /*   background: inherit; */
 }
 
 .bar li.active a:hover { 
 	color: #FF9148; 
-	background: inherit;
+/*	background: inherit; */
 } 	
 
+.browse_category  {
+	font-size: 0.9em;
+	padding-right: 40px;
+	padding-left: 10px;
+	color: #FFF;
+/*	background: inherit; */
+}
 
 /*  ----------  misc styles ---------------- */
 
@@ -207,10 +212,6 @@ input.login {
 	float: left;
 	width: 63%;
 	margin: 0 0 10px 0;
-}
-
-.left tt {	
-	font-size : 11px;
 }
 
 #h3_1 {
@@ -338,6 +339,10 @@ input.login {
 
 /* maven specifics */
 
+.left tt {	
+	font-size : 11px;
+}
+
 .right_articles ul {
   margin: 0;
   padding: 0;
@@ -354,6 +359,13 @@ input.login {
   font-size: 11px;
 }
 
+.right_articles h5 {
+	background: #3B4E65;
+	background-image:url(portlethdr_home.gif);
+	background-repeat:repeat-x;
+	color: #FFF;
+}
+
 .right_articles li.expanded {
   /*background-image: url(../images/expanded.gif);*/
 }
@@ -363,6 +375,17 @@ input.login {
 
 .section {
   padding: 4px;
+}
+
+.section h2 {
+	clear: both;
+	background: #3B4E65;
+	background-image:url(portlethdr_home.gif);
+	background-repeat:repeat-x;
+	color: #FFF;
+	padding: 7px 0 7px 5px;
+	font: bold 1 em Tahoma, Arial, Sans-Serif;
+	margin: 0 0 3px 0;
 }
 
 .section h3 {
@@ -376,7 +399,8 @@ input.login {
 	background-repeat:repeat-x;
 }
 
-.section h2 {
+.section h4 {
+  	clear: both;
 	background: #3B4E65;
 	background-image:url(portlethdr_home.gif);
 	background-repeat:repeat-x;
@@ -384,6 +408,17 @@ input.login {
 	padding: 7px 0 7px 5px;
 	font: bold 1 em Tahoma, Arial, Sans-Serif;
 	margin: 0 0 3px 0;
+}
+
+.section h5 {
+  	clear: both;
+	color: #3B4E65;
+	padding: 7px 0 7px 5px;
+	font: bold 1.2 em Tahoma, Arial, Sans-Serif;
+	margin: 0 0 0px 0;
+	border-bottom: 1px solid #3B4E65;
+	background-image:url(H3_hdrbkg4.gif);
+	background-repeat:repeat-x;
 }
 
 .source {
