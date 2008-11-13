@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
-import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
