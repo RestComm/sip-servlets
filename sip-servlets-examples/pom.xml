@@ -31,7 +31,7 @@
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>1.0.0.CR2</mms.version>
+		<mms.version>1.0.0.CR3-SNAPSHOT</mms.version>
 	</properties>
 
 	<dependencies>
