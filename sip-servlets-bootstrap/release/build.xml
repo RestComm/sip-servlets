@@ -49,6 +49,7 @@
 		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" tofile="${tomcat.home}/conf/dars/mobicents-dar.properties" />
 		
 		<copy file="${base.path}/server-tomcat-6.xml" tofile="${tomcat.home}/conf/server.xml" />
+		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home}" />
@@ -91,6 +92,7 @@
 		<mkdir dir="${jboss.home}/server/${jboss.config}/conf/dars" />
 		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
 		
+		<copy file="${base.path}/mss-sip-stack.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
 		<copy file="${base.path}/server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
 		<copy file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
 		<copy file="${base.path}/jboss-service.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
@@ -127,6 +129,7 @@
 	</target>
 	
 	<target name="release-jboss-node-ha" if="ha.capable">
+		<copy overwrite="true" file="${base.path}/mss-sip-stack.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
 		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />

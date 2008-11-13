@@ -118,11 +118,7 @@
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	signalingTransport="udp" 
-    	logLevel="DEBUG"
-	debugLog = "logs/debuglog.txt" 
-	serverLog = "logs/serverlog.txt"
-	sipStackName="SIP-Servlet-Tomcat-Server" 
-	sipPathName="gov.nist"/>
+    sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 	
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone
