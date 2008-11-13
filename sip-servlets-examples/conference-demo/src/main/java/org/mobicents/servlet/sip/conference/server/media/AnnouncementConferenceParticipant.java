@@ -77,6 +77,14 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 			public void linkFailed(MsLinkEvent evt) {
 				logger.info("link failed " + evt);
 			}
+
+			public void modeFullDuplex(MsLinkEvent evt) {
+				logger.info("link mode full duplex" + evt);
+			}
+
+			public void modeHalfDuplex(MsLinkEvent evt) {
+				logger.info("link mode half duplex" + evt);
+			}
 		});
 		
 		String confEndpoint = conference.getConferenceEndpointName();

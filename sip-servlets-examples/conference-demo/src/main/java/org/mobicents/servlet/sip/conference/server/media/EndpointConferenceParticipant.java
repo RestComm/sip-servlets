@@ -77,6 +77,14 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 			public void linkFailed(MsLinkEvent evt) {
 				logger.info("link failed " + evt);
 			}
+
+			public void modeFullDuplex(MsLinkEvent evt) {
+				logger.info("link mode full duplex" + evt);
+			}
+
+			public void modeHalfDuplex(MsLinkEvent evt) {
+				logger.info("link mode half duplex" + evt);
+			}
 		});
 		
 		String log = "Linking " + endpoint.getLocalName() + " to CONF" + conference.getKey();

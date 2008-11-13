@@ -142,4 +142,19 @@ public class ConferenceConnectionListener implements MsConnectionListener, MsNot
     	logger.info(evt);
     }
 
+	public void connectionModeRecvOnly(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void connectionModeSendOnly(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void connectionModeSendRecv(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

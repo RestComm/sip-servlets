@@ -17,6 +17,8 @@
 package org.mobicents.slee.service.interop;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -156,7 +158,7 @@ public abstract class InteropSbb implements Sbb {
 
 		this.setInteropCustomEvent(event);
 		
-		playAnnouncement(OPENING_ANNOUNCEMENT, false, true);							
+		playAnnouncement(OPENING_ANNOUNCEMENT, false, true, false);							
 	}
 	
 	public void onPlayConfirmationAnnouncement(InteropCustomEvent event, ActivityContextInterface ac) {
@@ -169,7 +171,7 @@ public abstract class InteropSbb implements Sbb {
 		
 		String announcement = generateConfirmationAnnouncement(event.getBoothNumber());
 		
-		playAnnouncement(announcement, true, false);
+		playAnnouncement(announcement, true, false, true);
 	}
 
 	/**
@@ -190,7 +192,7 @@ public abstract class InteropSbb implements Sbb {
 		return stringBuffer.toString();
 	}
 
-	private void playAnnouncement(String announcement, boolean attachToGeneratorActivity, boolean listenForDTMF) {
+	private void playAnnouncement(String announcement, boolean attachToGeneratorActivity, boolean listenForDTMF, boolean listenForCompletion) {
 		TTSSession ttsSession = ttsProvider.getNewTTSSession(
 				audioFilePath, "kevin");
 		
@@ -233,14 +235,27 @@ public abstract class InteropSbb implements Sbb {
 		
 		play.setURL(announcementFile);
 		
+		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
+		
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
-		
-        connection.getEndpoint().execute(requestedSignals, requestedEvents, connection);	
-		
-		if(listenForDTMF) {
-			this.initDtmfDetector(connection, ENDPOINT_NAME);
-		}
+        
+        List<MsRequestedEvent> eventList = new ArrayList<MsRequestedEvent>();
+        eventList.add(onFailed);
+        if(listenForCompletion) {
+        	eventList.add(onCompleted);
+        }
+        if(listenForDTMF) {
+        	try {
+	        	ActivityContextInterface dtmfAci = mediaAcif.getActivityContextInterface(connection.getSession());
+	        	dtmfAci.attach(getSbbContext().getSbbLocalObject());
+	        	eventList.add(dtmf);
+        	} catch (UnrecognizedActivityException e) {
+    			logger.error("Internal Server Erro", e);
+    		}
+        }
+        MsRequestedEvent[] requestedEvents = eventList.toArray(new MsRequestedEvent[eventList.size()]);
+        
+        connection.getEndpoint().execute(requestedSignals, requestedEvents, connection);					
 	}
 	
 	private MsConnection getConnection() {
@@ -326,7 +341,7 @@ public abstract class InteropSbb implements Sbb {
 			} catch (java.lang.NumberFormatException e) {
 				//user entered a # sign 
 				String announcement = generateConfirmationAnnouncement(getBoothNumber());
-				playAnnouncement(announcement, true, false);
+				playAnnouncement(announcement, true, false, true);
 				return ;
 			}				
 			
