@@ -12,6 +12,8 @@ cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
 cp jboss-service-port-1.xml $JBOSS_HOME/server/port-1/conf/jboss-service.xml
 cp jboss-service-port-2.xml $JBOSS_HOME/server/port-2/conf/jboss-service.xml
+cp mss-sip-stack.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
+cp mss-sip-stack.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
 cp server-jboss-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/server.xml
 cp server-jboss-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/server.xml
 cp jboss-context.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/context.xml

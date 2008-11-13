@@ -43,7 +43,6 @@
   <Service name="Sip-Servlets" 
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
   		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
@@ -119,11 +118,7 @@
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	signalingTransport="udp" 
-    	logLevel="DEBUG"
-	debugLog = "logs/debuglog.txt" 
-	serverLog = "logs/serverlog.txt"
-	sipStackName="SIP-Servlet-Tomcat-Server" 
-	sipPathName="gov.nist"/>
+	sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 	
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone

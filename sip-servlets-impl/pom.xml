@@ -205,6 +205,7 @@
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
 										<copy verbose="true" file="docs/logging.properties" todir="${CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
                                         <copy todir="${CATALINA_HOME}">
                                             <fileset file="LICENSES/*" />
                                         </copy>
@@ -255,6 +256,7 @@
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}\lib" />
 										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
                                         <copy todir="${env.CATALINA_HOME}">
                                             <fileset file="LICENSES/*" />
                                         </copy>
@@ -301,6 +303,7 @@
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
 										<copy verbose="true" file="docs/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
                                         <copy todir="${env.JBOSS_HOME}/docs/licenses">
                                             <fileset file="LICENSES/*" />
                                         </copy>
@@ -346,6 +349,7 @@
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
                                         <copy todir="${JBOSS_HOME}/docs/licenses">
                                             <fileset file="LICENSES/*" />
                                         </copy>

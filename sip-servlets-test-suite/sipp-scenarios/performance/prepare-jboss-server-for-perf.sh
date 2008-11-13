@@ -1,3 +1,4 @@
+cp jboss-setup/mss-sip-stack.properties $JBOSS_HOME/server/default/conf/mss-sip-stack.properties
 cp jboss-setup/server-jboss.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/server.xml
 cp jboss-setup/jboss-context.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/context.xml
 cp jboss-setup/jboss-service.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml

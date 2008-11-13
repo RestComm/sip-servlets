@@ -13,7 +13,6 @@
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
   		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -48,11 +47,7 @@
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp" 
-    	 logLevel="DEBUG"
-	     debugLog = "log/jsip-5070-debug.txt" 
-	     serverLog = "log/jsip-5070-server.txt"
-	     sipStackName="SIP-Servlet-Tomcat-Server" 
-	     sipPathName="gov.nist"/>
+    	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
 

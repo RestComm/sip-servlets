@@ -509,6 +509,18 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=320">
 						Mid Call Failover Support for Proxy Applications
 						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=321">
+						Mid Call Failover Support for B2BUA Applications
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=454">
+						Mid Call Failover Support for UAC Applications
+						</a>
 						<br />		
 						<img src="green.jpeg" />
 						<a
@@ -574,6 +586,13 @@
 									Long From tags cause some phones to fail
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=456">
+									Externalize jain sip stack configuration in a separate properties file
+								</a>
+							</li>
 						</ul>
 					</p>
 				</subsection>
@@ -584,19 +603,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=347">
 						Port to JBoss AS 5
 						</a>
-						<br />							
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=321">
-						Mid Call Failover Support for B2BUA Applications
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=454">
-						Mid Call Failover Support for UAC Applications
-						</a>
-						<br />
+						<br />													
 						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=122">
@@ -608,7 +615,13 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=229">
 						More Extensions : JOIN/Replaces
 						</a>
-						<br />						
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=470">
+						More Extensions : PATH
+						</a>
+						<br />							
 						<!--img src="red.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>

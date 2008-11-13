@@ -14,7 +14,6 @@
       	className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
   		balancers="192.168.1.21"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
   		darConfigurationFileLocation="conf/dars/distributable-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -49,13 +48,7 @@
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp"
-	     threadPoolSize="64"
-		 isReentrantListener="true"  
-    	 logLevel="DEBUG"
-	     debugLog = "logs/jsip-debug-cluster-all.txt" 
-		 serverLog = "logs/jsip-log-cluster-all.xml"
-	     sipStackName="SIP-Servlet-Jboss-Server-All" 
-	     sipPathName="gov.nist"/>
+	     sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
 

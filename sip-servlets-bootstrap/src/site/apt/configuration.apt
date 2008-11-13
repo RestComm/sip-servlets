@@ -14,16 +14,10 @@ Configuration
     <<<ipAddress = "127.0.0.1">>>\
 	<<<protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler">>>\
 	<<<signalingTransport="udp">>>\
-	<<<threadPoolSize="64">>>\
-	<<<isReentrantListener="true">>>\
 	<<<useStun="false">>>\
 	<<<stunServerAddress="stun01.sipphone.com">>>\
 	<<<stunServerPort="3478">>>\
-    <<<logLevel="DEBUG">>>\
-	<<<debugLog = "logs/debuglog.txt">>>\ 
-	<<<serverLog = "logs/serverlog.txt">>>\
-	<<<sipStackName="SIP-Servlet-Server">>>\ 
-	<<<sipPathName="gov.nist"/>>>>
+    <<<sipStackPropertiesFile="conf/mss-sip-stack.properties"/>>>>
 	
 	Here is a description of the sip Connector tag's attributes :
 		
@@ -34,26 +28,31 @@ Configuration
 	* <<<protocol>>> : This  attribute specifies that this is a Sip Connector and not an http one. There is no need to change this property.
 	
 	* <<<signalingTransport>>> : the transport on which the container will be able to receive SIP messages
-	
-	* <<<threadPoolSize>>> : Concurrency control for number of simultaneous active threads in the nist sip stack. Check the nist sip stack javadoc for more information.
-	
-	* <<<isReentrantListener>>> : If the listener is re-entrant then the stack manages a thread pool and synchronously calls the listener from the same thread which read the message. Check the nist sip stack javadoc for more information.
 		
 	* <<<useStun>>> : Set to true to enable STUN for this connector and make sure <<<ipAddress>>> is different from 127.0.0.1. (Default to false, you can also check the {{{./stun.html}STUN section}} for more information)
+			
+	* <<<sipStackPropertiesFile>>> : the underlying JAIN SIP Stack implementation can be further configured through a set of properties 
+	(see {{{http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html}jain sip configuration properties}} and 
+	{{{http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html}nit sip implementation configuration properties}}), set this property to the location of the file that will contain key/value pairs corresponding to the stack configuration properties.
+	If this property is ommitted, the following default values will be assumed :
+	
+		** gov.nist.javax.sip.LOG_MESSAGE_CONTENT=true
 		
-	* <<<stunServerAddress>>> : The STUN server address that will be used for discovering the public IP address of this SIP connector (only needed if useStun="true", you can also check the {{{./stun.html}STUN section}} for more information)
+		** gov.nist.javax.sip.TRACE_LEVEL=32
 		
-	* <<<stunServerPort>>> : The STUN server port of the STUN server used in the previous property (will rarely be changed if ever and only needed if useStun="true", you can also check the {{{./stun.html}STUN section}} for more information)
-	
-	* <<<logLevel>>> : the log level of the underlying JAIN SIP Stack
-	
-	* <<<debugLog>>> : the debug log location of the underlying JAIN SIP Stack
-	
-	* <<<serverLog>>> : the server log location of the underlying JAIN SIP Stack
-	
-	* <<<sipStackName>>> : the name of the underlying JAIN SIP Stack
-	
-	* <<<sipPathName>>> : the JAIN SIP Stack implementation to use (will rarely be changed if ever, default is the most famous nist sip stack lead by Neo-Ranga. If it is changed, don't forget to to put the jain sip jar implementation in the lib directory of the container)
+		** gov.nist.javax.sip.DEBUG_LOG=logs/mss-jsip-debuglog.txt
+		
+		** gov.nist.javax.sip.SERVER_LOG=logs/mss-jsip-messages.xml
+		
+		** javax.sip.STACK_NAME=Mobicents-SIP-Servlets
+		
+		** javax.sip.AUTOMATIC_DIALOG_SUPPORT=off
+		
+		** gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY=true
+		
+		** gov.nist.javax.sip.THREAD_POOL_SIZE=64
+		
+		** gov.nist.javax.sip.REENTRANT_LISTENER=true  
 	
 	
 * Application Router and Service Configuration

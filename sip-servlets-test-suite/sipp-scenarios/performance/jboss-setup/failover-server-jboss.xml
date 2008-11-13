@@ -48,13 +48,7 @@
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp"
-	     threadPoolSize="64"
-		 isReentrantListener="true"  
-    	 logLevel="ERROR"
-	     debugLog = "" 
-		 serverLog = ""
-	     sipStackName="SIP-Servlet-Jboss-Server" 
-	     sipPathName="gov.nist"/>
+	     sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
 

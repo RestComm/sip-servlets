@@ -48,7 +48,6 @@
   		className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
   		balancers="127.0.0.1" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
   		darConfigurationFileLocation="conf/dars/simple-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
@@ -124,14 +123,7 @@
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	signalingTransport="udp"
-	threadPoolSize="64"
-	isReentrantListener="true" 
-    logLevel="ERROR"
-    logMessageContent="false"
-	debugLog = "" 
-	serverLog = ""
-	sipStackName="SIP-Servlet-Tomcat-Server" 
-	sipPathName="gov.nist"/>
+	sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 	
 	<!-- Define a SIP Connector -->
     <!--Connector port="5081" 

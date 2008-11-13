@@ -13,7 +13,6 @@
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
   		darConfigurationFileLocation="conf/dars/locationservice-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -48,13 +47,7 @@
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp"
-	     threadPoolSize="64"
-		 isReentrantListener="true"  
-    	 logLevel="ERROR"
-	     debugLog = "" 
-		 serverLog = ""
-	     sipStackName="SIP-Servlet-Jboss-Server" 
-	     sipPathName="gov.nist"/>
+	   	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
 

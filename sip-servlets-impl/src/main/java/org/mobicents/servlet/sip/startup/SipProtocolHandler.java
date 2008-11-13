@@ -18,9 +18,12 @@ package org.mobicents.servlet.sip.startup;
 
 import gov.nist.javax.sip.SipStackImpl;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -88,61 +91,18 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	public ExtendedListeningPoint extendedListeningPoint;
 
 	// sip stack attributes defined by the server.xml
+	private String sipStackPropertiesFile;
+	// defining sip stack properties
+	private Properties sipStackProperties;
 	/**
 	 * the sip stack signaling transport
 	 */
 	private String signalingTransport;
 
 	/**
-	 * the sip stack name
-	 */
-	private String sipStackName;
-
-	/**
-	 * the sip Path Name
-	 */
-	private String sipPathName;
-
-	/**
-	 * whether or not to enable the retransmission filter
-	 */
-	private String retransmissionFilter;
-
-	/**
 	 * the sip stack listening port
 	 */
 	private int port;
-
-	/**
-	 * the sip stack thread pool size
-	 */
-	private String threadPoolSize;
-	
-	/**
-	 * Tells if the listener is reentrant
-	 */
-	private String isReentrantListener;
-	
-	/*
-	 * The log level
-	 */
-	private String logLevel;
-	
-	/*
-	 * The log level
-	 */
-	private String logMessageContent;
-
-	/*
-	 * The debug log file. TODO -- integrate this with log4j.
-	 */
-	private String debugLog;
-
-	/*
-	 * The server log file.
-	 */
-	private String serverLog;
-
 	/*
 	 * IP address for this protocol handler.
 	 */
@@ -221,8 +181,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init() throws Exception {
-		SipFactories.initialize(this.sipPathName);
+	public void init() throws Exception {		
+		SipFactories.initialize("gov.nist");
 		setAttribute("isSipConnector",Boolean.TRUE);
 	}
 
@@ -252,7 +212,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Starting a sip protocol handler");
-			}
+			}						
 			
 			String catalinaHome = System.getProperty("catalina.home");
 	        if (catalinaHome == null) {
@@ -261,54 +221,54 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	        if(catalinaHome == null) {
 	        	catalinaHome = ".";
 	        }
-			// defining sip stack properties
-			Properties properties = new Properties();
+	        if(sipStackPropertiesFile != null && !sipStackPropertiesFile.startsWith("file:///")) {
+				sipStackPropertiesFile = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFile;
+	 		}	
+	        sipStackProperties = new Properties();
+	        boolean isPropsLoaded = false;
+			try {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFile);
+				}
+				if(sipStackPropertiesFile != null) {
+					FileInputStream sipStackPropertiesInputStream = new FileInputStream(new File(new URI(sipStackPropertiesFile)));
+					sipStackProperties.load(sipStackPropertiesInputStream);
+					String debugLog = sipStackProperties.getProperty("gov.nist.javax.sip.DEBUG_LOG");
+					if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
+						sipStackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+							catalinaHome + "/" + debugLog);
+					}
+					String serverLog = sipStackProperties.getProperty("gov.nist.javax.sip.SERVER_LOG");
+					if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
+						sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+							catalinaHome + "/" + serverLog);
+					}
+					isPropsLoaded = true;
+				} else {
+					logger.warn("no sip stack properties file defined ");		
+				}
+			} catch (Exception e) {
+				logger.warn("Could not find or problem when loading the sip stack properties file : " + sipStackPropertiesFile, e);		
+			}
 			
-			if(logMessageContent == null) {
-				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
-					"true");
-			} else {
-				properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
-					logMessageContent);
-			}
-			if(logger.isDebugEnabled()) {
-				logger.debug("logLevel = " + this.logLevel);
+			if(!isPropsLoaded) {
+				logger.warn("loading default Mobicents Sip Servlets sip stack properties");
+				// Silently set default values
+				sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+						"true");
+				sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+						"32");
+				sipStackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-debug.txt");
+				sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-messages.xml");
+				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + ipAddress + "-" + port);
+				sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");		
+				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
 			}
 			
-			if (this.logLevel != null) {				
-
-				if(logLevel != null && logLevel.length() > 0) {
-					properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
-						this.logLevel);
-				}
-				if(debugLog != null && debugLog.length() > 0) {
-					properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-						catalinaHome + "/" + this.debugLog);
-				}
-				if(serverLog != null && serverLog.length() > 0) {
-					properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-						catalinaHome + "/" + this.serverLog);
-				}
-				if(logger.isDebugEnabled()) {
-					logger.debug(properties.toString());
-				}
-				
-			}
-			properties.setProperty("javax.sip.STACK_NAME", sipStackName);
-			properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");		
-			properties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
-			if(threadPoolSize != null && threadPoolSize.length() > 0) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("The size of the nist sip stack's thread pool will be " + threadPoolSize);
-				}
-				properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", threadPoolSize);
-			}
-			if(isReentrantListener != null && isReentrantListener.length() > 0) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("nist sip stack's listener reentrancy : " + isReentrantListener);
-				}
-				properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", isReentrantListener);
-			}
 			//checking the external ip address if stun enabled			
 			String globalIpAddress = null;			
 			int globalPort = -1;
@@ -345,9 +305,11 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					addressDiscovery.shutDown();
 				}
 			}
-			
+			if(logger.isInfoEnabled()) {
+				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
+			}
 			// Create SipStack object
-			sipStack = SipFactories.sipFactory.createSipStack(properties);
+			sipStack = SipFactories.sipFactory.createSipStack(sipStackProperties);
 
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
@@ -459,51 +421,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
     public static int getRandomPortNumber(int min, int max) {
         return portNumberGenerator.nextInt(max - min) + min;
     }
-	
-	/**
-	 * @return the retransmissionFilter
-	 */
-	public String getRetransmissionFilter() {
-		return retransmissionFilter;
-	}
-
-	/**
-	 * @param retransmissionFilter
-	 *            the retransmissionFilter to set
-	 */
-	public void setRetransmissionFilter(String retransmissionFilter) {
-		this.retransmissionFilter = retransmissionFilter;
-	}
-
-	/**
-	 * @return the sipPathName
-	 */
-	public String getSipPathName() {
-		return sipPathName;
-	}
-
-	/**
-	 * @param sipPathName
-	 *            the sipPathName to set
-	 */
-	public void setSipPathName(String sipPathName) {
-		this.sipPathName = sipPathName;
-	}
-
-	/**
-	 * @return the sipStackName
-	 */
-	public String getSipStackName() {
-		return sipStackName;
-	}
-
-	/**
-	 * @param sipStackName
-	 *            the sipStackName to set
-	 */
-	public void setSipStackName(String sipStackName) {
-		this.sipStackName = sipStackName;
-	}
+			
 
 	/**
 	 * @return the signalingTransport
@@ -534,31 +452,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	public void setPort(int port) {
 		this.port = port;
 	}
-
-	public void setLogLevel(String logLevel) {
-		this.logLevel = logLevel;
-	}
-
-	public String getLogLevel() {
-		return logLevel;
-	}
-
-	public void setServerLog(String serverLog) {
-		this.serverLog = serverLog;
-	}
-
-	public String getServerLog() {
-		return serverLog;
-	}
-
-	public void setDebugLog(String debugLog) {
-		this.debugLog = debugLog;
-	}
-
-	public String getDebugLog() {
-		return debugLog;
-	}
-
+		
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
 	}
@@ -607,49 +501,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public void setUseStun(boolean useStun) {
 		this.useStun = useStun;
-	}
-
-	/**
-	 * @return the logMessageContent
-	 */
-	public String getLogMessageContent() {
-		return logMessageContent;
-	}
-
-	/**
-	 * @param logMessageContent the logMessageContent to set
-	 */
-	public void setLogMessageContent(String logMessageContent) {
-		this.logMessageContent = logMessageContent;
-	}
-
-	/**
-	 * @return the threadPoolSize
-	 */
-	public String getThreadPoolSize() {
-		return threadPoolSize;
-	}
-
-	/**
-	 * @param threadPoolSize the threadPoolSize to set
-	 */
-	public void setThreadPoolSize(String threadPoolSize) {
-		this.threadPoolSize = threadPoolSize;
-	}
-
-	/**
-	 * @return the isReentrantListener
-	 */
-	public String getIsReentrantListener() {
-		return isReentrantListener;
-	}
-
-	/**
-	 * @param isReentrantListener the isReentrantListener to set
-	 */
-	public void setIsReentrantListener(String isReentrantListener) {
-		this.isReentrantListener = isReentrantListener;
-	}
+	}	
 
 	public InetAddress getAddress() {
 		try {
@@ -671,6 +523,20 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
         }
         return ("sip-" + encodedAddr + getPort());
     }
+    
+    /**
+	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set
+	 */
+	public void setSipStackPropertiesFile(String sipStackPropertiesFile) {
+		this.sipStackPropertiesFile = sipStackPropertiesFile;
+	}
+
+	/**
+	 * @return the sipStackPropertiesFile
+	 */
+	public String getSipStackPropertiesFile() {
+		return sipStackPropertiesFile;
+	}
     
     // -------------------- JMX related methods --------------------
 
@@ -702,5 +568,5 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
     }
 
     public void postDeregister() {
-    }
+    }	
 }

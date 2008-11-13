@@ -199,15 +199,9 @@ public class SipEmbedded {
 		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
 				.getProtocolHandler();
 		udpProtocolHandler.setPort(port);
-		udpProtocolHandler.setDebugLog("../logs/debuglog.txt");
 		udpProtocolHandler.setIpAddress(ipAddress);
-		udpProtocolHandler.setLogLevel("DEBUG");
-		udpProtocolHandler.setServerLog("../logs/serverlog.xml");
 		udpProtocolHandler.setSignalingTransport(transport);
-		udpProtocolHandler.setSipPathName("gov.nist");
-		udpProtocolHandler.setSipStackName(connectorName);
-		udpProtocolHandler.setThreadPoolSize("64");
-		udpProtocolHandler.setIsReentrantListener("true");
+//		udpProtocolHandler.setSipStackPropertiesFile("file:///" + loggingFilePath + "mss-sip-stack.properties");
 
 		sipService.addConnector(udpSipConnector);
 	}
