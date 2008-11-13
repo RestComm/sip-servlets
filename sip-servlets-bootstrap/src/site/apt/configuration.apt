@@ -33,8 +33,8 @@ Configuration
 			
 	* <<<sipStackPropertiesFile>>> : the underlying JAIN SIP Stack implementation can be further configured through a set of properties 
 	(see {{{http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html}jain sip configuration properties}} and 
-	{{{http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html}nit sip implementation configuration properties}}), set this property to the location of the file that will contain key/value pairs corresponding to the stack configuration properties.
-	If this property is ommitted, the following default values will be assumed :
+	{{{http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html}nist sip implementation configuration properties}}), set this property to the location of the file that will contain key/value pairs corresponding to the stack configuration properties.
+	If this property is omitted, the following default values will be assumed :
 	
 		** gov.nist.javax.sip.LOG_MESSAGE_CONTENT=true
 		
