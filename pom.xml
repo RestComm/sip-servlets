@@ -81,7 +81,7 @@
 	<properties>
 		<!-- MOBICENTS TOOL VERSIONS -->
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
-		<jain-sip-ri.version>1.2.86</jain-sip-ri.version>
+		<!--jain-sip-ri.version>1.2.86</jain-sip-ri.version-->
 		<jboss.version>4.2.3.GA</jboss.version>
 	</properties>
 	
