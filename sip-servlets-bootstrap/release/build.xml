@@ -150,7 +150,9 @@
 	
 	<target name="deploy-mgmnt">
 		<property name="management.home" location="${base.path}/../../sip-servlets-management/"/>
-		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${management.home}">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
 		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
 	</target>
 	
