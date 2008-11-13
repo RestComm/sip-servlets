@@ -75,14 +75,13 @@
 		<module>sip-servlets-bootstrap</module>
 		<module>sip-servlets-spec</module>
 		<module>sip-servlets-impl</module>
-		<module>sip-servlets-application-router</module>
-		<module>sip-servlets-management</module>
+		<module>sip-servlets-application-router</module>		
 	</modules>
 	
 	<properties>
 		<!-- MOBICENTS TOOL VERSIONS -->
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
-		<!--jain-sip-ri.version>1.2.86</jain-sip-ri.version-->
+		<jain-sip-ri.version>1.2.86</jain-sip-ri.version>
 		<jboss.version>4.2.3.GA</jboss.version>
 	</properties>
 	
@@ -184,7 +183,9 @@
 		</profile>
 		<profile>			
 			<id>release</id>
-			<modules>
+			<modules>				
+				<module>sip-servlets-management</module>
+				<module>jopr-plugin</module>
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
 			</modules>
