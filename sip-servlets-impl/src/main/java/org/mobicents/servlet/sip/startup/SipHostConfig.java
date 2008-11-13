@@ -200,6 +200,17 @@ public class SipHostConfig extends HostConfig {
 		if (file.getName().toLowerCase().endsWith(SAR_EXTENSION)) {
 			return true;
 		} else if (file.getName().toLowerCase().endsWith(WAR_EXTENSION)) {
+			try{
+                JarFile jar = new JarFile(file);                                  
+                JarEntry entry = jar.getJarEntry(SipContext.APPLICATION_SIP_XML);
+                if(entry != null) {
+                        return true;
+                }                
+	        } catch (IOException e) {
+	        	if(logger.isInfoEnabled()) {
+	        		logger.info("couldn't find WEB-INF/sip.xml in " + file + " checking for package-info.class");
+	        	}
+	        }
 			return SipApplicationAnnotationUtils.findPackageInfoInArchive(file);
 		} 		
 		return false;
