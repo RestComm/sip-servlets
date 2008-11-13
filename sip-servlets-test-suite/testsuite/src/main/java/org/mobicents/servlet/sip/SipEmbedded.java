@@ -201,7 +201,7 @@ public class SipEmbedded {
 		udpProtocolHandler.setPort(port);
 		udpProtocolHandler.setIpAddress(ipAddress);
 		udpProtocolHandler.setSignalingTransport(transport);
-//		udpProtocolHandler.setSipStackPropertiesFile("file:///" + loggingFilePath + "mss-sip-stack.properties");
+		udpProtocolHandler.setSipStackPropertiesFile("file:///" + loggingFilePath + "mss-sip-stack.properties");
 
 		sipService.addConnector(udpSipConnector);
 	}
