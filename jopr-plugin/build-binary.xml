@@ -48,9 +48,9 @@
 		<copy todir="${embjopr.home.contents}/plugins/">
 			<fileset dir="./target" includes="jopr-mobicents-sip-servlets-plugin-*.jar" />
 		</copy>	
-		<jar destfile="./target/${embjopr.war}">
+		<war destfile="./target/${embjopr.war}">
 			<fileset dir="${embjopr.home.contents}" includes="**/*" />
-		</jar>
+		</war>
 	</target>
 </project>
 	
