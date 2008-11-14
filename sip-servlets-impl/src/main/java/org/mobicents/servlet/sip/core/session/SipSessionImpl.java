@@ -617,7 +617,7 @@ public class SipSessionImpl implements MobicentsSipSession {
             }
             int numExpired = manager.getExpiredSipSessions();
             numExpired++;
-            manager.setExpiredSessions(numExpired);
+            manager.setExpiredSipSessions(numExpired);
             int average = manager.getSipSessionAverageAliveTime();
             average = ((average * (numExpired-1)) + timeAlive)/numExpired;
             manager.setSipSessionAverageAliveTime(average);
