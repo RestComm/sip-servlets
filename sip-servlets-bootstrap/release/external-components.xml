@@ -7,14 +7,14 @@
 
 	<artifactId>sip-servlets-external-modules-checkout</artifactId>
 	<groupId>org.mobicents.servlet.sip</groupId>
-	<version>0.6-SNAPSHOT</version>
+	<version>0.7-SNAPSHOT</version>
 	
      <properties>
          <checkout.basedir>${basedir}/target/dependencies</checkout.basedir>
          <checkout.username>mobicents-read-only</checkout.username>
          <checkout.password></checkout.password>
          
-         <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/mobicents-media-server-core-1.0.0.BETA4</media.core.connectionURL>
+         <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/mobicents-media-server-core-1.0.0.CR3</media.core.connectionURL>
          <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL>
      </properties>
      
