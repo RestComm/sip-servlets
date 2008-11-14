@@ -3,6 +3,8 @@ package org.mobicents.servlet.management.client.configuration;
 import org.mobicents.servlet.management.client.router.Console;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -76,17 +78,6 @@ public class ConfiguationPage extends Panel {
 		queueSize.setAllowBlank(false); 
 		queueSize.setHideLabel(true);
 		addLabeledControl("SIP Mesage Queue Size:", queueSize, formPanel);
-		ConfigurationService.Util.getInstance().getQueueSize(new AsyncCallback() {
-
-			public void onFailure(Throwable caught) {
-				Console.error("Error while trying to get SIP message queue size.");
-			}
-
-			public void onSuccess(Object result) {
-				queueSize.setValue(result.toString());
-			}
-			
-		});
 		
 		//Concurrency control modes selector
 		final Store ccmsStore = new SimpleStore(new String[]{"ccms"}, concurrencyControlModes);  
@@ -98,45 +89,34 @@ public class ConfiguationPage extends Panel {
 			}  
 		}, (String)concurrencyControlModes[1][0]);
 		addLabeledControl("Concurrency control mode:", ccms, formPanel);
-		ConfigurationService.Util.getInstance().getConcurrencyControlMode(
-				new AsyncCallback() {
 
-					public void onFailure(Throwable caught) {
-						Console.error("Error while trying to get concurreny control mode.");
-					}
-
-					public void onSuccess(Object result) {
-						ccms.setValue(result.toString());
-					}
-					
-				});
 		
 		//Save button
 		Button save = new Button("Apply", new ButtonListenerAdapter(){
 
 			public void onClick(Button button, EventObject e) {
 				ConfigurationService.Util.getInstance().setConcurrencyControlMode(
-						ccms.getValue(), new AsyncCallback() {
+						ccms.getValue(), new AsyncCallback<Void>() {
 
 							public void onFailure(Throwable caught) {
 								Console.error("Error while trying to set concurreny control mode.");
 							}
 
-							public void onSuccess(Object result) {
-								
+							public void onSuccess(Void result) {
+								result = result;
 							}
 							
 						});
 				
 				ConfigurationService.Util.getInstance().setQueueSize(
-						Integer.parseInt(queueSize.getValueAsString()), new AsyncCallback() {
+						Integer.parseInt(queueSize.getValueAsString()), new AsyncCallback<Void>() {
 
 							public void onFailure(Throwable caught) {
 								Console.error("Error while trying to set SIP message queue size.");
 							}
 
-							public void onSuccess(Object result) {
-								
+							public void onSuccess(Void result) {
+								result = result;
 							}
 							
 						});
@@ -147,6 +127,37 @@ public class ConfiguationPage extends Panel {
 		formPanel.add(save);
 
 		add(formPanel);
+		
+		DeferredCommand.addCommand(new Command() {
+
+			public void execute() {
+				ConfigurationService.Util.getInstance().getQueueSize(new AsyncCallback<Integer>() {
+
+					public void onFailure(Throwable caught) {
+						Console.error("Error while trying to get SIP message queue size.");
+					}
+
+					public void onSuccess(Integer result) {
+						queueSize.setValue(result.toString());
+					}
+					
+				});
+				
+				ConfigurationService.Util.getInstance().getConcurrencyControlMode(
+						new AsyncCallback<String>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to get concurreny control mode.");
+							}
+
+							public void onSuccess(String result) {
+								ccms.setValue(result.toString());
+							}
+							
+						});
+			}
+			
+		});
 	}
 
 }
