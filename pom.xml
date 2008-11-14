@@ -3,7 +3,7 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>6</version>
+        <version>7</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -81,8 +81,6 @@
 	<properties>
 		<!-- MOBICENTS TOOL VERSIONS -->
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
-		<!--jain-sip-ri.version>1.2.86</jain-sip-ri.version-->
-		<jboss.version>4.2.3.GA</jboss.version>
 	</properties>
 	
 	<dependencies>
