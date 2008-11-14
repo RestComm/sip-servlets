@@ -32,12 +32,9 @@
  */
 package org.mobicents.servlet.sip.conference.client;
 
-import org.mobicents.servlet.sip.conference.client.ui.AddAnnouncementForm;
 import org.mobicents.servlet.sip.conference.client.ui.Conference;
-import org.mobicents.servlet.sip.conference.client.ui.ConferenceGwtExt;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**

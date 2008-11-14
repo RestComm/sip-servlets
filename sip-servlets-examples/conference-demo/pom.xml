@@ -65,6 +65,12 @@
 	<dependencies>
 		<!--  GWT deps (from central repo) -->
 		<dependency>
+			<groupId>com.gwtext</groupId>
+			<artifactId>gwtext</artifactId>
+			<version>2.0.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
 			<version>${gwtVersion}</version>
@@ -100,17 +106,17 @@
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
-			<version>1.0.0.CR3-SNAPSHOT</version>
+			<version>1.0.0.CR3</version>
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
-			<version>1.0.0.CR3-SNAPSHOT</version>
+			<version>1.0.0.CR3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
-			<version>1.0.0.CR3-SNAPSHOT</version>
+			<version>1.0.0.CR3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.sip</groupId>
@@ -138,7 +144,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.6</version>
+			<version>1.1.7-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		

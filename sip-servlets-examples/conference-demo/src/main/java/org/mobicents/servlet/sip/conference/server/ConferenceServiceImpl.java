@@ -3,8 +3,6 @@ package org.mobicents.servlet.sip.conference.server;
 import java.util.Iterator;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
