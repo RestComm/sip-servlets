@@ -1,5 +1,6 @@
 package org.mobicents.servlet.sip.conference.client.ui;
 
+import org.mobicents.servlet.sip.conference.client.ParticipantInfo;
 import org.mobicents.servlet.sip.conference.client.ServerConnection;
 import org.mobicents.servlet.sip.conference.client.SipGwtConferenceConsole;
 
@@ -14,6 +15,10 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtext.client.util.Format;
+import com.gwtext.client.widgets.MessageBox;
+import com.gwtext.client.widgets.MessageBoxConfig;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 
 public class Conference extends VerticalPanel{
 
@@ -39,13 +44,13 @@ public class Conference extends VerticalPanel{
 		add(new HTML("</br></br>"));
 		add(new AddAnnouncementForm(conferenceName));
 		add(new AddSipPhoneForm(conferenceName));
-		final AsyncCallback<String[]> callback = new AsyncCallback<String[]>() {
+		final AsyncCallback<ParticipantInfo[]> callback = new AsyncCallback<ParticipantInfo[]>() {
 
 			public void onFailure(Throwable caught) {
 				
 			}
 
-			public void onSuccess(String[] result) {
+			public void onSuccess(ParticipantInfo[] result) {
 
 				ServerConnection.Util.getInstance().getParticipants(
 						conferenceName, true, this);
@@ -54,15 +59,15 @@ public class Conference extends VerticalPanel{
 			}
 
 		};
-		
+
 		ServerConnection.Util.getInstance().getParticipants(
 				conferenceName, false, callback);
 	}
-	
-	private void populateParticipants(String[] result) {
+
+	private void populateParticipants(ParticipantInfo[] result) {
 		participants.clear();
 		for(int q=0; q<result.length; q++) {
-			final String user = result[q];
+			final String user = result[q].name;
 			
 			Button kickLink = new Button();
 			kickLink.setText("kick");
@@ -103,6 +108,27 @@ public class Conference extends VerticalPanel{
 				}
 				
 			});
+			
+			Button unmuteLink = new Button();
+			unmuteLink.setText("unmute");
+			unmuteLink.addClickListener(new ClickListener() {
+
+				public void onClick(Widget sender) {
+					ServerConnection.Util.getInstance().unmute(user, conferenceName, new AsyncCallback<Void>() {
+
+						public void onFailure(Throwable caught) {
+							
+						}
+
+						public void onSuccess(Void result) {
+							
+						}
+						
+					});
+				}
+				
+			});
+			
 			Label numberLabel = new Label(new Integer(q).toString());
 			numberLabel.setStyleName("numberLabel");
 			participants.setWidget(q, 0, new Image("ajax-loader.gif"));
@@ -110,7 +136,11 @@ public class Conference extends VerticalPanel{
 			userLabel.setStyleName("userLabel");
 			HorizontalPanel commands = new HorizontalPanel();
 			commands.add(kickLink);
-			//commands.add(muteLink);
+			if(!result[q].muted) {
+				commands.add(muteLink);
+			} else {
+				commands.add(unmuteLink);
+			}
 			participants.setWidget(q, 1, userLabel);
 			participants.setWidget(q, 2, commands);
 		}

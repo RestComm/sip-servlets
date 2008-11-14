@@ -111,6 +111,10 @@ public class Conference {
 		this.participants.get(participantName).mute(this);
 	}
 	
+	public void unmute(String participantName) {
+		this.participants.get(participantName).unmute(this);
+	}
+	
 	public String getConferenceEndpointName() {
 		String confEnpName = null;
 		if(getConferenceEndpoint() != null) {

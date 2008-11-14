@@ -55,7 +55,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 	}
 	
 	private void join(final Conference conference, MsLinkMode mode) {
-		MsSession session = getSession();
+		final MsSession session = getSession();
 		MsLink link = session.createLink(mode);
 		link.addLinkListener(new MsLinkListener() {
 			public void linkCreated(MsLinkEvent evt) {
@@ -67,7 +67,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 			public void linkConnected(MsLinkEvent evt) {
 				logger.info("CONF-ANN link connected " + evt.getSource().getEndpoints()[0].getLocalName()
 						+ "   " + evt.getSource().getEndpoints()[1].getLocalName());
-					playOnLink(evt.getSource(), fileUrl);
+				playOnLink(session, evt.getSource(), fileUrl, 1);
 			}
 
 			public void linkDisconnected(MsLinkEvent evt) {
@@ -101,7 +101,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 		links.remove(conference);
 	}
 	
-	public void playOnLink(MsLink link, String url) {
+	public static void playOnLink(MsSession session, MsLink link, String url, int endpointSide) {
 		MsEventFactory eventFactory = session.getProvider().getEventFactory();
 		MsPlayRequestedSignal play = null;
 		play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
@@ -121,7 +121,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[]{play};
 		MsRequestedEvent[] requestedEvents = new MsRequestedEvent[]{onCompleted, onFailed};
-		link.getEndpoints()[1].execute(requestedSignals, requestedEvents, link);
+		link.getEndpoints()[endpointSide].execute(requestedSignals, requestedEvents, link);
 	}
 
 	@Override
@@ -134,6 +134,14 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 	public void mute(Conference conference) {
 		leave(conference);
 		join(conference, MsLinkMode.HALF_DUPLEX);
+		muted = true;
+	}
+
+	@Override
+	public void unmute(Conference conference) {
+		leave(conference);
+		join(conference, MsLinkMode.HALF_DUPLEX);
+		muted = false;
 	}
 
 }

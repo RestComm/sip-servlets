@@ -57,7 +57,7 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 	private void join(final Conference conference, MsLinkMode mode) {
 		MsEndpoint endpoint = getEndpoint();
 		//provider.addNotificationListener(this);
-		MsSession session = getSession();
+		final MsSession session = getSession();
 		final MsLink link = session.createLink(mode);
 		link.addLinkListener(new MsLinkListener() {
 			public void linkCreated(MsLinkEvent evt) {
@@ -68,6 +68,7 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 				logger.info("PR-CONF link connected " +link.getEndpoints()[0].getLocalName() +
 						" " + link.getEndpoints()[1].getLocalName());
 				conference.setConferenceEndpoint(link.getEndpoints()[0]);
+				//AnnouncementConferenceParticipant.playOnLink(session, link, "/home/vralev/control/mobicents/servers/media/examples/mms-demo/web/src/main/webapp/audio/cuckoo.wav", 0);
 			}
 
 			public void linkDisconnected(MsLinkEvent evt) {
@@ -122,6 +123,14 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 	public void mute(Conference conference) {
 		leave(conference);
 		join(conference, MsLinkMode.HALF_DUPLEX);
+		muted = true;
+	}
+
+	@Override
+	public void unmute(Conference conference) {
+		leave(conference);
+		join(conference, MsLinkMode.FULL_DUPLEX);
+		muted = false;
 	}
 
 }

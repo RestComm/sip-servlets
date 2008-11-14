@@ -38,9 +38,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public interface ConferenceServiceAsync {
-    public void getParticipants(String conference, Boolean refresh, AsyncCallback<String[]> callback);
+    public void getParticipants(String conference, Boolean refresh, AsyncCallback<ParticipantInfo[]> callback);
     public void joinAnnouncement(String name, String conference, String url, AsyncCallback<Void> callback);
     public void joinSipPhone(String namr, String conference, String url, AsyncCallback<Void> callback);
     public void kick(String user, String conference, AsyncCallback<Void> callback);
     public void mute(String user, String conference, AsyncCallback<Void> callback);
+    public void unmute(String user, String conference, AsyncCallback<Void> callback);
  }

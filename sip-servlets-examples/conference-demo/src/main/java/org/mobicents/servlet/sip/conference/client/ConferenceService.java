@@ -40,9 +40,10 @@ import com.google.gwt.user.client.rpc.RemoteService;
  */
 public interface ConferenceService extends RemoteService {
    
-    public String[] getParticipants(String conference, Boolean refresh);
+    public ParticipantInfo[] getParticipants(String conference, Boolean refresh);
     public void joinAnnouncement(String name, String conference, String url);
     public void joinSipPhone(String namr, String conference, String url);
     public void kick(String user, String conference);
     public void mute(String user, String conference);
+    public void unmute(String user, String conference);
  }

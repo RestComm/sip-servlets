@@ -1,15 +1,21 @@
 package org.mobicents.servlet.sip.conference.server;
 
+import java.util.Iterator;
+
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 
 import org.mobicents.servlet.sip.conference.client.ConferenceService;
+import org.mobicents.servlet.sip.conference.client.ParticipantInfo;
 import org.mobicents.servlet.sip.conference.server.media.AnnouncementConferenceParticipant;
 import org.mobicents.servlet.sip.conference.server.media.Conference;
 import org.mobicents.servlet.sip.conference.server.media.ConferenceCenter;
+import org.mobicents.servlet.sip.conference.server.media.ConferenceParticipant;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -18,7 +24,8 @@ public class ConferenceServiceImpl extends RemoteServiceServlet implements Confe
 	@Resource
 	private static SipFactory sipFactory;
 	
-	public String[] getParticipants(String conference, Boolean refresh) {
+	public ParticipantInfo[] getParticipants(String conference, Boolean refresh) {
+		
 		Conference conf = ConferenceCenter.getInstance().getConference(conference);
 		if(refresh) {
 			try {
@@ -26,10 +33,21 @@ public class ConferenceServiceImpl extends RemoteServiceServlet implements Confe
 					conf.wait(30000);
 				}
 			} catch (InterruptedException e) {
-				return new String[] {};
+				return new ParticipantInfo[] {};
 			}
 		}
-		return conf.getParticipantNames();
+		int length = conf.getParticipantNames().length;
+		ParticipantInfo[] result = new ParticipantInfo[length];
+		int q = 0;
+		Iterator<ConferenceParticipant> it = conf.getParticipants().values().iterator();
+		while(it.hasNext()) {
+			ConferenceParticipant p = it.next();
+			result[q] = new ParticipantInfo();
+			result[q].name = p.getName();
+			result[q].muted = p.isMuted();
+			q++;
+		}
+		return result;
 	}
 
 	public void joinAnnouncement(String name, String conference, String url) {
@@ -41,11 +59,16 @@ public class ConferenceServiceImpl extends RemoteServiceServlet implements Confe
 	}
 
 	public void kick(String user, String conference) {
-		ConferenceCenter.getInstance().getConference(conference).kick(user);
+		Conference conf = ConferenceCenter.getInstance().getConference(conference);
+		conf.kick(user);
 	}
 
 	public void mute(String user, String conference) {
-		ConferenceCenter.getInstance().getConference(conference).mute(user);
+		Conference conf = ConferenceCenter.getInstance().getConference(conference);
+		conf.mute(user);
+		synchronized (conf) {
+			conf.notifyAll();
+		}
 	}
 
 	public void joinSipPhone(String namr, String conference, String url) {
@@ -59,6 +82,14 @@ public class ConferenceServiceImpl extends RemoteServiceServlet implements Confe
 			e.printStackTrace();
 		}
 		
+	}
+
+	public void unmute(String user, String conference) {
+		Conference conf = ConferenceCenter.getInstance().getConference(conference);
+		conf.unmute(user);
+		synchronized (conf) {
+			conf.notifyAll();
+		}
 	}
 
 }
