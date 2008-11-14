@@ -66,7 +66,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 		try {
 			super.lifecycleEvent(event);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 

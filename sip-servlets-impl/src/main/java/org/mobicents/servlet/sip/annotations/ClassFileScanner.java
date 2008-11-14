@@ -143,8 +143,11 @@ public class ClassFileScanner {
 				processListenerAnnotation(clazz);
 				processServletAnnotation(clazz);
 				processSipApplicationKeyAnnotation(clazz);
-			} catch (ClassNotFoundException e) {
-				logger.error("Failed to parse annotations for class " + classpath, e);
+			} catch (Throwable e) {
+				logger.warn("Failed to parse annotations for class " + classpath);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Failed to parse annotations for class " + classpath, e);
+				}
 			}
     	}
     }
