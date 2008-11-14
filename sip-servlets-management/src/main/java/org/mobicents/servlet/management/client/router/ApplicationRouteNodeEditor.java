@@ -186,6 +186,9 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		collapsedPanel.setCollapsed(true);
 		collapsedPanel.addStyleName("ssm-collapsed-background");
 		formPanel.add(collapsedPanel);
+		
+		// Set this default value, because it is the most common
+		subscriberIdentity.setValue("DAR:From");
 
 		// Add delete button to remove this item from the app list
 		Button deleteButton = new Button("Delete");
