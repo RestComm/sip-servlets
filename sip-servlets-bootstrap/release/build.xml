@@ -115,7 +115,7 @@
 		</antcall>
 		
 		<antcall target="build-mobicents-media-server" />
-		<antcall target="build-mobicents-jopr-plugin" />
+		<!--antcall target="build-mobicents-jopr-plugin" /-->
 		
 		<condition property="ha.capable">
 			<or>
