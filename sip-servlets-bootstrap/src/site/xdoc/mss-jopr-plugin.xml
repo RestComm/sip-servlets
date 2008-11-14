@@ -67,7 +67,7 @@
 		<section name="Installation Instructions">
 			<subsection name="Jopr for Development">
 				<p>
-					The Embedded Jopr called also JBoss Administration console is available from {{{http://mobicents.googlecode.com/files/embedded-jopr.war}here}} and works with Mobicents Sip Servlets starting from version 0.7.<br/>
+					The Embedded Jopr called also JBoss Administration console is available from  <a href="http://mobicents.googlecode.com/files/embedded-jopr.war">here</a> and works with Mobicents Sip Servlets starting from version 0.7.<br/>
 					If you want to install it from the source, follow those instructions :
 					<ul>
 					<li>Follow the <a href="http://www.jboss.org/community/docs/DOC-12807">Embedded Jopr installation instructions</a> to install the latest version of Embedded Jopr.</li>
