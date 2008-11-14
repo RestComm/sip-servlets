@@ -29,7 +29,7 @@
 	</build>
 	
 	<properties>	
-		<mms.version>1.0.0.CR3-SNAPSHOT</mms.version>	
+		<mms.version>1.0.0.CR3</mms.version>	
 		<!-- dependency versions -->
 		<jboss.version>4.2.2.GA</jboss.version>
 		<javassist.version>3.6.0.GA</javassist.version>
