@@ -12,4 +12,7 @@
 	<servlet
 		class="org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl"
 		path="/DARConfigurationService" />
+	<servlet
+		class="org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl"
+		path="/ConfigurationService" />
 </module>
