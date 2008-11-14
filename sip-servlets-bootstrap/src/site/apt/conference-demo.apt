@@ -4,8 +4,8 @@ Sip Servlets Conference Demo
 
 	This example is focusing on the interaction with the more advanced features in Mobicents Media Server - endpoint composition and conferencing.
 	It is using the {{{http://code.google.com/webtoolkit/}Google's GWT}} Ajax framework with {{{http://code.google.com/p/google-web-toolkit-incubator/wiki/ServerPushFAQ}server-push}}
-	updates (a.k.a "reverse Ajax" or comet) to provide desktop-like experience when interacting with the user interface.
-	The application is demonstrating how Sip Servlets can work seamlessly with any third-party web framework without any need of repackaging or modifying the deployment descriptors.
+	updates (a.k.a "reverse Ajax" or Comet) to provide desktop-like experience for the user interface.
+	The application is demonstrating how Sip Servlets can work seamlessly with any third-party web framework without repackaging or modifying the deployment descriptors.
 	All that is needed are a two Java annotations in the code to specify the application name and the servlet name, nothing else.
 
 	
@@ -21,7 +21,7 @@ Sip Servlets Conference Demo
 
 * How to activate it
 
-	Navigate you browser to the {{{http://localhost:8080/sip-servlets-management}Sip Servlets Management console}} and select the Conferen application to receive the INVITE requests. Then save the configuration.
+	Navigate you browser to the {{{http://localhost:8080/sip-servlets-management}Sip Servlets Management console}} and select the "Conference" application to receive the INVITE requests. Then save the configuration.
 	
 * How to use it
 
@@ -33,4 +33,6 @@ Sip Servlets Conference Demo
 	[[2]] You can dial a SIP Phone from the form in the web application.
 	
 	
-	Additionally once the conference is started you can play an announcement by typing a file name in the respetive text-box and pressing "Play file". The file must be PCM, mono, 16 bits, 8KHz WAV.
+	Additionally once the conference is started you can play an announcement by typing a file name in the respective text-box and pressing "Play file". The file must be PCM, mono, 16 bits, 8KHz WAV.
+	
+	Participants can be muted and unmuted at any time.
