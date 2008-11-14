@@ -15,18 +15,22 @@
 	<modules>
 		<module>call-blocking</module>
 		<module>call-forwarding</module>
+		<module>call-forwarding-distributable</module>
 		<module>chatserver</module>
 		<module>click-to-call</module>
+		<module>conference-demo</module>
 		<module>facebook-c2c</module>
+		<module>jslee-sips-interop</module>
 		<module>location-service</module>
 		<module>location-service-distributable</module>
 		<module>media-playback-servlet</module>
+		<module>shootist-sip-servlet</module>
+		<module>shootist-sip-servlet-distributable</module>
 		<module>shopping-demo</module>
 		<module>simple-sip-servlet</module>
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
 		<module>uac-register</module>
-		<module>conference-demo</module>
 	</modules>
 
 	<properties>
