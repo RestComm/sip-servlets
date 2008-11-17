@@ -79,6 +79,10 @@
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
+				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server">
+					<property name="jboss.home" value="${jboss.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>
 			</sequential>
 		</for>
 		
@@ -114,7 +118,6 @@
 			<param name="management.deploy.folder" value="${jboss.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
-		<antcall target="build-mobicents-media-server" />
 		<!--antcall target="build-mobicents-jopr-plugin" /-->
 		
 		<condition property="ha.capable">
