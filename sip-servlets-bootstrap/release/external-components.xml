@@ -15,7 +15,7 @@
          <checkout.password></checkout.password>
          
          <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.0.CR3</media.core.connectionURL>
-         <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL>
+         <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/mobicents-tools-sip-balancer-1.0.BETA2</sip.balancer.connectionURL>
      </properties>
      
 	<build>
