@@ -1,6 +1,5 @@
 package org.mobicents.servlet.sip.testsuite.address;
 
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.TelURL;
 
 import org.mobicents.servlet.sip.SipFactories;

@@ -1,6 +1,5 @@
 package org.mobicents.servlet.sip.testsuite.address;
 
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipURI;
 
 import org.mobicents.servlet.sip.SipFactories;
@@ -12,7 +11,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 public class SipURITest extends junit.framework.TestCase {
 
 	static String[][] equal = {
-//			{"sip:%61lice@atlanta.com;transport=TCP", "sip:alice@AtlanTa.CoM;Transport=tcp"},
+			{"sip:%61lice@atlanta.com;transport=TCP", "sip:alice@AtlanTa.CoM;Transport=tcp"},
 			{"sip:carol@chicago.com", "sip:carol@chicago.com;newparam=5"},
 			{"sip:carol@chicago.com", "sip:carol@chicago.com;lr"},
 			{"sip:carol@chicago.com;security=on", "sip:carol@chicago.com;newparam=5"},
@@ -25,9 +24,9 @@ public class SipURITest extends junit.framework.TestCase {
 	static String[][] different = {
 			{"sip:alice@atlanta.com", "sip:ALICE@atlanta.com"},
 			{"sip:bob@biloxi.com", "sip:bob@biloxi.com:5060"},
-//			{"sip:bob@biloxi.com", "sip:bob@biloxi.com;transport=tcp"},
+			{"sip:bob@biloxi.com", "sip:bob@biloxi.com;transport=tcp"},
 			{"sip:carol@chicago.com;newparam=6", "sip:carol@chicago.com;newparam=5"},
-//			{"sip:carol@chicago.com", "sip:carol@chicago.com?Subject=next%20meeting"},
+			{"sip:carol@chicago.com", "sip:carol@chicago.com?Subject=next%20meeting"},
 			{"sip:carol@chicago.com?Subject=next%20meeting", "sip:carol@chicago.com?Subject=another%20meeting"},
 			{"sip:carol@chicago.com;security=off", "sip:carol@chicago.com;security=on"}
 	};
