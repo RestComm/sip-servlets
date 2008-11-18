@@ -174,6 +174,9 @@ public class RFC2396UrlDecoder {
                 i++;
             }
         }
+        if(logger.isDebugEnabled()) {
+    		logger.debug("decoded uri " + translatedUri);
+    	}
         return translatedUri.toString();
     }
 }
