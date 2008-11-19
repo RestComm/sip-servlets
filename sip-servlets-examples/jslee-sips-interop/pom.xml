@@ -13,7 +13,7 @@
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>jslee-sips-interop-demo-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>JSLEE - SIPS Interoperability Demo Parent</name>
 	<url>http://www.mobicents.org/jslee-sips-interop-demo.html</url>
 	<modules>		

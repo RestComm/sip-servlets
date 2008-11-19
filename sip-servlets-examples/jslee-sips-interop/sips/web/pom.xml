@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>jslee-sips-interop-demo-sips-parent</artifactId>
-		<version>1.0</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>jslee-sips-interop-demo-sips-web</artifactId>
 	<packaging>war</packaging>
@@ -15,13 +15,13 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>jslee-sips-interop-commons</artifactId>
-			<version>1.0</version>
+			<version>1.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>jslee-sips-interop-demo-sips-business</artifactId>
-			<version>1.0</version>
+			<version>1.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
