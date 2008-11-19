@@ -104,7 +104,7 @@ Mobicents SIP Load Balancer
 	
 * Current Limitations
 
-	* It can handle only SIP(S) requests not and HTTP(S).
+	* It can handle only SIP(S) requests not HTTP(S).
 	
 	* It cannot load-balance converged application (application having web and sip components) or pure web applications, only sip applications.
 	

@@ -9,6 +9,124 @@
 				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
 			</p>		
 			<subsection name="Released Versions">
+				<subsection name="Version 0.7 - 11/20/2008">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=133">
+						Concurrency Control
+						</a>						
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=395">
+						Congestion Control
+						</a>						
+						<br />													
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=119">
+						Diameter support
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=130">						
+						User Guide with DocBook Documentation
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=320">
+						Mid Call Failover Support for Proxy Applications
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=321">
+						Mid Call Failover Support for B2BUA Applications
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=454">
+						Mid Call Failover Support for UAC Applications
+						</a>
+						<br />		
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=125">
+						JOPR Integration
+						</a>
+						<br />																		
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=127">
+						More Extensions : PRACK, OPTIONS, INFO
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=308">
+									MSS CLustering improvements
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=362">
+									Incorrect Session Invalidation for SUBSCRIBE/NOTIFY
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=245">
+									Implementation of 17.8 P-Asserted Identity Security 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=410">
+									SipURIImpl.getUser() throws NullPointerException instead of returning null 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=411">
+									SipFactoryImpl.createSipServletRequest(...) uses App. Session key as Call-ID instead of random, unique ID
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=413">
+									One SipServlet and no main-handler tag in sip.xml doesn't work
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=416">
+									Long From tags cause some phones to fail
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=456">
+									Externalize jain sip stack configuration in a separate properties file
+								</a>
+							</li>
+						</ul>
+					</p>
+				</subsection>
 				<subsection name="Version 0.6 - 09/30/2008">
 					<p>
 						<img src="green.jpeg" />
@@ -477,125 +595,7 @@
 					</p>
 				</subsection>
 			</subsection>
-			<subsection name="Planned Versions">																
-				<subsection name="Version 0.7 - 11/01/2008">
-					<p>
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=133">
-						Concurrency Control
-						</a>						
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=395">
-						Congestion Control
-						</a>						
-						<br />													
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=119">
-						Diameter support
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=130">						
-						User Guide with DocBook Documentation
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=320">
-						Mid Call Failover Support for Proxy Applications
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=321">
-						Mid Call Failover Support for B2BUA Applications
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=454">
-						Mid Call Failover Support for UAC Applications
-						</a>
-						<br />		
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=125">
-						JOPR Integration
-						</a>
-						<br />																		
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=127">
-						More Extensions : PRACK, OPTIONS, INFO
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						Various Enhancements and Bug fixes
-						<ul>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=308">
-									MSS CLustering improvements
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=362">
-									Incorrect Session Invalidation for SUBSCRIBE/NOTIFY
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=245">
-									Implementation of 17.8 P-Asserted Identity Security 
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=410">
-									SipURIImpl.getUser() throws NullPointerException instead of returning null 
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=411">
-									SipFactoryImpl.createSipServletRequest(...) uses App. Session key as Call-ID instead of random, unique ID
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=413">
-									One SipServlet and no main-handler tag in sip.xml doesn't work
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=416">
-									Long From tags cause some phones to fail
-								</a>
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=456">
-									Externalize jain sip stack configuration in a separate properties file
-								</a>
-							</li>
-						</ul>
-					</p>
-				</subsection>
+			<subsection name="Planned Versions">																				
 				<subsection name="Version 0.8 - 12/01/2008">
 					<p>
 						<img src="red.jpeg" />

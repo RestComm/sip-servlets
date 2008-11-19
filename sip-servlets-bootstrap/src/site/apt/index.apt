@@ -17,30 +17,40 @@ Goals
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
   
-Version 0.6 is out !
+Version 0.7 is out !
 
-	This release features the first open source containers certified for JSR 289 compliance !!! 
+	Our latest release working on top of both containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> provides new features : 
 	
-	Both containers Tomcat and Jboss passed the TCK tests : 
+		* {{{concurrency.html}Concurrency and Congestion Control}} 
+		
+		* {{{diameter_event_charging.html}Diameter support (Technology preview)}}
+		
+		* {{{failover.html}Mid Call Failover Support}} for Proxy, B2BUA and UAC Applications which makes the mid call failover support complete for pure sip applications.  
+		
+		* Mobicents Sip Servlets now features seamless integration into {{{mss-jopr-plugin.html}JOPR and Embedded JOPR (JBoss Administration console)}}, the JBoss Enterprise management solution.
+		
+		* Two new shinny examples : {{{http://www.mobicents.org/conference-demo.html}a conference media server demo application built on GWT with server-push updates}} and {{{diameter_event_charging.html}a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)}} 		
+		
+		* More Extensions : PRACK/INFO/OPTIONS										
+					 
+	Check the Roadmap to see {{{roadmap.html} the feature details and the usual round of bug fixes}} too.
 	
-	See our {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsReleaseTest/76/testReport}TCK Jboss results}}
-	
-	See our {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsTomcatReleaseTest/13/testReport}TCK Tomcat results}}
-	 
-	Check the Roadmap to see {{{roadmap.html} the usual round of bug fixes}} too. 
+	Checkout the {{{http://hudson.jboss.org/hudson/job/MobicentsDocumentation/lastSuccessfulBuild/artifact/html_single/index.html#chapter-Mobicents_SIP_Servlets_Server}shinny Mobicents Sip Servlets User Guide}}, courtesy of Douglas Silas Hensley.   
 	 
 	It is shipped with :		
 	
 		* {{{sip-servlets-managment.htm}Management Console}}
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
+		
+		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 	
-		* For JBoss only, Mobicents Media Server 1.0.0-BETA4, the Mobicents SIP load Balancer and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
+		* For JBoss only, Mobicents Media Server 1.0.0-CR3, the Mobicents SIP load Balancer and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
 		to test clustering and mid call failover. 
 	 
 	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=629778}Mobicents Sip Servlet 0.6 downloads}}
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=629778}Mobicents Sip Servlet 0.7 downloads}}
 					
 					
 Roadmap
@@ -51,7 +61,7 @@ Roadmap
   
 Try it !
 
-	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or Jboss 4.2.2.GA to become a sip-servlet converged container.
+	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or Jboss 4.2.3.GA to become a sip-servlet converged container.
 	
 	Then have fun with the {{{examples.html}different examples}} provided with this distribution.
 	
