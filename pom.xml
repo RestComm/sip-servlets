@@ -107,7 +107,6 @@
 		<artifactId>maven-release-plugin</artifactId>
 		<configuration>
 			<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-			<autoVersionSubmodules>true</autoVersionSubmodules>
                        	<tagBase>
                                	https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/
                        	</tagBase>
@@ -177,7 +176,7 @@
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
-            <tagBase>https://mobicents.googlecode.com/svn/tags/sip-servlets</tagBase>
+                           	https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/
           </configuration>
         </plugin>
 				</plugins>
