@@ -16,6 +16,7 @@
          
          <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.0.CR3</media.core.connectionURL>
          <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/mobicents-tools-sip-balancer-1.0.BETA2</sip.balancer.connectionURL>
+         <diameter.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.0.0.BETA1</diameter.core.connectionURL>
      </properties>
      
 	<build>
@@ -56,6 +57,24 @@
                             <skipCheckoutIfExists>true</skipCheckoutIfExists>
                             <connectionUrl>
                                 ${sip.balancer.connectionURL}
+                            </connectionUrl>
+                            <username>${checkout.username}</username>
+                            <password>${checkout.password}</password>
+                        </configuration>
+                    </execution>
+                     <execution>
+                        <id>diameter-core-checkout</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>
+                                ${checkout.basedir}/diameter/core
+                            </checkoutDirectory>
+                            <skipCheckoutIfExists>true</skipCheckoutIfExists>
+                            <connectionUrl>
+                                ${diameter.core.connectionURL}
                             </connectionUrl>
                             <username>${checkout.username}</username>
                             <password>${checkout.password}</password>

@@ -83,6 +83,10 @@
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
+				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
+					<property name="jboss.home" value="${jboss.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>
 			</sequential>
 		</for>
 		
@@ -112,6 +116,14 @@
 		
 		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/click2call.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/diameter-event-charging.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
 		</copy>
 		
 		<antcall target="deploy-mgmnt" >
@@ -202,6 +214,13 @@
 		</copy>
 		<copy file="${base.path}/target/dependencies/sip-balancer/src/test/resources/lb-configuration.properties"
 			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
+	</target>
+	
+	<target name="build-mobicents-diameter-core" depends="get-deps">
+		<echo>Building Mobicents Diameter Core</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter/core">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
 	</target>
 	
 	<target name="build-mobicents-jopr-plugin">

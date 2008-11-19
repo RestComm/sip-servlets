@@ -26,7 +26,7 @@ Diameter Event Charging Service
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/diameter-event-charging/1.0/diameter-event-charging-1.0.war}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/diameter-event-charging/1.1/diameter-event-charging-1.1.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/diametereventcharging-dar.properties}dar configuration file}}.\
@@ -42,6 +42,7 @@ Diameter Event Charging Service
 	Please check out the location service example located under this 
 	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/diameter-event-charging}location}} 
 	from the svn repository.
+	
 	Follow the instructions in the README.txt to build and run the example.  
 
 * How to play with it
