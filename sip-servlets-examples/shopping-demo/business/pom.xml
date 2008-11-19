@@ -6,7 +6,7 @@
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>shopping-demo-business</artifactId>
-	<packaging>ejb</packaging>
+	<packaging>jar</packaging>
 	<name>Shopping Demo Business</name>
 	<dependencies>
 		<dependency>
