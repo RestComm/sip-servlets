@@ -4,6 +4,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
+	<parent>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>sip-servlets-examples-parent</artifactId>
+		<version>1.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>jslee-sips-interop-demo-parent</artifactId>
 	<packaging>pom</packaging>
@@ -31,7 +37,7 @@
 	<properties>	
 		<mms.version>1.0.0.CR3</mms.version>	
 		<!-- dependency versions -->
-		<jboss.version>4.2.2.GA</jboss.version>
+		<jboss.version>4.2.3.GA</jboss.version>
 		<javassist.version>3.6.0.GA</javassist.version>
 		<jboss-cache.version>1.4.1.SP3</jboss-cache.version>
 		<commons-pool.version>1.4</commons-pool.version>
@@ -46,7 +52,7 @@
 		<gwt-user.version>1.4.61</gwt-user.version>
 		<commons-fileupload.version>1.1</commons-fileupload.version>
 		<jain-sip-api.version>1.2</jain-sip-api.version>
-		<jain-sip-ri.version>1.2.85</jain-sip-ri.version>
+		<jain-sip-ri.version>1.2.86</jain-sip-ri.version>
 		<jain-mgcp.version>1.0</jain-mgcp.version>			
 		<javax.activation.version>1.1</javax.activation.version>
 		<jcc.version>1.1</jcc.version>				

@@ -4,6 +4,12 @@
 	<!--
 		GWT-Maven example POM without google.webtoolkit.home SET (GWT as deps)
 	-->
+	<parent>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>sip-servlets-examples-parent</artifactId>
+		<version>1.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mobicents.servlet.sip.examples</groupId>
 	<artifactId>conference-demo</artifactId>
