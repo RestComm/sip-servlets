@@ -13,27 +13,27 @@
 	<name>Diameter Event Charging Sip Servlet Example</name>
 	<dependencies>
     <dependency>
-      <groupId>org.mobicents.diameter</groupId>
+      <groupId>org.mobicents.servers.diameter</groupId>
       <artifactId>jdiameter-api</artifactId>
       <version>1.5.0.1-build183</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.mobicents.diameter</groupId>
+      <groupId>org.mobicents.servers.diameter</groupId>
       <artifactId>mobicents-diameter-mux-jar</artifactId>
-      <version>1.0.0.BETA1-SNAPSHOT</version>
+      <version>1.0.0.BETA1</version>
       <scope>provided</scope>
     </dependency>    
     <dependency>
 		  <groupId>jboss</groupId>
 		  <artifactId>jboss-system</artifactId>
-		  <version>4.2.2.GA</version>
+		  <version>${jboss.version}</version>
 		  <scope>provided</scope>
     </dependency>    
     <dependency>
 		  <groupId>jboss</groupId>
 		  <artifactId>jboss-jmx</artifactId>
-		  <version>4.2.2.GA</version>
+		  <version>${jboss.version}</version>
 		  <scope>provided</scope>
     </dependency>    
 	</dependencies>

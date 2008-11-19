@@ -1,5 +1,5 @@
 To build run:
-You should first run "mvn clean install" on MOBICENTS_HOME/servers/diameter/core/ in order to install the Diameter Stack and Multiplexer.
+You should first run "mvn clean install" on MOBICENTS_HOME/servers/diameter/core/ in order to install the Diameter Stack and Multiplexer into JBoss.
 Then, you should do "mvn clean install" at this example location.
 
 To deploy:
