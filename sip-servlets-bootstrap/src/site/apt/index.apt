@@ -29,7 +29,9 @@ Version 0.7 is out !
 		
 		* Mobicents Sip Servlets now features seamless integration into {{{mss-jopr-plugin.html}JOPR and Embedded JOPR (JBoss Administration console)}}, the JBoss Enterprise management solution.
 		
-		* Two new shinny examples : {{{http://www.mobicents.org/conference-demo.html}a conference media server demo application built on GWT with server-push updates}} and {{{diameter_event_charging.html}a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)}} 		
+		* Two new shinny examples : {{{http://www.mobicents.org/conference-demo.html}a conference media server demo application built on GWT with server-push updates}} 
+		(you can also see {{{http://vladimirralev.blogspot.com/2008/10/conference-demo-for-sip-servlets.html}vlad's blog post}} about it) and 
+		{{{diameter_event_charging.html}a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)}} 		
 		
 		* More Extensions : PRACK/INFO/OPTIONS										
 					 
