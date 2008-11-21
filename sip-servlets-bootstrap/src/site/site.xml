@@ -44,6 +44,7 @@
 			<item name="Concurrency and Congestion Control" href="concurrency.html" />
 			<item name="Management Console" href="sip-servlets-managment.htm" />
 			<item name="Server Monitoring Jopr Integration" href="mss-jopr-plugin.html" />
+			<item name="JBoss Seam Integration" href="mss-seam.html" />
 		</menu>
 		<menu name="High Availability">
 			<item name="SIP Load Balancer" href="load-balancer.html" />

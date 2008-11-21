@@ -1,0 +1,118 @@
+<document>
+	<properties>
+		<title>JBoss Seam Integration</title>
+	</properties>
+	<body>
+	<section name="JBoss Seam Integration Overview">
+		<p>
+				<a href="http://www.seamframework.org/">JBoss Seam</a> components can now handle real SipServletRequests while taking advantage of the Seam perks - bijection, scoping, transaction management, interceptors and everything else.
+		</p>
+		<p>
+			Your SIP and HTTP Servlets are running in the same servlet context and they share the same application-scoped components, while the session-scoped components are mapped to the respective SIP and HTTP sessions. You can work with both EJBs and POJOs, interact with your web-layer, and still build very loosely coupled telco components working on the same messages without being aware of each-other. Seam provides synchronous and asynchronous light-weight message passing through the @Observer-annotated methods, which covers most of the communication needs in converged applications.
+		</p>
+		</section>
+		<section name="How it works?">
+			<p>The Seam 2 core is now mostly independent of HTTP Servlets and JSF. Basically we hooked a controller Sip Servlet and session listeners to the Seam lifecycle to control the context assignment for incoming SIP messages. When a SIP message arrives, we raise Seam events to notify the Seam components subscribed to receive the SIP events. We had to use a small Java reflection hack to reach some protected Seam contexts, but I believe it is safe. We will try to make it more clean.
+</p><p>
+	The setup is straightforward - just add the controller servlet to your Seam application in a Sip Servlets container and it's ready to go. For now you can start with the sample application.
+</p><p>
+	Theoretically this technique can work on any JSR289-compliant container that supports JBoss Seam, but I have only tested it on Mobicents Sip Servlets 0.6/0.7 with JBoss Application Server 4.2.3 and Seam 2.1.0.SP1.
+</p>
+		</section>	
+		<section name="Example">
+	<p>This is simple SIP service which responds to an INVITE and counts the number of messages per session. There is a session-scoped counter, which is incremented on every message. Note how you can subscribe methods to SIP events. You can subscribe as many methods as you like in any Seam component, they all will be notified.
+</p>
+<source>
+@Name("simpleSeamSipService")
+@Scope(ScopeType.STATELESS)
+@Transactional
+public class SimpleSeamSipService {
+    @Logger Log log;
+    @In SessionMessageCounter sessionMessageCounter;
+    
+    public void inc() {
+        sessionMessageCounter.increment();
+        log.info("Processed SIP messages " 
+                + sessionMessageCounter.getMessages());
+    }
+    
+    @Observer("INVITE")
+    public void doInvite(SipServletRequest request) 
+    throws Exception {
+        inc();
+        request.createResponse(180).send();
+        Thread.sleep(100);
+        request.createResponse(200).send();
+    }
+    
+    @Observer("ACK")
+    public void doAck(SipServletRequest request) 
+    throws Exception {
+        inc();
+    }
+    
+    @Observer({"REGISTER","BYE"})
+    public void doRegister(SipServletRequest request) 
+    throws Exception {
+        inc();
+        request.createResponse(200).send();
+    }
+}
+</source>
+
+	<p>You should keep in mind that the Seam events are application-wide. If you need cross-application messaging use JMS. Seam would help a lot with JMS too.
+</p><p>
+	And this is the SIP-session scoped component:
+</p>
+<source>
+@Name("sessionMessageCounter")
+@Startup
+@Scope(ScopeType.SESSION)
+public class SessionMessageCounter {
+    private int messages;
+    
+    public int getMessages() {
+        return messages;
+    }
+    
+    public void increment() {
+        messages++;
+    }
+}
+</source>
+
+<p>	Actually, this component is created and stored in every Seam session, no matter if it's SIP or HTTP. This is a bit inefficient, but has some advantages. Ultimately we would want to have a separate SipSession and SipApplicationSession scopes in Seam and we will probably get there with the user-defined scopes in Web Beans (JSR 299) or a newer version of Seam.
+</p>
+		</section>
+		<section name="Advantages">
+
+					<ul>
+					<li><a href="http://docs.jboss.com/seam/latest/reference/en-US/html/index.html">All the Seam goodness.</a></li>
+		
+					<li>Development will be easier, because you can take advantage of the Seam <code>WEB-INF/dev</code> classloader to deploy Seam components faster. Otherwise you have to redeploy the whole war/ear (10-20 secs vs 1-2 secs). This feature is not perfect yet.</li>
+							
+					<li>Testing - Seam provides a great framework for testing based on dependency injection and mocking.</li>
+					
+					<li>Programming model is practically the same as the one you use for Web apps with Seam and similar to the future Web Beans.</li>
+				
+					<li>Potential to integrate with jBPM and JBoss Rules through Seam. (contributors?)</li>
+				
+					</ul>
+		</section>	
+		<section name="Disadvantages">
+
+					<ul>
+					<li>It is not standards-based.</li>
+					<li>Performance is suffering a bit with Seam.</li>
+				
+					</ul>
+						<p>You can find the sample application in SVN:
+	<a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam">http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam</a></p>
+
+	<p>We will soon provide a kit for integrating this capability in your applications. Until then, use the sample application.</p>
+
+
+	<p>*(We currently have no use for conversation scope in SIP.)</p>
+		</section>				
+	</body>
+</document>
