@@ -10,8 +10,8 @@ Mobicents SIP Load Balancer
 	
 	The Mobicents SIP Load Balancer permits pooling these servers, thereby eliminating the need to balance user demands for connectivity through a complicated provisioning algorithm.
 	 
-	All users can send their INVITEs and REGISTERs to the same SIP URI and the Load Balancer will assign ingress proxy servers dynamically to each transaction. 
-	In this way, the traffic load is balanced over a pool of proxy servers based on the real-time demand for services.
+	All users can send their SIP request to the same SIP URI using the Load Balancer as outbound proxy and the Load Balancer will assign application server node to each call. 
+	In this way, the traffic load is balanced over a pool of application server nodes based on the real-time demand for services.
 	
 	The Mobicents SIP Load Balancer will distribute requests across the healthy and available instances in cluster to increase throughput of the overall system. 
 	It can also fail-over mid-call requests from unhealthy/inaccessible instances to healthy and available instances.
@@ -38,16 +38,19 @@ Mobicents SIP Load Balancer
 	
 	This has the following advantages compared to standard implementations where the Load Balancer is reponsible for pinging the cluster nodes :
         
-		* Dynamic configuration of the nodes : Traditional SIP-based load balancers require explicit configuration of the nodes available. 
+		* Dynamic configuration of the nodes : Traditional SIP-based load balancers require explicit configuration of the nodes available.
+		This has the downside ofnot being able to add new nodes on the fly to the cluster to respond to peaks of calls without updating manually the SIP Load Balancer.
 		In Mobicents SIP Load Balancer, the bulk of the configuration resides on the application server nodes. 
 		The set of SIP load balancers to which an application server will communicate is determined by a static list. 
 		The application server relays lifecycle events (e.g. server startup/shutdown) to the load balancers allowing them to effectively auto-configure themselves. 
 		They also send keep alives to the Load Balancers so that if the application server crashes, the load balancer autmatically remove the node after receiving no keep alives from the node.  
 		
-		* Server-side load balance factor calculation : In contrast with traditional SIP-based load balancers, 
-		the Mobicents SIP load Balance uses load balance factors calculated and provided by the application server nodes, 
-		rather than computing these in the load balancer. Consequently, it offers a more robust and accurate set 
-		of load metrics than is available from the load balancer.  
+		* Server-side load balance factor calculation : In traditional SIP-based load balancers, the compputation of the load 
+		is done by the load balancer but the SIP Load Balancer only knows about the request that went through it. Thus if many SIP Load
+		Balancers are used for the same cluster, the calculation will not be accurate at all. Also it doesn't take into account some other factors
+		that can happen on the node itself such as CPU or Memory Consumption.  
+		The Mobicents SIP load Balance uses load balance factors calculated and provided by the application server nodes, 
+		rather than computing these in the load balancer. Consequently, it offers a more robust and accurate set of load metrics than is available from the load balancer.
 		
 	To configure Mobicents Sip Servlets cluster node to contact the SIP Load Baalncer, this is done in extending the 
 	<<<SipStandardService>>> class which already extends the Tomcat <<<StandardService>>> class implementing the Tomcat <<<Service>>> interface.\

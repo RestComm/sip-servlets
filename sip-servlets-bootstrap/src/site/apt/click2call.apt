@@ -26,8 +26,8 @@ Click To Call
 
 ** From the binary
 
-	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/click-to-call-servlet/1.0/click-to-call-servlet-1.0.war}here}}.\
+	It is bundled as a default example with the binary but you can also find the war file corresponding to this example
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/click-to-call-servlet/1.1/click-to-call-servlet-1.1.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/click2call-dar.properties}dar configuration file}}.\

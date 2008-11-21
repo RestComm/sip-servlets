@@ -69,7 +69,7 @@ Configuration
 	<<<<Service name="Sip-Servlets">>>\
   	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>\
   	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>\
-  	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/reinvite-demo/reinvite-dar.properties">>>>
+  	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/call-blocking-demo/call-blocking-servlet-dar.properties">>>>
   	
   	Here is a description of the sip Service tag's attributes :
   	

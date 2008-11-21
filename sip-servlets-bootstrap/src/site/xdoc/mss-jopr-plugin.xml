@@ -78,7 +78,7 @@
 					
 					<li>In mss-jopr-plugin, do a mvn clean install</li>
 				
-					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.0-SNAPSHOT.jar</code> from the target directory to the <code>$JBOSS_HOME/server/default/deploy/embedded-jopr.war/plugins/</code></li>
+					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.1-SNAPSHOT.jar</code> from the target directory to the <code>$JBOSS_HOME/server/default/deploy/embedded-jopr.war/plugins/</code></li>
 				
 					<li>Start your JBoss Application Server (you can start it on localhost)</li>
 				
@@ -99,7 +99,7 @@
 					
 					<li>In mss-jopr-plugin, do a mvn clean install</li>
 				
-					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.0-SNAPSHOT.jar</code> in the target directory to the <code>jopr-server-2.1.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</code></li>
+					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.1-SNAPSHOT.jar</code> in the target directory to the <code>jopr-server-2.1.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</code></li>
 				
 					<li>Wait a bit, 20 seconds maybe or as soon as you see the following message on the jopr server console : [ProductPluginDeployer] Deploying RHQ plugin MobicentsSipServlets (Mobicents Sip Servlets Application Container), undefined version...
 					and then from the jopr agent, run the command <code>plugins update</code>, it will get the newly deployed plugin from the jopr server and start collecting data about the SipApplicationDispatcher</li>

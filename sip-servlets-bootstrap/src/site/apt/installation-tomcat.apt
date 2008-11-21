@@ -30,13 +30,13 @@ Installation Instructions
 	To run the sip servlet container :
 	check that the following files have been copied during the mvn clean install
 	
-		* in tomcat_home/lib directory, there should be a sip-servlets-impl-0.7-SNAPSHOT.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-impl-0.8-SNAPSHOT.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-servlets-application-router-0.7-SNAPSHOT.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-application-router-0.8-SNAPSHOT.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-balancer-1.0-SNAPSHOT.jar
+		* in tomcat_home/lib directory, there should be a sip-balancer-1.0-BETA2.jar
 		
-		* in tomcat_home/lib directory, there should be a sip-servlets-spec-1.1.7-SNAPSHOT.jar
+		* in tomcat_home/lib directory, there should be a sip-servlets-spec-1.1.8-SNAPSHOT.jar
 		
 		* in tomcat_home/lib directory, there should be a jain-sip-api-1.2.jar
 		
