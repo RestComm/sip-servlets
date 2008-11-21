@@ -56,7 +56,7 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 	}
 
 	public void sessionDestroyed(SipSessionEvent arg0) {
-		Lifecycle.beginSession(new SipSeamSessionMap(arg0.getSession()));
+		Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
 		System.out.println("SEAM SIP SESSION DESTROYED");
 	}
 
