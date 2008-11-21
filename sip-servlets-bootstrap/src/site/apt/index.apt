@@ -21,6 +21,8 @@ Version 0.7 is out !
 
 	Our latest release working on top of both containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> provides new features : 
 	
+		* Move to JBoss AS 4.2.3.GA
+	
 		* {{{concurrency.html}Concurrency and Congestion Control}} 
 		
 		* {{{diameter_event_charging.html}Diameter support (Technology preview)}}
@@ -52,7 +54,7 @@ Version 0.7 is out !
 	 
 	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=629778}Mobicents Sip Servlet 0.7 downloads}}
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=641930}Mobicents Sip Servlet 0.7 downloads}}
 					
 					
 Roadmap
