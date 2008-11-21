@@ -2952,6 +2952,20 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void dumpSipApplicationSessions() {
 		sipManagerDelegate.dumpSipApplicationSessions();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Iterator<MobicentsSipSession> getAllSipSessions() {
+		return sipManagerDelegate.getAllSipSessions();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Iterator<MobicentsSipApplicationSession> getAllSipApplicationSessions() {
+		return sipManagerDelegate.getAllSipApplicationSessions();
+	}
 
 	/**
 	 * {@inheritDoc}

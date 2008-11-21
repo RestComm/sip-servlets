@@ -7,7 +7,7 @@
 
 	<artifactId>sip-servlets-external-modules-checkout</artifactId>
 	<groupId>org.mobicents.servlet.sip</groupId>
-	<version>0.7-SNAPSHOT</version>
+	<version>0.8-SNAPSHOT</version>
 	
      <properties>
          <checkout.basedir>${basedir}/target/dependencies</checkout.basedir>

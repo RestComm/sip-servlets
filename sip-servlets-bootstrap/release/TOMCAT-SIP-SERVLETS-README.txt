@@ -19,8 +19,8 @@ What is different from Tomcat standard version
 	** in the lib directory, there should be a sip-servlets-impl-*.jar
 	** in lib directory, there should be a sip-servlets-spec-*.jar
  	** in lib directory, there should be a sip-balancer-*.jar
-	** in lib directory, there should be a jain-sip-api-1.2.1.jar
-	** in lib directory, there should be a jain-sip-ri-1.2.1.jar
+	** in lib directory, there should be a jain-sip-api-1.2.jar
+	** in lib directory, there should be a jain-sip-ri-1.2.86.jar
 	** in lib directory, there should be a concurrent-1.3.4.jar
 	** in lib directory, there should be a log4j-1.2.14.jar
 	** in lib directory, there should be a stun4j.jar

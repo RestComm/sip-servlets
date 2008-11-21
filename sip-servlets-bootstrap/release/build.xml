@@ -4,7 +4,7 @@
 	<property name="release.path" location="${ant.file.mobicents.sipservlets.release}/../target" />
 	<property name="base.path" location="${ant.file.mobicents.sipservlets.release}/.." />
 	
-	<property name="mss.release.version" value="0.7-SNAPSHOT" />
+	<property name="mss.release.version" value="0.8-SNAPSHOT" />
 	<property name="mss.release.configurations" value="all,default" />
 	
 	<property name="jboss.version" value="4.2.3.GA" />

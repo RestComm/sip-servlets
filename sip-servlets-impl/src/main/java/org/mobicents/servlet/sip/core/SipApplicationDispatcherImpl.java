@@ -95,7 +95,6 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -417,7 +416,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			while (applicationsIterator.hasNext()) {
 				SipContext context = applicationsIterator.next();
-				SipStandardManager manager = (SipStandardManager) context
+				SipManager manager = (SipManager) context
 						.getManager();
 				if (this.getConcurrencyControlMode().equals(
 						ConcurrencyControlMode.SipApplicationSession)) {

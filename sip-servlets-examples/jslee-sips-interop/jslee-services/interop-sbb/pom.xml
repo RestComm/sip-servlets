@@ -27,7 +27,7 @@
 		<dependency>		
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>jslee-sips-interop-demo-slee-custom-events</artifactId>
-			<version>1.0</version>
+			<version>1.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
