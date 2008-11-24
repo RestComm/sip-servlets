@@ -1,0 +1,15 @@
+Sip Servlets JSLEE Interoperability
+
+	As you might know, there is a constant war raging between Sip Servlets and JAIN-SLEE and most see them as competing specifications/products and try to choose between one or the other.
+
+	Our take at JBoss, the only vendor to implement both technologies, is that they don't need to compete since they complete each other very well and it has been one of the leitmotiv behind building Mobicents Sip Servlets.
+
+	JAIN SLEE is a more complex specification than SIP Servlets, and it has been know as heavyweight and with a steep learning curve. However JAIN SLEE has standardized a high performing event driven application server, an execution environment with a a good concurrency model and powerful protocol agnostic capabilities thus covering a variety of telco protocols.
+	SIP Servlets on the other is way much simple and easier to get started with. Its focus is currently on SIP + HTTP/JEE only and is more of a programming model while JAIN SLEE is more of an application environment, a platform.
+	The fact that Sip Servlets is focused on SIP+JEE makes it a natural fit to build JEE converged applications and way much simpler than JAIN SLEE. To us it feels like JAIN SLEE and Sip Servlets target different audiences, different needs.
+
+	It's been a long time since we wanted to leverage the power of both and make them work hand in hand to leverage standards all the way for an application. It is now possible since the Mobicents Platform provides both JAIN SLEE and Sip Servlets implementation within the same VM.
+	
+	Please read {{{http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf}our paper}} describing our approach and the possible different approaches we have identified to achieve the goal of interoperability bewteen Sip Servlets and JSlee.
+	
+	We also have a {{{jslee-sip-interop-demo}working JSLEE/SIP Servlets interoperability example}} showcasing our approach. 

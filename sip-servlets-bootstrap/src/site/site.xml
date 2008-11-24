@@ -45,6 +45,7 @@
 			<item name="Management Console" href="sip-servlets-managment.htm" />
 			<item name="Server Monitoring Jopr Integration" href="mss-jopr-plugin.html" />
 			<item name="JBoss Seam Integration" href="mss-seam.html" />
+			<item name="JSLEE/Sip Servlets Interoperability" href="mobicents-sip-servlets-jslee-sips-interoperability.html" />
 		</menu>
 		<menu name="High Availability">
 			<item name="SIP Load Balancer" href="load-balancer.html" />
