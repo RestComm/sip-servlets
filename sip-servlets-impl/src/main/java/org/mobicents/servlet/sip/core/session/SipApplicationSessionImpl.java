@@ -493,7 +493,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		isValid = false;	
 		//cancelling the timers
 		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
-			servletTimerEntry.getValue().cancel();
+			ServletTimer timerEntry = servletTimerEntry.getValue();
+			if(timerEntry != null) {
+				timerEntry.cancel();
+			}
 		}		
 		if(!expired && expirationTimerFuture != null) {
 			expirationTimerFuture.cancel(false);			
