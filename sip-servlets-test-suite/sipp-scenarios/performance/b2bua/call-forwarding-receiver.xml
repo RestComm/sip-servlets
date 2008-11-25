@@ -3,9 +3,9 @@
 
 <!-- Luis Barreiro - Mobicents QA team -->
 
-<scenario name="UAC for SIP-Servlets Tests - location-service-c">
+<scenario name="UAS for SIP-Servlets Tests">
 
-  <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1" />
+  <recv request="INVITE" rrs="true" timeout="5000" />
 
   <send>
     <![CDATA[
@@ -55,11 +55,9 @@
       <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
       <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
     </action>
-  </recv>
+  </recv>  
   
-  <pause milliseconds="14000"/>
-  
-  <recv request="BYE" timeout="5000" />
+  <recv request="BYE" timeout="20000" />
 
   <send>
     <![CDATA[

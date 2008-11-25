@@ -3,7 +3,7 @@
 
 <!-- Jean Deruelle -->
 
-<scenario name="UAC for SIP-Servlets Tests - location-service-a">
+<scenario name="UAC for SIP-Servlets Tests">
 
   <send retrans="500">
     <![CDATA[
@@ -16,7 +16,7 @@
       CSeq: 1 INVITE
       Contact: sip:sipp@[local_ip]:[local_port]
       Max-Forwards: 70
-      Subject: Clustering Test
+      Subject: Performance Test
       Content-Type: application/sdp
       Content-Length: [len]
 
@@ -53,7 +53,7 @@
       CSeq: 1 ACK
       Max-Forwards: 70
       [routes]
-      Subject: Clustering Test
+      Subject: Performance Test
       Content-Length: 0
 
     ]]>
@@ -72,7 +72,7 @@
       Contact: sip:sipp@[local_ip]:[local_port]
       [routes]
       Max-Forwards: 70
-      Subject: Clustering Test
+      Subject: Performance Test
       Content-Length: 0
     ]]>
 </send>
