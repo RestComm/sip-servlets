@@ -13,6 +13,7 @@
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+  		concurrencyControlMode="None" 
   		darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
