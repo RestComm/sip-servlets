@@ -204,7 +204,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			
 			if (linked) {
 				sessionMap.put(originalSession.getKey(), session.getKey());
-				sessionMap.put(session.getKey(), originalSession.getKey());				
+				sessionMap.put(session.getKey(), originalSession.getKey());
+				dumpLinkedSessions();
 			}
 			session.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
@@ -264,6 +265,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			
 			sessionMap.put(originalSession.getKey(), sessionImpl.getKey());
 			sessionMap.put(sessionImpl.getKey(), originalSession.getKey());
+			dumpLinkedSessions();
 
 			sessionImpl.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
@@ -348,11 +350,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		SipSessionKey sipSessionKey = this.sessionMap.get(((MobicentsSipSession)session).getKey());
 		if(sipSessionKey == null) {
+			dumpLinkedSessions();
 			return null;
 		}
 		MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, null);
 		if(logger.isDebugEnabled()) {
-			logger.debug("Linked Session found : " + linkedSession + " for this session " + session);
+			logger.debug("Linked Session found : " + linkedSession.getKey() + " for this session " + session.getId());
 		}
 		return linkedSession;
 		
@@ -449,7 +452,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		this.sessionMap.put(((MobicentsSipSession)session1).getKey(), ((MobicentsSipSession)session2).getKey());
 		this.sessionMap.put(((MobicentsSipSession)session2).getKey(), ((MobicentsSipSession) session1).getKey());
-
+		dumpLinkedSessions();
 	}
 	
 	/*
@@ -471,6 +474,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			this.sessionMap.remove(value);
 		}
 		this.sessionMap.remove(key.getKey());
+		dumpLinkedSessions();
 	}
 	
 	/**
@@ -538,7 +542,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			
 			sessionMap.put(originalSession.getKey(), session.getKey());
-			sessionMap.put(session.getKey(), originalSession.getKey());				
+			sessionMap.put(session.getKey(), originalSession.getKey());	
+			dumpLinkedSessions();
 
 			originalRequestMap.put(originalSession.getKey(), origRequest);
 			originalRequestMap.put(session.getKey(), newSipServletRequest);						
@@ -591,5 +596,13 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 */
 	public void setSipManager(SipManager sipManager) {
 		this.sipManager = sipManager;
+	}
+	
+	private void dumpLinkedSessions() {
+		if(logger.isDebugEnabled()) {
+			for (SipSessionKey key : sessionMap.keySet()) {
+				logger.debug(key + " tied to session " + sessionMap.get(key));
+			}
+		}
 	}
 }

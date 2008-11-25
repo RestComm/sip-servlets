@@ -44,8 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CallForwardingB2BUASipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);
-	B2buaHelper helper = null;
+	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);	
 	Map<String, String[]> forwardingUris = null;
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */
@@ -80,7 +79,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 		}
 		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
-			helper = request.getB2buaHelper();						
+			B2buaHelper helper = request.getB2buaHelper();						
 			
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 					SIP_FACTORY);
@@ -118,7 +117,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 		sipServletResponse.send();
 		
 		//we forward the BYE
-		SipSession session = request.getSession();		
+		SipSession session = request.getSession();
+		B2buaHelper helper = request.getB2buaHelper();
 		SipSession linkedSession = helper.getLinkedSession(session);		
 		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");
 		if(logger.isInfoEnabled()) {
