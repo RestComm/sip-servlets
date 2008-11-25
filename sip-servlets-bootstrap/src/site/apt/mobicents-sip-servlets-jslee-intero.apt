@@ -12,4 +12,4 @@ Sip Servlets JSLEE Interoperability
 	
 	Please read {{{http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf}our paper}} describing our approach and the possible different approaches we have identified to achieve the goal of interoperability bewteen Sip Servlets and JSlee.
 	
-	We also have a {{{jslee-sip-interop-demo}working JSLEE/SIP Servlets interoperability example}} showcasing our approach. 
+	We also have a {{{jslee-sips-interop-demo.html}working JSLEE/SIP Servlets interoperability example}} showcasing our approach. 
