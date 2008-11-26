@@ -36,6 +36,8 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -77,7 +79,6 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
-import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
@@ -125,7 +126,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient Principal userPrincipal;
 	
-	protected transient ThreadPoolQueueExecutor executorService = new ThreadPoolQueueExecutor(1, 1,
+	protected transient ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 90, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<Runnable>());
 	
 	/**
@@ -561,7 +562,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return this.state;
 	}
 
-	public ThreadPoolQueueExecutor getExecutorService() {
+	public ThreadPoolExecutor getExecutorService() {
 		return executorService;
 	}
 	/**
@@ -632,7 +633,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		ongoingTransactions.clear();
 		parentSession = null;
 		userPrincipal = null;
-		executorService.shutdownNow();
+		executorService.shutdown();
 		executorService = null;
 	}
 	

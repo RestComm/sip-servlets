@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipSession;
@@ -31,7 +32,6 @@ import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
 
-import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -147,7 +147,7 @@ public interface MobicentsSipSession extends SipSession {
 
 	SipApplicationRoutingRegion getRegionInternal();
 	
-	ThreadPoolQueueExecutor getExecutorService();
+	ThreadPoolExecutor getExecutorService();
 
 	//RFC 3265
 	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;

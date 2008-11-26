@@ -62,12 +62,12 @@ public class ExecutorServiceWrapper {
 	 * Executes the Runnable in a thread pool of worker threads
 	 */
 	public void execute(Runnable r) {
-		myThreadPool.execute(new MyRunnable(r));
+		myThreadPool.execute(r);
 	}
 
 	public ScheduledFuture<?> schedule(Runnable command, long delay,
 			TimeUnit unit) {
-		return myThreadPool.schedule(new MyRunnable(command), delay, unit);
+		return myThreadPool.schedule(command, delay, unit);
 	}
 	
 	public ScheduledFuture<?> schedule(Callable<?> command, long delay,
@@ -77,13 +77,13 @@ public class ExecutorServiceWrapper {
 
 	public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,
 			long initialDelay, long period, TimeUnit unit) {
-		return myThreadPool.scheduleAtFixedRate(new MyRunnable(command),
+		return myThreadPool.scheduleAtFixedRate(command,
 				initialDelay, period, unit);
 	}
 
 	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
 			long initialDelay, long delay, TimeUnit unit) {
-		return myThreadPool.scheduleWithFixedDelay(new MyRunnable(command),
+		return myThreadPool.scheduleWithFixedDelay(command,
 				initialDelay, delay, unit);
 	}
 
@@ -91,22 +91,26 @@ public class ExecutorServiceWrapper {
 		myThreadPool.purge();
 	}
 
-	private class MyRunnable implements Runnable {
-		private Runnable myRunnable;
-
-		MyRunnable(Runnable r) {
-			myRunnable = r;
-		}
-
-		public void run() {
-			try {
-				myRunnable.run();
-
-			} catch (Throwable t) {
-//				log.fatal("error while executing task:", t);
-				throw new RuntimeException(t);
-			}
-		}
+	public boolean remove(Runnable task) {
+		return myThreadPool.remove(task);
 	}
+	
+//	private class MyRunnable implements Runnable {
+//		private Runnable myRunnable;
+//
+//		MyRunnable(Runnable r) {
+//			myRunnable = r;
+//		}
+//
+//		public void run() {
+//			try {
+//				myRunnable.run();
+//
+//			} catch (Throwable t) {
+////				log.fatal("error while executing task:", t);
+//				throw new RuntimeException(t);
+//			}
+//		}
+//	}
 	
 }

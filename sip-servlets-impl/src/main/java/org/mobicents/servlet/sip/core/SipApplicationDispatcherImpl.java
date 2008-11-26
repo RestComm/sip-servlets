@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanRegistration;
@@ -89,7 +91,6 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
-import org.mobicents.servlet.sip.core.dispatchers.ThreadPoolQueueExecutor;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -150,7 +151,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
-	private ThreadPoolQueueExecutor asynchronousExecutor = new ThreadPoolQueueExecutor(4, 32,
+	private ThreadPoolExecutor asynchronousExecutor = new ThreadPoolExecutor(4, 32, 90, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<Runnable>());
 	
 	/**
@@ -1028,11 +1029,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		return applicationRouterInfo;
 	}
 
-	public ThreadPoolQueueExecutor getAsynchronousExecutor() {
+	public ThreadPoolExecutor getAsynchronousExecutor() {
 		return asynchronousExecutor;
 	}
 
-	public void setAsynchronousExecutor(ThreadPoolQueueExecutor asynchronousExecutor) {
+	public void setAsynchronousExecutor(ThreadPoolExecutor asynchronousExecutor) {
 		this.asynchronousExecutor = asynchronousExecutor;
 	}
 
