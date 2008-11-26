@@ -530,6 +530,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		sipApplicationSessionAttributeMap.clear();
 		sipSessions.clear();
 		httpSessions.clear();
+		executorService.shutdownNow();
+		executorService = null;
 	}
 
 	/*

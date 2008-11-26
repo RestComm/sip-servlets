@@ -632,6 +632,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		ongoingTransactions.clear();
 		parentSession = null;
 		userPrincipal = null;
+		executorService.shutdownNow();
+		executorService = null;
 	}
 	
 	/**
