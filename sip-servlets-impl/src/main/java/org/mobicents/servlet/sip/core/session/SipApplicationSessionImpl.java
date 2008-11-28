@@ -307,7 +307,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public long getExpirationTime() {
 		if(!isValid()) {
-			throw new IllegalStateException("this sip application session " + getId() + " is not valid anymore");
+			throw new IllegalStateException("this sip application session is not valid anymore");
 		}
 		if(expirationTimerFuture == null || expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) <= 0) {
 			return 0;

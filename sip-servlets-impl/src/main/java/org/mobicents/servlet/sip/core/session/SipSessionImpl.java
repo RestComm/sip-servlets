@@ -631,7 +631,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		parentSession = null;
 		userPrincipal = null;		
 		executorService = null;
-		sipApplicationSession = null;
+		// If the sip app session is nullified com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest102 will fail
+		// because it will try to get the B2BUAHelper after the session has been invalidated	
+//		sipApplicationSession = null;
 		manager = null;
 		b2buaHelper= null;		
 		derivedSipSessions = null;
