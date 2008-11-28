@@ -490,6 +490,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			if(originalRequest != null) {				
 				originalRequest.setResponse(this);					
 			}
+			//updating the last accessed times 
+			getSipSession().access();
+			getSipSession().getSipApplicationSession().access();
 			if(sendReliably) {
 				getTransaction().getDialog().sendReliableProvisionalResponse((Response)this.message);
 			} else {
@@ -498,10 +501,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			isMessageSent = true;
 			if(isProxiedResponse) {
 				isResponseForwardedUpstream = true;
-			}
-			//updating the last accessed times 
-			getSipSession().access();
-			getSipSession().getSipApplicationSession().access();
+			}			
 		} catch (Exception e) {			
 			logger.error("an exception occured when sending the response", e);
 			throw new IllegalStateException(e);

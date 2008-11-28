@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 	
+	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
 	
@@ -76,6 +77,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("Got request: "
 				+ request.getMethod());
 		
+		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
+		request.getHeader(TEST_NON_EXISTING_HEADER);
+		request.getHeaders(TEST_NON_EXISTING_HEADER);
+		request.getParameterableHeader("Reply-To");
+		request.getParameterableHeaders("Reply-To");
 		// Test register cseq issue http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
 		if(request.getFrom().toString().contains("testRegisterCSeq")) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);

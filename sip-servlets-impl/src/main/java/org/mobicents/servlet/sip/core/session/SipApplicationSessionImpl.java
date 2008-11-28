@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -521,9 +520,16 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		httpSessions.clear();
 		executorService.shutdown();
 		executorService = null;		
+		httpSessions = null;
+		sipSessions = null;
+		sipApplicationSessionAttributeMap = null;
+		servletTimers = null;
+		sipContext = null;		
 		if(logger.isInfoEnabled()) {
 			logger.info("The following sip application session " + key + " has been invalidated");
 		}
+		currentRequestHandler = null;
+		key = null;		
 	}
 
 	private void cancelExpirationTimer() {

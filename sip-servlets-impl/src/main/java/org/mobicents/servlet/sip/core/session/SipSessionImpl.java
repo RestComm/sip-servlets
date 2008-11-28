@@ -602,8 +602,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
 			derivedMobicentsSipSession.invalidate();
 		}
-		derivedSipSessions.clear();
-		derivedSipSessions = null;
+		derivedSipSessions.clear();		
 		
 		/*
          * Compute how long this session has been alive, and update
@@ -626,15 +625,33 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
+		ongoingTransactions.clear();
+		subscriptions.clear();
+		executorService.shutdown();
+		parentSession = null;
+		userPrincipal = null;		
+		executorService = null;
+		sipApplicationSession = null;
+		manager = null;
+		b2buaHelper= null;		
+		derivedSipSessions = null;
+		handlerServlet = null;
+		localParty = null;
+		ongoingTransactions = null;
+		originalTransaction = null;
+		outboundInterface = null;
 		sipSessionAttributeMap = null;
-		//key = null;
+		key = null;
 		sessionCreatingDialog = null;
 		sessionCreatingTransaction = null;
-		ongoingTransactions.clear();
-		parentSession = null;
-		userPrincipal = null;
-		executorService.shutdown();
-		executorService = null;
+		proxy = null;
+		remoteParty = null;
+		routingRegion = null;
+		sipFactory = null;
+		state = null;
+		stateInfo = null;
+		subscriberURI = null;
+		subscriptions = null;		
 	}
 	
 	/**

@@ -941,6 +941,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					session.getKey().getApplicationName());
 			
 			getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
+			//updating the last accessed times 
+			getSipSession().access();
+			getSipSession().getSipApplicationSession().access();
 			// If dialog does not exist or has no state.
 			if (getDialog() == null || getDialog().getState() == null
 					|| (getDialog().getState() == DialogState.EARLY && !Request.PRACK.equals(request.getMethod()))) {
@@ -956,10 +959,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				getDialog().sendRequest((ClientTransaction) getTransaction());
 			}			
-			isMessageSent = true;			
-			//updating the last accessed times 
-			getSipSession().access();
-			getSipSession().getSipApplicationSession().access();			
+			isMessageSent = true;								
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request",ex);
 		}

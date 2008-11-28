@@ -574,7 +574,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				.getHeaders(nameToSearch);
 		ListIterator<Header> lit = headers;
 
-		if (lit != null) {
+		if (lit != null && lit.hasNext()) {
 			Header first = lit.next();
 			if (first instanceof AddressParametersHeader) {
 				try {
@@ -874,7 +874,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 		try {
 			ListIterator<Header> list = this.message.getHeaders(nameToSearch);
-			while (list.hasNext()) {
+			while (list != null && list.hasNext()) {
 				Header h = list.next();
 				result.add(((SIPHeader)h).getHeaderValue());
 			}
@@ -934,7 +934,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
 		}
-
+		
+		if(h == null) {
+			return null;
+		}
+		
 		return createParameterable(h, getFullHeaderName(name));
 	}
 
@@ -950,13 +954,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 		ArrayList<Parameterable> result = new ArrayList<Parameterable>();
 
-		while (headers.hasNext())
+		while (headers != null && headers.hasNext())
 			result.add(createParameterable(headers.next(),
 					getFullHeaderName(name)));
 
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
-		}
+		}			
 		
 		return result.listIterator();
 	}
