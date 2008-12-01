@@ -2,7 +2,7 @@
 
 <sip-app>
  
-	<app-name>SeamEntryPointApplication</app-name>
+	<app-name>SeamEntryPointApplicationDemo</app-name>
 	<display-name>SeamEntryPointApplication</display-name>
 	<description>SeamEntryPointApplication</description>
 	

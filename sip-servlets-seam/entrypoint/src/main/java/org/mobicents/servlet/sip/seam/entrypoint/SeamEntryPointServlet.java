@@ -11,13 +11,7 @@ import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.contexts.ApplicationContext;
-import org.jboss.seam.contexts.BasicContext;
-import org.jboss.seam.contexts.Context;
-import org.jboss.seam.contexts.Contexts;
-import org.jboss.seam.contexts.EventContext;
-import org.jboss.seam.contexts.Lifecycle;
-import org.jboss.seam.contexts.SessionContext;
+import org.jboss.seam.contexts.*;
 import org.jboss.seam.core.Events;
 
 public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implements SipSessionListener{
@@ -41,7 +35,7 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		setContext("eventContext", new BasicContext(ScopeType.EVENT ));
 		setContext("sessionContext", new SessionContext( new SipSeamRequestSessionMap(message)));
 		setContext("conversationContext", new BasicContext(ScopeType.CONVERSATION ));
-		//setContext("businessProcessContext", new BusinessProcessContext() );
+		setContext("businessProcessContext", new BusinessProcessContext() );
 	}
 	
 

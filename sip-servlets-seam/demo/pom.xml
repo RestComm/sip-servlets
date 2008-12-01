@@ -7,11 +7,11 @@
 
 	<groupId>org.mobicents.seam</groupId>
 
-	<artifactId>sip-servlets-seam</artifactId>
+	<artifactId>sip-servlets-seam-demo</artifactId>
 
 	<version>1.0</version>
 
-	<name>Sip Servlets Seam project</name>
+	<name>Sip Servlets Seam Demo Project</name>
 
 	<packaging>war</packaging>
 
@@ -45,7 +45,7 @@
 				<version>2.1-alpha-1</version>
 				<configuration>
 					<warSourceExcludes>
-						**/hibernate*.jar,**/persist*.jar,**/dom4*.jar,**/*logging*.jar,**/*javassist*.jar,**/*collection*.jar,**/*asm-*.jar,**/*el-api*.jar,**/*jta-*.jar,**/*jboss-common-core-*.jar,**/*cglib-*.jar,**/*ehcache-*.jar
+						**/xml-api*.jar,**/jackrab*.jar,**/xerces*.jar,**/hibernate*.jar,**/persist*.jar,**/dom4*.jar,**/*logging*.jar,**/*javassist*.jar,**/*collection*.jar,**/*asm-*.jar,**/*el-api*.jar,**/*jta-*.jar,**/*jboss-common-core-*.jar,**/*cglib-*.jar,**/*ehcache-*.jar
 					</warSourceExcludes>
 				</configuration>
 			</plugin>
@@ -165,6 +165,18 @@
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam-remoting</artifactId>
 			<version>2.1.0.SP1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jbpm.jbpm3</groupId>
+			<artifactId>jbpm-jpdl</artifactId>
+			<version>3.3.0.GA</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jbpm.jbpm3</groupId>
+			<artifactId>jbpm-identity</artifactId>
+			<version>3.3.0.GA</version>
 		</dependency>
 	</dependencies>
 
