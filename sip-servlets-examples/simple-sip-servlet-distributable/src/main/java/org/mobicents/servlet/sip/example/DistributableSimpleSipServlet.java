@@ -127,15 +127,9 @@ public class DistributableSimpleSipServlet
 			logger.info("Distributable Simple Servlet: Got response:\n" + response);
 		}
 		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
-			SipSession sipSession = response.getSession(false);
-			if(sipSession != null) {
-				SipApplicationSession sipApplicationSession = sipSession.getApplicationSession();
-				if(sipSession.isValid()) {
-					sipSession.invalidate();
-				}
-				if(sipApplicationSession.isValid()) {
-					sipApplicationSession.invalidate();
-				}
+			SipApplicationSession sipApplicationSession = response.getApplicationSession(false);
+			if(sipApplicationSession != null && sipApplicationSession.isValid()) {
+				sipApplicationSession.invalidate();
 			}			
 		}
 	}
