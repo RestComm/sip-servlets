@@ -246,6 +246,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	private void notifySipSessionListeners(SipSessionEventType sipSessionEventType) {
 		SipContext sipContext = 
 			getSipApplicationSession().getSipContext();		
+		ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+		java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
 		if(logger.isDebugEnabled()) {
 			logger.debug("notifying sip session listeners of context " + sipContext.getApplicationName() + " of following event " +
 					sipSessionEventType);
@@ -266,6 +268,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				logger.error("SipSessionListener threw exception", t);
 			}
 		}
+		java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
 		
 	}
 
