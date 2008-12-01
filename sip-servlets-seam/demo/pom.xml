@@ -103,6 +103,12 @@
 			<artifactId>jboss-seam</artifactId>
 			<version>2.1.0.SP1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.seam</groupId>
+			<artifactId>sip-servlets-seam-entrypoint</artifactId>
+			<version>1.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
