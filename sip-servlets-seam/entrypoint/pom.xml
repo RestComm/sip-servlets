@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.mobicents.seam</groupId>
+
+	<artifactId>sip-servlets-seam-entrypoint</artifactId>
+
+	<version>1.0</version>
+
+	<name>Sip Servlets Seam Entrypoint Project</name>
+
+	<packaging>jar</packaging>
+
+	<repositories>
+
+		<repository>
+
+			<id>repository.jboss.org</id>
+
+			<name>JBoss Repository</name>
+
+			<url>http://repository.jboss.org/maven2</url>
+
+		</repository>
+
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1-alpha-1</version>
+				<configuration>
+					<warSourceExcludes>
+						**/hibernate*.jar,**/persist*.jar,**/dom4*.jar,**/*logging*.jar,**/*javassist*.jar,**/*collection*.jar,**/*asm-*.jar,**/*el-api*.jar,**/*jta-*.jar,**/*jboss-common-core-*.jar,**/*cglib-*.jar,**/*ehcache-*.jar
+					</warSourceExcludes>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>3.0.0.GA</version>
+			<scope>compile</scope>
+		</dependency>
+
+
+
+		<dependency>
+
+			<groupId>org.hibernate</groupId>
+
+			<artifactId>hibernate-annotations</artifactId>
+
+			<version>3.3.0.ga</version>
+
+			<scope>compile</scope>
+
+		</dependency>
+
+
+
+		<dependency>
+
+			<groupId>org.hibernate</groupId>
+
+			<artifactId>hibernate-entitymanager</artifactId>
+
+			<version>3.3.1.ga</version>
+
+			<scope>compile</scope>
+
+		</dependency><!--	 -->
+
+		<dependency>
+
+			<groupId>org.richfaces.ui</groupId>
+
+			<artifactId>richfaces-ui</artifactId>
+
+			<version>3.2.2.SR1</version>
+
+		</dependency>
+		<dependency>
+
+			<groupId>com.sun.facelets</groupId>
+
+			<artifactId>jsf-facelets</artifactId>
+
+			<version>1.1.14</version>
+
+		</dependency>
+		<!--
+			<dependency> <groupId>org.drools</groupId>
+
+			<artifactId>drools-compiler</artifactId> <version>4.0.7</version>
+
+			</dependency> <dependency> <groupId>org.drools</groupId>
+
+			<artifactId>drools-core</artifactId> <version>4.0.7</version>
+
+			</dependency> <dependency> <groupId>janino</groupId>
+
+			<artifactId>janino</artifactId> <version>2.5.15</version>
+
+			</dependency> <dependency> <groupId>org.mvel</groupId>
+
+			<artifactId>mvel14</artifactId> <version>1.2.21</version>
+
+			</dependency>
+		-->
+
+
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam-ioc</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam-debug</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam-mail</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-spec</artifactId>
+			<version>1.1.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam-pdf</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>ejb3-persistence</artifactId>
+			<version>1.0.2.GA</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam-ui</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+		<dependency>
+
+			<groupId>org.jboss.seam</groupId>
+
+			<artifactId>jboss-seam-remoting</artifactId>
+
+			<version>2.1.0.SP1</version>
+		</dependency>
+	</dependencies>
+
+</project>
+
