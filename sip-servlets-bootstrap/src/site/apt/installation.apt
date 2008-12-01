@@ -6,9 +6,9 @@ Installation Instructions
 	
 ** Tomcat 6.0.14
 
-	Download our JSR 289 sip-servlet-ized version of Tomcat 6.0.14 {{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}mss-0.7-apache-tomcat-6.0.14.zip}}
+	Download our JSR 289 sip-servlet-ized version of Tomcat 6.0.14 {{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}mss-0.7.1-apache-tomcat-6.0.14.zip}}
 	
-	Unzip it. Set the CATALINA_HOME env variable to your freshly unzipped root directory of tomcat such as <<<CATALINA_HOME=E:/servers/mss-0.7-apache-tomcat-6.0.14>>> by example.  
+	Unzip it. Set the CATALINA_HOME env variable to your freshly unzipped root directory of tomcat such as <<<CATALINA_HOME=E:/servers/mss-0.7.1-apache-tomcat-6.0.14>>> by example.  
 	
 	Start the server from bin directory with ./catalina.bat run or ./catalina.sh command. 
 	
@@ -24,11 +24,11 @@ Installation Instructions
 		
 	* some jars have been added to allow sip servlets to be used
 		
-		** in lib directory, there should be a sip-servlets-impl-0.7.jar
+		** in lib directory, there should be a sip-servlets-impl-0.7.1.jar
   	
-		** in lib directory, there should be a sip-servlets-spec-1.1.7.jar
+		** in lib directory, there should be a sip-servlets-spec-1.1.7.1.jar
 	
-		** in lib directory, there should be a sip-servlets-application-router-0.7.jar
+		** in lib directory, there should be a sip-servlets-application-router-0.7.1.jar
 		
 		** in lib directory, there should be a sip-balancer-1.0-BETA2.jar
 		  	
@@ -50,9 +50,9 @@ Installation Instructions
 
 ** Jboss 4.2.3.GA
 
-	Download our JSR 289 sip-servlet-ized version of Jboss AS 4.2.3.GA {{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}mss-0.7-jboss-4.2.3.GA.zip}}
+	Download our JSR 289 sip-servlet-ized version of Jboss AS 4.2.3.GA {{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024}mss-0.7.1-jboss-4.2.3.GA.zip}}
 	
-	Unzip it. Set the JBOSS_HOME env variable to your freshly unzipped root directory of jboss such as <<<JBOSS_HOME=E:/servers/mss-0.7-jboss-4.2.3.GA>>> by example.  
+	Unzip it. Set the JBOSS_HOME env variable to your freshly unzipped root directory of jboss such as <<<JBOSS_HOME=E:/servers/mss-0.7.1-jboss-4.2.3.GA>>> by example.  
 	
 	Start the server from bin directory with ./run.bat run or ./run.sh command. 
 	
@@ -76,11 +76,11 @@ Installation Instructions
 		
 	* some jars have been added to allow sip servlets to be used
 		
-		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-impl-0.7.jar
+		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-impl-0.7.1.jar
 	  	
-		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-spec-1.1.7.jar
+		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-spec-1.1.7.1.jar
 		
-		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-application-router-0.7.jar
+		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-application-router-0.7.1.jar
 		
 		** in server/default/deploy/jboss-web.deployer directory, there should be a sip-balancer-1.0-BETA2.jar
 		  	

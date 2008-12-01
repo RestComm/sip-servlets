@@ -17,6 +17,12 @@ Goals
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
   
+Version 0.7.1 is out !
+
+	This release is primarly a bug fix release where {{{http://code.google.com/p/mobicents/issues/detail?id=481}Issue 481}} has been fixed and
+	the default {{{concurrency.html}concurrency control}} mode was updated from SipSession to None to cope with the {{{http://code.google.com/p/mobicents/issues/detail?id=480}Issue 480}}. 
+	 
+  
 Version 0.7 is out !
 
 	Our latest release working on top of both containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> provides new features : 
@@ -56,7 +62,7 @@ Version 0.7 is out !
 	 
 	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=641930}Mobicents Sip Servlet 0.7 downloads}}
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=644201}Mobicents Sip Servlet 0.7.1 downloads}}
 					
 					
 Roadmap

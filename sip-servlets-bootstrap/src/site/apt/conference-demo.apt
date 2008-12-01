@@ -31,7 +31,7 @@ Sip Servlets Conference Demo
 	
 	<<<svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/conference-demo>>>
 	
-	To build it you need Maven 2. If you set the JBOSS_HOME environment variable to a location with Mobicents Sip Servlets 0.7 server the following command will build and deploy the application:
+	To build it you need Maven 2. If you set the JBOSS_HOME environment variable to a location with Mobicents Sip Servlets 0.7.1 server the following command will build and deploy the application:
 	
 	<<<mvn install -Pdeploy>>>
 

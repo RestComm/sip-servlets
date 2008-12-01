@@ -596,7 +596,7 @@
 				</subsection>
 			</subsection>
 			<subsection name="Planned Versions">																				
-				<subsection name="Version 0.8 - 12/01/2008">
+				<subsection name="Version 0.8 - 01/01/2009">
 					<p>
 						<img src="red.jpeg" />
 						<a
@@ -622,15 +622,34 @@
 						More Extensions : PATH
 						</a>
 						<br />							
-						<!--img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
-							<li>								
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=481">
+									SipServletMessageImpl.getAddressHeader(..) throws exception instead of returning null
+								</a>								
 							</li>
-						</ul-->
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=482">
+									Sip Servlet Listeners can not load classes from WEB-INF/lib
+								</a>								
+							</li>
+							<li>
+								<img src="orange.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=482">
+									Clustering perf improvements
+								</a>								
+							</li>
+						</ul>
 					</p>
 				</subsection>
-				<subsection name="Version 0.9 - 01/01/2009">
+				<subsection name="Version 0.9 - 02/01/2009">
 					<p>	
 						<img src="red.jpeg" />
 						<a
@@ -664,7 +683,7 @@
 						</ul-->
 					</p>
 				</subsection>
-				<subsection name="Version 1.0 - 02/01/2008">
+				<subsection name="Version 1.0 - 03/01/2008">
 					<p>		
 						<img src="red.jpeg" />
 						<a
