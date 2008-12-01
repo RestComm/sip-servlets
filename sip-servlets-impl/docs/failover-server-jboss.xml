@@ -12,7 +12,7 @@
       	className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
   		balancers="127.0.0.1"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
+		concurrencyControlMode="None" 
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -89,6 +89,7 @@
            autoDeploy="false" deployOnStartup="false" deployXML="false"
            hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig"
            configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig"
+	   xmlNamespaceAware="true"
            >
            <!-- 
                 configClass="org.jboss.web.tomcat.security.config.JBossContextConfig"

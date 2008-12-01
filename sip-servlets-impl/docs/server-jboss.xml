@@ -13,6 +13,7 @@
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+  		concurrencyControlMode="None"
   		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -89,6 +90,7 @@
            autoDeploy="false" deployOnStartup="false" deployXML="false"
            hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig"
            configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig"
+	   xmlNamespaceAware="true"
            >
            <!-- 
                 configClass="org.jboss.web.tomcat.security.config.JBossContextConfig"

@@ -39,7 +39,7 @@
   		className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
   		balancers="127.0.0.1" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
+		concurrencyControlMode="None" 
   		darConfigurationFileLocation="conf/docs/locationservice-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
