@@ -55,80 +55,7 @@
 
 
 	<dependencies>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>3.0.0.GA</version>
-			<scope>compile</scope>
-		</dependency>
-
-
-
-		<dependency>
-
-			<groupId>org.hibernate</groupId>
-
-			<artifactId>hibernate-annotations</artifactId>
-
-			<version>3.3.0.ga</version>
-
-			<scope>compile</scope>
-
-		</dependency>
-
-
-
-		<dependency>
-
-			<groupId>org.hibernate</groupId>
-
-			<artifactId>hibernate-entitymanager</artifactId>
-
-			<version>3.3.1.ga</version>
-
-			<scope>compile</scope>
-
-		</dependency><!--	 -->
-
-		<dependency>
-
-			<groupId>org.richfaces.ui</groupId>
-
-			<artifactId>richfaces-ui</artifactId>
-
-			<version>3.2.2.SR1</version>
-
-		</dependency>
-		<dependency>
-
-			<groupId>com.sun.facelets</groupId>
-
-			<artifactId>jsf-facelets</artifactId>
-
-			<version>1.1.14</version>
-
-		</dependency>
-		<!--
-			<dependency> <groupId>org.drools</groupId>
-
-			<artifactId>drools-compiler</artifactId> <version>4.0.7</version>
-
-			</dependency> <dependency> <groupId>org.drools</groupId>
-
-			<artifactId>drools-core</artifactId> <version>4.0.7</version>
-
-			</dependency> <dependency> <groupId>janino</groupId>
-
-			<artifactId>janino</artifactId> <version>2.5.15</version>
-
-			</dependency> <dependency> <groupId>org.mvel</groupId>
-
-			<artifactId>mvel14</artifactId> <version>1.2.21</version>
-
-			</dependency>
-		-->
-
-
+	
 		<dependency>
 
 			<groupId>org.jboss.seam</groupId>
@@ -181,12 +108,7 @@
 
 			<version>2.1.0.SP1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>ejb3-persistence</artifactId>
-			<version>1.0.2.GA</version>
-			<scope>provided</scope>
-		</dependency>
+
 		<dependency>
 
 			<groupId>org.jboss.seam</groupId>
