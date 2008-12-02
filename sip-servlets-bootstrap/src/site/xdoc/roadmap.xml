@@ -646,6 +646,27 @@
 									Clustering perf improvements
 								</a>								
 							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=483">
+									Concurrency control at application level
+								</a>								
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=484">
+									JRuby integration
+								</a>								
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=395">
+									More Congestion Control mechanisms
+								</a>								
+							</li>														
 						</ul>
 					</p>
 				</subsection>
@@ -709,12 +730,17 @@
 						Sip Servlets working as IMS node (HSS or CSCF)
 						</a>
 						<br />
-						<!--img src="red.jpeg" />
+						<img src="red.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
-							<li>								
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=485">
+									Asterisk Interop/Integration Example
+								</a>								
 							</li>
-						</ul-->
+						</ul>
 					</p>
 				</subsection>
 			</subsection>
