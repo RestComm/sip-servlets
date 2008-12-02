@@ -31,6 +31,7 @@ public class SipApplicationSessionKey implements Serializable {
 	String id; 
 	String applicationName;
 	boolean isAppGeneratedKey;
+	private String toString;
 	
 	/**
 	 * @param id
@@ -41,6 +42,13 @@ public class SipApplicationSessionKey implements Serializable {
 		this.id = id;
 		this.applicationName = applicationName;
 		this.isAppGeneratedKey = isAppGeneratedKey;
+		StringBuffer value = new StringBuffer();
+		value = value.append("(");
+		value = value.append(id);
+		value = value.append(",");
+		value = value.append(applicationName);
+		value = value.append(")");
+		toString = value.toString();
 	}
 	/**
 	 * @return the Id
@@ -99,12 +107,6 @@ public class SipApplicationSessionKey implements Serializable {
 	
 	@Override
 	public String toString() {
-		StringBuffer value = new StringBuffer();
-		value = value.append("(");
-		value = value.append(id);
-		value = value.append(",");
-		value = value.append(applicationName);
-		value = value.append(")");
-		return value.toString();
+		return toString;
 	}
 }

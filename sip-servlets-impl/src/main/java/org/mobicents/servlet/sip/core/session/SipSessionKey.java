@@ -40,6 +40,7 @@ public class SipSessionKey implements Serializable {
 	String toTag;
 	String callId; 
 	String applicationName;
+	private String toString;
 	/**
 	 * @param fromAddress
 	 * @param fromTag
@@ -57,6 +58,19 @@ public class SipSessionKey implements Serializable {
 		this.toTag = toTag;
 		this.callId = callId;
 		this.applicationName = applicationName;
+		StringBuffer value = new StringBuffer();
+		value = value.append("(");
+		value = value.append(fromAddress);
+		value = value.append(",");
+		value = value.append(fromTag);
+		value = value.append(",");
+		value = value.append(toAddress);
+		value = value.append(",");
+		value = value.append(callId);
+		value = value.append(",");
+		value = value.append(applicationName);
+		value = value.append(")");
+		toString = value.toString();
 	}
 	/**
 	 * @return the fromAddress
@@ -153,19 +167,7 @@ public class SipSessionKey implements Serializable {
 	
 	@Override
 	public String toString() {
-		StringBuffer value = new StringBuffer();
-		value = value.append("(");
-		value = value.append(fromAddress);
-		value = value.append(",");
-		value = value.append(fromTag);
-		value = value.append(",");
-		value = value.append(toAddress);
-		value = value.append(",");
-		value = value.append(callId);
-		value = value.append(",");
-		value = value.append(applicationName);
-		value = value.append(")");
-		return value.toString();
+		return toString;
 	}
 	/**
 	 * @param toTag the toTag to set
