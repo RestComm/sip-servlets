@@ -43,6 +43,7 @@
   <Service name="Sip-Servlets" 
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
+		concurrencyControlMode="None" 
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		

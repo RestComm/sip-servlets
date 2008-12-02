@@ -48,7 +48,7 @@
 		<copy todir="${embjopr.home.contents}/plugins/">
 			<fileset dir="./target" includes="jopr-mobicents-sip-servlets-plugin-*.jar" />
 		</copy>	
-		<war destfile="./target/${embjopr.war}">
+		<war destfile="./target/${embjopr.war}" manifest="${embjopr.home.contents}/META-INF/MANIFEST.MF">
 			<fileset dir="${embjopr.home.contents}" includes="**/*" />
 		</war>
 	</target>
