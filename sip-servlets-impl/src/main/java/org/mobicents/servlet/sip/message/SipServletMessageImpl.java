@@ -74,6 +74,8 @@ import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
+import javax.sip.header.RAckHeader;
+import javax.sip.header.RSeqHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.ReplyToHeader;
@@ -169,6 +171,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		// responses. Additionally, for containers implementing the reliable
 		// provisional responses extension, RAck and RSeq are considered system
 		// headers also.
+		systemHeaders.add(RSeqHeader.NAME);
+		systemHeaders.add(RAckHeader.NAME);
 	}
 
 	protected static final HashSet<String> addressHeadersNames = new HashSet<String>();

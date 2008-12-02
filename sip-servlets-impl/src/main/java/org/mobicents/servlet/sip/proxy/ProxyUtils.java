@@ -129,7 +129,7 @@ public class ProxyUtils {
 			
 			
 			//Add route-record header, if enabled and if needed (if not null)
-			if(params.routeRecord != null) {
+			if(params.routeRecord != null && !Request.REGISTER.equalsIgnoreCase(originalRequest.getMethod())) {
 				javax.sip.address.SipURI rrURI = null;
 				if(proxy.getOutboundInterface() == null) {
 					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
@@ -158,7 +158,7 @@ public class ProxyUtils {
 			}
 			
 			// Add path header
-			if(params.path != null)
+			if(params.path != null && Request.REGISTER.equalsIgnoreCase(originalRequest.getMethod()))
 			{
 				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
 

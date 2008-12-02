@@ -44,10 +44,10 @@ public interface SipApplicationDispatcher extends SipListener {
 
 	// List of sip extensions supported by the container
 	public static final String[] EXTENSIONS_SUPPORTED = 
-		new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN"};
+		new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path"};
 	// List of sip rfcs supported by the container
 	public static final String[] RFC_SUPPORTED = 
-		new String[] {"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489"};
+		new String[] {"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327"};
 	
 	/**
 	 * Initialize the sip application dispatcher. <br/>

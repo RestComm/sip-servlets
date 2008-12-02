@@ -458,6 +458,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void pushPath(Address uri) {
 
+		if(!Request.REGISTER.equalsIgnoreCase(((Request)message).getMethod())) {
+			throw new IllegalStateException("Cannot push a Path on a non REGISTER request !");
+		}
 		if(uri.getURI() instanceof TelURL) {
 			throw new IllegalArgumentException("Cannot push a TelUrl as a path !");
 		}

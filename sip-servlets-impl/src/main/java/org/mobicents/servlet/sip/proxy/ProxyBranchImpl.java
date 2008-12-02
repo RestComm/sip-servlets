@@ -497,10 +497,10 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 * {@inheritDoc}
 	 */
 	public SipURI getPathURI() {
-		if(isAddToPath) {
+		if(!isAddToPath) {
 			throw new IllegalStateException("addToPath is not enabled!");
 		}
-		throw new UnsupportedOperationException("the path extension is not yet supported");
+		return this.pathURI;
 	}
 
 	/**
@@ -521,8 +521,13 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 * {@inheritDoc}
 	 */
 	public void setAddToPath(boolean isAddToPath) {
+		if(started) {
+			throw new IllegalStateException("Cannot set a record route on an already started proxy");
+		}
+		if(this.pathURI == null) {
+			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null));
+		}		
 		this.isAddToPath = isAddToPath;
-		
 	}
 
 	/**
