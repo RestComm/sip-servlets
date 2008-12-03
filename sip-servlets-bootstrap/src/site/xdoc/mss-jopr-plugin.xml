@@ -86,23 +86,24 @@
 				</p>
 			</subsection>
 			<subsection name="Jopr for Production">
+				<p><b>Note that those instructions works equally to install the Mobicents Sip Servlets Jopr plugin for RHQ or JON</b></p>
 				<p>
 					<ul>
-					<li>Follow the <a href="http://jboss.org/community/docs/DOC-12828">jopr installation instructions</a> to install the latest version of jopr.</li>
-		
-					<li>Make sure the jopr server and agent are running</li>
-				
-					<li>Start your JBoss Application Server in making sure that you specify the binding address when starting such <code>sh run.sh -b 192.168.0.10</code> 
-					(the JBoss AS will not get recognized on localhost)</li>
-			
+					<li>Follow the <a href="http://jboss.org/community/docs/DOC-12828">jopr installation instructions</a> to install the latest version of jopr. </li>
+					
+					<li>Stop the jopr server and agent if they are running</li>
+					
 					<li>Get the Mobicents Sip Servlets Jopr Plugin from the source code : <code>svn checkout http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/jopr-plugin mss-jopr-plugin</code></li>
 					
 					<li>In mss-jopr-plugin, do a mvn clean install</li>
 				
 					<li>Then copy the generated <code>jopr-mobicents-sip-servlets-plugin-1.1-SNAPSHOT.jar</code> in the target directory to the <code>jopr-server-2.1.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</code></li>
+		
+					<li>Start the jopr server then the agent</li>
 				
-					<li>Wait a bit, 20 seconds maybe or as soon as you see the following message on the jopr server console : [ProductPluginDeployer] Deploying RHQ plugin MobicentsSipServlets (Mobicents Sip Servlets Application Container), undefined version...
-					and then from the jopr agent, run the command <code>plugins update</code>, it will get the newly deployed plugin from the jopr server and start collecting data about the SipApplicationDispatcher</li>
+					<li>Start your JBoss Application Server in making sure that you specify the binding address when starting such <code>sh run.sh -b 192.168.0.10</code> 
+					(the JBoss AS will not get recognized on localhost)</li>								
+									
 					</ul>
 				</p>
 			</subsection>			
