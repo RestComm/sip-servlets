@@ -78,6 +78,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	{
 		this.targetURI = uri;
 		this.proxy = proxy;
+		isAddToPath = proxy.getAddToPath();
 		this.originalRequest = (SipServletRequestImpl) proxy.getOriginalRequest();
 		this.recordRouteURI = proxy.recordRouteURI;
 		this.pathURI = proxy.pathURI;
