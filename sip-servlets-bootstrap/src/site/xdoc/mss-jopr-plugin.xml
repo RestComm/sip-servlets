@@ -134,6 +134,7 @@
 				</p>
 			</subsection> 
 			<subsection name="Jopr for Production">
+			<p><b>Note that those instructions works equally to use the Mobicents Sip Servlets Jopr plugin for RHQ or JON</b></p>
 			<p>
 				<ul>
 				<li>Log in to the jopr console on <a href="http://localhost:7080"/> and from the <b>Dashboard</b> Tab, in the <b>Auto Discovery</b> portlet, import your server (by example <code>deruelle-laptop JBossAS 4.2.3.GA default (192.168.0.12:1099)</code>) from under localhost.</li>
