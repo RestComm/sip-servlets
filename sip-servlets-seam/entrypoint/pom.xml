@@ -28,6 +28,10 @@
 		</repository>
 
 	</repositories>
+	
+	<properties>
+		<seam.version>2.1.0.SP1</seam.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -62,7 +66,7 @@
 
 			<artifactId>jboss-seam</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
 
@@ -70,7 +74,7 @@
 
 			<artifactId>jboss-seam-ioc</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
 
@@ -78,7 +82,7 @@
 
 			<artifactId>jboss-seam-debug</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
 
@@ -86,7 +90,7 @@
 
 			<artifactId>jboss-seam-mail</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
@@ -106,7 +110,7 @@
 
 			<artifactId>jboss-seam-pdf</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 
 		<dependency>
@@ -115,7 +119,7 @@
 
 			<artifactId>jboss-seam-ui</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
 
@@ -123,7 +127,7 @@
 
 			<artifactId>jboss-seam-remoting</artifactId>
 
-			<version>2.1.0.SP1</version>
+			<version>${seam.version}</version>
 		</dependency>
 	</dependencies>
 

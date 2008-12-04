@@ -3,6 +3,7 @@ package org.mobicents.servlet.sip.seam.entrypoint;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
@@ -11,8 +12,13 @@ import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.Seam;
 import org.jboss.seam.contexts.*;
 import org.jboss.seam.core.Events;
+import org.jboss.seam.core.Init;
+import org.jboss.seam.init.Initialization;
+import org.jboss.seam.mock.MockHttpServletRequest;
+import org.jboss.seam.mock.MockHttpSession;
 
 public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implements SipSessionListener{
 	
@@ -62,6 +68,19 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 	@Override
 	protected void doRequest(SipServletRequest request) throws ServletException,
 			IOException {
+		ServletContext ctx = request.getSession().getServletContext();
+		Init init = (Init) ctx.getAttribute( Seam.getComponentName(Init.class) );
+		if ( init!=null && init.isDebug())
+		{
+			MockHttpSession session = new MockHttpSession(ctx);
+			MockHttpServletRequest r = new MockHttpServletRequest(session);
+
+			try {
+				new Initialization(ctx).redeploy(r);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		beginEvent(request);
 		Events.instance().raiseEvent(request.getMethod().toUpperCase(), request);
 		endEvent(request);
