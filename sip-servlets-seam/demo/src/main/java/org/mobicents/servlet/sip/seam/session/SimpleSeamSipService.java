@@ -1,4 +1,4 @@
-package org.mobicents.anpbx.session;
+package org.mobicents.servlet.sip.seam.session;
 
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -26,7 +26,6 @@ public class SimpleSeamSipService {
 
 	@Observer("ACK")
 	@StartTask(taskId="2") @EndTask()
-	@Asynchronous
 	public void doAck(SipServletRequest request)
 	throws Exception {
 	}
