@@ -666,7 +666,28 @@
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=395">
 									More Congestion Control mechanisms
 								</a>								
-							</li>														
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=491">
+									Jopr Integration for Mobicents SIP Load Balancer
+								</a>								
+							</li>	
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=492">
+									Diameter Sh Example
+								</a>								
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=489">
+									Proxy problem
+								</a>								
+							</li>																	
 						</ul>
 					</p>
 				</subsection>
