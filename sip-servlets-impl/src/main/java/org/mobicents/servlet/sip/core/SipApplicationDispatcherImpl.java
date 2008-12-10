@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.SipStackImpl;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -464,6 +466,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		analyzeQueueCongestionState();
 		SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
+		Dialog dialog = requestEvent.getDialog();
 		Request request = requestEvent.getRequest();
 		try {
 			if(logger.isInfoEnabled()) {
@@ -475,7 +478,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				    if(request.getHeader(MaxForwardsHeader.NAME)==null){
 					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
 					}
-					transaction = sipProvider.getNewServerTransaction(request);
+					transaction = sipProvider.getNewServerTransaction(request);					
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
 					// Sends a 500 Internal server error and stops processing.				
@@ -486,9 +489,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					return;				
 				} 
 			} 	
+			
+			
 			if(logger.isInfoEnabled()) {
-				logger.info("ServerTx ref "  + transaction);
-				logger.info("Dialog ref "  + requestEvent.getDialog());
+				logger.info("ServerTx ref "  + transaction);				
+				logger.info("Dialog ref "  + dialog);				
 			}
 			
 			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
@@ -496,7 +501,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						sipFactoryImpl,
 						null,
 						transaction,
-						requestEvent.getDialog(),
+						dialog,
 						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));
 			if(transaction != null) {
 				TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
@@ -540,6 +545,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(!isRouteExternal(routeHeader)) {
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
+				javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
+				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null) {
+					if(logger.isInfoEnabled()) {
+						logger.info("the request is for a proxy application, thus it is a subsequent request ");
+					}
+					sipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
+				}
 				if(transaction != null) {
 					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
 					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				

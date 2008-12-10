@@ -71,30 +71,30 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
+		if(!request.isInitial()){
+			return;
+		}
+			
 		logger.info("Got request:\n"
 				+ request.getMethod());		
 		//This is a proxying sample.
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-		
-		boolean useHostName = false;
-		if(USE_HOSTNAME.equals(((SipURI)request.getFrom().getURI()).getUser())) {
-			useHostName = true;
+				
+		String host = "127.0.0.1";
+		SipURI fromURI = ((SipURI)request.getFrom().getURI());
+		if(USE_HOSTNAME.equals(fromURI.getUser())) {		
+			host = "localhost";
 			logger.info("using Host Name for proxy test");
 		}
 		
-		URI uri1 = null;		
-		URI uri2 = null;
-		if(useHostName) {
-			uri1 = sipFactory.createAddress("sip:receiver@localhost:5057").getURI();
-			uri2 = sipFactory.createAddress("sip:cutme@localhost:5056").getURI();	
-		} else {
-			uri1 = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();
-			uri2 = sipFactory.createAddress("sip:cutme@127.0.0.1:5056").getURI();
-		}
+		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();		
+		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
 		
 		ArrayList<URI> uris = new ArrayList<URI>();
 		uris.add(uri1);
-		uris.add(uri2);
+		if(!fromURI.getUser().equals("unique-location")) {
+			uris.add(uri2);
+		}
 		Proxy proxy = request.getProxy();
 		List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
 		

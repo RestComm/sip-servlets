@@ -63,6 +63,11 @@ public abstract class MessageDispatcher {
 	 */
 	public static final String RR_PARAM_APPLICATION_NAME = "appname";
 	/* 
+	 * This parameter is to know if a record routing proxy app forwarded the request
+	 * It will help us to determine if the next request coming from either side is a subsequent request
+	 */
+	public static final String RR_PARAM_PROXY_APP = "proxy";
+	/* 
 	 * This parameter is to know if a servlet application sent a final response
 	 */
 	public static final String FINAL_RESPONSE = "final_response";

@@ -68,8 +68,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
 /**
@@ -1528,11 +1526,19 @@ public class TestSipListener implements SipListener {
 		return ackSent;
 	}
 
+	public void setAckSent(boolean ackSent) {
+		this.ackSent = ackSent;
+	}
+
 	/**
 	 * @return the ackReceived
 	 */
 	public boolean isAckReceived() {
 		return ackReceived;
+	}
+
+	public void setAckReceived(boolean ackReceived) {
+		this.ackReceived = ackReceived;
 	}
 
 	/**

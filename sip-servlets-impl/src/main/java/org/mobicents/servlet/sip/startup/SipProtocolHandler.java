@@ -243,6 +243,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 						sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
 							catalinaHome + "/" + serverLog);
 					}
+					// The whole MSS is built upon this assumption, so this property is not overrideable
+					sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
 					isPropsLoaded = true;
 				} else {
 					logger.warn("no sip stack properties file defined ");		
