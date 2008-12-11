@@ -166,6 +166,14 @@ public class JainSipUtils {
 				transport = ListeningPoint.TCP;
 			}
 		}
+		//if the request uri doesn't have any param, the request can still be on TCP so we check the topmost via header
+		ViaHeader topmostViaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+		if(topmostViaHeader != null) {
+			String viaTransport = topmostViaHeader.getTransport();
+			if(viaTransport != null && viaTransport.length() > 0) {
+				transport = viaTransport;
+			}
+		}
 		 
 		return transport;
 	}
