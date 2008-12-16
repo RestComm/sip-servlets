@@ -44,6 +44,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/0.8-SNAPSHOT/sip-servlets-impl-0.8-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.8-SNAPSHOT/sip-servlets-spec-1.1.8-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-tomcat-jboss4/0.8-SNAPSHOT/sip-servlets-tomcat-jboss4-0.8-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA2/sip-balancer-1.0.BETA2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/0.8-SNAPSHOT/sip-servlets-application-router-0.8-SNAPSHOT.jar"/>
