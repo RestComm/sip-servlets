@@ -14,9 +14,9 @@ Quality Assurance
 	
 * Mobicents Sip Servlets Load and Performance Tests
 
-	Mobicents Sip Servlets version 0.6 can handle load peaks of more than 400 cps. See {{{http://groups.google.com/group/mobicents-public/browse_thread/thread/13ab783b1acd8294}Report of a Mobicents Sip Servlets Performance Test}}
-	
-	{{{http://groups.google.com/group/mobicents-public/browse_thread/thread/9002afc3ef00c08}Report of a Mobicents Sip Servlets Soak Test}} on a Jboss Labs server : a current call rate of 100 calls per second over a 24-hour duration for a toal of 8,640,000 calls.   
+	{{{http://groups.google.com/group/mobicents-public/browse_thread/thread/d0ce822bd5a9221d}Report of a Mobicents Sip Servlets 0.7.1 Soak Test}} on a Jboss Labs server : a current call rate of 350 calls per second over a 80-hour duration for a total of 100,000,000 calls.
+
+	Mobicents Sip Servlets version 0.6 can handle load peaks of more than 400 cps. See {{{http://groups.google.com/group/mobicents-public/browse_thread/thread/13ab783b1acd8294}Report of a Mobicents Sip Servlets Performance Test}}		  
 
 	The {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
 	

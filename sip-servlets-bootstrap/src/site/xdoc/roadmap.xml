@@ -598,10 +598,10 @@
 			<subsection name="Planned Versions">																				
 				<subsection name="Version 0.8 - 01/01/2009">
 					<p>
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=347">
-						Port to JBoss AS 5
+						Port to JBoss AS 5 - Loading sip servlet and converged applications
 						</a>
 						<br />													
 						<img src="orange.jpeg" />
@@ -609,7 +609,19 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=122">
 						Basic IPBX
 						</a>
-						<br />													
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=491">
+							Jopr Integration for Mobicents SIP Load Balancer
+						</a>	
+						<br />	
+						<img src="orange.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=492">
+							Diameter Sh Example
+						</a>								
+						<br />					
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=229">
@@ -640,7 +652,7 @@
 								</a>								
 							</li>
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=482">
 									Clustering perf improvements
@@ -656,36 +668,29 @@
 							<li>
 								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=484">
-									JRuby integration
-								</a>								
-							</li>
-							<li>
-								<img src="red.jpeg" />
-								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=395">
 									More Congestion Control mechanisms
 								</a>								
-							</li>
+							</li>														
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=491">
-									Jopr Integration for Mobicents SIP Load Balancer
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=489">
+									Proxy bug for subsequent requests
+								</a>								
+							</li>	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=494">
+									Duplication of URI parameters in SipURIImpl
 								</a>								
 							</li>	
 							<li>
 								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=492">
-									Diameter Sh Example
-								</a>								
-							</li>
-							<li>
-								<img src="red.jpeg" />
-								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=489">
-									Proxy problem
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=497">
+									address.toString() doesn't contain any Address parameters									  	 
 								</a>								
 							</li>																	
 						</ul>
@@ -716,7 +721,13 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=128">
 						Maven 2 sar plugin
 						</a>
-						<br />						
+						<br />	
+						<img src="red.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=484">
+						JRuby integration
+						</a>
+						<br />					
 						<!--img src="red.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
