@@ -19,15 +19,18 @@ $Id:$
 
    <!-- web.xml parsing deployer -->
    <bean name="WebAppParsingDeployer" class="org.jboss.deployment.WebAppParsingDeployer">
-      <property name="relativeOrder">2000</property>
+      <property name="relativeOrder">1999</property>
    </bean>
    <!-- sip.xml parsing deployer -->
-   <bean name="SipAppParsingDeployer" class="org.jboss.deployment.SipAppParsingDeployer">
+   <!--bean name="SipAppParsingDeployer" class="org.jboss.deployment.SipAppParsingDeployer">
+      <property name="relativeOrder">2000</property>
+   </bean-->
+   <bean name="JBossWebAppParsingDeployer" class="org.jboss.deployment.JBossWebAppParsingDeployer">
       <property name="relativeOrder">2001</property>
    </bean>
-   <bean name="JBossConvergedSipAppParsingDeployer" class="org.jboss.deployment.JBossConvergedSipAppParsingDeployer">
-      <property name="relativeOrder">2002</property>
-   </bean>   
+   <!--bean name="JBossConvergedSipAppParsingDeployer" class="org.jboss.deployment.JBossConvergedSipAppParsingDeployer">
+      <property name="relativeOrder">2001</property>
+   </bean-->   
 
   <!-- See JBAS-6062 -->
    <bean name="WebXmlLessDeployer" class="org.jboss.deployment.LegacyWebXmlLessDeployer"/>
