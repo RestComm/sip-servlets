@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -46,7 +44,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.commons.logging.Log;
@@ -232,43 +229,43 @@ public class SipStandardContext extends StandardContext implements SipContext {
             }
         }
         // Reading the "catalina.useNaming" environment variable
-        String useNamingProperty = System.getProperty("catalina.useNaming");
-        if ((useNamingProperty != null)
-            && (useNamingProperty.equals("false"))) {
-            setUseNaming(false);
-        }
+//        String useNamingProperty = System.getProperty("catalina.useNaming");
+//        if ((useNamingProperty != null)
+//            && (useNamingProperty.equals("false"))) {
+//            setUseNaming(false);
+//        }
         //activating our custom naming context to be able to set the sip factory in JNDI
-        if (isUseNaming()) {    
-        	if (getNamingContextListener() == null) {
-            	NamingContextListener namingContextListener = new SipNamingContextListener();
-                namingContextListener.setName(getNamingContextName());
-                setNamingContextListener(namingContextListener);
-                addLifecycleListener(namingContextListener);
-                addContainerListener(namingContextListener);                
-            }
-        	// FIXME Replace the default annotation processor. This is needed to handle resource injection
-			// for SipFactory, Session utils and other objects residing in the servlet context space.
-			// Of course if the variable is not found in in the servet context it defaults to the
-			// normal lookup method - in the default naming context.
-			//tomcat naming         	
-//			this.setAnnotationProcessor(
-//					new SipAnnotationProcessor(
-//							getNamingContextListener().getEnvContext(),
-//							this));
-        } else {
-        	// jboss or other kind of naming
-			try {
-				InitialContext iniCtx = new InitialContext();
-				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-				//FIXME
-//				this.setAnnotationProcessor(
-//						new SipAnnotationProcessor(
-//								envCtx,
-//								this));
-			} catch (NamingException e) {
-				logger.error("Impossible to get the naming context ", e);
-			}
-        }
+//        if (isUseNaming()) {    
+//        	if (getNamingContextListener() == null) {
+//            	NamingContextListener namingContextListener = new SipNamingContextListener();
+//                namingContextListener.setName(getNamingContextName());
+//                setNamingContextListener(namingContextListener);
+//                addLifecycleListener(namingContextListener);
+//                addContainerListener(namingContextListener);                
+//            }
+//        	// FIXME Replace the default annotation processor. This is needed to handle resource injection
+//			// for SipFactory, Session utils and other objects residing in the servlet context space.
+//			// Of course if the variable is not found in in the servet context it defaults to the
+//			// normal lookup method - in the default naming context.
+//			//tomcat naming         	
+////			this.setAnnotationProcessor(
+////					new SipAnnotationProcessor(
+////							getNamingContextListener().getEnvContext(),
+////							this));
+//        } else {
+//        	// jboss or other kind of naming
+//			try {
+//				InitialContext iniCtx = new InitialContext();
+//				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+//				//FIXME
+////				this.setAnnotationProcessor(
+////						new SipAnnotationProcessor(
+////								envCtx,
+////								this));
+//			} catch (NamingException e) {
+//				logger.error("Impossible to get the naming context ", e);
+//			}
+//        }
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
@@ -508,27 +505,27 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //				}	  			
 //			}
 //		}
-		if(isUseNaming()) {
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_ADDED_EVENT, null);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_APPNAME_SUBCONTEXT_ADDED_EVENT, null);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT, sipFactoryFacade);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_ADDED_EVENT, sipSessionsUtil);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());			
-		} else {
-        	try {
-				InitialContext iniCtx = new InitialContext();
-				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-				// jboss or other kind of naming
-				SipNamingContextListener.addSipSubcontext(envCtx);
-				SipNamingContextListener.addAppNameSubContext(envCtx, applicationName);
-				SipNamingContextListener.addSipFactory(envCtx, applicationName, sipFactoryFacade);
-				SipNamingContextListener.addSipSessionsUtil(envCtx, applicationName, sipSessionsUtil);
-				SipNamingContextListener.addTimerService(envCtx, applicationName, TimerServiceImpl.getInstance());
-			} catch (NamingException e) {
-				logger.error("Impossible to get the naming context ", e);
-				throw new IllegalStateException(e);
-			}	        			
-        }		
+//		if(isUseNaming()) {
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SUBCONTEXT_ADDED_EVENT, null);
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_APPNAME_SUBCONTEXT_ADDED_EVENT, null);
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT, sipFactoryFacade);
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_ADDED_EVENT, sipSessionsUtil);
+//			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());			
+//		} else {
+//        	try {
+//				InitialContext iniCtx = new InitialContext();
+//				Context envCtx = (Context) iniCtx.lookup("java:comp/env");
+//				// jboss or other kind of naming
+//				SipNamingContextListener.addSipSubcontext(envCtx);
+//				SipNamingContextListener.addAppNameSubContext(envCtx, applicationName);
+//				SipNamingContextListener.addSipFactory(envCtx, applicationName, sipFactoryFacade);
+//				SipNamingContextListener.addSipSessionsUtil(envCtx, applicationName, sipSessionsUtil);
+//				SipNamingContextListener.addTimerService(envCtx, applicationName, TimerServiceImpl.getInstance());
+//			} catch (NamingException e) {
+//				logger.error("Impossible to get the naming context ", e);
+//				throw new IllegalStateException(e);
+//			}	        			
+//        }		
 		super.loadOnStartup(containers);	
 	}
 

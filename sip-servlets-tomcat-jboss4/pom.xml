@@ -21,6 +21,13 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>javax.sip</groupId>
+			<artifactId>jain-sip-ri</artifactId>
+			<version>${jain-sip-ri.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-impl</artifactId>
 			<version>0.8-SNAPSHOT</version>
