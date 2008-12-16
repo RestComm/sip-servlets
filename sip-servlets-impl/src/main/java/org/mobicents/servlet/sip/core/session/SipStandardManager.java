@@ -29,7 +29,6 @@ import org.apache.catalina.session.StandardSession;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 /**
  * Extension of the Standard implementation of the <b>Manager</b> interface provided by Tomcat
@@ -67,7 +66,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
 		if( initialized ) return;	                
 	        
         if(oname==null && this.getContainer() instanceof SipContext) {
-            SipStandardContext ctx=(SipStandardContext)this.getContainer();
+            SipContext ctx=(SipContext)this.getContainer();
             domain=ctx.getEngineName();
             distributable = ctx.getDistributable();
             StandardHost hst=(StandardHost)ctx.getParent();

@@ -19,7 +19,9 @@ package org.mobicents.servlet.sip.startup;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardEngine;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
  * Sip Servlet implementation of the <code>Engine</code> interface.  
@@ -42,13 +44,20 @@ public class SipStandardEngine extends StandardEngine implements Engine {
 		if(child instanceof Host) {
 			final Host host = (Host) child;
 			String hostName = host.getName();
-			String[] aliases = host.findAliases();
+			String[] aliases = host.findAliases();			
 			if(getService() instanceof SipService) {
 				final SipService sipService = (SipService) getService();
-				sipService.getSipApplicationDispatcher().addHostName(hostName);
-				for (String alias : aliases) {
-					sipService.getSipApplicationDispatcher().addHostName(alias);
+				SipApplicationDispatcher sipApplicationDispatcher = sipService.getSipApplicationDispatcher();
+				if(sipApplicationDispatcher != null) {
+					sipApplicationDispatcher.addHostName(hostName);
+					for (String alias : aliases) {
+						sipService.getSipApplicationDispatcher().addHostName(alias);
+					}
 				}
+			}
+			//FIXME : ugly hack to cope with lack of extensibility  in jboss as 5 Tomcat Service
+			if("org.jboss.web.tomcat.service.deployers.JBossContextConfig".equals(host.getConfigClass())) {
+				host.setConfigClass("org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig");
 			}
 		}
 		super.addChild(child);
@@ -62,12 +71,39 @@ public class SipStandardEngine extends StandardEngine implements Engine {
 			String[] aliases = host.findAliases();
 			if(getService() instanceof SipService) {
 				final SipService sipService = (SipService) getService();
-				sipService.getSipApplicationDispatcher().removeHostName(hostName);
-				for (String alias : aliases) {
-					sipService.getSipApplicationDispatcher().removeHostName(alias);
+				SipApplicationDispatcher sipApplicationDispatcher = sipService.getSipApplicationDispatcher();
+				if(sipApplicationDispatcher != null) {
+					sipApplicationDispatcher.removeHostName(hostName);
+					for (String alias : aliases) {
+						sipService.getSipApplicationDispatcher().removeHostName(alias);
+					}
 				}
 			}
 		}
 		super.removeChild(child);		
+	}
+	
+	@Override
+	/**
+	 * Used for JBoss AS 5 to add the hostnames and aliases to the sip application dispatcher
+	 * since when addChild is called the sip application dispatcher is still null
+	 */
+	public void start() throws LifecycleException {		
+		super.start();
+		if(getService() instanceof SipService) {
+			final SipService sipService = (SipService) getService();
+			SipApplicationDispatcher sipApplicationDispatcher = sipService.getSipApplicationDispatcher();
+			if(sipApplicationDispatcher != null) {
+				for (Object child: children.values()) {
+					Host host = (Host) child;
+					String hostName = host.getName();
+					String[] aliases = host.findAliases();
+					sipApplicationDispatcher.addHostName(hostName);
+					for (String alias : aliases) {
+						sipService.getSipApplicationDispatcher().addHostName(alias);
+					}
+				}
+			}
+		}
 	}
 }

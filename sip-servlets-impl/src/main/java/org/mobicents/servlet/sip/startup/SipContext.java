@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.servlet.sip.SipServletRequest;
 
+import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -112,4 +113,10 @@ public interface SipContext extends Context {
 	SipManager getSipManager();
 	
 	SipApplicationDispatcher getSipApplicationDispatcher();
+
+	AnnotationProcessor getAnnotationProcessor();
+
+	String getEngineName();
+
+	String getBasePath();
 }

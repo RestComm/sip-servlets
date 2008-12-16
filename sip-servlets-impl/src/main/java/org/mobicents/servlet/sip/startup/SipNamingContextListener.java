@@ -61,8 +61,8 @@ public class SipNamingContextListener extends NamingContextListener {
 	public void lifecycleEvent(LifecycleEvent event) {
 		super.lifecycleEvent(event);
 		if (event.getType() == Lifecycle.START_EVENT) {
-			if (container instanceof SipStandardContext) {
-				((SipAnnotationProcessor)((SipStandardContext)container).getAnnotationProcessor()).setContext(envCtx);
+			if (container instanceof SipContext) {
+				((SipAnnotationProcessor)((SipContext)container).getAnnotationProcessor()).setContext(envCtx);
 			}
 		}
 	}
@@ -72,7 +72,7 @@ public class SipNamingContextListener extends NamingContextListener {
 		super.containerEvent(event);
 		
 		// Setting the context in read/write mode
-        ContextAccessController.setWritable(getName(), container);        
+//        ContextAccessController.setWritable(getName(), container);        
         String type = event.getType();
         SipContext sipContext = null;
         String appName = null;
@@ -150,7 +150,7 @@ public class SipNamingContextListener extends NamingContextListener {
             }
         }
 		// Setting the context in read only mode
-        ContextAccessController.setReadOnly(getName());
+//        ContextAccessController.setReadOnly(getName());
 	}
 	
 	/**

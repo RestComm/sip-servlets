@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+
+   <bean name="WebServer"
+         class="org.jboss.web.tomcat.service.deployers.TomcatConvergedService">
+         
+      <annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="jboss.web:service=WebServer", exposedInterface=org.jboss.web.tomcat.service.deployers.TomcatServiceMBean.class,registerDirectly=true)</annotation>
+
+      <!-- Only needed if the org.jboss.web.tomcat.service.jca.CachedConnectionValve
+           is enabled in the tomcat server.xml file.
+      -->
+      <depends>jboss.jca:service=CachedConnectionManager</depends>
+
+      <!-- Transaction manager for unfinished transaction checking in the CachedConnectionValve -->      
+      <depends>jboss:service=TransactionManager</depends>
+
+      <!-- Inject the TomcatDeployer -->
+      <property name="tomcatDeployer"><inject bean="WarDeployer"/></property>
+      <!-- Set the securityManagerService used to flush the auth cache on session expiration -->
+      <property name="securityManagerService">
+         <inject bean="jboss.security:service=JaasSecurityManager" />
+      </property>
+      <!-- 
+         Do not configure other JMX attributes via this file.
+         Use the WarDeployer bean in deployers/jboss-web.deployer/war-deployers-beans.xml
+      -->
+
+   </bean>
+
+</deployment>

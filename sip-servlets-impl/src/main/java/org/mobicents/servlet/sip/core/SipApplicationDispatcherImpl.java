@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.core;
 
-import gov.nist.javax.sip.SipStackImpl;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,8 +28,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -135,7 +134,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private Map<String, String> mdToApplicationName = null;
 
 	//List of host names managed by the container
-	private List<String> hostNames = null;
+	private Set<String> hostNames = null;
 	
 	private SessionManagerUtil sessionManager = null;
 	
@@ -164,7 +163,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		sipFactoryImpl = new SipFactoryImpl(this);
 		sessionManager = new SessionManagerUtil();
-		hostNames = new CopyOnWriteArrayList<String>();
+		hostNames = new CopyOnWriteArraySet<String>();
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
 	}
 	
@@ -964,7 +963,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#findHostNames()
 	 */
-	public List<String> findHostNames() {		
+	public Set<String> findHostNames() {		
 		return hostNames;
 	}
 

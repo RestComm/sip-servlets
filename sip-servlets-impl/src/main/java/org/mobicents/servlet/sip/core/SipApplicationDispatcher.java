@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
@@ -132,7 +133,7 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * @return An immutable instance of the java.util.List interface containing
 	 * the sip application dispatcher registered host names
 	 */
-	List<String> findHostNames();
+	Set<String> findHostNames();
 	
 	/**
 	 * Retrieve the session manager associated with this application disptacher 

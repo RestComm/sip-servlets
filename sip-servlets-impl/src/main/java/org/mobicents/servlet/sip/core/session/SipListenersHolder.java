@@ -37,10 +37,8 @@ import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.annotation.SipServlet;
 
-import org.apache.catalina.ContainerServlet;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 
@@ -96,7 +94,7 @@ public class SipListenersHolder {
 			try {
 				Class listenerClass = Class.forName(className, false, classLoader);
 				EventListener listener = (EventListener) listenerClass.newInstance();
-				((SipStandardContext)sipContext).getAnnotationProcessor().processAnnotations(listener);
+				((SipContext)sipContext).getAnnotationProcessor().processAnnotations(listener);
 				SipServletImpl sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(className);
 				if(sipServletImpl != null) {
 					listener = (EventListener) sipServletImpl.allocate();

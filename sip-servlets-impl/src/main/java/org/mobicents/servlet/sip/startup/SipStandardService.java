@@ -117,7 +117,7 @@ public class SipStandardService extends StandardService implements SipService {
 		}
 		if(darConfigurationFileLocation != null) {
 			if(!darConfigurationFileLocation.startsWith("file:///")) {
-				darConfigurationFileLocation = "file:///" + System.getProperty("catalina.base").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
+				darConfigurationFileLocation = "file:///" + System.getProperty("catalina.home").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
 			}
 			System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
  		}		
