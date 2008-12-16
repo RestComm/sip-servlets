@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.testsuite.address;
 
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -80,5 +81,12 @@ public class SipURITest extends junit.framework.TestCase {
 		assertNotNull(uri1.getHost());
 		assertEquals("TCP", uri1.getTransportParam());
 		assertTrue(uri1.getHeader("Subject") + " is different as SIP Servlets" , uri1.getHeader("Subject").equals("SIP Servlets"));
+	}
+	
+	public void testParams() throws Exception {
+		URI uri = sipFactory.createURI("sip:127.0.0.1:5080");
+		uri.setParameter("Key", "val");
+		String s = uri.toString();
+		assertEquals("sip:127.0.0.1:5080;Key=val", s);
 	}
 }

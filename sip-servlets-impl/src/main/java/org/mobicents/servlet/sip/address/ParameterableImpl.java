@@ -129,7 +129,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable{
 		if(!isModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
-		this.parameters.put(name,new NameValue(name,value));
+		//Fix from abondar for Issue 494
+		this.parameters.set(name,new NameValue(name,value));
 		if(header != null) {
 			try {
 				header.setParameter(name, value);
