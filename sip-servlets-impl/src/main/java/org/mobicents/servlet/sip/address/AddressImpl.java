@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.core.NameValue;
 import gov.nist.core.NameValueList;
 import gov.nist.javax.sip.address.RFC2396UrlDecoder;
 import gov.nist.javax.sip.header.AddressParametersHeader;
@@ -23,6 +24,7 @@ import gov.nist.javax.sip.header.Contact;
 
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.URI;
@@ -48,6 +50,7 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 	
 	private static final String Q_PARAM_NAME = "q";
 	private static final String EXPIRES_PARAM_NAME = "expires";
+	private static final String PARAM_SEPARATOR = ";";
 	private javax.sip.address.Address address;	
 	
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
@@ -248,8 +251,16 @@ public class AddressImpl  extends ParameterableImpl implements Address {
 		// To/From are parametrable.
 		StringBuffer retval = new StringBuffer();
 		retval.append(address.toString());
-		//Commented because Makes the TCK AR spec test number 5 to fail
-//		if ( parameters!= null && parameters.size() > 0 ) retval.append(";").append(parameters.toString());
+		//excluding the parameters already present in the address uri
+		if ( parameters!= null && parameters.size() > 0 && this.address.getURI() instanceof Parameters) {
+			Iterator<java.util.Map.Entry<String, NameValue>> parametersIt = parameters.entrySet().iterator();
+			while (parametersIt.hasNext()) {
+				Map.Entry<java.lang.String, gov.nist.core.NameValue> entry = parametersIt.next();
+				if(((Parameters)address.getURI()).getParameter(entry.getKey()) == null) {
+					retval.append(PARAM_SEPARATOR).append(entry.getValue().encode());
+				}
+			}
+		}
 		return retval.toString();
 	}
 

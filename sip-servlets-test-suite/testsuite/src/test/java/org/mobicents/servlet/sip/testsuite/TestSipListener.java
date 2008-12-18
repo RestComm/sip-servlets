@@ -196,6 +196,8 @@ public class TestSipListener implements SipListener {
 	
 	private long lastRegisterCSeqNumber = -1;
 
+	private int finalResponseStatus;
+
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -925,6 +927,7 @@ public class TestSipListener implements SipListener {
 		try {			
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
 				finalResponseReceived = true;
+				setFinalResponseStatus(response.getStatusCode());
 			}
 			if (response.getStatusCode() == Response.OK) {
 				logger.info("response = " + response);
@@ -1782,6 +1785,20 @@ public class TestSipListener implements SipListener {
 	
 	public void setRespondWithError(int errorCode) {
 		this.respondWithError = errorCode;
+	}
+
+	/**
+	 * @param finalResponseStatus the finalResponseStatus to set
+	 */
+	public void setFinalResponseStatus(int finalResponseStatus) {
+		this.finalResponseStatus = finalResponseStatus;
+	}
+
+	/**
+	 * @return the finalResponseStatus
+	 */
+	public int getFinalResponseStatus() {
+		return finalResponseStatus;
 	}
 
 }

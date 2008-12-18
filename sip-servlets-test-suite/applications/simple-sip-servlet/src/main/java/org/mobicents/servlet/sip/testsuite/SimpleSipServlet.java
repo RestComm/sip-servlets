@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
@@ -196,7 +197,13 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	@Override
 	protected void doRegister(SipServletRequest req) throws ServletException,
 			IOException {
+		Address contact = req.getAddressHeader("Contact");
+		contact.setExpires(3600);
+		logger.info("REGISTER Contact Address.toString = " + contact.toString());
 		int response = SipServletResponse.SC_OK;
+		if(!"<sip:sender@127.0.0.1:5080;transport=udp;lr>;expires=3600".equals(contact.toString())) {
+			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+		}
 		SipServletResponse resp = req.createResponse(response);
 		resp.send();
 	}

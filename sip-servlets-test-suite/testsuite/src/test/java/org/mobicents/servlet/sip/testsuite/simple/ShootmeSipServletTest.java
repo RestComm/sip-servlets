@@ -115,6 +115,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());
+		assertEquals(200, sender.getFinalResponseStatus());
 	}
 	
 	public void testShootmeRegisterCSeqIncrease() throws Exception {
