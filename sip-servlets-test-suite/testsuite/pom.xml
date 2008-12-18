@@ -30,6 +30,11 @@
 			<artifactId>sip-servlets-application-router</artifactId>
 			<version>0.8-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-tomcat-jboss4</artifactId>
+			<version>0.8-SNAPSHOT</version>
+		</dependency>
 		
 		<!-- j2ee dependencies -->
 		<dependency>
