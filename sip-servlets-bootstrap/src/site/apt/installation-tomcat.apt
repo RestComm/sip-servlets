@@ -8,8 +8,7 @@ Installation Instructions
 	
 	Check out the sip-servlets project at {{{http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/}http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/}} 
 	
-	Open up the pom.xml from sip-servlets-bootstrap project and change the following property tomcat.home at the end of the file
-	Make it the same as your tomcat root installation by example E:\servers\apache-tomcat-6.0.14 
+	Set up the environment variable CATALINA_HOME and make it the same as your tomcat root installation by example E:\servers\apache-tomcat-6.0.14 
 	
 	Run <<<mvn clean install>>> from the project root
 	

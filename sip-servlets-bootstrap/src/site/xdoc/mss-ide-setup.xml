@@ -1,0 +1,68 @@
+<document>
+	<properties>
+		<title>Mobicents Sip Servlets IDE Setup</title>
+	</properties>
+	<body>
+		<p>
+			<b><i>Throughout this page you can click on the images to see them larger.</i></b>
+		</p>
+		<section name="Description">
+			<p>
+				This section explains, for people interested in contributing to Mobicents Sip Servlets, how to to setup the IDE. We currently supports only Eclipse.
+				Although if you're willing to help contributing support for other IDEs, we would gladly welcome that			
+			</p>
+		</section>	
+		<section name="Prerequisites">
+			<p>
+				Checkout the Mobicents sip servlets project from the source with the following command <pre>svn checkout</pre><br/><pre>https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</pre><br/><pre>mobicents-sip-servlets --username your.username </pre>
+				<br/>
+				Set up the environment variable CATALINA_HOME and make it the same as your tomcat root installation by example E:\servers\apache-tomcat-6.0.14 or 
+				Set up the environment variable JBOSS_HOME and make it the same as your tomcat root installation by example E:\servers\jboss-4.2.3.GA depending on which server you want to deploy
+				<br/>
+				From the command line and within the newly created mobicents-sip-servlets directory call <pre>mvn clean install</pre> (or <pre>mvn clean install -P jboss</pre> if you want to deploy to jboss) 
+				<br/>
+				For more information check <a href="./installation-tomcat.html">Mobicents Sip Servlets on Tomcat installation instructions</a> or <a href="./installation-jboss.html">Mobicents Sip Servlets on JBoss installation instructions</a>	
+			</p>						
+		</section>
+		<section name="Eclipse">			
+				<p>
+					Start your Eclipse 3.4 and create a mobicents-sip-servlets workspace (you can create wherever you want even make it point to the newly created mobicents-sip-servlets directory)
+				</p>
+				<p>
+					Now you'll need to create the M2_REPO variable so that Eclipse can locate the dependencies jar files.<br/>
+					To do that click on the 'Window' menu, then Preferences. On the popup, click on Java->Build Path->ClassPath variables as shown in the screenshot below 
+				</p>			
+				<p>			
+					<a href="./mss-eclipse-variables.png"><img src="small-mss-eclipse-variables.png" /></a>
+				</p>
+				<p>
+					You'll need to create the M2_REPO variable by clicking the new button in the popup.<br/>
+					Then fill out the input text fields with Name = M2_REPO and Value = "the location of your maven 2 repository" (which is usually located at on your filesystem at "your user directory"/.m2/repository)
+					Then click the OK button as shown on the sreenshot below
+				</p>			
+				<p>			
+					<a href="./mss-eclipse-m2-variable.png"><img src="small-mss-m2-variable.png" /></a>
+				</p>
+				<p>
+					<i>All the eclipse metadata information is already present in the svn trunk so you'll just need to import the different projects and that should work out of the box</i>
+					<br/>
+					Now click on File->Import then in the popup click on General->Existing projects into workspace and click on Next as shown in the screenshot below
+				</p>	
+				<p>			
+					<a href="./mss-eclipse-import.png"><img src="small-mss-eclipse-import.png" /></a>
+				</p>
+				<p>
+					In the new screen of the popup, click on the Browse button and select the mobicents-sip-servlets directory (that has been created by the svn checkout) and import all the projects (except the www-sip-servlets project) as shown in the screenshot below			
+				</p>
+				<p>			
+					<a href="./mss-eclipse-projects.png"><img src="small-mss-eclipse-projects.png" /></a>
+				</p>							
+				<p>
+					And in the screenshot below is the final result of the newly created mobicents-sip-servlets Eclipse workspace. You're now ready to contribute to Mobicents Sip Servlets ! :-)			
+				</p>
+				<p>			
+					<a href="./mss-eclipse-setup.png"><img src="small-mss-eclipse-setup.png" /></a>
+				</p>				
+		</section>
+	</body>
+</document>
