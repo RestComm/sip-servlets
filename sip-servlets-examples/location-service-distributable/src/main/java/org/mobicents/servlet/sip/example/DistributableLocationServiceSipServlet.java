@@ -148,14 +148,14 @@ public class DistributableLocationServiceSipServlet extends SipServlet {
 			throws ServletException, IOException {
 
 		logger.info("SimpleProxyServlet: Got response:\n" + response);
-		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
-			SipSession sipSession = response.getSession(false);
-			if(sipSession != null) {
-				SipApplicationSession sipApplicationSession = sipSession.getApplicationSession();
-				sipSession.invalidate();
-				sipApplicationSession.invalidate();
-			}			
-		}
+//		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
+//			SipSession sipSession = response.getSession(false);
+//			if(sipSession != null) {
+//				SipApplicationSession sipApplicationSession = sipSession.getApplicationSession();
+//				sipSession.invalidate();
+//				sipApplicationSession.invalidate();
+//			}			
+//		}
 	}
 	
 }
