@@ -613,13 +613,13 @@
 						<img src="red.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=491">
-							Jopr Integration for Mobicents SIP Load Balancer
+						Jopr Integration for Mobicents SIP Load Balancer
 						</a>	
 						<br />	
 						<img src="orange.jpeg" />
 						<a
 							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=492">
-							Diameter Sh Example
+						Diameter Sh Example
 						</a>								
 						<br />					
 						<img src="red.jpeg" />
@@ -687,7 +687,7 @@
 								</a>								
 							</li>	
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=497">
 									address.toString() doesn't contain any Address parameters									  	 
