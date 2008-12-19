@@ -22,6 +22,7 @@ import gov.nist.javax.sip.address.RFC2396UrlDecoder;
 import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.Contact;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,7 +44,7 @@ import org.mobicents.servlet.sip.SipFactories;
  * @author bartek
  * 
  */
-public class AddressImpl  extends ParameterableImpl implements Address {
+public class AddressImpl extends ParameterableImpl implements Address, Serializable {
 	
 //	private static Log logger = LogFactory.getLog(AddressImpl.class
 //			.getCanonicalName());

@@ -565,7 +565,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
@@ -577,7 +577,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
@@ -774,7 +774,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
@@ -786,7 +786,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());

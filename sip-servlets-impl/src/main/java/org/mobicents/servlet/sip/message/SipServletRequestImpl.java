@@ -814,7 +814,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("routing outside the container " +
-								"since no more apps are is interested.");
+								"since no more apps are interested.");
+					}
+					//Adding Route Header for LB if we are in a HA configuration
+					if(sipFactoryImpl.isUseLoadBalancer() && isInitial) {
+						sipFactoryImpl.addLoadBalancerRouteHeader(request);
+						if(logger.isDebugEnabled()) {
+							logger.debug("adding route to Load Balancer since we are in a HA configuration " +
+									" and no more apps are interested.");
+						}
 					}
 				}
 			}

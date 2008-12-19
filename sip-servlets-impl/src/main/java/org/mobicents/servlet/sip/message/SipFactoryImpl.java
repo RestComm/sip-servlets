@@ -486,11 +486,6 @@ public class SipFactoryImpl implements Serializable {
 			if(contactHeader != null) {
 				requestToWrap.addHeader(contactHeader);
 			}
-			// if a sip load balancer is present in front of the server, add a route header to go through it
-			// so that the subsequent requests can be failed over
-			if(useLoadBalancer) {
-				addLoadBalancerRouteHeader(requestToWrap);
-			}
 			
 			SipApplicationDispatcher dispatcher = 
 				mobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
@@ -657,22 +652,27 @@ public class SipFactoryImpl implements Serializable {
 	 * @param request
 	 * @throws ParseException
 	 */
-	public void addLoadBalancerRouteHeader(Request request) throws ParseException {
-		javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, loadBalancerToUse.getAddress().getHostAddress());
-		sipUri.setPort(loadBalancerToUse.getSipPort());
-		sipUri.setLrParam();
-		String transport = JainSipUtils.findTransport(request);
-		sipUri.setTransportParam(transport);
-		ExtendedListeningPoint listeningPoint = 
-			getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
-		sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
-				listeningPoint.getHost());
-		sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
-				"" + listeningPoint.getPort());
-		javax.sip.address.Address routeAddress = 
-			SipFactories.addressFactory.createAddress(sipUri);
-		RouteHeader routeHeader = 
-			SipFactories.headerFactory.createRouteHeader(routeAddress);
-		request.addHeader(routeHeader);		
+	public void addLoadBalancerRouteHeader(Request request) {
+		try {
+			javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, loadBalancerToUse.getAddress().getHostAddress());
+			sipUri.setPort(loadBalancerToUse.getSipPort());
+			sipUri.setLrParam();
+			String transport = JainSipUtils.findTransport(request);
+			sipUri.setTransportParam(transport);
+			ExtendedListeningPoint listeningPoint = 
+				getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
+			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
+					listeningPoint.getHost());
+			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
+					"" + listeningPoint.getPort());
+			javax.sip.address.Address routeAddress = 
+				SipFactories.addressFactory.createAddress(sipUri);
+			RouteHeader routeHeader = 
+				SipFactories.headerFactory.createRouteHeader(routeAddress);
+			request.addHeader(routeHeader);
+		} catch (ParseException e) {
+			//this should never happen
+			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !");
+		}
 	}
 }
