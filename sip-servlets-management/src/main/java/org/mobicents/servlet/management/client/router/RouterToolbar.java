@@ -31,7 +31,7 @@ public class RouterToolbar extends Toolbar {
 		helpWindow.setWidth(600);  
 		helpWindow.setHeight(350);  
 		helpWindow.setPlain(true);  
-		helpWindow.setAutoScroll(true);
+		helpWindow.setAutoScroll(false);
 		helpWindow.setLayout(new FitLayout());
 		helpWindow.add(helpFrame);
 		helpWindow.setCloseAction(Window.HIDE);
@@ -53,6 +53,7 @@ public class RouterToolbar extends Toolbar {
 			}
 			
 		});
+		showDARTextButton.setIconCls("tab-icon-source");
 		
 		// Set up the Save button - saves the DAR configuration
 		ToolbarButton saveButton = new ToolbarButton("Save", new ButtonListenerAdapter() {  
@@ -79,6 +80,7 @@ public class RouterToolbar extends Toolbar {
 			}
 			
 		});
+		saveButton.setIconCls("tab-icon-save");
 		
 		// Pop the console window
 		ToolbarButton logErrorButton = new ToolbarButton("Log and errors", new ButtonListenerAdapter() {  
@@ -87,6 +89,7 @@ public class RouterToolbar extends Toolbar {
 			}
 			
 		});
+		logErrorButton.setIconCls("tab-icon-log");
 		
 		// Help button
 		ToolbarButton helpButton = new ToolbarButton("Help", new ButtonListenerAdapter() {  
@@ -96,6 +99,7 @@ public class RouterToolbar extends Toolbar {
 			}
 			
 		});
+		helpButton.setIconCls("tab-icon-help");
 		
 		addButton(showDARTextButton);
 		addSeparator();

@@ -1,6 +1,7 @@
 package org.mobicents.servlet.management.client;
 
 import org.mobicents.servlet.management.client.configuration.ConfiguationPage;
+import org.mobicents.servlet.management.client.deploy.DeployExamplesPage;
 import org.mobicents.servlet.management.client.router.RouterConfigurationPage;
 
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -21,6 +22,7 @@ public class UserInterface extends VerticalPanel{
 		TabPanel tabPanel = new TabPanel();
 		tabPanel.add(getRouterConfigPage());
 		tabPanel.add(getConfigurationPage());
+		tabPanel.add(getDeploymentPage());
 		tabPanel.setResizeTabs(true);  
 		tabPanel.setMinTabWidth(115);  
 		tabPanel.setTabWidth(135);  
@@ -39,6 +41,7 @@ public class UserInterface extends VerticalPanel{
 		routerPagePanel.setTitle("Router Configuration");
 		routerPagePanel.setShadow(true);
 		routerPagePanel.add(routerPage);
+		routerPagePanel.setIconCls("tab-icon-router");
 		return routerPagePanel;
 	}
 	
@@ -56,7 +59,17 @@ public class UserInterface extends VerticalPanel{
 		ConfiguationPage config = new ConfiguationPage();
 		configPanel.add(config);
 		configPanel.setTitle("Server Settings");
+		configPanel.setIconCls("tab-icon-settings");
 		return configPanel;
+	}
+	
+	private Widget getDeploymentPage() {
+		Panel deployPanel = new Panel();
+		deployPanel.setTitle("Deploy Examples");
+		DeployExamplesPage page = new DeployExamplesPage();
+		deployPanel.add(page);
+		deployPanel.setIconCls("tab-icon-deploy");
+		return deployPanel;
 	}
 	
 

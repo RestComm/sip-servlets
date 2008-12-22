@@ -15,4 +15,7 @@
 	<servlet
 		class="org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl"
 		path="/ConfigurationService" />
+	<servlet
+		class="org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl"
+		path="/DeploymentService" />
 </module>
