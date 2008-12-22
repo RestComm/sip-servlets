@@ -14,7 +14,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DeploymentServiceImpl  extends RemoteServiceServlet implements DeploymentService{
 
 	private static String[] appExtensions = {"war", "sar", "sar2", "ear"};
-	@Override
+
 	public void deploy(String application) {
 		String serverHome = System.getProperty("jboss.server.home.dir");
 		String jbossHome = System.getProperty("jboss.home.dir");
@@ -24,7 +24,6 @@ public class DeploymentServiceImpl  extends RemoteServiceServlet implements Depl
 		copyFile(appToDeploy, targetFile);
 	}
 
-	@Override
 	public String[] getApplications(String directory) {
 		String serverHome = System.getProperty("jboss.server.home.dir");
 		String jbossHome = System.getProperty("jboss.home.dir");
@@ -80,7 +79,6 @@ public class DeploymentServiceImpl  extends RemoteServiceServlet implements Depl
 		return true;
 	}
 
-	@Override
 	public boolean isJBoss() {
 		String serverHome = System.getProperty("jboss.server.home.dir");
 		if(serverHome != null) return true;
