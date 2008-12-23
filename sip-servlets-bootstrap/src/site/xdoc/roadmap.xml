@@ -640,77 +640,77 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=481">
+									href="http://code.google.com/p/mobicents/issues/detail?id=481">
 									SipServletMessageImpl.getAddressHeader(..) throws exception instead of returning null
 								</a>								
 							</li>
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=482">
+									href="http://code.google.com/p/mobicents/issues/detail?id=482">
 									Sip Servlet Listeners can not load classes from WEB-INF/lib
 								</a>								
 							</li>
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=482">
+									href="http://code.google.com/p/mobicents/issues/detail?id=482">
 									Clustering perf improvements
 								</a>								
 							</li>
 							<li>
 								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=483">
+									href="http://code.google.com/p/mobicents/issues/detail?id=483">
 									Concurrency control at application level
 								</a>								
 							</li>
 							<li>
 								<img src="red.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=395">
+									href="http://code.google.com/p/mobicents/issues/detail?id=395">
 									More Congestion Control mechanisms
 								</a>								
 							</li>														
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=489">
+									href="http://code.google.com/p/mobicents/issues/detail?id=489">
 									Proxy bug for subsequent requests
 								</a>								
 							</li>	
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=494">
+									href="http://code.google.com/p/mobicents/issues/detail?id=494">
 									Duplication of URI parameters in SipURIImpl
 								</a>								
 							</li>	
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=497">
+									href="http://code.google.com/p/mobicents/issues/detail?id=497">
 									address.toString() doesn't contain any Address parameters									  	 
 								</a>								
 							</li>																	
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=504">
+									href="http://code.google.com/p/mobicents/issues/detail?id=504">
 									Route to Load Balancer not added in HA proxy case									  	 
 								</a>								
 							</li>
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=507">
+									href="http://code.google.com/p/mobicents/issues/detail?id=507">
 									URI encoded by SipApplicationSession is not UTF8 encoded
 								</a>								
 							</li>
-														<li>
-								<img src="red.jpeg" />
+							<li>
+								<img src="green.jpeg" />
 								<a
-									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=507">
+									href="http://code.google.com/p/mobicents/issues/detail?id=507">
 									PRACK can not be proxied properly
 								</a>								
 							</li>
@@ -745,7 +745,7 @@
 						<br />	
 						<img src="red.jpeg" />
 						<a
-							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=484">
+							href="http://code.google.com/p/mobicents/issues/detail?id=484">
 						JRuby integration
 						</a>
 						<br />					
