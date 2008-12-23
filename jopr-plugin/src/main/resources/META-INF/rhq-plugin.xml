@@ -48,6 +48,9 @@
         
         <metric displayName="Number of SIP requests processed" property="requestsProcessed"
              defaultOn="true" defaultInterval="1000" displayType="summary"/>
+             
+        <metric displayName="Number of SIP responses processed" property="responsesProcessed"
+             defaultOn="true" defaultInterval="1000" displayType="summary"/>
 
      	<metric displayName="Number of pending messages in all queues" property="numberOfPendingMessages"
              defaultOn="true" defaultInterval="500" displayType="summary"/>

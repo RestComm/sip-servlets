@@ -24,6 +24,11 @@
 			description="number of requests processed by the sip application dispatcher"
 			type="long"
 			writeable="false" />
+			
+		<attribute name="responsesProcessed"
+			description="number of responses processed by the sip application dispatcher"
+			type="long"
+			writeable="false" />
 
 		<attribute name="numberOfPendingMessages"
 			description="number of pending messages in all queues for all concurrency control modes."

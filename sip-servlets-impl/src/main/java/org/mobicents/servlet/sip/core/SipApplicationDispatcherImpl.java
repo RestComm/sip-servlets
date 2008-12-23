@@ -146,6 +146,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	private AtomicLong requestsProcessed = new AtomicLong(0);
 	
+	private AtomicLong responsesProcessed = new AtomicLong(0);
+	
 	private boolean rejectRequests = false;
 	
 	int queueSize;
@@ -627,7 +629,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			return;
 		}
-		
+		responsesProcessed.incrementAndGet();
 		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
 		Dialog dialog = responseEvent.getDialog();
 		// Transate the response to SipServletResponse
@@ -1053,10 +1055,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		return asynchronousExecutor;
 	}
 
-	public void setAsynchronousExecutor(ThreadPoolExecutor asynchronousExecutor) {
-		this.asynchronousExecutor = asynchronousExecutor;
-	}
-
 	/**
 	 * Serialize the state info in memory and deserialize it and return the new object. 
 	 * Since there is no clone method this is the only way to get the same object with a new reference 
@@ -1228,5 +1226,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public long getRequestsProcessed() {
 		return requestsProcessed.get();
+	}
+	
+	/**
+	 * @return the requestsProcessed
+	 */
+	public long getResponsesProcessed() {
+		return responsesProcessed.get();
 	}
 }
