@@ -178,6 +178,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				sipSessionsUtil);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
 				sipApplicationDispatcher.getOutboundInterfaces());
+		this.getServletContext().setAttribute(SipContext.LOAD_BALANCER,
+				((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()).getLoadBalancerToUse());		
 	}
 
 	/**

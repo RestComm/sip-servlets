@@ -46,6 +46,8 @@ public interface SipContext extends Context {
 
 	public static final String APPLICATION_SIP_XML = "WEB-INF/sip.xml";
 	
+	public static final String LOAD_BALANCER = "org.mobicents.servlet.sip.LoadBalancer";
+	
 	String getApplicationName();
 
 	void setApplicationName(String applicationName);
