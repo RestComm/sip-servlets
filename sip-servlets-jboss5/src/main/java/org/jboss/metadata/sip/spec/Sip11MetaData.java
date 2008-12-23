@@ -16,15 +16,16 @@ import org.jboss.xb.annotations.JBossXmlSchema;
  */
 @XmlRootElement(name="sip-app", namespace="http://www.jcp.org/xml/ns/sipservlet")
 @JBossXmlSchema(
-      xmlns={@XmlNs(namespaceURI = "http://www.jcp.org/xml/ns/sipservlet", prefix = "ss")},
+      xmlns={@XmlNs(namespaceURI = "http://www.jcp.org/xml/ns/sipservlet", prefix = "sipservlet")},
       ignoreUnresolvedFieldOrClass=false,
       namespace="http://www.jcp.org/xml/ns/sipservlet",
       elementFormDefault=XmlNsForm.QUALIFIED,
       normalizeSpace=true)
+//      strict=false)
 @XmlType(name="sip-appType",
       namespace="http://www.jcp.org/xml/ns/sipservlet",
       propOrder={"descriptionGroup", "distributable", "contextParams", "listeners", "servletSelection", "servlets",
-      "proxyConfig", "sessionConfig", "securityContraints", "loginConfig", "securityRoles", "jndiEnvironmentRefsGroup", "messageDestinations", "localEncodings"})
+      "proxyConfig", "sessionConfig", "sipSecurityContraints", "sipLoginConfig", "securityRoles", "jndiEnvironmentRefsGroup", "messageDestinations", "localEncodings"})
 public class Sip11MetaData extends SipMetaData
 {
    private static final long serialVersionUID = 1;

@@ -92,7 +92,7 @@ public class SipSecurityConstraintMetaData extends IdMetaDataImpl
    /** The unchecked flag is set when there is no security-constraint/auth-constraint
    @return true if there is no auth-constraint
     */
-   @XmlTransient
+//   @XmlTransient
    public boolean isUnchecked()
    {
       return authConstraint == null;
@@ -102,7 +102,7 @@ public class SipSecurityConstraintMetaData extends IdMetaDataImpl
    security-constraint/auth-constraint element
    @return true if there is an empty auth-constraint
    */
-   @XmlTransient
+//   @XmlTransient
    public boolean isExcluded()
    {
       boolean isExcluded = authConstraint != null
@@ -114,7 +114,7 @@ public class SipSecurityConstraintMetaData extends IdMetaDataImpl
     * @return A possibly empty set of constraint role names. Use isUnchecked
     * and isExcluded to check for no or an emtpy auth-constraint
    */
-   @XmlTransient
+//   @XmlTransient
    public List<String> getRoleNames()
    {
       List<String> roleNames = Collections.emptyList();
@@ -127,7 +127,7 @@ public class SipSecurityConstraintMetaData extends IdMetaDataImpl
     * Accessor for the UserDataConstraint.TransportGuarantee
     * @return UserDataConstraint.TransportGuarantee
     */
-   @XmlTransient
+//   @XmlTransient
    public TransportGuaranteeType getTransportGuarantee()
    {
       TransportGuaranteeType type = TransportGuaranteeType.NONE;
@@ -144,7 +144,7 @@ public class SipSecurityConstraintMetaData extends IdMetaDataImpl
 	/**
 	 * @return the proxyAuthentication
 	 */
-	@XmlTransient
+//	@XmlTransient
 	public EmptyMetaData getProxyAuthentication() {
 		return proxyAuthentication;
 	}

@@ -22,9 +22,9 @@ $Id:$
       <property name="relativeOrder">1999</property>
    </bean>
    <!-- sip.xml parsing deployer -->
-   <!--bean name="SipAppParsingDeployer" class="org.jboss.deployment.SipAppParsingDeployer">
+   <bean name="SipAppParsingDeployer" class="org.jboss.deployment.SipAppParsingDeployer">
       <property name="relativeOrder">2000</property>
-   </bean-->
+   </bean>
    <bean name="JBossWebAppParsingDeployer" class="org.jboss.deployment.JBossWebAppParsingDeployer">
       <property name="relativeOrder">2001</property>
    </bean>
