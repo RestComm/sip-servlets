@@ -693,6 +693,27 @@
 									address.toString() doesn't contain any Address parameters									  	 
 								</a>								
 							</li>																	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=504">
+									Route to Load Balancer not added in HA proxy case									  	 
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=507">
+									URI encoded by SipApplicationSession is not UTF8 encoded
+								</a>								
+							</li>
+														<li>
+								<img src="red.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=507">
+									PRACK can not be proxied properly
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
