@@ -93,6 +93,8 @@ public class Shootist implements SipListener {
 	
 	public boolean prackOkReceived = false;
 	
+	public boolean okToInviteRecevied = false;
+	
 	int count = 0;
 	
 	private boolean forkingProxy = false;
@@ -251,6 +253,7 @@ public class Shootist implements SipListener {
 						System.out.println("Sending ACK");
 						dialog.sendAck(ackRequest);
 					}
+					okToInviteRecevied = true;
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (dialog.getState() == DialogState.CONFIRMED) {
 						// oops cancel went in too late. Need to hang up the

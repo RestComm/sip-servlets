@@ -81,6 +81,8 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 			fail("Conversation not complete!");
 		if (!shootist.prackOkReceived)
 			fail("No OK to PRACK received");
+		if (!shootist.okToInviteRecevied)
+			fail("No OK to INVITE received");
 	}
 
 	@Override
