@@ -79,6 +79,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private boolean canceled;
 	private boolean isAddToPath;
 	private transient List<ProxyBranch> recursedBranches;
+	private boolean waitingForPrack;
 	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
@@ -333,7 +334,12 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		// Send informational responses back immediately
 		if((response.getStatus() > 100 && response.getStatus() < 200) || (response.getStatus() == 200 && Request.PRACK.equals(response.getMethod())))
 		{
-
+			// Deterimine if the response is reliable. We just look at RSeq, because
+			// every such response is required to have it.
+			if(response.getHeader("RSeq") != null) {
+				this.setWaitingForPrack(true); // this branch is expecting a PRACK now
+			}
+			
 			SipServletResponse proxiedResponse = 
 				proxy.getProxyUtils().createProxiedResponse(response, this);
 			
@@ -644,6 +650,14 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 */
 	public SipServletRequestImpl getPrackOriginalRequest() {
 		return prackOriginalRequest;
+	}
+
+	public boolean isWaitingForPrack() {
+		return waitingForPrack;
+	}
+
+	public void setWaitingForPrack(boolean waitingForPrack) {
+		this.waitingForPrack = waitingForPrack;
 	}
 
 }

@@ -221,7 +221,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								List<ProxyBranch> branches = sipSession.getProxy().getProxyBranches();
 								for(ProxyBranch pb : branches) {
 									ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
-									proxyBranch.proxyPrack(sipServletRequest);
+									if(proxyBranch.isWaitingForPrack()) {
+										proxyBranch.proxyPrack(sipServletRequest);
+										proxyBranch.setWaitingForPrack(false);
+									}
 								}
 							}
 						}
