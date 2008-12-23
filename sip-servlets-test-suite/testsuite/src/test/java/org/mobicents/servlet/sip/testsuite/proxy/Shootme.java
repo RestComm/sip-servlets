@@ -67,6 +67,7 @@ public class Shootme implements SipListener {
 	private static final String myAddress = "127.0.0.1";
 
 	private int myPort = 5057;
+	private String toTag;
 
 	protected ServerTransaction inviteTid;
 
@@ -79,6 +80,8 @@ public class Shootme implements SipListener {
 	public boolean ended = false;
 	
 	public boolean cancelled = false;
+	
+	public boolean usePrack = false;
 	
 	public static final boolean callerSendsBye = true;
 
@@ -127,6 +130,8 @@ public class Shootme implements SipListener {
 			processBye(requestEvent, serverTransactionId);
 		} else if (request.getMethod().equals(Request.CANCEL)) {
 			processCancel(requestEvent, serverTransactionId);
+		} else if (request.getMethod().equals(Request.PRACK)) {
+			processPrack(requestEvent, serverTransactionId);
 		} else {
 			try {
 				serverTransactionId.sendResponse( messageFactory.createResponse( 202, request ) );
@@ -184,20 +189,26 @@ public class Shootme implements SipListener {
 		try {
 			System.out.println("shootme: got an Invite sending Trying");
 			// System.out.println("shootme: " + request);
-			Response response = messageFactory.createResponse(Response.RINGING,
+			Response response = null;
+			
+			if(serverTransaction == null) {
+				serverTransaction = sipProvider.getNewServerTransaction(request);
+			}
+			if(!usePrack) response = messageFactory.createResponse(Response.RINGING,
 					request);
+			else response = serverTransaction.getDialog().createReliableProvisionalResponse(180);
 			String toTag = Integer.toString((int) (Math.random()*10000000));
 			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
 			toHeader.setTag(toTag); // Application is supposed to set.
-			ServerTransaction st = requestEvent.getServerTransaction();
+			this.toTag = toTag;
+		
+			dialog = serverTransaction.getDialog();
 
-			if (st == null) {
-				st = sipProvider.getNewServerTransaction(request);
-			}
-			dialog = st.getDialog();
-
-			st.sendResponse(response);
-
+			if(!usePrack)
+				serverTransaction.sendResponse(response);
+			else
+				dialog.sendReliableProvisionalResponse(response);
+			
 			this.okResponse = messageFactory.createResponse(Response.OK,
 					request);
 			Address address = addressFactory.createAddress("Shootme <sip:"
@@ -208,12 +219,12 @@ public class Shootme implements SipListener {
 			toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
 			toHeader.setTag(toTag); // Application is supposed to set.
 			okResponse.addHeader(contactHeader);
-			this.inviteTid = st;
+			this.inviteTid = serverTransaction;
 			// Defer sending the OK to simulate the phone ringing.
 			// Answered in 1 second ( this guy is fast at taking calls)
 			this.inviteRequest = request;
 	
-			new Timer().schedule(new MyTimerTask(this), 1000);
+			//new Timer().schedule(new MyTimerTask(this), 1000);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
@@ -401,5 +412,39 @@ public class Shootme implements SipListener {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void processPrack(RequestEvent requestEvent,
+			ServerTransaction serverTransactionId) {
+		try {
+			System.out.println("shootme: got an PRACK! ");
+			System.out.println("Dialog State = " + dialog.getState());
+			
+			/**
+			 * JvB: First, send 200 OK for PRACK
+			 */
+			Request prack = requestEvent.getRequest();
+			Response prackOk = messageFactory.createResponse( 200, prack );
+			serverTransactionId.sendResponse( prackOk );
+			
+			/**
+			 * Send a 200 OK response to complete the 3 way handshake for the
+			 * INIVTE.
+			 */			
+			Response response = messageFactory.createResponse(200,
+					inviteRequest);
+			ToHeader to = (ToHeader) response.getHeader(ToHeader.NAME);
+			to.setTag(this.toTag);
+			Address address = addressFactory.createAddress("Shootme <sip:"
+					+ myAddress + ":" + myPort + ">");
+			ContactHeader contactHeader = headerFactory
+					.createContactHeader(address);
+			response.addHeader(contactHeader);
+			inviteTid.sendResponse(response);			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+
+		}
+
 	}
 }

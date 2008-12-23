@@ -53,6 +53,7 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RequireHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.MessageFactory;
@@ -87,6 +88,10 @@ public class Shootist implements SipListener {
 	private boolean byeTaskRunning;
 	
 	public boolean ended = false;
+	
+	public boolean usePrack = false;
+	
+	public boolean prackOkReceived = false;
 	
 	int count = 0;
 	
@@ -260,6 +265,14 @@ public class Shootist implements SipListener {
 
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					ended = true;
+				} else if(cseq.getMethod().equals(Request.PRACK)) {
+					prackOkReceived = true;
+				}
+			} else if(response.getStatusCode() == 180) {
+				if(usePrack) {
+					Request prackRequest = dialog.createPrack(response);
+					ClientTransaction ct = sipProvider.getNewClientTransaction(prackRequest);
+					dialog.sendRequest(ct);
 				}
 			}
 		} catch (Exception ex) {
@@ -454,6 +467,12 @@ public class Shootist implements SipListener {
 			Header callInfoHeader = headerFactory.createHeader("Call-Info",
 					"<http://www.antd.nist.gov>");
 			request.addHeader(callInfoHeader);
+			
+			if(usePrack) {
+				RequireHeader requireHeader = headerFactory
+				.createRequireHeader("100rel");
+				request.addHeader(requireHeader);
+			}
 
 			// Create the client transaction.
 			inviteTid = sipProvider.getNewClientTransaction(request);
