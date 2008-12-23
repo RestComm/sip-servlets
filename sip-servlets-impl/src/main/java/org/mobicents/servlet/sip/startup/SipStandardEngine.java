@@ -86,7 +86,7 @@ public class SipStandardEngine extends StandardEngine implements Engine {
 	@Override
 	/**
 	 * Used for JBoss AS 5 to add the hostnames and aliases to the sip application dispatcher
-	 * since when addChild is called the sip application dispatcher is still null
+	 * since when addChild is called the sip application dispatcher is still null or getService might still return null
 	 */
 	public void start() throws LifecycleException {		
 		super.start();
