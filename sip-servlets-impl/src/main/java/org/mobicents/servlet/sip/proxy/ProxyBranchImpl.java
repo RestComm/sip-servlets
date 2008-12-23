@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -33,9 +34,11 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
+import javax.sip.ClientTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
@@ -44,10 +47,12 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 
 /**
  * @author root
@@ -57,6 +62,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private transient static Log logger = LogFactory.getLog(ProxyBranchImpl.class);
 	private ProxyImpl proxy;
 	private transient SipServletRequestImpl originalRequest;
+	private transient SipServletRequestImpl prackOriginalRequest;
 	private transient SipServletRequestImpl outgoingRequest;
 	private transient SipServletResponseImpl lastResponse;
 	private transient URI targetURI;
@@ -325,7 +331,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			return;
 		
 		// Send informational responses back immediately
-		if(response.getStatus() > 100 && response.getStatus() < 200)
+		if((response.getStatus() > 100 && response.getStatus() < 200) || (response.getStatus() == 200 && Request.PRACK.equals(response.getMethod())))
 		{
 
 			SipServletResponse proxiedResponse = 
@@ -426,7 +432,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		try {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
-			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) || clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
+			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
 				sipProvider.sendRequest(clonedRequest);
 			}
 			else {				
@@ -435,6 +441,60 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			
 		} catch (SipException e) {
 			logger.error("A problem occured while proxying a subsequent request", e);
+		}
+	}
+	
+	/**
+	 * Proxy prack
+	 * 
+	 * @param request
+	 */
+	public void proxyPrack(SipServletRequestImpl request) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Proxying prack request " + request);
+		}
+		// Update the last proxied request
+		request.setRoutingState(RoutingState.PROXIED);
+		this.prackOriginalRequest = request;
+		
+		ProxyParams params = new ProxyParams(this.targetURI, null, null, null);
+		Request clonedRequest = 
+			proxy.getProxyUtils().createProxiedRequest(request, this, params);
+
+		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
+		try {
+			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
+					request.getSipSession().getKey().getApplicationName());
+		} catch (ParseException pe) {
+			logger.error("A problem occured while proxying a PRACK request", pe);
+		}
+		
+		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
+		if(routeHeader != null) {
+			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
+				clonedRequest.removeFirst(RouteHeader.NAME);	
+			}
+		}		
+	
+		String transport = JainSipUtils.findTransport(clonedRequest);
+		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				transport, false).getSipProvider();
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Getting new Client Tx for request " + clonedRequest);
+		}
+		
+		try {
+			ClientTransaction ctx = sipProvider
+				.getNewClientTransaction(clonedRequest);			
+			
+			TransactionApplicationData appData = (TransactionApplicationData) request.getTransactionApplicationData();
+			appData.setProxyBranch(this);
+			ctx.setApplicationData(appData);
+			
+			ctx.sendRequest();
+		} catch (SipException e) {
+			logger.error("A problem occured while proxying a PRACK request", e);
 		}
 	}
 	
@@ -570,6 +630,20 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		&& this.originalRequest.getSession().isValid())
 			return;
 		throw new IllegalStateException("Invalid session.");
+	}
+
+	/**
+	 * @param prackOriginalRequest the prackOriginalRequest to set
+	 */
+	public void setPrackOriginalRequest(SipServletRequestImpl prackOriginalRequest) {
+		this.prackOriginalRequest = prackOriginalRequest;
+	}
+
+	/**
+	 * @return the prackOriginalRequest
+	 */
+	public SipServletRequestImpl getPrackOriginalRequest() {
+		return prackOriginalRequest;
 	}
 
 }

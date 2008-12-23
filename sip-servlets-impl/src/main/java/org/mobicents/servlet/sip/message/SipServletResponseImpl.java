@@ -472,7 +472,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				}
 			}
 			//keeping track of application data and transaction in the dialog
-			if(getTransaction().getDialog() != null) {
+			if(getTransaction() != null && getTransaction().getDialog() != null) {
 				if(getTransaction().getDialog().getApplicationData() == null) {
 					getTransaction().getDialog().setApplicationData(
 							originalRequest.getTransactionApplicationData());	

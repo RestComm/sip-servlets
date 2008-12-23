@@ -216,6 +216,11 @@ public class ProxyUtils {
 		SipServletRequestImpl originalRequest =
 			(SipServletRequestImpl) this.proxy.getOriginalRequest();
 		
+		if(Request.PRACK.equals(sipServetResponse.getMethod())) {
+			originalRequest =
+				(SipServletRequestImpl) proxyBranch.getPrackOriginalRequest();
+		}
+		
 		SipServletResponseImpl newServletResponseImpl = new SipServletResponseImpl(clonedResponse,
 				sipFactoryImpl,
 				originalRequest.getTransaction(),

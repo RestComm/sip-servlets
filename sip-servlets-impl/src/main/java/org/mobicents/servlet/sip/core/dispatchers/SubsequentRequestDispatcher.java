@@ -17,8 +17,12 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
@@ -46,6 +50,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -204,13 +209,21 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								
 						// See if the subsequent request should go directly to the proxy
 						ProxyImpl proxy = sipSession.getProxy();
-						if(proxy != null && proxy.getFinalBranchForSubsequentRequests() != null) {
-							ProxyBranchImpl proxyBranch = sipSession.getProxy().getFinalBranchForSubsequentRequests();
-							proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
-							proxy.setOriginalRequest(sipServletRequest);
-							callServlet(sipServletRequest);
-						
-							proxyBranch.proxySubsequentRequest(sipServletRequest);
+						if(proxy != null) {
+							if(proxy.getFinalBranchForSubsequentRequests() != null) {
+								ProxyBranchImpl proxyBranch = sipSession.getProxy().getFinalBranchForSubsequentRequests();
+								proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
+								proxy.setOriginalRequest(sipServletRequest);
+								callServlet(sipServletRequest);
+								proxyBranch.proxySubsequentRequest(sipServletRequest);
+							} else if(sipServletRequest.getMethod().equals(Request.PRACK)) {
+								callServlet(sipServletRequest);
+								List<ProxyBranch> branches = sipSession.getProxy().getProxyBranches();
+								for(ProxyBranch pb : branches) {
+									ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
+									proxyBranch.proxyPrack(sipServletRequest);
+								}
+							}
 						}
 						// If it's not for a proxy then it's just an AR, so go to the next application
 						else {							

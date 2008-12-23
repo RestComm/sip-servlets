@@ -471,7 +471,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isInfoEnabled()) {
 				logger.info("Got a request event "  + request.toString());
 			}
-			if (!Request.ACK.equals(request.getMethod()) && !Request.PRACK.equals(request.getMethod())  && transaction == null ) {
+			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
 				    if(request.getHeader(MaxForwardsHeader.NAME)==null){
