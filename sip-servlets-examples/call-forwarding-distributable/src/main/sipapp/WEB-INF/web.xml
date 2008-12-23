@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app>
-	<app-name>org.mobicents.servlet.sip.example.DistributableCallForwardingB2BUAApplication</app-name>
 	<display-name>Distributable Call Forwarding B2BUA Sip Servlet</display-name>
 	<description>Distributable Call Forwarding B2BUA Sip Servlet</description>
 	<distributable/>	

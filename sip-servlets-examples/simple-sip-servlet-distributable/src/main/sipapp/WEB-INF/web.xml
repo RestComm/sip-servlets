@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app>
-	<app-name>org.mobicents.servlet.sip.example.DistributableSimpleApplication</app-name>
 	<display-name>Distributable Simple Sip Servlet</display-name>
 	<description>Distributable Simple Sip Servlet</description>
 	<distributable/>
