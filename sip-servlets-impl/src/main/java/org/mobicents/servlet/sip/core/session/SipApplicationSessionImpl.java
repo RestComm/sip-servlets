@@ -43,6 +43,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -243,7 +244,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * {@inheritDoc}
 	 */
 	public void encodeURI(URI uri) {
-		uri.setParameter(SIP_APPLICATION_KEY_PARAM_NAME, getId());
+		uri.setParameter(SIP_APPLICATION_KEY_PARAM_NAME, RFC2396UrlDecoder.encode(getId()));
 	}
 
 	/**

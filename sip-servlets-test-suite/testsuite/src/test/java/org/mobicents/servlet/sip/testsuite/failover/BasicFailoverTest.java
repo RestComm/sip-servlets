@@ -29,10 +29,14 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -140,10 +144,17 @@ public class BasicFailoverTest extends SipServletTestCase {
 	}
 	
 	public void deployShootistApplication(SipEmbedded sipEmbedded) {
-		assertTrue(sipEmbedded.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp",
-				"sip-test-context", 
-				"sip-test"));
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("encodeRequestURI");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(sipEmbedded.deployContext(context));
 	}
 
 	protected String getDarConfigurationFileShootist() {

@@ -48,6 +48,7 @@ import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
+import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -151,6 +152,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// Request-URI (in that order) to see if it contains an encoded URI. 
 		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
 		String targetedApplicationKey = sipServletRequest.getRequestURI().getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+		if(targetedApplicationKey != null) {
+			targetedApplicationKey = RFC2396UrlDecoder.decode(targetedApplicationKey);
+		}
 		SipTargetedRequestInfo targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
 		if(targetedRequestInfo == null && poppedAddress != null) {
 			targetedApplicationKey = poppedAddress.getURI().getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
