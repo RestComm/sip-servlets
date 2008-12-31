@@ -414,6 +414,13 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Proxying subsequent request " + request);
 		}
+		
+		// A re-INVITE needs special handling without goind through the dialog-stateful methods
+		if(request.getMethod().equalsIgnoreCase("INVITE")) {
+			proxyDialogStateless(request);
+			return;
+		}
+		
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
 		proxy.setOriginalRequest(request);
@@ -451,13 +458,19 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	}
 	
 	/**
-	 * Proxy prack
+	 * This method proxies requests without updating JSIP dialog state. PRACK and re-INVITE
+	 * requests require this kind of handling because:
+	 * 1. PRACK occurs before a dialog has been established (and also produces OKs before
+	 *  the final response)
+	 * 2. re-INVITE when sent with the dialog method resets the internal JSIP CSeq counter
+	 *  to 1 every time you need it, which causes issues like 
+	 *  http://groups.google.com/group/mobicents-public/browse_thread/thread/1a22ccdc4c481f47
 	 * 
 	 * @param request
 	 */
-	public void proxyPrack(SipServletRequestImpl request) {
+	public void proxyDialogStateless(SipServletRequestImpl request) {
 		if(logger.isDebugEnabled()) {
-			logger.debug("Proxying prack request " + request);
+			logger.debug("Proxying request dialog-statelessly" + request);
 		}
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
@@ -472,7 +485,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					request.getSipSession().getKey().getApplicationName());
 		} catch (ParseException pe) {
-			logger.error("A problem occured while proxying a PRACK request", pe);
+			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", pe);
 		}
 		
 		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
@@ -500,7 +513,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			
 			ctx.sendRequest();
 		} catch (SipException e) {
-			logger.error("A problem occured while proxying a PRACK request", e);
+			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", e);
 		}
 	}
 	
