@@ -219,8 +219,8 @@ public class Shootist implements SipListener {
 			new Timer().schedule(new ByeTask(dialog), 4000) ;
 		}
 		System.out.println("transaction state is " + tid.getState());
-		System.out.println("Dialog = " + tid.getDialog());
-		System.out.println("Dialog State is " + tid.getDialog().getState());
+		//System.out.println("Dialog = " + tid.getDialog());
+		//System.out.println("Dialog State is " + tid.getDialog().getState());
 
 		try {
 			if (response.getStatusCode() == Response.OK) {
