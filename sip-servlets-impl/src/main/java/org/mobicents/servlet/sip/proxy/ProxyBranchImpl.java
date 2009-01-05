@@ -476,7 +476,16 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		request.setRoutingState(RoutingState.PROXIED);
 		this.prackOriginalRequest = request;
 		
-		ProxyParams params = new ProxyParams(this.targetURI, null, null, null);
+		URI targetURI = this.targetURI;
+		
+		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
+		// or from the callee
+		if(!request.getFrom().toString().equals(proxy.getCallerFromHeader())) {
+			// If it's from the callee we should send it in the other direction
+			targetURI = proxy.getPreviousNode();
+		}
+		
+		ProxyParams params = new ProxyParams(targetURI, null, null, null);
 		Request clonedRequest = 
 			proxy.getProxyUtils().createProxiedRequest(request, this, params);
 
@@ -493,7 +502,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
 				clonedRequest.removeFirst(RouteHeader.NAME);	
 			}
-		}		
+		}	
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(

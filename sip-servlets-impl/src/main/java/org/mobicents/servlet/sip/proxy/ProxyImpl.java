@@ -16,6 +16,9 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
+import gov.nist.javax.sip.header.Via;
+import gov.nist.javax.sip.message.SIPRequest;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -28,12 +31,17 @@ import java.util.Map;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.SipFactory;
+import javax.sip.SipProvider;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
+import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -80,6 +88,13 @@ public class ProxyImpl implements Proxy, Serializable {
 	// that will be used for proxying subsequent requests
 	private ProxyBranchImpl finalBranchForSubsequentRequests;
 	
+	// Keep the URI of the previous SIP entity that sent the original request to us (either another proxy or UA)
+	private SipURI previousNode;
+	
+	// The From-header of the initiator of the request. Used to determine the direction of the request.
+	// Caller -> Callee or Caller <- Callee
+	private String callerFromHeader;
+
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
 		this.originalRequest = request;
@@ -88,7 +103,42 @@ public class ProxyImpl implements Proxy, Serializable {
 		this.proxyUtils = new ProxyUtils(sipFactoryImpl, this);
 		this.proxyTimeout = 180; // 180 secs default
 		this.outboundInterface = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
-		
+		this.callerFromHeader = request.getFrom().toString();
+		this.previousNode = extractPreviousNodeFromRequest(request);
+	}
+	
+	/*
+	 * This method will find the address of the machine that is the previous dialog path node.
+	 * If there are proxies before the current one that are adding Record-Route we should visit them,
+	 * otherwise just send to the client directly. And we don't want to visit proxies that are not
+	 * Record-Routing, because they are not in the dialog path.
+	 */
+	private SipURI extractPreviousNodeFromRequest(SipServletRequestImpl request) {
+		SipURI uri = null;
+		try {
+			// First check for record route
+			RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
+			if(rrh != null) {
+				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
+				uri = new SipURIImpl(sipUri);
+			} else { 
+				// If no record route is found then use the last via (the originating endpoint)
+				SIPRequest sipRequest = (SIPRequest) request.getMessage();
+				Via via = (Via)sipRequest.getViaHeaders().getLast();
+				String uriString = via.getSentBy().toString();
+				uri = sipFactoryImpl.createSipURI(null, uriString);
+				if(via.getTransport() != null) {
+					uri.setTransportParam(via.getTransport());
+				} else {
+					uri.setTransportParam("udp");
+				}
+			}
+		} catch (Exception e) {
+			// We shouldn't completely fail in this case because it is rare to visit this code
+			logger.error("Failed parsing previous address ", e);
+		}
+		return uri;
+
 	}
 	
 	/* (non-Javadoc)
@@ -649,4 +699,17 @@ public class ProxyImpl implements Proxy, Serializable {
 	public boolean getAckReceived() {
 		return this.ackReceived;
 	}
+	
+	public SipURI getPreviousNode() {
+		return previousNode;
+	}
+
+	public String getCallerFromHeader() {
+		return callerFromHeader;
+	}
+
+	public void setCallerFromHeader(String initiatorFromHeader) {
+		this.callerFromHeader = initiatorFromHeader;
+	}
+
 }
