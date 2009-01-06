@@ -19,21 +19,32 @@ package org.mobicents.servlet.sip.startup.jboss;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import javax.management.ObjectName;
 import javax.servlet.sip.annotation.SipApplication;
 
+import org.jboss.deployers.spi.DeploymentException;
 import org.jboss.deployers.spi.annotations.AnnotationEnvironment;
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
+import org.jboss.kernel.plugins.bootstrap.basic.KernelConstants;
 import org.jboss.logging.Logger;
-import org.jboss.metadata.sip.jboss.JBoss50ConvergedSipMetaData;
-import org.jboss.metadata.sip.spec.Sip11MetaData;
+import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBoss50WebMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.Web25MetaData;
 import org.jboss.security.plugins.JaasSecurityManagerServiceMBean;
+import org.jboss.sip.deployers.ConvergedSipModule;
+import org.jboss.system.metadata.ServiceAttributeMetaData;
+import org.jboss.system.metadata.ServiceConstructorMetaData;
+import org.jboss.system.metadata.ServiceDependencyMetaData;
+import org.jboss.system.metadata.ServiceInjectionValueMetaData;
+import org.jboss.system.metadata.ServiceMetaData;
+import org.jboss.web.deployers.AbstractWarDeployer;
 import org.jboss.web.deployers.AbstractWarDeployment;
 import org.jboss.web.tomcat.service.deployers.DeployerConfig;
+import org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment;
 import org.jboss.xb.binding.Unmarshaller;
 import org.jboss.xb.binding.UnmarshallerFactory;
 import org.jboss.xb.binding.sunday.unmarshalling.SchemaBinding;
@@ -48,7 +59,12 @@ import org.mobicents.servlet.sip.startup.SipHostConfig;
 public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deployers.TomcatDeployer {
 	private static final Logger log = Logger.getLogger(TomcatConvergedDeployer.class);
 	
-	JBoss50ConvergedSipMetaData sharedConvergedMetaData;
+//	JBoss50ConvergedSipMetaData sharedConvergedMetaData;
+	/**
+    * Shared metaData.
+    */
+   private JBossWebMetaData sharedMetaData = null;
+   
 	/**
 	 * Domain for tomcat6 mbeans
 	 */
@@ -75,6 +91,10 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
     */
    private static final UnmarshallerFactory factory = UnmarshallerFactory.newInstance();
 	
+   public TomcatConvergedDeployer() {
+		super();
+   }
+   
 	/**
 	 * Start the deployer. This sets up the tomcat core.
 	 */
@@ -95,22 +115,36 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 		Web25MetaData confWebMD = (Web25MetaData) unmarshaller.unmarshal(webXml
 				.toString(), schema);
 		
+	      sharedMetaData = new JBoss50WebMetaData();
+	      sharedMetaData.merge(null, confWebMD);
+		
 		// Parse shared sip.xml
-		URL sipXml = this.getClass().getClassLoader().getResource("sip.xml");
-		if (sipXml == null) {
-			sipXml = this.getClass().getClassLoader().getResource("conf/sip.xml");
-		}
-		sharedConvergedMetaData = new JBoss50ConvergedSipMetaData();
-		if (sipXml != null) {
-			schema = JBossXBBuilder.build(Sip11MetaData.class);
-			Sip11MetaData confSipMD = (Sip11MetaData) unmarshaller.unmarshal(sipXml
-					.toString(), schema);			
-			sharedConvergedMetaData.merge(confWebMD, confSipMD);
-		} else {
-			sharedConvergedMetaData.merge(null, confWebMD);
-		}
+//		URL sipXml = this.getClass().getClassLoader().getResource("sip.xml");
+//		if (sipXml == null) {
+//			sipXml = this.getClass().getClassLoader().getResource("conf/sip.xml");
+//		}
+//		sharedConvergedMetaData = new JBoss50ConvergedSipMetaData();
+//		if (sipXml != null) {
+//			schema = JBossXBBuilder.build(Sip11MetaData.class);
+//			Sip11MetaData confSipMD = (Sip11MetaData) unmarshaller.unmarshal(sipXml
+//					.toString(), schema);			
+//			sharedConvergedMetaData.merge(confWebMD, confSipMD);
+//		} else {
+//			sharedConvergedMetaData.merge(null, confWebMD);
+//		}
 	}	   
-
+   	
+   	@Override
+   	public void deploy(VFSDeploymentUnit unit, JBossWebMetaData metaData)
+   			throws DeploymentException {   		
+   		if(isSipServletApplication(unit)) {
+   			JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
+   			super.deploy(unit, convergedMetaData);
+   		} else {
+   			super.deploy(unit, metaData);
+   		}
+   	}
+   	
    /**
 	 * Create a tomcat war deployment bean for the deployment unit/metaData.
 	 * 
@@ -122,12 +156,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	 */
 	@Override
 	public AbstractWarDeployment getDeployment(VFSDeploymentUnit unit,
-			JBossWebMetaData metaData) throws Exception {
-		
-		String className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
-				: getDeploymentClass();
-		AbstractWarDeployment convergedDeployment = (AbstractWarDeployment) (getClass()
-				.getClassLoader().loadClass(className)).newInstance();
+			JBossWebMetaData metaData) throws Exception {						
 
 		DeployerConfig config = new DeployerConfig();
 		config.setDefaultSecurityDomain(this.defaultSecurityDomain);
@@ -141,11 +170,18 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 		config.setUnpackWars(this.unpackWars);
 		config.setLenientEjbLink(this.lenientEjbLink);
 		config.setCatalinaDomain(catalinaDomain);
-		if(isSipServletApplication(unit)) {
+		String className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatDeployment"
+				: getDeploymentClass();
+		if(metaData instanceof JBossConvergedSipMetaData) {
+			className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
+					: getDeploymentClass();
 			config.setContextClassName(SipHostConfig.SIP_CONTEXT_CLASS);			
-		}else {
+		}else {			
 			config.setContextClassName(contextClassName);
 		}
+		AbstractWarDeployment convergedDeployment = (AbstractWarDeployment) (getClass()
+				.getClassLoader().loadClass(className)).newInstance();
+		
 		config.setServiceName(null);
 		config.setSubjectAttributeName(this.getSubjectAttributeName());
 		config.setUseJBossWebLoader(this.getUseJBossWebLoader());
@@ -153,7 +189,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 				.isAllowSelfPrivilegedWebApps());
 		config.setSecurityManagerService(this.secMgrService);
 		config.setFilteredPackages(getFilteredPackages());
-		config.setSharedMetaData(sharedConvergedMetaData);
+		config.setSharedMetaData(sharedMetaData);
 		config.setDeleteWorkDirs(getDeleteWorkDirOnContextDestroy());
 
 		config.setSecurityContextClassName(securityContextClassName);
@@ -254,7 +290,81 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	@Override
 	protected void deployWebModule(VFSDeploymentUnit unit,
 			JBossWebMetaData metaData, AbstractWarDeployment deployment)
-			throws Exception {	
-		super.deployWebModule(unit, metaData, deployment);
+			throws Exception {		
+		if (deployment instanceof TomcatConvergedDeployment) {
+			log.debug("deployConvergedModule: " + unit.getName());
+			try {
+				ServiceMetaData webModule = new ServiceMetaData();
+				String name = getObjectName(metaData);
+				ObjectName objectName = new ObjectName(name);
+				webModule.setObjectName(objectName);
+				webModule.setCode(ConvergedSipModule.class.getName());
+				// WebModule(DeploymentUnit, AbstractWarDeployer,
+				// AbstractWarDeployment)
+				ServiceConstructorMetaData constructor = new ServiceConstructorMetaData();
+				constructor.setSignature(new String[] {
+						VFSDeploymentUnit.class.getName(),
+						AbstractWarDeployer.class.getName(),
+						AbstractWarDeployment.class.getName() });
+				constructor
+						.setParameters(new Object[] { unit, this, deployment });
+				webModule.setConstructor(constructor);
+
+				List<ServiceAttributeMetaData> attrs = new ArrayList<ServiceAttributeMetaData>();
+
+				ServiceAttributeMetaData attr = new ServiceAttributeMetaData();
+				attr.setName("SecurityManagement");
+				ServiceInjectionValueMetaData injectionValue = new ServiceInjectionValueMetaData(
+						deployment.getSecurityManagementName());
+				attr.setValue(injectionValue);
+				attrs.add(attr);
+
+				ServiceAttributeMetaData attrPR = new ServiceAttributeMetaData();
+				attrPR.setName("PolicyRegistration");
+				ServiceInjectionValueMetaData injectionValuePR = new ServiceInjectionValueMetaData(
+						deployment.getPolicyRegistrationName());
+				attrPR.setValue(injectionValuePR);
+				attrs.add(attrPR);
+
+				ServiceAttributeMetaData attrKernel = new ServiceAttributeMetaData();
+				attrKernel.setName("Kernel");
+				ServiceInjectionValueMetaData injectionValueKernel = new ServiceInjectionValueMetaData(
+						KernelConstants.KERNEL_NAME);
+				attrKernel.setValue(injectionValueKernel);
+				attrs.add(attrKernel);
+
+				webModule.setAttributes(attrs);
+
+				// Dependencies...Still have old jmx names here
+				Collection<String> depends = metaData.getDepends();
+				List<ServiceDependencyMetaData> dependencies = new ArrayList<ServiceDependencyMetaData>();
+				if (depends != null && depends.isEmpty() == false) {
+					if (log.isTraceEnabled())
+						log.trace(name + " has dependencies: " + depends);
+
+					for (String iDependOn : depends) {
+						ServiceDependencyMetaData sdmd = new ServiceDependencyMetaData();
+						sdmd.setIDependOn(iDependOn);
+						dependencies.add(sdmd);
+					}
+				}
+				webModule.setDependencies(dependencies);
+
+				// Here's where a bit of magic happens. By attaching the
+				// ServiceMetaData
+				// to the deployment, we now make the deployment "relevant" to
+				// deployers that use ServiceMetaData as an input (e.g. the
+				// org.jboss.system.deployers.ServiceDeployer). Those deployers
+				// can now take over deploying the web module.
+
+				unit.addAttachment("WarServiceMetaData", webModule,
+						ServiceMetaData.class);
+			} catch (Exception e) {
+				throw DeploymentException.rethrowAsDeploymentException(
+						"Error creating rar deployment " + unit.getName(), e);
+			}
+		} else {
+			super.deployWebModule(unit, metaData, deployment);
+		}
 	}
 }

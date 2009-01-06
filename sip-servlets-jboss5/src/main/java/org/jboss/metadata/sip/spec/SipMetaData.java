@@ -78,7 +78,7 @@ public class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    private List<ParamValueMetaData> contextParams;
    private List<ListenerMetaData> listeners;
    private ServletSelectionMetaData servletSelection;
-   private ServletsMetaData servlets;
+   private ServletsMetaData sipServlets;
    private ProxyConfigMetaData proxyConfig;
    private SessionConfigMetaData sessionConfig;   
    private List<SipSecurityConstraintMetaData> sipSecurityContraints;
@@ -205,14 +205,14 @@ public class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
       this.sipLoginConfig = sipLoginConfig;
    }   
 
-   public ServletsMetaData getServlets()
+   public ServletsMetaData getSipServlets()
    {
-      return servlets;
+      return sipServlets;
    }
    @XmlElement(name="servlet")
-   public void setServlets(ServletsMetaData servlets)
+   public void setSipServlets(ServletsMetaData sipServlets)
    {
-      this.servlets = servlets;
+      this.sipServlets = sipServlets;
    }
    
    public List<SipSecurityConstraintMetaData> getSipSecurityContraints()
@@ -434,6 +434,7 @@ public void setApplicationName(String applicationName) {
 /**
  * @return the applicationName
  */
+@XmlElement(name="app-name")
 public String getApplicationName() {
 	return applicationName;
 }

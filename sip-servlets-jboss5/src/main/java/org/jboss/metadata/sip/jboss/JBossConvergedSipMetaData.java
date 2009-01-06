@@ -30,7 +30,6 @@ import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.web.jboss.JBossServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletsMetaData;
@@ -105,22 +104,16 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
       
       if(override != null && override.sipServlets!= null)
           setSipServlets(override.sipServlets);
-       else if(original != null && original.getServlets() != null)
-          setSipServlets(original.getServlets());
+       else if(original != null && original.getSipServlets() != null)
+          setSipServlets(original.getSipServlets());
 
-      JBossServletsMetaData soverride = null;
-      ServletsMetaData soriginal = null;
-      if(override != null)
-         soverride = override.getServlets();
-      if(original != null)
-         soriginal = original.getServlets();
-      setServlets(JBossServletsMetaData.merge(soverride, soriginal));
-      
-      List<ParamValueMetaData> mergedContextParams = new ArrayList<ParamValueMetaData>(sipContextParams);
-      if(override != null && override.getContextParams() != null) {
-    	  mergedContextParams.addAll(override.getContextParams());
-      }
-      setContextParams(mergedContextParams);
+      if(sipContextParams != null) {
+	      List<ParamValueMetaData> mergedContextParams = new ArrayList<ParamValueMetaData>(sipContextParams);
+	      if(override != null && override.getContextParams() != null) {
+	    	  mergedContextParams.addAll(override.getContextParams());
+	      }
+	      setContextParams(mergedContextParams);
+      }      
       
       //listeners should not be merged because they have a special treatment when loading the context
    }

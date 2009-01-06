@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="lib" path="lib/jboss-web-deployer-5.0.0.GA.jar"/>
-	<classpathentry kind="lib" path="lib/jboss-web-service-5.0.0.GA.jar"/>
+	<classpathentry kind="lib" path="lib/jboss-web-deployer-5.0.0.GA.jar" sourcepath="/home/deruelle/workspaces/JBoss_5_0_0_GA/tomcat/src/main"/>
+	<classpathentry kind="lib" path="lib/jboss-web-service-5.0.0.GA.jar" sourcepath="/home/deruelle/workspaces/JBoss_5_0_0_GA/tomcat/src/main"/>
 	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6/antlr-2.7.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/apache-avalon/avalon-framework/4.1.5/avalon-framework-4.1.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/apache-httpclient/commons-httpclient/2.0.2/commons-httpclient-2.0.2.jar"/>
@@ -32,7 +32,7 @@
 	<classpathentry kind="var" path="M2_REPO/jboss/jboss-test/1.0.3.GA/jboss-test-1.0.3.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jboss/jbossws/jboss-jaxws/3.0.1-native-2.0.4.GA/jboss-jaxws-3.0.1-native-2.0.4.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jboss/profiler/jvmti/jboss-profiler-jvmti/1.0.0.CR5/jboss-profiler-jvmti-1.0.0.CR5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/jboss/web/jbossweb/2.1.1.GA/jbossweb-2.1.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jboss/web/jbossweb/2.1.1.GA/jbossweb-2.1.1.GA.jar" sourcepath="/JBOSS-5/jbossweb/java"/>
 	<classpathentry kind="var" path="M2_REPO/jgroups/jgroups/2.6.7.GA/jgroups-2.6.7.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jpl-pattern/jpl-pattern/1.0/jpl-pattern-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jpl-util/jpl-util/1.0/jpl-util-1.0.jar"/>
@@ -128,7 +128,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system/5.0.0.GA/jboss-as-system-5.0.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-tomcat/5.0.0.GA/jboss-as-tomcat-5.0.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-server-manager/1.0.0.GA/jboss-server-manager-1.0.0.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossxb/2.0.0.GA/jbossxb-2.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossxb/2.0.0.GA/jbossxb-2.0.0.GA.jar" sourcepath="/JBOSS-5/jbossxb/src"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jpa/jboss-jpa-deployers/1.0.0-Beta2/jboss-jpa-deployers-1.0.0-Beta2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-log4j/2.0.5.GA/jboss-logging-log4j-2.0.5.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-spi/2.0.5.GA/jboss-logging-spi-2.0.5.GA.jar"/>

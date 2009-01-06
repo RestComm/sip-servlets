@@ -28,9 +28,15 @@ import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.naming.NamingException;
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
@@ -56,6 +62,8 @@ import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
@@ -888,4 +896,73 @@ public class SipStandardContext extends StandardContext implements SipContext {
         }
         
     }
+
+	public void enterSipApp(SipServletRequestImpl request,
+			SipServletResponseImpl response, SipManager manager,
+			boolean startCacheActivity, boolean bindSessions) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void exitSipApp() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean notifySipServletsListeners() {
+		boolean ok = true;
+		
+		List<SipServletListener> sipServletListeners = listeners.getSipServletsListeners();
+		if(logger.isDebugEnabled()) {
+			logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+		}
+		Container[] children = findChildren();
+		if(logger.isDebugEnabled()) {
+			logger.debug(children.length + " container to notify of servlet initialization");
+		}
+		enterSipApp(null, null, null, true, false);
+		try {
+			for (Container container : children) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
+				}
+				if(container instanceof Wrapper) {			
+					Wrapper wrapper = (Wrapper) container;
+					Servlet sipServlet = null;
+					try {
+						sipServlet = wrapper.allocate();
+						if(sipServlet instanceof SipServlet) {
+							SipServletContextEvent sipServletContextEvent = 
+								new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
+							for (SipServletListener sipServletListener : sipServletListeners) {					
+								sipServletListener.servletInitialized(sipServletContextEvent);					
+							}
+						}					
+					} catch (ServletException e) {
+						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
+								"that it has been initialized", e);
+						ok = false; 
+					} catch (Throwable e) {
+						logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
+						ok = false; 
+					} 
+					try {
+						if(sipServlet != null) {
+							wrapper.deallocate(sipServlet);
+						}
+					} catch (ServletException e) {
+			            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+			            ok = false;
+					} catch (Throwable e) {
+						logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+			            ok = false;
+					}
+				}
+			}
+		} finally {
+			exitSipApp();
+		}
+		return ok;
+	}
+	
 }

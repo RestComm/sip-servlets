@@ -94,7 +94,7 @@ public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<
       // Set the merged as the output
       unit.getTransientManagedObjects().addAttachment(JBossConvergedSipMetaData.class, mergedMetaData);
       // Keep the raw parsed metadata as well
-      unit.addAttachment("Raw"+JBossConvergedSipMetaData.class.getName(), metaData, JBossConvergedSipMetaData.class);
+      unit.addAttachment("Raw"+JBossConvergedSipMetaData.class.getName(), mergedMetaData, JBossConvergedSipMetaData.class);
    }
 
    /**
@@ -109,6 +109,13 @@ public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<
       WebMetaData wmd = unit.getTransientManagedObjects().getAttachment(WebMetaData.class);
       SipMetaData smd = unit.getTransientManagedObjects().getAttachment(SipMetaData.class);
       JBossConvergedSipMetaData result = unit.getTransientManagedObjects().getAttachment(getOutput());
+      if (result == null && wmd != null && smd != null)
+      {
+         result = new JBossConvergedSipMetaData();
+         result.merge(null, wmd);
+         result.merge(wmd, smd);
+         unit.getTransientManagedObjects().addAttachment(key, result, getOutput());
+      }
       if (result == null && wmd != null)
       {
          result = new JBossConvergedSipMetaData();

@@ -9,23 +9,24 @@ import javax.xml.bind.annotation.XmlType;
 import org.jboss.xb.annotations.JBossXmlSchema;
 
 /**
- * Web application spec metadata.
+ * Sip application spec metadata.
  *
- * @author Scott.Stark@jboss.org
+ * @author jean.deruelle@gmail.com
  * @version $Revision$
  */
 @XmlRootElement(name="sip-app", namespace="http://www.jcp.org/xml/ns/sipservlet")
 @JBossXmlSchema(
-      xmlns={@XmlNs(namespaceURI = "http://www.jcp.org/xml/ns/sipservlet", prefix = "sipservlet")},
+      xmlns={
+    		  @XmlNs(namespaceURI = "http://www.jcp.org/xml/ns/sipservlet", prefix = "sipservlet"), 
+    		  @XmlNs(namespaceURI = "http://java.sun.com/xml/ns/javaee", prefix = "javaee")
+      },      
       ignoreUnresolvedFieldOrClass=false,
       namespace="http://www.jcp.org/xml/ns/sipservlet",
       elementFormDefault=XmlNsForm.QUALIFIED,
-      normalizeSpace=true)
-//      strict=false)
+      normalizeSpace=true,
+      strict=false)
 @XmlType(name="sip-appType",
-      namespace="http://www.jcp.org/xml/ns/sipservlet",
-      propOrder={"descriptionGroup", "distributable", "contextParams", "listeners", "servletSelection", "servlets",
-      "proxyConfig", "sessionConfig", "sipSecurityContraints", "sipLoginConfig", "securityRoles", "jndiEnvironmentRefsGroup", "messageDestinations", "localEncodings"})
+      namespace="http://www.jcp.org/xml/ns/sipservlet")
 public class Sip11MetaData extends SipMetaData
 {
    private static final long serialVersionUID = 1;
