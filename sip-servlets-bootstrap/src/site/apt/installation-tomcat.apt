@@ -12,20 +12,6 @@ Installation Instructions
 	
 	Run <<<mvn clean install>>> from the project root
 	
-	Open the project with Eclipse,
-	You need to add the M2_REPO variable so that eclipse can locate the jar files.
-	to do that right click on the project name, click on properties,
-	go to 'java build path'
-	Click on Libraries Tab, then on 'Add Variable' button
-	On the dialog popup, click on 'Configure variables' button
-	on the new popup, click on 'New' button
-	on the new popup(what a popup mess :-)), 
-	enter M2_REPO for the name input field 
-	and <your user directory>/.m2/repository for the value.
-	on windows <your user directory> shall be replaced by C:/Documents and Settings/Ranga by example.
-	Then OK to all and close all remaining popups. This should compile without errors
-	if it behaves otherwise mail me to jean.deruelle@gmail.com
-	
 	To run the sip servlet container :
 	check that the following files have been copied during the mvn clean install
 	

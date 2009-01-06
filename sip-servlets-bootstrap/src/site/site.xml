@@ -12,7 +12,8 @@
 			<item name="User Guide" href="http://hudson.jboss.org/hudson/job/MobicentsDocumentation/lastSuccessfulBuild/artifact/html_single/index.html#chapter-Mobicents_SIP_Servlets_Server"/>				
 			<item name="Installation" href="installation.html" collapse="true">
 				<item name="Tomcat Installation" href="installation-tomcat.html" />
-				<item name="Jboss Installation" href="installation-jboss.html" />
+				<item name="Jboss AS 4.x Installation" href="installation-jboss.html" />
+				<item name="Jboss AS 5.x Installation" href="installation-jboss-5.html" />
 			</item>
 			<item name="Configuration" href="configuration.html" />
 			<item name="Roadmap" href="roadmap.html" />
