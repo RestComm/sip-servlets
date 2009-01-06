@@ -41,8 +41,6 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -79,34 +77,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			//should not be treated as expired.
 			if(expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) <= 0) {
 				setExpired(true);
-				boolean isDistributable = sipContext.getDistributable();
-				if(isDistributable) {
-					ConvergedSessionReplicationContext.enterSipapp(null, null, true);
-				}
+				sipContext.enterSipApp(null, null, null, true, false);
 				try {
 					invalidate();
 				} finally {
-					if (isDistributable) {
-						if(logger.isInfoEnabled()) {
-							logger.info("We are now after the servlet invocation, We replicate no matter what");
-						}
-						try {
-							ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-									.exitSipapp();
-			
-							if(logger.isInfoEnabled()) {
-								logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-							}
-							if (ctx.getSoleSnapshotManager() != null) {
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipSession());
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipApplicationSession());
-							} 
-						} finally {
-							ConvergedSessionReplicationContext.finishSipCacheActivity();
-						}
-					}
+					sipContext.exitSipApp();
 				}
 			}
 		}

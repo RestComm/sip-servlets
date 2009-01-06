@@ -21,8 +21,6 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
-import javax.servlet.sip.SipURI;
-import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
@@ -35,8 +33,6 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -50,7 +46,6 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -176,10 +171,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
 			public void dispatch() throws DispatcherException {
-				final boolean isDistributable = sipContext.getDistributable();
-				if(isDistributable) {
-					ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipServletRequest, null, sipManager, true);
-				}
+				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
 				try {
 					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					// JSR 289 Section 6.2.1 :
@@ -240,27 +232,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
 					} 	 
 				} finally {
-					if (isDistributable) {
-						if(logger.isInfoEnabled()) {
-							logger.info("We are now after the servlet invocation, We replicate no matter what");
-						}
-						try {
-							ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-									.exitSipapp();
-
-							if(logger.isInfoEnabled()) {
-								logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-							}
-							if (ctx.getSoleSnapshotManager() != null) {
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipApplicationSession());
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipSession());								
-							} 
-						} finally {
-							ConvergedSessionReplicationContext.finishSipCacheActivity();
-						}
-					}
+					sipContext.exitSipApp();
 				}
 				
 				//if a final response has been sent, or if the request has 

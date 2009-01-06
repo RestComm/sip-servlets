@@ -32,8 +32,6 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -167,10 +165,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
 
 				public void dispatch() throws DispatcherException {
-					final boolean isDistributable = sipContext.getDistributable();
-					if(isDistributable) {
-						ConvergedSessionReplicationContext.enterSipappAndBindSessions(null, sipServletResponse, sipManager, true);
-					} 
+					sipContext.enterSipApp(null, sipServletResponse, sipManager, true, true);
 					try {
 						try {
 							session.setSessionCreatingTransaction(clientTransaction);
@@ -226,26 +221,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						}
 					} finally {
-						if (isDistributable) {
-							if(logger.isInfoEnabled()) {
-								logger.info("We are now after the servlet invocation, We replicate no matter what");
-							}
-							try {
-								ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-								.exitSipapp();
-								if(logger.isInfoEnabled()) {
-									logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-								}
-								if (ctx.getSoleSnapshotManager() != null) {									
-									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-											ctx.getSoleSipApplicationSession());
-									((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-											ctx.getSoleSipSession());
-								} 
-							} finally {
-								ConvergedSessionReplicationContext.finishSipCacheActivity();
-							}
-						}
+						sipContext.exitSipApp();
 					}
 				}
 			};

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.TimerService;
 
 import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
@@ -28,6 +30,9 @@ import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.message.SipFactoryFacade;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
@@ -121,4 +126,16 @@ public interface SipContext extends Context {
 	String getEngineName();
 
 	String getBasePath();
+	
+	boolean notifySipServletsListeners();
+	
+	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions);
+	
+	void exitSipApp();
+	
+	SipFactoryFacade getSipFactoryFacade();
+	
+	SipSessionsUtil getSipSessionsUtil();
+	
+	TimerService getTimerService();
 }

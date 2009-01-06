@@ -43,8 +43,6 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
@@ -226,10 +224,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
 			public void dispatch() throws DispatcherException {
-				final boolean isDistributable = sipContext.getDistributable();
-				if(isDistributable) {
-					ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipServletRequest, null, sipManager, true);
-				}
+				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
 				try {
 					sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					
@@ -290,29 +285,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following initial request " + request, e);
 					}
 				} finally {
-					if (isDistributable) {
-						if(logger.isInfoEnabled()) {
-							logger.info("We are now after the servlet invocation, We replicate no matter what");
-						}
-						try {
-							ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-									.exitSipapp();
-
-							if(logger.isInfoEnabled()) {
-								logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-								logger.info("Snapshot Sole Sip Session" + ctx.getSoleSipSession());
-								logger.info("Snapshot Sole Sip App Session " + ctx.getSoleSipApplicationSession());
-							}
-							if (ctx.getSoleSnapshotManager() != null) {
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipApplicationSession());
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipSession());								
-							} 
-						} finally {
-							ConvergedSessionReplicationContext.finishSipCacheActivity();
-						}
-					}
+					sipContext.exitSipApp();
 				}
 				//if a final response has been sent, or if the request has 
 				//been proxied or relayed we stop routing the request

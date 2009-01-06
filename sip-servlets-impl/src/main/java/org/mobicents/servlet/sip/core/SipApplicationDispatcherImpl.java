@@ -39,13 +39,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
-import javax.servlet.sip.SipServlet;
-import javax.servlet.sip.SipServletContextEvent;
-import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
@@ -77,14 +72,10 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
-import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -95,7 +86,6 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
@@ -244,94 +234,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		resetOutboundInterfaces();
 		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
 		for (SipContext sipContext : applicationDeployed.values()) {
-			notifySipServletsListeners(sipContext);
+			sipContext.notifySipServletsListeners();
 		}		
-	}
-	
-	/**
-	 * Notifies the sip servlet listeners that the servlet has been initialized
-	 * and that it is ready for service
-	 * @param sipContext the sip context of the application where the listeners reside.
-	 * @return true if all listeners have been notified correctly
-	 */
-	private static boolean notifySipServletsListeners(SipContext sipContext) {
-		boolean ok = true;
-		SipListenersHolder sipListenersHolder = sipContext.getListeners();
-		List<SipServletListener> sipServletListeners = sipListenersHolder.getSipServletsListeners();
-		if(logger.isDebugEnabled()) {
-			logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
-		}
-		Container[] children = sipContext.findChildren();
-		if(logger.isDebugEnabled()) {
-			logger.debug(children.length + " container to notify of servlet initialization");
-		}
-		final boolean isDistributable = sipContext.getDistributable();
-		if(isDistributable) {
-			ConvergedSessionReplicationContext.enterSipapp(null, null, true);
-		}
-		try {
-			for (Container container : children) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
-				}
-				if(container instanceof Wrapper) {			
-					Wrapper wrapper = (Wrapper) container;
-					Servlet sipServlet = null;
-					try {
-						sipServlet = wrapper.allocate();
-						if(sipServlet instanceof SipServlet) {
-							SipServletContextEvent sipServletContextEvent = 
-								new SipServletContextEvent(sipContext.getServletContext(), (SipServlet)sipServlet);
-							for (SipServletListener sipServletListener : sipServletListeners) {					
-								sipServletListener.servletInitialized(sipServletContextEvent);					
-							}
-						}					
-					} catch (ServletException e) {
-						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
-								"that it has been initialized", e);
-						ok = false; 
-					} catch (Throwable e) {
-						logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
-						ok = false; 
-					} 
-					try {
-						if(sipServlet != null) {
-							wrapper.deallocate(sipServlet);
-						}
-					} catch (ServletException e) {
-			            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-			            ok = false;
-					} catch (Throwable e) {
-						logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-			            ok = false;
-					}
-				}
-			}
-		} finally {
-			if (isDistributable) {
-				if(logger.isInfoEnabled()) {
-					logger.info("We are now after the servlet invocation, We replicate no matter what");
-				}
-				try {
-					ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-							.exitSipapp();
-	
-					if(logger.isInfoEnabled()) {
-						logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-					}
-					if (ctx.getSoleSnapshotManager() != null) {
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipSession());
-						((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-								ctx.getSoleSipApplicationSession());
-					} 
-				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
-				}
-			}
-		}
-		return ok;
-	}
+	}	
 	
 	/**
 	 * {@inheritDoc}
@@ -368,7 +273,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		//otherwise the notification will be delayed until the ApplicationDispatcher has started
 		synchronized (started) {
 			if(started) {
-				notifySipServletsListeners(sipApplication);
+				sipApplication.notifySipServletsListeners();
 			}
 		}
 		if(logger.isInfoEnabled()) {
@@ -674,10 +579,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			SipContext sipContext = findSipApplication(sipSessionImpl.getKey().getApplicationName());
 			//the context can be null if the server is being shutdown
 			if(sipContext != null) {		
-				boolean isDistributable = sipContext.getDistributable();
-				if(isDistributable) {
-					ConvergedSessionReplicationContext.enterSipapp(null, null, true);
-				}
+				sipContext.enterSipApp(null, null, null, true, false);
 				try {
 					if(logger.isInfoEnabled()) {
 						logger.info("session " + sipSessionImpl.getId() + " is valid ? :" + sipSessionImpl.isValid());
@@ -695,27 +597,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						sipApplicationSession.tryToInvalidate();
 					}
 				} finally {
-					if (isDistributable) {
-						if(logger.isInfoEnabled()) {
-							logger.info("We are now after the servlet invocation, We replicate no matter what");
-						}
-						try {
-							ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-									.exitSipapp();
-			
-							if(logger.isInfoEnabled()) {
-								logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
-							}
-							if (ctx.getSoleSnapshotManager() != null) {
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipSession());
-								((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-										ctx.getSoleSipApplicationSession());
-							} 
-						} finally {
-							ConvergedSessionReplicationContext.finishSipCacheActivity();
-						}
-					}
+					sipContext.exitSipApp();
 				}
 			}
 		}
