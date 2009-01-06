@@ -5,10 +5,6 @@
 	<display-name>Simple Sip Servlet</display-name>
 	<description>Simple Sip Servlet</description>
 	
-	<main-servlet>
-		SimpleSipServlet
-	</main-servlet>
-
 	<servlet>
 		<servlet-name>SimpleSipServlet</servlet-name>
 		<display-name>SimpleSipServlet</display-name>

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<sip-app>
+<!--sip-app xmlns="http://www.jcp.org/xml/ns/sipservlet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.jcp.org/xml/ns/sipservlet http://www.jcp.org/xml/ns/sipservlet/sip-app_1_1.xsd"
+	xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	version="1.1"-->
+<sip-app>	      
 	<app-name>org.mobicents.servlet.sip.example.CallBlockingApplication</app-name>
-	<display-name>Call Blocking Sip Servlet</display-name>
-	<description>Call Blocking Sip Servlet</description>
-	
-	<main-servlet>
-		CallBlockingSipServlet
-	</main-servlet>
 
+	<!--<servlet-selection>
+		<main-servlet>
+			CallBlockingSipServlet
+		</main-servlet>
+	</servlet-selection>-->
+	
 	<servlet>
 		<servlet-name>CallBlockingSipServlet</servlet-name>
-		<display-name>CallBlockingSipServlet</display-name>
-		<description>Call Blocking SIP servlet</description>
-		<servlet-class>
-			org.mobicents.servlet.sip.example.CallBlockingSipServlet
-		</servlet-class>
+		<servlet-class>org.mobicents.servlet.sip.example.CallBlockingSipServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-	</servlet>	
+	</servlet>
 </sip-app>
