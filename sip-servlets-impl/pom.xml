@@ -75,87 +75,7 @@
 			<artifactId>coyote</artifactId>
 			<version>6.0.14</version>
 			<scope>provided</scope>
-		</dependency>		
-		
-		<!-- JBoss dependencies -->
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jbossweb-service</artifactId>
-			<version>${jboss.version}</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/jbossweb-service-4.2.3.GA.jar</systemPath>
-		</dependency>
-		
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss</artifactId>
-			<version>${jboss.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-system</artifactId>
-			<version>${jboss.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-jmx</artifactId>
-			<version>${jboss.version}</version>
-			<scope>provided</scope>
-		</dependency>
-	
-		<dependency>
-			<groupId>jboss.common</groupId>
-			<artifactId>jboss-common</artifactId>
-			<version>1.2.1.GA</version>
-			<scope>provided</scope>
-		</dependency>
-				
-		
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jbosssx</artifactId>
-			<version>${jboss.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		  
-		<dependency>
-			<groupId>org.jboss.aop</groupId>
-			<artifactId>jboss-aop-aspects</artifactId>
-			<version>2.0.0.CR14</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<!-- clustering deps -->
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-cache</artifactId>
-			<version>1.4.1.SP5</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>jgroups</groupId>
-			<artifactId>jgroups</artifactId>
-			<version>2.4.1</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<version>1.0.1B</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-j2ee-jacc</artifactId>
-			<version>1.0-rc4</version>
-		</dependency>
+		</dependency>									
 		
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
@@ -283,7 +203,7 @@
 			</build>
 		</profile>		
 		<profile>		
-			<id>jboss</id>			
+			<id>jboss</id>						
 			<build>			
 				<plugins>
 					<plugin>
