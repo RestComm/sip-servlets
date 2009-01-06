@@ -289,38 +289,38 @@
                <key>sip-app_1_1.xsd</key>
                <value>org.jboss.metadata.sip.spec.Sip11MetaData</value>
             </entry>
-	    	<entry>
+	    	    <entry>
                <key>sip-app</key>
-               <value>org.jboss.metadata.sip.spec.Sip11MetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBossSip11MetaData</value>
             </entry>
             <!-- JBossWebMetaData -->
             <entry>
                <key>jboss-web</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50DTDConvergedSipMetaData</value>
             </entry>
             <entry>
                <key>jboss-web_3_0.dtd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50DTDConvergedSipMetaData</value>
             </entry>
             <entry>
                <key>jboss-web_3_2.dtd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50DTDConvergedSipMetaData</value>
             </entry>
             <entry>
                <key>jboss-web_4_0.dtd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50DTDConvergedSipMetaData</value>
             </entry>
             <entry>
                <key>jboss-web_4_2.dtd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50DTDConvergedSipMetaData</value>
             </entry>
             <entry>
                <key>jboss-web_5_0.dtd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50DTDConvergedSipMetaData</value>
             </entry>
             <entry>
                <key>jboss-web_5_0.xsd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50WebMetaData</value>
+               <value>org.jboss.metadata.sip.jboss.JBoss50ConvergedSipMetaData</value>
             </entry>
             <!-- PersistenceMetaData -->
             <entry>

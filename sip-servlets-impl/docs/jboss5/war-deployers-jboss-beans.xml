@@ -25,12 +25,12 @@ $Id:$
    <bean name="SipAppParsingDeployer" class="org.jboss.deployment.SipAppParsingDeployer">
       <property name="relativeOrder">2000</property>
    </bean>
-   <bean name="JBossWebAppParsingDeployer" class="org.jboss.deployment.JBossWebAppParsingDeployer">
+   <!--bean name="JBossWebAppParsingDeployer" class="org.jboss.deployment.JBossWebAppParsingDeployer">
       <property name="relativeOrder">2001</property>
-   </bean>
-   <!--bean name="JBossConvergedSipAppParsingDeployer" class="org.jboss.deployment.JBossConvergedSipAppParsingDeployer">
+   </bean-->
+   <bean name="JBossConvergedSipAppParsingDeployer" class="org.jboss.deployment.JBossConvergedSipAppParsingDeployer">
       <property name="relativeOrder">2001</property>
-   </bean-->   
+   </bean>   
 
   <!-- See JBAS-6062 -->
    <bean name="WebXmlLessDeployer" class="org.jboss.deployment.LegacyWebXmlLessDeployer"/>
@@ -127,7 +127,7 @@ $Id:$
       
    </bean>
 
-   <!-- The WebMetaData to service mbean deployer -->
+   <!-- The WebMetaData to service mbean deployer org.jboss.web.tomcat.service.deployers.TomcatDeployer org.mobicents.servlet.sip.startup.jboss.TomcatConvergedDeployer-->
    <bean name="WarDeployer" class="org.mobicents.servlet.sip.startup.jboss.TomcatConvergedDeployer">
       <install bean="ManagedDeploymentCreator" method="addAttachmentType">
          <parameter>
@@ -249,8 +249,8 @@ $Id:$
        <property name="securityContextClassName">org.jboss.security.plugins.JBossSecurityContext</property> 
    </bean>
    
-   <bean name="MergedJBossWebMetaDataDeployer" 
-          class="org.jboss.web.deployers.MergedJBossWebMetaDataDeployer">
+   <bean name="MergedJBossConvergedSipMetaDataDeployer" 
+          class="org.jboss.sip.deployers.MergedJBossConvergedSipMetaDataDeployer">
    </bean>
 
 </deployment>
