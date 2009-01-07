@@ -64,9 +64,9 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the simple sip servlet has been started");
 		super.init(servletConfig);
-		logger.info("SipFactory injected resource" + sipFactory);
-		logger.info("SipSessionsUtil injected resource" + sipSessionsUtil);
-		logger.info("TimerService injected resource" + timerService);
+		logger.info("SipFactory injected resource " + sipFactory);
+		logger.info("SipSessionsUtil injected resource " + sipSessionsUtil);
+		logger.info("TimerService injected resource " + timerService);
 		if(sipFactory == null || sipSessionsUtil == null || timerService == null) {
 			throw new ServletException("Impossible to get one of the annotated resource");
 		}
