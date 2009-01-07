@@ -89,7 +89,7 @@
     </property>
   </bean>
 
-   <bean name="AnnotationMetaDataDeployer" class="org.jboss.deployment.OptAnnotationMetaDataDeployer">
+   <bean name="AnnotationMetaDataDeployer" class="org.jboss.deployment.ConvergedSipAnnotationMetaDataDeployer">
       <property name="metaDataCompleteIsDefault">false</property>
    </bean>
 
