@@ -34,7 +34,6 @@ import javax.management.Attribute;
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
@@ -52,14 +51,13 @@ import org.jboss.web.WebApplication;
 import org.jboss.web.tomcat.security.JaccContextValve;
 import org.jboss.web.tomcat.security.RunAsListener;
 import org.jboss.web.tomcat.security.SecurityAssociationValve;
-import org.jboss.web.tomcat.service.TomcatInjectionContainer;
+import org.jboss.web.tomcat.service.TomcatConvergedSipInjectionContainer;
 import org.jboss.web.tomcat.service.session.AbstractJBossManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipNamingContextListener;
 import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
-import org.mobicents.servlet.sip.startup.jboss.TomcatConvergedDeployer;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -110,7 +108,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		StandardContext context = (StandardContext) Class.forName(
 				config.getContextClassName()).newInstance();
 
-		TomcatInjectionContainer injectionContainer = new TomcatInjectionContainer(
+		TomcatConvergedSipInjectionContainer injectionContainer = new TomcatConvergedSipInjectionContainer(
 				webApp, webApp.getDeploymentUnit(), context,
 				getPersistenceUnitDependencyResolver());
 
@@ -401,179 +399,50 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		public void lifecycleEvent(LifecycleEvent event) {
 			super.lifecycleEvent(event);
 			if (event.getType().equals(StandardContext.AFTER_START_EVENT)) {
-				boolean isSipServletApp = TomcatConvergedDeployer.isSipServletApplication(unit);
-				if(isSipServletApp) {
-					JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) metaData ;
-					Thread currentThread = Thread.currentThread();
-		            ClassLoader currentLoader = currentThread.getContextClassLoader();
-					currentThread.setContextClassLoader(webLoader.getClassLoader());
-					try {
-						InitialContext iniCtx = new InitialContext();
-			            Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-			            if (log.isDebugEnabled()) {
-							log
-									.debug("Sip Objects made available to global JNDI under following context : java:sip/"
-											+ convergedMetaData.getApplicationName() + "/<ObjectName>");
-						}						
-												
-						Context sipSubcontext = envCtx.createSubcontext(SipNamingContextListener.SIP_SUBCONTEXT);
-						Context applicationNameSubcontext = sipSubcontext.createSubcontext(convergedMetaData.getApplicationName());						
-						
-						SipContext sipContext = (SipContext) event.getSource();
-						SipFactoryFacade sipFactoryFacade = (SipFactoryFacade) sipContext.getSipFactoryFacade();
-						TimerService timerService = (TimerService) sipContext.getTimerService();
-						SipSessionsUtil sipSessionsUtil = (SipSessionsUtil) sipContext.getSipSessionsUtil();
-						
-						NonSerializableFactory.rebind(
+				JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) metaData ;
+				Thread currentThread = Thread.currentThread();
+	            ClassLoader currentLoader = currentThread.getContextClassLoader();
+				currentThread.setContextClassLoader(webLoader.getClassLoader());
+				try {
+					InitialContext iniCtx = new InitialContext();
+		            Context envCtx = (Context) iniCtx.lookup("java:comp/env");		            																
+					Context sipSubcontext = envCtx.createSubcontext(SipNamingContextListener.SIP_SUBCONTEXT);
+					Context applicationNameSubcontext = sipSubcontext.createSubcontext(convergedMetaData.getApplicationName());						
+					
+					SipContext sipContext = (SipContext) event.getSource();
+					SipFactoryFacade sipFactoryFacade = (SipFactoryFacade) sipContext.getSipFactoryFacade();
+					TimerService timerService = (TimerService) sipContext.getTimerService();
+					SipSessionsUtil sipSessionsUtil = (SipSessionsUtil) sipContext.getSipSessionsUtil();
+					
+					NonSerializableFactory.rebind(
+								applicationNameSubcontext,
+								SipNamingContextListener.SIP_FACTORY_JNDI_NAME,
+								sipFactoryFacade);
+					 
+					NonSerializableFactory
+							.rebind(
 									applicationNameSubcontext,
-									SipNamingContextListener.SIP_FACTORY_JNDI_NAME,
-									sipFactoryFacade);
-						 
-						NonSerializableFactory
-								.rebind(
-										applicationNameSubcontext,
-										SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME,
-										sipSessionsUtil);
-						NonSerializableFactory
-								.rebind(
-										applicationNameSubcontext,
-										SipNamingContextListener.TIMER_SERVICE_JNDI_NAME,
-										timerService);
-						if (log.isDebugEnabled()) {
-							log
-									.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
-											+ convergedMetaData.getApplicationName() + "/<ObjectName>");
-						}
-		            }
-		            catch (Throwable t) {
-		               log.error("ENC setup failed", t);
-		               throw new RuntimeException(t);
-		            }
-		            finally {
-		               currentThread.setContextClassLoader(currentLoader);		               		              
-		            }		            
-				}
+									SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME,
+									sipSessionsUtil);
+					NonSerializableFactory
+							.rebind(
+									applicationNameSubcontext,
+									SipNamingContextListener.TIMER_SERVICE_JNDI_NAME,
+									timerService);
+					if (log.isDebugEnabled()) {
+						log
+								.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
+										+ convergedMetaData.getApplicationName() + "/<ObjectName>");
+					}
+	            }
+	            catch (Throwable t) {
+	               log.error("ENC setup failed", t);
+	               throw new RuntimeException(t);
+	            }
+	            finally {
+	               currentThread.setContextClassLoader(currentLoader);		               		              
+	            }		            
 			}
 		}
 	}
-	
-	// @Override
-	// protected void performDeployInternal(String hostName,
-	// WebApplication appInfo, String warUrl,
-	// AbstractWebContainer.WebDescriptorParser webAppParser) throws Exception {
-	//		
-	// super.performDeployInternal(hostName, appInfo, warUrl, webAppParser);
-	//
-	// if(log.isDebugEnabled()) {
-	// log.debug("Context class name : " + config.getContextClassName() +
-	// " for context " + appInfo.getMetaData().getContextRoot());
-	// }
-	// if(config.getContextClassName().equals(SipHostConfig.SIP_CONTEXT_CLASS))
-	// {
-	// String objectNameS = config.getCatalinaDomain()
-	// + ":j2eeType=WebModule,name=//" +
-	// ((hostName == null) ? "localhost" : hostName)
-	// + appInfo.getMetaData().getContextRoot() +
-	// ",J2EEApplication=none,J2EEServer=none";
-	//			
-	// ObjectName objectName = new ObjectName(objectNameS);
-	//			
-	// String applicationName = (String) server.invoke(objectName,
-	// "getApplicationName", new Object[]{}, new String[]{});
-	// SipFactory sipFactoryFacade = (SipFactory) server.invoke(objectName,
-	// "getSipFactoryFacade", new Object[]{}, new String[]{});
-	// TimerService timerService = (TimerService) server.invoke(objectName,
-	// "getTimerService", new Object[]{}, new String[]{});
-	// SipSessionsUtil sipSessionsUtil = (SipSessionsUtil)
-	// server.invoke(objectName, "getSipSessionsUtil", new Object[]{}, new
-	// String[]{});
-	//					
-	// InitialContext iniCtx = new InitialContext();
-	// Context globalEnvCtx = (Context) iniCtx.lookup("java:/");
-	// Context sipSubcontext =
-	// Util.createSubcontext(globalEnvCtx,SipNamingContextListener.SIP_SUBCONTEXT);
-	// Context applicationNameSubcontext =
-	// Util.createSubcontext(sipSubcontext,applicationName);
-	// NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.SIP_FACTORY_JNDI_NAME,
-	// sipFactoryFacade);
-	// NonSerializableFactory.rebind(applicationNameSubcontext,
-	// SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
-	// NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME,
-	// timerService);
-	// if(log.isDebugEnabled()) {
-	// log.debug("Sip Objects made available to global JNDI under following context : java:sip/"
-	// + applicationName + "/<ObjectName>");
-	// }
-	// Thread currentThread = Thread.currentThread();
-	// ClassLoader currentLoader = currentThread.getContextClassLoader();
-	// ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	// ClassLoader parent = loader.getParent();
-	// while (parent != null) {
-	// parent = parent.getParent();
-	// }
-	// currentThread.setContextClassLoader(loader);
-	// appInfo.getMetaData().setENCLoader(loader);
-	// Context envCtx = (Context) iniCtx.lookup("java:comp/env");
-	// currentThread.setContextClassLoader(currentLoader);
-	// sipSubcontext =
-	// Util.createSubcontext(envCtx,SipNamingContextListener.SIP_SUBCONTEXT);
-	// applicationNameSubcontext =
-	// Util.createSubcontext(sipSubcontext,applicationName);
-	// NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.SIP_FACTORY_JNDI_NAME,
-	// sipFactoryFacade);
-	// NonSerializableFactory.rebind(applicationNameSubcontext,
-	// SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
-	// NonSerializableFactory.rebind(applicationNameSubcontext,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME,
-	// timerService);
-	// if(log.isDebugEnabled()) {
-	// log.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
-	// + applicationName + "/<ObjectName>");
-	// }
-	// }
-	// }
-	//	
-	// @Override
-	// protected void performUndeployInternal(String hostName, String warUrl,
-	// WebApplication appInfo) throws Exception {
-	//		
-	// if(config.getContextClassName().equals(SipHostConfig.SIP_CONTEXT_CLASS))
-	// {
-	// // Removing the SipFatcory, SipSessionsUtil and TimerService for the
-	// current context being undeployed
-	// // from the global JNDI context for other JEE components
-	// // TODO fix this to make them disappear from the private ENC and not the
-	// global JNDI context
-	// String objectNameS = config.getCatalinaDomain()
-	// + ":j2eeType=WebModule,name=//" +
-	// ((hostName == null) ? "localhost" : hostName)
-	// + appInfo.getMetaData().getContextRoot() +
-	// ",J2EEApplication=none,J2EEServer=none";
-	//			
-	// ObjectName objectName = new ObjectName(objectNameS);
-	//			
-	// if(server.isRegistered(objectName)) {
-	//				
-	// String applicationName = (String) server.invoke(objectName,
-	// "getApplicationName", new Object[]{}, new String[]{});
-	//				
-	// try {
-	// InitialContext iniCtx = new InitialContext();
-	// Context applicationNameEnvCtx = (Context) iniCtx.lookup("java:/sip/" +
-	// applicationName);
-	// Util.unbind(applicationNameEnvCtx,SipNamingContextListener.SIP_FACTORY_JNDI_NAME);
-	// Util.unbind(applicationNameEnvCtx,
-	// SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME);
-	// Util.unbind(applicationNameEnvCtx,SipNamingContextListener.TIMER_SERVICE_JNDI_NAME);
-	// Context sipEnvCtx = (Context) iniCtx.lookup("java:/sip/");
-	// Util.unbind(sipEnvCtx, applicationName);
-	// } catch (OperationNotSupportedException onse) {
-	// log.warn("Could not remove the JNDI context java:/sip/" +
-	// applicationName);
-	// }
-	//				
-	// }
-	// }
-	//		
-	// super.performUndeployInternal(hostName, warUrl, appInfo);
-	// }
 }

@@ -144,7 +144,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			if(mainServlet != null && mainServlet.length() > 0) {
 				convergedContext.setMainServlet(mainServlet);
 				servletSelectionSet = true;
-			} else if(convergedMetaData.getServletSelection().getSipServletMappings().size() > 0) {
+			} else if(servletSelectionMetaData.getSipServletMappings() != null || servletSelectionMetaData.getSipServletMappings().size() > 0) {
 				servletSelectionSet = true;
 			}
 		}
@@ -186,6 +186,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 				convergedContext.addChild((SipServletImpl)wrapper);
 			}
 		}
+		convergedContext.setSipApplicationKeyMethod(convergedMetaData.getSipApplicationKeyMethod());
 		convergedContext.setWrapperClass(StandardWrapper.class.getName());
 	}
 

@@ -7,17 +7,16 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.sip.annotation.SipListener;
-import javax.servlet.sip.annotation.SipServlet;
 
-import org.jboss.metadata.annotation.creator.AbstractComponentProcessor;
+import org.jboss.metadata.annotation.creator.AbstractFinderUser;
 import org.jboss.metadata.annotation.creator.Processor;
 import org.jboss.metadata.annotation.creator.ProcessorUtils;
 import org.jboss.metadata.annotation.finder.AnnotationFinder;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 
-public class SipListenerProcessor extends AbstractComponentProcessor<ListenerMetaData>
-	implements Processor<ListenerMetaData, Class<?>> {	
+public class SipListenerProcessor extends AbstractFinderUser
+	implements Processor<SipMetaData, Class<?>> {	
 
 	public SipListenerProcessor(AnnotationFinder<AnnotatedElement> finder) {
 		super(finder);
@@ -40,26 +39,14 @@ public class SipListenerProcessor extends AbstractComponentProcessor<ListenerMet
 		if (annotation == null)
 			return null;
 
-		ListenerMetaData beanMetaData = create(beanClass, annotation);
-		return beanMetaData;
-	}
-
-	protected ListenerMetaData create(Class<?> beanClass,
-			SipListener annotation) {
-		return create(beanClass, annotation.applicationName(), annotation.description());
-	}
-
-	private ListenerMetaData create(Class<?> beanClass, String applicationName,
-			String description) {
-		
 		ListenerMetaData listenerMetaData = new ListenerMetaData();
-		listenerMetaData.setListenerClass(beanClass.getClass().getName());
+		listenerMetaData.setListenerClass(beanClass.getCanonicalName());
 		
 		return listenerMetaData;
-	}
+	}	
 
 	public Collection<Class<? extends Annotation>> getAnnotationTypes() {
-		return ProcessorUtils.createAnnotationSet(SipServlet.class);
+		return ProcessorUtils.createAnnotationSet(SipListener.class);
 	}
 
 

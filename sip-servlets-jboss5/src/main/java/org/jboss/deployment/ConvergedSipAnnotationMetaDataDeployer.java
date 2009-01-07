@@ -31,6 +31,7 @@ import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.metadata.annotation.creator.sip.Sip11MetaDataCreator;
 import org.jboss.metadata.annotation.finder.AnnotationFinder;
 import org.jboss.metadata.annotation.finder.DefaultAnnotationFinder;
+import org.jboss.metadata.sip.jboss.JBossSip11MetaData;
 import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.virtual.VirtualFile;
@@ -61,6 +62,8 @@ public class ConvergedSipAnnotationMetaDataDeployer extends
 		SipMetaData sipMetaData = unit.getAttachment(SipMetaData.class);
 		if (sipMetaData != null && sipMetaData instanceof Sip11MetaData) {
 			isComplete |= ((Sip11MetaData) sipMetaData).isMetadataComplete();
+		} else if (sipMetaData != null && sipMetaData instanceof JBossSip11MetaData) {
+			isComplete |= ((JBossSip11MetaData) sipMetaData).isMetadataComplete();
 		} else if (sipMetaData != null) {
 			// Any web.xml 2.4 or earlier deployment is metadata complete
 			isComplete = true;
@@ -98,7 +101,7 @@ public class ConvergedSipAnnotationMetaDataDeployer extends
 				classpath);
 		if (classes.size() > 0) {
 			AnnotationFinder<AnnotatedElement> finder = new DefaultAnnotationFinder<AnnotatedElement>();
-			if (sipMetaData != null)
+//			if (sipMetaData != null)
 				processSipMetaData(unit, finder, classes);			
 		}
 

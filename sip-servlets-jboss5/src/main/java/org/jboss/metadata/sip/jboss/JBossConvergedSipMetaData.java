@@ -21,8 +21,11 @@
  */
 package org.jboss.metadata.sip.jboss;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
@@ -51,7 +54,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private List<ParamValueMetaData> sipContextParams;
 	private List<ListenerMetaData> sipListeners;
 	private ServletsMetaData sipServlets;
-	
+	private Method sipApplicationKeyMethod;
 	
 	public void merge(JBossConvergedSipMetaData override, SipMetaData original)
 	{
@@ -114,6 +117,11 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	      }
 	      setContextParams(mergedContextParams);
       }      
+      
+      if(override != null && override.getSipApplicationKeyMethod()!= null)
+          setSipApplicationKeyMethod(override.getSipApplicationKeyMethod());
+       else if(original != null && original.getSipApplicationKeyMethod() != null)
+          setSipApplicationKeyMethod(original.getSipApplicationKeyMethod());
       
       //listeners should not be merged because they have a special treatment when loading the context
    }
@@ -224,5 +232,18 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	 */
 	public SessionConfigMetaData getSipSessionConfig() {
 		return sipSessionConfig;
+	}
+	
+	/**
+	 * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+	 */
+	public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
+		this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+	}
+	/**
+	 * @return the sipApplicationKeyMethod
+	 */
+	public Method getSipApplicationKeyMethod() {
+		return sipApplicationKeyMethod;
 	}
 }

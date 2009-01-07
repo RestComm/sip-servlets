@@ -70,11 +70,7 @@ public class Sip11MetaDataCreator extends AbstractCreator<SipMetaData>
    public Sip11MetaDataCreator(AnnotationFinder<AnnotatedElement> finder)
    {
       super(finder);
-      addProcessor(new SipComponentProcessor(finder));
-//      addProcessor(new SipServletProcessor(finder));
-//      addProcessor(new SipListenerProcessor(finder));
-//      addProcessor(new SipApplicationKeyProcessor(finder));
-//      addProcessor(new SipApplicationProcessor(finder));
+      addProcessor(new SipComponentProcessor(finder));      
    }
 
    public Sip11MetaData create(Collection<Class<?>> classes)

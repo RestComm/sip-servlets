@@ -29,6 +29,8 @@ import org.jboss.deployment.ConvergedSipAnnotationMetaDataDeployer;
 import org.jboss.metadata.ear.jboss.JBossAppMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
+import org.jboss.metadata.sip.spec.Sip11MetaData;
+import org.jboss.metadata.sip.spec.SipAnnotationMergedView;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.web.spec.AnnotationMergedView;
 import org.jboss.metadata.web.spec.Web25MetaData;
@@ -71,7 +73,7 @@ public class MergedJBossConvergedSipMetaDataDeployer extends
 	      WebMetaData specMetaData = unit.getAttachment(WebMetaData.class);
 	      SipMetaData specSipMetaData = unit.getAttachment(SipMetaData.class);
 	      JBossConvergedSipMetaData metaData = unit.getAttachment(JBossConvergedSipMetaData.class);
-	      if(specMetaData == null && metaData == null)
+	      if(specMetaData == null && metaData == null && specSipMetaData == null)
 	         return;
 
 	      // Check for an annotated view
@@ -88,6 +90,22 @@ public class MergedJBossConvergedSipMetaDataDeployer extends
 	         }
 	         else
 	            specMetaData = annotatedMetaData;
+	      }
+	      
+	      // Check for a sip annotated view
+	      String sipKey = ConvergedSipAnnotationMetaDataDeployer.SIP_ANNOTATED_ATTACHMENT_NAME;
+	      Sip11MetaData sipAnnotatedMetaData = unit.getAttachment(sipKey, Sip11MetaData.class);
+	      if(sipAnnotatedMetaData != null)
+	      {
+	         if(specSipMetaData != null)
+	         {
+	            Sip11MetaData specMerged = new Sip11MetaData();
+	            // TODO: JBMETA-7
+	            SipAnnotationMergedView.merge(specMerged, specSipMetaData, sipAnnotatedMetaData);
+	            specSipMetaData = specMerged;
+	         }
+	         else
+	            specSipMetaData = sipAnnotatedMetaData;
 	      }
 
 	      // Create a merged view

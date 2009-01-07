@@ -16,7 +16,7 @@ import org.jboss.xb.annotations.JBossXmlSchema;
  */
 @XmlRootElement(name="sip-app", namespace="")
 @JBossXmlSchema(
-      xmlns={@XmlNs(namespaceURI = "", prefix = "sipservlet")},
+      xmlns={@XmlNs(namespaceURI = "", prefix = "sipservlet"), @XmlNs(namespaceURI = "http://www.jcp.org/xml/ns/sipservlet", prefix = "sipservlet")},
       ignoreUnresolvedFieldOrClass=false,
       namespace="",
       elementFormDefault=XmlNsForm.UNSET,

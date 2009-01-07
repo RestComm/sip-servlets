@@ -21,6 +21,7 @@
  */
 package org.jboss.metadata.sip.spec;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -92,6 +93,7 @@ public class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    /** The message destinations */
    private MessageDestinationsMetaData messageDestinations;
 
+   private Method sipApplicationKeyMethod;
    /**
     * Callback for the DTD information
     * @param root
@@ -437,5 +439,19 @@ public void setApplicationName(String applicationName) {
 @XmlElement(name="app-name")
 public String getApplicationName() {
 	return applicationName;
+}
+/**
+ * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+ */
+@XmlTransient
+public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
+	this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+}
+/**
+ * @return the sipApplicationKeyMethod
+ */
+@XmlTransient
+public Method getSipApplicationKeyMethod() {
+	return sipApplicationKeyMethod;
 }
 }
