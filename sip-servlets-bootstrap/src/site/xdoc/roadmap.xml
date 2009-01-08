@@ -598,10 +598,10 @@
 			<subsection name="Planned Versions">																				
 				<subsection name="Version 0.8 - 01/01/2009">
 					<p>
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=347">
-						Port to JBoss AS 5 - Loading sip servlet and converged applications
+						Port to JBoss AS 5 - Loading pure sip servlet applications and converged SIP/HTTP applications
 						</a>
 						<br />													
 						<img src="orange.jpeg" />
@@ -679,6 +679,13 @@
 									Proxy bug for subsequent requests
 								</a>								
 							</li>	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=514">
+									Proxying subsequest INVITE overrides CSeq
+								</a>								
+							</li>
 							<li>
 								<img src="green.jpeg" />
 								<a

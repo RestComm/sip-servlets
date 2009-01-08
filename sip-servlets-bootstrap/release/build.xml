@@ -6,9 +6,12 @@
 	
 	<property name="mss.release.version" value="0.8-SNAPSHOT" />
 	<property name="mss.release.configurations" value="all,default" />
+	<property name="mss.release.jboss-5.profiles" value="default" />
 	
 	<property name="jboss.version" value="4.2.3.GA" />
+	<property name="jboss-5.version" value="5.0.0.GA" />
 	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
+	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />
 	
 	<property name="tomcat.version" value="6.0.14" />
 	<property name="tomcat.download.url" value="http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
@@ -18,9 +21,11 @@
 	
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
+	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	
 	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
+	<property name="jboss-5.home" value="${release.path}/jboss-${jboss-5.version}" />
 	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
 	<property name="embjopr.war" value="embedded-jopr.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
@@ -38,7 +43,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="release-tomcat,release-jboss,make-src-zip,clean" />
+	<target name="release" depends="release-tomcat,release-jboss,release-jboss-5,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	
@@ -92,7 +97,34 @@
 		
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
 		<antcall target="build-mobicents-sip-load-balancer"/>
-		<antcall target="make-final-zip-jboss" />
+		<antcall target="make-final-zip-jboss" />		
+		
+	</target>
+	
+	<target name="release-jboss-5" depends="extract-jboss-5">
+		<for delimiter="," param="jboss.config" list="${mss.release.jboss-5.profiles}">
+			<sequential>
+				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
+					<property name="jboss-5.home" value="${jboss-5.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>
+				<!-- Commented out because they don't run on JB5 yet -->
+				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server">
+					<property name="jboss.home" value="${jboss.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>
+				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
+					<property name="jboss.home" value="${jboss.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant-->
+			</sequential>
+		</for>
+		
+		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5.home}" />
+		<antcall target="build-mobicents-sip-load-balancer">
+			<param name="jboss.home" value="${jboss-5.home}"/>
+		</antcall>
+		<antcall target="make-final-zip-jboss-5" />
 		
 	</target>
 	
@@ -140,6 +172,45 @@
 		</condition>
 		
 		<antcall target="release-jboss-node-ha" />
+		
+	</target>
+	
+	<target name="release-jboss-5-node">
+		<mkdir dir="${jboss-5.home}/server/${jboss.config}/conf/dars" />
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		<copy file="${base.path}/mss-sip-stack-jboss.properties" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy file="${base.path}/server-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />		
+		<copy file="${base.path}/jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
+		<copy file="${base.path}/metadata-deployer-jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy file="${base.path}/war-deployers-jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+		</exec>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>
+				
+		<antcall target="deploy-mgmnt" >
+			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
+		</antcall>
+		
+		<!--antcall target="build-mobicents-jopr-plugin" /-->
+		
+		<!--condition property="ha.capable">
+			<or>
+				<equals arg1="${jboss.config}" arg2="all" />
+				<equals arg1="${jboss.config}" arg2="production" />
+			</or>
+		</condition>
+		
+		<antcall target="release-jboss-node-ha" /-->
 		
 	</target>
 	
@@ -288,6 +359,19 @@
 		</zip>
 	</target>
 	
+	<target name="make-final-zip-jboss-5" depends="set-time-stamp">
+		<fixcrlf srcdir="${jboss-5.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${jboss-5.home}/bin" filemode="755" prefix="bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss-5.home}/bin" prefix="bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss-5.home}" prefix="" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+		</zip>
+	</target>
+	
 	<target name="make-final-zip-tomcat" depends="set-time-stamp">
 		<fixcrlf srcdir="${tomcat.home}/bin" includes="*.sh" eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}-${time.stamp}.zip" filesonly="false">
@@ -322,15 +406,33 @@
 		<get dest="${jboss.distro.zip.path}" src="${jboss.download.url}"/>
 	</target>
 	
+	<available file="${jboss-5.distro.zip.path}" property="got.jboss-5" />
+	<target name="get-jboss-5" unless="got.jboss-5">
+		<echo>Downloading JBoss AS 5</echo>
+		<get dest="${jboss-5.distro.zip.path}" src="${jboss-5.download.url}"/>
+	</target>
+	
 	<target name="extract-jboss" depends="get-jboss">
 		<delete dir="${jboss.home}" failonerror="true" />
 		<unzip src="${jboss.distro.zip.path}" dest="${jboss.home}/.." />
 		
 		<propertyregex input="${mss.release.configurations}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations" />
-		<echo>Included configurations: ${release.configurations} -&gt; Excludes list: ${used.configurations}</echo>
+		<echo>Included configurations: ${mss.release.configurations} -&gt; Excludes list: ${used.configurations}</echo>
 		
 		<delete includeemptydirs="true" failonerror="false" verbose="false">
 			<fileset dir="${jboss.home}/server" excludes="${used.configurations}" />
+		</delete>
+	</target>
+	
+	<target name="extract-jboss-5" depends="get-jboss-5">
+		<delete dir="${jboss-5.home}" failonerror="true" />
+		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5.home}/.." />
+		
+		<propertyregex input="${mss.release.jboss-5.profiles}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations" />
+		<echo>Included profiles: ${mss.release.jboss-5.profiles} -&gt; Excludes list: ${used.configurations}</echo>
+		
+		<delete includeemptydirs="true" failonerror="false" verbose="false">
+			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations}" />
 		</delete>
 	</target>
 	
