@@ -218,6 +218,18 @@
 				<module>sip-servlets-jboss5</module>				
 			</modules>			
 		</profile>
+		<profile>			
+			<id>jboss-distro</id>
+			<modules>				
+				<module>sip-servlets-tomcat-jboss4</module>				
+			</modules>			
+		</profile>
+		<profile>			
+			<id>jboss-5-distro</id>
+			<modules>				
+				<module>sip-servlets-jboss5</module>				
+			</modules>			
+		</profile>
 	</profiles>
 	<!-- repositories -->
 	<repositories>
