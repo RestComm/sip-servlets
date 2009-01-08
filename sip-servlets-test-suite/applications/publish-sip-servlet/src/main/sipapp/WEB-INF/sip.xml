@@ -5,9 +5,11 @@
 	<display-name>Publish Sip Servlet</display-name>
 	<description>Publish Sip Servlet</description>
 	
-	<main-servlet>
-		PublishSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			PublishSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>PublishSipServlet</servlet-name>

@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.B2BUAApplication</app-name>
 	<display-name>B2BUA Sip Servlet</display-name>
 	<description>B2BUA Sip Servlet</description>
-	
-	<main-servlet>
-		B2BUASipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			B2BUASipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>B2BUASipServlet</servlet-name>

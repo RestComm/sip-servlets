@@ -10,8 +10,10 @@
 		</listener-class>
 	</listener>
 	
-	<main-servlet>pbx</main-servlet>
-
+	<servlet-selection>
+		<main-servlet>pbx</main-servlet>
+	</servlet-selection>
+	
 	<servlet>
 		<servlet-name>pbx</servlet-name>
 		<display-name>pbx</display-name>

@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.MainHandlerApplication</app-name>
 	<display-name>MainHandler Test Sip Servlet</display-name>
 	<description>MainHandler Test Sip Servlet</description>
-	
-	<main-servlet>
-		MainHandlerSipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			MainHandlerSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>MainHandlerSipServlet</servlet-name>

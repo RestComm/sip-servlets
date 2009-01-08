@@ -5,9 +5,11 @@
 	<display-name>MediaPlaybackServlet</display-name>
 	<description>MediaPlaybackServlet</description>
 	
-	<main-servlet>
-		MediaPlaybackServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			MediaPlaybackServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>MediaPlaybackServlet</servlet-name>

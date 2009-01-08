@@ -5,9 +5,11 @@
 	<display-name>AppKey Sip Servlet</display-name>
 	<description>AppKey Sip Servlet</description>
 	
-	<main-servlet>
-		AppKeySipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			AppKeySipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>AppKeySipServlet</servlet-name>

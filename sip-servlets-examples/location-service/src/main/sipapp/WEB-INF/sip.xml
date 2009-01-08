@@ -5,9 +5,11 @@
 	<display-name>Location Service Sip Servlet</display-name>
 	<description>Location Service Sip Servlet</description>
 	
-	<main-servlet>
-		LocationServiceSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			LocationServiceSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>LocationServiceSipServlet</servlet-name>

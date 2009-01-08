@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.example.SpeedDialApplication</app-name>
 	<display-name>Speed Dial Sip Servlet</display-name>
 	<description>Speed Dial Sip Servlet</description>
-	
-	<main-servlet>
-		SpeedDialSipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			SpeedDialSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>SpeedDialSipServlet</servlet-name>

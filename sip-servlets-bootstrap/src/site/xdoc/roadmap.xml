@@ -717,8 +717,15 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=507">
+									href="http://code.google.com/p/mobicents/issues/detail?id=505">
 									PRACK can not be proxied properly
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=519">
+									Tomcat/JBoss 4 sip.xml parsing not compliant with the xsd
 								</a>								
 							</li>
 						</ul>

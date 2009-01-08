@@ -5,9 +5,11 @@
 	<display-name>ChatRoom Test Sip Servlet</display-name>
 	<description>ChatRoom Test Sip Servlet</description>
 	
-	<main-servlet>
-		ChatRoomSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			ChatRoomSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>ChatRoomSipServlet</servlet-name>

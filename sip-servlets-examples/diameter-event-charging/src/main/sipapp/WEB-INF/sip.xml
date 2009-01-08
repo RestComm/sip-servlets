@@ -5,9 +5,11 @@
 	<display-name>Diameter Event Charging Sip Servlet</display-name>
 	<description>Diameter Event Charging Sip Servlet</description>
 	
-	<main-servlet>
-		DiameterEventChargingSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			DiameterEventChargingSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>DiameterEventChargingSipServlet</servlet-name>

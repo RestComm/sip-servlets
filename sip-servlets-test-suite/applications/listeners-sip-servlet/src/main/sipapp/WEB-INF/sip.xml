@@ -5,9 +5,11 @@
 	<display-name>Listeners Test Sip Servlet</display-name>
 	<description>Listeners Test Sip Servlet</description>
 	
-	<main-servlet>
-		ListenersSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			ListenersSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>ListenersSipServlet</servlet-name>

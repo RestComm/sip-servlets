@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.ShootmeAuthApplication</app-name>
 	<display-name>Shootme Sip Servlet Auth</display-name>
 	<description>Shootme Sip Servlet Auth</description>
-	
-	<main-servlet>
-		ShootmeSipServletAuth
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			ShootmeSipServletAuth
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>ShootmeSipServletAuth</servlet-name>

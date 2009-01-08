@@ -7,7 +7,9 @@
 	<display-name>UAC RegisterSip Servlet</display-name>
 	<description>UAC RegisterSip Servlet</description>
 
-	<main-servlet>UACRegisterSipServlet</main-servlet>
+	<servlet-selection>
+		<main-servlet>UACRegisterSipServlet</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>UACRegisterSipServlet</servlet-name>

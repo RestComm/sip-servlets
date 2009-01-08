@@ -5,9 +5,11 @@
 	<display-name>Subscriber Sip Servlet</display-name>
 	<description>Subscriber Sip Servlet</description>
 	
-	<main-servlet>
-		SubscriberSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			SubscriberSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>SubscriberSipServlet</servlet-name>

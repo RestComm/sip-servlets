@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.ProxyApplication</app-name>
 	<display-name>Proxy Sip Servlet</display-name>
 	<description>Proxy Sip Servlet</description>
-	
-	<main-servlet>
-		ProxySipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			ProxySipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>ProxySipServlet</servlet-name>

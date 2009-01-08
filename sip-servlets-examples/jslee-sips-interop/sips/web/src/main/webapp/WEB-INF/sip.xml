@@ -5,9 +5,11 @@
 	<display-name>JSLEE-SIPS Interop Demo Sip Servlet</display-name>
 	<description>JSLEE-SIPS Interop Demo Sip Servlet</description>
 	
-	<main-servlet>
-		JSleeSipsInteropServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			JSleeSipsInteropServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>JSleeSipsInteropServlet</servlet-name>

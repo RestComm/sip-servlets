@@ -5,9 +5,11 @@
 	<display-name>Call Forwarding B2BUA Sip Servlet</display-name>
 	<description>Call Forwarding B2BUA Sip Servlet</description>
 	
-	<main-servlet>
-		CallForwardingB2BUASipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			CallForwardingB2BUASipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>CallForwardingB2BUASipServlet</servlet-name>

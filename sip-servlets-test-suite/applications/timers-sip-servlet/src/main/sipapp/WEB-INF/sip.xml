@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.TimersApplication</app-name>
 	<display-name>Timers Test Sip Servlet</display-name>
 	<description>Timers Test Sip Servlet</description>
-	
-	<main-servlet>
-		TimersSipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			TimersSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>TimersSipServlet</servlet-name>

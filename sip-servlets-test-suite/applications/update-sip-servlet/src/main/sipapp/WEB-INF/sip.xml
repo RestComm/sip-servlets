@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.UpdateApplication</app-name>
 	<display-name>Update Sip Servlet</display-name>
 	<description>Update Sip Servlet</description>
-	
-	<main-servlet>
-		UpdateSipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			UpdateSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>UpdateSipServlet</servlet-name>

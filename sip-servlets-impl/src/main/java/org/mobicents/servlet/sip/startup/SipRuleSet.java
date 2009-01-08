@@ -148,9 +148,9 @@ public class SipRuleSet extends RuleSetBase {
                                 "addSipApplicationListener", 0);
          
         //Handles Main Servlet
-        digester.addRule(prefix + "sip-app/main-servlet",
+        digester.addRule(prefix + "sip-app/servlet-selection/main-servlet",
                 servletSelection);
-        digester.addCallMethod(prefix + "sip-app/main-servlet",
+        digester.addCallMethod(prefix + "sip-app/servlet-selection/main-servlet",
                 "setMainServlet", 0);        
         //Handles Servlets
         digester.addRule(prefix + "sip-app/servlet",
@@ -193,16 +193,16 @@ public class SipRuleSet extends RuleSetBase {
 //        digester.addCallParam(prefix + "sip-app/servlet/security-role-ref/description", 2);
         
         //Handles servlet mapping rules
-        digester.addRule(prefix + "sip-app/servlet-mapping",
+        digester.addRule(prefix + "sip-app/servlet-selection/servlet-mapping",
                 servletSelection);
-        digester.addObjectCreate(prefix + "sip-app/servlet-mapping",        		
+        digester.addObjectCreate(prefix + "sip-app/servlet-selection/servlet-mapping",        		
         	"org.mobicents.servlet.sip.startup.loading.SipServletMapping");
-        digester.addSetNext(prefix + "sip-app/servlet-mapping",        		
+        digester.addSetNext(prefix + "sip-app/servlet-selection/servlet-mapping",        		
         	"addSipServletMapping");
-        digester.addCallMethod(prefix + "sip-app/servlet-mapping/servlet-name",
+        digester.addCallMethod(prefix + "sip-app/servlet-selection/servlet-mapping/servlet-name",
         		"setServletName", 0);
         try {
-			digester.addRule("sip-app/servlet-mapping/pattern",
+			digester.addRule("sip-app/servlet-selection/servlet-mapping/pattern",
 			        new PatternRule());
 		} catch (Throwable e) {
 			throw new IllegalArgumentException("Impossible to parse the pattern", e);

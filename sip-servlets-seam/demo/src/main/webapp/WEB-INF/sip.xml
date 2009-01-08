@@ -6,9 +6,11 @@
 	<display-name>SeamEntryPointApplication</display-name>
 	<description>SeamEntryPointApplication</description>
 	
-	<main-servlet>
-		SeamEntryPointServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			SeamEntryPointServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>SeamEntryPointServlet</servlet-name>

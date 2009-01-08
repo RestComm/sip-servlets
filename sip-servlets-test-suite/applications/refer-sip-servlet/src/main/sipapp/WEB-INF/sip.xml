@@ -5,9 +5,11 @@
 	<display-name>Refer Sip Servlet</display-name>
 	<description>Refer Sip Servlet</description>
 	
-	<main-servlet>
-		ReferSipServlet
-	</main-servlet>
+	<servlet-selection>
+		<main-servlet>
+			ReferSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>ReferSipServlet</servlet-name>

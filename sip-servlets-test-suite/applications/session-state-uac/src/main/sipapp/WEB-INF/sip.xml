@@ -4,10 +4,12 @@
 	<app-name>org.mobicents.servlet.sip.testsuite.SessionStateUACApplication</app-name>
 	<display-name>Session State UAC Test Sip Servlet</display-name>
 	<description>Session State UAC Test Sip Servlet</description>
-	
-	<main-servlet>
-		SessionStateUACSipServlet
-	</main-servlet>
+
+	<servlet-selection>	
+		<main-servlet>
+			SessionStateUACSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>SessionStateUACSipServlet</servlet-name>

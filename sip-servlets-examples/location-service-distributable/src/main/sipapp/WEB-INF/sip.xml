@@ -7,9 +7,12 @@
 	
 	<distributable/>
 	
-	<main-servlet>
-		DistributableLocationServiceSipServlet
-	</main-servlet>
+	
+	<servlet-selection>
+		<main-servlet>
+			DistributableLocationServiceSipServlet
+		</main-servlet>
+	</servlet-selection>
 
 	<servlet>
 		<servlet-name>DistributableLocationServiceSipServlet</servlet-name>

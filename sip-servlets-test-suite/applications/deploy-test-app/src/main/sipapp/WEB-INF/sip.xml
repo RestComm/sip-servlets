@@ -4,11 +4,13 @@
 	<app-name>org.mobicents.servlet.sip.example.SimpleApplication</app-name>
 	<display-name>Simple Sip Servlet</display-name>
 	<description>Simple Sip Servlet</description>
-	
-	<main-servlet>
-		SimpleSipServlet
-	</main-servlet>
 
+	<servlet-selection>	
+		<main-servlet>
+			SimpleSipServlet
+		</main-servlet>
+	</servlet-selection>
+	
 	<servlet>
 		<servlet-name>SimpleSipServlet</servlet-name>
 		<display-name>SimpleSipServlet</display-name>
