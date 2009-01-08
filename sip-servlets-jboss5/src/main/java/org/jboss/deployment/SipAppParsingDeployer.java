@@ -11,9 +11,7 @@ import org.jboss.metadata.sip.spec.SipMetaData;
  * An ObjectModelFactoryDeployer for translating sip.xml descriptors into
  * SipMetaData instances.
  * 
- * @author Scott.Stark@jboss.org
- * @author adrian@jboss.org
- * @version $Revision:$
+ * @author jean.deruelle@gmail.com
  */
 public class SipAppParsingDeployer  extends SchemaResolverDeployer<SipMetaData>
 {
@@ -24,21 +22,21 @@ public class SipAppParsingDeployer  extends SchemaResolverDeployer<SipMetaData>
    }
 
    /**
-    * Get the virtual file path for the web-app descriptor in the
+    * Get the virtual file path for the sip-app descriptor in the
     * DeploymentContext.getMetaDataPath.
     * 
-    * @return the current virtual file path for the web-app descriptor
+    * @return the current virtual file path for the sip-app descriptor
     */
    public String getSipXmlPath()
    {
       return getName();
    }
    /**
-    * Set the virtual file path for the web-app descriptor in the
-    * DeploymentContext.getMetaDataLocation. The standard path is web.xml
+    * Set the virtual file path for the sip-app descriptor in the
+    * DeploymentContext.getMetaDataLocation. The standard path is sip.xml
     * to be found in the WEB-INF metdata path.
     * 
-    * @param webXmlPath - new virtual file path for the web-app descriptor
+    * @param sipXmlPath - new virtual file path for the sip-app descriptor
     */
    public void setSipXmlPath(String sipXmlPath)
    {

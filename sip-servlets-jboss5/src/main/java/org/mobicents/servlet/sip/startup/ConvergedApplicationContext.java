@@ -26,6 +26,8 @@ import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
+ * A converged application context to be able to dispatch web or sip requests.
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */

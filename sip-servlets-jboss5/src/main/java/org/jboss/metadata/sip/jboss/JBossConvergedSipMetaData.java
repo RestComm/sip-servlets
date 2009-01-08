@@ -25,8 +25,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
@@ -39,6 +37,8 @@ import org.jboss.metadata.web.spec.ServletsMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 
 /**
+ * Extend the JBossWebMetaData from JBoss 5 to provide support for converged sip/http applications
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

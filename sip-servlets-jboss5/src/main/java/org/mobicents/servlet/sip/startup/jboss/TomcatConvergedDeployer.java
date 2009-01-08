@@ -53,14 +53,15 @@ import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipHostConfig;
 
 /**
+ * Extends the JBoss 5 TomcatDeployer to be able to deploy sip applications and converged web/sip applications 
+ * 
  * @author jean.deruelle
  *
  */
 public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deployers.TomcatDeployer {
 	private static final Logger log = Logger.getLogger(TomcatConvergedDeployer.class);
 	
-//	JBoss50ConvergedSipMetaData sharedConvergedMetaData;
-	/**
+   /**
     * Shared metaData.
     */
    private JBossWebMetaData sharedMetaData = null;
@@ -79,13 +80,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
     /** FQN of the SecurityContext Class */
     private String securityContextClassName;
     private String policyRegistrationName;
-    
-//	private DeployerConfig config;
-//	protected String applicationName; 
-//	protected SipFactory sipFactoryFacade;
-//	protected TimerService timerService;
-//	protected SipSessionsUtil sipSessionsUtil;
-	
+    	
 	/**
     * Unmarshall factory used for parsing shared web.xml.
     */
@@ -172,6 +167,8 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 		config.setCatalinaDomain(catalinaDomain);
 		String className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatDeployment"
 				: getDeploymentClass();
+		//if the application is a sip servlet application or converged one we use the TomcatConvergedDeployment to be able to deploy it 
+		// in accordance with sip servlets spec
 		if(metaData instanceof JBossConvergedSipMetaData) {
 			className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
 					: getDeploymentClass();
@@ -257,12 +254,12 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
    
    /**
 	 * Check if the WEB-INF/sip.xml file can be found in the local class loader
-	 * of the service deployment info. If it is then it means that a sip servlet
-	 * application is trying to be deployed
+	 * of the service deployment info or if the SipApplication annotation is present. 
+	 * If it is then it means that a sip servlet application is trying to be deployed
 	 * 
-	 * @param di
+	 * @param unit
 	 *            the service deployment info
-	 * @return true if the service being deployed contains WEB-INF/sip.xml,
+	 * @return true if the service being deployed contains WEB-INF/sip.xml or a SipApplication annotation,
 	 *         false otherwise
 	 */
 	public static boolean isSipServletApplication(VFSDeploymentUnit unit) {
@@ -298,6 +295,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 				String name = getObjectName(metaData);
 				ObjectName objectName = new ObjectName(name);
 				webModule.setObjectName(objectName);
+				//specify the correct class for converged or pure sip applications
 				webModule.setCode(ConvergedSipModule.class.getName());
 				// WebModule(DeploymentUnit, AbstractWarDeployer,
 				// AbstractWarDeployment)

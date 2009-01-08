@@ -56,10 +56,14 @@ import org.jboss.web.tomcat.service.session.AbstractJBossManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipNamingContextListener;
 import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
 
 /**
+ * A tomcat converged sip application deployment that will be able to deploy web applications, sip applications and converged sip/web applications.
+ * 
+ * It extends the TomcatDeployment JBoss 5 class so that the config class for the context becomes org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig
+ * and that a ConvergedEncListener is set to the context to inject SipFactory, TimerService and SipSessionUtils into the private jndi of the context.
+ * 
  * @author jean.deruelle@gmail.com
  * 
  */
@@ -72,6 +76,11 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 	 */
 	private static final String CONTEXT_CONFIG_FILE = "WEB-INF/context.xml";
 
+	public static final String SIP_SUBCONTEXT = "sip";
+	public static final String SIP_FACTORY_JNDI_NAME = "SipFactory";
+	public static final String SIP_SESSIONS_UTIL_JNDI_NAME = "SipSessionsUtil";
+	public static final String TIMER_SERVICE_JNDI_NAME = "TimerService";	
+	
 	protected DeployerConfig config;
 
 	private final String[] javaVMs = { " jboss.management.local:J2EEServer=Local,j2eeType=JVM,name=localhost" };
@@ -406,7 +415,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 				try {
 					InitialContext iniCtx = new InitialContext();
 		            Context envCtx = (Context) iniCtx.lookup("java:comp/env");		            																
-					Context sipSubcontext = envCtx.createSubcontext(SipNamingContextListener.SIP_SUBCONTEXT);
+					Context sipSubcontext = envCtx.createSubcontext(SIP_SUBCONTEXT);
 					Context applicationNameSubcontext = sipSubcontext.createSubcontext(convergedMetaData.getApplicationName());						
 					
 					SipContext sipContext = (SipContext) event.getSource();
@@ -416,18 +425,18 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 					
 					NonSerializableFactory.rebind(
 								applicationNameSubcontext,
-								SipNamingContextListener.SIP_FACTORY_JNDI_NAME,
+								SIP_FACTORY_JNDI_NAME,
 								sipFactoryFacade);
 					 
 					NonSerializableFactory
 							.rebind(
 									applicationNameSubcontext,
-									SipNamingContextListener.SIP_SESSIONS_UTIL_JNDI_NAME,
+									SIP_SESSIONS_UTIL_JNDI_NAME,
 									sipSessionsUtil);
 					NonSerializableFactory
 							.rebind(
 									applicationNameSubcontext,
-									SipNamingContextListener.TIMER_SERVICE_JNDI_NAME,
+									TIMER_SERVICE_JNDI_NAME,
 									timerService);
 					if (log.isDebugEnabled()) {
 						log

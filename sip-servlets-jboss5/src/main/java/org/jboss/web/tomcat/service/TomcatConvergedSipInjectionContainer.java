@@ -41,6 +41,9 @@ import org.jboss.logging.Logger;
 import org.jboss.web.WebApplication;
 
 /**
+ * Extends the TomcatInjectionContainer to be able to inject SipFactory, TimerService and SipSessionUtils 
+ * through @Resource annotation as defined per sip servlet 1.1 specification 
+ * 
  * @author jean.deruelle@gmail.com
  * 
  */

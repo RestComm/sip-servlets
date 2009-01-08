@@ -37,6 +37,9 @@ import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.virtual.VirtualFile;
 
 /**
+ * A POST_CLASSLOADER deployer which generates metadata from sip annotations.
+ * Overriding the Optimized AnnotationMetaDataDeployer from JBoss 5
+ * 
  * @author jean.deruelle@gmail.com
  * 
  */
@@ -65,7 +68,7 @@ public class ConvergedSipAnnotationMetaDataDeployer extends
 		} else if (sipMetaData != null && sipMetaData instanceof JBossSip11MetaData) {
 			isComplete |= ((JBossSip11MetaData) sipMetaData).isMetadataComplete();
 		} else if (sipMetaData != null) {
-			// Any web.xml 2.4 or earlier deployment is metadata complete
+			// Any sip.xml 1.0 is metadata complete
 			isComplete = true;
 		}
 
@@ -93,7 +96,7 @@ public class ConvergedSipAnnotationMetaDataDeployer extends
 
 		super.deploy(unit);
 	}
-
+	
 	protected void processSipMetaData(VFSDeploymentUnit unit,
 			SipMetaData sipMetaData, List<VirtualFile> classpath) throws IOException {
 		String mainClassName = getMainClassName(unit);
@@ -107,6 +110,13 @@ public class ConvergedSipAnnotationMetaDataDeployer extends
 
 	}
 
+	/**
+	 * Process sip meta data.
+	 *
+	 * @param unit the deployment unit
+	 * @param finder the finder
+	 * @param classes 
+	 */
 	protected void processSipMetaData(VFSDeploymentUnit unit,
 			AnnotationFinder<AnnotatedElement> finder,
 			Collection<Class<?>> classes) {

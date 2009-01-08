@@ -23,13 +23,17 @@ package org.jboss.sip.deployers;
 
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
-import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.web.WebApplication;
 import org.jboss.web.deployers.AbstractWarDeployer;
 import org.jboss.web.deployers.AbstractWarDeployment;
 import org.jboss.web.deployers.WebModule;
 
 /**
+ * Extends JBoss 5 WebModule class to provide support for Converged http/sip applications or pure sip applications
+ * 
+ * @see WebModule
+ * @see AbstractWarDeployer
+ * 
  * @author jean.deruelle@gmail.com
  * 
  */

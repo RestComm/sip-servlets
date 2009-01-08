@@ -12,7 +12,6 @@ import org.jboss.xb.annotations.JBossXmlSchema;
  * Sip application spec metadata.
  *
  * @author jean.deruelle@gmail.com
- * @version $Revision$
  */
 @XmlRootElement(name="sip-app", namespace="http://www.jcp.org/xml/ns/sipservlet")
 @JBossXmlSchema(

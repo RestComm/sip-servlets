@@ -34,10 +34,9 @@ import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.web.spec.ServletsMetaData;
 
 /**
- * Create the correct meta data for web component.
+ * Create the correct meta data for sip component.
  *
- * @author Scott.Stark@jboss.org
- * @version $Revision$
+ * @author jean.deruelle@gmail.com
  */
 public class SipComponentProcessor extends AbstractComponentProcessor<SipMetaData>
    implements Processor<SipMetaData,Class<?>>

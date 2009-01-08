@@ -12,7 +12,6 @@ import org.jboss.xb.annotations.JBossXmlSchema;
  * Sip application spec metadata if no xsd is defined in the sip.xml.
  * 
  * @author jean.deruelle@gmail.com
- * @version $Revision$
  */
 @XmlRootElement(name="sip-app", namespace="")
 @JBossXmlSchema(

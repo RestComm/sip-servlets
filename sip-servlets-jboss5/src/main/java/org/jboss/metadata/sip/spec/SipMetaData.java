@@ -64,7 +64,6 @@ import org.jboss.metadata.web.spec.SessionConfigMetaData;
 /**
  * The sip-app spec metadata. This class is based on the CR12 Tag of the WebMetaData class
  * @author jean.deruelle@gmail.com
- * @version $Revision$
  */
 public class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    implements Environment

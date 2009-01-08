@@ -24,6 +24,8 @@ package org.jboss.web.tomcat.service.deployers;
 import javax.management.ObjectName;
 
 /**
+ * A Converged Service extending JBoss 5 TomcatService to start the sip application dispatcher after the connectors have been started 
+ * 
  * @author jean.deruelle@gmail.com
  *
  */
@@ -35,7 +37,7 @@ public class TomcatConvergedService extends TomcatService {
 		Object[] args = {};
 	    String[] sig = {};
 		// start the sip application disptacher after the connectors have been started
-		// so that serverl can act as UAC in servletInitialized callback
+		// so that servlets can act as UAC in servletInitialized callback
 		ObjectName sipApplicationDispatcher = new ObjectName(getTomcatDeployer().getDomain() + ":type=SipApplicationDispatcher");      
 		server.invoke(sipApplicationDispatcher,"start", args, sig);      
 	}

@@ -41,10 +41,10 @@ import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 
 /**
- * Create a Web25MetaData instance from the class annotations
+ * Create a Sip11MetaData instance from the class annotations
+ * based on the Web25MetaDataCreator from JBoss 5
  * 
- * @author Scott.Stark@jboss.org
- * @version $Revision$
+ * @author jean.deruelle@gmail.com
  */
 public class Sip11MetaDataCreator extends AbstractCreator<SipMetaData>
       implements Creator<Collection<Class<?>>, Sip11MetaData>

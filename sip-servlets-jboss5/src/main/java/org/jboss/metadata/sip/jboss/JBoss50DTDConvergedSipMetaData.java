@@ -29,9 +29,10 @@ import javax.xml.bind.annotation.XmlType;
 import org.jboss.xb.annotations.JBossXmlSchema;
 
 /**
+ * Reuse the JBoss50WebMetaData class from JBoss 5 to provide support for converged http/sip applications jboss-web metadata parsing
  * DTD based schema for use with jboss-web.xml without a namespace
- * @author Scott.Stark@jboss.org
- * @version $Revision$
+ * 
+ * @author jean.deruelle@gmail.com
  */
 @XmlRootElement(name="jboss-web", namespace="")
 @JBossXmlSchema(

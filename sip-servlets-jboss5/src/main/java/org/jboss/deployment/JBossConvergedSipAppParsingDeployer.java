@@ -30,11 +30,10 @@ import org.jboss.metadata.web.spec.WebMetaData;
 
 /**
  * An ObjectModelFactoryDeployer for translating jboss-web.xml descriptors into
- * WebMetaData instances.
+ * Converged Sip & WebMetaData instances.
  * 
- * @author Scott.Stark@jboss.org
- * @author adrian@jboss.org
- * @version $Revision:$
+ * @author jean.deruelle@gmail.com
+ * 
  */
 public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<JBossConvergedSipMetaData>
 {

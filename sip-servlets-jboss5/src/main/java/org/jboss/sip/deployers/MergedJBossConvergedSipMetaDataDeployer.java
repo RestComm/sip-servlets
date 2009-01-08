@@ -38,6 +38,12 @@ import org.jboss.metadata.web.spec.WebMetaData;
 import org.jboss.web.deployers.MergedJBossWebMetaDataDeployer;
 
 /**
+ * A deployer that extends MergedJBossWebMetaDataDeployer to provide support for pure sip applications or converged http/sip applications
+ * 
+ * A deployer that merges web annotation metadata, sip annotation metadata, xml web metadata, xml sip metadata and jboss metadata
+ * into a merged JBossConvergedSipMetaData. It also incorporates ear level overrides from
+ * the top level JBossAppMetaData attachment.
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

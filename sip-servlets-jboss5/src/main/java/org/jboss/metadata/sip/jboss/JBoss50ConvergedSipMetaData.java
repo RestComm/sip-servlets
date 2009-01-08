@@ -30,8 +30,9 @@ import org.jboss.metadata.javaee.spec.JavaEEMetaDataConstants;
 import org.jboss.xb.annotations.JBossXmlSchema;
 
 /**
- * @author Scott.Stark@jboss.org
- * @version $Revision$
+ * Reuse the JBoss50WebMetaData class from JBoss 5 to provide support for converged http/sip applications jboss-web metadata parsing
+ * 
+ * @author jean.deruelle@gmail.com
  */
 @XmlRootElement(name="jboss-web", namespace=JavaEEMetaDataConstants.JBOSS_NS)
 @JBossXmlSchema(
