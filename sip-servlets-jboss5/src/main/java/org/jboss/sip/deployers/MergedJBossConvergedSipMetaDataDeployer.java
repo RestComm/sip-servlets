@@ -78,8 +78,10 @@ public class MergedJBossConvergedSipMetaDataDeployer extends
 	   {
 	      WebMetaData specMetaData = unit.getAttachment(WebMetaData.class);
 	      SipMetaData specSipMetaData = unit.getAttachment(SipMetaData.class);
+	      String sipKey = ConvergedSipAnnotationMetaDataDeployer.SIP_ANNOTATED_ATTACHMENT_NAME;
+	      Sip11MetaData sipAnnotatedMetaData = unit.getAttachment(sipKey, Sip11MetaData.class);
 	      JBossConvergedSipMetaData metaData = unit.getAttachment(JBossConvergedSipMetaData.class);
-	      if(specMetaData == null && metaData == null && specSipMetaData == null)
+	      if(specMetaData == null && metaData == null && specSipMetaData == null && sipAnnotatedMetaData == null)
 	         return;
 
 	      // Check for an annotated view
@@ -98,9 +100,7 @@ public class MergedJBossConvergedSipMetaDataDeployer extends
 	            specMetaData = annotatedMetaData;
 	      }
 	      
-	      // Check for a sip annotated view
-	      String sipKey = ConvergedSipAnnotationMetaDataDeployer.SIP_ANNOTATED_ATTACHMENT_NAME;
-	      Sip11MetaData sipAnnotatedMetaData = unit.getAttachment(sipKey, Sip11MetaData.class);
+	      // Check for a sip annotated view	      
 	      if(sipAnnotatedMetaData != null)
 	      {
 	         if(specSipMetaData != null)

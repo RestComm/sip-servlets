@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<sip-app xmlns:javaee="http://java.sun.com/xml/ns/javaee">
+<sip-app>
   <app-name>com.bea.sipservlet.tck.apps.spectestapp.uas</app-name> 
 
   <context-param>
-    <javaee:param-name>pet</javaee:param-name>
-    <javaee:param-value>cat</javaee:param-value>
+    <param-name>pet</param-name>
+    <param-value>cat</param-value>
   </context-param>
   <context-param>
-    <javaee:param-name>hobby</javaee:param-name>
-    <javaee:param-value>halo</javaee:param-value>
+    <param-name>hobby</param-name>
+    <param-value>halo</param-value>
   </context-param>
 
   <servlet>
-    <javaee:servlet-name>Context</javaee:servlet-name>
-    <javaee:servlet-class>com.bea.sipservlet.tck.apps.spec.uas.ContextServlet</javaee:servlet-class>
-    <javaee:init-param>
-      <javaee:param-name>eyes</javaee:param-name>
-      <javaee:param-value>brown</javaee:param-value>
-    </javaee:init-param>
+    <servlet-name>Context</servlet-name>
+    <servlet-class>com.bea.sipservlet.tck.apps.spec.uas.ContextServlet</servlet-class>
+    <init-param>
+      <param-name>eyes</param-name>
+      <param-value>brown</param-value>
+    </init-param>
 
-    <javaee:init-param>
-      <javaee:param-name>hair</javaee:param-name>
-      <javaee:param-value>black</javaee:param-value>
-    </javaee:init-param>
+    <init-param>
+      <param-name>hair</param-name>
+      <param-value>black</param-value>
+    </init-param>
 
   </servlet>
 

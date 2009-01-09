@@ -24,17 +24,27 @@ package org.jboss.metadata.sip.jboss;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.jboss.metadata.ejb.jboss.JBossEnvironmentRefsGroupMetaData;
+import org.jboss.metadata.javaee.jboss.RunAsIdentityMetaData;
+import org.jboss.metadata.javaee.spec.Environment;
+import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
+import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
+import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
+import org.jboss.metadata.web.jboss.JBossServletMetaData;
+import org.jboss.metadata.web.jboss.JBossServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletsMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
+import org.jboss.metadata.web.spec.Web25MetaData;
 
 /**
  * Extend the JBossWebMetaData from JBoss 5 to provide support for converged sip/http applications
@@ -53,7 +63,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private SipLoginConfigMetaData sipLoginConfig;     
 	private List<ParamValueMetaData> sipContextParams;
 	private List<ListenerMetaData> sipListeners;
-	private ServletsMetaData sipServlets;
+	private JBossServletsMetaData sipServlets;
 	private Method sipApplicationKeyMethod;
 	
 	public void merge(JBossConvergedSipMetaData override, SipMetaData original)
@@ -65,6 +75,159 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
     {
       super.merge(override, original);
 
+      if(override != null && override.getDistributable()!= null)
+          setDistributable(override.getDistributable());
+       else if(original != null && original.getDistributable() != null)
+          setDistributable(original.getDistributable());
+      
+      if(override != null && override.isMetadataComplete() != false)
+          setMetadataComplete(override.isMetadataComplete());
+       else if(original != null && (original instanceof Sip11MetaData) )
+       {
+          Sip11MetaData sip11MD = (Sip11MetaData) original;
+          setMetadataComplete(sip11MD.isMetadataComplete());
+       } 
+       else if(original != null && (original instanceof JBossSip11MetaData) )
+       {
+    	   JBossSip11MetaData sip11MD = (JBossSip11MetaData) original;
+           setMetadataComplete(sip11MD.isMetadataComplete());
+        }
+      
+      if(override != null && override.getContextParams()!= null)
+          setContextParams(override.getContextParams());
+       else if(original != null && original.getContextParams() != null)
+          setContextParams(original.getContextParams());       
+      
+      if(override != null && override.getServletVersion()!= null)
+          setServletVersion(override.getServletVersion());
+       else if(original != null && original.getVersion() != null)
+          setServletVersion(original.getVersion());
+
+       if(override != null && override.getSessionConfig()!= null)
+          setSessionConfig(override.getSessionConfig());
+       else if(original != null && original.getSessionConfig() != null)
+          setSessionConfig(original.getSessionConfig());
+       
+       if(override != null && override.getFilters()!= null)
+          setFilters(override.getFilters());
+       
+       if(override != null && override.getFilterMappings()!= null)
+          setFilterMappings(override.getFilterMappings());
+       
+       if(override != null && override.getErrorPages()!= null)
+          setErrorPages(override.getErrorPages());
+       
+       if(override != null && override.getJspConfig()!= null)
+          setJspConfig(override.getJspConfig());
+       
+//       if(override != null && override.getListeners()!= null)
+//          setListeners(override.getListeners());
+//       else if(original != null && original.getListeners() != null)
+//          setListeners(original.getListeners());
+       
+       if(override != null && override.getLoginConfig()!= null)
+          setLoginConfig(override.getLoginConfig());
+       
+       if(override != null && override.getMimeMappings()!= null)
+          setMimeMappings(override.getMimeMappings());
+       
+       if(override != null && override.getServletMappings()!= null)
+          setServletMappings(override.getServletMappings());
+       
+       if(override != null && override.getSecurityContraints()!= null)
+          setSecurityContraints(override.getSecurityContraints());
+       
+       if(override != null && override.getWelcomeFileList()!= null)
+          setWelcomeFileList(override.getWelcomeFileList());
+       
+       if(override != null && override.getLocalEncodings()!= null)
+          setLocalEncodings(override.getLocalEncodings());
+       
+       if(override != null && override.isJaccAllStoreRole())
+          setJaccAllStoreRole(override.isJaccAllStoreRole());
+       
+       if(override != null && override.getVersion()!= null)
+          setVersion(override.getVersion());
+       else if(original != null && original.getVersion() != null)
+          setVersion(original.getVersion());
+       
+       if(override != null && override.getContextRoot()!= null)
+          setContextRoot(override.getContextRoot());
+       
+       if(override != null && override.getAlternativeDD()!= null)
+          setAlternativeDD(override.getAlternativeDD());
+       
+       if(override != null && override.getSecurityDomain()!= null)
+          setSecurityDomain(override.getSecurityDomain());
+       
+       if(override != null && override.getJaccContextID()!= null)
+          setJaccContextID(override.getJaccContextID());
+       
+       if(override != null && override.getClassLoading()!= null)
+          setClassLoading(override.getClassLoading());
+       
+       if(override != null && override.getDepends()!= null)
+          setDepends(override.getDepends());
+       
+       if(override != null && override.getRunAsIdentity()!= null)
+          setRunAsIdentity(override.getRunAsIdentity());
+
+       if(getSecurityRoles() == null)
+          setSecurityRoles(new SecurityRolesMetaData());
+       SecurityRolesMetaData overrideRoles = null;
+       SecurityRolesMetaData originalRoles = null;
+       if(override != null)
+          overrideRoles = override.getSecurityRoles();
+       if(original != null)
+          originalRoles = original.getSecurityRoles();
+       getSecurityRoles().merge(overrideRoles, originalRoles);
+
+       MessageDestinationsMetaData overrideMsgDests = null;
+       MessageDestinationsMetaData originalMsgDests = null;
+       if(override != null && override.getMessageDestinations()!= null)
+          overrideMsgDests = override.getMessageDestinations();
+       if(original != null && original.getMessageDestinations() != null)
+          originalMsgDests = original.getMessageDestinations();
+       setMessageDestinations(MessageDestinationsMetaData.merge(overrideMsgDests,
+             originalMsgDests, overridenFile, overrideFile));
+
+       if(this.getJndiEnvironmentRefsGroup() == null)
+    	   setJndiEnvironmentRefsGroup(new JBossEnvironmentRefsGroupMetaData());
+        Environment env = null;
+        JBossEnvironmentRefsGroupMetaData jenv = null;
+        if( override != null )
+           jenv = (JBossEnvironmentRefsGroupMetaData) override.getJndiEnvironmentRefsGroup();
+        if(original != null)
+           env = original.getJndiEnvironmentRefsGroup();
+        ((JBossEnvironmentRefsGroupMetaData)getJndiEnvironmentRefsGroup()).merge(jenv, env, null, overrideFile, overridenFile, mustOverride);
+        
+       if(override != null && override.getVirtualHosts()!= null)
+          setVirtualHosts(override.getVirtualHosts());
+       
+       if(override != null && override.isFlushOnSessionInvalidation())
+          setFlushOnSessionInvalidation(override.isFlushOnSessionInvalidation());
+       
+       if(override != null && override.isUseSessionCookies())
+          setUseSessionCookies(override.isUseSessionCookies());
+       
+       if(override != null && override.getReplicationConfig()!= null)
+          setReplicationConfig(override.getReplicationConfig());
+       
+       if(override != null && override.getPassivationConfig()!= null)
+          setPassivationConfig(override.getPassivationConfig());
+       
+       if(override != null && override.getWebserviceDescriptions()!= null)
+          setWebserviceDescriptions(override.getWebserviceDescriptions());
+       
+       if(override != null && override.getArbitraryMetadata()!= null)
+          setArbitraryMetadata(override.getArbitraryMetadata());
+       
+       if(override != null && override.getMaxActiveSessions() != null)
+          setMaxActiveSessions(override.getMaxActiveSessions());
+       
+       if(override != null && override.getSessionCookies() != -1)
+          setSessionCookies(override.getSessionCookies());       
+      
       if(override != null && override.getApplicationName()!= null)
          setApplicationName(override.getApplicationName());
       else if(original != null && original.getApplicationName() != null)
@@ -105,10 +268,14 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
        else if(original != null && original.getListeners() != null)
           setSipListeners(original.getListeners());
       
-      if(override != null && override.sipServlets!= null)
-          setSipServlets(override.sipServlets);
-       else if(original != null && original.getSipServlets() != null)
-          setSipServlets(original.getSipServlets());
+      JBossServletsMetaData soverride = null;
+      ServletsMetaData soriginal = null;
+      if(override != null)
+         soverride = override.getSipServlets();
+      if(original != null)
+         soriginal = original.getSipServlets();
+      sipServlets = JBossServletsMetaData.merge(soverride, soriginal);
+
 
       if(sipContextParams != null) {
 	      List<ParamValueMetaData> mergedContextParams = new ArrayList<ParamValueMetaData>(sipContextParams);
@@ -124,6 +291,39 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
           setSipApplicationKeyMethod(original.getSipApplicationKeyMethod());
       
       //listeners should not be merged because they have a special treatment when loading the context
+      
+   // Update run-as indentity for a run-as-principal
+      if(sipServlets != null)
+      {
+         for(JBossServletMetaData servlet : sipServlets)
+         {
+            String servletName = servlet.getServletName();
+            String principalName = servlet.getRunAsPrincipal();
+            // Get the sip.xml run-as primary role
+            String sipXmlRunAs = null;
+            if(servlet.getRunAs() != null)
+               sipXmlRunAs = servlet.getRunAs().getRoleName();
+            if (principalName != null)
+            {
+               // Update the run-as indentity to use the principal name
+               if (sipXmlRunAs == null)
+               {
+                  //Needs to be merged from Annotations
+                  sipXmlRunAs = "PLACEHOLDER_FOR_ANNOTATION";
+                  //throw new IllegalStateException("run-as-principal: " + principalName + " found in jboss-web.xml but there was no run-as in web.xml");
+               }
+               // See if there are any additional roles for this principal
+               Set<String> extraRoles = getSecurityRoles().getSecurityRoleNamesByPrincipal(principalName);
+               RunAsIdentityMetaData runAsId = new RunAsIdentityMetaData(sipXmlRunAs, principalName, extraRoles);
+               getRunAsIdentity().put(servletName, runAsId);
+            }
+            else if (sipXmlRunAs != null)
+            {
+               RunAsIdentityMetaData runAsId = new RunAsIdentityMetaData(sipXmlRunAs, null);
+               getRunAsIdentity().put(servletName, runAsId);
+            }
+         }
+      }
    }
 	/**
 	 * @param applicationName the applicationName to set
@@ -212,13 +412,13 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	/**
 	 * @param sipServlets the sipServlets to set
 	 */
-	public void setSipServlets(ServletsMetaData sipServlets) {
+	public void setSipServlets(JBossServletsMetaData sipServlets) {
 		this.sipServlets = sipServlets;
 	}
 	/**
 	 * @return the sipServlets
 	 */
-	public ServletsMetaData getSipServlets() {
+	public JBossServletsMetaData getSipServlets() {
 		return sipServlets;
 	}
 	/**

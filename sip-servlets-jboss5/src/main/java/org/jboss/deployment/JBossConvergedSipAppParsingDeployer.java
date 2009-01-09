@@ -25,6 +25,7 @@ import org.jboss.deployers.spi.DeploymentException;
 import org.jboss.deployers.structure.spi.DeploymentUnit;
 import org.jboss.deployers.vfs.spi.deployer.SchemaResolverDeployer;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
+import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
 
@@ -78,6 +79,9 @@ public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<
       WebMetaData specMetaData = unit.getAttachment(WebMetaData.class);
       SipMetaData sipMetaData = unit.getAttachment(SipMetaData.class);
       JBossConvergedSipMetaData metaData = unit.getAttachment(JBossConvergedSipMetaData.class);
+      String sipKey = ConvergedSipAnnotationMetaDataDeployer.SIP_ANNOTATED_ATTACHMENT_NAME;
+      Sip11MetaData sipAnnotatedMetaData = unit.getAttachment(sipKey, Sip11MetaData.class);
+      
       if(specMetaData == null && sipMetaData ==null && metaData == null)
          return;
 

@@ -21,6 +21,13 @@ import java.util.List;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
+import org.jboss.metadata.javaee.spec.DescriptionImpl;
+import org.jboss.metadata.javaee.spec.DescriptionsImpl;
+import org.jboss.metadata.javaee.spec.DisplayNameImpl;
+import org.jboss.metadata.javaee.spec.DisplayNamesImpl;
+import org.jboss.metadata.javaee.spec.IconImpl;
+import org.jboss.metadata.javaee.spec.IconsImpl;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
@@ -30,6 +37,7 @@ import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionsMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
+import org.jboss.metadata.web.jboss.JBossServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
@@ -71,6 +79,24 @@ public class SipJBossContextConfig extends JBossContextConfig {
 		/* 
 		 * sip sepcific treatment 
 		 */
+		//description
+		DescriptionGroupMetaData descriptionGroupMetaData = convergedMetaData.getDescriptionGroup();
+		if(descriptionGroupMetaData != null) {
+			DescriptionsImpl descriptionsImpl = (DescriptionsImpl)descriptionGroupMetaData.getDescriptions();
+			if(descriptionsImpl != null && !descriptionsImpl.isEmpty()) {
+				convergedContext.setDescription(((DescriptionImpl)descriptionsImpl.iterator().next()).getDescription());
+			}
+			IconsImpl iconsImpl = (IconsImpl)descriptionGroupMetaData.getIcons();
+			if(iconsImpl != null && !iconsImpl.isEmpty()) {
+				IconImpl iconImpl = (IconImpl)iconsImpl.iterator().next();
+				convergedContext.setSmallIcon(iconImpl.getSmallIcon());
+				convergedContext.setLargeIcon(iconImpl.getLargeIcon());
+			}
+			DisplayNamesImpl displayNamesImpl = (DisplayNamesImpl)descriptionGroupMetaData.getDisplayNames();
+			if(displayNamesImpl != null && !displayNamesImpl.isEmpty()) {
+				convergedContext.setDisplayName(((DisplayNameImpl)displayNamesImpl.iterator().next()).getDisplayName());
+			}
+		}
 		//app name
 		convergedContext.setApplicationName(convergedMetaData.getApplicationName());		
 		//sip proxy config
@@ -149,19 +175,20 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			}
 		}
 		//Sip Servlet
-		ServletsMetaData servlets = convergedMetaData.getSipServlets();
-		if (servlets != null) {
-			if(servlets.size() > 1 && !servletSelectionSet) {
+		JBossServletsMetaData sipServlets = convergedMetaData.getSipServlets();
+		if (sipServlets != null) {
+			if(sipServlets.size() > 1 && !servletSelectionSet) {
 				throw new IllegalArgumentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
 			}
-			for (ServletMetaData value : servlets) {
-				org.apache.catalina.Wrapper wrapper = convergedContext.createWrapper();
+			for (ServletMetaData value : sipServlets) {
+				SipServletImpl wrapper = (SipServletImpl)convergedContext.createWrapper();
 				wrapper.setName(value.getName());
 				// no main servlet defined in the sip.xml we take the name of the only sip servlet present
 				if(!servletSelectionSet) {
 					convergedContext.setMainServlet(value.getName());
 				}
 				wrapper.setServletClass(value.getServletClass());
+				wrapper.setServletName(value.getServletName());
 				if (value.getJspFile() != null) {
 					wrapper.setJspFile(value.getJspFile());
 				}

@@ -23,22 +23,29 @@ package org.jboss.web.tomcat.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.Resource;
-import javax.naming.NamingException;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
-
 import org.apache.catalina.Context;
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
+import org.jboss.deployment.MappedReferenceMetaDataResolverDeployer;
+import org.jboss.deployment.dependency.ContainerDependencyMetaData;
+import org.jboss.deployment.spi.DeploymentEndpointResolver;
+import org.jboss.injection.DependsHandler;
+import org.jboss.injection.InjectionHandler;
+import org.jboss.injection.PersistenceContextHandler;
+import org.jboss.injection.PersistenceUnitHandler;
 import org.jboss.jpa.resolvers.PersistenceUnitDependencyResolver;
 import org.jboss.logging.Logger;
+import org.jboss.metadata.javaee.spec.Environment;
+import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.web.WebApplication;
+import org.jboss.web.tomcat.service.injection.ConvergedSipResourceHandler;
+import org.jboss.web.tomcat.service.injection.WebEJBHandler;
+import org.jboss.web.tomcat.service.injection.WebServiceRefInjectionHandler;
 
 /**
  * Extends the TomcatInjectionContainer to be able to inject SipFactory, TimerService and SipSessionUtils 
@@ -51,8 +58,8 @@ public class TomcatConvergedSipInjectionContainer extends
 		TomcatInjectionContainer {
 	private static final Logger log = Logger.getLogger(TomcatConvergedSipInjectionContainer.class);
 
-//	private DeploymentEndpointResolver deploymentEndpointResolver;
-//	private Map<String, ContainerDependencyMetaData> endpointMap;
+	private DeploymentEndpointResolver deploymentEndpointResolver;
+	private Map<String, ContainerDependencyMetaData> endpointMap;
 	private static final Set<String> dynamicClassLoaders = new HashSet<String>();
 	private static final Properties restrictedFilters = new Properties();
 	private static final Properties restrictedListeners = new Properties();
@@ -120,8 +127,10 @@ public class TomcatConvergedSipInjectionContainer extends
 			VFSDeploymentUnit unit, Context catalinaContext,
 			PersistenceUnitDependencyResolver resolver) {
 		super(appInfo, unit, catalinaContext, resolver);
-//		this.deploymentEndpointResolver = unit.getAttachment(DeploymentEndpointResolver.class);
-//	    this.endpointMap = unit.getTopLevel().getAttachment(MappedReferenceMetaDataResolverDeployer.ENDPOINT_MAP_KEY, Map.class);
+		this.webDD = unit.getAttachment(JBossConvergedSipMetaData.class);
+	    assert this.webDD != null : "webDD is null (no JBossConvergedSipMetaData attachment in VFSDeploymentUnit)";
+		this.deploymentEndpointResolver = unit.getAttachment(DeploymentEndpointResolver.class);
+	    this.endpointMap = unit.getTopLevel().getAttachment(MappedReferenceMetaDataResolverDeployer.ENDPOINT_MAP_KEY, Map.class);
 	}
 
 	/**
@@ -133,153 +142,33 @@ public class TomcatConvergedSipInjectionContainer extends
 	 * microcontainer
 	 * 
 	 */
-//	public void processMetadata() {
-//		// 
-//		InjectionHandler<Environment> webEjbHandler = new WebEJBHandler<Environment>(
-//				webDD, deploymentEndpointResolver, endpointMap, unit
-//						.getRelativePath());
-//
-//		// todo injection handlers should be pluggable from XML
-//		handlers = new ArrayList<InjectionHandler<Environment>>();
-//		handlers.add(webEjbHandler);
-//		handlers.add(new DependsHandler<Environment>());
-//		handlers.add(new PersistenceContextHandler<Environment>());
-//		handlers.add(new PersistenceUnitHandler<Environment>());
-//		handlers.add(new ConvergedSipResourceHandler<Environment>());
-//		handlers.add(new WebServiceRefInjectionHandler<Environment>());
-//
-//		ClassLoader old = Thread.currentThread().getContextClassLoader();
-//		ClassLoader webLoader = getClassloader();
-//		Thread.currentThread().setContextClassLoader(webLoader);
-//		try {
-//			for (InjectionHandler<Environment> handler : handlers)
-//				handler.loadXml(webDD.getJndiEnvironmentRefsGroup(), this);
-//		} finally {
-//			Thread.currentThread().setContextClassLoader(old);
-//		}
-//	}
-	
-	public Object newInstance(String className) throws IllegalAccessException,
-			InvocationTargetException, NamingException, InstantiationException,
-			ClassNotFoundException {
-		ClassLoader loader = catalinaContext.getLoader().getClassLoader();
-		Class<?> clazz = loader.loadClass(className);
-		checkAccess(clazz);
-		Object instance = clazz.newInstance();
-		processInjectors(instance);
-		if (!catalinaContext.getIgnoreAnnotations()) {
-			processDynamicBeanAnnotations(instance);
-			postConstruct(instance);
-			processSipResources(instance);
-		}
-		return instance;
-	}
+	public void processMetadata() {
+		// 
+		InjectionHandler<Environment> webEjbHandler = new WebEJBHandler<Environment>(
+				webDD, deploymentEndpointResolver, endpointMap, unit
+						.getRelativePath());
 
-	public Object newInstance(String className, ClassLoader classLoader)
-			throws IllegalAccessException, InvocationTargetException,
-			NamingException, InstantiationException, ClassNotFoundException {
-		Class<?> clazz = classLoader.loadClass(className);
-		checkAccess(clazz);
-		Object instance = clazz.newInstance();
-		processInjectors(instance);
-		if (!catalinaContext.getIgnoreAnnotations()) {
-			processDynamicBeanAnnotations(instance);
-			postConstruct(instance);
-			processSipResources(instance);
-		}
-		return instance;
-	}
+		// todo injection handlers should be pluggable from XML
+		handlers = new ArrayList<InjectionHandler<Environment>>();
+		handlers.add(webEjbHandler);
+		handlers.add(new DependsHandler<Environment>());
+		handlers.add(new PersistenceContextHandler<Environment>());
+		handlers.add(new PersistenceUnitHandler<Environment>());
+		handlers.add(new ConvergedSipResourceHandler<Environment>());
+		handlers.add(new WebServiceRefInjectionHandler<Environment>());
 
-	public void newInstance(Object instance) throws IllegalAccessException,
-			InvocationTargetException, NamingException {
-		processInjectors(instance);
-		if (!catalinaContext.getIgnoreAnnotations()) {
-			processDynamicBeanAnnotations(instance);
-			postConstruct(instance);
-			processSipResources(instance);
+		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		ClassLoader webLoader = getClassloader();
+		Thread.currentThread().setContextClassLoader(webLoader);
+		try {
+			for (InjectionHandler<Environment> handler : handlers)
+				handler.loadXml(webDD.getJndiEnvironmentRefsGroup(), this);
+		} finally {
+			Thread.currentThread().setContextClassLoader(old);
 		}
 	}
 	
-	protected void processSipResources(Object instance) throws NamingException, IllegalAccessException {
-		// Initialize fields annotations
-        Field[] fields = instance.getClass().getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i].isAnnotationPresent(Resource.class)) {
-                Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
-                if(!lookupResourceInServletContext(instance, fields[i], annotation.name()))
-                	lookupFieldResource(getEnc(), instance, fields[i], annotation.name());
-            }
-        }
-	}
-	
-	protected boolean lookupResourceInServletContext(Object instance, Field field, String annotationName) {
-		String typeName = field.getType().getCanonicalName();
-		if(annotationName == null || annotationName.equals("")) annotationName = typeName;
-		Object objectToInject = catalinaContext.getServletContext().getAttribute(annotationName);
-		if(objectToInject != null &&
-				field.getType().isAssignableFrom(objectToInject.getClass())) {
-			boolean accessibility = false;
-			accessibility = field.isAccessible();
-			field.setAccessible(true);
-			try {
-				field.set(instance, objectToInject);
-			} catch (IllegalArgumentException e) {
-				throw e;
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-			field.setAccessible(accessibility);
-			return true;
-		}
-		return false;
-	}
-	   
-	/**
-     * Inject resources in specified field.
-     */
-    protected static void lookupFieldResource(javax.naming.Context context, 
-            Object instance, Field field, String name)
-        throws NamingException, IllegalAccessException {
-    
-        Object lookedupResource = null;
-        boolean accessibility = false;
-        
-        if ((name != null) &&
-                (name.length() > 0)) {
-            lookedupResource = context.lookup(name);
-        } else {
-        	if(field.getClass().getName().startsWith("javax.servlet.sip")) {
-        		lookedupResource = context.lookup("sip/" + instance.getClass().getName() + "/" + field.getName());
-        	} else {
-        		lookedupResource = context.lookup(instance.getClass().getName() + "/" + field.getName());
-        	}
-        }
-        
-        accessibility = field.isAccessible();
-        field.setAccessible(true);
-        field.set(instance, lookedupResource);
-        field.setAccessible(accessibility);
-    }
-
-	private void checkAccess(Class<?> clazz) {
-		if (catalinaContext.getPrivileged())
-			return;
-		if (Filter.class.isAssignableFrom(clazz)) {
-			checkAccess(clazz, restrictedFilters);
-		} else if (Servlet.class.isAssignableFrom(clazz)) {
-			checkAccess(clazz, restrictedServlets);
-		} else {
-			checkAccess(clazz, restrictedListeners);
-		}
-	}
-
-	private void checkAccess(Class<?> clazz, Properties restricted) {
-		while (clazz != null) {
-			if ("restricted".equals(restricted.getProperty(clazz.getName()))) {
-				throw new SecurityException("Restricted class: "
-						+ clazz.getName());
-			}
-			clazz = clazz.getSuperclass();
-		}
+	public Context getCatalinaContext() {
+		return catalinaContext;
 	}
 }

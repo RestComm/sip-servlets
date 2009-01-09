@@ -28,11 +28,20 @@ import java.util.Collection;
 import javax.servlet.sip.annotation.SipApplication;
 import javax.servlet.sip.annotation.SipServlet;
 
+import org.jboss.annotation.javaee.Descriptions;
+import org.jboss.annotation.javaee.DisplayNames;
 import org.jboss.metadata.annotation.creator.AbstractFinderUser;
 import org.jboss.metadata.annotation.creator.Processor;
 import org.jboss.metadata.annotation.creator.ProcessorUtils;
 import org.jboss.metadata.annotation.finder.AnnotationFinder;
+import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
+import org.jboss.metadata.javaee.spec.DescriptionImpl;
+import org.jboss.metadata.javaee.spec.DescriptionsImpl;
+import org.jboss.metadata.javaee.spec.DisplayNameImpl;
+import org.jboss.metadata.javaee.spec.DisplayNamesImpl;
 import org.jboss.metadata.javaee.spec.EmptyMetaData;
+import org.jboss.metadata.javaee.spec.IconImpl;
+import org.jboss.metadata.javaee.spec.IconsImpl;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
@@ -139,19 +148,47 @@ public class SipServletProcessor extends
     		sipMetaData.setApplicationName(packageName);
     	else
     		sipMetaData.setApplicationName(appData.name());
+    	DescriptionGroupMetaData descriptionGroupMetaData = sipMetaData.getDescriptionGroup();
+    	if(sipMetaData.getDescriptionGroup() == null) {
+    		descriptionGroupMetaData = new DescriptionGroupMetaData();
+    		sipMetaData.setDescriptionGroup(descriptionGroupMetaData);
+    	}  
+    	DisplayNamesImpl displayNames = (DisplayNamesImpl)sipMetaData.getDescriptionGroup().getDisplayNames();
+    	if(displayNames == null) {
+    		displayNames= new DisplayNamesImpl();
+    		descriptionGroupMetaData.setDisplayNames(displayNames);
+    	}
+        	
+    	DisplayNameImpl displayName = new DisplayNameImpl();
+    	if(appData.displayName() == null || appData.displayName().equals(""))
+    		displayName.setDisplayName(packageName);
+    	else
+    		displayName.setDisplayName(appData.displayName());
+    	displayNames.add(displayName);
     	
-//    	if(appData.displayName() == null || appData.displayName().equals(""))
-//    		sipMetaData.setDisplayName(packageName);
-//    	else
-//    		sipMetaData.setDisplayName(appData.displayName());
 //    	if(logger.isDebugEnabled()) {
 //			logger.debug("the following @SipApplication annotation has been found : ");
 //			logger.debug("ApplicationName : " + sipMetaData.getApplicationName());
 //			logger.debug("MainServlet : " + sipMetaData.getMainServlet());
 //		}
-//    	sipMetaData.setDescription(appData.description());
-//    	sipMetaData.setLargeIcon(appData.largeIcon());
-//    	sipMetaData.setSmallIcon(appData.smallIcon());
+    	DescriptionsImpl descriptionsImpl = (DescriptionsImpl)sipMetaData.getDescriptionGroup().getDescriptions();
+    	if(descriptionsImpl == null) {
+    		descriptionsImpl= new DescriptionsImpl();
+    		descriptionGroupMetaData.setDescriptions(descriptionsImpl);
+    	}
+    	DescriptionImpl descriptionImpl = new DescriptionImpl();
+    	descriptionImpl.setDescription(appData.description());
+    	descriptionsImpl.add(descriptionImpl);
+    	
+    	IconsImpl iconsImpl = (IconsImpl)sipMetaData.getDescriptionGroup().getIcons();
+    	if(iconsImpl == null) {
+    		iconsImpl= new IconsImpl();
+    		descriptionGroupMetaData.setIcons(iconsImpl);
+    	}
+    	IconImpl iconImpl = new IconImpl();
+    	iconImpl.setLargeIcon(appData.largeIcon());
+    	iconImpl.setSmallIcon(appData.smallIcon());
+    	iconsImpl.add(iconImpl);
     	if(appData.distributable()) {
     		sipMetaData.setDistributable(new EmptyMetaData());
     	}

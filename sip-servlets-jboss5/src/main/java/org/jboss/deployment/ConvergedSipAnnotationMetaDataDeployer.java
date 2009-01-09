@@ -46,7 +46,7 @@ import org.jboss.virtual.VirtualFile;
 public class ConvergedSipAnnotationMetaDataDeployer extends
 		OptAnnotationMetaDataDeployer {
 
-	public static final String SIP_ANNOTATED_ATTACHMENT_NAME = "annotated."
+	public static final String SIP_ANNOTATED_ATTACHMENT_NAME = "sip.annotated."
 			+ SipMetaData.class.getName();
 
 	/**
