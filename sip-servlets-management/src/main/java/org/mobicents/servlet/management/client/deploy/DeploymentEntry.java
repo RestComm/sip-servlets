@@ -2,9 +2,13 @@ package org.mobicents.servlet.management.client.deploy;
 
 import org.mobicents.servlet.management.client.router.Console;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
@@ -36,5 +40,20 @@ public class DeploymentEntry extends Panel {
 			
 		});
 		add(deployButton);
+		
+		Hyperlink link = new Hyperlink();
+		final String currentHost = Window.Location.getProtocol() + "//"
+        	+ Window.Location.getHost();
+		
+		// Remove extension
+		String noExtension = file;
+		int dotIndex = noExtension.lastIndexOf('.');
+		if(dotIndex > 0) {
+			noExtension = file.substring(0, dotIndex);
+		}
+		
+		final String applicationUrl = currentHost + "/" + noExtension;
+		
+		add(new HTML("<a href=\"" + applicationUrl + "\">" + applicationUrl + "</a>"));
 	}
 }

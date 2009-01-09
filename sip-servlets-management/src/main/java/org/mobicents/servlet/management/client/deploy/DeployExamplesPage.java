@@ -19,14 +19,26 @@ public class DeployExamplesPage extends Panel {
 			public void onSuccess(Boolean isJBoss) {
 				//setCls("x-panel-mc");
 				if(isJBoss) {
-					add(new Label("You can deploy additional examples from here. Note that you still have to configure the Application Router to make the applications active!"));
+					DeploymentService.Util.getInstance().getApplications("examples", new AsyncCallback<String[]>() {
 
-					add(new HTML("<br/>"));
-					DeploymentEntry app1 = new DeploymentEntry("conference-demo.war");
-					DeploymentEntry app2 = new DeploymentEntry("shopping-demo.ear");
-					add(app1);
-					add(app2);
-					add(new HTML("<br/>"));
+						public void onFailure(Throwable arg0) {
+							Console.error("Couldn't get a list of applications");
+							
+						}
+
+						public void onSuccess(String[] apps) {
+						
+							add(new HTML("<br/><h2>You can deploy additional examples from here. Note that you still have to configure the Application Router to make the applications active!</h2>"));
+							add(new HTML("<br/>"));
+							for(String app : apps) {
+								DeploymentEntry entry = new DeploymentEntry(app);
+								add(entry);
+							}
+							add(new HTML("<br/>"));
+							
+						}
+						
+					});
 				} else {
 					add(new Label("The additional examples are not available for Tomcat. It is recommended to use the JBoss version, which includes Mobicents Media Server and enterprise features required bu some of the examples."));
 				}

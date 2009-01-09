@@ -65,7 +65,7 @@ public class UserInterface extends VerticalPanel{
 	
 	private Widget getDeploymentPage() {
 		Panel deployPanel = new Panel();
-		deployPanel.setTitle("Deploy Examples");
+		deployPanel.setTitle("Deploy Applications");
 		DeployExamplesPage page = new DeployExamplesPage();
 		deployPanel.add(page);
 		deployPanel.setIconCls("tab-icon-deploy");
