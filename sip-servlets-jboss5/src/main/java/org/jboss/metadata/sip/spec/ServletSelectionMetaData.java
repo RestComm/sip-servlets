@@ -26,14 +26,14 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.jboss.metadata.javaee.support.IdMetaDataImplWithDescriptionGroup;
+import org.jboss.metadata.javaee.support.IdMetaDataImpl;
 
 /**
  * @author jean.deruelle@gmail.com
  * @version $Revision$
  */
 @XmlType(name="servlet-SelectionType")
-public class ServletSelectionMetaData extends IdMetaDataImplWithDescriptionGroup
+public class ServletSelectionMetaData extends IdMetaDataImpl
 {
    private static final long serialVersionUID = 1;
 
