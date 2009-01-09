@@ -451,8 +451,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 		for(HttpSession session: httpSessions.values()) {
-			if(((Session)session).isValid()) {
+			try {
 				session.invalidate();
+			} catch(IllegalStateException ignore) {
+				//we ignore this exception, ugly but the only way to test for validity of the session since we cannot cast to catalina Session
+				//See Issue 523 http://code.google.com/p/mobicents/issues/detail?id=523
 			}
 		}
 		for (String key : sipApplicationSessionAttributeMap.keySet()) {
