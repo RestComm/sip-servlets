@@ -39,6 +39,7 @@ import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
+import org.apache.catalina.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -450,7 +451,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 		for(HttpSession session: httpSessions.values()) {
-			session.invalidate();
+			if(((Session)session).isValid()) {
+				session.invalidate();
+			}
 		}
 		for (String key : sipApplicationSessionAttributeMap.keySet()) {
 			removeAttribute(key);
