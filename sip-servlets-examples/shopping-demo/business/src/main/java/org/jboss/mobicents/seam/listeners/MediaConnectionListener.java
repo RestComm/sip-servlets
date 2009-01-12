@@ -11,7 +11,12 @@ import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsEndpoint;
+import org.mobicents.mscontrol.MsLink;
+import org.mobicents.mscontrol.MsLinkEvent;
+import org.mobicents.mscontrol.MsLinkListener;
+import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.mscontrol.MsProvider;
+import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.mscontrol.events.MsRequestedEvent;
@@ -34,6 +39,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
 	
 	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
+	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
 	
 	private SipServletRequest inviteRequest;	
 
@@ -83,58 +89,98 @@ public class MediaConnectionListener implements MsConnectionListener {
 	public void connectionOpen(MsConnectionEvent event) {
 		logger.info("connection opened " + event);
 		logger.info("Remote Media Connection created. Endpoints connected " + event.getEventID());
-		MsConnection connection = event.getConnection();
+		
+		final MsConnection connection = event.getConnection();
 		MsEndpoint endpoint = connection.getEndpoint();
-		MsProvider provider = connection.getSession().getProvider();
-		
-		MsEventFactory eventFactory = provider.getEventFactory();
-		String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audioFilePath");
-		
-		// Let us request for Announcement Complete event or Failure
-		// in case if it happens
-		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
-		onCompleted.setEventAction(MsEventAction.NOTIFY);
+		final MsSession session = connection.getSession();
+		final MsLink link = session.createLink(MsLinkMode.FULL_DUPLEX);
+		link.addLinkListener(new MsLinkListener() {
 
-		MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
-		onFailed.setEventAction(MsEventAction.NOTIFY);
-		
-		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
-        
-		DTMFListener dtmfListener = new DTMFListener(eventFactory, connection, inviteRequest.getSession(), pathToAudioDirectory);
-		connection.addNotificationListener(dtmfListener);
-		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
-	
-		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
-		
-		if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
-			java.io.File speech = new File("speech.wav");
-			if(inviteRequest.getSession().getApplicationSession().getAttribute("adminApproval") != null) {
-				speech = new File("adminspeech.wav");	
-			}			
-			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
-	        play.setURL("file://"+ speech.getAbsolutePath());
+			public void linkCreated(MsLinkEvent evt) {
+				logger.info("PR-IVR link created " + evt);
+			}
 
-	        endpoint.execute(requestedSignals, requestedEvents, connection);
-	        
-			logger.info("Waiting for DTMF at the same time..");
-		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
-			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
-			logger.info("Playing Delivery Date Announcement : " + announcementFile);
-			play.setURL(announcementFile);
-			endpoint.execute(requestedSignals, requestedEvents, connection);
+			public void linkConnected(MsLinkEvent evt) {
+				logger.info("link connected " + link.getEndpoints()[0].getLocalName() +
+						" " + link.getEndpoints()[1].getLocalName());
+				MsProvider provider = session.getProvider();
+				MsEventFactory eventFactory = provider.getEventFactory();
+				
+				MsEndpoint endpoint = link.getEndpoints()[0];
+				
+				String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audioFilePath");
+				
+				// Let us request for Announcement Complete event or Failure
+				// in case if it happens
+				MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
+				onCompleted.setEventAction(MsEventAction.NOTIFY);
+
+				MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
+				onFailed.setEventAction(MsEventAction.NOTIFY);
+				
+				MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+		        
+				DTMFListener dtmfListener = new DTMFListener(eventFactory, link, inviteRequest.getSession(), pathToAudioDirectory);
+				link.addNotificationListener(dtmfListener);
+				MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
 			
-			logger.info("Waiting for DTMF at the same time..");
-		} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
-			java.io.File speech = new File("shipping.wav");
-			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
-			MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
-			connection.addNotificationListener(mediaResourceListener);
-			play.setURL("file://"+ speech.getAbsolutePath());
-			endpoint.execute(requestedSignals, requestedEvents, connection);
-			
-			logger.info("shipping announcement played. tearing down the call");
-		}		
+				MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+		        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
+				
+				if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
+					java.io.File speech = new File("speech.wav");
+					if(inviteRequest.getSession().getApplicationSession().getAttribute("adminApproval") != null) {
+						speech = new File("adminspeech.wav");	
+					}			
+					logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
+			        play.setURL("file://"+ speech.getAbsolutePath());
+
+			        endpoint.execute(requestedSignals, requestedEvents, link);
+			        
+					logger.info("Waiting for DTMF at the same time..");
+				} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
+					String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
+					logger.info("Playing Delivery Date Announcement : " + announcementFile);
+					play.setURL(announcementFile);
+					endpoint.execute(requestedSignals, requestedEvents, link);
+					
+					logger.info("Waiting for DTMF at the same time..");
+				} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
+					java.io.File speech = new File("shipping.wav");
+					logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
+					MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
+					connection.addNotificationListener(mediaResourceListener);
+					play.setURL("file://"+ speech.getAbsolutePath());
+					endpoint.execute(requestedSignals, requestedEvents, link);
+					
+					logger.info("shipping announcement played. tearing down the call");
+				}		
+			}
+
+			public void linkDisconnected(MsLinkEvent evt) {
+				logger.info("link disconnected " + evt);
+			}
+
+			public void linkFailed(MsLinkEvent evt) {
+				logger.info("link failed " + evt);
+			}
+
+			public void modeFullDuplex(MsLinkEvent evt) {
+				logger.info("link mode full duplex" + evt);
+			}
+
+			public void modeHalfDuplex(MsLinkEvent evt) {
+				logger.info("link mode half duplex" + evt);
+			}
+		});
+		
+		String log = "Linking " + endpoint.getLocalName() + " to IVR";
+		logger.info(log);
+		
+		link.join(IVR_JNDI_NAME, endpoint.getLocalName());
+		
+		
+
 	}
 
 	public void connectionModeRecvOnly(MsConnectionEvent arg0) {

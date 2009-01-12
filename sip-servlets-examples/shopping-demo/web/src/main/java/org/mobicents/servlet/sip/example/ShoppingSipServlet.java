@@ -249,7 +249,7 @@ public class ShoppingSipServlet
 			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
-			MsConnection connection = session.createNetworkConnection(MediaConnectionListener.IVR_JNDI_NAME);
+			MsConnection connection = session.createNetworkConnection(MediaConnectionListener.PR_JNDI_NAME);
 			MediaConnectionListener listener = new MediaConnectionListener();
 			listener.setInviteRequest(sipServletRequest);
 //			provider.addConnectionListener(listener);
