@@ -46,7 +46,7 @@ import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
 public class MediaPlaybackServlet extends SipServlet {
 	private static Log logger = LogFactory.getLog(MediaPlaybackServlet.class);
 	
-	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
+	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
 	
 	public MediaPlaybackServlet() {
 	}
@@ -75,7 +75,7 @@ public class MediaPlaybackServlet extends SipServlet {
 			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
-			MsConnection connection = session.createNetworkConnection(IVR_JNDI_NAME);
+			MsConnection connection = session.createNetworkConnection(PR_JNDI_NAME);
 			MediaConnectionListener listener = new MediaConnectionListener();
 			listener.setInviteRequest(request);
 			connection.addConnectionListener(listener);

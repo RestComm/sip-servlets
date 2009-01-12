@@ -13,6 +13,7 @@ import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsProvider;
+import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.mscontrol.events.MsRequestedEvent;
@@ -21,6 +22,11 @@ import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
 import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
 import org.mobicents.mscontrol.events.pkg.DTMF;
 import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
+import org.mobicents.mscontrol.MsLink;
+import org.mobicents.mscontrol.MsLinkEvent;
+import org.mobicents.mscontrol.MsLinkListener;
+import org.mobicents.mscontrol.MsLinkMode;
+
 
 /**
  * This class is registered in the media server to be notified on media connection
@@ -32,6 +38,7 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
  */
 public class MediaConnectionListener implements MsConnectionListener{
 	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
+	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
 	
 	private SipServletRequest inviteRequest;
 	
@@ -62,39 +69,78 @@ public class MediaConnectionListener implements MsConnectionListener{
 
 	public void connectionOpen(MsConnectionEvent event) {
 		logger.info("connection opened " + event);
+		final MsConnection connection = event.getConnection();
+		MsEndpoint endpoint = connection.getEndpoint();
+		final MsSession session = connection.getSession();
+		final MsLink link = session.createLink(MsLinkMode.FULL_DUPLEX);
+		link.addLinkListener(new MsLinkListener() {
+
+			public void linkCreated(MsLinkEvent evt) {
+				logger.info("PR-IVR link created " + evt);
+			}
+
+			public void linkConnected(MsLinkEvent evt) {
+				logger.info("link connected " + link.getEndpoints()[0].getLocalName() +
+						" " + link.getEndpoints()[1].getLocalName());
+				MsProvider provider = session.getProvider();
+				MsEventFactory eventFactory = provider.getEventFactory();
+				java.io.File speech = new File("speech.wav");
+				
+				// Let us request for Announcement Complete event or Failure
+				// in case if it happens
+				MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
+				onCompleted.setEventAction(MsEventAction.NOTIFY);
+
+				MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
+				onFailed.setEventAction(MsEventAction.NOTIFY);
+				
+				MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+				
+				play.setURL("file://" + speech.getAbsolutePath());
+				
+				DTMFListener dtmfListener = new DTMFListener(eventFactory, link);
+				provider.addNotificationListener(dtmfListener);
+				MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
+				
+				MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+		        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { //onCompleted, onFailed,
+		        		dtmf };
+				
+		        logger.info("Executing requests...");
+		        link.getEndpoints()[0].execute(requestedSignals, requestedEvents, (MsLink) link);		
+			}
+
+			public void linkDisconnected(MsLinkEvent evt) {
+				logger.info("link disconnected " + evt);
+			}
+
+			public void linkFailed(MsLinkEvent evt) {
+				logger.info("link failed " + evt);
+			}
+
+			public void modeFullDuplex(MsLinkEvent evt) {
+				logger.info("link mode full duplex" + evt);
+			}
+
+			public void modeHalfDuplex(MsLinkEvent evt) {
+				logger.info("link mode half duplex" + evt);
+			}
+		});
+		
+		String log = "Linking " + endpoint.getLocalName() + " to IVR";
+		logger.info(log);
+		
+		link.join(IVR_JNDI_NAME, endpoint.getLocalName());
+		
 		String sdp = event.getConnection().getLocalDescriptor();
 		SipServletResponse sipServletResponse = inviteRequest.createResponse(SipServletResponse.SC_OK);
 		try {
 			sipServletResponse.setContent(sdp, "application/sdp");
 			sipServletResponse.send();
 		} catch (Exception e) {e.printStackTrace();}
-		MsConnection connection = event.getConnection();
-		MsEndpoint endpoint = connection.getEndpoint();
-		MsProvider provider = connection.getSession().getProvider();
-		MsEventFactory eventFactory = provider.getEventFactory();
-		java.io.File speech = new File("speech.wav");
-		
-		// Let us request for Announcement Complete event or Failure
-		// in case if it happens
-		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
-		onCompleted.setEventAction(MsEventAction.NOTIFY);
 
-		MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
-		onFailed.setEventAction(MsEventAction.NOTIFY);
-		
-		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
-		
-		play.setURL("file://" + speech.getAbsolutePath());
-		
-		DTMFListener dtmfListener = new DTMFListener(eventFactory, connection);
-		provider.addNotificationListener(dtmfListener);
-		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
-		
-		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
-		
-		endpoint.execute(requestedSignals, requestedEvents, connection);		
 	}
+
 
 	public SipServletRequest getInviteRequest() {
 		return inviteRequest;

@@ -2,6 +2,7 @@ package org.mobicents.servlet.sip.example;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.events.MsEventFactory;
@@ -16,11 +17,11 @@ public class DTMFListener implements MsNotificationListener {
 	private static Log logger = LogFactory.getLog(DTMFListener.class);
 	
 	MsEventFactory eventFactory;
-	MsConnection connection;
+	MsLink link;
 	
-	public DTMFListener(MsEventFactory eventFactory, MsConnection connection) {
+	public DTMFListener(MsEventFactory eventFactory, MsLink link) {
 		this.eventFactory = eventFactory;
-		this.connection = connection;
+		this.link = link;
 	}
 	
 	public void update(MsNotifyEvent evt) {
@@ -35,7 +36,7 @@ public class DTMFListener implements MsNotificationListener {
 		MsRequestedSignal[] signals = new MsRequestedSignal[] {};
 		MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
 
-		connection.getEndpoint().execute(signals, events, connection);
+		link.getEndpoints()[0].execute(signals, events, link);
 	}
 
 	public void resourceCreated(MsNotifyEvent arg0) {
