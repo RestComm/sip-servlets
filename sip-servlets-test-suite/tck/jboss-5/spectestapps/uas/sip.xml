@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<sip-app>
+<sip-app xmlns="http://www.jcp.org/xml/ns/sipservlet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.jcp.org/xml/ns/sipservlet http://www.jcp.org/xml/ns/sipservlet/sip-app_1_1.xsd"
+        xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        version="1.1">
   <app-name>com.bea.sipservlet.tck.apps.spectestapp.uas</app-name> 
 
   <context-param>
-    <param-name>pet</param-name>
-    <param-value>cat</param-value>
+    <javaee:param-name>pet</javaee:param-name>
+    <javaee:param-value>cat</javaee:param-value>
   </context-param>
   <context-param>
-    <param-name>hobby</param-name>
-    <param-value>halo</param-value>
+    <javaee:param-name>hobby</javaee:param-name>
+    <javaee:param-value>halo</javaee:param-value>
   </context-param>
 
   <servlet>
-    <servlet-name>Context</servlet-name>
-    <servlet-class>com.bea.sipservlet.tck.apps.spec.uas.ContextServlet</servlet-class>
-    <init-param>
-      <param-name>eyes</param-name>
-      <param-value>brown</param-value>
-    </init-param>
+    <javaee:servlet-name>Context</javaee:servlet-name>
+    <javaee:servlet-class>com.bea.sipservlet.tck.apps.spec.uas.ContextServlet</javaee:servlet-class>
+    <javaee:init-param>
+      <javaee:param-name>eyes</javaee:param-name>
+      <javaee:param-value>brown</javaee:param-value>
+    </javaee:init-param>
 
-    <init-param>
-      <param-name>hair</param-name>
-      <param-value>black</param-value>
-    </init-param>
+    <javaee:init-param>
+      <javaee:param-name>hair</javaee:param-name>
+      <javaee:param-value>black</javaee:param-value>
+    </javaee:init-param>
 
   </servlet>
 

@@ -27,8 +27,10 @@ import org.jboss.metadata.javaee.spec.Environment;
 import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
-import org.jboss.metadata.web.spec.ServletMetaData;
-import org.jboss.metadata.web.spec.ServletsMetaData;
+import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
+import org.jboss.metadata.javaee.support.IdMetaDataImpl;
+import org.jboss.metadata.sip.jboss.JBossSip11MetaData;
+import org.jboss.metadata.sip.jboss.JBossSip11ServletsMetaData;
 
 /**
  * Create a merged SipMetaData view from an xml + annotation views
@@ -41,9 +43,15 @@ public class SipAnnotationMergedView {
 	public static void merge(SipMetaData merged, SipMetaData xml, SipMetaData annotation)
 	   {
 	      //Merge the servlets meta data
-	      ServletsMetaData servletsMetaData = new ServletsMetaData();
-	      merge(servletsMetaData,xml.getSipServlets(), annotation.getSipServlets());
-	      merged.setSipServlets(servletsMetaData);
+		SipServletsMetaData servletsMetaData = null;
+		if (merged instanceof Sip11MetaData) {
+			servletsMetaData = new Sip11ServletsMetaData();
+		}
+		if (merged instanceof JBossSip11MetaData) {
+			servletsMetaData = new JBossSip11ServletsMetaData();			
+		}
+		merge(servletsMetaData, xml.getServlets(), annotation.getServlets());
+		merged.setServlets(servletsMetaData);  
 	      
 	      //Security Roles
 	      SecurityRolesMetaData securityRolesMetaData = new SecurityRolesMetaData();
@@ -68,15 +76,15 @@ public class SipAnnotationMergedView {
 	      mergeIn(merged,xml);
 	   }
 	   
-	   private static void merge(ServletsMetaData merged, ServletsMetaData xml,
-	         ServletsMetaData annotation)
+	   private static void merge(SipServletsMetaData merged, SipServletsMetaData xml,
+	         SipServletsMetaData annotation)
 	   {
 	      HashMap<String,String> servletClassToName = new HashMap<String,String>();
 	      if(xml != null)
 	      {
-	         if(xml.getId() != null)
-	            merged.setId(xml.getId());
-	         for(ServletMetaData servlet : xml)
+	         if(((IdMetaDataImpl)xml).getId() != null)
+	        	 ((IdMetaDataImpl)merged).setId(((IdMetaDataImpl)xml).getId());
+	         for(SipServletMetaData servlet : ((AbstractMappedMetaData<SipServletMetaData>)xml))
 	         {
 	            String className = servlet.getServletName();
 	            if(className != null)
@@ -93,37 +101,37 @@ public class SipAnnotationMergedView {
 	      // First get the annotation beans without an xml entry
 	      if(annotation != null)
 	      {
-	         for(ServletMetaData servlet : annotation)
+	         for(SipServletMetaData servlet : ((AbstractMappedMetaData<SipServletMetaData>)annotation))
 	         {
 	            if(xml != null)
 	            {
 	               // This is either the servlet-name or the servlet-class simple name
 	               String servletName = servlet.getServletName();
-	               ServletMetaData match = xml.get(servletName);
+	               SipServletMetaData match = ((AbstractMappedMetaData<SipServletMetaData>)xml).get(servletName);
 	               if(match == null)
 	               {
 	                  // Lookup by the unqualified servlet class
 	                  String xmlServletName = servletClassToName.get(servletName);
 	                  if(xmlServletName == null)
-	                     merged.add(servlet);
+	                	  ((AbstractMappedMetaData<SipServletMetaData>)merged).add(servlet);
 	               }
 	            }
 	            else
 	            {
-	               merged.add(servlet);
+	            	((AbstractMappedMetaData<SipServletMetaData>)merged).add(servlet);
 	            }
 	         }
 	      }
 	      // Now merge the xml and annotations
 	      if(xml != null)
 	      {
-	         for(ServletMetaData servlet : xml)
+	         for(SipServletMetaData servlet : ((AbstractMappedMetaData<SipServletMetaData>)xml))
 	         {
-	            ServletMetaData annServlet = null;
+	            SipServletMetaData annServlet = null;
 	            if(annotation != null)
 	            {
 	               String name = servlet.getServletName();
-	               annServlet = annotation.get(name);
+	               annServlet = ((AbstractMappedMetaData<SipServletMetaData>)annotation).get(name);
 	               if(annServlet == null)
 	               {
 	                  // Lookup by the unqualified servlet class
@@ -134,18 +142,18 @@ public class SipAnnotationMergedView {
 	                     int dot = className.lastIndexOf('.');
 	                     if(dot >= 0)
 	                        className = className.substring(dot+1);
-	                     annServlet = annotation.get(className);
+	                     annServlet = ((AbstractMappedMetaData<SipServletMetaData>)annotation).get(className);
 	                  }
 	               }
 	            }
 	            // Merge
-	            ServletMetaData mergedServletMetaData = servlet;
+	            SipServletMetaData mergedServletMetaData = servlet;
 	            if(annServlet != null)
 	            {
-	               mergedServletMetaData = new ServletMetaData();
+	               mergedServletMetaData = new Sip11ServletMetaData();
 	               mergedServletMetaData.merge(servlet, annServlet);
 	            }
-	            merged.add(mergedServletMetaData);
+	            ((AbstractMappedMetaData<SipServletMetaData>)merged).add(mergedServletMetaData);
 	         }
 	      } 
 	   }

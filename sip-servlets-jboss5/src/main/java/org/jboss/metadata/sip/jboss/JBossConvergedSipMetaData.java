@@ -22,7 +22,6 @@
 package org.jboss.metadata.sip.jboss;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,21 +29,18 @@ import org.jboss.metadata.ejb.jboss.JBossEnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.jboss.RunAsIdentityMetaData;
 import org.jboss.metadata.javaee.spec.Environment;
 import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
-import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.sip.spec.ParamValueMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
 import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.web.jboss.JBossServletMetaData;
-import org.jboss.metadata.web.jboss.JBossServletsMetaData;
+import org.jboss.metadata.sip.spec.SipServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
-import org.jboss.metadata.web.spec.ServletsMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
-import org.jboss.metadata.web.spec.Web25MetaData;
 
 /**
  * Extend the JBossWebMetaData from JBoss 5 to provide support for converged sip/http applications
@@ -61,7 +57,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private List<SipSecurityConstraintMetaData> sipSecurityContraints;
 	private SessionConfigMetaData sipSessionConfig;
 	private SipLoginConfigMetaData sipLoginConfig;     
-	private List<ParamValueMetaData> sipContextParams;
+	private List<? extends ParamValueMetaData> sipContextParams;
 	private List<ListenerMetaData> sipListeners;
 	private JBossServletsMetaData sipServlets;
 	private Method sipApplicationKeyMethod;
@@ -93,10 +89,10 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
            setMetadataComplete(sip11MD.isMetadataComplete());
         }
       
-      if(override != null && override.getContextParams()!= null)
-          setContextParams(override.getContextParams());
+      if(override != null && override.getSipContextParams()!= null)
+          setSipContextParams(override.getSipContextParams());
        else if(original != null && original.getContextParams() != null)
-          setContextParams(original.getContextParams());       
+          setSipContextParams(original.getContextParams());       
       
       if(override != null && override.getServletVersion()!= null)
           setServletVersion(override.getServletVersion());
@@ -269,21 +265,27 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
           setSipListeners(original.getListeners());
       
       JBossServletsMetaData soverride = null;
-      ServletsMetaData soriginal = null;
+      SipServletsMetaData soriginal = null;
       if(override != null)
          soverride = override.getSipServlets();
-      if(original != null)
-         soriginal = original.getSipServlets();
+      if(original != null) {
+    	  if(original instanceof Sip11MetaData) {
+    		  soriginal = ((Sip11MetaData)original).getServlets();
+    	  }
+    	  if(original instanceof JBossSip11MetaData) {
+    		  soriginal = ((JBossSip11MetaData)original).getServlets();
+    	  }
+      }
       sipServlets = JBossServletsMetaData.merge(soverride, soriginal);
 
 
-      if(sipContextParams != null) {
-	      List<ParamValueMetaData> mergedContextParams = new ArrayList<ParamValueMetaData>(sipContextParams);
-	      if(override != null && override.getContextParams() != null) {
-	    	  mergedContextParams.addAll(override.getContextParams());
-	      }
-	      setContextParams(mergedContextParams);
-      }      
+//      if(sipContextParams != null) {
+//	      List<ParamValueMetaData> mergedContextParams = new ArrayList<ParamValueMetaData>(sipContextParams);
+//	      if(override != null && override.getContextParams() != null) {
+//	    	  mergedContextParams.addAll(override.getContextParams());
+//	      }
+//	      setContextParams(mergedContextParams);
+//      }      
       
       if(override != null && override.getSipApplicationKeyMethod()!= null)
           setSipApplicationKeyMethod(override.getSipApplicationKeyMethod());
@@ -388,13 +390,13 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	/**
 	 * @param sipContextParams the sipContextParams to set
 	 */
-	public void setSipContextParams(List<ParamValueMetaData> sipContextParams) {
+	public void setSipContextParams(List<? extends ParamValueMetaData> sipContextParams) {
 		this.sipContextParams = sipContextParams;
 	}
 	/**
 	 * @return the sipContextParams
 	 */
-	public List<ParamValueMetaData> getSipContextParams() {
+	public List<? extends ParamValueMetaData> getSipContextParams() {
 		return sipContextParams;
 	}
 	/**

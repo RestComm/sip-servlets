@@ -28,20 +28,19 @@ import org.jboss.metadata.javaee.spec.DisplayNameImpl;
 import org.jboss.metadata.javaee.spec.DisplayNamesImpl;
 import org.jboss.metadata.javaee.spec.IconImpl;
 import org.jboss.metadata.javaee.spec.IconsImpl;
-import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
+import org.jboss.metadata.sip.jboss.JBossServletsMetaData;
+import org.jboss.metadata.sip.spec.ParamValueMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionsMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.web.jboss.JBossServletsMetaData;
+import org.jboss.metadata.sip.spec.SipServletMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
-import org.jboss.metadata.web.spec.ServletMetaData;
-import org.jboss.metadata.web.spec.ServletsMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -61,6 +60,28 @@ public class SipJBossContextConfig extends JBossContextConfig {
 
 	private static transient Log logger = LogFactory
 			.getLog(SipJBossContextConfig.class);
+
+	@Override
+	protected void processContextParameters() {		
+		super.processContextParameters();
+		
+		JBossWebMetaData metaData = metaDataLocal.get();
+		if(metaData instanceof JBossConvergedSipMetaData && context instanceof SipStandardContext) {			
+			processSipContextParameters((JBossConvergedSipMetaData)metaData);
+		}
+	}
+	
+	/**
+	 * Process the context parameters defined in sip.xml. Let a user application
+     * 	override the sharedMetaData values.
+     */
+	protected void processSipContextParameters(JBossConvergedSipMetaData metaData) {
+		if(metaData.getSipContextParams() != null) {
+			for (org.jboss.metadata.sip.spec.ParamValueMetaData param : metaData.getSipContextParams()) {
+				context.addParameter(param.getParamName(), param.getParamValue());
+			}
+		}
+	}
 
 	@Override
 	protected void processWebMetaData(JBossWebMetaData metaData) {
@@ -180,7 +201,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			if(sipServlets.size() > 1 && !servletSelectionSet) {
 				throw new IllegalArgumentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
 			}
-			for (ServletMetaData value : sipServlets) {
+			for (SipServletMetaData value : sipServlets) {
 				SipServletImpl wrapper = (SipServletImpl)convergedContext.createWrapper();
 				wrapper.setName(value.getName());
 				// no main servlet defined in the sip.xml we take the name of the only sip servlet present
@@ -196,7 +217,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 				if (value.getRunAs() != null) {
 					wrapper.setRunAs(value.getRunAs().getRoleName());
 				}
-				List<ParamValueMetaData> params = value.getInitParam();
+				List<? extends ParamValueMetaData> params = value.getInitParam();
 				if (params != null) {
 					for (ParamValueMetaData param : params) {
 						wrapper.addInitParameter(param.getParamName(), param

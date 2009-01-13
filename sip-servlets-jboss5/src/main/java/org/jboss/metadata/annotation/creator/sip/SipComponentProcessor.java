@@ -30,7 +30,12 @@ import org.jboss.metadata.annotation.creator.web.RunAsProcessor;
 import org.jboss.metadata.annotation.finder.AnnotationFinder;
 import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.sip.jboss.JBossSip11MetaData;
+import org.jboss.metadata.sip.jboss.JBossSip11ServletsMetaData;
+import org.jboss.metadata.sip.spec.Sip11MetaData;
+import org.jboss.metadata.sip.spec.Sip11ServletsMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
+import org.jboss.metadata.sip.spec.SipServletsMetaData;
 import org.jboss.metadata.web.spec.ServletsMetaData;
 
 /**
@@ -71,13 +76,13 @@ public class SipComponentProcessor extends AbstractComponentProcessor<SipMetaDat
       super.process(env, type);
       
       // @RunAs
-      ServletsMetaData servlets = metaData.getSipServlets();
-      if(servlets == null)
-      {
-         servlets = new ServletsMetaData();
-         metaData.setSipServlets(servlets);
+	  SipServletsMetaData servlets = metaData.getServlets();
+	  if(servlets == null)
+      {   
+		  servlets = new Sip11ServletsMetaData();
+     	  metaData.setServlets(servlets);
       }
-      super.processClass(servlets, type);
+	  super.processClass(servlets, type);
       
       // @DeclareRoles
       SecurityRolesMetaData securityRoles = metaData.getSecurityRoles();
