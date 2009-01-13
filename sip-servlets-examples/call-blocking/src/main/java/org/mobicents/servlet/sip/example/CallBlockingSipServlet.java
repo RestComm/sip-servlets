@@ -23,6 +23,8 @@ import java.util.List;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
@@ -37,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Jean Deruelle
  *
  */
-public class CallBlockingSipServlet extends SipServlet {
+public class CallBlockingSipServlet extends SipServlet implements SipServletListener {
 
 	private static Log logger = LogFactory.getLog(CallBlockingSipServlet.class);
 	List<String> blockedUris = null;
@@ -76,5 +78,9 @@ public class CallBlockingSipServlet extends SipServlet {
 	protected void doBye(SipServletRequest req) throws ServletException,
 			IOException {
 		logger.info("Call Blocking doesn't handle BYE requests");
+	}
+
+	public void servletInitialized(SipServletContextEvent arg0) {
+		logger.info("the call blocking sip servlet has been initialized");
 	}
 }

@@ -9,4 +9,8 @@
                 <javaee:servlet-class>org.mobicents.servlet.sip.example.CallBlockingSipServlet</javaee:servlet-class>
                 <javaee:load-on-startup>1</javaee:load-on-startup>
         </servlet>
+        
+        <listener>
+        	<javaee:listener-class>org.mobicents.servlet.sip.example.CallBlockingSipServlet</javaee:listener-class>
+        </listener>
 </sip-app>	
