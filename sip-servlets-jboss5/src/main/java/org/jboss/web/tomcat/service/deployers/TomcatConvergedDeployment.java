@@ -285,7 +285,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		SecurityContextEstablishmentValve scevalve = new SecurityContextEstablishmentValve(
 				metaDataSecurityDomain, SecurityUtil
 						.unprefixSecurityDomain(config
-								.getDefaultSecurityDomain()), config.getSecurityContextClassName().getClass(),
+								.getDefaultSecurityDomain()), Class.forName(config.getSecurityContextClassName()),
 				getSecurityManagement());
 		context.addValve(scevalve);
 
