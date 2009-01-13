@@ -34,7 +34,7 @@ import org.jboss.metadata.annotation.creator.Processor;
 import org.jboss.metadata.annotation.creator.ProcessorUtils;
 import org.jboss.metadata.annotation.finder.AnnotationFinder;
 import org.jboss.metadata.sip.spec.SipMetaData;
-import org.jboss.metadata.web.spec.ListenerMetaData;
+import org.jboss.metadata.sip.spec.ListenerMetaData;
 
 /**
  * Create the correct meta data for a SipListener annotation.

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2007, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2008, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -21,15 +21,32 @@
  */
 package org.jboss.metadata.sip.spec;
 
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
+
+import org.jboss.metadata.javaee.support.IdMetaDataImpl;
+import org.jboss.metadata.web.spec.LocaleEncodingMetaData;
+import org.jboss.xb.annotations.JBossXmlNsPrefix;
 
 /**
- * @author Scott.Stark@jboss.org
- * @version $Revision: 65943 $
+ * @author jean.deruelle@gmail.com
+ *
  */
-public interface SipServletsMetaData {
-//	private static final long serialVersionUID = 1;
-//   public SipServletsMetaData(String name)
-//   {
-//      super(name);
-//   }
+public class LocaleEncodingsMetaData extends IdMetaDataImpl
+{
+	   private static final long serialVersionUID = 1;
+
+	   private List<LocaleEncodingMetaData> mappings;
+
+	   public List<LocaleEncodingMetaData> getMappings()
+	   {
+	      return mappings;
+	   }
+	   @XmlElement(name="locale-encoding-mapping")
+	   @JBossXmlNsPrefix(prefix="javaee", schemaTargetIfNotMapped=true)
+	   public void setMappings(List<LocaleEncodingMetaData> mappings)
+	   {
+	      this.mappings = mappings;
+	   }   
 }

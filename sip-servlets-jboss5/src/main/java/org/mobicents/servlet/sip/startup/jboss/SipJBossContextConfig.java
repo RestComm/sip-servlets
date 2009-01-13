@@ -38,9 +38,9 @@ import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionsMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.sip.spec.SipServletMetaData;
+import org.jboss.metadata.sip.spec.ServletMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.jboss.metadata.web.spec.ListenerMetaData;
+import org.jboss.metadata.sip.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -201,7 +201,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			if(sipServlets.size() > 1 && !servletSelectionSet) {
 				throw new IllegalArgumentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
 			}
-			for (SipServletMetaData value : sipServlets) {
+			for (ServletMetaData value : sipServlets) {
 				SipServletImpl wrapper = (SipServletImpl)convergedContext.createWrapper();
 				wrapper.setName(value.getName());
 				// no main servlet defined in the sip.xml we take the name of the only sip servlet present

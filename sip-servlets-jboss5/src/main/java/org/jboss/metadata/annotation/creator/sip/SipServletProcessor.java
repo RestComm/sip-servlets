@@ -41,17 +41,12 @@ import org.jboss.metadata.javaee.spec.EmptyMetaData;
 import org.jboss.metadata.javaee.spec.IconImpl;
 import org.jboss.metadata.javaee.spec.IconsImpl;
 import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
-import org.jboss.metadata.sip.jboss.JBossSip11MetaData;
-import org.jboss.metadata.sip.jboss.JBossSip11ServletsMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
-import org.jboss.metadata.sip.spec.Sip11MetaData;
-import org.jboss.metadata.sip.spec.Sip11ServletMetaData;
-import org.jboss.metadata.sip.spec.Sip11ServletsMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
-import org.jboss.metadata.sip.spec.SipServletMetaData;
-import org.jboss.metadata.sip.spec.SipServletsMetaData;
-import org.jboss.metadata.web.spec.SessionConfigMetaData;
+import org.jboss.metadata.sip.spec.ServletMetaData;
+import org.jboss.metadata.sip.spec.ServletsMetaData;
+import org.jboss.metadata.sip.spec.SessionConfigMetaData;
 
 /**
  * Create the correct meta data for a SipServlet annotation.
@@ -74,16 +69,16 @@ public class SipServletProcessor extends
 		if (servlet == null)
 			return ;
 		
-		SipServletMetaData beanMetaData = create(beanClass, servlet);
+		ServletMetaData beanMetaData = create(beanClass, servlet);
 		if(beanMetaData == null)
 	         return; 						
 		
-		SipServletsMetaData servletsMetaData = sipMetaData.getServlets(); 
+		ServletsMetaData servletsMetaData = sipMetaData.getServlets(); 
 		if(servletsMetaData == null) {
-			servletsMetaData = new Sip11ServletsMetaData();
+			servletsMetaData = new ServletsMetaData();
         	 sipMetaData.setServlets(servletsMetaData);
 		}
-		((AbstractMappedMetaData<SipServletMetaData>)servletsMetaData).add(beanMetaData);
+		((AbstractMappedMetaData<ServletMetaData>)servletsMetaData).add(beanMetaData);
 				
 		if(sipMetaData.getServletSelection() == null) {
 			sipMetaData.setServletSelection(new ServletSelectionMetaData());
@@ -121,13 +116,13 @@ public class SipServletProcessor extends
 		}
 	}
 	
-	public SipServletMetaData create(Class<?> beanClass, SipServlet servlet) {		
+	public ServletMetaData create(Class<?> beanClass, SipServlet servlet) {		
 		String name = servlet.name();
 		if (name == null || name.equals("")) {
 			name = beanClass.getSimpleName(); // if no name is specified deduce from the classname
 		} 
 		
-		SipServletMetaData servletMetaData = new Sip11ServletMetaData();
+		ServletMetaData servletMetaData = new ServletMetaData();
 		servletMetaData.setName(name);		
 		servletMetaData.setServletName(name);
 		servletMetaData.setServletClass(beanClass.getCanonicalName());

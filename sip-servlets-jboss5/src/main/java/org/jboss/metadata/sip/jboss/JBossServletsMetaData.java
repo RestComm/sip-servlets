@@ -22,8 +22,8 @@
 package org.jboss.metadata.sip.jboss;
 
 import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
-import org.jboss.metadata.sip.spec.SipServletMetaData;
-import org.jboss.metadata.sip.spec.SipServletsMetaData;
+import org.jboss.metadata.sip.spec.ServletMetaData;
+import org.jboss.metadata.sip.spec.ServletsMetaData;
 
 /**
  * jboss-web/serlvet collection
@@ -37,7 +37,7 @@ public class JBossServletsMetaData
    private static final long serialVersionUID = 1;
 
    public static JBossServletsMetaData merge(JBossServletsMetaData override,
-         SipServletsMetaData original)
+         ServletsMetaData original)
    {
       JBossServletsMetaData merged = new JBossServletsMetaData();
       if (override == null && original == null)
@@ -45,7 +45,7 @@ public class JBossServletsMetaData
 
       if(original != null)
       {
-         for(SipServletMetaData smd : ((AbstractMappedMetaData<SipServletMetaData>)original))
+         for(ServletMetaData smd : ((AbstractMappedMetaData<ServletMetaData>)original))
          {
             String key = smd.getKey();
             if(override != null && override.containsKey(key))

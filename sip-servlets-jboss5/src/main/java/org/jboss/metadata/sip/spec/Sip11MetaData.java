@@ -34,8 +34,8 @@ public class Sip11MetaData extends SipMetaData
 {
    private static final long serialVersionUID = 1;
 	private boolean metadataComplete;
-	private Sip11ServletsMetaData servlets;
-	private List<Sip11ParamValueMetaData> contextParams;
+//	private Sip11ServletsMetaData servlets;
+//	private List<Sip11ParamValueMetaData> contextParams;
 
 	public boolean isMetadataComplete() {
 		return metadataComplete;
@@ -46,33 +46,33 @@ public class Sip11MetaData extends SipMetaData
 		this.metadataComplete = metadataComplete;
 	}
 
-	public List<Sip11ParamValueMetaData> getContextParams() {
-		return contextParams;
-	}
+//	public List<Sip11ParamValueMetaData> getContextParams() {
+//		return contextParams;
+//	}
+//
+//	@Override
+//	@XmlTransient
+//	public void setContextParams(List<? extends ParamValueMetaData> params) {
+//		this.contextParams = (List<Sip11ParamValueMetaData>) params;
+//	}
+//
+//	@XmlElement(name = "context-param")
+//	public void setSipContextParams(List<Sip11ParamValueMetaData> params) {
+//		this.contextParams = params;
+//	}
 
-	@Override
-	@XmlTransient
-	public void setContextParams(List<? extends ParamValueMetaData> params) {
-		this.contextParams = (List<Sip11ParamValueMetaData>) params;
-	}
-
-	@XmlElement(name = "context-param")
-	public void setSipContextParams(List<Sip11ParamValueMetaData> params) {
-		this.contextParams = params;
-	}
-
-	public Sip11ServletsMetaData getServlets() {
-		return this.servlets;
-	}
-
-	@XmlElement(name = "servlet")
-	public void setServlets(Sip11ServletsMetaData sipServlets) {
-		this.servlets = sipServlets;
-	}
-
-	@Override
-	@XmlTransient
-	public void setServlets(SipServletsMetaData sipServlets) {
-		this.servlets = (Sip11ServletsMetaData) sipServlets;
-	}  
+//	public Sip11ServletsMetaData getServlets() {
+//		return this.servlets;
+//	}
+//
+//	@XmlElement(name = "servlet")
+//	public void setServlets(Sip11ServletsMetaData sipServlets) {
+//		this.servlets = sipServlets;
+//	}
+//
+//	@Override
+//	@XmlTransient
+//	public void setServlets(SipServletsMetaData sipServlets) {
+//		this.servlets = (Sip11ServletsMetaData) sipServlets;
+//	}  
 }

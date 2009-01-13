@@ -41,8 +41,7 @@ import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.spec.LifecycleCallbacksMetaData;
 import org.jboss.metadata.javaee.spec.MessageDestinationReferenceMetaData;
 import org.jboss.metadata.javaee.spec.MessageDestinationReferencesMetaData;
-import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
-import org.jboss.metadata.sip.spec.ParamValueMetaData;
+import org.jboss.metadata.sip.spec.MessageDestinationsMetaData;
 import org.jboss.metadata.javaee.spec.PersistenceContextReferenceMetaData;
 import org.jboss.metadata.javaee.spec.PersistenceContextReferencesMetaData;
 import org.jboss.metadata.javaee.spec.PersistenceUnitReferenceMetaData;
@@ -51,14 +50,13 @@ import org.jboss.metadata.javaee.spec.ResourceEnvironmentReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceEnvironmentReferencesMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferencesMetaData;
-import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.sip.spec.SecurityRolesMetaData;
 import org.jboss.metadata.javaee.spec.ServiceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ServiceReferencesMetaData;
 import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
 import org.jboss.metadata.javaee.support.IdMetaDataImplWithDescriptionGroup;
-import org.jboss.metadata.web.spec.ListenerMetaData;
-import org.jboss.metadata.web.spec.LocaleEncodingsMetaData;
-import org.jboss.metadata.web.spec.SessionConfigMetaData;
+import org.jboss.metadata.sip.spec.LocaleEncodingsMetaData;
+import org.jboss.metadata.sip.spec.SessionConfigMetaData;
 
 /**
  * The sip-app spec metadata. This class is based on the CR12 Tag of the WebMetaData class
@@ -75,8 +73,10 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    private String applicationName;
    private EmptyMetaData distributable;   
    private List<ListenerMetaData> listeners;
+   private List<ParamValueMetaData> contextParams;
    private ServletSelectionMetaData servletSelection;   
    private ProxyConfigMetaData proxyConfig;
+   private ServletsMetaData servlets;
    private SessionConfigMetaData sessionConfig;   
    private List<SipSecurityConstraintMetaData> sipSecurityContraints;
    private SipLoginConfigMetaData sipLoginConfig;           
@@ -164,8 +164,14 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
       this.sessionConfig = sessionConfig;
    }
    
-   public abstract List<? extends ParamValueMetaData> getContextParams();
-   public abstract void setContextParams(List<? extends ParamValueMetaData> params);
+   public List<ParamValueMetaData> getContextParams() {
+	   return contextParams;
+   }
+   
+   @XmlElement(name = "context-param")
+   public void setContextParams(List<ParamValueMetaData> params) {
+	   this.contextParams = params;
+   }
    
    public List<ListenerMetaData> getListeners()
    {
@@ -217,8 +223,13 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
       this.securityRoles = securityRoles;
    }  
 
-   public abstract SipServletsMetaData getServlets();
-   public abstract void setServlets(SipServletsMetaData sipServlets);
+   public ServletsMetaData getServlets() {
+	   return servlets;
+   }
+   @XmlElement(name="servlet")
+   public void setServlets(ServletsMetaData sipServlets) {
+	   this.servlets = sipServlets;
+   }
    /**
     * Get the jndiEnvironmentRefsGroup.
     * 

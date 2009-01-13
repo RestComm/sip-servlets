@@ -28,8 +28,8 @@ import java.util.Set;
 import org.jboss.metadata.ejb.jboss.JBossEnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.jboss.RunAsIdentityMetaData;
 import org.jboss.metadata.javaee.spec.Environment;
-import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
-import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
+import org.jboss.metadata.sip.spec.MessageDestinationsMetaData;
+import org.jboss.metadata.sip.spec.SecurityRolesMetaData;
 import org.jboss.metadata.sip.spec.ParamValueMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
@@ -37,10 +37,10 @@ import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.sip.spec.SipServletsMetaData;
+import org.jboss.metadata.sip.spec.ServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.jboss.metadata.web.spec.ListenerMetaData;
-import org.jboss.metadata.web.spec.SessionConfigMetaData;
+import org.jboss.metadata.sip.spec.ListenerMetaData;
+import org.jboss.metadata.sip.spec.SessionConfigMetaData;
 
 /**
  * Extend the JBossWebMetaData from JBoss 5 to provide support for converged sip/http applications
@@ -60,6 +60,8 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private List<? extends ParamValueMetaData> sipContextParams;
 	private List<ListenerMetaData> sipListeners;
 	private JBossServletsMetaData sipServlets;
+	private MessageDestinationsMetaData messageDestinations;
+	private SecurityRolesMetaData securityRoles;
 	private Method sipApplicationKeyMethod;
 	
 	public void merge(JBossConvergedSipMetaData override, SipMetaData original)
@@ -101,8 +103,12 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 
        if(override != null && override.getSessionConfig()!= null)
           setSessionConfig(override.getSessionConfig());
-       else if(original != null && original.getSessionConfig() != null)
-          setSessionConfig(original.getSessionConfig());
+       else if(original != null && original.getSessionConfig() != null) {
+    	   org.jboss.metadata.web.spec.SessionConfigMetaData sessionConfigMetaData = new org.jboss.metadata.web.spec.SessionConfigMetaData();
+    	   sessionConfigMetaData.setSessionTimeout(original.getSessionConfig().getSessionTimeout());
+    	   setSessionConfig(sessionConfigMetaData); 
+       }
+          
        
        if(override != null && override.getFilters()!= null)
           setFilters(override.getFilters());
@@ -114,12 +120,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
           setErrorPages(override.getErrorPages());
        
        if(override != null && override.getJspConfig()!= null)
-          setJspConfig(override.getJspConfig());
-       
-//       if(override != null && override.getListeners()!= null)
-//          setListeners(override.getListeners());
-//       else if(original != null && original.getListeners() != null)
-//          setListeners(original.getListeners());
+          setJspConfig(override.getJspConfig());       
        
        if(override != null && override.getLoginConfig()!= null)
           setLoginConfig(override.getLoginConfig());
@@ -168,23 +169,23 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
        if(override != null && override.getRunAsIdentity()!= null)
           setRunAsIdentity(override.getRunAsIdentity());
 
-       if(getSecurityRoles() == null)
-          setSecurityRoles(new SecurityRolesMetaData());
+       if(getSipSecurityRoles() == null)
+          setSipSecurityRoles(new SecurityRolesMetaData());
        SecurityRolesMetaData overrideRoles = null;
        SecurityRolesMetaData originalRoles = null;
        if(override != null)
-          overrideRoles = override.getSecurityRoles();
+          overrideRoles = override.getSipSecurityRoles();
        if(original != null)
           originalRoles = original.getSecurityRoles();
-       getSecurityRoles().merge(overrideRoles, originalRoles);
+       getSipSecurityRoles().merge(overrideRoles, originalRoles);
 
        MessageDestinationsMetaData overrideMsgDests = null;
        MessageDestinationsMetaData originalMsgDests = null;
-       if(override != null && override.getMessageDestinations()!= null)
-          overrideMsgDests = override.getMessageDestinations();
+       if(override != null && override.getSipMessageDestinations()!= null)
+          overrideMsgDests = override.getSipMessageDestinations();
        if(original != null && original.getMessageDestinations() != null)
           originalMsgDests = original.getMessageDestinations();
-       setMessageDestinations(MessageDestinationsMetaData.merge(overrideMsgDests,
+       setSipMessageDestinations(MessageDestinationsMetaData.merge(overrideMsgDests,
              originalMsgDests, overridenFile, overrideFile));
 
        if(this.getJndiEnvironmentRefsGroup() == null)
@@ -265,7 +266,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
           setSipListeners(original.getListeners());
       
       JBossServletsMetaData soverride = null;
-      SipServletsMetaData soriginal = null;
+      ServletsMetaData soriginal = null;
       if(override != null)
          soverride = override.getSipServlets();
       if(original != null) {
@@ -447,5 +448,29 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	 */
 	public Method getSipApplicationKeyMethod() {
 		return sipApplicationKeyMethod;
+	}
+	/**
+	 * @param messageDestinations the messageDestinations to set
+	 */
+	public void setSipMessageDestinations(MessageDestinationsMetaData messageDestinations) {
+		this.messageDestinations = messageDestinations;
+	}
+	/**
+	 * @return the messagesDestinations
+	 */
+	public MessageDestinationsMetaData getSipMessageDestinations() {
+		return messageDestinations;
+	}
+	/**
+	 * @param securityRoles the securityRoles to set
+	 */
+	public void setSipSecurityRoles(SecurityRolesMetaData securityRoles) {
+		this.securityRoles = securityRoles;
+	}
+	/**
+	 * @return the securityRoles
+	 */
+	public SecurityRolesMetaData getSipSecurityRoles() {
+		return securityRoles;
 	}
 }

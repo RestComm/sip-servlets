@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2007, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2008, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -21,18 +21,35 @@
  */
 package org.jboss.metadata.sip.spec;
 
-import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
+import javax.xml.bind.annotation.XmlElement;
 
+import org.jboss.metadata.javaee.support.IdMetaDataImplWithDescriptionGroup;
+import org.jboss.xb.annotations.JBossXmlNsPrefix;
 
 /**
- * @author Scott.Stark@jboss.org
- * @version $Revision: 65943 $
+ * @author jean.deruelle@gmail.com
+ * 
  */
-public class Sip11ServletsMetaData extends AbstractMappedMetaData<Sip11ServletMetaData> implements SipServletsMetaData
-{
-   private static final long serialVersionUID = 1;
-   public Sip11ServletsMetaData()
-   {
-      super("sip app servlets");
-   }
+public class ListenerMetaData extends IdMetaDataImplWithDescriptionGroup {
+	private static final long serialVersionUID = 1;
+
+	private String listenerClass;
+
+	public String getListenerClass() {
+		return listenerClass;
+	}
+	@XmlElement(name="listener-class")
+	@JBossXmlNsPrefix(prefix="javaee", schemaTargetIfNotMapped=true)
+	public void setListenerClass(String listenerClass) {
+		this.listenerClass = listenerClass;
+	}
+
+	public String toString() {
+		StringBuilder tmp = new StringBuilder("ListenerMetaData(id=");
+		tmp.append(getId());
+		tmp.append(",listenerClass=");
+		tmp.append(listenerClass);
+		tmp.append(')');
+		return tmp.toString();
+	}
 }

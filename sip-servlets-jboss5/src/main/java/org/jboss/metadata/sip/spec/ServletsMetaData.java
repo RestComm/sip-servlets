@@ -19,20 +19,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.metadata.sip.jboss;
+package org.jboss.metadata.sip.spec;
 
 import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
-import org.jboss.metadata.sip.spec.SipServletsMetaData;
+
 
 /**
  * @author Scott.Stark@jboss.org
  * @version $Revision: 65943 $
  */
-public class JBossSip11ServletsMetaData extends AbstractMappedMetaData<JBossSip11ServletMetaData> implements SipServletsMetaData
+public class ServletsMetaData extends AbstractMappedMetaData<ServletMetaData>
 {
    private static final long serialVersionUID = 1;
-   public JBossSip11ServletsMetaData()
+   public ServletsMetaData()
    {
-      super("jboss sip app servlets");
+      super("sip app servlets");
    }
 }

@@ -26,7 +26,7 @@ import java.util.List;
 import org.jboss.metadata.sip.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.RunAsMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
-import org.jboss.metadata.sip.spec.SipServletMetaData;
+import org.jboss.metadata.sip.spec.ServletMetaData;
 
 
 /**
@@ -35,7 +35,7 @@ import org.jboss.metadata.sip.spec.SipServletMetaData;
  * @author Scott.Stark@jboss.org
  * @version $Revision: 66522 $
  */
-public class JBossServletMetaData extends SipServletMetaData
+public class JBossServletMetaData extends ServletMetaData
 {
    private static final int loadOnStartupDefault = -1;
    private static final long serialVersionUID = 1;
@@ -45,7 +45,7 @@ public class JBossServletMetaData extends SipServletMetaData
    private String servletClass;
    private String jspFile;
    /** The servlet init-params */
-   private List<? extends ParamValueMetaData> initParam;
+   private List<ParamValueMetaData> initParam;
    private int loadOnStartup = loadOnStartupDefault;
    private RunAsMetaData runAs;
    /** The security role ref */
@@ -70,11 +70,11 @@ public class JBossServletMetaData extends SipServletMetaData
       this.servletClass = servletClass;
    }
 
-   public List<? extends ParamValueMetaData> getInitParam()
+   public List<ParamValueMetaData> getInitParam()
    {
       return initParam;
    }
-   public void setInitParam(List<? extends ParamValueMetaData> initParam)
+   public void setInitParam(List<ParamValueMetaData> initParam)
    {
       this.initParam = initParam;
    }
@@ -122,13 +122,13 @@ public class JBossServletMetaData extends SipServletMetaData
       this.runAsPrincipal = runAsPrincipal;
    }
 
-   public JBossServletMetaData merge(SipServletMetaData original)
+   public JBossServletMetaData merge(ServletMetaData original)
    {
       JBossServletMetaData merged = new JBossServletMetaData();
       merged.merge(this, original);
       return merged;
    }
-   public void merge(JBossServletMetaData override, SipServletMetaData original)
+   public void merge(JBossServletMetaData override, ServletMetaData original)
    {
       super.merge(override, original);
       if(override != null && override.runAsPrincipal != null)
