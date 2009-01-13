@@ -224,7 +224,8 @@ public class Shootme implements SipListener {
 			// Answered in 1 second ( this guy is fast at taking calls)
 			this.inviteRequest = request;
 	
-			//new Timer().schedule(new MyTimerTask(this), 1000);
+			if(!usePrack)
+				new Timer().schedule(new MyTimerTask(this), 1000);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
