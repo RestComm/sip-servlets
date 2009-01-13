@@ -46,11 +46,13 @@ import org.jboss.logging.Logger;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.naming.NonSerializableFactory;
+import org.jboss.security.SecurityUtil;
 import org.jboss.virtual.VirtualFile;
 import org.jboss.web.WebApplication;
 import org.jboss.web.tomcat.security.JaccContextValve;
 import org.jboss.web.tomcat.security.RunAsListener;
 import org.jboss.web.tomcat.security.SecurityAssociationValve;
+import org.jboss.web.tomcat.security.SecurityContextEstablishmentValve;
 import org.jboss.web.tomcat.service.TomcatConvergedSipInjectionContainer;
 import org.jboss.web.tomcat.service.session.AbstractJBossManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
@@ -272,7 +274,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		if (metaDataSecurityDomain != null)
 			metaDataSecurityDomain = metaDataSecurityDomain.trim();
 
-		// TODO : add the security valve again was commented due to IllegalAccessError, it is a regression from regular JBoss 5
+		// TODO : add the security valve again with SecurityActions enabled. It was commented due to IllegalAccessError, it is a regression from regular JBoss 5
 		// Add a valve to establish security context
 //		SecurityContextEstablishmentValve scevalve = new SecurityContextEstablishmentValve(
 //				metaDataSecurityDomain, SecurityUtil
@@ -280,7 +282,12 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 //								.getDefaultSecurityDomain()), SecurityActions
 //						.loadClass(config.getSecurityContextClassName()),
 //				getSecurityManagement());
-//		context.addValve(scevalve);
+		SecurityContextEstablishmentValve scevalve = new SecurityContextEstablishmentValve(
+				metaDataSecurityDomain, SecurityUtil
+						.unprefixSecurityDomain(config
+								.getDefaultSecurityDomain()), config.getSecurityContextClassName().getClass(),
+				getSecurityManagement());
+		context.addValve(scevalve);
 
 		// Add a valve to estalish the JACC context before authorization valves
 		Certificate[] certs = null;

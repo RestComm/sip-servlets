@@ -53,6 +53,13 @@
 			<systemPath>${basedir}/lib/jboss-web-service-5.0.0.GA.jar</systemPath>
 		</dependency>
 		
+		<!--dependency>
+			<groupId>org.jboss.jbossas</groupId>
+			<artifactId>jboss-as-tomcat</artifactId>
+			<version>${jboss.version}</version>
+			<scope>provided</scope>
+		</dependency-->
+		
 		<dependency>
 			<groupId>org.jboss.jbossas</groupId>
 			<artifactId>jboss-web-deployer</artifactId>
