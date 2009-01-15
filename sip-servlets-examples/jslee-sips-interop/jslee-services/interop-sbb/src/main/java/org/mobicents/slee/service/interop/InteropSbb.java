@@ -34,8 +34,13 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.mobicents.seam.CallManager;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
+import org.mobicents.mscontrol.MsEndpoint;
+import org.mobicents.mscontrol.MsLink;
+import org.mobicents.mscontrol.MsLinkEvent;
+import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.MsProvider;
+import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.mscontrol.events.MsEventIdentifier;
@@ -59,7 +64,8 @@ import org.mobicents.slee.service.events.InteropCustomEvent;
  */
 public abstract class InteropSbb implements Sbb { 
 
-	private static final String ENDPOINT_NAME = "media/trunk/IVR/$";
+	private static final String IVR_ENDPOINT_NAME = "media/trunk/IVR/$";
+	private static final String PR_ENDPOINT_NAME = "media/trunk/PacketRelay/$";
 
 	private static final String OPENING_ANNOUNCEMENT = "Welcome to JavaOne 2008. Please enter your booth number followed by the pound sign to get some free beers.";
 	
@@ -139,7 +145,7 @@ public abstract class InteropSbb implements Sbb {
 				+ event.getBoothNumber() + ". sdpContent = " + new String(event.getSdpContent()));
 
 		this.setInteropCustomEvent(event);
-		MsConnection msConnection = msProvider.createSession().createNetworkConnection(ENDPOINT_NAME);
+		MsConnection msConnection = msProvider.createSession().createNetworkConnection(PR_ENDPOINT_NAME);
 		try {
 			ActivityContextInterface msAci = mediaAcif.getActivityContextInterface(msConnection);
 			msAci.attach(this.getSbbContext().getSbbLocalObject());
@@ -191,8 +197,16 @@ public abstract class InteropSbb implements Sbb {
 		}
 		return stringBuffer.toString();
 	}
-
+	
+	public void onLinkConnected(MsLinkEvent evt, ActivityContextInterface aci) {
+		System.out.println("LINK CONNECTED");
+	}
+	
 	private void playAnnouncement(String announcement, boolean attachToGeneratorActivity, boolean listenForDTMF, boolean listenForCompletion) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {}
+		
 		TTSSession ttsSession = ttsProvider.getNewTTSSession(
 				audioFilePath, "kevin");
 		
@@ -201,8 +215,8 @@ public abstract class InteropSbb implements Sbb {
 		MsEventFactory eventFactory = msProvider
 			.getEventFactory();
 		
-		MsConnection connection = getConnection();
-		if(connection == null) {
+		MsLink link = getLink();
+		if(link == null) {
 			logger.error("Connection could not be created, closing the call ");
 			CallManager callManagerRef = (CallManager)this.getInteropCustomEvent().getCallManagerRef();
 			try {
@@ -215,7 +229,7 @@ public abstract class InteropSbb implements Sbb {
 		if(attachToGeneratorActivity) {
 			try {
 				ActivityContextInterface generatorActivity = mediaAcif
-						.getActivityContextInterface(connection.getSession());
+						.getActivityContextInterface(link.getSession());
 				generatorActivity.attach(getSbbContext().getSbbLocalObject());				
 			} catch (javax.slee.UnrecognizedActivityException e) {
 				logger.error("Impossible to attach to Media Signal Generator activity", e);
@@ -246,7 +260,7 @@ public abstract class InteropSbb implements Sbb {
         }
         if(listenForDTMF) {
         	try {
-	        	ActivityContextInterface dtmfAci = mediaAcif.getActivityContextInterface(connection.getSession());
+	        	ActivityContextInterface dtmfAci = mediaAcif.getActivityContextInterface(link.getSession());
 	        	dtmfAci.attach(getSbbContext().getSbbLocalObject());
 	        	eventList.add(dtmf);
         	} catch (UnrecognizedActivityException e) {
@@ -255,7 +269,7 @@ public abstract class InteropSbb implements Sbb {
         }
         MsRequestedEvent[] requestedEvents = eventList.toArray(new MsRequestedEvent[eventList.size()]);
         
-        connection.getEndpoint().execute(requestedSignals, requestedEvents, connection);					
+        link.getEndpoints()[1].execute(requestedSignals, requestedEvents, link);					
 	}
 	
 	private MsConnection getConnection() {
@@ -266,6 +280,17 @@ public abstract class InteropSbb implements Sbb {
 			}
 		}
 		logger.info("Connection is null...");
+		return null;
+	}
+	
+	private MsLink getLink() {
+		ActivityContextInterface[] activities = getSbbContext().getActivities();
+		for (int i = 0; i < activities.length; i++) {
+			if (activities[i].getActivity() instanceof MsConnection) {
+				return (MsLink) activities[i].getActivity();
+			}
+		}
+		logger.info("Link is null...");
 		return null;
 	}
 	
@@ -293,6 +318,28 @@ public abstract class InteropSbb implements Sbb {
 		MsConnection connection = evt.getConnection();
 		String sdp = connection.getLocalDescriptor();
 		logger.info("connection SDP content : " + sdp);
+		
+		if(connection == null) {
+			logger.error("Connection could not be created, closing the call ");
+			CallManager callManagerRef = (CallManager)this.getInteropCustomEvent().getCallManagerRef();
+			try {
+				callManagerRef.endCall(null, false);
+			} catch (IOException e) {
+				logger.error("Impossible to call back the EJB", e);				
+			}
+			return;
+		}
+		MsSession session = connection.getSession();
+		MsLink link = session.createLink(MsLinkMode.FULL_DUPLEX);
+
+		ActivityContextInterface linkActivity = null;
+		try {
+			linkActivity = mediaAcif.getActivityContextInterface(link);
+		} catch (UnrecognizedActivityException ex) {
+		}
+
+		linkActivity.attach(sbbContext.getSbbLocalObject());
+		link.join(evt.getConnection().getEndpoint().getLocalName(), IVR_ENDPOINT_NAME);		
 	}
 
 
@@ -309,19 +356,19 @@ public abstract class InteropSbb implements Sbb {
 	}
 
 	
-	private void initDtmfDetector(MsConnection connection, String endpointName) {
+	private void initDtmfDetector(MsLink link, String endpointName) {
 		MsEventFactory eventFactory = msProvider
 				.getEventFactory();
 		try {
 			ActivityContextInterface dtmfAci = mediaAcif
-					.getActivityContextInterface(connection.getSession());
+					.getActivityContextInterface(link.getSession());
 			dtmfAci.attach(getSbbContext().getSbbLocalObject());
 			
 			MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
 			MsRequestedSignal[] signals = new MsRequestedSignal[] {};
 			MsRequestedEvent[] events = new MsRequestedEvent[] { dtmf };
 
-			connection.getEndpoint().execute(signals, events, connection);
+			link.getEndpoints()[1].execute(signals, events, link);
 		} catch (UnrecognizedActivityException e) {
 			logger.error("Internal Server Erro", e);
 		}
@@ -387,7 +434,7 @@ public abstract class InteropSbb implements Sbb {
 			
 			setBoothNumber(boothNumber);
 			
-			this.initDtmfDetector(getConnection(), ENDPOINT_NAME);
+			this.initDtmfDetector(getLink(), IVR_ENDPOINT_NAME);
         }
 	}
 
