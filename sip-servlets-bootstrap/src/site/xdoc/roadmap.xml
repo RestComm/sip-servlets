@@ -596,7 +596,7 @@
 				</subsection>
 			</subsection>
 			<subsection name="Planned Versions">																				
-				<subsection name="Version 0.8 - 01/01/2009">
+				<subsection name="Version 0.8 - 01/23/2009">
 					<p>
 						<img src="green.jpeg" />
 						<a
@@ -610,15 +610,15 @@
 						Basic IPBX
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
-							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=491">
+							href="http://code.google.com/p/mobicents/issues/detail?id=491">
 						Jopr Integration for Mobicents SIP Load Balancer
 						</a>	
 						<br />	
 						<img src="orange.jpeg" />
 						<a
-							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=492">
+							href="http://code.google.com/p/mobicents/issues/detail?id=492">
 						Diameter Sh Example
 						</a>								
 						<br />					
@@ -682,17 +682,10 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=514">
-									Proxying subsequest INVITE overrides CSeq
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=494">
 									Duplication of URI parameters in SipURIImpl
 								</a>								
-							</li>	
+							</li>															
 							<li>
 								<img src="green.jpeg" />
 								<a
@@ -710,6 +703,13 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=505">
+									PRACK can not be proxied properly
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=507">
 									URI encoded by SipApplicationSession is not UTF8 encoded
 								</a>								
@@ -717,10 +717,10 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=505">
-									PRACK can not be proxied properly
+									href="http://code.google.com/p/mobicents/issues/detail?id=514">
+									Proxying subsequest INVITE overrides CSeq
 								</a>								
-							</li>
+							</li>							
 							<li>
 								<img src="green.jpeg" />
 								<a
@@ -738,7 +738,7 @@
 						</ul>
 					</p>
 				</subsection>
-				<subsection name="Version 0.9 - 02/01/2009">
+				<subsection name="Version 0.9 - 03/01/2009">
 					<p>	
 						<img src="red.jpeg" />
 						<a
@@ -784,7 +784,7 @@
 						</ul-->
 					</p>
 				</subsection>
-				<subsection name="Version 1.0 - 03/01/2008">
+				<subsection name="Version 1.0 - 04/15/2008">
 					<p>		
 						<img src="red.jpeg" />
 						<a

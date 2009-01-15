@@ -43,11 +43,14 @@
 			<item name="Security" href="security.html" />
 			<item name="STUN suport" href="stun.html" />
 			<item name="Diameter suport" href="diameter_event_charging.html" />
-			<item name="Concurrency and Congestion Control" href="concurrency.html" />
-			<item name="Management Console" href="sip-servlets-managment.htm" />
-			<item name="Server Monitoring Jopr Integration" href="mss-jopr-plugin.html" />
+			<item name="Concurrency and Congestion Control" href="concurrency.html" />			
 			<item name="JBoss Seam Integration" href="mss-seam.html" />
 			<item name="JSLEE/Sip Servlets Interoperability" href="mobicents-sip-servlets-jslee-intero.html" />
+		</menu>
+		<menu name="Server Monitoring - Operations - Management">
+			<item name="Management Console" href="sip-servlets-managment.htm" />
+			<item name="Server Monitoring Jopr Integration" href="mss-jopr-plugin.html" />
+			<item name="Sip Load Balancer Monitoring Jopr Integration" href="mss-jopr-lb-plugin.html" />
 		</menu>
 		<menu name="High Availability">
 			<item name="SIP Load Balancer" href="load-balancer.html" />
