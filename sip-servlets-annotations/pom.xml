@@ -98,6 +98,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
 									</tasks>
 								</configuration>
@@ -176,6 +177,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
 									</tasks>
 								</configuration>
