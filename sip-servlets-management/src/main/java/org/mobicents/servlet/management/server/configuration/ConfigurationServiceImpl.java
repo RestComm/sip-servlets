@@ -1,16 +1,13 @@
 package org.mobicents.servlet.management.server.configuration;
 
-import java.io.ByteArrayInputStream;
-import java.util.Properties;
-
 import javax.management.Attribute;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.apache.catalina.mbeans.MBeanUtils;
-import org.mobicents.servlet.management.client.configuration.*;
-import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
+import org.mobicents.servlet.management.client.configuration.ConfigurationService;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
