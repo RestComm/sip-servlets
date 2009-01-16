@@ -20,6 +20,11 @@ Mobicents Sip Servlets Concurrency and Congestion Control
 
 	You can configure concurrency and congestion control in the following ways:
 
+	*   <For concurrency only>, In your application, in a package-info.java class by using the annotation 
+		@ConcurrencyControl(mode=ConcurrencyControlMode.SipApplicationSession).
+		See an example of {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/applications/annotated-servlet/src/main/java/org/mobicents/servlet/sip/testsuite}package-info.java}} from one of our testsuite applications. 
+		You must also import the corresponding sip-servlets-annotations-0.8-SNAPSHOT.jar into your application so that it can find the class.
+
 	*	From server.xml in the Service tag you can add concurrencyControlMode and sipMessageQueueSize attributes like this:
     
     	<<<<Service name="jboss.web" 
@@ -30,12 +35,7 @@ Mobicents Sip Servlets Concurrency and Congestion Control
 		concurrencyControlMode="SipApplicationSession" 
 		sipMessageQueueSize="1500">>>>
 		
-		By default the queue size is 1500.
-		
-	*   In your application, in a package-info.java class by using the annotation 
-		@org.mobicents.servlet.sip.annotation.ConcurrencyControl(mode=org.mobicents.servlet.sip.annotation.ConcurrencyControlMode.SipApplicationSession).
-		See an example of {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/applications/annotated-servlet/src/main/java/org/mobicents/servlet/sip/testsuite}package-info.java}} from one of our testsuite applications. 
-		You must also import the corresponding sip-servlets-annotations-0.8-SNAPSHOT.jar into your application so that it can find the class. See the corresponding {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/applications/annotated-servlet/pom.xml}pom}}
+		By default the queue size is 1500.			
 		
 	*	From the {{{http://localhost:8080/sip-servlets-management}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
 	
