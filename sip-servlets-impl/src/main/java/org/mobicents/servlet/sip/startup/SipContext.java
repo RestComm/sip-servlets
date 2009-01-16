@@ -27,6 +27,7 @@ import javax.servlet.sip.TimerService;
 import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
@@ -51,7 +52,7 @@ public interface SipContext extends Context {
 
 	public static final String APPLICATION_SIP_XML = "WEB-INF/sip.xml";
 	
-	public static final String LOAD_BALANCER = "org.mobicents.servlet.sip.LoadBalancer";
+	public static final String LOAD_BALANCER = "org.mobicents.servlet.sip.LoadBalancer";	
 	
 	String getApplicationName();
 
@@ -138,4 +139,7 @@ public interface SipContext extends Context {
 	SipSessionsUtil getSipSessionsUtil();
 	
 	TimerService getTimerService();
+
+	void setConcurrencyControlMode(ConcurrencyControlMode mode);
+	ConcurrencyControlMode getConcurrencyControlMode();
 }

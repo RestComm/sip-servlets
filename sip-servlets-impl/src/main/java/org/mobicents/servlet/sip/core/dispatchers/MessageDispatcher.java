@@ -33,7 +33,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -266,9 +266,8 @@ public abstract class MessageDispatcher {
 	 * @return
 	 */
 	public final ExecutorService getConcurrencyModelExecutorService(
-			SipServletMessageImpl sipServletMessage) {
-		ConcurrencyControlMode concurrencyControlMode = this.sipApplicationDispatcher
-				.getConcurrencyControlMode();
+			SipContext sipContext, SipServletMessageImpl sipServletMessage) {
+		ConcurrencyControlMode concurrencyControlMode = sipContext.getConcurrencyControlMode();
 		switch (concurrencyControlMode) {
 		case SipSession:
 			return sipServletMessage.getSipSession().getExecutorService();

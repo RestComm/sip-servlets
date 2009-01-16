@@ -235,6 +235,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			}
 		}
 		convergedContext.setSipApplicationKeyMethod(convergedMetaData.getSipApplicationKeyMethod());
+		convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
 		convergedContext.setWrapperClass(StandardWrapper.class.getName());
 	}
 

@@ -171,6 +171,9 @@ public class SipAnnotationMergedView {
 	      if(xml.getSipApplicationKeyMethod() != null)
 		         merged.setSipApplicationKeyMethod(xml.getSipApplicationKeyMethod());
 	      
+	      if(xml.getConcurrencyControlMode() != null)
+		         merged.setConcurrencyControlMode(xml.getConcurrencyControlMode());
+	      
 	      //Web Specifics
 	      
 	      //Version

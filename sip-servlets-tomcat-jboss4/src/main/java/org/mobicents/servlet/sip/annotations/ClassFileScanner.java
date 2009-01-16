@@ -29,6 +29,7 @@ import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -111,7 +112,7 @@ public class ClassFileScanner {
 		_scan(new File(this.docbase));
 	}
 	
-    private void _scan(File folder) throws AnnotationVerificationException {    	
+	protected void _scan(File folder) throws AnnotationVerificationException {    	
         File[] files = folder.listFiles();
         if(files != null) {
 	        for(int j = 0; j < files.length; j++) {
@@ -124,7 +125,7 @@ public class ClassFileScanner {
         }
     }
     
-    private void analyzeClass(String path) throws AnnotationVerificationException {
+    protected void analyzeClass(String path) throws AnnotationVerificationException {
     	if(logger.isDebugEnabled()) {
     		logger.debug("analyzing class " + path + " for annotations");
     	}
@@ -143,6 +144,7 @@ public class ClassFileScanner {
 				processListenerAnnotation(clazz);
 				processServletAnnotation(clazz);
 				processSipApplicationKeyAnnotation(clazz);
+				processConcurrencyAnnotation(clazz);
 			} catch (Throwable e) {
 				logger.warn("Failed to parse annotations for class " + classpath);
 				if(logger.isDebugEnabled()) {
@@ -152,7 +154,7 @@ public class ClassFileScanner {
     	}
     }
     
-    private void processListenerAnnotation(Class<?> clazz) {
+    protected void processListenerAnnotation(Class<?> clazz) {
     	if(logger.isDebugEnabled()) {
     		logger.debug("scanning " + clazz.getCanonicalName() + " for listener annotations");
     	}
@@ -165,7 +167,7 @@ public class ClassFileScanner {
     	}
     }
     
-    private void processSipApplicationKeyAnnotation(Class<?> clazz) throws AnnotationVerificationException {
+	protected void processSipApplicationKeyAnnotation(Class<?> clazz) throws AnnotationVerificationException {
     	if(logger.isDebugEnabled()) {
     		logger.debug("scanning " + clazz.getCanonicalName() + " for sip application key annotation");
     	}
@@ -199,7 +201,7 @@ public class ClassFileScanner {
     }
     
     
-    private void processServletAnnotation(Class<?> clazz) {
+    protected void processServletAnnotation(Class<?> clazz) {
     	if(logger.isDebugEnabled()) {
     		logger.debug("scanning " + clazz.getCanonicalName() + " for servlet annotations");
     	}
@@ -269,7 +271,7 @@ public class ClassFileScanner {
 		this.applicationParsed = true;
 	}
     
-    private void parseSipApplication(SipApplication appData, String packageName) {
+    protected void parseSipApplication(SipApplication appData, String packageName) {
     	sipContext.setMainServlet(appData.mainServlet());
     	sipContext.setProxyTimeout(appData.proxyTimeout());
     	sipContext.setSessionTimeout(appData.sessionTimeout());
@@ -294,7 +296,7 @@ public class ClassFileScanner {
     	sipContext.setDistributable(appData.distributable());
     }
     
-    private static SipApplication getApplicationAnnotation(Package pack) {
+    protected SipApplication getApplicationAnnotation(Package pack) {
     	if(pack == null) return null;
     	
     	SipApplication sipApp = (SipApplication) pack.getAnnotation(SipApplication.class);
@@ -303,6 +305,27 @@ public class ClassFileScanner {
     	}
     	return null;
     }
+
+    /**
+     * Check if the @ConcurrencyControl annotation is present in the package and if so process it 
+     * @param clazz the clazz to check for @ConcurrencyControl annotation - only its package will be checked
+     */
+    protected void processConcurrencyAnnotation(Class clazz) {
+    	if(sipContext.getConcurrencyControlMode() == null) {
+	    	Package pack = clazz.getPackage();
+	    	if(pack != null) {
+				ConcurrencyControl concurrencyControl = pack.getAnnotation(ConcurrencyControl.class);
+				if(concurrencyControl != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Concurrency control annotation found " + concurrencyControl.mode());
+					}
+					sipContext.setConcurrencyControlMode(concurrencyControl.mode());
+				}
+	    	}
+
+    	}
+	}
+
     
     /**
      * Shows if there is SipApplication annotation parsed and thur we dont need to

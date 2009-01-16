@@ -225,7 +225,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					}
 				}
 			};
-			getConcurrencyModelExecutorService(sipServletMessage).execute(dispatchTask);
+			getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);
 		} else {
 			// No sessions here and no servlets called, no need for asynchronicity
 			forwardResponseStatefully(sipServletResponse);

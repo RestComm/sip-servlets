@@ -17,10 +17,8 @@
 package org.mobicents.servlet.sip.testsuite.concurrency;
 
 import java.text.ParseException;
-import java.util.Iterator;
 
 import javax.sip.InvalidArgumentException;
-import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -28,7 +26,10 @@ import javax.sip.address.SipURI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -48,13 +49,23 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 	
 	public ConcurrentyControlSipSessionIsolationTest(String name) {
 		super(name);
+		autoDeployOnStartup = false;
 	}
 
-	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
+		
+	}
+	
+	public void deployApplication(ConcurrencyControlMode concurrencyControlMode) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome
+				+ "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		context.setConcurrencyControlMode(concurrencyControlMode);
+		assertTrue(tomcat.deployContext(context));		
 	}
 
 	@Override
@@ -79,6 +90,7 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 	}
 	
 	public void testElapsedTimeAndSessionOverlapping() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		deployApplication(null);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -106,7 +118,7 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 	}
 	
 	public void testElapsedTimeAndSessionOverlappingWithNoConcurrencyControl() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
-		tomcat.getSipService().getSipApplicationDispatcher().setConcurrencyControlMode(ConcurrencyControlMode.None);
+		deployApplication(ConcurrencyControlMode.None);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(

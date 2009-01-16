@@ -78,14 +78,9 @@ public class AnnotationTest extends SipServletTestCase implements SipListener {
 
 	@Override
 	public void deployApplication() {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome
-				+ "/sip-servlets-test-suite/applications/annotated-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		assertTrue(tomcat.deployContext(context));
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/annotated-servlet/src/main/sipapp",
+				"sip-test-context", "sip-test"));
 	}
 
 	@Override

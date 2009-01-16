@@ -42,12 +42,14 @@ import javax.servlet.sip.annotation.SipListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControl;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+
 
 @SipListener
-@javax.servlet.sip.annotation.SipServlet
-public class AnnotatedServlet extends SipServlet implements SipErrorListener,
-		Servlet, SipServletListener {
-
+@javax.servlet.sip.annotation.SipServlet(loadOnStartup=1)
+public class AnnotatedServlet extends SipServlet implements Servlet, SipServletListener {
+	
 	@Resource
 	SipFactory sipFactory;
 	@Resource
@@ -56,9 +58,6 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 	TimerService timerService;
 	
 	private static Log logger = LogFactory.getLog(AnnotatedServlet.class);
-	
-	public AnnotatedServlet() {
-	}
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {		
@@ -69,7 +68,7 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 		logger.info("TimerService injected resource " + timerService);
 		if(sipFactory == null || sipSessionsUtil == null || timerService == null) {
 			throw new ServletException("Impossible to get one of the annotated resource");
-		}
+		}		
 		SipFactory sipFactoryJndi;
 		SipSessionsUtil sipSessionsUtilJndi;
 		TimerService timerServiceJndi;
@@ -90,7 +89,7 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 		}
 		if(sipFactoryJndi == null || sipSessionsUtilJndi == null || timerServiceJndi == null) {
 			throw new ServletException("Impossible to get one of the annotated resource");
-		}
+		}		
 	}
 
 	/**
@@ -133,22 +132,13 @@ public class AnnotatedServlet extends SipServlet implements SipErrorListener,
 	}	
 
 	// SipErrorListener methods
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noAckReceived(SipErrorEvent ee) {
-		logger.error("noAckReceived.");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noPrackReceived(SipErrorEvent ee) {
-		logger.error("noPrackReceived.");
-	}
 	
 	public void servletInitialized(SipServletContextEvent ce) {
+		ConcurrencyControlMode concurrencyControlMode = (ConcurrencyControlMode)ce.getServletContext().getAttribute(ConcurrencyControlMode.class.getCanonicalName());
+		logger.info("concurrency control mode set to " + concurrencyControlMode);
+		if(!ConcurrencyControlMode.SipApplicationSession.equals(concurrencyControlMode)) {
+			throw new IllegalArgumentException("@ConcurrencyControl annotation badly parsed");
+		}
 		try {
 
 			SipFactory sipFactory = (SipFactory) ce.getServletContext().getAttribute(SIP_FACTORY);

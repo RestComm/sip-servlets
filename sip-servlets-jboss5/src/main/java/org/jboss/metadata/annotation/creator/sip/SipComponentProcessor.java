@@ -52,6 +52,8 @@ public class SipComponentProcessor extends AbstractComponentProcessor<SipMetaDat
       addTypeProcessor(new SipServletProcessor(finder));
       // @SipListener
       addTypeProcessor(new SipListenerProcessor(finder));
+      // @ConcurrencyControl
+      addTypeProcessor(new ConcurrencyControlProcessor(finder));
       // @SipApplicationKey
       addMethodProcessor(new SipApplicationKeyProcessor(finder));      
    }

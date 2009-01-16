@@ -41,7 +41,6 @@ import org.jboss.metadata.javaee.spec.EnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.spec.LifecycleCallbacksMetaData;
 import org.jboss.metadata.javaee.spec.MessageDestinationReferenceMetaData;
 import org.jboss.metadata.javaee.spec.MessageDestinationReferencesMetaData;
-import org.jboss.metadata.sip.spec.MessageDestinationsMetaData;
 import org.jboss.metadata.javaee.spec.PersistenceContextReferenceMetaData;
 import org.jboss.metadata.javaee.spec.PersistenceContextReferencesMetaData;
 import org.jboss.metadata.javaee.spec.PersistenceUnitReferenceMetaData;
@@ -50,13 +49,11 @@ import org.jboss.metadata.javaee.spec.ResourceEnvironmentReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceEnvironmentReferencesMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferencesMetaData;
-import org.jboss.metadata.sip.spec.SecurityRolesMetaData;
 import org.jboss.metadata.javaee.spec.ServiceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ServiceReferencesMetaData;
 import org.jboss.metadata.javaee.support.AbstractMappedMetaData;
 import org.jboss.metadata.javaee.support.IdMetaDataImplWithDescriptionGroup;
-import org.jboss.metadata.sip.spec.LocaleEncodingsMetaData;
-import org.jboss.metadata.sip.spec.SessionConfigMetaData;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 
 /**
  * The sip-app spec metadata. This class is based on the CR12 Tag of the WebMetaData class
@@ -90,6 +87,7 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    private MessageDestinationsMetaData messageDestinations;
 
    private Method sipApplicationKeyMethod;
+   private ConcurrencyControlMode concurrencyControlMode;
    /**
     * Callback for the DTD information
     * @param root
@@ -446,5 +444,13 @@ public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
 @XmlTransient
 public Method getSipApplicationKeyMethod() {
 	return sipApplicationKeyMethod;
+}
+@XmlTransient
+public ConcurrencyControlMode getConcurrencyControlMode() {
+	return concurrencyControlMode;
+}
+@XmlTransient
+public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
+	this.concurrencyControlMode = mode;
 }
 }

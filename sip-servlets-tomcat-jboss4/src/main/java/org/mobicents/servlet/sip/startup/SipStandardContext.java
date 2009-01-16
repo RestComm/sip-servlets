@@ -56,6 +56,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -110,7 +111,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected String namingContextName;
     
     protected Method sipApplicationKeyMethod;
-    
+    protected ConcurrencyControlMode concurrencyControlMode;
 	/**
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
@@ -281,7 +282,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
-		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
+		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the application
 		super.start();	
 								
 		if(getAvailable()) {
@@ -965,4 +966,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 	}
+	
+	public ConcurrencyControlMode getConcurrencyControlMode() {		
+		return concurrencyControlMode;
+	}
+
+	public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
+		this.concurrencyControlMode = mode;
+	}
+	
 }

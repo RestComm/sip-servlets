@@ -29,6 +29,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 
 import org.apache.catalina.LifecycleException;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;

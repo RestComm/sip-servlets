@@ -53,6 +53,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
@@ -106,7 +107,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected String namingContextName;
     
     protected Method sipApplicationKeyMethod;
-    
+    protected ConcurrencyControlMode concurrencyControlMode;    
 	/**
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
@@ -122,7 +123,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected SipApplicationDispatcher sipApplicationDispatcher = null;
     
     protected Map<String, Container> childrenMap;
-    
+
 	/**
 	 * 
 	 */
@@ -843,6 +844,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			exitSipApp();
 		}
 		return ok;
+	}
+
+	public ConcurrencyControlMode getConcurrencyControlMode() {		
+		return concurrencyControlMode;
+	}
+
+	public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
+		this.concurrencyControlMode = mode;
 	}
 	
 }

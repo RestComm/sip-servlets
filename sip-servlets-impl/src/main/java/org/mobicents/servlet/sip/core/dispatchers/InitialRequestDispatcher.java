@@ -356,7 +356,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			}
 			
 		};
-		getConcurrencyModelExecutorService(sipServletRequest).execute(dispatchTask);
+		getConcurrencyModelExecutorService(sipContext, sipServletRequest).execute(dispatchTask);
 
 	}
 

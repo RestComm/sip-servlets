@@ -28,19 +28,20 @@ import java.util.Set;
 import org.jboss.metadata.ejb.jboss.JBossEnvironmentRefsGroupMetaData;
 import org.jboss.metadata.javaee.jboss.RunAsIdentityMetaData;
 import org.jboss.metadata.javaee.spec.Environment;
+import org.jboss.metadata.sip.spec.ListenerMetaData;
 import org.jboss.metadata.sip.spec.MessageDestinationsMetaData;
-import org.jboss.metadata.sip.spec.SecurityRolesMetaData;
 import org.jboss.metadata.sip.spec.ParamValueMetaData;
 import org.jboss.metadata.sip.spec.ProxyConfigMetaData;
+import org.jboss.metadata.sip.spec.SecurityRolesMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
+import org.jboss.metadata.sip.spec.ServletsMetaData;
+import org.jboss.metadata.sip.spec.SessionConfigMetaData;
 import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.sip.spec.ServletsMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.jboss.metadata.sip.spec.ListenerMetaData;
-import org.jboss.metadata.sip.spec.SessionConfigMetaData;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 
 /**
  * Extend the JBossWebMetaData from JBoss 5 to provide support for converged sip/http applications
@@ -63,6 +64,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private MessageDestinationsMetaData messageDestinations;
 	private SecurityRolesMetaData securityRoles;
 	private Method sipApplicationKeyMethod;
+	private ConcurrencyControlMode concurrencyControlMode;
 	
 	public void merge(JBossConvergedSipMetaData override, SipMetaData original)
 	{
@@ -293,6 +295,11 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
        else if(original != null && original.getSipApplicationKeyMethod() != null)
           setSipApplicationKeyMethod(original.getSipApplicationKeyMethod());
       
+      if(override != null && override.getConcurrencyControlMode()!= null)
+          setConcurrencyControlMode(override.getConcurrencyControlMode());
+       else if(original != null && original.getConcurrencyControlMode() != null)
+          setConcurrencyControlMode(original.getConcurrencyControlMode());
+      
       //listeners should not be merged because they have a special treatment when loading the context
       
    // Update run-as indentity for a run-as-principal
@@ -472,5 +479,17 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	 */
 	public SecurityRolesMetaData getSipSecurityRoles() {
 		return securityRoles;
+	}
+	/**
+	 * @param concurrencyControlMode the concurrencyControlMode to set
+	 */
+	public void setConcurrencyControlMode(ConcurrencyControlMode ConcurrencyControlMode) {
+		this.concurrencyControlMode = ConcurrencyControlMode;
+	}
+	/**
+	 * @return the concurrencyControlMode
+	 */
+	public ConcurrencyControlMode getConcurrencyControlMode() {
+		return concurrencyControlMode;
 	}
 }

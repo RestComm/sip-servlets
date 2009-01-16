@@ -80,6 +80,7 @@ import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
@@ -261,7 +262,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isDebugEnabled()) {
 			logger.debug("Adding the following sip servlet application " + sipApplicationName + ", SipContext=" + sipApplication);
 		}
-
+		if(sipApplicationName == null) {
+			throw new IllegalArgumentException("Something when wrong while initializing a sip servlets or converged application ");
+		}
+		if(sipApplication == null) {
+			throw new IllegalArgumentException("Something when wrong while initializing the following application " + sipApplicationName);
+		}
+		
+		//if the application has not set any concurrency control mode, we default to the container wide one
+		if(sipApplication.getConcurrencyControlMode() == null) {			
+			sipApplication.setConcurrencyControlMode(concurrencyControlMode);
+			if(logger.isInfoEnabled()) {
+				logger.info("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
+			}
+		} else {
+			if(logger.isInfoEnabled()) {
+				logger.info("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
+			}
+		}
+		sipApplication.getServletContext().setAttribute(ConcurrencyControlMode.class.getCanonicalName(), sipApplication.getConcurrencyControlMode());		
+		
 		applicationDeployed.put(sipApplicationName, sipApplication);
 
 		mdToApplicationName.put(GenericUtils.hashString(sipApplicationName), sipApplicationName);
@@ -319,33 +339,34 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		int size = 0;
 		Iterator<SipContext> applicationsIterator = this.applicationDeployed
 				.values().iterator();
-		if (this.getConcurrencyControlMode()
-				.equals(ConcurrencyControlMode.None)) {
-			size = this.asynchronousExecutor.getQueue().size();
-		} else {
-			while (applicationsIterator.hasNext()) {
-				SipContext context = applicationsIterator.next();
-				SipManager manager = (SipManager) context
-						.getManager();
-				if (this.getConcurrencyControlMode().equals(
-						ConcurrencyControlMode.SipApplicationSession)) {
-					Iterator<MobicentsSipApplicationSession> sessionIterator = manager
-							.getAllSipApplicationSessions();
-					while (sessionIterator.hasNext()) {
-						size += sessionIterator.next().getExecutorService()
-								.getQueue().size();
-					}
-				} else if (this.getConcurrencyControlMode().equals(
-						ConcurrencyControlMode.SipSession)) {
-					Iterator<MobicentsSipSession> sessionIterator = manager
-							.getAllSipSessions();
-					while (sessionIterator.hasNext()) {
-						size += sessionIterator.next().getExecutorService()
-								.getQueue().size();
-					}
+		boolean noneModeAlreadyCounted = false;
+		while (applicationsIterator.hasNext()) {
+			SipContext context = applicationsIterator.next();
+			SipManager manager = (SipManager) context
+					.getManager();
+			if(context.getConcurrencyControlMode().equals(
+					ConcurrencyControlMode.None) && !noneModeAlreadyCounted) {
+				size = this.asynchronousExecutor.getQueue().size();
+				noneModeAlreadyCounted = true;
+			} else if (context.getConcurrencyControlMode().equals(
+					ConcurrencyControlMode.SipApplicationSession)) {
+				Iterator<MobicentsSipApplicationSession> sessionIterator = manager
+						.getAllSipApplicationSessions();
+				while (sessionIterator.hasNext()) {
+					size += sessionIterator.next().getExecutorService()
+							.getQueue().size();
+				}
+			} else if (context.getConcurrencyControlMode().equals(
+					ConcurrencyControlMode.SipSession)) {
+				Iterator<MobicentsSipSession> sessionIterator = manager
+						.getAllSipSessions();
+				while (sessionIterator.hasNext()) {
+					size += sessionIterator.next().getExecutorService()
+							.getQueue().size();
 				}
 			}
 		}
+		
 		return size;
 	}
 	

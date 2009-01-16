@@ -29,7 +29,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.core.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -277,7 +277,7 @@ public class SipStandardService extends StandardService implements SipService {
 	}
 
 	/**
-	 * Concurrency control mode is SipSession, AppSession or None
+	 * ConcurrencyControl control mode is SipSession, AppSession or None
 	 * Specifies the isolation level of concurrently executing requests.
 	 * 
 	 * @return
@@ -287,7 +287,7 @@ public class SipStandardService extends StandardService implements SipService {
 	}
 
 	/**
-	 * Concurrency control mode is SipSession, AppSession or None
+	 * ConcurrencyControl control mode is SipSession, AppSession or None
 	 * Specifies the isolation level of concurrently executing requests.
 	 * 
 	 * @return
