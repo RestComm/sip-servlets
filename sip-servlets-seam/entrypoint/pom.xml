@@ -31,6 +31,7 @@
 	
 	<properties>
 		<seam.version>2.1.0.SP1</seam.version>
+		<media.server.version>1.0.0.CR3</media.server.version>
 	</properties>
 
 	<build>
@@ -59,7 +60,31 @@
 
 
 	<dependencies>
-	
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api</artifactId>
+			<version>${media.server.version}</version>
+		</dependency>
+		<dependency>		
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-constants</artifactId>
+			<version>${media.server.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+			<version>${media.server.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-ri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mobicents.servers.media</groupId>
+					<artifactId>mobicents-media-server-spi</artifactId>
+				</exclusion>
+			</exclusions>		
+		</dependency>
 		<dependency>
 
 			<groupId>org.jboss.seam</groupId>
