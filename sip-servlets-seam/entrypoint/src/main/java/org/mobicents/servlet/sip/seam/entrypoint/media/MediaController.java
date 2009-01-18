@@ -45,7 +45,7 @@ public class MediaController {
 			MsRequestedSignal[] signals,
 			MsRequestedEvent[] events) {
 		endpoint.execute(signals, events);
-		endpoint.addNotificationListener(new NotificationListener(sipSession, endpoint, null));
+		endpoint.addNotificationListener(new NotificationListener(sipSession, msSession, endpoint, null));
 	}
 	
 	public void execute(MsEndpoint endpoint,
@@ -53,7 +53,7 @@ public class MediaController {
 			MsRequestedEvent[] events,
 			MsConnection connection) {
 		endpoint.execute(signals, events, connection);
-		endpoint.addNotificationListener(new NotificationListener(sipSession, endpoint, connection));
+		connection.addNotificationListener(new NotificationListener(sipSession, msSession, endpoint, connection));
 	}
 	
 	public void execute(MsEndpoint endpoint,
@@ -61,7 +61,7 @@ public class MediaController {
 			MsRequestedEvent[] events,
 			MsLink link) {
 		endpoint.execute(signals, events, link);
-		endpoint.addNotificationListener(new NotificationListener(sipSession, endpoint, link));
+		link.addNotificationListener(new NotificationListener(sipSession, msSession, endpoint, link));
 	}
 	
 }

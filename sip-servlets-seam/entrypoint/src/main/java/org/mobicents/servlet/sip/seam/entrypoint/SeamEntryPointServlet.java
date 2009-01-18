@@ -34,11 +34,17 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		arg0.getSession().setAttribute("msSession", MsProviderContainer.msProvider.createSession());
 		arg0.getSession().setAttribute("sipSession", arg0.getSession());
 		Lifecycle.beginSession(new SipSeamSessionMap(arg0.getSession()));
+		SeamEntrypointUtils.beginEvent(arg0.getSession());
+		Events.instance().raiseEvent("sipSessionCreated", arg0.getSession());
+		SeamEntrypointUtils.endEvent();
 		System.out.println("SEAM SIP SESSION CREATED");
 	}
 
 	public void sessionDestroyed(SipSessionEvent arg0) {
 		//cleanupConversation(arg0.getSession());
+		SeamEntrypointUtils.beginEvent(arg0.getSession());
+		Events.instance().raiseEvent("sipSessionDestroyed", arg0.getSession());
+		SeamEntrypointUtils.endEvent();
 		Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
 		System.out.println("SEAM SIP SESSION DESTROYED");
 	}
