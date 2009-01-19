@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -30,6 +32,7 @@ import org.jboss.seam.util.Id;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MsProviderContainer;
 
 public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implements SipSessionListener {
+	
 	public void sessionCreated(SipSessionEvent arg0) {
 		arg0.getSession().setAttribute("msSession", MsProviderContainer.msProvider.createSession());
 		arg0.getSession().setAttribute("sipSession", arg0.getSession());
@@ -54,6 +57,7 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		
 	}
 
+	
 	@Override
 	protected void doRequest(SipServletRequest request) throws ServletException,
 			IOException {
@@ -71,8 +75,10 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 			}
 		}
 		SeamEntrypointUtils.beginEvent(request);
-		Contexts.getApplicationContext().set("sipSession", request.getSession());
-		Contexts.getApplicationContext().set("msSession", MsProviderContainer.msProvider.createSession());
+		Contexts.getSessionContext().set("sipSession", request.getSession());
+		Contexts.getSessionContext().set("msSession", MsProviderContainer.msProvider.createSession());
+		Contexts.getApplicationContext().set("sipFactory", (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY));
 		Events.instance().raiseEvent(request.getMethod().toUpperCase(), request);
 		SeamEntrypointUtils.endEvent();
 	}
