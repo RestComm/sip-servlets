@@ -23,8 +23,8 @@ import static org.jboss.seam.annotations.Install.BUILT_IN;
 @Startup
 public class MediaController {
 	
-	@In private SipSession sipSession;
-	@In private MsSession msSession;
+	@In(required=false) private SipSession sipSession;
+	@In(required=false) private MsSession msSession;
 	
 	public MediaController() {
 	}
