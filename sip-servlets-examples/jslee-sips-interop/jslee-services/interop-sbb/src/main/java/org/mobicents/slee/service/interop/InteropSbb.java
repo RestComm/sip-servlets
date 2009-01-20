@@ -286,7 +286,7 @@ public abstract class InteropSbb implements Sbb {
 	private MsLink getLink() {
 		ActivityContextInterface[] activities = getSbbContext().getActivities();
 		for (int i = 0; i < activities.length; i++) {
-			if (activities[i].getActivity() instanceof MsConnection) {
+			if (activities[i].getActivity() instanceof MsLink) {
 				return (MsLink) activities[i].getActivity();
 			}
 		}

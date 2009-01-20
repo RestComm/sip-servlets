@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.address;
 
 import gov.nist.javax.sip.address.SipUri;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 
@@ -35,7 +36,7 @@ import org.mobicents.servlet.sip.SipFactories;
  * @author M. Ranganathan
  * 
  */
-public class SipURIImpl extends URIImpl implements SipURI {
+public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 
 	private static Log logger = LogFactory.getLog(SipURIImpl.class.getCanonicalName());
 

@@ -28,6 +28,7 @@ import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaResourceListener;
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
@@ -100,7 +101,7 @@ public class DTMFUtils {
 		} catch (java.lang.NumberFormatException e) {
 			return false;
 		}
-
+		MsLink link = (MsLink)session.getApplicationSession().getAttribute("link");
 		synchronized(session) {
 			String dateAndTime = (String) session.getAttribute("dateAndTime");
 			if(dateAndTime == null) {
@@ -231,15 +232,13 @@ public class DTMFUtils {
 				logger.info(stringBuffer.toString());
 				try {
 					TTSUtils.buildAudio(stringBuffer.toString(), "deliveryDate.wav");
-					MsConnection connection = (MsConnection) session
-							.getApplicationSession().getAttribute("connection");
-					MsEndpoint endpoint = connection.getEndpoint();
-					MsEventFactory eventFactory = connection.getSession()
+					MsEndpoint endpoint = link.getEndpoints()[0];
+					MsEventFactory eventFactory = link.getSession()
 							.getProvider().getEventFactory();
 					java.io.File speech = new File("deliveryDate.wav");
 					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
-					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
-					connection.addNotificationListener(mediaResourceListener);
+					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, link);
+					link.addNotificationListener(mediaResourceListener);
 
 					// Let us request for Announcement Complete event or Failure
 					// in case if it happens
@@ -257,7 +256,7 @@ public class DTMFUtils {
 					MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
 			        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
 										
-			        endpoint.execute(requestedSignals, requestedEvents, connection);
+			        endpoint.execute(requestedSignals, requestedEvents, link);
 					logger.info("delivery Date summary played. not waiting for DTMF anymore");
 					return true;
 				} catch (Exception e) {
@@ -280,10 +279,11 @@ public class DTMFUtils {
 	public static void playFileInResponseToDTMFInfo(SipSession session,
 			String audioFile) {
 		MsConnection connection = (MsConnection)session.getApplicationSession().getAttribute("connection");
-		MsEndpoint endpoint = connection.getEndpoint();
+		MsLink link = (MsLink)session.getApplicationSession().getAttribute("link");
+		MsEndpoint endpoint = link.getEndpoints()[0];
 		MsEventFactory eventFactory = connection.getSession().getProvider().getEventFactory();		
-		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, connection);
-		connection.addNotificationListener(mediaResourceListener);
+		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, link);
+		link.addNotificationListener(mediaResourceListener);
 
 		// Let us request for Announcement Complete event or Failure
 		// in case if it happens
@@ -304,7 +304,7 @@ public class DTMFUtils {
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed };
 							
-        endpoint.execute(requestedSignals, requestedEvents, connection);
+        endpoint.execute(requestedSignals, requestedEvents, link);
 		session.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STOPPED);
 	}
 }

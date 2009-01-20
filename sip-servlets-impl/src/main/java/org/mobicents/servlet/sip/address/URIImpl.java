@@ -16,9 +16,11 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import java.io.Serializable;
+
 import javax.servlet.sip.URI;
 
-public abstract class URIImpl extends ParameterableImpl implements URI {
+public abstract class URIImpl extends ParameterableImpl implements URI, Serializable {
 
 //	private static Log logger = LogFactory.getLog(URIImpl.class
 //			.getCanonicalName());

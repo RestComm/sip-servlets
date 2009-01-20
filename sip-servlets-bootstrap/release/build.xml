@@ -289,6 +289,7 @@
 	
 	<target name="build-mobicents-diameter-core" depends="get-deps">
 		<echo>Building Mobicents Diameter Core</echo>
+		<copy overwrite="true" file="${base.path}/jdiameter-config.xml" tofile="${base.path}/target/dependencies/diameter/core/mux/jar/src/main/resources/org/mobicents/diameter/stack" />
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>

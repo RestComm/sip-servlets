@@ -23,7 +23,7 @@ import javax.servlet.sip.SipSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
@@ -35,16 +35,16 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 public class MediaResourceListener implements MsNotificationListener {
 	private static Log logger = LogFactory.getLog(MediaResourceListener.class);
 	private SipSession session;
-	private MsConnection connection;
+	private MsLink link;
 	
 	/**
 	 * @param session
 	 * @param connection
 	 */
-	public MediaResourceListener(SipSession session, MsConnection connection) {
+	public MediaResourceListener(SipSession session, MsLink link) {
 		super();
 		this.session = session;
-		this.connection = connection;
+		this.link = link;
 	}
 
 	/* (non-Javadoc)
@@ -52,14 +52,14 @@ public class MediaResourceListener implements MsNotificationListener {
 	 */	
 	public void update(MsNotifyEvent event) {
 		logger.info("resource updated : event FQN " + event.getEventID().getFqn());
-		if(session != null && connection != null && event.getEventID().equals(MsAnnouncement.COMPLETED)) {						
+		if(session != null && link != null && event.getEventID().equals(MsAnnouncement.COMPLETED)) {						
 			try {
 				SipServletRequest byeRequest = session.createRequest("BYE");				
 				byeRequest.send();																	
 			} catch (IOException e) {
 				logger.error("Unexpected error while sending the BYE request", e);				
 			}
-			connection.release();			
+			link.release();			
 		}
 	}
 

@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.address;
 import gov.nist.core.NameValue;
 import gov.nist.core.NameValueList;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,13 +42,13 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 
-public abstract class ParameterableImpl implements Parameterable ,Cloneable{
+public abstract class ParameterableImpl implements Parameterable ,Cloneable, Serializable {
 	protected NameValueList parameters = new NameValueList();
 	
-	protected Parameters header = null;
+	protected transient Parameters header = null;
 	
 	protected static final Log logger= LogFactory.getLog(ParameterableImpl.class.getCanonicalName());
-	protected transient boolean isModifiable = true;
+	protected boolean isModifiable = true;
 	
 	protected ParameterableImpl() {
 		this.parameters = new NameValueList();	

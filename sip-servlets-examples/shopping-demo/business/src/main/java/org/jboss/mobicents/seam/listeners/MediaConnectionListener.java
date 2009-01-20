@@ -105,6 +105,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 						" " + link.getEndpoints()[1].getLocalName());
 				MsProvider provider = session.getProvider();
 				MsEventFactory eventFactory = provider.getEventFactory();
+				inviteRequest.getSession().getApplicationSession().setAttribute("link", link);
 				
 				MsEndpoint endpoint = link.getEndpoints()[0];
 				
@@ -148,8 +149,8 @@ public class MediaConnectionListener implements MsConnectionListener {
 				} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
 					java.io.File speech = new File("shipping.wav");
 					logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
-					MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), connection);
-					connection.addNotificationListener(mediaResourceListener);
+					MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), link);
+					link.addNotificationListener(mediaResourceListener);
 					play.setURL("file://"+ speech.getAbsolutePath());
 					endpoint.execute(requestedSignals, requestedEvents, link);
 					
