@@ -132,15 +132,17 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 
 	@Override
 	public void mute(Conference conference) {
-		leave(conference);
-		join(conference, MsLinkMode.HALF_DUPLEX);
+		links.get(conference).setMode(MsLinkMode.HALF_DUPLEX);
+		//leave(conference);
+		//join(conference, MsLinkMode.HALF_DUPLEX);
 		muted = true;
 	}
 
 	@Override
 	public void unmute(Conference conference) {
-		leave(conference);
-		join(conference, MsLinkMode.HALF_DUPLEX);
+		links.get(conference).setMode(MsLinkMode.FULL_DUPLEX);
+		//leave(conference);
+		//join(conference, MsLinkMode.HALF_DUPLEX);
 		muted = false;
 	}
 
