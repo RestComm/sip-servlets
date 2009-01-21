@@ -22,13 +22,6 @@
                  conversation-timeout="120000" 
                  conversation-id-parameter="cid"
                  parent-conversation-id-parameter="pid"/>
-    
-   <persistence:managed-persistence-context name="entityManager"
-                                     auto-create="true"
-                          entity-manager-factory="#{entityManagerFactory}"/>
-
-   <persistence:entity-manager-factory name="entityManagerFactory" 
-                      persistence-unit-name="sipServletsPbxDatasource"/>
 
    <security:identity authenticate-method="#{authenticator.authenticate}"
                               remember-me="true"/>
