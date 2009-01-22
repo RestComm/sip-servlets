@@ -107,13 +107,13 @@
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
 					<property name="jboss-5.home" value="${jboss-5.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
-				<!-- Commented out because they don't run on JB5 yet -->
-				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server">
+				</ant>				
+				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
+				<!-- Commented out because they don't run on JB5 yet -->
+				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant-->
@@ -269,8 +269,15 @@
 	<!-- Build dependencies-->
 	
 	<target name="build-mobicents-media-server" depends="get-deps">
-		<echo>Building Mobicents Media Server</echo>
+		<echo>Building Mobicents Media Server 1.x</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/core">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+	</target>
+	
+	<target name="build-mobicents-media-server-2.x" depends="get-deps">
+		<echo>Building Mobicents Media Server 2.x</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/core/2.x">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 	</target>

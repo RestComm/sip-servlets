@@ -15,6 +15,7 @@
          <checkout.password></checkout.password>
          
          <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.0.CR4</media.core.connectionURL>
+         <media.core.2.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/media/core</media.core.2.x.connectionURL>
          <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/mobicents-tools-sip-balancer-1.0.BETA2</sip.balancer.connectionURL>
          <diameter.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.0.0.BETA2</diameter.core.connectionURL>
      </properties>
@@ -39,6 +40,24 @@
                             <skipCheckoutIfExists>true</skipCheckoutIfExists>
 							<connectionUrl>
 								${media.core.connectionURL}
+							</connectionUrl>
+                            <username>${checkout.username}</username>
+                            <password>${checkout.password}</password>
+						</configuration>
+					</execution>
+					<execution>
+                        <id>media-core-2.x-checkout</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<configuration>
+							<checkoutDirectory>
+                                ${checkout.basedir}/media/core/2.x
+							</checkoutDirectory>
+                            <skipCheckoutIfExists>true</skipCheckoutIfExists>
+							<connectionUrl>
+								${media.core.2.x.connectionURL}
 							</connectionUrl>
                             <username>${checkout.username}</username>
                             <password>${checkout.password}</password>
