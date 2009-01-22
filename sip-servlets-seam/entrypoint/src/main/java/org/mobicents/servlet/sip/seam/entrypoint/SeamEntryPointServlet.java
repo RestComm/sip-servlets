@@ -1,34 +1,23 @@
 package org.mobicents.servlet.sip.seam.entrypoint;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipFactory;
-import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.Seam;
-import org.jboss.seam.contexts.*;
-import org.jboss.seam.core.Conversation;
-import org.jboss.seam.core.ConversationEntries;
-import org.jboss.seam.core.ConversationEntry;
+import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.core.Init;
-import org.jboss.seam.core.Manager;
-import org.jboss.seam.deployment.ComponentsXmlDeploymentHandler;
 import org.jboss.seam.init.Initialization;
 import org.jboss.seam.mock.MockHttpServletRequest;
 import org.jboss.seam.mock.MockHttpSession;
-import org.jboss.seam.util.Id;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MsProviderContainer;
 
 public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implements SipSessionListener {
