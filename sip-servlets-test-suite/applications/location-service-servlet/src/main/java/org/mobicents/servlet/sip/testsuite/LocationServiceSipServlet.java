@@ -40,8 +40,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class LocationServiceSipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class LocationServiceSipServlet extends SipServlet {
 
 	private static Log logger = LogFactory.getLog(LocationServiceSipServlet.class);
 	Map<String, List<URI>> registeredUsers = null;
@@ -61,7 +60,7 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
 		uriList  = new ArrayList<URI>();
 		uriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:5090"));
-		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
+		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);		
 	}
 
 	@Override
@@ -112,20 +111,4 @@ public class LocationServiceSipServlet extends SipServlet implements SipErrorLis
 		SipServletResponse resp = req.createResponse(response);
 		resp.send();
 	}
-	
-	// SipErrorListener methods
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noAckReceived(SipErrorEvent ee) {
-		logger.error("noAckReceived.");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noPrackReceived(SipErrorEvent ee) {
-		logger.error("noPrackReceived.");
-	}
-
 }
