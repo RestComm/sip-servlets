@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.JoinApplication</app-name>
+	<display-name>Join Sip Servlet</display-name>
+	<description>Join Sip Servlet</description>
+
+	<servlet-selection>
+		<main-servlet>
+			DispatcherMainSipServlet
+		</main-servlet>
+	</servlet-selection>
+	
+	<servlet>
+		<servlet-name>DispatcherMainSipServlet</servlet-name>
+		<display-name>DispatcherMainSipServlet</display-name>
+		<description>Dispatcher Main SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.DispatchMainSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>JoinSenderSipServlet</servlet-name>
+		<display-name>JoinSenderSipServlet</display-name>
+		<description>Join Sender SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.JoinSenderSipServlet
+		</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet> 
+	
+	<servlet>
+		<servlet-name>JoinReceiverSipServlet</servlet-name>
+		<display-name>JoinReceiverSipServlet</display-name>
+		<description>Join Receiver SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.JoinReceiverSipServlet
+		</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+</sip-app>

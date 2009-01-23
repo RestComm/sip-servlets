@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app>
+	<display-name>Simple Sip Servlet</display-name>
+	<description>Simple Sip Servlet</description>
+		
+</web-app>
