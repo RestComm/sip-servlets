@@ -108,10 +108,10 @@
 					<property name="jboss-5.home" value="${jboss-5.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>				
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
+				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
+				</ant-->
 				<!-- Commented out because they don't run on JB5 yet -->
 				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
 					<property name="jboss.home" value="${jboss.home}"/>
