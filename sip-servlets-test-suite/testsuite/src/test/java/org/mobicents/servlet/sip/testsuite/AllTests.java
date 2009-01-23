@@ -38,6 +38,7 @@ import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJ
 import org.mobicents.servlet.sip.testsuite.concurrency.ConcurrentyControlSipSessionIsolationTest;
 import org.mobicents.servlet.sip.testsuite.concurrency.CongestionControlTest;
 import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
+import org.mobicents.servlet.sip.testsuite.join.JoinSipServletTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyTelURLWithRecordRouteTest;
@@ -49,6 +50,7 @@ import org.mobicents.servlet.sip.testsuite.proxy.ProxyRecordRouteReInviteTest;
 import org.mobicents.servlet.sip.testsuite.publish.PublishSipServletTest;
 import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
 import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
+import org.mobicents.servlet.sip.testsuite.replaces.ReplacesSipServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.security.PAssertedIdentityAuthTest;
 import org.mobicents.servlet.sip.testsuite.security.ShootistSipServletAuthTest;
@@ -120,6 +122,8 @@ public class AllTests {
 		suite.addTestSuite(UpdateSipServletTest.class);
 		suite.addTestSuite(PublishSipServletTest.class);
 		suite.addTestSuite(ReferSipServletTest.class);
+		suite.addTestSuite(JoinSipServletTest.class);
+		suite.addTestSuite(ReplacesSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);

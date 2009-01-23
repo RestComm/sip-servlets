@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.LocationServiceApplication</app-name>
 	<display-name>Location Service Sip Servlet</display-name>
 	<description>Location Service Sip Servlet</description>
 	

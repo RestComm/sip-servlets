@@ -16,14 +16,14 @@ Mobicents Sip Servlets Sip Extensions/RFCs supported
 
 	* PRACK : {{{http://www.ietf.org/rfc/rfc3262.txt}RFC 3262}}
 	
-	* STUN : {{{http://www.ietf.org/rfc/rfc3489.txt}RFC 3489}}
-
-* SIP Extensions planned :
-
 	* PATH : {{{http://www.ietf.org/rfc/rfc3327.txt}RFC 3327}}
 
 	* JOIN : {{{http://www.ietf.org/rfc/rfc3911.txt}RFC 3911}}
 	
 	* REPLACES : {{{http://www.ietf.org/rfc/rfc3891.txt}RFC 3891}}
 	
-	If you need a support for a particular SIP Extension/RFC, let us know in {{{http://code.google.com/p/mobicents/issues/list}creating an issue}} with a comment of why it is needed
+	* STUN : {{{http://www.ietf.org/rfc/rfc3489.txt}RFC 3489}}
+
+* SIP Extensions planned :	
+	
+	No more SIP Extensions currenlty planned, they will be added on demand. If you need support for a particular SIP Extension/RFC, let us know in {{{http://code.google.com/p/mobicents/issues/list}creating an issue}} with a comment about its usefulness

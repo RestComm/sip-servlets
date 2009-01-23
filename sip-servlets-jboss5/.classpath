@@ -123,7 +123,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-security/5.0.0.GA/jboss-as-security-5.0.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.0.0.CR2/jboss-as-server-5.0.0.CR2-client.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.0.0.CR2/jboss-as-server-5.0.0.CR2-jmx-invoker-adaptor-client.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.0.0.GA/jboss-as-server-5.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.0.0.GA/jboss-as-server-5.0.0.GA.jar" sourcepath="/JBOSS-5/server/src/main"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system-jmx/5.0.0.GA/jboss-as-system-jmx-5.0.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system/5.0.0.GA/jboss-as-system-5.0.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-tomcat/5.0.0.GA/jboss-as-tomcat-5.0.0.GA.jar"/>

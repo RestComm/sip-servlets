@@ -16,9 +16,14 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.header.extensions.JoinHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.ListIterator;
 
 import javax.servlet.ServletException;
@@ -31,6 +36,8 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.SipTargetedRequestInfo;
 import javax.servlet.sip.ar.SipTargetedRequestType;
+import javax.sip.Dialog;
+import javax.sip.DialogState;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -62,6 +69,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
@@ -159,6 +167,84 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
 		}	
 		
+		// 15.11.4 Join and Replaces Targeting Mechanism		
+		SipTargetedRequestInfo joinReplacesTargetedRequestInfo = null;
+		MobicentsSipSession joinReplacesCorrespondingSession = null;
+		JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
+		ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
+		if(joinHeader != null || replacesHeader != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("One Join or Replaces Header has been found : JoinHeader = " + joinHeader + ", ReplacesHeader = " + replacesHeader);
+			}
+			// 15.11.4.1 If a container supporting [RFC 3911] or [RFC 3891] receives an initial INVITE request with Join or Replaces header, 
+			// the container must first ensure that the request passes the RFC-defined validation rules.
+			if(!Request.INVITE.equals(request.getMethod())) {
+				throw new DispatcherException(Response.BAD_REQUEST, "A Join or Replaces Header cannot be present in a request other than INVITE as per RFC 3911, Section 4 or RFC 3891, Section 3. Check your request " + request);
+			}
+			if(joinHeader != null && replacesHeader != null) {
+				throw new DispatcherException(Response.BAD_REQUEST, "A Join Header and a Replaces Header cannot be present as per RFC 3911, Section 4 in the same request " + request);
+			}
+			Dialog joinReplacesDialog = null;
+			if(joinHeader != null) {
+				joinReplacesDialog = ((SipStackExt)sipProvider.getSipStack()).getJoinDialog(joinHeader);
+			}
+			if(replacesHeader != null) {
+				joinReplacesDialog = ((SipStackExt)sipProvider.getSipStack()).getReplacesDialog(replacesHeader);
+			}
+			if(targetedRequestInfo != null) {
+				// If no match is found, but the Request-URI in the INVITE corresponds to a conference URI, the UAS MUST ignore the Join header and continue
+				// processing the INVITE as if the Join header did not exist
+			} else 
+			//Otherwise if no match is found, the UAS rejects the INVITE and returns a 481 Call/Transaction Does Not Exist response.  
+			if(joinReplacesDialog == null && targetedRequestInfo == null) {
+				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces Header : no match is found as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
+			} else 
+			//Likewise, if the Join/Replaces header field matches a dialog which was not created with an INVITE, the UAS MUST reject the request with a 481 response.	
+			if(joinReplacesDialog != null && ((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getSipServletMessage().getMethod())) {					 
+				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces header field matches a dialog which was not created with an INVITE as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
+			} else
+			// If the Join/Replaces header field matches a dialog which has already terminated, the UA SHOULD decline the request with a 603 Declined response.
+			if(joinReplacesDialog != null && DialogState.TERMINATED.equals(joinReplacesDialog.getState())) {
+				throw new DispatcherException(Response.DECLINE, "Join/Replaces header field matches a dialog which has already terminated as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
+			}
+			//TODO If the initiator of the new INVITE has authenticated successfully as equivalent to the user who is being joined, then the join is authorized
+			//TODO Alternatively, the Referred-By mechanism [9] defines a mechanism that the UAS can use to verify that a join request was sent on behalf of the other participant in the matched dialog
+			
+			// 15.11.4.2. For a request that passes the validation step, the container MUST attempt to locate the SipSession object matching 
+			// the tuple from the Join or Replaces header. In locating this SipSession, the container MUST not match a SipSession 
+			// owned by an application that has acted as a proxy with respect to the candidate SipSession. 
+			// It must only match a SipSession for an application that has acted as a UA. 
+			// If the matching SipSession is found, the container Session Targeting must locate the corresponding SipApplicationSession 
+			// object along with the application name of the application that owns the SipApplicationSession.
+			joinReplacesCorrespondingSession = retrieveSipSession(joinReplacesDialog);			
+			if(joinReplacesCorrespondingSession != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("the following matching sip session has been found for the Join or Replaces Header " + joinReplacesCorrespondingSession.getKey());
+				}
+				// 15.11.4.3. The container MUST populate a SipTargetedRequestInfo object with the type corresponding to whichever header 
+				// appears in the request (e.g. JOIN or REPLACES) and with the application name that owns the identified SipApplicationSession 
+				// and SipSession. 
+				// The container MUST then pass the request to the Application Router’s getNextApplication() method as a targeted request i.e., 
+				// along with the populated SipTargetedRequestInfo object.
+				SipTargetedRequestType sipTargetedRequestType = null;
+				if(joinHeader != null) {
+					sipTargetedRequestType = SipTargetedRequestType.JOIN;
+				} 
+				if(replacesHeader != null) {
+					sipTargetedRequestType = SipTargetedRequestType.REPLACES;
+				}
+				joinReplacesTargetedRequestInfo = new SipTargetedRequestInfo(sipTargetedRequestType, joinReplacesCorrespondingSession.getKey().getApplicationName());
+			} else {
+				// 15.11.4.4.If no SipSession matching the tuple is found, the container MUST pass the request to the Application Router as an untargeted request, i.e., where the SipTargetedRequestInfo argument to getNextApplication() is null.
+				if(logger.isDebugEnabled()) {
+					logger.debug("no matching sip session found for the Join or Replaces Header");
+				}
+			}
+		}		
+		if(joinReplacesTargetedRequestInfo != null) {
+			targetedRequestInfo = joinReplacesTargetedRequestInfo;
+		}
+		
 		// 15.4.1 Routing an Initial request Algorithm
 		// 15.4.1 Procedure : point 1			
 		
@@ -182,19 +268,21 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// 15.4.1 Procedure : point 3
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			dispatchOutsideContainer(sipServletRequest);
-		} else {
-			dispatchInsideContainer(sipProvider, applicationRouterInfo, sipServletRequest, sipFactoryImpl);
+		} else {			
+			dispatchInsideContainer(sipProvider, applicationRouterInfo, sipServletRequest, sipFactoryImpl, joinReplacesCorrespondingSession);
 		}		
 	}
 
 	/**
 	 * Dispatch a request inside the container based on the information returned by the AR
+	 * @param sipProvider the sip Provider on which the request has been received 
 	 * @param applicationRouterInfo information returned by the AR
 	 * @param sipServletRequest the request to dispatch
 	 * @param sipFactoryImpl the sip factory
+	 * @param joinReplacesSipSession the potential corresponding Join/Replaces SipSession previously found, can be null
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
-	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl) throws DispatcherException {
+	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl, MobicentsSipSession joinReplacesSipSession) throws DispatcherException {
 		if(logger.isInfoEnabled()) {
 			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
 		}
@@ -211,15 +299,52 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "No matching deployed application has been found !");
 		}			
 		final SipManager sipManager = (SipManager)sipContext.getManager();
-		//sip appliation session association
-		SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
-				sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
-		final MobicentsSipApplicationSession appSession = sipManager.getSipApplicationSession(
-				sipApplicationSessionKey, true);
+		
+		JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
+		ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
+		String headerName = null;
+		if(joinHeader != null) {
+			headerName = JoinHeader.NAME;
+		} else if (replacesHeader != null) {
+			headerName = ReplacesHeader.NAME;	
+		}
+		
+		MobicentsSipApplicationSession sipApplicationSession = null;
+		if(joinReplacesSipSession != null && applicationRouterInfo.getNextApplicationName().equals(joinReplacesSipSession.getKey().getApplicationName())) {
+			// 15.11.4.5. If the Application Router returns an application name that matches the application name found in step 15.11.4.2, 
+			// then the container must create a SipSession object and associate it with the SipApplicationSession identified in step 2. 
+			
+			sipApplicationSession = joinReplacesSipSession.getSipApplicationSession();
+			if(logger.isDebugEnabled()) {
+				logger.debug("Reusing the application session from the Join/Replaces " + sipApplicationSession.getId());
+			}
+			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
+					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
+			sipContext.getSipSessionsUtil().addCorrespondingSipApplicationSession(sipApplicationSessionKey, sipApplicationSession.getKey(), headerName);
+		} else {
+			// 15.11.4.6. If the Application Router returns an application name that does not match the application name found in step 15.11.4.2,
+			// then the container invokes the application using its normal procedure, creating a new SipSession and SipApplicationSession.
+
+			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
+					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
+			sipApplicationSession = sipManager.getSipApplicationSession(
+					sipApplicationSessionKey, true);
+		}	
+		
+		//sip application session association
+		final MobicentsSipApplicationSession appSession = sipApplicationSession;
 		//sip session association
 		SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
 		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
 		sipServletRequest.setSipSession(sipSessionImpl);
+
+		if(joinReplacesSipSession != null && applicationRouterInfo.getNextApplicationName().equals(joinReplacesSipSession.getKey().getApplicationName())) {
+			// 15.11.4.5. If the Application Router returns an application name that matches the application name found in step 15.11.4.2, 
+			// then the container must create a SipSession object and associate it with the SipApplicationSession identified in step 2. 
+			// The association of this newly created SipSession with the one found in step 15.11.4.2 is made available to the application 
+			// through the SipSessionsUtil.getCorrespondingSipSession(SipSession session, String headerName) method.			
+			sipContext.getSipSessionsUtil().addCorrespondingSipSession(sipSessionImpl, joinReplacesSipSession, headerName);		
+		}
 		
 		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
@@ -545,6 +670,47 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				return new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, targetedApplicationSessionKey.getApplicationName());
 			}				
 		}
+		return null;
+	}
+	
+	/**
+	 * Try to find a matching Sip Session to a given dialog
+	 * @param dialog the dialog to find the session
+	 * @return the matching session, null if not session have been found
+	 */
+	private MobicentsSipSession retrieveSipSession(Dialog dialog) {
+		
+		Iterator<SipContext> iterator = sipApplicationDispatcher.findSipApplications();
+		while(iterator.hasNext()) {
+			SipContext sipContext = iterator.next();
+			SipManager sipManager = sipContext.getSipManager();
+			
+			Iterator<MobicentsSipSession> sipSessionsIt= sipManager.getAllSipSessions();
+			while (sipSessionsIt.hasNext()) {
+				MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) sipSessionsIt
+						.next();
+				SipSessionKey sessionKey = mobicentsSipSession.getKey();				
+				if(sessionKey.getCallId().trim().equals(dialog.getCallId().getCallId())) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("found session with the same Call Id " + sessionKey + ", to Tag " + sessionKey.getToTag());
+						logger.debug("dialog localParty = " + dialog.getLocalParty().getURI() + ", localTag " + dialog.getLocalTag());
+						logger.debug("dialog remoteParty = " + dialog.getRemoteParty().getURI() + ", remoteTag " + dialog.getRemoteTag());
+					}
+					if(sessionKey.getFromAddress().equals(dialog.getLocalParty().getURI().toString()) && sessionKey.getToAddress().equals(dialog.getRemoteParty().getURI().toString()) &&
+							sessionKey.getFromTag().equals(dialog.getLocalTag()) && sessionKey.getToTag().equals(dialog.getRemoteTag())) {
+						if(mobicentsSipSession.getProxy() == null) {
+							return mobicentsSipSession;	
+						}
+					} else if (sessionKey.getFromAddress().equals(dialog.getRemoteParty().getURI().toString()) && sessionKey.getToAddress().equals(dialog.getLocalParty().getURI().toString()) &&
+							sessionKey.getFromTag().equals(dialog.getRemoteTag()) && sessionKey.getToTag().equals(dialog.getLocalTag())){
+						if(mobicentsSipSession.getProxy() == null) {
+							return mobicentsSipSession;	
+						}
+					}
+				}
+			}
+		}
+		
 		return null;
 	}
 }

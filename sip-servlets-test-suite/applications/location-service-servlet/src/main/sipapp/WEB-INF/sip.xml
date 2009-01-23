@@ -19,11 +19,5 @@
 			org.mobicents.servlet.sip.testsuite.LocationServiceSipServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
-	</servlet>
-
-	<listener>
-		<listener-class>
-			org.mobicents.servlet.sip.testsuite.LocationServiceSipServlet
-		</listener-class>
-	</listener>
+	</servlet>	
 </sip-app>

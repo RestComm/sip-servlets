@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/replaces-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/replaces-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/join-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/join-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/deploy-test-app/src/main/sipapp/WEB-INF/classes" path="applications/deploy-test-app/src/main/java"/>
 	<classpathentry kind="src" output="applications/appkey-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/appkey-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/shootme-sip-servlet-auth/src/main/sipapp/WEB-INF/classes" path="applications/shootme-sip-servlet-auth/src/main/java"/>
 	<classpathentry kind="src" output="applications/shootist-sip-servlet-auth/src/main/sipapp/WEB-INF/classes" path="applications/shootist-sip-servlet-auth/src/main/java"/>
@@ -29,11 +32,12 @@
 	<classpathentry kind="src" output="applications/annotated-servlet/src/main/sipapp/WEB-INF/classes" path="applications/annotated-servlet/src/main/java"/>
 	<classpathentry kind="src" output="testsuite/target/classes" path="testsuite/src/main/java"/>
 	<classpathentry kind="src" path="testsuite/src/test/resources"/>
-	<classpathentry kind="src" path="testsuite/src/test/java"/>
+	<classpathentry kind="src" path="testsuite/src/test/java"/> 
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar" sourcepath="/JAIN_SIP_HOME/src"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.90/jain-sip-ri-1.2.90.jar"/>
 	<classpathentry kind="var" path="M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
@@ -44,9 +48,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA2/sip-balancer-1.0.BETA2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.89/jain-sip-ri-1.2.89.jar" sourcepath="/JAIN-SIP_HOME/src"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.12/log4j-1.2.12.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-tomcat-jboss4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>	
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>

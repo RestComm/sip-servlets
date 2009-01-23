@@ -16,6 +16,9 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.header.extensions.JoinHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -134,8 +137,20 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
 			sipManager.dumpSipApplicationSessions();
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+			//trying the join or replaces matching sip app sessions
+			SipApplicationSessionKey joinSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, JoinHeader.NAME);
+			SipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
+			if(joinSipApplicationSessionKey != null) {
+				sipApplicationSession = sipManager.getSipApplicationSession(joinSipApplicationSessionKey, false);
+				sipApplicationSessionKey = joinSipApplicationSessionKey;
+			} else if(replacesSipApplicationSessionKey != null) {
+				sipApplicationSession = sipManager.getSipApplicationSession(replacesSipApplicationSessionKey, false);
+				sipApplicationSessionKey = replacesSipApplicationSessionKey;
+			}
+			if(sipApplicationSession == null) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			}
 		}
 		
 		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);

@@ -743,7 +743,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * @return the sipSessionsUtil
 	 */
-	public SipSessionsUtil getSipSessionsUtil() {
+	public SipSessionsUtilImpl getSipSessionsUtil() {
 		return sipSessionsUtil;
 	}
 	

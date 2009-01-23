@@ -494,7 +494,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             manager.setSipApplicationSessionAverageAliveTime(average);
         }
 		
-		sipContext.getSipManager().removeSipApplicationSession(key);		
+		sipContext.getSipManager().removeSipApplicationSession(key);
+		sipContext.getSipSessionsUtil().removeCorrespondingSipApplicationSession(key);
 		expirationTimerTask = null;
 		expirationTimerFuture = null;
 		httpSessions.clear();

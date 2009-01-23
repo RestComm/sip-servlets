@@ -14,7 +14,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.testsuite.composition;
+package org.mobicents.servlet.sip.testsuite.replaces;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -25,50 +25,43 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
+/**
+ * Test the behavior of Mobicents Sip Servlets with regard to Replaces (RFC 3891) Support
+ * @author jean.deruelle@gmail.com
+ *
+ */
+public class ReplacesSipServletTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(SpeedDialLocationServiceJunitTest.class);
+	private static Log logger = LogFactory.getLog(ReplacesSipServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 20000;	
 //	private static final int TIMEOUT = 100000000;
-	 
+	
 	TestSipListener sender;
 	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
 
-	public SpeedDialLocationServiceJunitTest(String name) {
+	public ReplacesSipServletTest(String name) {
 		super(name);
 	}
 
 	@Override
 	public void deployApplication() {
-		deploySpeedDial();
-		deployLocationService();
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/replaces-sip-servlet/src/main/sipapp",
+				"replaces-context", 
+				"replaces-dial"));
 	}
 
-	private void deploySpeedDial() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp",
-				"speed-dial-context", 
-				"speed-dial"));
-	}
-	
-	private void deployLocationService() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/location-service-servlet/src/main/sipapp",
-				"location-service-context", 
-				"location-service"));
-	}
-	
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///"
 				+ projectHome
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/composition/speeddial-locationservice-dar.properties";
+				+ "org/mobicents/servlet/sip/testsuite/replaces/replaces-dar.properties";
 	}
 	
 	@Override
@@ -81,8 +74,8 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT, AUTODIALOG);			
 	}
 	
-	public void testSpeedDialLocationServiceCallerSendBye() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+	public void testSipServletSendsReplaces() throws Exception {		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
@@ -99,19 +92,20 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromHost);
 				
-		String toUser = "1";
+		String toUser = "replaces";
 		String toHost = "sip-servlets.com";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
+		assertTrue(receiver.isReplacesRequestReceived());		
+		assertTrue(receiver.getOkToByeReceived());
+		assertTrue(sender.getByeReceived());
 	}
 	
-	public void testSpeedDialLocationServiceErrorResponse() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+	public void testSipServletReceivesReplaces() throws Exception {		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
@@ -119,34 +113,6 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
-		receiver.setRespondWithError(408);
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
-
-		String fromName = "sender-expect-408";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "1";
-		String toHost = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isServerErrorReceived());
-	}
-
-	public void testSpeedDialLocationServiceCalleeSendBye() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		SipProvider senderProvider = sender.createProvider();
-
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
-		SipProvider receiverProvider = receiver.createProvider();
-
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
@@ -156,48 +122,17 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromHost);
 				
-		String toUser = "1";
+		String toUser = "replaces-receiver";
 		String toHost = "sip-servlets.com";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());		
-	}
-
-	public void testCancelSpeedDialLocationService() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		SipProvider senderProvider = sender.createProvider();
-
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
-		receiver.setWaitForCancel(true);
-		SipProvider receiverProvider = receiver.createProvider();
-
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
-
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
-
-		String fromName = "sender";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "1";
-		String toHost = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(200);
-		sender.sendCancel();
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isCancelOkReceived());
-		assertTrue(sender.isRequestTerminatedReceived());
-		assertTrue(receiver.isCancelReceived());
+		assertNotNull(receiver.getLastMessageContent());		
+		assertFalse(receiver.isErrorResponseReceived());
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getByeReceived());
 	}
 	
 	@Override

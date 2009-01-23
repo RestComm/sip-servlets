@@ -36,6 +36,8 @@
 		<module>update-sip-servlet</module>
 		<module>refer-sip-servlet</module>
 		<module>publish-sip-servlet</module>
+		<module>join-sip-servlet</module>
+		<module>replaces-sip-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->

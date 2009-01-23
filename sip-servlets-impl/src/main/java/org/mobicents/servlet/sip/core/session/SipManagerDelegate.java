@@ -225,6 +225,10 @@ public abstract class SipManagerDelegate {
 			String toTag = sipSessionImpl.getKey().getToTag();
 			if(toTag == null && key.getToTag() != null) {
 				sipSessionImpl.getKey().setToTag(key.getToTag());
+				if(logger.isDebugEnabled()) {
+					logger.debug("Setting the To tag " + key.getToTag() + 
+							" to the session " + key);
+				}
 			} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
 				MobicentsSipSession derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
 				if(derivedSipSession == null) {

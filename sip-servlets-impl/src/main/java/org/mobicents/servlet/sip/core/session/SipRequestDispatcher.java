@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -44,7 +45,11 @@ public class SipRequestDispatcher implements RequestDispatcher {
 	 */
 	public void forward(ServletRequest request, ServletResponse response)
 			throws ServletException, IOException {
-		((SipServletRequest)request).getSession().setHandler(handler.getName());
+		if(request != null) {
+			((SipServletRequest)request).getSession().setHandler(handler.getName());
+		} else {
+			((SipServletResponse)response).getSession().setHandler(handler.getName());
+		}
 		Servlet servlet = handler.allocate();
 		servlet.service(request, response);
 		handler.deallocate(servlet);

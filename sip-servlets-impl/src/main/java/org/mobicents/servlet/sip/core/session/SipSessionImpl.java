@@ -627,6 +627,7 @@ public class SipSessionImpl implements MobicentsSipSession {
         }
 		
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
+		getSipApplicationSession().getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		ongoingTransactions.clear();
 		subscriptions.clear();

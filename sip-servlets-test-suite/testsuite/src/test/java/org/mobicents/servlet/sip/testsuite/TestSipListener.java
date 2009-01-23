@@ -16,9 +16,13 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
+import gov.nist.javax.sip.address.SipUri;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.SIPETag;
 import gov.nist.javax.sip.header.SIPHeaderNames;
 import gov.nist.javax.sip.header.WWWAuthenticate;
+import gov.nist.javax.sip.header.extensions.JoinHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -90,6 +94,10 @@ public class TestSipListener implements SipListener {
 
 	private boolean sendBye;
 	
+	private boolean sendJoinMessage;
+	
+	private boolean sendReplacesMessage;
+	
 	private boolean sendByeBeforeTerminatingNotify;
 	
 	private boolean sendByeAfterTerminatingNotify;
@@ -107,6 +115,10 @@ public class TestSipListener implements SipListener {
 	private ServerTransaction inviteServerTid;
 
 	private Dialog dialog;
+	
+	private Dialog joinDialog;
+	
+	private Dialog replacesDialog;
 
 	public int myPort;
 
@@ -135,6 +147,10 @@ public class TestSipListener implements SipListener {
 	private boolean byeReceived;
 
 	private boolean redirectReceived;
+	
+	private boolean joinRequestReceived;
+	
+	private boolean replacesRequestReceived;
 
 	private boolean okToByeReceived;
 	
@@ -197,6 +213,8 @@ public class TestSipListener implements SipListener {
 	private long lastRegisterCSeqNumber = -1;
 
 	private int finalResponseStatus;
+
+	private boolean errorResponseReceived;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -662,10 +680,20 @@ public class TestSipListener implements SipListener {
         }
 		
 		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
-		request.getHeader(ContentTypeHeader.NAME);		
+		request.getHeader(ContentTypeHeader.NAME);
+		boolean sendInvitewithJoin = false;
+		boolean sendInvitewithReplaces = false;
 		if(TEXT_CONTENT_TYPE.equals(contentTypeHeader.getContentType())) {
 			this.lastMessageContent = new String(request.getRawContent());
 			allMessagesContent.add(new String(lastMessageContent));
+			if(lastMessageContent.indexOf("Join : ") != -1) {
+				this.lastMessageContent = lastMessageContent.substring("Join : ".length());
+				sendInvitewithJoin = true;
+			}
+			if(lastMessageContent.indexOf("Replaces : ") != -1) {
+				this.lastMessageContent = lastMessageContent.substring("Replaces : ".length());
+				sendInvitewithReplaces = true;
+			}
 		}
 		try {
 			Response okResponse = protocolObjects.messageFactory.createResponse(
@@ -679,7 +707,45 @@ public class TestSipListener implements SipListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error("error sending OK response to message", ex);
-		}		
+		}			
+		if(sendInvitewithJoin) {
+			try {
+				String fromUser = "receiver";
+				String fromHost = "sip-servlets.com";
+				SipURI fromAddress = protocolObjects.addressFactory.createSipURI(
+						fromUser, fromHost);
+				
+				String toUser = "join-receiver";
+				String toHost = "sip-servlets.com";
+				SipURI toAddress = protocolObjects.addressFactory.createSipURI(
+						toUser, toHost);
+				String[] headerNames = new String[] {"Join"};
+				String[] headerContents = new String[] {lastMessageContent};
+				sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerContents);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				logger.error("error sending INVITE with Join", ex);
+			}
+		}
+		if(sendInvitewithReplaces) {
+			try {
+				String fromUser = "receiver";
+				String fromHost = "sip-servlets.com";
+				SipURI fromAddress = protocolObjects.addressFactory.createSipURI(
+						fromUser, fromHost);
+				
+				String toUser = "replaces-receiver";
+				String toHost = "sip-servlets.com";
+				SipURI toAddress = protocolObjects.addressFactory.createSipURI(
+						toUser, toHost);
+				String[] headerNames = new String[] {"Replaces"};
+				String[] headerContents = new String[] {lastMessageContent};
+				sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerContents);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				logger.error("error sending INVITE with Join", ex);
+			}
+		}
 	}
 	
 	private void processRegister(Request request,
@@ -777,9 +843,16 @@ public class TestSipListener implements SipListener {
 			}
 			inviteServerTid = st;
 			Dialog dialog = st.getDialog();
-			
-			this.dialogCount ++;
-			this.dialog = dialog;
+			if(request.getHeader(JoinHeader.NAME) != null) {
+				setJoinRequestReceived(true);
+				this.joinDialog = dialog;
+			} else if (request.getHeader(ReplacesHeader.NAME) != null) {
+				setReplacesRequestReceived(true);
+				this.replacesDialog = dialog;
+			} else {
+				this.dialogCount ++;
+				this.dialog = dialog;
+			}						
 			
 			logger.info("Shootme: dialog = " + dialog);
 			
@@ -822,8 +895,14 @@ public class TestSipListener implements SipListener {
 				return ;
 			}
 			
+			if(((SipUri)request.getRequestURI()).getUser().equalsIgnoreCase("join")) {
+				sendJoinMessage = true;
+			}
+			if(((SipUri)request.getRequestURI()).getUser().equalsIgnoreCase("replaces")) {
+				sendReplacesMessage = true;
+			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("unexpected exception", ex);
 		}
 	}
 	
@@ -894,7 +973,51 @@ public class TestSipListener implements SipListener {
 				logger.info("Sending BYE : " + byeRequest);
 				serverTransactionId.getDialog().sendRequest(ct);
 				logger.info("Dialog State = " + serverTransactionId.getDialog().getState());
-			}							
+			}	
+			if(!joinRequestReceived && sendJoinMessage) {
+				String fromUser = "join";
+				String fromHost = "sip-servlets.com";
+				SipURI fromAddress = protocolObjects.addressFactory.createSipURI(
+						fromUser, fromHost);
+				
+				String toUser = "join-receiver";
+				String toHost = "sip-servlets.com";
+				SipURI toAddress = protocolObjects.addressFactory.createSipURI(
+						toUser, toHost);
+				
+				CallIdHeader callIdHeader = (CallIdHeader) request.getHeader(CallIdHeader.NAME);
+				FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
+				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
+				JoinHeader joinHeader = (JoinHeader) ((HeaderFactoryExt)protocolObjects.headerFactory).createJoinHeader(callIdHeader.getCallId(), toHeader.getTag(), fromHeader.getTag());
+				
+				sendSipRequest("MESSAGE", fromAddress, toAddress, joinHeader.toString(), null, false);
+			}
+			if(!isReplacesRequestReceived() && sendReplacesMessage) {
+				String fromUser = "replaces";
+				String fromHost = "sip-servlets.com";
+				SipURI fromAddress = protocolObjects.addressFactory.createSipURI(
+						fromUser, fromHost);
+				
+				String toUser = "replaces-receiver";
+				String toHost = "sip-servlets.com";
+				SipURI toAddress = protocolObjects.addressFactory.createSipURI(
+						toUser, toHost);
+				
+				CallIdHeader callIdHeader = (CallIdHeader) request.getHeader(CallIdHeader.NAME);
+				FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
+				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
+				ReplacesHeader replacesHeader = (ReplacesHeader) ((HeaderFactoryExt)protocolObjects.headerFactory).createReplacesHeader(callIdHeader.getCallId(), toHeader.getTag(), fromHeader.getTag());
+				
+				sendSipRequest("MESSAGE", fromAddress, toAddress, replacesHeader.toString(), null, false);
+			}
+			if(joinRequestReceived) {
+				sendBye();
+				sendBye(joinDialog);
+			}
+			if(isReplacesRequestReceived()) {
+				sendBye();
+				sendBye(replacesDialog);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
@@ -905,6 +1028,9 @@ public class TestSipListener implements SipListener {
 		Response response = (Response) responseReceivedEvent.getResponse();
 		if(response.getStatusCode() >= 400 && response.getStatusCode() < 510) {
 			this.serverErrorReceived = true;
+		}
+		if(response.getStatusCode() >= 400 && response.getStatusCode() < 999) {
+			this.setErrorResponseReceived(true);
 		}
 		if(response.toString().toLowerCase().contains("info")) {
 			lastInfoResponseTime = System.currentTimeMillis();
@@ -932,12 +1058,12 @@ public class TestSipListener implements SipListener {
 			if (response.getStatusCode() == Response.OK) {
 				logger.info("response = " + response);
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					Request ackRequest = dialog.createAck(cseq.getSeqNumber());
+					Request ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					if (useToURIasRequestUri) {
 						ackRequest.setRequestURI(requestURI);	
 					}
 					logger.info("Sending ACK");
-					dialog.sendAck(ackRequest);
+					tid.getDialog().sendAck(ackRequest);
 					ackSent = true;
 					Thread.sleep(1000);
 					// If the caller is supposed to send the bye
@@ -945,20 +1071,20 @@ public class TestSipListener implements SipListener {
 						sendBye();
 					}
 					if(sendByeAfterTerminatingNotify || sendByeAfterTerminatingNotify) {
-						this.dialog.terminateOnBye(false);
+						 tid.getDialog().terminateOnBye(false);
 					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					okToByeReceived = true;
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					this.cancelOkReceived = true;
-					if (dialog.getState() == DialogState.CONFIRMED) {
+					if (tid.getDialog().getState() == DialogState.CONFIRMED) {
 						// oops cancel went in too late. Need to hang up the
 						// dialog.
 						logger.info("Sending BYE -- cancel went in too late !!");
 						Request byeRequest = dialog.createRequest(Request.BYE);
 						ClientTransaction ct = sipProvider
 								.getNewClientTransaction(byeRequest);
-						dialog.sendRequest(ct);
+						tid.getDialog().sendRequest(ct);
 					} 
 				} else if (cseq.getMethod().equals(Request.PUBLISH)) {
 					SIPETagHeader sipTagHeader = (SIPETagHeader)response.getHeader(SIPETag.NAME);
@@ -1239,7 +1365,17 @@ public class TestSipListener implements SipListener {
 	 */
 	public void sendBye() throws SipException,
 			TransactionUnavailableException, TransactionDoesNotExistException {
-		Request byeRequest = this.dialog.createRequest(Request.BYE);
+		sendBye(this.dialog);
+	}
+	
+	/**
+	 * @throws SipException
+	 * @throws TransactionUnavailableException
+	 * @throws TransactionDoesNotExistException
+	 */
+	public void sendBye(Dialog dialog) throws SipException,
+			TransactionUnavailableException, TransactionDoesNotExistException {
+		Request byeRequest = dialog.createRequest(Request.BYE);
 		ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 		dialog.sendRequest(ct);
 		byeSent = true;
@@ -1392,7 +1528,9 @@ public class TestSipListener implements SipListener {
 		this.transactionCount ++;
 		
 		logger.info("client tx = " + inviteClientTid);
-		dialog = inviteClientTid.getDialog();
+		if(!Request.MESSAGE.equalsIgnoreCase(method)) {
+			dialog = inviteClientTid.getDialog();
+		}
 		this.dialogCount++;
 	}
 
@@ -1799,6 +1937,48 @@ public class TestSipListener implements SipListener {
 	 */
 	public int getFinalResponseStatus() {
 		return finalResponseStatus;
+	}
+
+	/**
+	 * @param joinRequestReceived the joinRequestReceived to set
+	 */
+	public void setJoinRequestReceived(boolean joinRequestReceived) {
+		this.joinRequestReceived = joinRequestReceived;
+	}
+
+	/**
+	 * @return the joinRequestReceived
+	 */
+	public boolean isJoinRequestReceived() {
+		return joinRequestReceived;
+	}
+
+	/**
+	 * @param errorResponseReceived the errorResponseReceived to set
+	 */
+	public void setErrorResponseReceived(boolean errorResponseReceived) {
+		this.errorResponseReceived = errorResponseReceived;
+	}
+
+	/**
+	 * @return the errorResponseReceived
+	 */
+	public boolean isErrorResponseReceived() {
+		return errorResponseReceived;
+	}
+
+	/**
+	 * @param replacesRequestReceived the replacesRequestReceived to set
+	 */
+	public void setReplacesRequestReceived(boolean replacesRequestReceived) {
+		this.replacesRequestReceived = replacesRequestReceived;
+	}
+
+	/**
+	 * @return the replacesRequestReceived
+	 */
+	public boolean isReplacesRequestReceived() {
+		return replacesRequestReceived;
 	}
 
 }

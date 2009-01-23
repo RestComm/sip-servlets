@@ -16,8 +16,13 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.header.extensions.JoinHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
@@ -35,9 +40,19 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	private static transient Log logger = LogFactory.getLog(SipSessionsUtilImpl.class);
 	
 	private transient SipContext sipContext;
+	
+	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> joinSession;
+	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> replacesSession;
+	
+	private transient ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> joinApplicationSession;
+	private transient ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> replacesApplicationSession;
 
 	public SipSessionsUtilImpl(SipContext sipContext) {
 		this.sipContext = sipContext;
+		joinSession = new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
+		replacesSession = new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
+		joinApplicationSession = new ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey>();
+		replacesApplicationSession = new ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey>();
 	}
 	
 	/**
@@ -81,6 +96,101 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	 * {@inheritDoc}
 	 */
 	public SipSession getCorrespondingSipSession(SipSession sipSession, String headerName) {
-		throw new UnsupportedOperationException("RFC 3911 and RFC 3891 are not currently supported");
+		MobicentsSipSession correspondingSipSession = null;
+		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
+			correspondingSipSession = joinSession.get(((MobicentsSipSession) sipSession).getKey());
+		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
+			correspondingSipSession = replacesSession.get(((MobicentsSipSession) sipSession).getKey());
+		} else {
+			throw new IllegalArgumentException("headerName argument should either be one of Join or Replaces");
+		}
+		return correspondingSipSession;
+	}
+	
+	/**
+	 * Add a mapping between a new session and a corresponding sipSession related to a headerName. See Also getCorrespondingSipSession method.
+	 * @param newSession the new session
+	 * @param correspondingSipSession the corresponding sip session to add
+	 * @param headerName the header name
+	 */
+	public void addCorrespondingSipSession(MobicentsSipSession newSession, MobicentsSipSession correspondingSipSession, String headerName) {
+		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
+			joinSession.putIfAbsent(newSession.getKey(), correspondingSipSession);
+		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
+			replacesSession.putIfAbsent(newSession.getKey(), correspondingSipSession);
+		} else {
+			throw new IllegalArgumentException("headerName argument should either be one of Join or Replaces");
+		}
+	}
+	
+	/**
+	 * Add a mapping between a corresponding sipSession related to a headerName. See Also getCorrespondingSipSession method.
+	 * @param correspondingSipSession the corresponding sip session to add
+	 * @param headerName the header name
+	 */
+	public void removeCorrespondingSipSession(SipSessionKey sipSession) {
+		joinSession.remove(sipSession);
+		replacesSession.remove(sipSession);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public SipApplicationSessionKey getCorrespondingSipApplicationSession(SipApplicationSessionKey sipApplicationSessionKey, String headerName) {
+		SipApplicationSessionKey correspondingSipApplicationSession = null;
+		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
+			correspondingSipApplicationSession = joinApplicationSession.get(sipApplicationSessionKey);
+		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
+			correspondingSipApplicationSession = replacesApplicationSession.get(sipApplicationSessionKey);
+		} else {
+			throw new IllegalArgumentException("headerName argument should either be one of Join or Replaces");
+		}
+		return correspondingSipApplicationSession;
+	}
+	
+	/**
+	 * Add a mapping between a new session and a corresponding sipSession related to a headerName. See Also getCorrespondingSipSession method.
+	 * @param newSession the new session
+	 * @param correspondingSipSession the corresponding sip session to add
+	 * @param headerName the header name
+	 */
+	public void addCorrespondingSipApplicationSession(SipApplicationSessionKey newApplicationSession, SipApplicationSessionKey correspondingSipApplicationSession, String headerName) {
+		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
+			joinApplicationSession.putIfAbsent(newApplicationSession, correspondingSipApplicationSession);
+		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
+			replacesApplicationSession.putIfAbsent(newApplicationSession, correspondingSipApplicationSession);
+		} else {
+			throw new IllegalArgumentException("headerName argument should either be one of Join or Replaces");
+		}
+	}
+	
+	/**
+	 * Add a mapping between a corresponding sipSession related to a headerName. See Also getCorrespondingSipSession method.
+	 * @param correspondingSipSession the corresponding sip session to add
+	 * @param headerName the header name
+	 */
+	public void removeCorrespondingSipApplicationSession(SipApplicationSessionKey sipApplicationSession) {
+		joinApplicationSession.remove(sipApplicationSession);
+		replacesApplicationSession.remove(sipApplicationSession);
+		Iterator<SipApplicationSessionKey> it = joinApplicationSession.values().iterator();
+		boolean found = false;
+		while (it.hasNext() && !found) {
+			SipApplicationSessionKey sipApplicationSessionKey = (SipApplicationSessionKey) it
+					.next();
+			if(sipApplicationSessionKey.equals(sipApplicationSession)) {
+				joinApplicationSession.remove(sipApplicationSessionKey);
+				found = true;
+			}
+		}
+		it = replacesApplicationSession.values().iterator();
+		found = false;
+		while (it.hasNext() && !found) {
+			SipApplicationSessionKey sipApplicationSessionKey = (SipApplicationSessionKey) it
+					.next();
+			if(sipApplicationSessionKey.equals(sipApplicationSession)) {
+				replacesApplicationSession.remove(sipApplicationSessionKey);
+				found = true;
+			}
+		}
 	}
 }
