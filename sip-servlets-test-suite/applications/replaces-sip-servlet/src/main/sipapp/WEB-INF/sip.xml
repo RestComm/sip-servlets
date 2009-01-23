@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.ReplacesApplication</app-name>
+	<display-name>Replaces Sip Servlet</display-name>
+	<description>Replaces Sip Servlet</description>
+
+	<servlet-selection>
+		<main-servlet>
+			DispatchReplacesMainSipServlet
+		</main-servlet>
+	</servlet-selection>
+	
+	<servlet>
+		<servlet-name>DispatchReplacesMainSipServlet</servlet-name>
+		<display-name>DispatchReplacesMainSipServlet</display-name>
+		<description>Dispatch Replaces Main SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.DispatchReplacesMainSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>ReplacesSenderSipServlet</servlet-name>
+		<display-name>ReplacesSenderSipServlet</display-name>
+		<description>Replaces Sender SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.ReplacesSenderSipServlet
+		</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet> 
+	
+	<servlet>
+		<servlet-name>ReplacesReceiverSipServlet</servlet-name>
+		<display-name>ReplacesReceiverSipServlet</display-name>
+		<description>Replaces Receiver SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.ReplacesReceiverSipServlet
+		</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+</sip-app>
