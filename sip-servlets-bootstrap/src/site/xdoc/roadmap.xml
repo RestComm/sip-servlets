@@ -621,7 +621,19 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=492">
 						Diameter Sh Example
 						</a>								
-						<br />					
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=483">
+						Concurrency control at application level
+						</a>								
+						<br/>
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=395">
+						More Congestion Control mechanisms
+						</a>
+						<br/>								
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=229">
@@ -634,7 +646,7 @@
 						More Extensions : PATH
 						</a>
 						<br />							
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -657,21 +669,7 @@
 									href="http://code.google.com/p/mobicents/issues/detail?id=482">
 									Clustering perf improvements
 								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=483">
-									Concurrency control at application level
-								</a>								
-							</li>
-							<li>
-								<img src="red.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=395">
-									More Congestion Control mechanisms
-								</a>								
-							</li>														
+							</li>																				
 							<li>
 								<img src="green.jpeg" />
 								<a
