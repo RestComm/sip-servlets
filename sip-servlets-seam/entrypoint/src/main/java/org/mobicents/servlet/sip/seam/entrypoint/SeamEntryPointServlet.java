@@ -27,6 +27,10 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		arg0.getSession().setAttribute("sipSession", arg0.getSession());
 		Lifecycle.beginSession(new SipSeamSessionMap(arg0.getSession()));
 		SeamEntrypointUtils.beginEvent(arg0.getSession());
+		Contexts.getSessionContext().set("sipSession", arg0.getSession());
+		Contexts.getSessionContext().set("msSession", MsProviderContainer.msProvider.createSession());
+		Contexts.getApplicationContext().set("eventFactory", MsProviderContainer.msProvider.getEventFactory());
+		
 		Events.instance().raiseEvent("sipSessionCreated", arg0.getSession());
 		SeamEntrypointUtils.endEvent();
 		System.out.println("SEAM SIP SESSION CREATED");
@@ -64,8 +68,6 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 			}
 		}
 		SeamEntrypointUtils.beginEvent(request);
-		Contexts.getSessionContext().set("sipSession", request.getSession());
-		Contexts.getSessionContext().set("msSession", MsProviderContainer.msProvider.createSession());
 		Contexts.getApplicationContext().set("sipFactory", (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY));
 		Events.instance().raiseEvent(request.getMethod().toUpperCase(), request);

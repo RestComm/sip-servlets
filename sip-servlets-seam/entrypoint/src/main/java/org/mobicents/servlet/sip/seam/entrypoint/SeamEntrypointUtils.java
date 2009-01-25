@@ -57,6 +57,7 @@ public class SeamEntrypointUtils {
 	}
 	
 	private static void simulateConversation(SipSession session) {
+		if(!session.isValid()) return;
 		String cid = (String)session.getAttribute("org.mobicents.servlet.sip.conversationId");
 		if(cid == null) {
 			cid = Id.nextId();
