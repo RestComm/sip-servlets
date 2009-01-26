@@ -78,6 +78,14 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 		sipServletResponse.send();
 	}
 	
+	@Override
+	protected void doErrorResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		logger.info("Got response: "
+				+ resp);
+		resp.getSession().createRequest("BYE").send();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

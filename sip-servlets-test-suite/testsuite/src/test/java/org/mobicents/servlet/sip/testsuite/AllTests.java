@@ -52,6 +52,7 @@ import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
 import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
 import org.mobicents.servlet.sip.testsuite.replaces.ReplacesSipServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
+import org.mobicents.servlet.sip.testsuite.routing.SameContainerRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.security.PAssertedIdentityAuthTest;
 import org.mobicents.servlet.sip.testsuite.security.ShootistSipServletAuthTest;
 import org.mobicents.servlet.sip.testsuite.security.ShootmeSipServletAuthTest;
@@ -126,6 +127,7 @@ public class AllTests {
 		suite.addTestSuite(ReplacesSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
+		suite.addTestSuite(SameContainerRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);
 		suite.addTestSuite(AddressTest.class);

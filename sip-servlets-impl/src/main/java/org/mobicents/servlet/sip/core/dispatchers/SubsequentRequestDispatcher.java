@@ -36,6 +36,7 @@ import javax.sip.message.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -278,10 +279,14 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						logger.info("Checking route header " + routeHeader + " to know what to do next with the subsequent request " + request.toString());
 					}
 					if(routeHeader == null || sipApplicationDispatcher.isRouteExternal(routeHeader)) {
-						// no route header or external, send outside the container
-						// FIXME send it statefully
-						if(dialog == null && transaction == null) {
+						// no route header and request URI meant for the container, we drop the request
+						if(routeHeader == null && !sipApplicationDispatcher.isExternal(((javax.sip.address.SipURI)request.getRequestURI()).getHost(), ((javax.sip.address.SipURI)request.getRequestURI()).getPort(), ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam())) {
+							logger.info("Since no final response has been sent by the application to this request and there is no route header and the request URI is meant for the container, we drop the Request " + request.toString());
+						}
+						// no route header or external, send outside the container						
+						else if(dialog == null && transaction == null) {
 							try{
+								// FIXME send it statefully
 								sipProvider.sendRequest((Request)request.clone());
 								if(logger.isInfoEnabled()) {
 									logger.info("Subsequent Request dispatched outside the container " + request.toString());
