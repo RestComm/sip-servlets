@@ -16,7 +16,38 @@ Goals
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
+
+Version 0.7.2 is out !
+
+	This release is primarly a bug fix release where a handful of bug fixes have been fixed (see below), please note that Issue 519 can potentially break your existing apps (make sure the main-servlet element in your sip.xml is enclosed by servlet-selection element) 
+	and The JBoss version has also been updated with the latest Mobicents Media Server release (1.0.0.CR5).
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=482}Issue 482}} Sip Servlet Listeners can not load classes from WEB-INF/lib 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=489}Issue 489}} Problem with Subsequent Requests in MSS 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=494}Issue 494}} Duplicating of URI parameters in SipURIImpl 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=497}Issue 497}} Address.toString() doesn't contain any Address parameters 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=504}Issue 504}} Route to Load Balancer not added in ha proxy case 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=505}Issue 505}} PRACK can not be proxied properly and generate 500 response 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=507}Issue 507}} URI encoded by SipApplicationSession is rejected by mobicents load balancer 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=514}Issue 514}} Proxying subsequest INVITE overrides CSeq 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=519}Issue 519}} Tomcat/JBoss 4 parsing not compliant with the xsd 
+	
+	* {{{http://code.google.com/p/mobicents/issues/detail?id=523}Issue 523}} java.lang.IllegalStateException: "invalidate": Session already invalidated  
+	
+	 
+	To download this release and try it out, follow the following link : 
+
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=656395}Mobicents Sip Servlet 0.7.2 downloads}}
   
+
 Version 0.7.1 is out !
 
 	This release is primarly a bug fix release where {{{http://code.google.com/p/mobicents/issues/detail?id=481}Issue 481}} has been fixed and

@@ -14,7 +14,7 @@ Sip Servlets Conference Demo
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/examples/conference-demo/1.0/conference-demo-1.0.war}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/examples/conference-demo/1.0.2/conference-demo-1.0.2.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/conference-demo-dar.properties}dar configuration file}}.\
@@ -31,7 +31,7 @@ Sip Servlets Conference Demo
 	
 	<<<svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/conference-demo>>>
 	
-	To build it you need Maven 2. If you set the JBOSS_HOME environment variable to a location with Mobicents Sip Servlets 0.7.1 server the following command will build and deploy the application:
+	To build it you need Maven 2. If you set the JBOSS_HOME environment variable to a location with Mobicents Sip Servlets server the following command will build and deploy the application:
 	
 	<<<mvn install -Pdeploy>>>
 
