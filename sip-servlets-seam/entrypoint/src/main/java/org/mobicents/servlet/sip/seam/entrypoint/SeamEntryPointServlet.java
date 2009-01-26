@@ -78,6 +78,8 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 	protected void doResponse(SipServletResponse response) throws ServletException,
 			IOException {
 		SeamEntrypointUtils.beginEvent(response);
+		Contexts.getApplicationContext().set("sipFactory", (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY));
 		Events.instance().raiseEvent("RESPONSE", response);
 		SeamEntrypointUtils.endEvent();
 	}
