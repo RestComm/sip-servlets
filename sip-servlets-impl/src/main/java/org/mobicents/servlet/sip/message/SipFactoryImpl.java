@@ -533,13 +533,6 @@ public class SipFactoryImpl implements Serializable {
 				throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe);
 			}
 		} 		
-	}
-
-	/**
-	 * @return the sessionManager
-	 */
-	public SessionManagerUtil getSessionManager() {
-		return sipApplicationDispatcher.getSessionManager();
 	}	
 	
 	/**

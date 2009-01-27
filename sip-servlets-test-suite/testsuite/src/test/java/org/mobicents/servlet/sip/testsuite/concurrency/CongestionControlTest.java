@@ -26,6 +26,7 @@ import javax.sip.address.SipURI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -99,6 +100,86 @@ public class CongestionControlTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(10000);
 		assertTrue(sender.isServerErrorReceived());
+		assertTrue(sender.isAckSent());		
+	}
+	
+	public void testCongestedQueueDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(5);
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.DropMessage);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(3000);
+		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
+		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
+		for(int q=0; q<40; q++) {
+			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+		}
+		sender.sendBye();
+		Thread.sleep(10000);
+		assertFalse(sender.isServerErrorReceived());
+		assertTrue(sender.isAckSent());		
+	}
+	
+	public void testMemoryCongestedErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(5);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(3000);
+		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
+		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
+		for(int q=0; q<40; q++) {
+			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+		}
+		sender.sendBye();
+		Thread.sleep(10000);
+		assertTrue(sender.isServerErrorReceived());
+		assertTrue(sender.isAckSent());		
+	}
+	
+	public void testMemoryCongestedDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(5);
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.DropMessage);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(3000);
+		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
+		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
+		for(int q=0; q<40; q++) {
+			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+		}
+		sender.sendBye();
+		Thread.sleep(10000);
+		assertFalse(sender.isServerErrorReceived());		
 		assertTrue(sender.isAckSent());		
 	}
 	

@@ -32,10 +32,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.imageio.spi.ServiceRegistry;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -86,8 +88,8 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -98,8 +100,6 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContext;
 
-import sun.misc.Service;
-
 /**
  * Implementation of the SipApplicationDispatcher interface.
  * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine), 
@@ -108,7 +108,25 @@ import sun.misc.Service;
  * dispatches the messages.
  * @author Jean Deruelle 
  */
-public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {	
+public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {
+	
+	/**
+	 * Timer task that will gather information about congestion control 
+	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+	 */
+	public class CongestionControlTimerTask implements Runnable {		
+		
+		public void run() {
+			if(logger.isDebugEnabled()) {
+				logger.debug("CongestionControlTimerTask now running ");
+			}
+			analyzeQueueCongestionState();
+			analyzeMemory();
+			//TODO wait for JDK 6 new OperatingSystemMXBean
+//			analyzeCPU();
+		}
+	} 
+	
 	//the logger
 	private static transient Log logger = LogFactory
 			.getLog(SipApplicationDispatcherImpl.class);
@@ -126,8 +144,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	//List of host names managed by the container
 	private Set<String> hostNames = null;
+
+	//2 sec
+	private long congestionControlCheckingInterval =  2000;		
 	
-	private SessionManagerUtil sessionManager = null;
+	protected transient CongestionControlTimerTask congestionControlTimerTask;
+	
+	protected transient ScheduledFuture congestionControlTimerFuture;
 	
 	private Boolean started = Boolean.FALSE;
 
@@ -141,7 +164,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	private boolean rejectRequests = false;
 	
+	private boolean memoryToHigh = false;
+	
+	private double maxMemory;
+	
+	private long memoryThreshold;
+	
+	private CongestionControlPolicy congestionControlPolicy;
+	
 	int queueSize;
+	
+	private int numberOfMessagesInQueue;
+	
+	private double percentageOfMemoryUsed;
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
@@ -155,9 +190,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		sipFactoryImpl = new SipFactoryImpl(this);
-		sessionManager = new SessionManagerUtil();
 		hostNames = new CopyOnWriteArraySet<String>();
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
+		maxMemory = Runtime.getRuntime().maxMemory() / 1024;
+		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 	}
 	
 	/**
@@ -187,7 +223,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isInfoEnabled()) {
 				logger.info("Using the Service Provider Framework to load the application router provider");
 			}
-			Iterator<SipApplicationRouterProvider> providers = Service.providers(SipApplicationRouterProvider.class);
+			//TODO when moving to JDK 6, use the official http://java.sun.com/javase/6/docs/api/java/util/ServiceLoader.html instead			
+			//http://grep.codeconsult.ch/2007/10/31/the-java-service-provider-spec-and-sunmiscservice/
+			Iterator<SipApplicationRouterProvider> providers = ServiceRegistry.lookupProviders(SipApplicationRouterProvider.class);
 			if(providers.hasNext()) {
 				sipApplicationRouter = providers.next().getSipApplicationRouter();
 			}
@@ -226,6 +264,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			started = Boolean.TRUE;
 		}
+		congestionControlTimerTask = new CongestionControlTimerTask();
+		congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Sip Application Dispatcher started");
 		}
@@ -374,12 +414,44 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(rejectRequests) {
 			int queuedMessages = getNumberOfPendingMessages();
 			if(queuedMessages<queueSize) {
+				if(logger.isWarnEnabled()) {
+					logger.warn("number of pending messages in the queues : " + queuedMessages + " < to the queue Size : " + queueSize + " => stopping to reject requests");
+				}
 				rejectRequests = false;
 			}
-		} else if(requestsProcessed.get() %5 == 0) {
+		} else {
 			int queuedMessages = getNumberOfPendingMessages();
 			if(queuedMessages>queueSize) {
+				if(logger.isWarnEnabled()) {
+					logger.warn("number of pending messages in the queues : " + queuedMessages + " > to the queue Size : " + queueSize + " => starting to reject requests");
+				}
 				rejectRequests = true;
+			}
+		}
+	}
+	
+	private void analyzeMemory() {
+		Runtime runtime = Runtime.getRuntime();  
+		   
+		double allocatedMemory = runtime.totalMemory() / 1024;  
+		double freeMemory = runtime.freeMemory() / 1024;
+		
+		double totalFreeMemory = freeMemory + (maxMemory - allocatedMemory);
+		double usedMemory =  (100 - ((totalFreeMemory / maxMemory) * 100));
+
+		if(memoryToHigh) {
+			if(usedMemory < memoryThreshold) {
+				if(logger.isWarnEnabled()) {
+					logger.warn("Memory used: " + usedMemory + "% < to the memory threshold : " + memoryThreshold + " => stopping to reject requests");
+				}
+				memoryToHigh = false;				
+			}
+		} else {
+			if(usedMemory > memoryThreshold) {
+				if(logger.isWarnEnabled()) {
+					logger.warn("Memory used: " + usedMemory + "% > to the memory threshold : " + memoryThreshold + " => starting to reject requests");
+				}
+				memoryToHigh = true;
 			}
 		}
 	}
@@ -388,9 +460,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
-	public void processRequest(RequestEvent requestEvent) {	
-		requestsProcessed.incrementAndGet();
-		analyzeQueueCongestionState();
+	public void processRequest(RequestEvent requestEvent) {
+		if((rejectRequests || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
+			logger.error("dropping request, memory is too high or too many messages present in queues");
+			return;
+		}
+		requestsProcessed.incrementAndGet();		
 		SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
 		Dialog dialog = requestEvent.getDialog();
@@ -398,7 +473,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		try {
 			if(logger.isInfoEnabled()) {
 				logger.info("Got a request event "  + request.toString());
-			}
+			}			
 			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
@@ -491,7 +566,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			
 			try {
-				if(rejectRequests) {
+				if(rejectRequests || memoryToHigh) {
 					if(!Request.ACK.equals(request.getMethod()) && !Request.PRACK.equals(request.getMethod())) {
 						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 					}
@@ -528,6 +603,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
+		if((rejectRequests || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
+			logger.error("dropping response, memory is too high or too many messages present in queues");
+			return;
+		}
 		if(logger.isInfoEnabled()) {
 			logger.info("Response " + responseEvent.getResponse().toString());
 		}
@@ -884,13 +963,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	}
 
 	/**
-	 * @return the sessionManager
-	 */
-	public SessionManagerUtil getSessionManager() {
-		return sessionManager;
-	}
-
-	/**
 	 * 
 	 */
 	public SipApplicationRouterInfo getNextInterestedApplication(
@@ -1115,14 +1187,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setQueueSize(int queueSize) {
 		this.queueSize = queueSize;
 	}
-
-	public void setMessageQueueSize(int queueSize) {
-		setQueueSize(queueSize);
-	}
 	
 	public void setConcurrencyControlModeByName(String concurrencyControlMode) {
 		this.concurrencyControlMode = ConcurrencyControlMode.valueOf(concurrencyControlMode);
-	}
+	}	
 
 	/**
 	 * @return the requestsProcessed
@@ -1136,5 +1204,69 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public long getResponsesProcessed() {
 		return responsesProcessed.get();
+	}
+
+	/**
+	 * @param congestionControlCheckingInterval the congestionControlCheckingInterval to set
+	 */
+	public void setCongestionControlCheckingInterval(
+			long congestionControlCheckingInterval) {
+		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
+		congestionControlTimerFuture.cancel(false);
+		congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * @return the congestionControlCheckingInterval
+	 */
+	public long getCongestionControlCheckingInterval() {
+		return congestionControlCheckingInterval;
+	}
+
+	/**
+	 * @param congestionControlPolicy the congestionControlPolicy to set
+	 */
+	public void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy) {
+		this.congestionControlPolicy = congestionControlPolicy;
+	}
+
+	
+	public void setCongestionControlPolicyByName(String congestionControlPolicy) {
+		this.congestionControlPolicy = CongestionControlPolicy.valueOf(congestionControlPolicy);
+	}	
+
+	/**
+	 * @return the congestionControlPolicy
+	 */
+	public CongestionControlPolicy getCongestionControlPolicy() {
+		return congestionControlPolicy;
+	}
+
+	/**
+	 * @param memoryThreshold the memoryThreshold to set
+	 */
+	public void setMemoryThreshold(long memoryThreshold) {
+		this.memoryThreshold = memoryThreshold;
+	}
+
+	/**
+	 * @return the memoryThreshold
+	 */
+	public long getMemoryThreshold() {
+		return memoryThreshold;
+	}
+	
+	/**
+	 * @return the numberOfMessagesInQueue
+	 */
+	public int getNumberOfMessagesInQueue() {
+		return numberOfMessagesInQueue;
+	}
+
+	/**
+	 * @return the percentageOfMemoryUsed
+	 */
+	public double getPercentageOfMemoryUsed() {
+		return percentageOfMemoryUsed;
 	}
 }

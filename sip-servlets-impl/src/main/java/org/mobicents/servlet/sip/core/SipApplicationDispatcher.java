@@ -135,13 +135,7 @@ public interface SipApplicationDispatcher extends SipListener {
 	 * the sip application dispatcher registered host names
 	 */
 	Set<String> findHostNames();
-	
-	/**
-	 * Retrieve the session manager associated with this application disptacher 
-	 * @return the session manager associated with this application disptacher
-	 */
-	SessionManagerUtil getSessionManager();
-	
+		
 	/**
 	 * 
 	 * @param sipServletRequestImpl
@@ -164,12 +158,22 @@ public interface SipApplicationDispatcher extends SipListener {
 	public Map<String, String> getMdToApplicationName();
 	
 	public ConcurrencyControlMode getConcurrencyControlMode();
-	
 	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode);
 	public void setConcurrencyControlModeByName(String concurrencyControlMode);
 
 	public int getQueueSize();
 	public void setQueueSize(int queueSize);
-    
-	public void setMessageQueueSize(int queueSize);
+	
+	public void setMemoryThreshold(long memoryThreshold);
+	public long getMemoryThreshold();
+	
+	public void setCongestionControlCheckingInterval(long interval);
+	public long getCongestionControlCheckingInterval();
+		
+	public CongestionControlPolicy getCongestionControlPolicy();
+	public void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy);
+	public void setCongestionControlPolicyByName(String congestionControlPolicy);
+	
+	public int getNumberOfMessagesInQueue();
+	public double getPercentageOfMemoryUsed();
 }

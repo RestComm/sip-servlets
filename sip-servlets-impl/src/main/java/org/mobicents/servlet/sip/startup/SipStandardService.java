@@ -30,6 +30,7 @@ import org.apache.catalina.core.StandardService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -58,8 +59,10 @@ public class SipStandardService extends StandardService implements SipService {
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 
 	protected SipApplicationDispatcher sipApplicationDispatcher;
 	protected int sipMessageQueueSize = 1500;
-
+	protected int memoryThreshold = 90;
+	
 	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
+	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
 	//the sip application router class name defined in the server.xml
 //	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
@@ -124,6 +127,8 @@ public class SipStandardService extends StandardService implements SipService {
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.domain);
 		
+		sipApplicationDispatcher.setMemoryThreshold(getMemoryThreshold());
+		sipApplicationDispatcher.setCongestionControlPolicyByName(getCongestionControlPolicy());
 		sipApplicationDispatcher.setQueueSize(getSipMessageQueueSize());
 		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));
 
@@ -294,6 +299,38 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public void setConcurrencyControlMode(String concurrencyControlMode) {
 		this.concurrencyControlMode = concurrencyControlMode;
+	}
+
+
+	/**
+	 * @param memoryThreshold the memoryThreshold to set
+	 */
+	public void setMemoryThreshold(int memoryThreshold) {
+		this.memoryThreshold = memoryThreshold;
+	}
+
+
+	/**
+	 * @return the memoryThreshold
+	 */
+	public int getMemoryThreshold() {
+		return memoryThreshold;
+	}
+
+
+	/**
+	 * @param congestionControlPolicy the congestionControlPolicy to set
+	 */
+	public void setCongestionControlPolicy(String congestionControlPolicy) {
+		this.congestionControlPolicy = congestionControlPolicy;
+	}
+
+
+	/**
+	 * @return the congestionControlPolicy
+	 */
+	public String getCongestionControlPolicy() {
+		return congestionControlPolicy;
 	}
 
 }
