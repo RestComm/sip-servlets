@@ -17,7 +17,7 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 
 public final class RequestColumnsContainer extends AbsolutePanel {
 
-	private static final String[] COLUMNS = new String[] {"INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH"};
+	private static final String[] COLUMNS = new String[] {"INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH", "INFO", "UPDATE", "REFER" };
 
 	private static final String CSS_SSM = "ssm";
 

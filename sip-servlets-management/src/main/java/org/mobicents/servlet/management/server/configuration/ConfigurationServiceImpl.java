@@ -8,6 +8,7 @@ import javax.management.ObjectName;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.mobicents.servlet.management.client.configuration.ConfigurationService;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -66,6 +67,53 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
 			Attribute att = new Attribute("queueSize", new Integer(queueSize));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+		
+	}
+	
+	public String getCongestionControlPolicy() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			CongestionControlPolicy policy = 
+				(CongestionControlPolicy) mserver.getAttribute(
+						dispatcherName, "congestionControlPolicy");
+			return policy.toString();
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+
+	public int getMemoryThreshold() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			String memoryThreshold = 
+				mserver.getAttribute(
+						dispatcherName, "memoryThreshold").toString();
+			return Integer.parseInt(memoryThreshold);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+
+	public void setCongestionControlPolicy(String policy) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("congestionControlPolicy", CongestionControlPolicy.valueOf(policy));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+
+	public void setMemoryThreshold(int memoryThreshold) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("memoryThreshold", new Integer(memoryThreshold));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);

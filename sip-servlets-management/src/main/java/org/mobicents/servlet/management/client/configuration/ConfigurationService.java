@@ -20,7 +20,11 @@ public interface ConfigurationService extends RemoteService {
 	
 	void setQueueSize(int queueSize);
 	int getQueueSize();
+	public void setMemoryThreshold(int memoryThreshold);
+	public int getMemoryThreshold();
 	String getConcurrencyControlMode();
 	void setConcurrencyControlMode(String mode);
+	public String getCongestionControlPolicy();
+	public void setCongestionControlPolicy(String congestionControlPolicy);
 
 }
