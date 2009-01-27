@@ -30,7 +30,6 @@ import javax.sip.header.ViaHeader;
 
 import org.apache.catalina.LifecycleException;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -164,8 +163,8 @@ public interface SipApplicationDispatcher extends SipListener {
 	public int getQueueSize();
 	public void setQueueSize(int queueSize);
 	
-	public void setMemoryThreshold(long memoryThreshold);
-	public long getMemoryThreshold();
+	public void setMemoryThreshold(int memoryThreshold);
+	public int getMemoryThreshold();
 	
 	public void setCongestionControlCheckingInterval(long interval);
 	public long getCongestionControlCheckingInterval();

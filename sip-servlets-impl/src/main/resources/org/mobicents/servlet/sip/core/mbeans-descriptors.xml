@@ -20,6 +20,10 @@
 			description="Maximum number of pending messages allowed to wait in a queue to be executed"
 			type="int" />
 			
+		<attribute name="memoryThreshold"
+			description="Percentage of memory to be used by the container before applying the congestion control policy"
+			type="int" />
+			
 		<attribute name="requestsProcessed"
 			description="number of requests processed by the sip application dispatcher"
 			type="long"
@@ -30,8 +34,13 @@
 			type="long"
 			writeable="false" />
 
-		<attribute name="numberOfPendingMessages"
+		<attribute name="numberOfMessagesInQueue"
 			description="number of pending messages in all queues for all concurrency control modes."
+			type="int"
+			writeable="false" />
+			
+		<attribute name="percentageOfMemoryUsed"
+			description="Percentage of memory to be used by the container before applying the congestion control policy."
 			type="int"
 			writeable="false" />
 
@@ -61,13 +70,13 @@
 				type="java.lang.String" />
 		</operation>
 		
-		<operation name="setMessageQueueSize"
-			description="Sets the number of messages that can go in the queue waiting for a session to be available, this is needed for embedded jopr"
+		<operation name="setCongestionControlPolicyByName"
+			description="Sets the congestion control policy when SIP Messages comes in and the container is overloaded"
 			impact="ACTION" returnType="void">
-			<parameter name="queueSize"
-				description="the number of messages that can go in the queue waiting for a session to be available"
-				type="int" />
-		</operation>
+			<parameter name="congestionControlPolicy"
+				description="the congestion control policy,must be one of the following - DropMessage, ErrorResponse"
+				type="java.lang.String" />
+		</operation>		
 		
 		<operation name="init"
 			description="Initialize the sip application dispatcher and its associated sip application router implementation"

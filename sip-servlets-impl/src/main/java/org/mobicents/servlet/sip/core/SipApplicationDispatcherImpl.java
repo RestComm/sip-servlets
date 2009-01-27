@@ -168,7 +168,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	private double maxMemory;
 	
-	private long memoryThreshold;
+	private int memoryThreshold;
 	
 	private CongestionControlPolicy congestionControlPolicy;
 	
@@ -411,19 +411,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	}
 	
 	private void analyzeQueueCongestionState() {
+		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
 		if(rejectRequests) {
-			int queuedMessages = getNumberOfPendingMessages();
-			if(queuedMessages<queueSize) {
+			if(numberOfMessagesInQueue<queueSize) {
 				if(logger.isWarnEnabled()) {
-					logger.warn("number of pending messages in the queues : " + queuedMessages + " < to the queue Size : " + queueSize + " => stopping to reject requests");
+					logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the queue Size : " + queueSize + " => stopping to reject requests");
 				}
 				rejectRequests = false;
 			}
 		} else {
-			int queuedMessages = getNumberOfPendingMessages();
-			if(queuedMessages>queueSize) {
+			if(numberOfMessagesInQueue>queueSize) {
 				if(logger.isWarnEnabled()) {
-					logger.warn("number of pending messages in the queues : " + queuedMessages + " > to the queue Size : " + queueSize + " => starting to reject requests");
+					logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize + " => starting to reject requests");
 				}
 				rejectRequests = true;
 			}
@@ -437,19 +436,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		double freeMemory = runtime.freeMemory() / 1024;
 		
 		double totalFreeMemory = freeMemory + (maxMemory - allocatedMemory);
-		double usedMemory =  (100 - ((totalFreeMemory / maxMemory) * 100));
+		this.percentageOfMemoryUsed=  (100 - ((totalFreeMemory / maxMemory) * 100));
 
 		if(memoryToHigh) {
-			if(usedMemory < memoryThreshold) {
+			if(percentageOfMemoryUsed < memoryThreshold) {
 				if(logger.isWarnEnabled()) {
-					logger.warn("Memory used: " + usedMemory + "% < to the memory threshold : " + memoryThreshold + " => stopping to reject requests");
+					logger.warn("Memory used: " + percentageOfMemoryUsed + "% < to the memory threshold : " + memoryThreshold + " => stopping to reject requests");
 				}
 				memoryToHigh = false;				
 			}
 		} else {
-			if(usedMemory > memoryThreshold) {
+			if(percentageOfMemoryUsed > memoryThreshold) {
 				if(logger.isWarnEnabled()) {
-					logger.warn("Memory used: " + usedMemory + "% > to the memory threshold : " + memoryThreshold + " => starting to reject requests");
+					logger.warn("Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold + " => starting to reject requests");
 				}
 				memoryToHigh = true;
 			}
@@ -1245,14 +1244,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * @param memoryThreshold the memoryThreshold to set
 	 */
-	public void setMemoryThreshold(long memoryThreshold) {
+	public void setMemoryThreshold(int memoryThreshold) {
 		this.memoryThreshold = memoryThreshold;
 	}
 
 	/**
 	 * @return the memoryThreshold
 	 */
-	public long getMemoryThreshold() {
+	public int getMemoryThreshold() {
 		return memoryThreshold;
 	}
 	
