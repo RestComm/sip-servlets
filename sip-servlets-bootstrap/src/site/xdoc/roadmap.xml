@@ -628,7 +628,7 @@
 						Concurrency control at application level
 						</a>								
 						<br/>
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=395">
 						More Congestion Control mechanisms
@@ -731,6 +731,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=523">
 									HTTP session already invalidated on SipApplicationSessionImpl.invalidate()
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=555">
+									Subsequent request routing wrong when app don't send final response		
 								</a>								
 							</li>
 						</ul>

@@ -1,9 +1,10 @@
-Mobicents Sip Servlets Concurrency and Congestion Control
+Mobicents Sip Servlets Concurrency
 
 * Description
 	
 	
-	Concurrency and congestion control settings define the way messages are processed under heavy load. Although the JSR 289 Expert Group couldn't agree on a concurrency control mechanism for JSR 289, we believe this feature together with congestion control is often required in production environments.
+	Although the JSR 289 Expert Group couldn't agree on a concurrency control mechanism for JSR 289, we believe this feature together with {{./mss-congestion.html{congestion control}}} is often required in production environments.
+	
 	The concurrency control modes supported in Mobicents Sip Servlets are the following:
 
 	*	None - In this mode all SIP messages are processed as soon as possible in a thread from the global thread-pool. In this mode two messages belonging to the same SipSession can be processed simultaneously, so you must take measures to ensure that access to a shared resource like the session attributes is synchronized in a thread-safe way.
@@ -14,28 +15,27 @@ Mobicents Sip Servlets Concurrency and Congestion Control
 	
 	 
 	 
-	The messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released. If this queue gets full the container will start rejecting any new SIP requests with SIP error code 503 until the server catches up. Note that only SIP requests will be rejected, the SIP responses that arrive at a full queue will be stored and processed sooner or later.
+	The messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released. If this queue gets full the container will apply {{./mss-congestion.html{congestion control  mechanisms}}}.
 
 * Configuration
 
-	You can configure concurrency and congestion control in the following ways:
+	You can configure concurrency in the following ways:
 
-	*   <For concurrency only>, In your application, in a package-info.java class by using the annotation 
+	*   In your application, in a package-info.java class by using the annotation 
 		@ConcurrencyControl(mode=ConcurrencyControlMode.SipApplicationSession).
 		See an example of {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/applications/annotated-servlet/src/main/java/org/mobicents/servlet/sip/testsuite}package-info.java}} from one of our testsuite applications. 
 		You must also import the corresponding sip-servlets-annotations-0.8-SNAPSHOT.jar into your application so that it can find the class.
 
-	*	From server.xml in the Service tag you can add concurrencyControlMode and sipMessageQueueSize attributes like this:
+	*	From server.xml in the Service tag you can add concurrencyControlMode attributes like this:
     
     	<<<<Service name="jboss.web" 
       	className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" 
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter" 
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties" 
-		concurrencyControlMode="SipApplicationSession" 
-		sipMessageQueueSize="1500">>>>
+		concurrencyControlMode="SipApplicationSession">>>>
 		
-		By default the queue size is 1500.			
+		By default the concurrencyControlMode is None as defined per Sip Servlets 1.1 specification.			
 		
 	*	From the {{{http://localhost:8080/sip-servlets-management}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
 	
