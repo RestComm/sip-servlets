@@ -41,9 +41,9 @@
 				<a href="./mss-jopr-queue.png"><img src="small-mss-jopr-queue.png" /></a>
 			</p>	
 			<p>
-				(More information on <a href="./concurrency.html">Mobicents Sip Servlets Concurrency and Congestion Control</a>)
-				and also you can see graphically the total number of SIP requests processed by the server and
-				the number of pending messages to be processed in all queues.
+				(More information on <a href="./concurrency.html">Mobicents Sip Servlets Concurrency</a> and <a href="./mss-congestion.html">Mobicents Sip Servlets Congestion Control</a>)
+				and also you can see graphically the total number of SIP requests/responses processed by the server,
+				the number of pending messages to be processed in all queues and the current percentage of memory used by the container.
 			</p>
 			<p>
 				<a href="./mss-jopr-metrics.png"><img src="small-mss-jopr-metrics.png" /></a>

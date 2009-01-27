@@ -3,7 +3,7 @@ Mobicents Sip Servlets Concurrency
 * Description
 	
 	
-	Although the JSR 289 Expert Group couldn't agree on a concurrency control mechanism for JSR 289, we believe this feature together with {{./mss-congestion.html{congestion control}}} is often required in production environments.
+	Although the JSR 289 Expert Group couldn't agree on a concurrency control mechanism for JSR 289, we believe this feature together with {{{./mss-congestion.html}congestion control}} is often required in production environments.
 	
 	The concurrency control modes supported in Mobicents Sip Servlets are the following:
 
@@ -15,7 +15,7 @@ Mobicents Sip Servlets Concurrency
 	
 	 
 	 
-	The messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released. If this queue gets full the container will apply {{./mss-congestion.html{congestion control  mechanisms}}}.
+	The messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released. If this queue gets full the container will apply {{{./mss-congestion.html}congestion control mechanisms}}.
 
 * Configuration
 
@@ -37,9 +37,9 @@ Mobicents Sip Servlets Concurrency
 		
 		By default the concurrencyControlMode is None as defined per Sip Servlets 1.1 specification.			
 		
-	*	From the {{{http://localhost:8080/sip-servlets-management}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
+	*	From the {{{sip-servlets-management.htm}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
 	
-	*	From {{{http://localhost:8080/embedded-jopr}Embedded Jopr}}. You must first install Embedded Jopr in order this link to be accessible.
+	*	From {{{mss-jopr-plugin.html}Embedded Jopr}}. You must first install Embedded Jopr in order this link to be accessible.
 		
 	*	From the {{{http://localhost:8080/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.web%3Atype%3DSipApplicationDispatcher}dispatcher MBean}}. You can navigate there from the JBoss jmx console. All changes performed at runtime are effective immediately, but are not persisted for the next reboot. If you want your changes to be permanent modify your server.xml file as described above. Remember, the allowed values are None, SipSession and SipApplicationSession.
 	

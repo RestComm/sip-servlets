@@ -13,7 +13,11 @@ Mobicents Sip Servlets Congestion Control
 	
 	*	The other based upon the percentage of memory currently used by the container. If the memory used goes over a configurable threshold (90% per default), the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen.
 	
+	
+	
 	The different values for the congestion control policy (what to do with an incoming message when the server is overloaded) are : 
+	
+	
 	
 	* DropMessage - drop any incoming message
 	
@@ -36,9 +40,9 @@ Mobicents Sip Servlets Congestion Control
 		
 		By default the queue size is 1500, the default memory threshold is 90% and the congestion control policy is ErrorResponse			
 		
-	*	From the {{{http://localhost:8080/sip-servlets-management}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
+	*	From the {{{sip-servlets-management.htm}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
 	
-	*	From {{{http://localhost:8080/embedded-jopr}Embedded Jopr}}. You must first install Embedded Jopr in order this link to be accessible.
+	*	From {{{mss-jopr-plugin.html}Embedded Jopr}}. You must first install Embedded Jopr in order this link to be accessible.
 		
-	*	From the {{{http://localhost:8080/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.web%3Atype%3DSipApplicationDispatcher}dispatcher MBean}}. You can navigate there from the JBoss jmx console. All changes performed at runtime are effective immediately, but are not persisted for the next reboot. If you want your changes to be permanent modify your server.xml file as described above. Remember, the allowed values are None, SipSession and SipApplicationSession.
+	*	From the {{{http://localhost:8080/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.web%3Atype%3DSipApplicationDispatcher}dispatcher MBean}}. You can navigate there from the JBoss jmx console. All changes performed at runtime are effective immediately, but are not persisted for the next reboot. If you want your changes to be permanent modify your server.xml file as described above. Remember, the allowed values are DropMessage and ErrorResponse.
 	
