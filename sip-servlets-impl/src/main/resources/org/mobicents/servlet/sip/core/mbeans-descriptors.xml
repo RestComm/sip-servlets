@@ -13,7 +13,12 @@
 			
 		<attribute name="concurrencyControlMode"
 			description="Concurrent control mode specifies if requests should be executed sequentially"
-			type="org.mobicents.servlet.sip.core.ConcurrencyControlMode" 
+			type="org.mobicents.servlet.sip.annotation.ConcurrencyControlMode" 
+			writeable="false"/>
+			
+		<attribute name="congestionControlPolicy"
+			description="Congestion control policy specifies if what should be done on server congestion"
+			type="org.mobicents.servlet.sip.core.CongestionControlPolicy" 
 			writeable="false"/>
 			
 		<attribute name="queueSize"

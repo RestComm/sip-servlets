@@ -56,8 +56,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setConcurrencyControlMode(String mode) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("concurrencyControlMode", ConcurrencyControlMode.valueOf(mode));
-			mserver.setAttribute(dispatcherName, att);
+			mserver.invoke(dispatcherName, "setConcurrencyControlModeByName", new Object[]{mode}, new String[]{"java.lang.String"});
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
 		}
@@ -102,9 +101,8 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 
 	public void setCongestionControlPolicy(String policy) {
 		try {
-			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("congestionControlPolicy", CongestionControlPolicy.valueOf(policy));
-			mserver.setAttribute(dispatcherName, att);
+			ObjectName dispatcherName = getApplicationDispatcher();			
+			mserver.invoke(dispatcherName, "setCongestionControlPolicyByName", new Object[]{policy}, new String[]{"java.lang.String"});
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
 		}
