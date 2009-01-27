@@ -278,6 +278,7 @@ public class DTMFUtils {
 	 */
 	public static void playFileInResponseToDTMFInfo(SipSession session,
 			String audioFile) {
+		logger.info("playing " + audioFile + " in response to DTMF");
 		MsConnection connection = (MsConnection)session.getApplicationSession().getAttribute("connection");
 		MsLink link = (MsLink)session.getApplicationSession().getAttribute("link");
 		MsEndpoint endpoint = link.getEndpoints()[0];
@@ -306,5 +307,6 @@ public class DTMFUtils {
 							
         endpoint.execute(requestedSignals, requestedEvents, link);
 		session.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STOPPED);
+		logger.info("played " + audioFile + " in response to DTMF");
 	}
 }
