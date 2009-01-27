@@ -40,6 +40,17 @@
         	</parameters>
         </operation>
         
+        <operation name="setCongestionControlPolicyByName" displayName="Set the Congestion Control Policy" description="Sets the congestion control policy when SIP Messages comes in and the container is overloaded, must be one of the following - Drop Message, Send Error Response">
+        	<parameters>
+        		<c:simple-property name="congestionControlPolicy" defaultValue="ErrorResponse">
+        			<c:property-options>
+	                   <c:option value="DropMessage"/>
+	                   <c:option value="ErrorResponse" default="true"/>
+	                </c:property-options>        		
+        		</c:simple-property>
+        	</parameters>
+        </operation>
+        
         <!--operation name="setMessageQueueSize" displayName="Set the Congestion Control" description="Sets the number of pending messages allowed to wait in a queue to be executed.">
         	<parameters>
         		<c:simple-property name="queueSize" type="integer" defaultValue="1500"/>        			
@@ -52,11 +63,15 @@
         <metric displayName="Number of SIP responses processed" property="responsesProcessed"
              defaultOn="true" defaultInterval="1000" displayType="summary"/>
 
-     	<metric displayName="Number of pending messages in all queues" property="numberOfPendingMessages"
+     	<metric displayName="Number of pending messages in all queues" property="numberOfMessagesInQueue"
+             defaultOn="true" defaultInterval="500" displayType="summary"/>
+             
+        <metric displayName="Percentage of Memory used by the container" property="percentageOfMemoryUsed"
              defaultOn="true" defaultInterval="500" displayType="summary"/>
              
         <resource-configuration>
         	<c:simple-property name="queueSize" type="integer" description="Maximum number of pending messages allowed to wait in a queue to be executed." defaultValue="1500"/>
+        	<c:simple-property name="memoryThreshold" type="integer" description="Percentage of memory to be used by the container before applying the congestion control policy" defaultValue="90"/>
         </resource-configuration>
     </service>
     
