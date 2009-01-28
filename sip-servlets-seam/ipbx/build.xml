@@ -18,7 +18,8 @@
     	</fileset>
     	<pathelement location="${target.dir}/WEB-INF/classes"/>
     </path>
-    <target name="init">
+    <target name="init" depends="dependencies">
+    	<mkdir dir="${target.dir}/WEB-INF/lib"/>
         <mkdir dir="WebContent/WEB-INF/classes"/>
     	<delete dir="WebContent/WEB-INF/dev"/>
     </target>
@@ -47,7 +48,7 @@
     	<copy todir="WebContent/WEB-INF/classes/META-INF">
     		<fileset dir="src/main/META-INF" includes="*"></fileset>
     	</copy>
-    	<antcall target="dependencies"></antcall>
+    	
     	<mkdir dir="warbuild"/>
     	<zip destfile="warbuild/ipbx.war"
     	       basedir="${target.dir}"
