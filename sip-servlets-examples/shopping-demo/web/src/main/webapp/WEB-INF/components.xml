@@ -15,7 +15,7 @@
                  http://jboss.com/products/seam/mail http://jboss.com/products/seam/mail-2.0.xsd
                  http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.0.xsd">
 
-   <core:init debug="@debug@" jndi-pattern="@jndiPattern@"/>
+   <core:init debug="true" jndi-pattern="shopping-demo/#{ejbName}/local"/>
      
     <!-- 120 second conversation timeout -->
     <core:manager conversation-timeout="120000"/>

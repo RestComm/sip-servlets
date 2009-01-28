@@ -5,10 +5,6 @@
 	<display-name>Shopping Demo Sip Servlet</display-name>
 	<description>Shopping Demo Sip Servlet</description>
 	
-	<main-servlet>
-		ShoppingSipServlet
-	</main-servlet>
-
 	<servlet>
 		<servlet-name>ShoppingSipServlet</servlet-name>
 		<display-name>ShoppingSipServlet</display-name>
