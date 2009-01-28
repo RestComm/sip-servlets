@@ -2,10 +2,14 @@
 <classpath>
 	<classpathentry kind="src" output="WebContent/WEB-INF/dev" path="src/hot"/>
 	<classpathentry kind="src" path="src/main"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/j2sdk1.6-sun"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/JBoss 4.2 Runtime"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam/2.1.0.SP1/jboss-seam-2.1.0.SP1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam-remoting/2.1.0.SP1/jboss-seam-remoting-2.1.0.SP1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.generic.runtimeTarget/JBoss v4.2"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.8-SNAPSHOT/sip-servlets-spec-1.1.8-20081203.090759-10.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.8-SNAPSHOT/sip-servlets-spec-1.1.8-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/seam/sip-servlets-seam-entrypoint/1.0/sip-servlets-seam-entrypoint-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/richfaces/framework/richfaces-api/3.2.2.SR1/richfaces-api-3.2.2.SR1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
