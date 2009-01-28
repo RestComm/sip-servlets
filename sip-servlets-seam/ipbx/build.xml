@@ -45,7 +45,7 @@
     	<copy todir="${target.dir}/WEB-INF/classes">
     		<fileset dir="src/main" includes="*"></fileset>
     	</copy>
-    	<copy todir="${target.dir}/WEB-INF/classes/META-INF">
+    	<copy todir="${target.dir}/META-INF">
     		<fileset dir="src/main/META-INF" includes="*"></fileset>
     	</copy>
     	
