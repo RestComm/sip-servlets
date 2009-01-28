@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faceted-project>
+  <runtime name="JBoss 4.2 Runtime"/>
+  <fixed facet="jst.java"/>
+  <fixed facet="jst.web"/>
+  <installed facet="jst.java" version="5.0"/>
+  <installed facet="jst.web" version="2.5"/>
+  <installed facet="jst.jsf" version="1.2"/>
+  <installed facet="jst.seam" version="2.1"/>
+</faceted-project>

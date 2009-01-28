@@ -1,0 +1,149 @@
+body {
+	font-size: 12px;
+}
+
+a:active, a:link, a:visited {
+	color: #EEBA11;
+}
+
+a:hover {
+	color: #8CAFCD;
+}
+
+centered {
+    margin-left: auto;
+    margin-right: auto;
+    width: 6em
+}
+
+input, textarea {
+	border: 1px solid #BBBBBB;
+	font-size: 10px;
+	background: #F0F8FF;
+	color: black;
+}
+
+input[type='submit'], input[type='button'] {
+	background: #4477AA;
+	color: white;
+	margin: 5px;
+	border-color: gray;
+}
+
+.tableControl, .actionButtons {
+	width: 100%;
+}
+
+.tableControl a {
+	padding-left: 10px;
+}
+
+.tableControl {
+	text-align: right;
+}
+
+.footer {
+	text-align: right;
+	font-size: 10px;
+}
+
+.mainbody {
+	width: 300px;
+	background-image: url('img/leftbg.png');
+}
+.rich-table {
+	width:100%;
+}
+
+h1 {
+	font-family: Arial,sans-serif;
+	color: #578BB8;
+	font-size: 1.6em;
+	margin-top: 0;
+}
+
+body {
+	margin: 0px;
+	font-family: Arial,sans-serif;
+	color: #616161;
+}
+
+.body {
+	padding: 30px;
+}
+
+.columnHeader:hover
+{
+	color: #FF6600;
+}
+
+.message {
+	border: 1px solid #FFCC00;
+	padding: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	background-color: #F0F8FF;
+	font-size: 12px;
+}
+
+.name {
+	vertical-align: top;
+	font-weight: bold;
+	width: 115px;
+	float: left;
+	padding: 5px;
+	margin-top: 3px;
+	clear: left;
+}
+.value {
+	float: left;
+	padding: 5px;
+}
+
+.error {
+	float: left;
+	padding: 5px;
+}
+.errors {
+	color: red;
+	vertical-align: middle;
+}
+img.errors {
+	padding-right: 5px;
+}
+.errors input {
+	border: 1px solid red;
+}
+.errors textarea {
+	border: 1px solid red;
+}
+
+.required {
+	color: red;
+	padding-left: 2px;
+}
+
+.rich-stglpanel-body {
+	overflow: auto;
+}
+
+.leftpanel {
+	left:12px;
+	position:absolute;
+	top:52px;
+	width:320px;
+	z-index:10;
+	background-color: #000;
+	padding-right: 1px;
+	padding-top: 6px;
+	padding-bottom: 3px;
+	padding-left: 1px;
+}
+.rightpanel {
+
+	background-color: #FFCA11;
+	padding-right: 4px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	padding-left: 6px;
+}

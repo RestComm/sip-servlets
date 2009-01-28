@@ -1,0 +1,88 @@
+<a4j:region xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:rich="http://richfaces.org/rich" rendered="#{identity.loggedIn}">
+	<div class="leftpanel"><rich:panel>
+		<f:facet name="header">My Phones</f:facet>
+		<a4j:form>
+			<rich:dataTable id="registration"
+				value="#{dataLoader.loadRegistrations()}" var="registration"
+				rows="10">
+
+				<rich:column>
+					<f:facet name="header">Phone</f:facet>
+					<h:outputText value="#{registration.uri}" />
+				</rich:column>
+				<rich:column width="20">
+					<f:facet name="header">
+					Ring
+				</f:facet>
+					<h:selectBooleanCheckbox id="selectedCb"
+						value="#{registration.selected}">
+						<a4j:support event="onchange" reRender="registration"
+							actionListener="#{registrationAction.select(registration)}"></a4j:support>
+					</h:selectBooleanCheckbox>
+				</rich:column>
+				<f:facet name="footer">
+					<s:link view="/registrationList.xhtml" value="Edit Registrations" />
+				</f:facet>
+
+			</rich:dataTable>
+			<br />
+
+			<h:inputText value="#{registrationAction.registrationUri}" size="15" />
+
+			<rich:spacer width="15"></rich:spacer>
+			<h:commandLink value="Add phone"
+				action="#{registrationAction.addRegistration()}"
+				reRender="registration">
+
+			</h:commandLink>
+		</a4j:form>
+
+	</rich:panel> <a4j:form>
+		<rich:panel>
+			<f:facet name="header">Contacts</f:facet>
+
+			<rich:dataTable id="contacts" value="#{dataLoader.loadContacts()}"
+				var="contact" rows="30">
+
+				<rich:column>
+					<f:facet name="header">Name</f:facet>
+					<h:outputText value="#{contact.uri}" />
+				</rich:column>
+				<rich:column width="40">
+					<f:facet name="header">
+					</f:facet>
+					<h:commandLink ajaxSingle="true"
+						action="#{callAction.call(contact.uri)}">Call</h:commandLink>
+				</rich:column>
+				<f:facet name="footer">
+					<s:link view="/contactList.xhtml" value="Edit Contacts" />
+				</f:facet>
+			</rich:dataTable>
+			<br />
+			<h:inputText value="#{contactAction.contactUri}" size="15" />
+			<rich:spacer width="15"></rich:spacer>
+			<a4j:commandLink value="Add contact"
+				action="#{contactAction.addContact()}" reRender="contacts">
+
+			</a4j:commandLink>
+		</rich:panel>
+	</a4j:form> <a4j:form>
+		<a4j:push id="pushStatus" interval="2000" enabled="true" eventProducer="#{currentUserState.addHistoryListener}"
+			reRender="historyPanel" />
+
+		<rich:panel id="historyPanel">
+			<f:facet name="header">History</f:facet>
+			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"
+				rows="5">
+				<b><h:outputText value="#{hist.message} " /></b>
+				<h:outputText value="(#{hist.timestamp})" />
+			</rich:dataList>
+		</rich:panel>
+	</a4j:form></div>
+</a4j:region>

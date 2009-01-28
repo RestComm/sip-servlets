@@ -1,0 +1,62 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="userForm">
+
+        <rich:panel>
+            <f:facet name="header">user</f:facet>
+
+            <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Username</ui:define>
+                <h:inputText id="name" required="true"
+                             value="#{userHome.instance.name}"/>
+            </s:decorate>
+            <s:decorate id="passField" template="layout/edit.xhtml">
+                <ui:define name="label">Password</ui:define>
+                <h:inputSecret id="name" required="true"
+                             value="#{userHome.instance.name}"/>
+            </s:decorate>
+            <s:decorate id="rnameField" template="layout/edit.xhtml">
+                <ui:define name="label">Real Name</ui:define>
+                <h:inputText id="name" required="true"
+                             value="#{userHome.instance.realName}"/>
+            </s:decorate>
+
+            <div style="clear:both"/>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{userHome.persist}"
+                       rendered="#{!userHome.managed}"/>
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{userHome.update}"
+                       rendered="#{userHome.managed}"/>
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{userHome.remove}"
+                      immediate="true"
+                       rendered="#{userHome.managed}"/>
+            <s:button propagation="end"
+                               id="done"
+                            value="Done"
+                             view="/userList.xhtml"/>
+        </div>
+
+    </h:form>
+
+</ui:define>
+
+</ui:composition>
