@@ -13,7 +13,7 @@
     <h:form id="userForm">
 
         <rich:panel>
-            <f:facet name="header">user</f:facet>
+            <f:facet name="header">New user</f:facet>
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Username</ui:define>
@@ -23,7 +23,7 @@
             <s:decorate id="passField" template="layout/edit.xhtml">
                 <ui:define name="label">Password</ui:define>
                 <h:inputSecret id="name" required="true"
-                             value="#{userHome.instance.name}"/>
+                             value="#{userHome.instance.password}"/>
             </s:decorate>
             <s:decorate id="rnameField" template="layout/edit.xhtml">
                 <ui:define name="label">Real Name</ui:define>
@@ -40,19 +40,6 @@
                           value="Save"
                          action="#{userHome.persist}"
                        rendered="#{!userHome.managed}"/>
-            <h:commandButton id="update"
-                          value="Save"
-                         action="#{userHome.update}"
-                       rendered="#{userHome.managed}"/>
-            <h:commandButton id="delete"
-                          value="Delete"
-                         action="#{userHome.remove}"
-                      immediate="true"
-                       rendered="#{userHome.managed}"/>
-            <s:button propagation="end"
-                               id="done"
-                            value="Done"
-                             view="/userList.xhtml"/>
         </div>
 
     </h:form>

@@ -6,11 +6,12 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
     template="layout/template.xhtml">
 
 <ui:define name="body">
-
-    <rich:panel rendered="#{identity.hasRole('admin')}">
+<a4j:region rendered="#{identity.hasRole('admin')}">
+    <rich:panel>
         <f:facet name="header">Users</f:facet>
 
         <div class="results">
@@ -41,12 +42,7 @@
 
     </rich:panel>
 
-    <div class="actionButtons">
-        <s:button id="done"
-               value="Create user"
-                view="/user.xhtml"/>
-    </div>
-
+</a4j:region>
 </ui:define>
 
 </ui:composition>
