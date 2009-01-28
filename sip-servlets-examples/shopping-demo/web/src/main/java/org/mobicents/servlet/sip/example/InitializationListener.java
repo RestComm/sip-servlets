@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class InitializationListener implements ServletContextListener {
 	private static Log logger = LogFactory.getLog(InitializationListener.class);
-	private static final String AUDIO_DIR = "audio";
+	private static final String AUDIO_DIR = "/audio";
 	private static final String FILE_PROTOCOL = "file://";
 	private static final String[] AUDIO_FILES = new String[] {
 			"AdminReConfirm.wav", "OrderApproved.wav", "OrderCancelled.wav", "OrderConfirmed.wav",
@@ -68,9 +68,8 @@ public class InitializationListener implements ServletContextListener {
 		for (int i = 0; i < AUDIO_FILES.length; i++) {
 			String audioFile = AUDIO_FILES[i];
 			logger.info("Writing " + audioFile + " to webapp temp dir : "
-					+ tempWriteDir);
-			InputStream is = InitializationListener.class.getClassLoader()
-					.getResourceAsStream(AUDIO_DIR + "/" + audioFile);
+					+ tempWriteDir);			
+			InputStream is = servletContext.getResourceAsStream(AUDIO_DIR + "/" + audioFile);
 			copyToTempDir(is, tempWriteDir, audioFile);
 		} 
 
