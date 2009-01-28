@@ -39,19 +39,21 @@ public class DeploymentServiceImpl  extends RemoteServiceServlet implements Depl
 		ArrayList<String> result = new ArrayList<String>();
 		File root = new File(folder);
 		File[] files = root.listFiles();
-		for(int q=0; q<files.length; q++) {
-			File file = files[q];
-			String fileName = file.getName();
-			boolean isApp = false;
-			for(String ext: appExtensions) {
-				if(fileName.endsWith(ext)) {
-					isApp = true;
-					break;
+		if(files != null) {
+			for(int q=0; q<files.length; q++) {
+				File file = files[q];
+				String fileName = file.getName();
+				boolean isApp = false;
+				for(String ext: appExtensions) {
+					if(fileName.endsWith(ext)) {
+						isApp = true;
+						break;
+					}
 				}
-			}
-			if(isApp)
-			{
-				result.add(fileName);
+				if(isApp)
+				{
+					result.add(fileName);
+				}
 			}
 		}
 		return result.toArray(new String[]{});
