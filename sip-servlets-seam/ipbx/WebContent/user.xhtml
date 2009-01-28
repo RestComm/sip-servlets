@@ -13,7 +13,7 @@
     <h:form id="userForm">
 
         <rich:panel>
-            <f:facet name="header">New user</f:facet>
+            <f:facet name="header">User</f:facet>
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Username</ui:define>
@@ -40,6 +40,10 @@
                           value="Save"
                          action="#{userHome.persist}"
                        rendered="#{!userHome.managed}"/>
+            <h:commandButton id="saveM"
+                          value="Save"
+                         action="#{userHome.update}"
+                       rendered="#{userHome.managed}"/>
         </div>
 
     </h:form>
