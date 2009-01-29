@@ -45,6 +45,12 @@
     <param-name>facelets.DEVELOPMENT</param-name>
     <param-value>true</param-value>
   </context-param>
+  
+  <!-- This here is performance killer, need to add it because of login/logout problems -->
+  <context-param>
+     <param-name>facelets.BUILD_BEFORE_RESTORE</param-name>
+     <param-value>true</param-value>
+ </context-param> 
   <context-param>
     <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
     <param-value>.xhtml</param-value>

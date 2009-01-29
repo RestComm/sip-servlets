@@ -73,7 +73,9 @@ public class DataLoader {
 	public List loadHistory() {
 		try {
 			refreshHistory();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         return historyCache;
 	}
 	

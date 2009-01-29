@@ -238,12 +238,19 @@ public class PbxEventHandler {
 			participant.setCallState(CallState.DISCONNECTED);
 			participant.setConference(null);
 			
+			// Remove the call from the callee GUI
 			callStateManager.getCurrentState(participant.getName()).removeCall(participant);
+			
 
 			CallParticipant[] ps = conf.getParticipants();
 			if(ps.length == 1) {
 				CallParticipant cp = ps[0];
 				callStateManager.getCurrentState(participant.getName()).endCall(cp);
+			}
+			
+			// Remove the call from other users' GUIs
+			for(CallParticipant cp : ps) {
+				callStateManager.getCurrentState(cp.getName()).removeCall(participant);
 			}
 			
 			// Release media stuff if possible

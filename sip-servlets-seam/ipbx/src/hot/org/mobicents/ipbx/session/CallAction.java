@@ -98,8 +98,10 @@ public class CallAction {
 		Conference conf = null;
 		CallParticipant fromParticipant = null;
 		Registration someSelected = null;
+		boolean alreadyInCall = false;
 		
-		
+		// Determine if we are in any calls right now. If yes, take a conference 
+		// endpoint to jointhe outgoing call
 		Iterator<Registration> regs = user.getRegistrations().iterator();
 		while(regs.hasNext()) {
 			Registration reg = regs.next();
@@ -109,11 +111,16 @@ public class CallAction {
 				if(fromParticipant != null) {
 					if(CallState.CONNECTED.equals(fromParticipant.getCallState())) {
 						conf = fromParticipant.getConference();
-						if(conf != null) break;
+						if(conf != null) {
+							alreadyInCall = true;
+							break;
+						}
 					}
 				}
 			}
 		}
+		// If there are no active calls just create a new conference where the 
+		// conversation will take place
 		if(conf == null) {
 			conf = conferenceManager.getNewConference();
 			fromParticipant = callParticipantManager.getCallParticipant(someSelected.getUri());
@@ -132,7 +139,10 @@ public class CallAction {
 		}
 
 		call(fromParticipant, toParticipant);
-		call(toParticipant, fromParticipant);
+		
+		if(!alreadyInCall) {
+			call(toParticipant, fromParticipant);
+		}
 		callStateManager.getCurrentState(fromParticipant.getName()).setOutgoing(toParticipant);
 		callStateManager.getCurrentState(toParticipant.getName()).setIncoming(fromParticipant);
 	}

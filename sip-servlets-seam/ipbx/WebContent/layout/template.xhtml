@@ -13,24 +13,13 @@
 
 
 <body>
-<script type="text/javascript">
-Seam.Remoting.setDebug(true);
 
 
-  function updateState() {
-    Seam.Component.getInstance("dataLoader").work(sayHelloCallback);
-  }
-
-  function sayHelloCallback(result) {
-    updateState();
-  }
-</script>
-
-
+<!--  
 <script type="text/javascript"
 	src="seam/resource/remoting/resource/remote.js"></script>
 <s:remote include="dataLoader" />
-
+-->
 
 <div style="background-color: #000; width: 100%"><h:graphicImage value="/img/mpbx.png"/><br/></div>
 <ui:include src="menu.xhtml">

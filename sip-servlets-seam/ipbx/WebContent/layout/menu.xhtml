@@ -11,8 +11,8 @@
         <h:outputText value="Home"/></s:link>
     </rich:toolBarGroup>
     <!-- @newMenuItem@ -->
-    <div class="menubar">
-	<rich:toolBarGroup location="right">
+    
+	<rich:toolBarGroup location="right"><div class="menubar">
 		<h:outputText value="signed in as: #{identity.username}"
 			rendered="#{identity.loggedIn}" />
 		<a4j:form rendered="#{not identity.loggedIn}" >
@@ -38,6 +38,6 @@
 			rendered="#{identity.loggedIn}">
 			<f:param name="userId" 
                                 value="#{user.id}"/>
-			</s:link>
-	</rich:toolBarGroup></div>
+			</s:link></div>
+	</rich:toolBarGroup>
 </rich:toolBar>

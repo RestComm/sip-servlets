@@ -20,7 +20,7 @@ import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
 
 @Name("currentUserState")
-@Scope(ScopeType.SESSION)
+@Scope(ScopeType.STATELESS)
 public class CurrentUserState {
 	@In CallStateManager callStateManager;
 	@In CallParticipantManager callParticipantManager;
@@ -73,14 +73,18 @@ public class CurrentUserState {
 				try {
 					CallParticipant other = ps[0];
 					String name = other.getName();
-					CurrentUserState cus = callStateManager.getCurrentState(name);
+					
+					// We can't use the injected callmanager here for some reason !! TODO: FIXME
+					CurrentUserState cus = CallStateManager.getUserState(name);
 					try {
 						cus.endCall(other, true);
 					} catch (Exception e) {}
 					try {
 						other.getInitialRequest().createCancel().send();
 					} catch (Exception e) {}
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					e=e;
+				}
 			}
 			
 			if(participant.getMsLink() != null) {
@@ -118,10 +122,9 @@ public class CurrentUserState {
 	}
 	
 	// Cancel an outgoing call
-	public void cancel(CallParticipant participant) throws IOException {
-		removeCall(participant);
+	public void cancel(CallParticipant participant) {
 		try {
-			participant.getInitialRequest().createCancel().send();
+			endCall(participant);
 		} catch (Exception e) {}
 	}
 	

@@ -11,10 +11,18 @@ import org.jboss.seam.annotations.Startup;
 @Scope(ScopeType.APPLICATION)
 @Startup
 public class CallStateManager {
-	private HashMap<String, CurrentUserState> currentUserStates =
+	private static HashMap<String, CurrentUserState> currentUserStates =
 		new HashMap<String, CurrentUserState>();
 	
 	public synchronized CurrentUserState getCurrentState(String username) {
+		if(currentUserStates.get(username) == null) {
+			CurrentUserState state = new CurrentUserState();
+			currentUserStates.put(username, state);
+		}
+		return currentUserStates.get(username);
+	}
+	
+	public static CurrentUserState getUserState(String username) {
 		if(currentUserStates.get(username) == null) {
 			CurrentUserState state = new CurrentUserState();
 			currentUserStates.put(username, state);
