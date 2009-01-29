@@ -1,39 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>org.mobicents.seam</groupId>
-
 	<artifactId>sip-servlets-seam-entrypoint</artifactId>
-
 	<version>1.0</version>
-
 	<name>Sip Servlets Seam Entrypoint Project</name>
-
 	<packaging>jar</packaging>
-
 	<repositories>
-
 		<repository>
-
 			<id>repository.jboss.org</id>
-
 			<name>JBoss Repository</name>
-
 			<url>http://repository.jboss.org/maven2</url>
-
 		</repository>
-
 	</repositories>
-	
 	<properties>
-		<seam.version>2.1.0.SP1</seam.version>
-		<media.server.version>1.0.0.CR3</media.server.version>
+		<seam.version>2.1.1.GA</seam.version>
+		<media.server.version>1.0.0.CR5</media.server.version>
 	</properties>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -50,22 +34,19 @@
 				<version>2.1-alpha-1</version>
 				<configuration>
 					<warSourceExcludes>
-						**/hibernate*.jar,**/persist*.jar,**/dom4*.jar,**/*logging*.jar,**/*javassist*.jar,**/*collection*.jar,**/*asm-*.jar,**/*el-api*.jar,**/*jta-*.jar,**/*jboss-common-core-*.jar,**/*cglib-*.jar,**/*ehcache-*.jar
+						**/hibernate*.jar,**/persist*.jar,**/dom4*.jar,**/*logging*.jar,**/*javassist*.jar,**/*collection*.jar,**/*asm-*.jar,**/*el-api*.jar,**/*jta-*.jar,**/*jboss-common-core-*.jar,**/*cglib-*.jar,**/*ehcache-*.jar 
 					</warSourceExcludes>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
 			<version>${media.server.version}</version>
 		</dependency>
-		<dependency>		
+		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
 			<version>${media.server.version}</version>
@@ -83,38 +64,26 @@
 					<groupId>org.mobicents.servers.media</groupId>
 					<artifactId>mobicents-media-server-spi</artifactId>
 				</exclusion>
-			</exclusions>		
+			</exclusions>
 		</dependency>
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam-ioc</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam-debug</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam-mail</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
@@ -130,40 +99,24 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam-pdf</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
-
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam-ui</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
-
 			<groupId>org.jboss.seam</groupId>
-
 			<artifactId>jboss-seam-remoting</artifactId>
-
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
-
 			<groupId>javax.faces</groupId>
-
 			<artifactId>jsf-api</artifactId>
-
 			<version>1.2_12</version>
 		</dependency>
-		
 	</dependencies>
-
 </project>
-
