@@ -33,6 +33,7 @@ public class ConfiguationPage extends Panel {
 	ComboBox ccps;
 	TextField queueSize;
 	TextField memoryThreshold;
+	TextField congestionControlCheckingInterval;
 	
 	private ComboBox makeCombo(Store store, String field, ComboBoxListenerAdapter listener, String defaultValue) {
 		final ComboBox box;
@@ -77,11 +78,16 @@ public class ConfiguationPage extends Panel {
 		queueSize.setAllowBlank(false); 
 		queueSize.setHideLabel(true);
 		addLabeledControl("SIP Mesage Queue Size:", queueSize, formPanel);
-		// Create memroy threshold size text box
+		// Create memory threshold size text box
 		memoryThreshold = new TextField();  
 		memoryThreshold.setAllowBlank(false); 
 		memoryThreshold.setHideLabel(true);
 		addLabeledControl("Memory Threshold:", memoryThreshold, formPanel);
+		// Create congestion control checking interval size text box
+		congestionControlCheckingInterval = new TextField();  
+		congestionControlCheckingInterval.setAllowBlank(false); 
+		congestionControlCheckingInterval.setHideLabel(true);
+		addLabeledControl("Congestion Control Checking Interval:", congestionControlCheckingInterval, formPanel);
 		
 		//Concurrency control modes selector
 		final Store ccmsStore = new SimpleStore(new String[]{"ccms"}, concurrencyControlModes);  
@@ -159,6 +165,19 @@ public class ConfiguationPage extends Panel {
 							}
 							
 						});
+				
+				ConfigurationService.Util.getInstance().setCongestionControlCheckingInterval(
+						Long.parseLong(congestionControlCheckingInterval.getValueAsString()), new AsyncCallback<Void>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to set congestion control checking interval.");
+							}
+
+							public void onSuccess(Void result) {
+								result = result;
+							}
+							
+						});
 			}
 			
 		});
@@ -216,6 +235,19 @@ public class ConfiguationPage extends Panel {
 
 							public void onSuccess(String result) {
 								ccps.setValue(result.toString());
+							}
+							
+						});
+				
+				ConfigurationService.Util.getInstance().getCongestionControlCheckingInterval(
+						new AsyncCallback<Long>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to get congestion control checking interval.");
+							}
+
+							public void onSuccess(Long result) {
+								congestionControlCheckingInterval.setValue(result.toString());
 							}
 							
 						});

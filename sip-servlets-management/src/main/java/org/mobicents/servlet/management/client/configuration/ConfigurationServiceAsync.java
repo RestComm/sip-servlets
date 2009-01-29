@@ -13,4 +13,6 @@ public interface ConfigurationServiceAsync {
 	void setConcurrencyControlMode(String mode, AsyncCallback<Void> callback);
 	void getCongestionControlPolicy(AsyncCallback<String> callback);
 	void setCongestionControlPolicy(String policy, AsyncCallback<Void> callback);
+	void setCongestionControlCheckingInterval(long interval, AsyncCallback<Void> callback);
+	void getCongestionControlCheckingInterval(AsyncCallback<Long> callback);	
 }

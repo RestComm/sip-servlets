@@ -12,10 +12,10 @@ Mobicents Sip Servlets Congestion Control
 		If this queue gets full the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen. 
 	
 	*	The other based upon the percentage of memory currently used by the container. If the memory used goes over a configurable threshold (90% per default), the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen.
-	
-	
-	
-	The different values for the congestion control policy (what to do with an incoming message when the server is overloaded) are : 
+
+			
+	A background task is running at regular intervals within Mobicents Sip Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration (through the congestionControlCheckingInterval attribute in the server.xml, see below) or at run time (through the various management interfaces available, see below).
+	Also the congestion control policy, what to do with an incoming message when the server is overloaded, is configurable and the possible values are : 
 	
 	
 	
@@ -27,18 +27,19 @@ Mobicents Sip Servlets Congestion Control
 
 	You can configure the congestion control policy and settings in the following ways:
 
-	*	From server.xml in the Service tag you can add memoryThreshold and sipMessageQueueSize attributes like this:
+	*	From server.xml in the Service tag you can add memoryThreshold, sipMessageQueueSize, congestionControlCheckingInterval, congestionControlPolicy attributes like this:
     
     	<<<<Service name="jboss.web" 
       	className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" 
   		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter" 
-  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties" 
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+  		congestionControlCheckingInterval="2000" 
   		congestionControlPolicy="DropMessage"
 		memoryThreshold="80" 
 		sipMessageQueueSize="2000">>>>
 		
-		By default the queue size is 1500, the default memory threshold is 90% and the congestion control policy is ErrorResponse			
+		By default the congestion control checking interval is 30000 millisecs (3O seconds), queue size is 1500, the default memory threshold is 90% and the congestion control policy is ErrorResponse			
 		
 	*	From the {{{sip-servlets-management.htm}Mobicents Sip Servlets Management Console}}. In the Server Settings tab.
 	

@@ -145,8 +145,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	//List of host names managed by the container
 	private Set<String> hostNames = null;
 
-	//2 sec
-	private long congestionControlCheckingInterval =  2000;		
+	//30 sec
+	private long congestionControlCheckingInterval;		
 	
 	protected transient CongestionControlTimerTask congestionControlTimerTask;
 	
@@ -1211,8 +1211,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setCongestionControlCheckingInterval(
 			long congestionControlCheckingInterval) {
 		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
-		congestionControlTimerFuture.cancel(false);
-		congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+		if(congestionControlTimerFuture != null) {
+			congestionControlTimerFuture.cancel(false);
+			congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	/**

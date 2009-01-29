@@ -21,6 +21,10 @@
 			type="org.mobicents.servlet.sip.core.CongestionControlPolicy" 
 			writeable="false"/>
 			
+		<attribute name="congestionControlCheckingInterval"
+			description="Congestion control interval specifies at which interval (in millisecs) runs the statistics for congestion control"
+			type="long" />
+			
 		<attribute name="queueSize"
 			description="Maximum number of pending messages allowed to wait in a queue to be executed"
 			type="int" />

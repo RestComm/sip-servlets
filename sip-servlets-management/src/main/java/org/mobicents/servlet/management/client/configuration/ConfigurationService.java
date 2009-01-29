@@ -26,5 +26,7 @@ public interface ConfigurationService extends RemoteService {
 	void setConcurrencyControlMode(String mode);
 	public String getCongestionControlPolicy();
 	public void setCongestionControlPolicy(String congestionControlPolicy);
+	public long getCongestionControlCheckingInterval();
+	public void setCongestionControlCheckingInterval(long interval);
 
 }

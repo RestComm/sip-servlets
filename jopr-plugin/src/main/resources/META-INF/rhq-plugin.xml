@@ -72,6 +72,7 @@
         <resource-configuration>
         	<c:simple-property name="queueSize" type="integer" description="Maximum number of pending messages allowed to wait in a queue to be executed." defaultValue="1500"/>
         	<c:simple-property name="memoryThreshold" type="integer" description="Percentage of memory to be used by the container before applying the congestion control policy" defaultValue="90"/>
+        	<c:simple-property name="congestionControlCheckingInterval" type="long" description="Congestion control interval specifies at which interval (in millisecs) runs the statistics for congestion control" defaultValue="30000"/>
         </resource-configuration>
     </service>
     

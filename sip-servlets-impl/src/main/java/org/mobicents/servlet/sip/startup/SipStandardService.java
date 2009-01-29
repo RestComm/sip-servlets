@@ -60,6 +60,7 @@ public class SipStandardService extends StandardService implements SipService {
 	protected SipApplicationDispatcher sipApplicationDispatcher;
 	protected int sipMessageQueueSize = 1500;
 	protected int memoryThreshold = 90;
+	private long congestionControlCheckingInterval = 30000;
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
@@ -128,6 +129,7 @@ public class SipStandardService extends StandardService implements SipService {
 		sipApplicationDispatcher.setDomain(this.domain);
 		
 		sipApplicationDispatcher.setMemoryThreshold(getMemoryThreshold());
+		sipApplicationDispatcher.setCongestionControlCheckingInterval(getCongestionControlCheckingInterval());
 		sipApplicationDispatcher.setCongestionControlPolicyByName(getCongestionControlPolicy());
 		sipApplicationDispatcher.setQueueSize(getSipMessageQueueSize());
 		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));
@@ -331,6 +333,23 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public String getCongestionControlPolicy() {
 		return congestionControlPolicy;
+	}
+
+
+	/**
+	 * @param congestionControlCheckingInterval the congestionControlCheckingInterval to set
+	 */
+	public void setCongestionControlCheckingInterval(
+			long congestionControlCheckingInterval) {
+		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
+	}
+
+
+	/**
+	 * @return the congestionControlCheckingInterval
+	 */
+	public long getCongestionControlCheckingInterval() {
+		return congestionControlCheckingInterval;
 	}
 
 }

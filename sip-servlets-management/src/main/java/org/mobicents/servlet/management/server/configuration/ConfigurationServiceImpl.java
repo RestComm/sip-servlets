@@ -118,5 +118,29 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 		}
 		
 	}
+	
+	public long getCongestionControlCheckingInterval() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			String checkingInterval = 
+				mserver.getAttribute(
+						dispatcherName, "congestionControlCheckingInterval").toString();
+			return Long.parseLong(checkingInterval);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+
+	public void setCongestionControlCheckingInterval(long interval) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("congestionControlCheckingInterval", new Long(interval));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+		
+	}
 
 }
