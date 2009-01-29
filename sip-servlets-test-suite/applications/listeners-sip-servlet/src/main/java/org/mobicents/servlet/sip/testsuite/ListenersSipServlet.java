@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Properties;
 
+import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -99,6 +100,7 @@ public class ListenersSipServlet
 	private static final String SIP_SESSION_PASSIVATED = "sipSessionPassivated";
 	private static final String SIP_SESSION_ACTIVATED = "sipSessionActivated";	
 
+	@Resource
 	private SipFactory sipFactory;	
 	
 	
@@ -147,7 +149,7 @@ public class ListenersSipServlet
 		sipServletResponse.send();
 		//create a timer to invalidate the sessions
 		request.getSession().setAttribute("sipFactory", sipFactory);
-		request.getSession().getApplicationSession().setAttribute("sipFactory", sipFactory);
+//		request.getSession().getApplicationSession().setAttribute("sipFactory", sipFactory);
 		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
 		timerService.createTimer(request.getApplicationSession(), 5000, false, null);		
 	}	
@@ -312,15 +314,15 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipSessionEvent se) {
 		logger.info("sip session destroyed " +  se.getSession());
-		SipFactory storedFactory = (SipFactory)se.getSession().getApplicationSession().getAttribute("sipFactory");
-		SipApplicationSession sipApplicationSession = storedFactory.createApplicationSession();
+//		SipFactory storedFactory = (SipFactory)se.getSession().getApplicationSession().getAttribute("sipFactory");
+		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		try {
-			SipServletRequest sipServletRequest = storedFactory.createRequest(
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
 					sipApplicationSession, 
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(SIP_SESSION_DESTROYED.length());
 			sipServletRequest.setContent(SIP_SESSION_DESTROYED, CONTENT_TYPE);
@@ -420,16 +422,16 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
 		logger.info("sip application session destroyed " +  ev.getApplicationSession());
-		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
-		if(storedFactory != null) {
-			SipApplicationSession sipApplicationSession = storedFactory.createApplicationSession();
+//		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
+		if(sipFactory != null) {
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			try {
-				SipServletRequest sipServletRequest = storedFactory .createRequest(
+				SipServletRequest sipServletRequest = sipFactory .createRequest(
 						sipApplicationSession, 
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);

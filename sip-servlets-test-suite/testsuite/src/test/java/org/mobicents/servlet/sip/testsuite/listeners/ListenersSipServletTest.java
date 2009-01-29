@@ -59,7 +59,7 @@ public class ListenersSipServletTest extends SipServletTestCase {
 //		"sipAppSessionExpired",
 		//Cannot get this one below because the sipfactory has already been removed when we get the event
 		//so we cannot send the message
-//		"sipAppSessionDestroyed", 
+		"sipAppSessionDestroyed", 
 		"sipSessionDestroyed"
 	};
 	

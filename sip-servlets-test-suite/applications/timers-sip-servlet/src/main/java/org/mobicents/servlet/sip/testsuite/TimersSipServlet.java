@@ -49,6 +49,8 @@ public class TimersSipServlet
 		extends SipServlet 
 		implements SipApplicationSessionListener, TimerListener {
 
+	private static final String RECURRING_TIME = "recurringTime";
+	private static final String RECURRING = "recurring";
 	private static final String ALREADY_EXTENDED = "alreadyExtended";
 	private static final String ALREADY_INVALIDATED = "alreadyInvalidated";
 	
@@ -59,6 +61,7 @@ public class TimersSipServlet
 	private static final String SIP_APP_SESSION_EXPIRED = "sipAppSessionExpired";
 	private static final String SIP_APP_SESSION_READY_TO_BE_INVALIDATED = "sipAppSessionReadyToBeInvalidated";
 	private static final String TIMER_EXPIRED = "timerExpired";
+	private static final String RECURRING_TIMER_EXPIRED = "recurringTimerExpired";
 	
 	private SipFactory sipFactory;	
 	
@@ -100,6 +103,9 @@ public class TimersSipServlet
 		//create a timer to test the feature				
 		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
 		timerService.createTimer(request.getApplicationSession(), 1000, false, null);
+		//create a recurring timer to test the feature					
+		timerService.createTimer(request.getApplicationSession(), 3000, 3000, true, false, RECURRING);
+		request.getApplicationSession().setAttribute(RECURRING_TIME, new Integer(0));
 	}
 	
 	@Override
@@ -176,8 +182,27 @@ public class TimersSipServlet
 	 */
 	public void timeout(ServletTimer timer) {
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
-		logger.info("timer expired " +  timer.getId());		
-		SipFactory storedFactory = (SipFactory)sipApplicationSession.getAttribute("sipFactory");		
+		Integer recurringTime = (Integer) sipApplicationSession.getAttribute(RECURRING_TIME);
+		logger.info("timer expired " +  timer.getId() + " , info " + timer.getInfo() + " , recurring Time " + recurringTime.intValue());		
+		SipFactory storedFactory = (SipFactory)sipApplicationSession.getAttribute("sipFactory");
+		if(timer.getInfo() == null) {
+			sendMessage(sipApplicationSession, storedFactory, TIMER_EXPIRED);
+		} else {			
+			int temp = recurringTime.intValue() + 1;			
+			sipApplicationSession.setAttribute(RECURRING_TIME, new Integer(temp));
+			if(temp > 2) {
+				sendMessage(sipApplicationSession, storedFactory, RECURRING_TIMER_EXPIRED);
+				timer.cancel();
+			}
+		}
+	}
+
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content) {
 		try {
 			SipServletRequest sipServletRequest = storedFactory.createRequest(
 					sipApplicationSession, 
@@ -186,8 +211,8 @@ public class TimersSipServlet
 					"sip:receiver@sip-servlets.com");
 			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
 			sipServletRequest.setRequestURI(sipUri);
-			sipServletRequest.setContentLength(TIMER_EXPIRED.length());
-			sipServletRequest.setContent(TIMER_EXPIRED, CONTENT_TYPE);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
 			sipServletRequest.send();
 		} catch (ServletParseException e) {
 			logger.error("Exception occured while parsing the addresses",e);

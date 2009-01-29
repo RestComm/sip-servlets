@@ -53,6 +53,7 @@ public class TimersSipServletTest extends SipServletTestCase {
 	
 	// the order is important here 
 	private static final String[] TIMERS_TO_TEST = new String[]{
+		"recurringTimerExpired",
 		"timerExpired",
 		"sipAppSessionExpired",
 		"sipAppSessionReadyToBeInvalidated"

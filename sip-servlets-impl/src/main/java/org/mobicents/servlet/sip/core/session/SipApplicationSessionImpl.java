@@ -39,7 +39,6 @@ import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
-import org.apache.catalina.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -164,33 +163,35 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * Notifies the listeners that a lifecycle event occured on that sip application session 
 	 * @param sipApplicationSessionEventType the type of event that happened
 	 */
-	public void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {				
-		SipApplicationSessionEvent event = new SipApplicationSessionEvent(this);
-		if(logger.isDebugEnabled()) {
-			logger.debug("notifying sip application session listeners of context " + 
-					key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
-		}
-		ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-		java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
+	public void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {						
 		List<SipApplicationSessionListener> listeners = 
 			sipContext.getListeners().getSipApplicationSessionListeners();
-		for (SipApplicationSessionListener sipApplicationSessionListener : listeners) {
-			try {
-				if(SipApplicationSessionEventType.CREATION.equals(sipApplicationSessionEventType)) {
-					sipApplicationSessionListener.sessionCreated(event);
-				} else if (SipApplicationSessionEventType.DELETION.equals(sipApplicationSessionEventType)) {
-					sipApplicationSessionListener.sessionDestroyed(event);
-				} else if (SipApplicationSessionEventType.EXPIRATION.equals(sipApplicationSessionEventType)) {
-					sipApplicationSessionListener.sessionExpired(event);
-				} else if (SipApplicationSessionEventType.READYTOINVALIDATE.equals(sipApplicationSessionEventType)) {
-					sipApplicationSessionListener.sessionReadyToInvalidate(event);
-				}
-				
-			} catch (Throwable t) {
-				logger.error("SipApplicationSessionListener threw exception", t);
+		if(listeners.size() > 0) {
+			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
+			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this);
+			if(logger.isDebugEnabled()) {
+				logger.debug("notifying sip application session listeners of context " + 
+						key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
 			}
-		}	
-		java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+			for (SipApplicationSessionListener sipApplicationSessionListener : listeners) {
+				try {
+					if(SipApplicationSessionEventType.CREATION.equals(sipApplicationSessionEventType)) {
+						sipApplicationSessionListener.sessionCreated(event);
+					} else if (SipApplicationSessionEventType.DELETION.equals(sipApplicationSessionEventType)) {
+						sipApplicationSessionListener.sessionDestroyed(event);
+					} else if (SipApplicationSessionEventType.EXPIRATION.equals(sipApplicationSessionEventType)) {
+						sipApplicationSessionListener.sessionExpired(event);
+					} else if (SipApplicationSessionEventType.READYTOINVALIDATE.equals(sipApplicationSessionEventType)) {
+						sipApplicationSessionListener.sessionReadyToInvalidate(event);
+					}
+					
+				} catch (Throwable t) {
+					logger.error("SipApplicationSessionListener threw exception", t);
+				}
+			}
+			java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+		}		
 	}
 	
 	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
@@ -553,26 +554,31 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			// null!!!");
 			return;
 
-		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(this, name);
+		SipApplicationSessionBindingEvent event = null;
 		
         Object value = this.sipApplicationSessionAttributeMap.remove(name);
 
         // Call the valueUnbound() method if necessary
         if (value != null && value instanceof SipApplicationSessionBindingListener) {
+        	event = new SipApplicationSessionBindingEvent(this, name);
             ((SipApplicationSessionBindingListener) value).valueUnbound(event);
         }
         
 		SipListenersHolder listeners = sipContext.getListeners();
-
-		if(logger.isDebugEnabled()) {
-			logger.debug("notifying SipApplicationSessionAttributeListener of attribute removed on key "+ key);
-		}
-		for (SipApplicationSessionAttributeListener listener : listeners
-				.getSipApplicationSessionAttributeListeners()) {
-			try {
-				listener.attributeRemoved(event);
-			} catch (Throwable t) {
-				logger.error("SipApplicationSessionAttributeListener threw exception", t);
+		List<SipApplicationSessionAttributeListener> listenersList = listeners.getSipApplicationSessionAttributeListeners();
+		if(listenersList.size() > 0) {		
+			if(event == null) {
+				event = new SipApplicationSessionBindingEvent(this, name);
+			}
+			for (SipApplicationSessionAttributeListener listener : listenersList) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("notifying SipApplicationSessionAttributeListener " + listener.getClass().getCanonicalName() + " of attribute removed on key "+ key);
+				}
+				try {
+					listener.attributeRemoved(event);
+				} catch (Throwable t) {
+					logger.error("SipApplicationSessionAttributeListener threw exception", t);
+				}
 			}
 		}
 
@@ -596,13 +602,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					"Attribute that is to be bound cant be null!!!");
 
 		// Construct an event with the new value
-		SipApplicationSessionBindingEvent event = new SipApplicationSessionBindingEvent(this, key);
+		SipApplicationSessionBindingEvent event = null;
 
         // Call the valueBound() method if necessary
         if (attribute instanceof SipApplicationSessionBindingListener) {
             // Don't call any notification if replacing with the same value
             Object oldValue = sipApplicationSessionAttributeMap.get(key);
             if (attribute != oldValue) {
+            	event = new SipApplicationSessionBindingEvent(this, key);
                 try {
                     ((SipApplicationSessionBindingListener) attribute).valueBound(event);
                 } catch (Throwable t){
@@ -624,31 +631,35 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         }
 
 		SipListenersHolder listeners = sipContext.getListeners();
-		if (previousValue == null) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("notifying SipApplicationSessionAttributeListener of attribute added on key "+ key);
+		List<SipApplicationSessionAttributeListener> listenersList = listeners.getSipApplicationSessionAttributeListeners();
+		if(listenersList.size() > 0) {
+			if(event == null) {
+				event = new SipApplicationSessionBindingEvent(this, key);
 			}
-			for (SipApplicationSessionAttributeListener listener : listeners
-					.getSipApplicationSessionAttributeListeners()) {
-				try {
-					listener.attributeAdded(event);
-				} catch (Throwable t) {
-					logger.error("SipApplicationSessionAttributeListener threw exception", t);
+			if (previousValue == null) {				
+				for (SipApplicationSessionAttributeListener listener : listenersList) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("notifying SipApplicationSessionAttributeListener " + listener.getClass().getCanonicalName() + " of attribute added on key "+ key);
+					}
+					try {
+						listener.attributeAdded(event);
+					} catch (Throwable t) {
+						logger.error("SipApplicationSessionAttributeListener threw exception", t);
+					}
 				}
-			}
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("notifying SipApplicationSessionAttributeListener of attribute replaced on key "+ key);
-			}
-			for (SipApplicationSessionAttributeListener listener : listeners
-					.getSipApplicationSessionAttributeListeners()) {
-				try {
-					listener.attributeReplaced(event);
-				} catch (Throwable t) {
-					logger.error("SipApplicationSessionAttributeListener threw exception", t);
+			} else {				
+				for (SipApplicationSessionAttributeListener listener : listenersList) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("notifying SipApplicationSessionAttributeListener " + listener.getClass().getCanonicalName() + " of attribute replaced on key "+ key);
+					}
+					try {
+						listener.attributeReplaced(event);
+					} catch (Throwable t) {
+						logger.error("SipApplicationSessionAttributeListener threw exception", t);
+					}
 				}
-			}
-		}		
+			}	
+		}
 	}
 	
 	/*
