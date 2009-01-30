@@ -31,9 +31,9 @@ insert into ROLES(ROLEID,VERSION,USERID,role) values(4,1,2,'admin');
 insert into ROLES(ROLEID,VERSION,USERID,role) values(5,1,3,'caller');
 insert into ROLES(ROLEID,VERSION,USERID,role) values(6,1,3,'admin');
 
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, NAME, VALUE) values (1,'pbx.hostname','localhost')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, NAME, VALUE) values (2,'pbx.registration.timeout','0')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, NAME, VALUE) values (3,'pbx.default.ringback.tone','file:///home/vralev/holdon16.wav')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, NAME, VALUE) values (4,'pbx.default.rejected.announcement','rejected.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (1,1,'pbx.hostname','localhost')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (2,1,'pbx.registration.timeout','0')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (3,1,'pbx.default.ringback.tone','file:///home/vralev/holdon16.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (4,1,'pbx.default.rejected.announcement','rejected.wav')
 
-insert into PSTNGATEWAYACCOUNTS(PSTNACCOUNTID, NAME, USERNAME, HOSTNAME, PASSWORD) values(1,'Callwithus account','189964505','uk.callwithus.com','412944')
+insert into PSTNGATEWAYACCOUNTS(PSTNACCOUNTID, VERSION, NAME, USERNAME, HOSTNAME, PASSWORD) values(1,1,'Callwithus account','189964505','uk.callwithus.com','412944')

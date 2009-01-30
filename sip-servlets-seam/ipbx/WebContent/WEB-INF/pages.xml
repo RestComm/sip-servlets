@@ -15,7 +15,7 @@
         <navigation from-action="#{identity.login}">
                 <redirect view-id="/home.xhtml"/>
         </navigation> 
-                <navigation from-action="#{userHome.persist}">
+        <navigation from-action="#{userHome.persist}">
                 <redirect view-id="/home.xhtml"/>
         </navigation> 
     </page>

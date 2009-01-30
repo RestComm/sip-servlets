@@ -28,14 +28,17 @@ public class RegistrationAction {
 	}
 
 	public void addRegistration() {
-		User u = entityManager.find(User.class, user.getId());
-		Registration registration = new Registration();
-		registration.setUri(registrationUri);
-		registration.setUser(u);
-		u.getRegistrations().add(registration);
-		entityManager.persist(registration);
-		user = entityManager.merge(u);
-		dataLoader.refreshRegistrations();
+		try {
+			User u = entityManager.find(User.class, user.getId());
+			Registration registration = new Registration();
+			registration.setUri(registrationUri);
+			registration.setUser(u);
+			u.getRegistrations().add(registration);
+			entityManager.persist(registration);
+			user = entityManager.merge(u);
+			dataLoader.refreshRegistrations();
+			entityManager.flush();
+		} catch (Exception e) {}
 	}
 	
 	public void select(Registration reg) {

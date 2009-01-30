@@ -5,7 +5,7 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:rich="http://richfaces.org/rich"
+    xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
     template="layout/template.xhtml">
 
 <ui:define name="body">
@@ -13,7 +13,7 @@
     <h:form id="contactForm">
 
         <rich:panel>
-            <f:facet name="header">contact</f:facet>
+            <f:facet name="header">Contact</f:facet>
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">URI</ui:define>
@@ -36,13 +36,13 @@
                        rendered="#{contactHome.managed}"/>
             <h:commandButton id="delete"
                           value="Delete"
-                         action="#{contactHome.remove}"
+                         action="#{contactHome.remove()}"
                       immediate="true"
                        rendered="#{contactHome.managed}"/>
             <s:button propagation="end"
                                id="done"
                             value="Done"
-                             view="/home.xhtml"/>
+                             view="/contactList.xhtml"/>
         </div>
 
     </h:form>

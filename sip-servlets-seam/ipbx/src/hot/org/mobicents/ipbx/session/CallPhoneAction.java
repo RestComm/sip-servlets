@@ -3,7 +3,7 @@ package org.mobicents.ipbx.session;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
-@Name("callPstnAction")
+@Name("callPhoneAction")
 public class CallPhoneAction {
 	@In(create=true) CallAction callAction;
 	

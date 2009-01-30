@@ -84,6 +84,26 @@ body {
 	margin-bottom: 5px;
 	background-color: #F0F8FF;
 	font-size: 12px;
+	list-style: none;
+}
+
+.message li {
+	background: no-repeat left center;
+	padding-top: 1px;
+	padding-left: 20px;
+	margin-left: 3px;
+}
+
+.message li.infomsg {
+	background-image: url(../img/msginfo.png);
+}
+
+.message li.errormsg {
+	background-image: url(../img/msgerror.png);
+}
+
+.message li.warnmsg {
+	background-image: url(../img/msgwarn.png);
 }
 
 .name {

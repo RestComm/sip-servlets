@@ -13,8 +13,12 @@
     <h:form id="pstnGatewayAccountForm" rendered="#{identity.hasRole('admin')}">
 
         <rich:panel>
-            <f:facet name="header">pstnGatewayAccount</f:facet>
-
+            <f:facet name="header">PSTN Gateway Account</f:facet>
+<s:decorate id="acnameField" template="layout/edit.xhtml">
+                <ui:define name="label">Account name</ui:define>
+                <h:inputText id="name" required="true"
+                             value="#{pstnGatewayAccountHome.instance.name}"/>
+            </s:decorate>
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Username</ui:define>
                 <h:inputText id="name" required="true"

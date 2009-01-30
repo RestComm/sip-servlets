@@ -24,14 +24,18 @@ public class ContactAction {
 	private String contactUri;
 	
 	public void addContact() {
-		User u = entityManager.find(User.class, user.getId());
-		Contact contact = new Contact();
-		contact.setUri(contactUri);
-		contact.setUser(u);
-		u.getContacts().add(contact);
-		entityManager.persist(contact);
-		user = entityManager.merge(u);
-		dataLoader.refreshContacts();
+		try {
+			User u = entityManager.find(User.class, user.getId());
+			Contact contact = new Contact();
+			contact.setUri(contactUri);
+			contact.setUser(u);
+			u.getContacts().add(contact);
+			entityManager.persist(contact);
+			user = entityManager.merge(u);
+			entityManager.flush();
+			dataLoader.refreshContacts();
+		} catch (Exception e) {
+		}
 	}
 
 	public String getContactUri() {

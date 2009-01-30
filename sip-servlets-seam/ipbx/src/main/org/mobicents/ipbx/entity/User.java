@@ -20,7 +20,6 @@ import org.jboss.seam.annotations.Scope;
 @Table(name="USERS")
 public class User implements Serializable {
 
-    // seam-gen attributes (you should probably edit these)
     private Long id;
     private Integer version;
     private String name;
@@ -30,10 +29,6 @@ public class User implements Serializable {
 	private Set<Registration> registrations;
 	private Set<History> history;
 	private Set<Role> roles;
-
-    // add additional entity attributes
-
-    // seam-gen attribute getters/setters with annotations (you probably should edit)
 
     @Id @GeneratedValue
     @Column(name="USERID")
@@ -55,6 +50,7 @@ public class User implements Serializable {
     }
 
     @Length(max = 20)
+    @Column(unique=true)
     public String getName() {
         return name;
     }
@@ -79,7 +75,7 @@ public class User implements Serializable {
 		this.realName = realName;
 	}
 
-	@OneToMany(mappedBy="user",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="user",cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},fetch=FetchType.EAGER)
 	public Set<Contact> getContacts() {
 		return contacts;
 	}
@@ -88,7 +84,7 @@ public class User implements Serializable {
 		this.contacts = contacts;
 	}
 
-	@OneToMany(mappedBy="user",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="user",cascade={CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},fetch=FetchType.EAGER)
 	public Set<Registration> getRegistrations() {
 		return registrations;
 	}
@@ -97,7 +93,7 @@ public class User implements Serializable {
 		this.registrations = registrations;
 	}
 
-	@OneToMany(mappedBy="user",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="user",cascade={CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},fetch=FetchType.EAGER)
 	public Set<History> getHistory() {
 		return history;
 	}
@@ -106,7 +102,7 @@ public class User implements Serializable {
 		this.history = history;
 	}
 	
-	@OneToMany(mappedBy="user",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="user",cascade={CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},fetch=FetchType.EAGER)
 	public Set<Role> getRoles() {
 		return roles;
 	}
