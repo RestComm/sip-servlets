@@ -29,9 +29,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
-@Entity
-@Table(name="BINDINGS")
+
 /**
  * This class correspond to the location of a sip phone for a given registration. 
  * Example, for a REGISTER with a From: sip:jean@mobicents.org header and a Contact: sip:jean@127.0.0.1:5060 headers
@@ -40,6 +40,9 @@ import javax.persistence.Table;
  * @author jean.deruelle@gmail.com
  *
  */
+
+@Entity
+@Table(name="BINDINGS")
 public class Binding {
 	private long id;
 	private String contactAddress;
@@ -47,6 +50,17 @@ public class Binding {
 	private int Cseq;
 	private int expires;
 	private Registration registration;
+	private Integer version;
+	
+    @Version
+    public Integer getVersion() {
+        return version;
+    }
+
+    private void setVersion(Integer version) {
+        this.version = version;
+    }
+    
 	/**
 	 * @param cseq the cseq to set
 	 */

@@ -2,6 +2,9 @@ package org.mobicents.ipbx.session;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -10,9 +13,11 @@ import javax.persistence.EntityManager;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Transactional;
+import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.entity.User;
 import org.jboss.seam.annotations.Name;
+
 
 @Name("registrationAction")
 @Transactional
@@ -53,6 +58,15 @@ public class RegistrationAction {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage("Error. Try Again!"));
 		}
+	}
+	
+	public List<Binding> getBindings(Registration registration) {
+		LinkedList<Binding> bindings = new LinkedList<Binding>();
+		Iterator<Binding> i = registration.getBindings().iterator();
+		while(i.hasNext()) {
+			bindings.add(i.next());
+		}
+		return bindings;
 	}
 	
 	public void select(Registration reg) {

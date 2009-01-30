@@ -30,6 +30,7 @@ public class CurrentUserState {
 	
 	private PushEventListener statusListener;
 	private PushEventListener historyListener;
+	private PushEventListener registrationListener;
 	
 	private HashSet<CallParticipant> incomingCalls = new HashSet<CallParticipant>();
 	private HashSet<CallParticipant> ongoingCalls = new HashSet<CallParticipant>();
@@ -218,6 +219,20 @@ public class CurrentUserState {
 	public void makeHistoryDirty() {
 		if(this.historyListener != null) {
 			this.historyListener.onEvent(new EventObject(this));
+		}
+	}
+	
+	public void makeRegistrationsDirty() {
+		if(this.registrationListener != null) {
+			this.registrationListener.onEvent(new EventObject(this));
+		}
+	}
+	
+	public void addRegistrationListener(EventListener listener) {
+		synchronized (listener) {
+			if (this.registrationListener != listener) {
+				this.registrationListener = (PushEventListener) listener;
+			}
 		}
 	}
 

@@ -22,6 +22,9 @@ insert into REGISTRATIONS(REGISTRATIONID,VERSION,USERID,selected,uri) values(8,1
 insert into REGISTRATIONS(REGISTRATIONID,VERSION,USERID,selected,uri) values(11,1,1,false,'sip:vralev-ekiga@192.168.1.187:5061;transport=udp');
 insert into REGISTRATIONS(REGISTRATIONID,VERSION,USERID,selected,uri) values(12,1,1,false,'sip:receiver@sip-servlets.com');
 
+insert into BINDINGS(BINDINGID,VERSION,CONTACTADDRESS,CALLID,CSEQ,EXPIRES,REGISTRATIONID) values(1,1,'sip:sdsad','sdfds',1,500,1);
+insert into BINDINGS(BINDINGID,VERSION,CONTACTADDRESS,CALLID,CSEQ,EXPIRES,REGISTRATIONID) values(2,1,'sip:sdsad2','sdfd2s',2,5200,1);
+
 insert into HISTORYLOG(HISTORYID,VERSION,USERID,MESSAGE, TIMESTAMP) values(1,1,1,'Missed call from sip:c1@swdsd.com','2009-01-14 11:39:00');
 insert into HISTORYLOG(HISTORYID,VERSION,USERID,MESSAGE, TIMESTAMP) values(2,1,1,'Answered call from sip:c1@swdsd.com','2009-01-14 16:39:00');
 

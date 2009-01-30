@@ -13,7 +13,7 @@
     <h:form id="registrationForm">
 
         <rich:panel>
-            <f:facet name="header">registration</f:facet>
+            <f:facet name="header">Registration</f:facet>
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">URI</ui:define>
@@ -30,7 +30,7 @@
                        rendered="#{not empty registrationHome.instance.bindings}"/>
 
             <h:dataTable id="bindingsList" var="binding"
-                      value="#{registrationHome.instance.bindings}"
+                      value="#{registrationAction.getBindings(registrationHome.instance)}"
                    rendered="#{not empty registrationHome.instance.bindings}">
                 <h:column>
                     <f:facet name="header">Id</f:facet>

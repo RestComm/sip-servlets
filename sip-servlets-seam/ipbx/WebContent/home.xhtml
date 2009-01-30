@@ -25,7 +25,7 @@
 			<a4j:region rendered="#{not currentUserState.anythingGoingOn()}"><div style="padding:5px;">Nothing going on at the moment. <b>No active calls.</b></div></a4j:region>
 			<a4j:region rendered="#{currentUserState.anythingGoingOn()}"><div style="padding:5px;">Calls in progress... <b> Call controls are displayed.</b></div></a4j:region>
 			<br/>
-			<a4j:push reRender="callStatusPanel" eventProducer="#{currentUserState.addStatusListener}" interval="1000"/>
+			<a4j:push enabled="false" reRender="callStatusPanel" eventProducer="#{currentUserState.addStatusListener}" interval="1000"/>
 			<div style="padding:4px;margin:7px;border:1px solid #CCC;">
 			<s:label>Phone number or SIP URI</s:label><rich:spacer width="10"></rich:spacer>
 			<h:inputText value="#{callPhoneAction.number}" /><rich:spacer width="10"/>

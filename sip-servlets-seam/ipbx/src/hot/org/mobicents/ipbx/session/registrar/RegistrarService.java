@@ -54,6 +54,7 @@ import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.session.DataLoader;
+import org.mobicents.ipbx.session.call.model.CallStateManager;
 import org.mobicents.ipbx.session.security.SimpleSipAuthenticator;
 import org.mobicents.ipbx.session.util.URIUtil;
 
@@ -80,7 +81,7 @@ public class RegistrarService {
 	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In EntityManager entityManager;
 	@In DataLoader dataLoader;
-	@Resource SipFactory sipFactory;
+	@In SipFactory sipFactory;
 	
 	private java.text.DateFormat dateFormat;
 	 
@@ -227,6 +228,7 @@ public class RegistrarService {
 		if(log.isDebugEnabled()) {
 			log.debug("Added binding: " + newBinding);
 		}
+		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
 	}
 
 	/**
@@ -294,6 +296,7 @@ public class RegistrarService {
 		} else if (cseq < binding.getCseq()) {
 			throw new BadRegistrationException(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "lower cseq");
 		}
+		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
 	}
 
 	/**

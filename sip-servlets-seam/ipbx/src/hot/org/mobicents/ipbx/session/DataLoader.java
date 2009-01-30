@@ -43,8 +43,10 @@ public class DataLoader {
 	}
 	
 	public List loadContacts() {
-		if(contactCache == null) {
+		try {
 			refreshContacts();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return contactCache;
 	}
@@ -57,8 +59,10 @@ public class DataLoader {
 	}
 	
 	public List loadRegistrations() {
-		if(registrationCache == null) {
+		try {
 			refreshRegistrations();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return registrationCache;
  	}
