@@ -18,6 +18,7 @@
     	</fileset>
     	<pathelement location="${target.dir}/WEB-INF/classes"/>
     </path>
+	<target name="all" depends="clean, build, deploy"/>
     <target name="init" depends="dependencies">
     	<mkdir dir="${target.dir}/WEB-INF/lib"/>
         <mkdir dir="WebContent/WEB-INF/classes"/>
@@ -25,6 +26,8 @@
     </target>
     <target name="clean">
         <delete dir="WebContent/WEB-INF/classes"/>
+    	<delete dir="${target.dir}"/>
+    	<delete dir="${maven.deps}"/>
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="build-project" name="build"/>

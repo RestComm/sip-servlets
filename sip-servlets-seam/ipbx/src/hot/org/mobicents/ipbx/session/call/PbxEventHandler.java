@@ -1,12 +1,8 @@
 package org.mobicents.ipbx.session.call;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
-import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletMessage;
@@ -22,25 +18,21 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.session.CallAction;
-import org.mobicents.ipbx.session.call.framework.LinkIVRHelper;
-import org.mobicents.ipbx.session.call.framework.MediaSessionStore;
 import org.mobicents.ipbx.session.call.model.CallParticipant;
 import org.mobicents.ipbx.session.call.model.CallParticipantManager;
 import org.mobicents.ipbx.session.call.model.CallStateManager;
 import org.mobicents.ipbx.session.call.model.Conference;
 import org.mobicents.ipbx.session.call.model.ConferenceManager;
-import org.mobicents.ipbx.session.call.model.RegistrationManager;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.ipbx.session.security.SimpleSipAuthenticator;
-import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsEndpoint;
@@ -49,6 +41,7 @@ import org.mobicents.mscontrol.MsLinkEvent;
 import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventAction;
+import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.mscontrol.events.MsRequestedEvent;
 import org.mobicents.mscontrol.events.MsRequestedSignal;
 import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
@@ -66,14 +59,14 @@ public class PbxEventHandler {
 	@In ConferenceManager conferenceManager;
 	@In CallStateManager callStateManager;
 	@In CallParticipantManager callParticipantManager;
-	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
+	@Out @In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In SipFactory sipFactory;
 	@In PbxConfiguration pbxConfiguration;
 	@In MsEventFactory eventFactory;
 	
 	@In(create=true) CallAction callAction;
 	
-	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
+	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";	
 	
 	@Observer("INVITE")
 	public void doInvite(SipServletRequest request) {
@@ -262,22 +255,6 @@ public class PbxEventHandler {
 			participant.setMsLink(null);
 			
 		}
-	}
-	
-	@Observer("REGISTER")
-	public void doRegister(SipServletRequest request) throws ServletException,
-			IOException {
-
-		// This is just to stop messages. No use for now.
-		Address address = request.getAddressHeader("Contact");
-		String uri = address.getURI().toString();
-		Registration fromRegistration = sipAuthenticator.authenticate(uri);
-		if(fromRegistration != null) {
-			request.createResponse(200).send();
-		} else {
-			request.createResponse(404).send();
-		}
-		
 	}
 	
 	@Observer("connectionOpen")
