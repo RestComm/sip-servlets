@@ -26,7 +26,7 @@ public class GlobalPropertyHome extends EntityHome<GlobalProperty>
         }
     }
 
-    @Override @Begin
+    @Override @Begin(join=true)
     public void create() {
         super.create();
     }

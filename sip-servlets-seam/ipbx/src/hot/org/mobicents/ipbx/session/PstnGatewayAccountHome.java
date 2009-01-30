@@ -26,7 +26,7 @@ public class PstnGatewayAccountHome extends EntityHome<PstnGatewayAccount>
         }
     }
 
-    @Override @Begin
+    @Override @Begin(join=true)
     public void create() {
         super.create();
     }

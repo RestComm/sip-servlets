@@ -23,8 +23,10 @@
 
 			</h:commandLink>
 		</a4j:form>
-		<s:link view="/home.xhtml" action="#{identity.logout}" value="Logout"
-			rendered="#{identity.loggedIn}" propagation="none" />
+
+			<h:form>
+		<h:commandLink  action="#{logoutAction.logout()}" value="Logout"
+			rendered="#{identity.loggedIn}"  /></h:form>
 			<rich:spacer width="50"></rich:spacer>
 		<s:link view="/user.xhtml" value="Register"
 			rendered="#{not identity.loggedIn}"/>

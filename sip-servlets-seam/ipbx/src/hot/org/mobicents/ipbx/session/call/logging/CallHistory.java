@@ -1,5 +1,7 @@
 package org.mobicents.ipbx.session.call.logging;
 
+import java.util.HashSet;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.sip.SipServletRequest;
@@ -64,6 +66,9 @@ public class CallHistory {
 			history.setMessage(message);
 			history.setTimestamp(DateUtil.now());
 			history.setUser(u);
+			if(u.getHistory() == null) {
+				u.setHistory(new HashSet<History>());
+			}
 			u.getHistory().add(history);
 			em.persist(history);
 			callStateManager.getCurrentState(user.getName()).makeHistoryDirty();

@@ -17,7 +17,7 @@
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Username</ui:define>
-                <h:inputText id="name" required="true"
+                <h:inputText id="name" required="true" disabled="#{userHome.managed}"
                              value="#{userHome.instance.name}"/>
             </s:decorate>
             <s:decorate id="passField" template="layout/edit.xhtml">

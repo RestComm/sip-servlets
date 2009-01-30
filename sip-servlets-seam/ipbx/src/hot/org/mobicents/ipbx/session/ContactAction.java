@@ -1,5 +1,10 @@
 package org.mobicents.ipbx.session;
 
+import java.io.IOException;
+import java.util.HashSet;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 
 import org.jboss.seam.ScopeType;
@@ -16,7 +21,7 @@ import org.mobicents.ipbx.entity.User;
 @Transactional
 public class ContactAction {
 	
-	@In(required=false) @Out(required=false) User user;
+	@In(required=false) User user;
 	
 	@In EntityManager entityManager;
 	@In DataLoader dataLoader;
@@ -24,17 +29,25 @@ public class ContactAction {
 	private String contactUri;
 	
 	public void addContact() {
+		if(user == null) return;
 		try {
 			User u = entityManager.find(User.class, user.getId());
 			Contact contact = new Contact();
 			contact.setUri(contactUri);
 			contact.setUser(u);
+			if(u.getContacts() == null) {
+				u.setContacts(new HashSet<Contact>());
+			}
 			u.getContacts().add(contact);
 			entityManager.persist(contact);
-			user = entityManager.merge(u);
+			//user = entityManager.merge(u);
 			entityManager.flush();
 			dataLoader.refreshContacts();
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Added new contact."));
 		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Error. " +e.getMessage()));
 		}
 	}
 

@@ -36,9 +36,9 @@
 			<h:inputText value="#{registrationAction.registrationUri}" size="15" />
 
 			<rich:spacer width="15"></rich:spacer>
-			<a4j:commandLink value="Add phone"
+			<a4j:commandLink value="Add phone" id="addPhone"
 				action="#{registrationAction.addRegistration()}"
-				reRender="registration">
+				reRender="registration,messages">
 
 			</a4j:commandLink>
 		</a4j:form>
@@ -68,7 +68,7 @@
 			<h:inputText value="#{contactAction.contactUri}" size="15" />
 			<rich:spacer width="15"></rich:spacer>
 			<a4j:commandLink value="Add contact"
-				action="#{contactAction.addContact()}" reRender="contacts">
+				action="#{contactAction.addContact()}" reRender="contacts,messages">
 
 			</a4j:commandLink>
 		</rich:panel>

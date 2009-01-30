@@ -1,5 +1,10 @@
 package org.mobicents.ipbx.session;
 
+import java.io.IOException;
+import java.util.HashSet;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 
 import org.jboss.seam.annotations.In;
@@ -12,7 +17,7 @@ import org.jboss.seam.annotations.Name;
 @Name("registrationAction")
 @Transactional
 public class RegistrationAction {
-	@In @Out User user;
+	@In(required=false) User user;
 	@In DataLoader dataLoader;
 	
 	@In EntityManager entityManager;
@@ -28,17 +33,26 @@ public class RegistrationAction {
 	}
 
 	public void addRegistration() {
+		if(user == null) return;
 		try {
 			User u = entityManager.find(User.class, user.getId());
 			Registration registration = new Registration();
 			registration.setUri(registrationUri);
 			registration.setUser(u);
+			if(u.getRegistrations() == null) {
+				u.setRegistrations(new HashSet<Registration>());
+			}
 			u.getRegistrations().add(registration);
 			entityManager.persist(registration);
-			user = entityManager.merge(u);
+			//user = entityManager.merge(u);
 			dataLoader.refreshRegistrations();
 			entityManager.flush();
-		} catch (Exception e) {}
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Added new registration."));
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Error. Try Again!"));
+		}
 	}
 	
 	public void select(Registration reg) {
