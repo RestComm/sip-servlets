@@ -388,15 +388,21 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new TooManyHopsException();
 		}
 		
-		// For requests like PUBLISH or SUBSCRIBE dialogs(sessions) do not exist, but some clients
+		// For requests like PUBLISH dialogs(sessions) do not exist, but some clients
 		// attempt to send them in sequence as if they support dialogs and when such a subsequent request
 		// comes in it gets assigned to the previous request session where the proxy is destroyed.
 		// In this case we must create a new proxy. And we recoginze this case by additionally checking
 		// if this request is initial. TODO: Consider deleting the session contents too? JSR 289 says
 		// the session is keyed against the headers, not against initial/non-initial...
-		if (create && (isInitial() || session.getProxy() == null)) {
-			ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
-			this.session.setProxy(proxy);
+		if (create) { 
+			boolean createNewProxy = false;
+			if(isInitial() && session.getProxy() != null && session.getProxy().getOriginalRequest() == null)  {
+				createNewProxy = true;
+			}
+			if(session.getProxy() == null || createNewProxy) {
+				ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
+				this.session.setProxy(proxy);
+			}
 		}
 		return this.session.getProxy();
 	}
