@@ -169,5 +169,23 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		logger.error("noPrackReceived.");
 	}
 	
+    @Override
+    protected void doSubscribe(SipServletRequest req) throws ServletException, IOException 
+    {
+        SipURI uri = (SipURI)req.getRequestURI().clone();
+        uri.setPort(5057);
+        req.pushRoute(uri);
+        req.getProxy(true).proxyTo(req.getRequestURI());
+    }
+
+    @Override
+    protected void doPublish(SipServletRequest req) throws ServletException, IOException 
+    {
+        SipURI uri = (SipURI)req.getRequestURI().clone();
+        uri.setPort(5057);
+        req.pushRoute(uri);
+        req.getProxy(true).proxyTo(req.getRequestURI());
+    }
+	
 
 }

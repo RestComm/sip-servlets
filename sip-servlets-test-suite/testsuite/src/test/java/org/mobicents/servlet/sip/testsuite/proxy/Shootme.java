@@ -115,11 +115,12 @@ public class Shootme implements SipListener {
 
 	}
 	
-	public void processPublish (RequestEvent requestEvent,
+	public void processPublishSubscribe (RequestEvent requestEvent,
 			ServerTransaction serverTransaction) {
 		try {
 			this.okResponse = messageFactory.createResponse(Response.OK,
 					requestEvent.getRequest());
+			this.okResponse.setHeader(headerFactory.createExpiresHeader(1000));
 			if(serverTransaction == null) {
 				serverTransaction = sipProvider.getNewServerTransaction(requestEvent.getRequest());
 			}
@@ -157,7 +158,9 @@ public class Shootme implements SipListener {
 		} else if (request.getMethod().equals(Request.PRACK)) {
 			processPrack(requestEvent, serverTransactionId);
 		} else if (request.getMethod().equals(Request.PUBLISH)){
-			processPublish(requestEvent, serverTransactionId);
+			processPublishSubscribe(requestEvent, serverTransactionId);
+		} else if (request.getMethod().equals(Request.SUBSCRIBE)){
+			processPublishSubscribe(requestEvent, serverTransactionId);
 		} else {
 			try {
 				serverTransactionId.sendResponse( messageFactory.createResponse( 202, request ) );

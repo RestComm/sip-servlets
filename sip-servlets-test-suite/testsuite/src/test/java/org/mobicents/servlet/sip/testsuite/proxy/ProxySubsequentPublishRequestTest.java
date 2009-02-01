@@ -47,6 +47,8 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 
 	protected Shootme shootme;
 	
+	protected Shootist subscribeShootist;
+	
 	protected Cutme cutme;
 
 	protected Hashtable providerTable = new Hashtable();
@@ -66,7 +68,9 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 		super.setUp();
 		this.shootist = new Shootist(false);
 		this.shootme = new Shootme(5057);
+		this.subscribeShootist = new Shootist(false);
 		this.cutme = new Cutme();
+		this.subscribeShootist.requestMethod = Request.SUBSCRIBE;
 		this.shootist.requestMethod = Request.PUBLISH;
 	}
 
@@ -74,6 +78,7 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init();
+		this.subscribeShootist.init();
 		for (int q = 0; q < 20; q++) {
 			try {
 				Thread.sleep(300);
@@ -84,6 +89,28 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 			if(shootist.lastResponse.getStatusCode() == 200) {
 				String lastcseq = shootist.lastResponse.getHeader(CSeqHeader.NAME).toString();
 				if(lastcseq.contains("2 PUBLISH")) {
+					return;
+				}
+			}
+		}
+		fail("We expect two responses to the PUBLISH request. We didn't receive them.");
+	}
+	
+	public void testProxySubscribe() {
+		this.shootme.init("stackName");
+		this.cutme.init();
+		this.subscribeShootist.init();
+		
+		for (int q = 0; q < 20; q++) {
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(subscribeShootist.lastResponse.getStatusCode() == 200) {
+				String lastcseq = subscribeShootist.lastResponse.getHeader(CSeqHeader.NAME).toString();
+				if(lastcseq.contains("2 SUBSCRIBE")) {
 					return;
 				}
 			}

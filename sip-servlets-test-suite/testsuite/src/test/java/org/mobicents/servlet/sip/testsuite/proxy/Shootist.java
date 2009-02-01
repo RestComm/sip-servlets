@@ -504,7 +504,8 @@ public class Shootist implements SipListener {
 			
 			
 			// Send a subsequent request after 2 secs
-			if(requestMethod.equals(Request.PUBLISH)) {
+			if(requestMethod.equals(Request.PUBLISH) ||
+					requestMethod.equals(Request.SUBSCRIBE)) {
 				Thread.sleep(2000);
 				
 				CSeqHeader subSeqcSeqHeader = headerFactory.createCSeqHeader(2L,
