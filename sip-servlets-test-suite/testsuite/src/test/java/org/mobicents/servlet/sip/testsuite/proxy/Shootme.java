@@ -61,6 +61,8 @@ public class Shootme implements SipListener {
 	private static MessageFactory messageFactory;
 
 	private static HeaderFactory headerFactory;
+	
+	private static SipProvider sipProvider;
 
 	private static SipStack sipStack;
 
@@ -112,7 +114,29 @@ public class Shootme implements SipListener {
 		System.exit(0);
 
 	}
-
+	
+	public void processPublish (RequestEvent requestEvent,
+			ServerTransaction serverTransaction) {
+		try {
+			this.okResponse = messageFactory.createResponse(Response.OK,
+					requestEvent.getRequest());
+			if(serverTransaction == null) {
+				serverTransaction = sipProvider.getNewServerTransaction(requestEvent.getRequest());
+			}
+			serverTransaction.sendResponse(this.okResponse);
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SipException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void processRequest(RequestEvent requestEvent) {
 		Request request = requestEvent.getRequest();
 		ServerTransaction serverTransactionId = requestEvent
@@ -132,6 +156,8 @@ public class Shootme implements SipListener {
 			processCancel(requestEvent, serverTransactionId);
 		} else if (request.getMethod().equals(Request.PRACK)) {
 			processPrack(requestEvent, serverTransactionId);
+		} else if (request.getMethod().equals(Request.PUBLISH)){
+			processPublish(requestEvent, serverTransactionId);
 		} else {
 			try {
 				serverTransactionId.sendResponse( messageFactory.createResponse( 202, request ) );
@@ -351,7 +377,7 @@ public class Shootme implements SipListener {
 
 			Shootme listener = this;
 
-			SipProvider sipProvider = sipStack.createSipProvider(lp);
+			sipProvider = sipStack.createSipProvider(lp);
 			System.out.println("udp provider " + sipProvider);
 			sipProvider.addSipListener(listener);
 

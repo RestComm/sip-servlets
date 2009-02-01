@@ -15,6 +15,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
+import gov.nist.javax.sip.header.Event;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -98,6 +100,12 @@ public class Shootist implements SipListener {
 	int count = 0;
 	
 	private boolean forkingProxy = false;
+	
+	public String requestMethod;
+	
+	public Request request;
+	
+	public Response lastResponse;
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -192,6 +200,7 @@ public class Shootist implements SipListener {
 	public void processResponse(ResponseEvent responseReceivedEvent) {
 		System.out.println("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
+		this.lastResponse = response;
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 		Dialog dialog = responseReceivedEvent.getDialog();
@@ -413,16 +422,22 @@ public class Shootist implements SipListener {
 
 			// Create a new Cseq header
 			CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(1L,
-					Request.INVITE);
+					requestMethod);
 
 			// Create a new MaxForwardsHeader
 			MaxForwardsHeader maxForwards = headerFactory
 					.createMaxForwardsHeader(70);
 
 			// Create the request.
+			if(requestMethod == null) requestMethod = Request.INVITE;
 			Request request = messageFactory.createRequest(requestURI,
-					Request.INVITE, callIdHeader, cSeqHeader, fromHeader,
+					requestMethod, callIdHeader, cSeqHeader, fromHeader,
 					toHeader, viaHeaders, maxForwards);
+			
+			if(requestMethod.equals(Request.PUBLISH)) {
+				request.setHeader(headerFactory.createEventHeader("presence"));
+				
+			}
 			// Create contact headers
 			String host = "127.0.0.1";
 
@@ -476,14 +491,31 @@ public class Shootist implements SipListener {
 				.createRequireHeader("100rel");
 				request.addHeader(requireHeader);
 			}
+			Request subSeq = (Request) request.clone();
+			this.request = request;
 
 			// Create the client transaction.
 			inviteTid = sipProvider.getNewClientTransaction(request);
 
 			// send the request out.
 			inviteTid.sendRequest();
-
+			
 			dialog = inviteTid.getDialog();
+			
+			
+			// Send a subsequent request after 2 secs
+			if(requestMethod.equals(Request.PUBLISH)) {
+				Thread.sleep(2000);
+				
+				CSeqHeader subSeqcSeqHeader = headerFactory.createCSeqHeader(2L,
+						requestMethod);
+				subSeq.setHeader(subSeqcSeqHeader);
+				subSeq.setHeader(lastResponse.getHeader(FromHeader.NAME));
+				ClientTransaction subseqCt = sipProvider.getNewClientTransaction(subSeq);
+				subseqCt.sendRequest();
+			}
+
+			
 
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
