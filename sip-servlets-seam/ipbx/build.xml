@@ -71,5 +71,11 @@
     		<fileset dir="${maven.deps}" 
     			includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api-local-impl* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
     	</copy>
+		<!-- Copy the dependencies to the folder where JB Tools expects them to be -->
+		<mkdir dir="WebContent/WEB-INF/lib"/>
+		<copy todir="WebContent/WEB-INF/lib">
+		    <fileset dir="${maven.deps}" 
+		    	includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api-local-impl* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
+		</copy>
 	</target>
 </project>
