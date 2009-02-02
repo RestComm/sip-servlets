@@ -25,6 +25,7 @@
     
    <persistence:managed-persistence-context name="entityManager"
                                      auto-create="true"
+                                     scope="event"
                           entity-manager-factory="#{ipbxEntityManagerFactory}"/>
 
    <persistence:entity-manager-factory name="ipbxEntityManagerFactory" 
