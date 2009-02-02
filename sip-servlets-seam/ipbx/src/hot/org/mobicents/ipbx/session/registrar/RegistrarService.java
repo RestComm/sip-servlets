@@ -195,6 +195,8 @@ public class RegistrarService {
 				}
 			}
 		}
+		dataLoader.refreshRegistrations();
+		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
 	}	
 
 	/**
@@ -243,8 +245,7 @@ public class RegistrarService {
 			}
 		} else if (cseq < binding.getCSeq()) {
 			throw new BadRegistrationException(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "lower cseq");
-		}
-		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
+		}		
 	}
 
 	/**
@@ -265,13 +266,9 @@ public class RegistrarService {
 		newBinding.setRegistration(registration);
 		registration.addBinding(newBinding);
 		entityManager.persist(newBinding);
-		//user = entityManager.merge(u);
-		dataLoader.refreshRegistrations();
-		entityManager.flush();
 		if(log.isDebugEnabled()) {
 			log.debug("Added binding: " + newBinding);
-		}
-		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
+		}		
 	}
 	
 	/**
@@ -291,9 +288,6 @@ public class RegistrarService {
 		binding.setExpires(expires);
 		registration.updateBinding(binding);
 		entityManager.persist(binding);
-		//user = entityManager.merge(u);
-		dataLoader.refreshRegistrations();
-		entityManager.flush();	
 		if(log.isInfoEnabled()) {
 			log.info("Updated binding: " + binding);
 		}
@@ -307,9 +301,6 @@ public class RegistrarService {
 	private void removeBinding(Registration registration, Binding binding) {
 		registration.removeBinding(binding);
 		entityManager.remove(binding);
-		//user = entityManager.merge(u);
-		dataLoader.refreshRegistrations();
-		entityManager.flush();								
 		if(log.isInfoEnabled()) {
 			log.info("Removed binding: " + binding);
 		}
