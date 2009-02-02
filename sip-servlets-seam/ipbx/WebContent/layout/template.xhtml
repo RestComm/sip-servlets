@@ -4,7 +4,8 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:s="http://jboss.com/products/seam/taglib">
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:a4j="http://richfaces.org/a4j">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>sip-servlets-pbx</title>
@@ -13,6 +14,12 @@
 
 
 <body>
+
+<a4j:outputPanel id="globalAll">
+<a4j:region rendered="#{identity.loggedIn}">
+	<a4j:push id="pushStatus" interval="1000" enabled="true" eventProducer="#{currentUserState.addGlobalListener}"
+			reRender="globalAll" />
+</a4j:region>
 
 
 <!--  
@@ -44,5 +51,7 @@
 			href="http://jboss.com/products/seam">Seam</a>.</div>
 		</td>
 	</tr>
-</table></div></body>
+</table></div>
+</a4j:outputPanel>
+</body>
 </html>

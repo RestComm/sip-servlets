@@ -72,10 +72,7 @@
 
 			</a4j:commandLink>
 		</rich:panel>
-	</a4j:form> <a4j:form>
-		<a4j:push id="pushStatus" interval="2000" enabled="true" eventProducer="#{currentUserState.addHistoryListener}"
-			reRender="historyPanel" />
-
+	</a4j:form> <a4j:form>		
 		<rich:panel id="historyPanel">
 			<f:facet name="header">History</f:facet>
 			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"

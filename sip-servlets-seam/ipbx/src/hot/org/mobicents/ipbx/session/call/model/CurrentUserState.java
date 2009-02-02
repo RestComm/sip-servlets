@@ -28,9 +28,12 @@ public class CurrentUserState {
 	@In ConferenceManager conferenceManager;
 	@In MediaController mediaController;
 	
-	private PushEventListener statusListener;
-	private PushEventListener historyListener;
-	private PushEventListener registrationListener;
+//	private PushEventListener statusListener;
+//	private PushEventListener historyListener;
+//	private PushEventListener registrationListener;
+
+	//using a global push listener instead of 3 listener because browsers can't handle more than 2 simulteanous connections 
+	private PushEventListener globalListener;
 	
 	private HashSet<CallParticipant> incomingCalls = new HashSet<CallParticipant>();
 	private HashSet<CallParticipant> ongoingCalls = new HashSet<CallParticipant>();
@@ -211,43 +214,51 @@ public class CurrentUserState {
 	}
 	
 	public void makeStatusDirty() {
-		if(this.statusListener != null) {
-			this.statusListener.onEvent(new EventObject(this));
+		if(this.globalListener != null) {
+			this.globalListener.onEvent(new EventObject(this));
 		}
 	}
 	
 	public void makeHistoryDirty() {
-		if(this.historyListener != null) {
-			this.historyListener.onEvent(new EventObject(this));
+		if(this.globalListener != null) {
+			this.globalListener.onEvent(new EventObject(this));
 		}
 	}
 	
 	public void makeRegistrationsDirty() {
-		if(this.registrationListener != null) {
-			this.registrationListener.onEvent(new EventObject(this));
+		if(this.globalListener != null) {
+			this.globalListener.onEvent(new EventObject(this));
 		}
 	}
 	
-	public void addRegistrationListener(EventListener listener) {
-		synchronized (listener) {
-			if (this.registrationListener != listener) {
-				this.registrationListener = (PushEventListener) listener;
-			}
-		}
-	}
-
-	public void addStatusListener(EventListener listener) {
-		synchronized (listener) {
-			if (this.statusListener != listener) {
-				this.statusListener = (PushEventListener) listener;
-			}
-		}
-	}
+//	public void addRegistrationListener(EventListener listener) {
+//		synchronized (listener) {
+//			if (this.registrationListener != listener) {
+//				this.registrationListener = (PushEventListener) listener;
+//			}
+//		}
+//	}
+//
+//	public void addStatusListener(EventListener listener) {
+//		synchronized (listener) {
+//			if (this.statusListener != listener) {
+//				this.statusListener = (PushEventListener) listener;
+//			}
+//		}
+//	}
+//	
+//	public void addHistoryListener(EventListener listener) {
+//		synchronized (listener) {
+//			if (this.historyListener != listener) {
+//				this.historyListener = (PushEventListener) listener;
+//			}
+//		}
+//	}
 	
-	public void addHistoryListener(EventListener listener) {
+	public void addGlobalListener(EventListener listener) {
 		synchronized (listener) {
-			if (this.historyListener != listener) {
-				this.historyListener = (PushEventListener) listener;
+			if (this.globalListener != listener) {
+				this.globalListener = (PushEventListener) listener;
 			}
 		}
 	}
