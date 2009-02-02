@@ -275,6 +275,7 @@ public class RegistrarService {
 	}
 	
 	/**
+	 * Update a binding
 	 * @param registration
 	 * @param callId
 	 * @param cseq
@@ -299,6 +300,7 @@ public class RegistrarService {
 	}
 
 	/**
+	 * Remove a binding
 	 * @param registration
 	 * @param binding
 	 */
