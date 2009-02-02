@@ -43,35 +43,27 @@ import javax.persistence.Version;
 
 @Entity
 @Table(name="BINDINGS")
-public class Binding {
+public class Binding {	
 	private long id;
-	private String contactAddress;
-	private String callId;
-	private int Cseq;
-	private int expires;
-	private Registration registration;
 	private Integer version;
 	
-    @Version
-    public Integer getVersion() {
-        return version;
-    }
-
-    private void setVersion(Integer version) {
-        this.version = version;
-    }
-    
+	private String contactAddress;
+	private String callId;
+	private int cSeq;
+	private int expires;
+	private Registration registration;
+		      
 	/**
 	 * @param cseq the cseq to set
 	 */
-	public void setCseq(int cseq) {
-		Cseq = cseq;
+	public void setCSeq(int cSeq) {
+		this.cSeq = cSeq;
 	}
 	/**
 	 * @return the cseq
 	 */
-	public int getCseq() {
-		return Cseq;
+	public int getCSeq() {
+		return cSeq;
 	}
 	/**
 	 * @param callId the callId to set
@@ -109,6 +101,45 @@ public class Binding {
 	public int getExpires() {
 		return expires;
 	}
+	
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	@Id @GeneratedValue(strategy=GenerationType.SEQUENCE)
+	@Column(name="BINDINGID")
+	public long getId() {
+		return id;
+	}
+	
+	@Version
+    public Integer getVersion() {
+        return version;
+    }
+
+    private void setVersion(Integer version) {
+        this.version = version;
+    }
+
+	/**
+	 * @param registration the registration to set
+	 */
+	public void setRegistration(Registration registration) {
+		this.registration = registration;
+	}
+	/**
+	 * @return the registration
+	 */
+	@ManyToOne
+	@JoinColumn(name="REGISTRATIONID")
+	public Registration getRegistration() {
+		return registration;
+	}
+
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -116,7 +147,7 @@ public class Binding {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Cseq;
+		result = prime * result + cSeq;
 		result = prime * result + ((callId == null) ? 0 : callId.hashCode());
 		result = prime * result
 				+ ((contactAddress == null) ? 0 : contactAddress.hashCode());
@@ -134,7 +165,7 @@ public class Binding {
 		if (getClass() != obj.getClass())
 			return false;
 		Binding other = (Binding) obj;
-		if (Cseq != other.Cseq)
+		if (cSeq != other.cSeq)
 			return false;
 		if (callId == null) {
 			if (other.callId != null)
@@ -149,31 +180,19 @@ public class Binding {
 		return true;
 	}
 	
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(long id) {
-		this.id = id;
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("Binding [Address of record:");
+		sb.append(registration.getUri());
+		sb.append(", Contact Address :");
+		sb.append(contactAddress);
+		sb.append(", Expires :");
+		sb.append(expires);
+		sb.append(", call Id :");
+		sb.append(callId);
+		sb.append(", cseq :");
+		sb.append(cSeq);		
+		return sb.toString();
 	}
-	@Id @GeneratedValue(strategy=GenerationType.SEQUENCE)
-	@Column(name="BINDINGID")
-	public long getId() {
-		return id;
-	}
-	/**
-	 * @param registration the registration to set
-	 */
-	public void setRegistration(Registration registration) {
-		this.registration = registration;
-	}
-	/**
-	 * @return the registration
-	 */
-	@ManyToOne
-	@JoinColumn(name="REGISTRATIONID")
-	public Registration getRegistration() {
-		return registration;
-	}
-	
 	
 }

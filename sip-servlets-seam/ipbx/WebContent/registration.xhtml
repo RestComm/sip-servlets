@@ -33,16 +33,20 @@
                       value="#{registrationAction.getBindings(registrationHome.instance)}"
                    rendered="#{not empty registrationHome.instance.bindings}">
                 <h:column>
-                    <f:facet name="header">Id</f:facet>
-                    #{binding.id}
-                </h:column>
-                <h:column>
                     <f:facet name="header">Contact Address</f:facet>
                     #{binding.contactAddress}
                 </h:column>
                 <h:column>
                     <f:facet name="header">Expires</f:facet>
                     #{binding.expires}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Call-Id</f:facet>
+                    #{binding.callId}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">CSeq</f:facet>
+                    #{binding.cSeq}
                 </h:column>
             </h:dataTable>
 	

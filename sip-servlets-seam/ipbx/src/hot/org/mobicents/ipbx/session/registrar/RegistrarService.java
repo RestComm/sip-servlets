@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -46,9 +45,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.TransactionPropagationType;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.Binding;
@@ -60,6 +57,8 @@ import org.mobicents.ipbx.session.util.URIUtil;
 
 /**
  * The registrar service as defined per RFC 3261, Section 10.3
+ * 
+ * TODO have a background timer task checking for unused bindings
  * 
  * @author jean.deruelle@gmail.com
  * @author Thomas Leseney from Nexcom Systems
@@ -121,56 +120,50 @@ public class RegistrarService {
         // database that maps user names to a list of addresses-of-record for which that user has authorization to modify bindings.  If
         // the authenticated user is not authorized to modify bindings, the registrar MUST return a 403 (Forbidden) and skip the
         // remaining steps.
-				
-		Registration registration = processAddressOfRecord(request);
-		if(registration == null) return;
-		
-		// RC3261, Section 10.3.6 : The registrar checks whether the request contains the Contact header field.  
-		// If not, it skips to the last step. 
-		Iterator<Address> it = request.getAddressHeaders(CONTACT_HEADER);
-		if(it != null) {			
-			if (it.hasNext()) {
-				List<Address> contacts = new ArrayList<Address>();
-				boolean wildcard = false;
-				// RC3261, Section 10.3.6 : If the Contact header field is present, the registrar checks if there
-		        // is one Contact field value that contains the special value "*" and an Expires field.  
-				// If the request has additional Contact fields or an expiration time other than zero, the request is
-		        // invalid, and the server MUST return a 400 (Invalid Request) and skip the remaining steps.  				
-				while (it.hasNext()) {
-					Address contact = it.next();
-					if (contact.isWildcard()) {
-						wildcard = true;
-						if (it.hasNext() || contacts.size() > 0 || request.getExpires() > 0) {
-							resp = request.createResponse(SipServletResponse.SC_BAD_REQUEST, "invalid wildcard");
-							resp.send();
-							return;
+		try {
+			Registration registration = processAddressOfRecord(request);
+			
+			// RC3261, Section 10.3.6 : The registrar checks whether the request contains the Contact header field.  
+			// If not, it skips to the last step. 
+			Iterator<Address> it = request.getAddressHeaders(CONTACT_HEADER);
+			if(it != null) {			
+				if (it.hasNext()) {
+					List<Address> contacts = new ArrayList<Address>();
+					boolean wildcard = false;
+					// RC3261, Section 10.3.6 : If the Contact header field is present, the registrar checks if there
+			        // is one Contact field value that contains the special value "*" and an Expires field.  
+					// If the request has additional Contact fields or an expiration time other than zero, the request is
+			        // invalid, and the server MUST return a 400 (Invalid Request) and skip the remaining steps.  				
+					while (it.hasNext()) {
+						Address contact = it.next();
+						if (contact.isWildcard()) {
+							wildcard = true;
+							if (it.hasNext() || contacts.size() > 0 || request.getExpires() > 0) {
+								throw new BadRegistrationException(SipServletResponse.SC_BAD_REQUEST, "invalid wildcard");
+							}
 						}
-					}
-					contacts.add(contact);
-				}								
-				try {
+						contacts.add(contact);
+					}								
 					processContacts(request, wildcard, registration, contacts);
-				} catch (BadRegistrationException e) {
-					log.error("the registration concerning the request " + request + " is wrong, cause : " + e.getReason());
-					resp = request.createResponse(e.getStatus(), e.getReason());
-					resp.send();
-					return;
-				}				
-			}						
-		} 		
-		// RFC3261, Section 10.3.8 : The registrar returns a 200 (OK) response.  
-		// The response MUST contain Contact header field values enumerating all current bindings.  
-		// Each Contact value MUST feature an "expires" parameter indicating its expiration interval chosen by the registrar.  
-		// The response SHOULD include a Date header field.
-		Set<Binding> bindings = registration.getBindings();
-		if (bindings != null) {
-			for (Binding binding : bindings) {
-				resp.addHeader(CONTACT_HEADER, "<" + binding.getContactAddress() + ">;expires=" + binding.getExpires());
-			}
-		}					
-		resp.addHeader(DATE_HEADER, dateFormat.format(new Date()));
-		
-		resp.send();
+				}						
+			} 			
+			// RFC3261, Section 10.3.8 : The registrar returns a 200 (OK) response.  
+			// The response MUST contain Contact header field values enumerating all current bindings.  
+			// Each Contact value MUST feature an "expires" parameter indicating its expiration interval chosen by the registrar.  
+			// The response SHOULD include a Date header field.
+			Set<Binding> bindings = registration.getBindings();
+			if (bindings != null) {
+				for (Binding binding : bindings) {
+					resp.addHeader(CONTACT_HEADER, "<" + binding.getContactAddress() + ">;expires=" + binding.getExpires());
+				}
+			}					
+			resp.addHeader(DATE_HEADER, dateFormat.format(new Date()));
+			resp.send();
+		} catch (BadRegistrationException e) {
+			log.error("the registration concerning the request " + request + " is wrong, cause : " + e.getReason());
+			resp = request.createResponse(e.getStatus(), e.getReason());
+			resp.send();
+		} 
 	}
 
 	// The binding updates MUST be committed (that is, made visible to the proxy or redirect server) if and only if all binding
@@ -184,7 +177,7 @@ public class RegistrarService {
 		Set<Binding> bindings = registration.getBindings();
 		if (wildcard) {
 			for (Binding binding : bindings) {
-				if (callId.equals(binding.getCallId()) && cseq < binding.getCseq()) {
+				if (callId.equals(binding.getCallId()) && cseq < binding.getCSeq()) {
 					throw new BadRegistrationException(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "lower cseq");					
 				}
 				registration.removeBinding(binding);
@@ -202,34 +195,7 @@ public class RegistrarService {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Create and add a binding
-	 * @param registration the registration where the new binding should be added
-	 * @param callId the callId
-	 * @param cseq the cseq
-	 * @param contact the contact address
-	 * @param expires the expires for the given contact
-	 */
-	private void createBinding(Registration registration, String callId,
-			int cseq, Address contact, int expires) {
-		Binding newBinding = new Binding();
-		newBinding.setContactAddress(contact.getURI().toString());
-		newBinding.setCallId(callId);
-		newBinding.setCseq(cseq);
-		newBinding.setExpires(expires);
-		newBinding.setRegistration(registration);
-		registration.addBinding(newBinding);
-		entityManager.persist(newBinding);
-		//user = entityManager.merge(u);
-		dataLoader.refreshRegistrations();
-		entityManager.flush();
-		if(log.isDebugEnabled()) {
-			log.debug("Added binding: " + newBinding);
-		}
-		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
-	}
+	}	
 
 	/**
 	 * If the binding does exist, the registrar checks the Call-ID value. 
@@ -259,44 +225,92 @@ public class RegistrarService {
 		    // If the Call-ID value in the existing binding differs from the Call-ID value in the request, the binding MUST be removed if
 		    // the expiration time is zero and updated otherwise.
 			if (expires == 0) {
-				registration.removeBinding(binding);
-				if(log.isDebugEnabled()) {
-					log.debug("Removed binding: " + binding);
-				}
+				removeBinding(registration, binding);
 			} else {
-				binding.setContactAddress(contact.getURI().toString());
-				binding.setCallId(callId);
-				binding.setCseq(cseq);
-				binding.setExpires(expires);
-				registration.updateBinding(binding);
-				if(log.isDebugEnabled()) {
-					log.debug("Updated binding: " + binding);
-				}
+				updateBinding(registration, callId, cseq, contact, expires,
+						binding);
 			}
 		} 
 		// If they are the same, the registrar compares the CSeq value.  If the value
 		// is higher than that of the existing binding, it MUST update or remove the binding as above.  If not, the update MUST be
 		// aborted and the request fails.
-		else if (cseq > binding.getCseq()) {
-			if (expires == 0) {
-				registration.removeBinding(binding);
-				if(log.isDebugEnabled()) {
-					log.debug("Removed binding: " + binding);
-				}
+		else if (cseq > binding.getCSeq()) {
+			if (expires == 0) {				
+				removeBinding(registration, binding);
 			} else {
-				binding.setContactAddress(contact.getURI().toString());
-				binding.setCallId(callId);
-				binding.setCseq(cseq);
-				binding.setExpires(expires);
-				registration.updateBinding(binding);		
-				if(log.isDebugEnabled()) {
-					log.debug("Updated binding: " + binding);
-				}
+				updateBinding(registration, callId, cseq, contact, expires,
+						binding);
 			}
-		} else if (cseq < binding.getCseq()) {
+		} else if (cseq < binding.getCSeq()) {
 			throw new BadRegistrationException(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "lower cseq");
 		}
 		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
+	}
+
+	/**
+	 * Create and add a binding
+	 * @param registration the registration where the new binding should be added
+	 * @param callId the callId
+	 * @param cseq the cseq
+	 * @param contact the contact address
+	 * @param expires the expires for the given contact
+	 */
+	private void createBinding(Registration registration, String callId,
+			int cseq, Address contact, int expires) {
+		Binding newBinding = new Binding();
+		newBinding.setContactAddress(contact.getURI().toString());
+		newBinding.setCallId(callId);
+		newBinding.setCSeq(cseq);
+		newBinding.setExpires(expires);
+		newBinding.setRegistration(registration);
+		registration.addBinding(newBinding);
+		entityManager.persist(newBinding);
+		//user = entityManager.merge(u);
+		dataLoader.refreshRegistrations();
+		entityManager.flush();
+		if(log.isDebugEnabled()) {
+			log.debug("Added binding: " + newBinding);
+		}
+		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
+	}
+	
+	/**
+	 * @param registration
+	 * @param callId
+	 * @param cseq
+	 * @param contact
+	 * @param expires
+	 * @param binding
+	 */
+	private void updateBinding(Registration registration, String callId,
+			int cseq, Address contact, int expires, Binding binding) {
+		binding.setContactAddress(contact.getURI().toString());
+		binding.setCallId(callId);
+		binding.setCSeq(cseq);
+		binding.setExpires(expires);
+		registration.updateBinding(binding);
+		entityManager.persist(binding);
+		//user = entityManager.merge(u);
+		dataLoader.refreshRegistrations();
+		entityManager.flush();	
+		if(log.isInfoEnabled()) {
+			log.info("Updated binding: " + binding);
+		}
+	}
+
+	/**
+	 * @param registration
+	 * @param binding
+	 */
+	private void removeBinding(Registration registration, Binding binding) {
+		registration.removeBinding(binding);
+		entityManager.remove(binding);
+		//user = entityManager.merge(u);
+		dataLoader.refreshRegistrations();
+		entityManager.flush();								
+		if(log.isInfoEnabled()) {
+			log.info("Removed binding: " + binding);
+		}
 	}
 
 	/**
@@ -335,13 +349,12 @@ public class RegistrarService {
 	 * @throws IOException if the 404 response could not be sent
 	 */
 	private Registration processAddressOfRecord(SipServletRequest request)
-			throws IOException {
+			throws BadRegistrationException {
 		URI toURI = request.getTo().getURI();
 		String addressOfRecord = URIUtil.toCanonical(toURI);
 		Registration registration = sipAuthenticator.authenticate(addressOfRecord);
 		if(registration == null) {
-			request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
-			return null;
+			throw new BadRegistrationException(SipServletResponse.SC_NOT_FOUND, "Address of Record not found");			
 		}
 		return registration;
 	}
