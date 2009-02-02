@@ -5,31 +5,45 @@
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:s="http://jboss.com/products/seam/taglib"
 	xmlns:rich="http://richfaces.org/rich" rendered="#{identity.loggedIn}">
-	<div class="leftpanel"><rich:panel>
+	<div class="leftpanel">
+	<rich:simpleTogglePanel switchType="client" >
 		<f:facet name="header">My Phones</f:facet>
 		<a4j:form>
 			<rich:dataTable id="registration"
 				value="#{dataLoader.loadRegistrations()}" var="registration"
-				rows="10">
+				rows="10"
+				>
 
 				<rich:column>
 					<f:facet name="header">Phone</f:facet>
-					<h:outputText value="#{registration.uri}" /><a4j:region rendered="#{not empty registration.bindings}"> <span style="color:red"> (#{registration.bindings.size()} bindings)</span></a4j:region>
+					<s:link id="registration"
+                         value="#{registration.uri}"
+                   		 propagation="none"
+                         view="/registration.xhtml">
+                        <f:param name="registrationId"
+                                value="#{registration.id}"/>
+                    </s:link>
+                    <a4j:region rendered="#{not empty registration.bindings}"> <span style="color:red"> (#{registration.bindings.size()} bindings)</span></a4j:region>
 				</rich:column>
 				<rich:column width="20">
 					<f:facet name="header">
 					Ring
-				</f:facet>
+					</f:facet>
 					<h:selectBooleanCheckbox id="selectedCb"
 						value="#{registration.selected}">
 						<a4j:support event="onchange" reRender="registration"
 							actionListener="#{registrationAction.select(registration)}"></a4j:support>
 					</h:selectBooleanCheckbox>
 				</rich:column>
+				<rich:column width="20">
+					<a4j:commandLink immediate="true" value="" 
+						action="#{registrationAction.remove(registration)}" reRender="registration">
+						<h:graphicImage value="/img/trash.png" style="border:0"/>
+					</a4j:commandLink>
+				</rich:column>	
 				<f:facet name="footer">
-					<s:link view="/registrationList.xhtml" value="Edit Registrations" />
-				</f:facet>
-
+                	<rich:datascroller renderIfSinglePage="false"/>
+            	</f:facet>				
 			</rich:dataTable>
 			<br/>
 
@@ -40,11 +54,13 @@
 				action="#{registrationAction.addRegistration()}"
 				reRender="registration,messages"> 
 
-			</a4j:commandLink><rich:spacer width="15"></rich:spacer><a4j:commandLink value="Refresh" reRender="registration"></a4j:commandLink>
+			</a4j:commandLink>
+			<!--rich:spacer width="15"></rich:spacer><a4j:commandLink value="Refresh" reRender="registration"></a4j:commandLink-->
 		</a4j:form>
 
-	</rich:panel> <a4j:form>
-		<rich:panel>
+	</rich:simpleTogglePanel> 
+	<a4j:form>
+		<rich:simpleTogglePanel switchType="client" >
 			<f:facet name="header">Contacts</f:facet>
 
 			<rich:dataTable id="contacts" value="#{dataLoader.loadContacts()}"
@@ -52,7 +68,13 @@
 
 				<rich:column>
 					<f:facet name="header">Name</f:facet>
-					<h:outputText value="#{contact.uri}" />
+					<s:link id="contact"
+                         value="#{contact.uri}"
+                   		 propagation="none"
+                         view="/contact.xhtml">
+                        <f:param name="contactId"
+                                value="#{contact.id}"/>
+                    </s:link>
 				</rich:column>
 				<rich:column width="40">
 					<f:facet name="header">
@@ -60,9 +82,15 @@
 					<h:commandLink ajaxSingle="true"
 						action="#{callAction.call(contact.uri)}">Call</h:commandLink>
 				</rich:column>
+				<rich:column width="20">
+					<a4j:commandLink immediate="true" value="" 
+						action="#{contactAction.remove(contact)}" reRender="contacts">
+						 <h:graphicImage value="/img/trash.png" style="border:0"/>
+					</a4j:commandLink>
+				</rich:column>
 				<f:facet name="footer">
-					<s:link view="/contactList.xhtml" value="Edit Contacts" />
-				</f:facet>
+                	<rich:datascroller renderIfSinglePage="false"/>
+            	</f:facet>	
 			</rich:dataTable>
 			<br />
 			<h:inputText value="#{contactAction.contactUri}" size="15" />
@@ -71,15 +99,16 @@
 				action="#{contactAction.addContact()}" reRender="contacts,messages">
 
 			</a4j:commandLink>
-		</rich:panel>
-	</a4j:form> <a4j:form>		
-		<rich:panel id="historyPanel">
+		</rich:simpleTogglePanel>
+	</a4j:form>
+	<a4j:form>		
+		<rich:simpleTogglePanel switchType="client" id="historyPanel">
 			<f:facet name="header">History</f:facet>
 			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"
 				rows="5">
 				<b><h:outputText value="#{hist.message} " /></b>
 				<h:outputText value="(#{hist.timestamp})" />
 			</rich:dataList>
-		</rich:panel>
+		</rich:simpleTogglePanel>
 	</a4j:form></div>
 </a4j:region>

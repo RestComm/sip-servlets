@@ -76,5 +76,12 @@ public class RegistrationAction {
 		} catch (Exception e) {}
 		//reg.setSelected(!reg.isSelected());
 	}
+	
+	public void remove(Registration reg) {
+		try {
+			entityManager.remove(reg);
+		} catch (Exception e) {}
+		//reg.setSelected(!reg.isSelected());
+	}
 
 }

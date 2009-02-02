@@ -29,7 +29,7 @@
 			<h:outputText value="Current Bindings for this registration :"
                        rendered="#{not empty registrationHome.instance.bindings}"/>
 
-            <h:dataTable id="bindingsList" var="binding"
+            <rich:dataTable id="bindingsList" var="binding"
                       value="#{registrationAction.getBindings(registrationHome.instance)}"
                    rendered="#{not empty registrationHome.instance.bindings}">
                 <h:column>
@@ -48,7 +48,7 @@
                     <f:facet name="header">CSeq</f:facet>
                     #{binding.CSeq}
                 </h:column>
-            </h:dataTable>
+            </rich:dataTable>
 	
         </rich:panel>
 

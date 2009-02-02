@@ -14,6 +14,7 @@ import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Transactional;
 import org.mobicents.ipbx.entity.Contact;
+import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.entity.User;
 
 @Name("contactAction")
@@ -51,6 +52,13 @@ public class ContactAction {
 		}
 	}
 
+	public void remove(Contact contact) {
+		try {
+			entityManager.remove(contact);
+		} catch (Exception e) {}
+		//reg.setSelected(!reg.isSelected());
+	}
+	
 	public String getContactUri() {
 		return contactUri;
 	}
