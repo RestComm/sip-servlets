@@ -64,28 +64,38 @@ public class CallAction {
 		}
 		final String requestUri = contactUri;
 		log.info("Calling " + requestUri + " from " + fromUri + " to " + toUri);
-
+		// We need a new thread here, because the thread-local storage used by seam from the Web part
+		// will collide with the Sip part (the session contexts are different).
+		Thread thread = new Thread() {
+			public void run() {
+				try {
+					SipApplicationSession appSession = sipFactory.createApplicationSession();
+					Address from = sipFactory.createAddress(fromUri);
+					Address to = sipFactory.createAddress(toUri);
+					URI requestURI = sipFactory.createURI(requestUri);
+					SipServletRequest request = sipFactory.createRequest(appSession, 
+							"INVITE", from, to);
+					request.getSession().setAttribute("toParticipant", toParticipant);
+					request.getSession().setAttribute("fromParticipant", fromParticipant);
+					request.getSession().setAttribute("participant", toParticipant);
+					if(user != null) request.getSession().setAttribute("user", user);
+					toParticipant.setCallState(CallState.CONNECTING);
+					request.setRequestURI(requestURI);
+					request.send();
+					toParticipant.setInitialRequest(request);
+					String timeout = pbxConfiguration.getProperty("pbx.call.timeout");
+					new Timer().schedule(new TimeoutTask(toParticipant), Integer.parseInt(timeout)) ;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		thread.start();
 		try {
-			SipApplicationSession appSession = sipFactory.createApplicationSession();
-			Address from = sipFactory.createAddress(fromUri);
-			Address to = sipFactory.createAddress(toUri);
-			URI requestURI = sipFactory.createURI(requestUri);
-			SipServletRequest request = sipFactory.createRequest(appSession, 
-					"INVITE", from, to);
-			request.getSession().setAttribute("toParticipant", toParticipant);
-			request.getSession().setAttribute("fromParticipant", fromParticipant);
-			request.getSession().setAttribute("participant", toParticipant);
-			if(user != null) request.getSession().setAttribute("user", user);
-			toParticipant.setCallState(CallState.CONNECTING);
-			request.setRequestURI(requestURI);
-			request.send();
-			toParticipant.setInitialRequest(request);
-			String timeout = pbxConfiguration.getProperty("pbx.call.timeout");
-			new Timer().schedule(new TimeoutTask(toParticipant), Integer.parseInt(timeout)) ;
-		} catch (Exception e) {
-			e.printStackTrace();
+			thread.join();
+		} catch (InterruptedException e) {
+			log.warn(e);
 		}
-
 	}
 	
 	private String getAuthUri(CallParticipant cp) {
