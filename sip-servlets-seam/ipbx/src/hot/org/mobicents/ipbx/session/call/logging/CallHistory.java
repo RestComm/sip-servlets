@@ -61,15 +61,15 @@ public class CallHistory {
 		try {
 			EntityManager em = ipbxEntityManagerFactory.createEntityManager();
 			User user = (User) sipSession.getAttribute("user");
-			User u = em.find(User.class, user.getId());
+			em.refresh(user);
 			History history = new History();
 			history.setMessage(message);
 			history.setTimestamp(DateUtil.now());
-			history.setUser(u);
-			if(u.getHistory() == null) {
-				u.setHistory(new HashSet<History>());
+			history.setUser(user);
+			if(user.getHistory() == null) {
+				user.setHistory(new HashSet<History>());
 			}
-			u.getHistory().add(history);
+			user.getHistory().add(history);
 			em.persist(history);
 			callStateManager.getCurrentState(user.getName()).makeHistoryDirty();
 		} catch (Exception e) {}
