@@ -78,7 +78,7 @@ public class RegistrarService {
 	
 	@Logger Log log;
 	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
-	@In EntityManager entityManager;
+	@In EntityManager sipEntityManager;
 	@In DataLoader dataLoader;
 	@In SipFactory sipFactory;
 	
@@ -265,7 +265,7 @@ public class RegistrarService {
 		newBinding.setExpires(expires);
 		newBinding.setRegistration(registration);
 		registration.addBinding(newBinding);
-		entityManager.persist(newBinding);
+		sipEntityManager.persist(newBinding);
 		if(log.isDebugEnabled()) {
 			log.debug("Added binding: " + newBinding);
 		}		
@@ -287,7 +287,7 @@ public class RegistrarService {
 		binding.setCSeq(cseq);
 		binding.setExpires(expires);
 		registration.updateBinding(binding);
-		entityManager.persist(binding);
+		sipEntityManager.persist(binding);
 		if(log.isInfoEnabled()) {
 			log.info("Updated binding: " + binding);
 		}
@@ -300,7 +300,7 @@ public class RegistrarService {
 	 */
 	private void removeBinding(Registration registration, Binding binding) {
 		registration.removeBinding(binding);
-		entityManager.remove(binding);
+		sipEntityManager.remove(binding);
 		if(log.isInfoEnabled()) {
 			log.info("Removed binding: " + binding);
 		}

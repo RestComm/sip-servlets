@@ -22,6 +22,7 @@ import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
+import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.entity.Registration;
@@ -59,7 +60,7 @@ public class PbxEventHandler {
 	@In ConferenceManager conferenceManager;
 	@In CallStateManager callStateManager;
 	@In CallParticipantManager callParticipantManager;
-	@Out @In(create=true) SimpleSipAuthenticator sipAuthenticator;
+	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In SipFactory sipFactory;
 	@In PbxConfiguration pbxConfiguration;
 	@In MsEventFactory eventFactory;
@@ -76,6 +77,7 @@ public class PbxEventHandler {
 		// Authentication just by user name for now
 		Registration fromRegistration = sipAuthenticator.authenticate(fromUri);
 		Registration toRegistration = sipAuthenticator.findRegistration(toUri);
+		
 		if(fromRegistration == null || toRegistration == null) {
 			try {
 				request.createResponse(404).send();
@@ -83,16 +85,15 @@ public class PbxEventHandler {
 				log.error("Can't send 404 response");
 			}
 			return;
-		} 
-		/*
-		else if(!toRegistration.isSelected()) { // If registration is disabled, reject
-			try {
-				request.createResponse(486).send();
-			} catch (IOException e) {
-				log.error("Can't send 404 response");
+		}
+		
+		Binding toBinding = null;
+		if(toRegistration.getBindings() != null) {
+			if(toRegistration.getBindings().size() > 0) {
+				toBinding = toRegistration.getBindings().iterator().next();
+				toUri = toBinding.getContactAddress();
 			}
-			return;
-		}*/
+		}
 		
 		
 		String fromUser = fromRegistration.getUser().getName();
@@ -122,7 +123,8 @@ public class PbxEventHandler {
 				toUri);
 		toParticipant.setName(toUser);
 		toParticipant.setRegistration(toRegistration);
-		toParticipant.setUri(toParticipant.getUri());
+		toParticipant.setUri(toUri);
+		toParticipant.setBinding(toBinding);
 		
 		//Store the request/session in the registration
 		fromParticipant.setInitialRequest(request);
@@ -323,32 +325,32 @@ public class PbxEventHandler {
 		MsEndpoint endpoint = event.getSource().getEndpoints()[0];
 		CallParticipant participant = 
 			(CallParticipant) sipSession.getAttribute("participant");
-		participant.setCallState(CallState.CONNECTED);
 		Conference conf = participant.getConference();
-		
 		// We should upgrade the call state to "active" for all participants (most already have it)
 		CallParticipant[] ps = conf.getParticipants();
 		for(CallParticipant p : ps) {
 			if(!p.getUri().equals(participant.getUri())) {
-				if(p.getCallState().equals(CallState.CONNECTED)){
-					if(p.getCallState().equals(CallState.RINGING)) {
-						p.setCallState(CallState.CONNECTED);
-						try {
-							endRingback(p.getMsLink(), endpoint);
-						} catch (Exception e) {}
-					}
+
+				if(p.getCallState().equals(CallState.CONNECTED)) {
+					p.setCallState(CallState.CONNECTED);
+					try {
+						endRingback(p.getMsLink(), endpoint);
+					} catch (Exception e) {}
 					callStateManager.getCurrentState(p.getName()).setOngoing(participant);
 					callStateManager.getCurrentState(participant.getName()).setOngoing(p);
-					participant.setCallState(CallState.CONNECTED);
 				}
+				participant.setCallState(CallState.CONNECTED);
+				
 			}
+
 		}
+
 		
 		// And if this is the first participant in the conference, let's determine which endpoint we use
 		if(participant != null) {
 			participant.setMsLink(event.getSource());
-			if(participant.getConference() != null) {
-				participant.getConference().setEndpoint(endpoint);
+			if(conf.getEndpoint() == null) {
+				conf.setEndpoint(endpoint);
 				playRingback(event.getSource(), endpoint);
 			}
 		}

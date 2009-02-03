@@ -1,6 +1,5 @@
 package org.mobicents.ipbx.session.call.model;
 
-import java.io.IOException;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.HashSet;
@@ -28,10 +27,6 @@ public class CurrentUserState {
 	@In ConferenceManager conferenceManager;
 	@In MediaController mediaController;
 	
-//	private PushEventListener statusListener;
-//	private PushEventListener historyListener;
-//	private PushEventListener registrationListener;
-
 	//using a global push listener instead of 3 listener because browsers can't handle more than 2 simulteanous connections 
 	private PushEventListener globalListener;
 	
@@ -72,6 +67,11 @@ public class CurrentUserState {
 			participant.setCallState(CallState.DISCONNECTED);
 			
 			CallParticipant[] ps = conf.getParticipants();
+			for(CallParticipant cp : ps) {
+				if(cp.getName() != null) {
+					CallStateManager.getUserState(cp.getName()).removeCall(participant);
+				}
+			}
 			// If there is only one other participant, attempt to disconnect him
 			if(ps.length == 1) {
 				try {
@@ -102,13 +102,8 @@ public class CurrentUserState {
 			}
 			participant.setInitialRequest(null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
-	}
-	
-	// Accept an incoming call in a conference
-	public void accept(CallParticipant participant, Conference conference) {
-		
 	}
 	
 	// Mute an active participant
@@ -230,30 +225,6 @@ public class CurrentUserState {
 			this.globalListener.onEvent(new EventObject(this));
 		}
 	}
-	
-//	public void addRegistrationListener(EventListener listener) {
-//		synchronized (listener) {
-//			if (this.registrationListener != listener) {
-//				this.registrationListener = (PushEventListener) listener;
-//			}
-//		}
-//	}
-//
-//	public void addStatusListener(EventListener listener) {
-//		synchronized (listener) {
-//			if (this.statusListener != listener) {
-//				this.statusListener = (PushEventListener) listener;
-//			}
-//		}
-//	}
-//	
-//	public void addHistoryListener(EventListener listener) {
-//		synchronized (listener) {
-//			if (this.historyListener != listener) {
-//				this.historyListener = (PushEventListener) listener;
-//			}
-//		}
-//	}
 	
 	public void addGlobalListener(EventListener listener) {
 		synchronized (listener) {

@@ -25,6 +25,9 @@
     
    <persistence:managed-persistence-context name="entityManager"
                                      auto-create="true"
+                          entity-manager-factory="#{ipbxEntityManagerFactory}"/>
+   <persistence:managed-persistence-context name="sipEntityManager"
+                                     auto-create="true"
                                      scope="event"
                           entity-manager-factory="#{ipbxEntityManagerFactory}"/>
 

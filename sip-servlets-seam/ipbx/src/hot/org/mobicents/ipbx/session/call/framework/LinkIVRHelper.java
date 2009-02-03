@@ -77,4 +77,12 @@ public class LinkIVRHelper {
         MsLink msLink = mediaSessionStore.getMsLink();  
         mediaController.execute(msLink.getEndpoints()[0], requestedSignals, requestedEvents, msLink);
 	}
+	
+	public void endAll() {
+		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] {  };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { };
+        
+        MsLink msLink = mediaSessionStore.getMsLink();  
+        mediaController.execute(msLink.getEndpoints()[0], requestedSignals, requestedEvents, msLink);
+	}
 }

@@ -1,6 +1,8 @@
 package org.mobicents.ipbx.entity;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -130,5 +132,33 @@ public class Registration implements Serializable {
 	
 	public void setBindings(Set<Binding> bindings) {
 		this.bindings = bindings;
+	}
+	
+	@Transient
+	public String[] getCallableUris() {
+		LinkedList<String> uris = new LinkedList<String>();
+		uris.add(getUri());
+		if(getBindings() != null) {
+			Iterator<Binding> bindings = getBindings().iterator();
+			while(bindings.hasNext()) {
+				Binding binding = bindings.next();
+				uris.add(binding.getContactAddress());
+			}
+		}
+		return uris.toArray(new String[]{});
+	}
+	
+	// This method doesn't return this.uri in the list
+	@Transient
+	public Binding[] getCallableBindings() {
+		LinkedList<Binding> uris = new LinkedList<Binding>();
+		if(getBindings() != null) {
+			Iterator<Binding> bindings = getBindings().iterator();
+			while(bindings.hasNext()) {
+				Binding binding = bindings.next();
+				uris.add(binding);
+			}
+		}
+		return uris.toArray(new Binding[]{});
 	}
 }

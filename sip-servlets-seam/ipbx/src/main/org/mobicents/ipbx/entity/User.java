@@ -1,6 +1,8 @@
 package org.mobicents.ipbx.entity;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -109,6 +111,21 @@ public class User implements Serializable {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+	
+	@Transient
+	public String[] getCallableUris() {
+		LinkedList<String> uris = new LinkedList<String>();
+		Iterator<Registration> regs = getRegistrations().iterator();
+		while(regs.hasNext()) {
+			Registration reg = regs.next();
+			if(reg.isSelected()) {
+				for(String uri : reg.getCallableUris()) {
+					uris.add(uri);
+				}
+			}
+		}
+		return uris.toArray(new String[] {});
 	}
 	
 }

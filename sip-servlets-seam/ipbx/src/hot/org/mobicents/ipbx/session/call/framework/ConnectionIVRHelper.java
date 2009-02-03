@@ -36,7 +36,8 @@ public class ConnectionIVRHelper {
 		onFailed.setEventAction(MsEventAction.NOTIFY);
 		
 		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
-	
+		play.setURL(file);
+		
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed};
         
@@ -53,6 +54,8 @@ public class ConnectionIVRHelper {
 		onFailed.setEventAction(MsEventAction.NOTIFY);
 		
 		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+		play.setURL(file);
+		
 		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
 	
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
@@ -67,6 +70,14 @@ public class ConnectionIVRHelper {
 	
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] {  };
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { dtmf };
+        
+        MsConnection msConnection = mediaSessionStore.getMsConnection();  
+        mediaController.execute(msConnection.getEndpoint(), requestedSignals, requestedEvents, msConnection);
+	}
+	
+	public void endAll() {
+		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] {  };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] {  };
         
         MsConnection msConnection = mediaSessionStore.getMsConnection();  
         mediaController.execute(msConnection.getEndpoint(), requestedSignals, requestedEvents, msConnection);

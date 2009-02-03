@@ -1,18 +1,24 @@
 package org.mobicents.ipbx.session;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession.State;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.entity.Registration;
@@ -36,6 +42,7 @@ public class CallAction {
 	@In PbxConfiguration pbxConfiguration;
 	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In SipFactory sipFactory;
+	@In EntityManager sipEntityManager;
 	
 	public void call(final CallParticipant fromParticipant,
 			final CallParticipant toParticipant) {
@@ -76,6 +83,8 @@ public class CallAction {
 					toParticipant.setCallState(CallState.CONNECTING);
 					request.send();
 					toParticipant.setInitialRequest(request);
+					String timeout = pbxConfiguration.getProperty("pbx.call.timeout");
+					new Timer().schedule(new TimeoutTask(toParticipant), Integer.parseInt(timeout)) ;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -90,32 +99,24 @@ public class CallAction {
 	}
 	
 	public void call(String toUri) {
+		LinkedList<CallParticipant> fromParticipants = new LinkedList<CallParticipant>();
+		
 		Registration toRegistration = sipAuthenticator.findRegistration(toUri);
-		//if(toRegistration == null) {
-		//	throw new RuntimeException("User not found " + toUri);
-		//}
+		User user = sipEntityManager.find(User.class, this.user.getId());
 		
 		Conference conf = null;
-		CallParticipant fromParticipant = null;
-		Registration someSelected = null;
 		boolean alreadyInCall = false;
 		
 		// Determine if we are in any calls right now. If yes, take a conference 
-		// endpoint to jointhe outgoing call
-		Iterator<Registration> regs = user.getRegistrations().iterator();
-		while(regs.hasNext()) {
-			Registration reg = regs.next();
-			if(reg.isSelected()) {
-				someSelected = reg;
-				fromParticipant = callParticipantManager.getExistingCallParticipant(reg.getUri());
-				if(fromParticipant != null) {
-					if(CallState.CONNECTED.equals(fromParticipant.getCallState())) {
-						conf = fromParticipant.getConference();
-						if(conf != null) {
-							alreadyInCall = true;
-							break;
-						}
-					}
+		// endpoint to join the outgoing call
+		String[] callableUris = user.getCallableUris();
+		for(String uri : callableUris) {
+			CallParticipant p = callParticipantManager.getExistingCallParticipant(uri);
+			if(p != null) {
+				if(p.getConference() != null && p.getCallState().equals(CallState.CONNECTED)) {
+					alreadyInCall = true;
+					conf = p.getConference();
+					fromParticipants.add(p);
 				}
 			}
 		}
@@ -123,12 +124,13 @@ public class CallAction {
 		// conversation will take place
 		if(conf == null) {
 			conf = conferenceManager.getNewConference();
-			fromParticipant = callParticipantManager.getCallParticipant(someSelected.getUri());
-			fromParticipant.setConference(conf);
+			for(String uri : user.getCallableUris()) {
+				CallParticipant fromParticipant = callParticipantManager.getCallParticipant(uri);
+				fromParticipant.setConference(conf);
+				fromParticipants.add(fromParticipant);
+			}
 			
 		}
-		fromParticipant.setName(user.getName());
-		
 		
 		CallParticipant toParticipant = callParticipantManager.getCallParticipant(toUri);
 
@@ -137,13 +139,35 @@ public class CallAction {
 		if(toRegistration != null && toParticipant.getName() == null) {
 			toParticipant.setName(toRegistration.getUser().getName());
 		}
-
-		call(fromParticipant, toParticipant);
-		
-		if(!alreadyInCall) {
-			call(toParticipant, fromParticipant);
+		for(CallParticipant cp : fromParticipants) {
+			cp.setName(user.getName());
+			call(cp, toParticipant);
+			callStateManager.getCurrentState(user.getName()).setOutgoing(toParticipant);
+			callStateManager.getCurrentState(toParticipant.getName()).setIncoming(cp);
 		}
-		callStateManager.getCurrentState(fromParticipant.getName()).setOutgoing(toParticipant);
-		callStateManager.getCurrentState(toParticipant.getName()).setIncoming(fromParticipant);
+		
+		if(!alreadyInCall) { 
+			//TODO: it doesnt matter what we put as fromParticipant here, but do it more cleanly
+			call(toParticipant, fromParticipants.iterator().next());
+		}
+		
 	}
+	
+	static class TimeoutTask  extends TimerTask {
+		private CallParticipant participant;
+		public TimeoutTask(CallParticipant participant)  {
+			this.participant = participant;
+		}
+		public void run () {
+			try {
+			   boolean active = this.participant.getInitialRequest().getSession().getState().equals(State.CONFIRMED);
+			   if(!active) {
+				   CallStateManager.getUserState(participant.getName()).endCall(participant);
+			   }
+			} catch (Exception ex) {
+				// No important
+			}
+		}
+	}
+	
 }

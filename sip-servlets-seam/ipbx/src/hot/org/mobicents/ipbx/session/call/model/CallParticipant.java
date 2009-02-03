@@ -9,6 +9,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
+import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.entity.Registration;
@@ -24,13 +25,12 @@ public class CallParticipant {
 	private String name;
 	private String uri;
 	private Conference conference;
-	private HashSet<Conference> allConferences = new HashSet<Conference>();
 	private CallState callState;
-	private SipSession sipSession;
 	private SipServletRequest initialRequest;
 	private Registration registration;
 	private boolean initiator;
 	private boolean muted;
+	private Binding binding;
 	private PstnGatewayAccount pstnGatewayAccount;
 	
 	public SipServletRequest getInitialRequest() {
@@ -135,7 +135,11 @@ public class CallParticipant {
 		return "[uri=" + uri + ", conf=" + conference.getName() + ", name=" + name + "]";
 	}
 
-	public HashSet<Conference> getAllConferences() {
-		return allConferences;
+	public Binding getBinding() {
+		return binding;
+	}
+
+	public void setBinding(Binding binding) {
+		this.binding = binding;
 	}
 }
