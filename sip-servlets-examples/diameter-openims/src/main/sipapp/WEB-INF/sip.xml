@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.DiameterOpenIMSApplication</app-name>
+	<display-name>Diameter OpenIMS SIP Servlet</display-name>
+	<description>Diameter OpenIMS SIP Servlet</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			DiameterOpenIMSSipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>DiameterOpenIMSSipServlet</servlet-name>
+		<display-name>DiameterOpenIMSSipServlet</display-name>
+		<description>Diameter OpenIMS SIP Servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.DiameterOpenIMSSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>

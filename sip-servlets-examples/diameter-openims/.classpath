@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.8-SNAPSHOT/sip-servlets-spec-1.1.8-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jboss/jboss-system/4.2.3.GA/jboss-system-4.2.3.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jboss/jboss-jmx/4.2.3.GA/jboss-jmx-4.2.3.GA.jar"/>	
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/mobicents-diameter-mux-jar/1.0.0.BETA2/mobicents-diameter-mux-jar-1.0.0.BETA2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/jdiameter-api/1.5.0.1-build184/jdiameter-api-1.5.0.1-build184.jar"/>
+	<classpathentry kind="output" path="src/main/sipapp/WEB-INF/classes"/>
+</classpath>
