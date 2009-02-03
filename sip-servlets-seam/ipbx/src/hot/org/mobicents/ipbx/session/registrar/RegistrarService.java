@@ -79,7 +79,6 @@ public class RegistrarService {
 	private int defaultExpires = 3600;
 	
 	@Logger Log log;	
-//	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In EntityManager sipEntityManager;
 	@In DataLoader dataLoader;
 	@In SipFactory sipFactory;

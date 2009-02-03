@@ -1,6 +1,7 @@
 package org.mobicents.ipbx.session.call;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.AuthInfo;
@@ -162,7 +163,7 @@ public class PbxEventHandler {
 	@Observer("RESPONSE")
 	public void doResponse(SipServletResponse response)
 			throws ServletException, IOException {
-		if(response.getRequest().getMethod().equalsIgnoreCase("INVITE")) {
+		if(response.getMethod().equalsIgnoreCase("INVITE")) {
 			CallParticipant participant = (CallParticipant) 
 				sipSession.getAttribute("participant");
 			
@@ -215,17 +216,23 @@ public class PbxEventHandler {
 			IOException {
 		log.info("Got BYE request:\n" + request);
 		
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		sipServletResponse.send();		
+		
 		// Clean up the mess in the models
 		CallParticipant participant = (CallParticipant) 
 			sipSession.getAttribute("participant");
+				
+		Conference conference = participant.getConference();
+		quitConference(participant, conference);
+		CallParticipant[] callParticipants = conference.getParticipants();
 		
-		Conference conf = participant.getConference();
-
+		log.debug("number of participants left in the conference = ", callParticipants.length);
 		// If one one participant in the conf is left, just disconnect him too
-		quitConference(participant, conf);
-		
-		SipServletResponse sipServletResponse = request.createResponse(200);
-		sipServletResponse.send();
+		if(callParticipants.length == 1) {
+			SipSession sipSession = callParticipants[0].getSipSession();
+			sipSession.createRequest("BYE").send();
+		}
 	}
 	
 	private void quitConference(CallParticipant participant, Conference conf) {
@@ -235,7 +242,6 @@ public class PbxEventHandler {
 			
 			// Remove the call from the callee GUI
 			callStateManager.getCurrentState(participant.getName()).removeCall(participant);
-			
 
 			CallParticipant[] ps = conf.getParticipants();
 			if(ps.length == 1) {
@@ -255,7 +261,6 @@ public class PbxEventHandler {
 				participant.getMsConnection().release();
 			participant.setMsConnection(null);
 			participant.setMsLink(null);
-			
 		}
 	}
 	

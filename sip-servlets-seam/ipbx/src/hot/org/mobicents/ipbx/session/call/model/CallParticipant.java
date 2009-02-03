@@ -60,13 +60,14 @@ public class CallParticipant {
 	}
 	public void setConference(Conference conference) {
 		if(conference == null) {
-			if(this.conference != null) {
+			if(this.conference != null) {				
 				this.conference.removeParticipant(this);
+				this.conference = conference;
 			}
 		} else {
 			this.conference = conference;
 			this.conference.addParticipant(this);
-		}
+		}		
 	}
 	public MsConnection getMsConnection() {
 		return msConnection;

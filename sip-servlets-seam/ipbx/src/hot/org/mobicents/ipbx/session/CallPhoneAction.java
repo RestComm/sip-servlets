@@ -17,9 +17,7 @@ public class CallPhoneAction {
 		this.number = number;
 	}
 
-	public void call(String number) {
-		
+	public void call() {
 		callAction.call(number);
-		
 	}
 }

@@ -120,9 +120,7 @@ public class User implements Serializable {
 		while(regs.hasNext()) {
 			Registration reg = regs.next();
 			if(reg.isSelected()) {
-				for(String uri : reg.getCallableUris()) {
-					uris.add(uri);
-				}
+				uris.add(reg.getUri());
 			}
 		}
 		return uris.toArray(new String[] {});

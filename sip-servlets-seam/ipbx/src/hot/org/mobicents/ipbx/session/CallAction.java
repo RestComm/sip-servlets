@@ -1,23 +1,23 @@
 package org.mobicents.ipbx.session;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.persistence.EntityManager;
-import javax.servlet.ServletContext;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
-import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.URI;
 import javax.servlet.sip.SipSession.State;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
@@ -34,6 +34,8 @@ import org.mobicents.ipbx.session.security.SimpleSipAuthenticator;
 @Name("callAction")
 @Scope(ScopeType.STATELESS)
 public class CallAction {
+	@Logger 
+	private static Log log;
 	@In(required=false,value="sessionUser") User user;
 	@In DataLoader dataLoader;
 	@In CallParticipantManager callParticipantManager;
@@ -65,7 +67,18 @@ public class CallAction {
 		//ServletContext ctx = (ServletContext) javax.faces.context.FacesContext
 		//	.getCurrentInstance().getExternalContext().getContext();
 		final SipFactory sipFactory = this.sipFactory;//(SipFactory) ctx.getAttribute(SipServlet.SIP_FACTORY);
-		
+		Registration toRegistration = sipAuthenticator.findRegistration(toUri);					
+			
+		String contactUri = toUri;
+		if(toRegistration != null && toRegistration.getBindings() != null) {
+			if(toRegistration.getBindings().size() > 0) {
+				Binding toBinding = toRegistration.getBindings().iterator().next();
+				contactUri = toBinding.getContactAddress();
+				toParticipant.setBinding(toBinding);
+			}
+		}
+		final String requestUri = contactUri;
+		log.info("Calling " + requestUri + " from " + fromUri + " to " + toUri);
 		// We need a new thread here, because the thread-local storage used by seam from the Web part
 		// will collide with the Sip part (the session contexts are different).
 		Thread thread = new Thread() {
@@ -74,6 +87,7 @@ public class CallAction {
 					SipApplicationSession appSession = sipFactory.createApplicationSession();
 					Address from = sipFactory.createAddress(fromUri);
 					Address to = sipFactory.createAddress(toUri);
+					URI requestURI = sipFactory.createURI(requestUri);
 					SipServletRequest request = sipFactory.createRequest(appSession, 
 							"INVITE", from, to);
 					request.getSession().setAttribute("toParticipant", toParticipant);
@@ -81,6 +95,7 @@ public class CallAction {
 					request.getSession().setAttribute("participant", toParticipant);
 					if(user != null) request.getSession().setAttribute("user", user);
 					toParticipant.setCallState(CallState.CONNECTING);
+					request.setRequestURI(requestURI);
 					request.send();
 					toParticipant.setInitialRequest(request);
 					String timeout = pbxConfiguration.getProperty("pbx.call.timeout");
@@ -122,8 +137,10 @@ public class CallAction {
 		}
 		// If there are no active calls just create a new conference where the 
 		// conversation will take place
-		if(conf == null) {
+		if(conf == null) {			
 			conf = conferenceManager.getNewConference();
+			
+			//Add the participants selected in the My Phones panel 
 			for(String uri : user.getCallableUris()) {
 				CallParticipant fromParticipant = callParticipantManager.getCallParticipant(uri);
 				fromParticipant.setConference(conf);
@@ -131,7 +148,7 @@ public class CallAction {
 			}
 			
 		}
-		
+		//Add the participant on which call has been clicked in the Contacts Panel
 		CallParticipant toParticipant = callParticipantManager.getCallParticipant(toUri);
 
 		toParticipant.setConference(conf);
