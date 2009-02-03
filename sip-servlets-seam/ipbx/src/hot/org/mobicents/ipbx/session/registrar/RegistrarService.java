@@ -38,6 +38,7 @@ import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.jboss.seam.ScopeType;
@@ -45,14 +46,15 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.Registration;
+import org.mobicents.ipbx.entity.User;
 import org.mobicents.ipbx.session.DataLoader;
 import org.mobicents.ipbx.session.call.model.CallStateManager;
-import org.mobicents.ipbx.session.security.SimpleSipAuthenticator;
 import org.mobicents.ipbx.session.util.URIUtil;
 
 /**
@@ -76,11 +78,13 @@ public class RegistrarService {
 	private int maxExpires = 86400;
 	private int defaultExpires = 3600;
 	
-	@Logger Log log;
-	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
+	@Logger Log log;	
+//	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In EntityManager sipEntityManager;
 	@In DataLoader dataLoader;
 	@In SipFactory sipFactory;
+	@In(required=true) SipSession sipSession;
+	@In(required=false) @Out(required=false) User user;
 	
 	private java.text.DateFormat dateFormat;
 	 
@@ -195,7 +199,6 @@ public class RegistrarService {
 				}
 			}
 		}
-		dataLoader.refreshRegistrations();
 		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
 	}	
 
@@ -345,7 +348,7 @@ public class RegistrarService {
 			throws BadRegistrationException {
 		URI toURI = request.getTo().getURI();
 		String addressOfRecord = URIUtil.toCanonical(toURI);
-		Registration registration = sipAuthenticator.authenticate(addressOfRecord);
+		Registration registration = findRegistration(addressOfRecord);
 		if(registration == null) {
 			throw new BadRegistrationException(SipServletResponse.SC_NOT_FOUND, "Address of Record not found");			
 		}
@@ -388,4 +391,23 @@ public class RegistrarService {
 		}
 		return expires;
 	}
+	
+	public Registration findRegistration(String uri) {
+    	List<Registration> registrations = sipEntityManager.createQuery(
+    			"SELECT registration FROM Registration registration WHERE registration.uri = :requestUri")
+    		.setParameter("requestUri", uri).getResultList();
+    	
+    	if(registrations.size() <= 0) return null;
+    	
+    	Registration reg = registrations.get(0);
+    	
+    	User user = reg.getUser();
+    	
+    	if(user == null) return null;
+    	
+    	this.user = user;
+    	sipSession.setAttribute("user", user);
+    	
+        return reg;
+    }
 }

@@ -109,7 +109,7 @@ public class Binding {
 		this.id = id;
 	}
 	
-	@Id @GeneratedValue(strategy=GenerationType.SEQUENCE)
+	@Id @GeneratedValue
 	@Column(name="BINDINGID")
 	public long getId() {
 		return id;
