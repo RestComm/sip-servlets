@@ -9,6 +9,8 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.TimerService;
 
 import org.jboss.seam.Seam;
 import org.jboss.seam.contexts.Contexts;
@@ -16,11 +18,14 @@ import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.core.Init;
 import org.jboss.seam.init.Initialization;
+import org.jboss.seam.log.LogProvider;
+import org.jboss.seam.log.Logging;
 import org.jboss.seam.mock.MockHttpServletRequest;
 import org.jboss.seam.mock.MockHttpSession;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MsProviderContainer;
 
 public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implements SipSessionListener {
+	private LogProvider log = Logging.getLogProvider(SeamEntryPointServlet.class);
 	
 	public void sessionCreated(SipSessionEvent arg0) {
 		arg0.getSession().setAttribute("msSession", MsProviderContainer.msProvider.createSession());
@@ -33,7 +38,7 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		
 		Events.instance().raiseEvent("sipSessionCreated", arg0.getSession());
 		SeamEntrypointUtils.endEvent();
-		System.out.println("SEAM SIP SESSION CREATED");
+		log.info("SEAM SIP SESSION CREATED");
 	}
 
 	public void sessionDestroyed(SipSessionEvent arg0) {
@@ -42,7 +47,7 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		Events.instance().raiseEvent("sipSessionDestroyed", arg0.getSession());
 		SeamEntrypointUtils.endEvent();
 		Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
-		System.out.println("SEAM SIP SESSION DESTROYED");
+		log.info("SEAM SIP SESSION DESTROYED");
 	}
 
 	public void sessionReadyToInvalidate(SipSessionEvent arg0) {
@@ -64,12 +69,16 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 			try {
 				new Initialization(ctx).redeploy(r);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Unexpected exception while movking the servlet context", e);
 			}
 		}
 		SeamEntrypointUtils.beginEvent(request);
 		Contexts.getApplicationContext().set("sipFactory", (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY));
+		Contexts.getApplicationContext().set("sipSessionsUtil", (SipSessionsUtil) getServletContext().getAttribute(
+				SIP_SESSIONS_UTIL));
+		Contexts.getApplicationContext().set("timerService", (TimerService) getServletContext().getAttribute(
+				TIMER_SERVICE));
 		Events.instance().raiseEvent(request.getMethod().toUpperCase(), request);
 		SeamEntrypointUtils.endEvent();
 	}
@@ -80,6 +89,10 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		SeamEntrypointUtils.beginEvent(response);
 		Contexts.getApplicationContext().set("sipFactory", (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY));
+		Contexts.getApplicationContext().set("sipSessionsUtil", (SipSessionsUtil) getServletContext().getAttribute(
+				SIP_SESSIONS_UTIL));
+		Contexts.getApplicationContext().set("timerService", (TimerService) getServletContext().getAttribute(
+				TIMER_SERVICE));
 		Events.instance().raiseEvent("RESPONSE", response);
 		SeamEntrypointUtils.endEvent();
 	}
