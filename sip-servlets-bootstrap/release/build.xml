@@ -280,12 +280,6 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config}" />
 		</exec>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/controllers/">
-			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config}" />
-		</exec>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/controllers/msc/msc-stack">
-			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config}" />
-		</exec>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core/server-sar">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
