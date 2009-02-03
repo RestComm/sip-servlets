@@ -222,18 +222,10 @@ public class PbxEventHandler {
 			sipSession.getAttribute("participant");
 				
 		Conference conference = participant.getConference();
-		quitConference(participant, conference);
-		CallParticipant[] callParticipants = conference.getParticipants();
-		
-		log.debug("number of participants left in the conference = ", callParticipants.length);
-		// If one one participant in the conf is left, just disconnect him too
-		if(callParticipants.length == 1) {
-			SipSession sipSession = callParticipants[0].getSipSession();
-			sipSession.createRequest("BYE").send();
-		}
+		quitConference(participant, conference);		
 	}
 	
-	private void quitConference(CallParticipant participant, Conference conf) {
+	private void quitConference(CallParticipant participant, Conference conf) throws IOException {
 		if(conf != null) {
 			participant.setCallState(CallState.DISCONNECTED);
 			participant.setConference(null);
@@ -241,14 +233,15 @@ public class PbxEventHandler {
 			// Remove the call from the callee GUI
 			callStateManager.getCurrentState(participant.getName()).removeCall(participant);
 
-			CallParticipant[] ps = conf.getParticipants();
-			if(ps.length == 1) {
-				CallParticipant cp = ps[0];
-				callStateManager.getCurrentState(participant.getName()).endCall(cp);
+			CallParticipant[] callParticipants = conf.getParticipants();
+			log.info("number of participants left in the conference = #0", callParticipants.length);
+			if(callParticipants.length == 1) {
+				CallParticipant cp = callParticipants[0];
+				callStateManager.getCurrentState(cp.getName()).endCall(cp);
 			}
 			
 			// Remove the call from other users' GUIs
-			for(CallParticipant cp : ps) {
+			for(CallParticipant cp : callParticipants) {
 				callStateManager.getCurrentState(cp.getName()).removeCall(participant);
 			}
 			
