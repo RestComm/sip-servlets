@@ -6,14 +6,17 @@ import javax.persistence.EntityManager;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.GlobalProperty;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 
 @Name("pbxConfiguration")
 @Scope(ScopeType.APPLICATION)
 @Startup
+@Transactional
 public class PbxConfiguration {
 	@In EntityManager sipEntityManager;
+	@Logger Log log;
 	
 	private List<PstnGatewayAccount> pstnAccounts;
 	private HashMap<String,GlobalProperty> globalProperties;
@@ -23,7 +26,7 @@ public class PbxConfiguration {
 		return pstnAccounts;
 	}
 	
-	@Create
+	
 	public HashMap<String,GlobalProperty> getGlobalProperties() {
 		if(globalProperties == null) globalProperties = loadGlobalProperties();
 		return globalProperties;
@@ -33,8 +36,11 @@ public class PbxConfiguration {
 		return getGlobalProperties().get(property).getValue();
 	}
 
-	
-	public void updateAll() {
+	@Create
+	@Observer("globalSettingsChanged")
+	public void updateAll() throws InterruptedException {
+		Thread.sleep(300);
+		log.info("Global settings updated");
 		pstnAccounts = loadPstnAccounts();
 		globalProperties = loadGlobalProperties();
 	}
