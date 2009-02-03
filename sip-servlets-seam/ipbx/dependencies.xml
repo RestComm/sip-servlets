@@ -94,7 +94,7 @@
 			<version>${seam.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.mobicents.seam</groupId>
+			<groupId>org.mobicents.servlet.seam</groupId>
 			<artifactId>sip-servlets-seam-entrypoint</artifactId>
 			<version>1.0</version>
 		</dependency>
