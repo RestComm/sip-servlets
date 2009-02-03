@@ -1,7 +1,6 @@
 package org.mobicents.ipbx.session.call;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.AuthInfo;
@@ -19,7 +18,6 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
-import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
@@ -361,8 +359,9 @@ public class PbxEventHandler {
 		}
 	}
 	
-	public void playRingback(MsLink link, MsEndpoint endpoint) {
+	public void playRingback(MsLink link, MsEndpoint endpoint) {		
 		String tone = pbxConfiguration.getProperty("pbx.default.ringback.tone");
+		log.info("playing following ringbacktone #0", tone);
 		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
 		onCompleted.setEventAction(MsEventAction.NOTIFY);
 

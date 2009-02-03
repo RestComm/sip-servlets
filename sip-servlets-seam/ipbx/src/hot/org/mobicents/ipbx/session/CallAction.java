@@ -46,24 +46,9 @@ public class CallAction {
 	@In SipFactory sipFactory;
 	@In EntityManager sipEntityManager;
 	
-	public void call(final CallParticipant fromParticipant,
-			final CallParticipant toParticipant) {
-		String fromUri = getAuthUri(fromParticipant);
-		String toUri = toParticipant.getUri();
-		call(fromParticipant, toParticipant, fromUri, toUri);
-	}
-	
-	private String getAuthUri(CallParticipant cp) {
-		PstnGatewayAccount account = cp.getPstnGatewayAccount();
-		
-		if(account == null) return cp.getUri();
-		
-		String uri = "sip:" + account.getUsername() + "@" + account.getHostname();
-		return uri;
-	}
-	
-	public void call(final CallParticipant fromParticipant,
-			final CallParticipant toParticipant, final String fromUri, final String toUri) {
+	public void call(final CallParticipant fromParticipant, final CallParticipant toParticipant) {
+		final String fromUri = getAuthUri(fromParticipant);
+		final String toUri = toParticipant.getUri();
 		//ServletContext ctx = (ServletContext) javax.faces.context.FacesContext
 		//	.getCurrentInstance().getExternalContext().getContext();
 		final SipFactory sipFactory = this.sipFactory;//(SipFactory) ctx.getAttribute(SipServlet.SIP_FACTORY);
@@ -111,6 +96,15 @@ public class CallAction {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String getAuthUri(CallParticipant cp) {
+		PstnGatewayAccount account = cp.getPstnGatewayAccount();
+		
+		if(account == null) return cp.getUri();
+		
+		String uri = "sip:" + account.getUsername() + "@" + account.getHostname();
+		return uri;
 	}
 	
 	public void call(String toUri) {
