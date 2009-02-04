@@ -5,7 +5,7 @@
 	<body>
 	<section name="JBoss Seam Integration Overview">
 		<p>
-				<a href="http://www.seamframework.org/">JBoss Seam</a> components can now handle real SipServletRequests while taking advantage of the Seam perks - bijection, scoping, transaction management, interceptors and everything else.
+				<a href="http://www.seamframework.org/">JBoss Seam</a> components can now handle real SipServletRequests and Media Server events while taking advantage of the Seam perks - bijection, scoping, transaction management, interceptors and everything else.
 		</p>
 		<p>
 			Your SIP and HTTP Servlets are running in the same servlet context and they share the same application-scoped components, while the session-scoped components are mapped to the respective SIP and HTTP sessions. You can work with both EJBs and POJOs, interact with your web-layer, and still build very loosely coupled telco components working on the same messages without being aware of each-other. Seam provides synchronous and asynchronous light-weight message passing through the @Observer-annotated methods, which covers most of the communication needs in converged applications.
@@ -13,7 +13,7 @@
 		</section>
 		<section name="How it works?">
 			<p>The Seam 2 core is now mostly independent of HTTP Servlets and JSF. Basically we hooked a controller Sip Servlet and session listeners to the Seam lifecycle to control the context assignment for incoming SIP messages. When a SIP message arrives, we raise Seam events to notify the Seam components subscribed to receive the SIP events. We had to use a small Java reflection hack to reach some protected Seam contexts, but I believe it is safe. We will try to make it more clean.
-</p><p>
+</p><p>The Media Server events occur in the context of a SIP session and are treated in a similar way as the SIP events. You just subscribe methods with @Observer and process them as regular Media Server listener notifications.</p><p>
 	The setup is straightforward - just add the controller servlet to your Seam application in a Sip Servlets container and it's ready to go. For now you can start with the sample application.
 </p><p>
 	Theoretically this technique can work on any JSR289-compliant container that supports JBoss Seam, but I have only tested it on Mobicents Sip Servlets 0.6/0.7 with JBoss Application Server 4.2.3 and Seam 2.1.0.SP1.
@@ -83,6 +83,123 @@ public class SessionMessageCounter {
 
 <p>	Actually, this component is created and stored in every Seam session, no matter if it's SIP or HTTP. This is a bit inefficient, but has some advantages. Ultimately we would want to have a separate SipSession and SipApplicationSession scopes in Seam and we will probably get there with the user-defined scopes in Web Beans (JSR 299) or a newer version of Seam.
 </p>
+		</section>
+		<section name="Media Support">
+			<p>The goal of the Seam Sip and Media framework is to add a
+				lightweight media framework you can use to build Media-intensive
+				applications. All Media events occur in the context of a SipSession
+				and you can use the Sip Session to share state between the Media and
+				SIP events.</p>
+			<p>Built-in components:</p>
+			<p>There are two main built-in components, both can be injected from anywhere</p>
+			<source>
+// the sipFactory for the application, it is SESSION-scoped
+SipFactory sipFactory; 
+
+// the factory for Media events like requesting playback or DTMF
+MsEventFactory eventFactory; 
+
+			</source>
+			<p>The SIP events being delivered are as follows</p>
+			<source>
+// Media Connection Events
+
+@Observer("mediaEvent")
+public void mediaEvent(MediaEvent mediaEvent) {}
+
+@Observer("connectionCreated")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionDisconnected")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionFailed")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionHalfOpen")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionModeRecvOnly")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionOpen")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionModeSendRecv")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+@Observer("connectionModeSendOnly")
+public void doConnectionEvent(MsConnectionEvent connectionEvent) {}
+
+// Media Link Events
+
+@Observer("linkConnected")
+public void doLinkEvent(MsLinkEvent linkEvent) {}
+
+@Observer("linkCreated")
+public void doLinkEvent(MsLinkEvent linkEvent) {}
+
+@Observer("linkDisconnected")
+public void doLinkEvent(MsLinkEvent linkEvent) {}
+
+@Observer("linkFailed")
+public void doLinkEvent(MsLinkEvent linkEvent) {}
+
+@Observer("modeFullDuplex")
+public void doLinkEvent(MsLinkEvent linkEvent) {}
+
+@Observer("modeHalfDuplex")
+public void doLinkEvent(MsLinkEvent linkEvent) {}
+			</source>
+			<p>You can handle these events and relate them to a sip session simply by injecting the SipSession object and you can store or read state from there as shown in the example below. We are reusing the
+				MSC API objects with the excpetion of MediaEvent where the
+				notification message is wrapped and carries more inforrmation than
+				the original event structure. You can see the demo for more details.
+			</p>
+			<p>Here is an example conference application using the most
+				common functions:</p>
+			<source> 
+@Name("conference")
+@Scope(ScopeType.STATELESS)
+public class Conference {
+	@Logger Log log;
+	@In MediaController mediaController;
+	@In SipSession sipSession;
+	
+	@In(scope=ScopeType.APPLICATION, required=false)
+	@Out(scope=ScopeType.APPLICATION, required=false)
+	String conferenceEndpointName;
+	
+	@Observer("INVITE")
+	public void doInvite(SipServletRequest request) throws Exception {
+		String sdp = new String((byte[]) request.getContent());
+		request.createResponse(180).send();
+		sipSession.setAttribute("inviteRequest", request);
+		if (conferenceEndpointName == null)
+			conferenceEndpointName = "media/trunk/Conference/$";
+		mediaController.createConnection(conferenceEndpointName).modify("$",
+				sdp);
+	}
+
+	@Observer("connectionOpen")
+	public void doConnectionOpen(MsConnectionEvent event) throws IOException {
+		conferenceEndpointName = event.getConnection().getEndpoint()
+				.getLocalName();
+		SipServletRequest request = (SipServletRequest) sipSession
+				.getAttribute("inviteRequest");
+		SipServletResponse response = request.createResponse(200);
+		response.setContent(event.getConnection().getLocalDescriptor(),
+				"application/sdp");
+		response.send();
+	}
+
+	@Observer( { "BYE", "REGISTER" })
+	public void sayOK(SipServletRequest request) throws Exception {
+		request.createResponse(200).send();
+	}
+
+}
+</source>
 		</section>
 		<section name="Advantages">
 
