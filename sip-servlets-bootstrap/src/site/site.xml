@@ -36,6 +36,8 @@
 				<item name="Facebook Click To Call Plugin" href="facebook-c2c.html" />
 				<item name="Conference Demo" href="conference-demo.html" />
 				<item name="Media PBX" href="mss-ipbx.html" />
+				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
+				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
 			</item>
 		</menu>
 		<menu name="Advanced Features">
@@ -43,11 +45,19 @@
 			<item name="Media support" href="media.html" />
 			<item name="Security" href="security.html" />
 			<item name="STUN suport" href="stun.html" />
-			<item name="Diameter suport" href="diameter_event_charging.html" />
 			<item name="Concurrency" href="concurrency.html" />			
 			<item name="Congestion Control" href="mss-congestion.html" />
 			<item name="JBoss Seam Integration" href="mss-seam.html" />
 			<item name="JSLEE/Sip Servlets Interoperability" href="mobicents-sip-servlets-jslee-intero.html" />
+		</menu>
+		<menu name="Other Protocols Support">
+			<item name="Diameter" href="mss-diameter.html" collapse="true">
+				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
+				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
+			</item>
+		</menu>
+		<menu name="IMS">
+			<item name="OpenIMS Core Integration" href="mss-ims-integration.html" />
 		</menu>
 		<menu name="Server Monitoring - Operations - Management">
 			<item name="Management Console" href="sip-servlets-managment.htm" />

@@ -1,0 +1,9 @@
+OpenIMS Core Integration - Mobicents Sip Servlets acting as a SIP Application Server 
+
+* Description
+
+	Mobicents Sip Servlets is now capable of acting as a SIP Application Server in the {{{http://en.wikipedia.org/wiki/IP_Multimedia_Subsystem}IMS architecture}}.\
+	It has been tested with {{{http://www.openimscore.org}OpenIMS Core}}.
+	
+	If you want to try it out, you can play with the {{{mss-diameter_sh.html}Diameter Sh OpenIMS Core Integration Example}} that is showcasing it 
+
