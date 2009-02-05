@@ -857,7 +857,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 
 	private void startSipBalancer() throws Exception {
 		prepareRegister();		
-		reg.startServer();
+		reg.startRegistry(2000);
 		RouterImpl.setRegister(reg);
 		Properties properties = new Properties();
 		properties.setProperty("javax.sip.STACK_NAME", "SipBalancerForwarder");
@@ -898,7 +898,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		MBeanServer server=ManagementFactory.getPlatformMBeanServer();
 		ObjectName on = new ObjectName("mobicents:name=Balancer,type=sip");
 		server.unregisterMBean(on);
-		reg.stopServer();
+		reg.stopRegistry();
 	}
 
 
