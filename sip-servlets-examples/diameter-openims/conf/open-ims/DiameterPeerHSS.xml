@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- HSS Server config -->
+<!-- HSS Server config : File present in /opt/OpenIMSCore/FHoSS/deploy -->
 <DiameterPeer 
 	FQDN="hss.open-ims.test"
 	Realm="open-ims.test"
