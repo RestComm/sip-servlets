@@ -1,0 +1,28 @@
+//file present in /etc/bind/pri
+$ORIGIN open-ims.test.
+$TTL 1W
+@                       1D IN SOA       open-ims.test. root.open-ims.test. (
+                                         4		; Serial
+					 604800		; Refresh
+					 86400		; Retry
+					 2419200	; Expire
+			 		 604800 )	; Negative Cache TTL
+
+                        1D IN NS        open-ims.test.
+@			1D IN NS	open-ims.test.
+@			1D IN A		192.168.0.10
+ns                      1D IN A         192.168.0.10
+pcscf    		1D IN A         192.168.0.10
+open-ims.test.       	1D IN A         192.168.0.10
+icscf		1D IN A         192.168.0.10
+scscf			1D IN A         192.168.0.10
+hss			1D IN A         192.168.0.10
+ue			1D IN A         192.168.0.10
+presence		1D IN A		192.168.0.10
+
+_sip                    1D SRV 0 0 5060 icscf
+_sip._udp               1D SRV 0 0 5060 icscf
+_sip._tcp               1D SRV 0 0 5060 icscf
+
+open-ims.test.		1D IN NAPTR 10 50 "s" "SIP+D2U"	""	_sip._udp
+open-ims.test.		1D IN NAPTR 20 50 "s" "SIP+D2T"	""	_sip._tcp

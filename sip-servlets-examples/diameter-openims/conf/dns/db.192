@@ -1,0 +1,20 @@
+//file present in /etc/bind
+;
+; BIND reverse data file for local loopback interface
+;
+$TTL	 	604800
+@	 	IN	SOA	open-ims.test. root.open-ims.test. (
+			      4		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@		IN	NS	open-ims.test.
+10.0.168	IN	PTR	open-ims.test.
+10.0.168 	IN	PTR	pcscf
+10.0.168 	IN	PTR	icscf
+10.0.168 	IN	PTR	scscf
+10.0.168 	IN	PTR	hss
+10.0.168 	IN	PTR	ue
+10.0.168 	IN	PTR	presence

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DiameterPeer 
+	FQDN="pcscf.open-ims.test"
+	Realm="open-ims.test"
+	Vendor_Id="10415"
+	Product_Name="CDiameterPeer"
+	AcceptUnknownPeers="1"
+	DropUnknownOnDisconnect="1"
+	Tc="30"
+	Workers="4"
+	QueueLength="8"
+>
+	<Peer FQDN="clf.open-ims.test" Realm="open-ims.test" port="3868"/> 
+
+	<Acceptor port="3867" bind="192.168.0.10"/>
+	
+	<Auth id="16777231" vendor="13019"/><!-- ETSI e2 -->
+
+	<DefaultRoute FQDN="clf.open-ims.test" metric="10"/>
+	
+<!-- Realm Routing configuration - Uncomment and Edit!
+
+	<Realm name="open-ims.test">
+		<Route FQDN="clf1.open-ims.test" metric="10"/>
+		<Route FQDN="clf2.open-ims.test" metric="20"/>
+	</Realm>
+	<Realm name="another.open-ims.test">
+		<Route FQDN="clf3.open-ims.test" metric="10"/>
+		<Route FQDN="clf2.open-ims.test" metric="20"/>		
+	</Realm>
+	<DefaultRoute FQDN="clf.open-ims.test" metric="10"/>
+	<DefaultRoute FQDN="clf4.open-ims.test" metric="20"/>
+
+-->
+
+</DiameterPeer>

@@ -1,0 +1,17 @@
+//file present in /etc/bind
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+zone "open-ims.test" IN {
+	type master;
+	file "/etc/bind/pri/open-ims.dnszone";
+};
+
+zone "192.in-addr.arpa" {
+        type master;
+        file "/etc/bind/db.192";
+};

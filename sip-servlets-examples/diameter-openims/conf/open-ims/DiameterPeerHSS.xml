@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- HSS Server config -->
+<DiameterPeer 
+	FQDN="hss.open-ims.test"
+	Realm="open-ims.test"
+	Vendor_Id="10415"
+	Product_Name="JavaDiameterPeer"
+	AcceptUnknownPeers="1"
+	DropUnknownOnDisconnect="1"
+	Tc="30"
+	Workers="4"
+	QueueLength="32"
+>
+	<Peer FQDN="icscf.open-ims.test" Realm="open-ims.test" port="3869" /> 
+	<Peer FQDN="scscf.open-ims.test" Realm="open-ims.test" port="3870" /> 
+
+	<Acceptor port="3868" bind="192.168.0.10" />
+	
+	<Auth id="16777216" vendor="10415"/><!-- 3GPP Cx -->
+	<Auth id="16777216" vendor="4491"/><!-- CableLabs Cx -->
+	<Auth id="16777216" vendor="13019"/><!-- ETSI/TISPAN Cx -->
+	<Auth id="16777217" vendor="10415"/><!-- 3GPP Sh -->
+	<Auth id="16777221" vendor="10415"/>
+
+</DiameterPeer>

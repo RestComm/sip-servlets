@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DiameterPeer 
+	FQDN="icscf.open-ims.test"
+	Realm="open-ims.test"
+	Vendor_Id="10415"
+	Product_Name="CDiameterPeer"
+	AcceptUnknownPeers="1"
+	DropUnknownOnDisconnect="1"
+	Tc="30"
+	Workers="4"
+	QueueLength="8"
+>
+	<Peer FQDN="hss.open-ims.test" Realm="open-ims.test" port="3868"/> 
+
+	<Acceptor port="3869" bind="192.168.0.10"/>
+	
+	<Auth id="16777216" vendor="10415"/><!-- 3GPP Cx -->
+	<Auth id="16777216" vendor="4491"/><!-- CableLabs Cx -->
+	<Auth id="16777216" vendor="13019"/><!-- ETSI/TISPAN Cx -->
+
+	<DefaultRoute FQDN="hss.open-ims.test" metric="10"/>
+	
+<!-- Realm Routing configuration - Uncomment and Edit!
+
+	<Realm name="open-ims.test">
+		<Route FQDN="hss1.open-ims.test" metric="10"/>
+		<Route FQDN="hss2.open-ims.test" metric="20"/>
+	</Realm>
+	<Realm name="another.open-ims.test">
+		<Route FQDN="hss3.open-ims.test" metric="10"/>
+		<Route FQDN="hss2.open-ims.test" metric="20"/>		
+	</Realm>
+	<DefaultRoute FQDN="hss.open-ims.test" metric="10"/>
+	<DefaultRoute FQDN="hss4.open-ims.test" metric="20"/>
+
+-->
+
+</DiameterPeer>
