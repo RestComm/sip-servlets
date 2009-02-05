@@ -2,6 +2,8 @@ body {
 	font-size: 12px;
 }
 
+
+
 a:active, a:link, a:visited {
 	color: #EEBA11;
 }
@@ -166,4 +168,9 @@ img.errors {
 	padding-top: 1px;
 	padding-bottom: 1px;
 	padding-left: 6px;
+}
+
+.helphint {
+border:solid 1px;
+background-color:#ffe000;
 }

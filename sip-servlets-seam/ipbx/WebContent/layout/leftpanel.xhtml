@@ -46,7 +46,7 @@
             	</f:facet>				
 			</rich:dataTable>
 			<br/>
-
+<h:graphicImage style="float:right" id="regHelp" value="/img/help.png" />
 			<h:inputText value="#{registrationAction.registrationUri}" size="15" />
 
 			<rich:spacer width="15"></rich:spacer>
@@ -55,10 +55,13 @@
 				reRender="registration,messages"> 
 
 			</a4j:commandLink>
-			<!--rich:spacer width="15"></rich:spacer><a4j:commandLink value="Refresh" reRender="registration"></a4j:commandLink-->
+			
+			<rich:toolTip for="regHelp" layout="block"><div style="width:350px;">You can add SIP URIs and PSTN Phone numbers for your account in this panel. Later you can register against the SIP URIs from SIP phones and the registration bindings will appear in this panel. When initiation calls from this UI only the phones you have selected with <b>Ring</b> will be called.</div></rich:toolTip>
+			
+				<!--rich:spacer width="15"></rich:spacer><a4j:commandLink value="Refresh" reRender="registration"></a4j:commandLink-->
 		</a4j:form>
 
-	</rich:simpleTogglePanel> 
+	</rich:simpleTogglePanel> 		
 	<a4j:form>
 		<rich:simpleTogglePanel switchType="client" >
 			<f:facet name="header">Contacts</f:facet>
@@ -92,13 +95,16 @@
                 	<rich:datascroller renderIfSinglePage="false"/>
             	</f:facet>	
 			</rich:dataTable>
-			<br />
+			<br /><h:graphicImage id="conHelp" style="float:right" value="/img/help.png" />
 			<h:inputText value="#{contactAction.contactUri}" size="15" />
 			<rich:spacer width="15"></rich:spacer>
 			<a4j:commandLink value="Add contact"
 				action="#{contactAction.addContact()}" reRender="contacts,messages">
 
 			</a4j:commandLink>
+			
+			<rich:toolTip for="conHelp" layout="block"><div style="width:350px;">You can add SIP URIs and PSTN Phone numbers for your account in this panel. Then you can initiate calls by clicking the <b>Call</b> button.</div></rich:toolTip>
+			
 		</rich:simpleTogglePanel>
 	</a4j:form>
 	<a4j:form>		

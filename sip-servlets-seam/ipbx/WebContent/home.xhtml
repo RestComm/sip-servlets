@@ -18,7 +18,7 @@
 			</div></a4j:region></div>
 		
 		<div class="rightpanel">
-		<a4j:region rendered="#{not identity.loggedIn}">Please log in or register to get started.</a4j:region>
+		<a4j:region rendered="#{not identity.loggedIn}">Please log in or register to get started. Administrator username is <i>admin</i> and the password is <i>admin</i>. You can register normal users from the registration link at the top-right corner.</a4j:region>
 		
 		<a4j:form id="callStatusPanel"
 			rendered="#{identity.loggedIn}">

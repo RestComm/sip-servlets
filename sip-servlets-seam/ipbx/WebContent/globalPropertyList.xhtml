@@ -9,7 +9,7 @@
     template="layout/template.xhtml">
 
 <ui:define name="body">
-
+<div class="helphint">This is a list of the global PBX properties, which is the main application-wide configuration store. It consists of key-value pairs and for now you can set things like ringback tone or call timeout. In the future this list will be extended with other settings.</div>
     <rich:panel rendered="#{identity.hasRole('admin')}">
         <f:facet name="header">Global Properties</f:facet>
 
@@ -46,6 +46,7 @@
                value="Create globalProperty"
                 view="/globalProperty.xhtml"/>
     </div>
+    
 
 </ui:define>
 

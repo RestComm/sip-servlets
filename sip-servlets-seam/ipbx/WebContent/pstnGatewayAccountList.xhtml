@@ -9,7 +9,7 @@
     template="layout/template.xhtml">
 
 <ui:define name="body">
-
+<div class="helphint">Here you can configure PSTN Gateway account to be used when the PBX needs to dial a PSTN phone number. Accounts are set up in the usual way, you user name, password and gateway host name from your provider.</div>
     <rich:panel rendered="#{identity.hasRole('admin')}">
         <f:facet name="header">PSTN Gateway Accounts</f:facet>
 
