@@ -35,6 +35,7 @@
 				<item name="JSLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html" />
 				<item name="Facebook Click To Call Plugin" href="facebook-c2c.html" />
 				<item name="Conference Demo" href="conference-demo.html" />
+				<item name="Media PBX" href="mss-ipbx.html" />
 			</item>
 		</menu>
 		<menu name="Advanced Features">
