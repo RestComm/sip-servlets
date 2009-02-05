@@ -43,7 +43,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="release-tomcat,release-jboss,release-jboss-5,make-src-zip,clean" />
+	<target name="release" depends="clean,release-tomcat,release-jboss,release-jboss-5,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	
@@ -407,6 +407,7 @@
 	<target name="clean">
 		<delete dir="${jboss.home}" />
 		<delete dir="${tomcat.home}" />
+		<delete di="${release.path}"/>
 	</target>
 	
 	<!-- Download and dependency building -->
