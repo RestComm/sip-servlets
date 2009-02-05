@@ -407,7 +407,7 @@
 	<target name="clean">
 		<delete dir="${jboss.home}" />
 		<delete dir="${tomcat.home}" />
-		<delete di="${release.path}"/>
+		<delete dir="${release.path}"/>
 	</target>
 	
 	<!-- Download and dependency building -->
