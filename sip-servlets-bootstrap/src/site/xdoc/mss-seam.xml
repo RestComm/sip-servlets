@@ -90,7 +90,6 @@ public class SessionMessageCounter {
 				applications. All Media events occur in the context of a SipSession
 				and you can use the Sip Session to share state between the Media and
 				SIP events.</p>
-			<p>Built-in components:</p>
 			<p>There are two main built-in components, both can be injected from anywhere</p>
 			<source>
 // the sipFactory for the application, it is SESSION-scoped
@@ -98,6 +97,14 @@ SipFactory sipFactory;
 
 // the factory for Media events like requesting playback or DTMF
 MsEventFactory eventFactory; 
+
+// The Media controller provides Media operations for creating
+// connections and links in a seam-managed way. The MediaController
+// suplicates some methods from the MSC API - createConnection, 
+// createLink and execute. It is recommended to study
+// the media-framework-demo for further information and usage.
+// http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/media-framework-demo
+MediaController mediaController;
 
 			</source>
 			<p>The SIP events being delivered are as follows</p>
@@ -200,7 +207,11 @@ public class Conference {
 
 }
 </source>
+
 		</section>
+		<section name="Guidelines">
+<ul><li><span style="font-weight: bold;">Do not subscribe methods to SIP and media events in Seam components with SESSION or CONVERSATION scopes! </span>The reason is that each of these SESSION or CONVERSATION scoped components is likely to have multiple instances (depending on the number of the sessions) and they all will be called, which is probably not what you want.</li><li><span style="font-weight: bold;">Always subscribe public methods to SIP and media events.</span> Any other access modifier will cause you method not to be called.</li><li><span style="font-weight: bold;">When dealing with JPA, always use your own EntityManager.</span> Either EVENT or METHOD scoped or manage it manually through the EntityManagerFactory. The default CONVERSATION-scoped entityManager might produce "EntityManager closed" errors.</li><li style="text-align: justify;"><span style="font-weight: bold;">When initiating a SIP request from a Web session, do it in another thread! </span>Seam uses thread-local storage and the Web contexts will collide with the SIP contexts. We are working on solving this issue and will probably be addressed in the future.</li><li style="text-align: justify;">Keep in mind that outjection occurs at the end of a method call. If you attempt to use an outjected variable from a nested method call, it will fail.<br/></li></ul>
+</section>
 		<section name="Advantages">
 
 					<ul>
@@ -223,13 +234,9 @@ public class Conference {
 					<li>Performance is suffering a bit with Seam.</li>
 				
 					</ul>
-						<p>You can find the sample application in SVN:
+						<p>You can find the entrypoint project and the sample applications in SVN:
 	<a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam">http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam</a></p>
 
-	<p>We will soon provide a kit for integrating this capability in your applications. Until then, use the sample application.</p>
-
-
-	<p>*(We currently have no use for conversation scope in SIP.)</p>
 		</section>				
 	</body>
 </document>

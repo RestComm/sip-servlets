@@ -22,13 +22,15 @@
 								Currently the PBX terminates all calls in Mobicents Media Server conference endpoints,
 				 which allows maximum flexibility to manipulate the calls after they are established. 
 				 This allows features like server-side conferencing, ringback tones, later voicemail and 
-				 call recording will be added. This also allows the PBX to act as Session Border Controller.
+				 call recording will be added. Another application of the PBX is to act as Session Border Controller.
+				 <a style="color:red">For now the PBX runs only on Mobicents Sip Servlets with JBoss AS 4.2.3</a>
 			</p>
 			<a href="./ipbx.png"><img src="ipbx_small.png" /></a>
 			
 		</section>	
 		<section name="Downloading">
-			You can download the war from here <a href="">here</a> and rename it to ipbx.war and drop it into JBOSS_HOME/server/default/deploy directory.
+			You can download the binaries from here <a href="http://mobicents.googlecode.com/svn/downloads/list/ipbx.zip">here</a>, unzip it and  drop it into JBOSS_HOME/server/default/deploy directory.
+			The PBX needs a data source, a default datasource is provided in the zip file, but you can configure your own as well.
 		</section>
 		<section name="Building and installing">
 		You can download the source code from <a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/">here</a>.
@@ -43,6 +45,9 @@
 		</section>	
 		<section name="Usage">
 			Once the PBX is installed and running navigate to <a href="http://localhost:8080/ipbx">http://localhost:8080/ipbx</a> and follow the instructions.
+			Please note that there is a known bug when you try to add a Phone from the GUI - the first operations succeeds, then secon two attempts will fail
+			(and the GUI will ask you to try again), after that no problems are expected. We are working towards solving this and other annoying issues, mostly
+			 related to the Database. And any help in this or other aspects are welcome!
 		</section>	
 	</body>
 </document>
