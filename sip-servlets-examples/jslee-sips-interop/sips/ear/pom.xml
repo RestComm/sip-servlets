@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>jslee-sips-interop-demo-sips-parent</artifactId>
-		<version>1.2</version>
+		<version>1.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>jslee-sips-interop-demo-sips-ear</artifactId>
 	<packaging>ear</packaging>
@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>jslee-sips-interop-demo-sips-web</artifactId>
-			<version>1.2</version>
+			<version>1.3-SNAPSHOT</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
