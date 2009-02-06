@@ -27,6 +27,9 @@
 			<a href="./ipbx.png"><img src="ipbx_small.png" /></a>
 			
 		</section>	
+		<section name="Downloading">
+			You can download the war from here <a href="">here</a> and rename it to ipbx.war and drop it into JBOSS_HOME/server/default/deploy directory.
+		</section>
 		<section name="Building and installing">
 		You can download the source code from <a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/">here</a>.
 			First you need SVN, Ant and Maven  properly configured on your system.

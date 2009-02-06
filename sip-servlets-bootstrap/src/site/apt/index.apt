@@ -11,74 +11,35 @@ Goals
 
   Mobicents Sip Servlets delivers a consistent, open platform on which to develop and deploy portable 
   and distributable SIP and Converged JEE services. 
-  It is a certified implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & Jboss containers and 
+  It is a certified implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & JBoss containers and 
   strive to develop interoperability standards between Sip Servlets and JSLEE so that applications 
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
 
-Version 0.7.2 is out !
-
-	This release is primarly a bug fix release where a handful of bug fixes have been fixed (see below), please note that Issue 519 can potentially break your existing apps (make sure the main-servlet element in your sip.xml is enclosed by servlet-selection element) 
-	and The JBoss version has also been updated with the latest Mobicents Media Server release (1.0.0.CR5).
+Version 0.8 is out !
 	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=482}Issue 482}} Sip Servlet Listeners can not load classes from WEB-INF/lib 
+	Our latest release working on top of the following containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> and now on <JBoss AS 5.0.0.GA> provides new features : 
 	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=489}Issue 489}} Problem with Subsequent Requests in MSS 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=494}Issue 494}} Duplicating of URI parameters in SipURIImpl 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=497}Issue 497}} Address.toString() doesn't contain any Address parameters 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=504}Issue 504}} Route to Load Balancer not added in ha proxy case 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=505}Issue 505}} PRACK can not be proxied properly and generate 500 response 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=507}Issue 507}} URI encoded by SipApplicationSession is rejected by mobicents load balancer 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=514}Issue 514}} Proxying subsequest INVITE overrides CSeq 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=519}Issue 519}} Tomcat/JBoss 4 parsing not compliant with the xsd 
-	
-	* {{{http://code.google.com/p/mobicents/issues/detail?id=523}Issue 523}} java.lang.IllegalStateException: "invalidate": Session already invalidated  
-	
-	 
-	To download this release and try it out, follow the following link : 
-
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=656395}Mobicents Sip Servlet 0.7.2 downloads}}
-  
-
-Version 0.7.1 is out !
-
-	This release is primarly a bug fix release where {{{http://code.google.com/p/mobicents/issues/detail?id=481}Issue 481}} has been fixed and
-	the default {{{concurrency.html}concurrency control}} mode was updated from SipSession to None to cope with the {{{http://code.google.com/p/mobicents/issues/detail?id=480}Issue 480}}. 
-	 
-	To download this release and try it out, follow the following link : 
-
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=644201}Mobicents Sip Servlet 0.7.1 downloads}}
-  
-Version 0.7 is out !
-
-	Our latest release working on top of both containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> provides new features : 
-	
-		* {{{concurrency.html}Concurrency and Congestion Control}} 
+		* {{{installation-jboss-5.html}JBoss AS 5 support - Pure sip servlet applications and converged SIP/HTTP applications}} 
 		
-		* {{{diameter_event_charging.html}Diameter support (Technology preview)}}
+		* {{{mss-ims-intergation.html}Mobicents Sip servlets can now act as SIP Application Server in an IMS network}}
 		
-		* {{{failover.html}Mid Call Failover Support}} for Proxy, B2BUA and UAC Applications which makes the mid call failover support complete for pure sip applications.  
+		* {{{mss-diameter_sh.html}Diameter Sh support}}
 		
-		* Mobicents Sip Servlets now features seamless integration into {{{mss-jopr-plugin.html}JOPR and Embedded JOPR (JBoss Administration console)}}, the JBoss Enterprise management solution.
+		* Mobicents Sip Servlets Load Balancer now features seamless integration into {{{mss-jopr-lb-plugin.html}JOPR (JBoss Administration console)}}, the JBoss Enterprise management solution.
 		
-		* {{{http://www.mobicents.org/mss-seam.html}JBoss Seam Integration (Technology preview)}} 
+		* {{{http://www.mobicents.org/mss-seam.html}JBoss Seam Integration improved (Technology preview)}} (you can also see {{{http://vladimirralev.blogspot.com/2009/02/rich-telco-applications-with-seam.html}vlad's blog post}} about it) 
 		
-		* Two new shinny examples : {{{http://www.mobicents.org/conference-demo.html}a conference media server demo application built on GWT with server-push updates}} 
-		(you can also see {{{http://vladimirralev.blogspot.com/2008/10/conference-demo-for-sip-servlets.html}vlad's blog post}} about it) and 
-		{{{diameter_event_charging.html}a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)}} 		
+		* Two new shinny examples : {{{http://www.mobicents.org/mss-ipbx.html}a JBoss Seam-based PBX in ALPHA1 version}} 
+		 and {{{mss-diameter_sh.html}a Diameter Sh service showing integration between Mobicents Sip Servlets acting as a SIP Application Server in OpenIMS Core, using the Diameter Sh interface to receive profile updates and SIP.}} 				
 		
-		* More Extensions : PRACK/INFO/OPTIONS		
+		* {{{./mss-congestion.html}More Congestion Control mechanisms}}
 		
-		* Move to JBoss AS 4.2.3.GA								
-					 
+		* {{{./concurrency.html}Concurrency control at application level}}
+		
+		* {{{./mss-sip-extensions.html}More Extensions : JOIN - Replaces - PATH}}		
+		
 	Check the Roadmap to see {{{roadmap.html} the feature details and the usual round of bug fixes}} too.
 	
 	Checkout the {{{http://hudson.jboss.org/hudson/job/MobicentsDocumentation/lastSuccessfulBuild/artifact/html_single/index.html#chapter-Mobicents_SIP_Servlets_Server}shiny Mobicents Sip Servlets User Guide}}, courtesy of Douglas Silas Hensley.   
@@ -91,7 +52,7 @@ Version 0.7 is out !
 		
 		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 	
-		* For JBoss only, Mobicents Media Server 1.0.0-CR3, the Mobicents SIP load Balancer and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
+		* For JBoss only, Mobicents Media Server 1.0.0-CR5, the Mobicents SIP load Balancer BETA3 and 'all' profile in JBoss with predeployed simple-sip-servlet-distributable application 
 		to test clustering and mid call failover. 
 	 
 	To download this release and try it out, follow the following link : 
@@ -107,7 +68,7 @@ Roadmap
   
 Try it !
 
-	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or Jboss 4.2.3.GA to become a sip-servlet converged container.
+	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or JBoss 4.2.3.GA or JBoss 5.0.0.GA to become a sip-servlet converged container.
 	
 	Then have fun with the {{{examples.html}different examples}} provided with this distribution.
 	

@@ -15,25 +15,25 @@ Installation Instructions
 	To run the sip servlet container :\
 	Check that the following files have been copied during the <<<mvn clean install -P jboss>>>
 	
-		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-impl-0.8-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-impl-0.9-SNAPSHOT.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-jboss5-0.8-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-jboss5-0.9-SNAPSHOT.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-application-router-0.8-SNPASHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-application-router-0.9-SNPASHOT.jar
 	
-		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-balancer-1.0-BETA2.jar
+		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-balancer-1.0-BETA3.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-spec-1.1.8-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a sip-servlets-spec-1.1.9-SNAPSHOT.jar
 		
 		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a jain-sip-api-1.2.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a jain-sip-ri-1.2.89.jar
+		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a jain-sip-ri-1.2.90.jar
 		
 		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a stun4j-1.0-MOBICENTS.jar
 	
 		* in JBOSS_HOME/server/default/deploy/jbossweb.sar/ directory, there should be a dnsjava-2.0.6.jar
 		
-		* in JBOSS_HOME/server/default/deployers/jbossweb.deployer/ directory, there should be a sip-servlets-jboss5-0.8-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deployers/jbossweb.deployer/ directory, there should be a sip-servlets-jboss5-0.9-SNAPSHOT.jar
 	
 	Make a backup of your jboss_home/server/default/deploy/jbossweb.sar/server.xml file\
 	Copy the server-jboss-5.xml located in docs/jboss-5 to jboss_home/server/default/deploy/jbossweb.sar and rename it to server.xml

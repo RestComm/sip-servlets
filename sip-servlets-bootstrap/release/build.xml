@@ -372,7 +372,7 @@
 	
 	<target name="make-final-zip-jboss-5" depends="set-time-stamp">
 		<fixcrlf srcdir="${jboss-5.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-${time.stamp}.zip" filesonly="false">
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-${time.stamp}-TECH-PREVIEW.zip" filesonly="false">
 			<zipfileset dir="${jboss-5.home}/bin" filemode="755" prefix="bin">
 				<include name="*.sh" />
 			</zipfileset>

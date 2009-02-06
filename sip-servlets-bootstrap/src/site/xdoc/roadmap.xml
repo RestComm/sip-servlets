@@ -9,6 +9,166 @@
 				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
 			</p>		
 			<subsection name="Released Versions">
+				<subsection name="Version 0.8 - 02/07/2009">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=347">
+						Port to JBoss AS 5 - Loading pure sip servlet applications and converged SIP/HTTP applications
+						</a>
+						<br />													
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=122">
+						Basic IPBX
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=491">
+						Jopr Integration for Mobicents SIP Load Balancer
+						</a>	
+						<br />	
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=492">
+						Diameter Sh Example
+						</a>								
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=323">
+						Mobicents Sip Servlets working as IMS SIP Application Server
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=483">
+						Concurrency control at application level
+						</a>								
+						<br/>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=395">
+						More Congestion Control mechanisms
+						</a>
+						<br/>								
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=229">
+						More Extensions : JOIN/Replaces
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=470">
+						More Extensions : PATH
+						</a>
+						<br />							
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=481">
+									SipServletMessageImpl.getAddressHeader(..) throws exception instead of returning null
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=482">
+									Sip Servlet Listeners can not load classes from WEB-INF/lib
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=482">
+									Clustering perf improvements
+								</a>								
+							</li>																				
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=489">
+									Proxy bug for subsequent requests
+								</a>								
+							</li>	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=494">
+									Duplication of URI parameters in SipURIImpl
+								</a>								
+							</li>															
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=497">
+									address.toString() doesn't contain any Address parameters									  	 
+								</a>								
+							</li>																	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=504">
+									Route to Load Balancer not added in HA proxy case									  	 
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=505">
+									PRACK can not be proxied properly
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=507">
+									URI encoded by SipApplicationSession is not UTF8 encoded
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=514">
+									Proxying subsequest INVITE overrides CSeq
+								</a>								
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=519">
+									Tomcat/JBoss 4 sip.xml parsing not compliant with the xsd
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=523">
+									HTTP session already invalidated on SipApplicationSessionImpl.invalidate()
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=555">
+									Subsequent request routing wrong when app don't send final response		
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=568">
+									second SIP request in SIP session cannot be "proxied"		
+								</a>								
+							</li>
+						</ul>
+					</p>
+				</subsection>
 				<subsection name="Version 0.7 - 11/20/2008">
 					<p>
 						<img src="green.jpeg" />
@@ -595,168 +755,8 @@
 					</p>
 				</subsection>
 			</subsection>
-			<subsection name="Planned Versions">																				
-				<subsection name="Version 0.8 - 02/01/2009">
-					<p>
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=347">
-						Port to JBoss AS 5 - Loading pure sip servlet applications and converged SIP/HTTP applications
-						</a>
-						<br />													
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=122">
-						Basic IPBX
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=491">
-						Jopr Integration for Mobicents SIP Load Balancer
-						</a>	
-						<br />	
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=492">
-						Diameter Sh Example
-						</a>								
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=323">
-						Mobicents Sip Servlets working as IMS SIP Application Server
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=483">
-						Concurrency control at application level
-						</a>								
-						<br/>
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=395">
-						More Congestion Control mechanisms
-						</a>
-						<br/>								
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=229">
-						More Extensions : JOIN/Replaces
-						</a>
-						<br />
-						<img src="green.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=470">
-						More Extensions : PATH
-						</a>
-						<br />							
-						<img src="green.jpeg" />
-						Various Enhancements and Bug fixes
-						<ul>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=481">
-									SipServletMessageImpl.getAddressHeader(..) throws exception instead of returning null
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=482">
-									Sip Servlet Listeners can not load classes from WEB-INF/lib
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=482">
-									Clustering perf improvements
-								</a>								
-							</li>																				
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=489">
-									Proxy bug for subsequent requests
-								</a>								
-							</li>	
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=494">
-									Duplication of URI parameters in SipURIImpl
-								</a>								
-							</li>															
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=497">
-									address.toString() doesn't contain any Address parameters									  	 
-								</a>								
-							</li>																	
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=504">
-									Route to Load Balancer not added in HA proxy case									  	 
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=505">
-									PRACK can not be proxied properly
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=507">
-									URI encoded by SipApplicationSession is not UTF8 encoded
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=514">
-									Proxying subsequest INVITE overrides CSeq
-								</a>								
-							</li>							
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=519">
-									Tomcat/JBoss 4 sip.xml parsing not compliant with the xsd
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=523">
-									HTTP session already invalidated on SipApplicationSessionImpl.invalidate()
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=555">
-									Subsequent request routing wrong when app don't send final response		
-								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=568">
-									second SIP request in SIP session cannot be "proxied"		
-								</a>								
-							</li>
-						</ul>
-					</p>
-				</subsection>
-				<subsection name="Version 0.9 - 03/01/2009">
+			<subsection name="Planned Versions">																								
+				<subsection name="Version 0.9 - 04/01/2009">
 					<p>	
 						<img src="red.jpeg" />
 						<a
@@ -807,7 +807,7 @@
 						</ul>
 					</p>
 				</subsection>
-				<subsection name="Version 1.0 - 04/15/2008">
+				<subsection name="Version 1.0 - 06/01/2008">
 					<p>		
 						<img src="red.jpeg" />
 						<a
