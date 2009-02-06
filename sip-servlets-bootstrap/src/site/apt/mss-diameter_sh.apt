@@ -83,7 +83,7 @@ Diameter Sh OpenIMS Core Integration Service
 		* open-ic : there is only one file in there providing you with the values needed 
 		to setup the {{{http://www.open-ims.org/openic/}OpenIC IMS client}}	
 	
-	If you don't use the database sql dumps provided in open-ims/database and use the ones from OpenIMS Core, you'll need to setup OpenIMS Core to use Mobicents Sip Servlets as a SIP Application Server, 
+	Now you'll need to setup OpenIMS Core to use Mobicents Sip Servlets as a SIP Application Server, 
 	follow those simple steps (this is a more thorough explanation of what can be found in {{{http://www.openimscore.org/node/83}OpenIMS FAQ}}) :
 	
 		* start the OpenIMS Core HSS server : <<<cd /opt/OpenIMSCore/FHoSS/deploy/>>> then <<<sh startup.sh>>>
@@ -148,7 +148,11 @@ Diameter Sh OpenIMS Core Integration Service
 	 		
 	 		* Click on Save Button 
 	 	
-	 		* {{{./mss-ims-sp.png}Corresponding Screenshot}}	 	
+	 		* {{{./mss-ims-sp.png}Corresponding Screenshot}}
+	 		
+	Alternatively, if you use the sql database dumps in open-ims/database instead of the one provided by OpenIMS Core, 
+	you'll still need to modify the IP Address of the SIP Application Server in the FHoSS Web interface as explained above 
+	in Application Server section except that instead of creating it you need to search for an existing one with the name <<<MSS>>> 	 	
 	 	
 	Start all open ims core elements : 
 	
@@ -182,6 +186,11 @@ Diameter Sh OpenIMS Core Integration Service
 	You have one file to modify so that it can connect to OpenIMS Core. In <<<JBOSS_HOME/server/default/deploy/mobicents-diameter-mux-1.0.0.BETA2.sar/lib>>>, you need to modify the <<<org/mobicents/diameter/stack/jdiameter-config.xml>>> file in the <<<mobicents-diameter-mux-jar-1.0.0.BETA2.jar>>> archive
 	
 	Modify it with the file located at {{{http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/diameter-openims/conf/mobicents-jdiameter/jdiameter-config.xml}http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/diameter-openims/conf/mobicents-jdiameter/jdiameter-config.xml}} (Make sure you modify all the 192.168.0.10 IP addresses in that file to map to your own IP address)
+	
+** Mobicents Sip Servlets
+
+	Since OpenIMS Core HSS component is deploying a management web application on port 8080, you'll need to modify the http connector port in Mobicents Sip Servlets to avoid any conflicts. So go edit <<<JBOSS_HOME/server/default/deploy/jboss-web.deployer/server.xml file.\
+	Look for the connector tag whose the port is 8080 and change it to 8081 or any other value that makes sense for you.
 
 ** Example
 
@@ -217,7 +226,7 @@ Diameter Sh OpenIMS Core Integration Service
 
 * How to play with it
 
-  	Start JBoss and make sure no exception pop up during startup because that could mean that Diameter cannot connect to the OpenIMS Core HSS server
+  	Start JBoss on the binding address of the same IP address you configured elsewhere, by example <<<sh run.sh -b 192.168.0.10>>>, and make sure no exception pop up during startup because that could mean that Diameter cannot connect to the OpenIMS Core HSS server
     
 	Start one OpenIC Lite with some account (doesn't have to be registered, but it's OK if it is).
 
