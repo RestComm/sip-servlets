@@ -19,6 +19,8 @@
 		<module>chatserver</module>
 		<module>click-to-call</module>
 		<module>conference-demo</module>
+		<module>diameter-event-charging</module>
+		<module>diameter-openims</module>
 		<module>facebook-c2c</module>
 		<module>jslee-sips-interop</module>
 		<module>location-service</module>
@@ -35,7 +37,7 @@
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>1.0.0.CR3</mms.version>
+		<mms.version>1.0.0.CR5</mms.version>
 	</properties>
 
 	<dependencies>
