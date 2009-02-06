@@ -1,5 +1,7 @@
 package org.mobicents.ipbx.session;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,6 +14,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.annotations.remoting.WebRemote;
+import org.mobicents.ipbx.entity.History;
 import org.mobicents.ipbx.entity.User;
 
 @Name("dataLoader")
@@ -19,7 +22,8 @@ import org.mobicents.ipbx.entity.User;
 @Startup
 @Transactional
 public class DataLoader {
-	//@Out
+	// This is a temporary hack to make the history work
+	public static HashMap<String, List> history = new HashMap<String, List>();
 	private String text;
 	@In(scope=ScopeType.SESSION, required=false) @Out(scope=ScopeType.SESSION, required=false) List registrationCache;
 	@In(scope=ScopeType.SESSION, required=false) @Out(scope=ScopeType.SESSION, required=false) List contactCache;
@@ -80,12 +84,14 @@ public class DataLoader {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        return historyCache;
+        return history.get(user.getName());
 	}
 	
 	public void refreshHistory() {
+		if(history.get(user.getName()) == null) history.put(user.getName(), new LinkedList<History>());
+		/*
 		User u = entityManager.find(User.class, user.getId());
 		historyCache = entityManager.createQuery("SELECT history FROM History history where history.user=:u order by history.timestamp desc").setParameter("u", u).getResultList();
-
+		 */
 	}
 }

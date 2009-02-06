@@ -1,9 +1,12 @@
 package org.mobicents.ipbx.session.call.logging;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -25,6 +28,8 @@ public class CallHistory {
 	@In SipSession sipSession;
 	@In DataLoader dataLoader;
 	@In CallStateManager callStateManager;
+	@In EntityManager sipEntityManager;
+	@In(scope=ScopeType.SESSION, required=false) @Out(scope=ScopeType.SESSION, required=false) List historyCache;
 	
 	@Observer("RESPONSE")
 	public void response(SipServletResponse response) {
@@ -58,10 +63,33 @@ public class CallHistory {
 	}
 	
 	public void addHistory(String message) {
+		// The database logging is deisabled for now and is replaced by this in-memory logging
 		try {
-			EntityManager em = ipbxEntityManagerFactory.createEntityManager();
 			User user = (User) sipSession.getAttribute("user");
-			em.refresh(user);
+			if(user == null) return;
+			if(DataLoader.history.get(user.getName()) == null) {
+				DataLoader.history.put(user.getName(), new LinkedList<History>());
+			}
+			History history = new History();
+			history.setMessage(message);
+			history.setTimestamp(DateUtil.now());
+			history.setUser(user);
+			DataLoader.history.get(user.getName()).add(history);
+
+			callStateManager.getCurrentState(user.getName()).makeHistoryDirty();
+		} catch(Exception e) {
+			// if something fails here we don't care because loggig is secondary function
+			e.printStackTrace();
+		}
+		/*
+		try {
+			EntityManager em = sipEntityManager;//ipbxEntityManagerFactory.createEntityManager();
+			em.flush();
+			User user = (User) sipSession.getAttribute("user");
+			user = (User) em.createQuery(
+			"SELECT user FROM User user where user.id=:uid")
+			.setParameter("uid", user.getId()).getSingleResult();
+			em.lock(user, LockModeType.READ);
 			History history = new History();
 			history.setMessage(message);
 			history.setTimestamp(DateUtil.now());
@@ -71,8 +99,11 @@ public class CallHistory {
 			}
 			user.getHistory().add(history);
 			em.persist(history);
+			
 			callStateManager.getCurrentState(user.getName()).makeHistoryDirty();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
 	}
 	
 

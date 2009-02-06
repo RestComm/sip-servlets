@@ -16,12 +16,12 @@ import org.mobicents.ipbx.entity.User;
 @Name("sipAuthenticator")
 @Scope(ScopeType.STATELESS)
 public class SimpleSipAuthenticator {
-	    @In EntityManager entityManager;
+	    @In EntityManager sipEntityManager;
 	    @In(required=false) SipSession sipSession;
 	    @In(required=false) @Out(required=false) User user;
 	   
 	    public Registration authenticate(String uri) {
-	    	List<Registration> registrations = entityManager.createQuery(
+	    	List<Registration> registrations = sipEntityManager.createQuery(
 	    			"SELECT registration FROM Registration registration WHERE registration.uri = :requestUri")
         		.setParameter("requestUri", uri).getResultList();
 	    	
@@ -40,7 +40,7 @@ public class SimpleSipAuthenticator {
 	    }
 	    
 	    public Registration findRegistration(String uri) {
-	    	List<Registration> registrations = entityManager.createQuery(
+	    	List<Registration> registrations = sipEntityManager.createQuery(
 	    	"SELECT registration FROM Registration registration WHERE registration.uri = :requestUri")
 	    	.setParameter("requestUri", uri).getResultList();
 

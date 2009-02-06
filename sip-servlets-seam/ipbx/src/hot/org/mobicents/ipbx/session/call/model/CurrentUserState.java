@@ -63,15 +63,19 @@ public class CurrentUserState {
 			// Already closed by someone
 			if(conf == null) return;
 			
-			participant.setConference(null);
-			participant.setCallState(CallState.DISCONNECTED);
-			
 			CallParticipant[] ps = conf.getParticipants();
 			for(CallParticipant cp : ps) {
 				if(cp.getName() != null) {
 					CallStateManager.getUserState(cp.getName()).removeCall(participant);
 				}
 			}
+			participant.setConference(null);
+			participant.setCallState(CallState.DISCONNECTED);
+			if(sendBye) {
+				participant.getInitialRequest().getSession().createRequest("BYE").send();
+			}
+			participant.setInitialRequest(null);
+
 			// If there is only one other participant, attempt to disconnect him
 			if(ps.length == 1) {
 				try {
@@ -97,10 +101,7 @@ public class CurrentUserState {
 			if(participant.getMsConnection() != null) {
 				participant.getMsConnection().release();
 			}
-			if(sendBye) {
-				participant.getInitialRequest().getSession().createRequest("BYE").send();
-			}
-			participant.setInitialRequest(null);
+
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
