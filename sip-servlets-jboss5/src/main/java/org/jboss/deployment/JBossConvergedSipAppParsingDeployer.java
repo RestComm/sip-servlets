@@ -27,6 +27,7 @@ import org.jboss.deployers.vfs.spi.deployer.SchemaResolverDeployer;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipMetaData;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
 
 /**
@@ -36,14 +37,14 @@ import org.jboss.metadata.web.spec.WebMetaData;
  * @author jean.deruelle@gmail.com
  * 
  */
-public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<JBossConvergedSipMetaData>
+public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<JBossWebMetaData>
 {
    /**
     * Create a new JBossWebAppParsingDeployer.
     */
    public JBossConvergedSipAppParsingDeployer()
    {
-      super(JBossConvergedSipMetaData.class);
+      super(JBossWebMetaData.class);
       addInput(WebMetaData.class);
       addInput(SipMetaData.class);
       setName("jboss-web.xml");
@@ -78,17 +79,17 @@ public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<
       // Merge the spec metadata
       WebMetaData specMetaData = unit.getAttachment(WebMetaData.class);
       SipMetaData sipMetaData = unit.getAttachment(SipMetaData.class);
-      JBossConvergedSipMetaData metaData = unit.getAttachment(JBossConvergedSipMetaData.class);
-      String sipKey = ConvergedSipAnnotationMetaDataDeployer.SIP_ANNOTATED_ATTACHMENT_NAME;
-      Sip11MetaData sipAnnotatedMetaData = unit.getAttachment(sipKey, Sip11MetaData.class);
+      JBossWebMetaData metaData = unit.getAttachment(JBossWebMetaData.class);
+//      String sipKey = ConvergedSipAnnotationMetaDataDeployer.SIP_ANNOTATED_ATTACHMENT_NAME;
+//      Sip11MetaData sipAnnotatedMetaData = unit.getAttachment(sipKey, Sip11MetaData.class);
       
       if(specMetaData == null && sipMetaData ==null && metaData == null)
          return;
 
-      // If there no JBossConvergedSipMetaData was created from a jboss-web.xml, create one
+      // If there no JBossWebMetaData was created from a jboss-web.xml, create one
       if (metaData == null)
       {
-         metaData = new JBossConvergedSipMetaData();
+         metaData = new JBossWebMetaData();
       }      
       // Create a merged view
       JBossConvergedSipMetaData mergedMetaData = new JBossConvergedSipMetaData();
@@ -111,7 +112,7 @@ public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<
       
       WebMetaData wmd = unit.getTransientManagedObjects().getAttachment(WebMetaData.class);
       SipMetaData smd = unit.getTransientManagedObjects().getAttachment(SipMetaData.class);
-      JBossConvergedSipMetaData result = unit.getTransientManagedObjects().getAttachment(getOutput());
+      JBossWebMetaData result = unit.getTransientManagedObjects().getAttachment(getOutput());
       if (result == null && wmd != null && smd != null)
       {
          result = new JBossConvergedSipMetaData();

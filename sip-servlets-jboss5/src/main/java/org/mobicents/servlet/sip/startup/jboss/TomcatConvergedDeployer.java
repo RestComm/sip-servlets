@@ -131,13 +131,9 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
    	
    	@Override
    	public void deploy(VFSDeploymentUnit unit, JBossWebMetaData metaData)
-   			throws DeploymentException {   		
-   		if(isSipServletApplication(unit)) {
-   			JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
-   			super.deploy(unit, convergedMetaData);
-   		} else {
-   			super.deploy(unit, metaData);
-   		}
+   			throws DeploymentException {   
+   		JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
+   		super.deploy(unit, convergedMetaData);
    	}
    	
    /**
@@ -169,7 +165,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 				: getDeploymentClass();
 		//if the application is a sip servlet application or converged one we use the TomcatConvergedDeployment to be able to deploy it 
 		// in accordance with sip servlets spec
-		if(metaData instanceof JBossConvergedSipMetaData) {
+		if(isSipServletApplication(unit)) { 
 			className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
 					: getDeploymentClass();
 			config.setContextClassName(SipHostConfig.SIP_CONTEXT_CLASS);			
@@ -288,81 +284,78 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	protected void deployWebModule(VFSDeploymentUnit unit,
 			JBossWebMetaData metaData, AbstractWarDeployment deployment)
 			throws Exception {		
-		if (deployment instanceof TomcatConvergedDeployment) {
-			log.debug("deployConvergedModule: " + unit.getName());
-			try {
-				ServiceMetaData webModule = new ServiceMetaData();
-				String name = getObjectName(metaData);
-				ObjectName objectName = new ObjectName(name);
-				webModule.setObjectName(objectName);
-				//specify the correct class for converged or pure sip applications
-				webModule.setCode(ConvergedSipModule.class.getName());
-				// WebModule(DeploymentUnit, AbstractWarDeployer,
-				// AbstractWarDeployment)
-				ServiceConstructorMetaData constructor = new ServiceConstructorMetaData();
-				constructor.setSignature(new String[] {
-						VFSDeploymentUnit.class.getName(),
-						AbstractWarDeployer.class.getName(),
-						AbstractWarDeployment.class.getName() });
-				constructor
-						.setParameters(new Object[] { unit, this, deployment });
-				webModule.setConstructor(constructor);
 
-				List<ServiceAttributeMetaData> attrs = new ArrayList<ServiceAttributeMetaData>();
+		log.debug("deploy Module: " + unit.getName());
+		try {
+			ServiceMetaData webModule = new ServiceMetaData();
+			String name = getObjectName(metaData);
+			ObjectName objectName = new ObjectName(name);
+			webModule.setObjectName(objectName);
+			//specify the correct class for converged or pure sip applications
+			webModule.setCode(ConvergedSipModule.class.getName());
+			// WebModule(DeploymentUnit, AbstractWarDeployer,
+			// AbstractWarDeployment)
+			ServiceConstructorMetaData constructor = new ServiceConstructorMetaData();
+			constructor.setSignature(new String[] {
+					VFSDeploymentUnit.class.getName(),
+					AbstractWarDeployer.class.getName(),
+					AbstractWarDeployment.class.getName() });
+			constructor
+					.setParameters(new Object[] { unit, this, deployment });
+			webModule.setConstructor(constructor);
 
-				ServiceAttributeMetaData attr = new ServiceAttributeMetaData();
-				attr.setName("SecurityManagement");
-				ServiceInjectionValueMetaData injectionValue = new ServiceInjectionValueMetaData(
-						deployment.getSecurityManagementName());
-				attr.setValue(injectionValue);
-				attrs.add(attr);
+			List<ServiceAttributeMetaData> attrs = new ArrayList<ServiceAttributeMetaData>();
 
-				ServiceAttributeMetaData attrPR = new ServiceAttributeMetaData();
-				attrPR.setName("PolicyRegistration");
-				ServiceInjectionValueMetaData injectionValuePR = new ServiceInjectionValueMetaData(
-						deployment.getPolicyRegistrationName());
-				attrPR.setValue(injectionValuePR);
-				attrs.add(attrPR);
+			ServiceAttributeMetaData attr = new ServiceAttributeMetaData();
+			attr.setName("SecurityManagement");
+			ServiceInjectionValueMetaData injectionValue = new ServiceInjectionValueMetaData(
+					deployment.getSecurityManagementName());
+			attr.setValue(injectionValue);
+			attrs.add(attr);
 
-				ServiceAttributeMetaData attrKernel = new ServiceAttributeMetaData();
-				attrKernel.setName("Kernel");
-				ServiceInjectionValueMetaData injectionValueKernel = new ServiceInjectionValueMetaData(
-						KernelConstants.KERNEL_NAME);
-				attrKernel.setValue(injectionValueKernel);
-				attrs.add(attrKernel);
+			ServiceAttributeMetaData attrPR = new ServiceAttributeMetaData();
+			attrPR.setName("PolicyRegistration");
+			ServiceInjectionValueMetaData injectionValuePR = new ServiceInjectionValueMetaData(
+					deployment.getPolicyRegistrationName());
+			attrPR.setValue(injectionValuePR);
+			attrs.add(attrPR);
 
-				webModule.setAttributes(attrs);
+			ServiceAttributeMetaData attrKernel = new ServiceAttributeMetaData();
+			attrKernel.setName("Kernel");
+			ServiceInjectionValueMetaData injectionValueKernel = new ServiceInjectionValueMetaData(
+					KernelConstants.KERNEL_NAME);
+			attrKernel.setValue(injectionValueKernel);
+			attrs.add(attrKernel);
 
-				// Dependencies...Still have old jmx names here
-				Collection<String> depends = metaData.getDepends();
-				List<ServiceDependencyMetaData> dependencies = new ArrayList<ServiceDependencyMetaData>();
-				if (depends != null && depends.isEmpty() == false) {
-					if (log.isTraceEnabled())
-						log.trace(name + " has dependencies: " + depends);
+			webModule.setAttributes(attrs);
 
-					for (String iDependOn : depends) {
-						ServiceDependencyMetaData sdmd = new ServiceDependencyMetaData();
-						sdmd.setIDependOn(iDependOn);
-						dependencies.add(sdmd);
-					}
+			// Dependencies...Still have old jmx names here
+			Collection<String> depends = metaData.getDepends();
+			List<ServiceDependencyMetaData> dependencies = new ArrayList<ServiceDependencyMetaData>();
+			if (depends != null && depends.isEmpty() == false) {
+				if (log.isTraceEnabled())
+					log.trace(name + " has dependencies: " + depends);
+
+				for (String iDependOn : depends) {
+					ServiceDependencyMetaData sdmd = new ServiceDependencyMetaData();
+					sdmd.setIDependOn(iDependOn);
+					dependencies.add(sdmd);
 				}
-				webModule.setDependencies(dependencies);
-
-				// Here's where a bit of magic happens. By attaching the
-				// ServiceMetaData
-				// to the deployment, we now make the deployment "relevant" to
-				// deployers that use ServiceMetaData as an input (e.g. the
-				// org.jboss.system.deployers.ServiceDeployer). Those deployers
-				// can now take over deploying the web module.
-
-				unit.addAttachment("WarServiceMetaData", webModule,
-						ServiceMetaData.class);
-			} catch (Exception e) {
-				throw DeploymentException.rethrowAsDeploymentException(
-						"Error creating rar deployment " + unit.getName(), e);
 			}
-		} else {
-			super.deployWebModule(unit, metaData, deployment);
-		}
+			webModule.setDependencies(dependencies);
+
+			// Here's where a bit of magic happens. By attaching the
+			// ServiceMetaData
+			// to the deployment, we now make the deployment "relevant" to
+			// deployers that use ServiceMetaData as an input (e.g. the
+			// org.jboss.system.deployers.ServiceDeployer). Those deployers
+			// can now take over deploying the web module.
+
+			unit.addAttachment("WarServiceMetaData", webModule,
+					ServiceMetaData.class);
+		} catch (Exception e) {
+			throw DeploymentException.rethrowAsDeploymentException(
+					"Error creating rar deployment " + unit.getName(), e);
+		}		
 	}
 }
