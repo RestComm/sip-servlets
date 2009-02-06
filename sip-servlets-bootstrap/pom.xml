@@ -156,6 +156,7 @@
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/site/index.html" tofile="${project.build.directory}/site/products_sip_servlets.html" />
+										<delete file="${project.build.directory}/site/index.html"/>
 									</tasks>
 								</configuration>
 								<goals>
