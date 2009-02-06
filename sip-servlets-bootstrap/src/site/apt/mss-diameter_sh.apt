@@ -189,7 +189,9 @@ Diameter Sh OpenIMS Core Integration Service
 	
 ** Mobicents Sip Servlets
 
-	Since OpenIMS Core HSS component is deploying a management web application on port 8080, you'll need to modify the http connector port in Mobicents Sip Servlets to avoid any conflicts. So go edit <<<JBOSS_HOME/server/default/deploy/jboss-web.deployer/server.xml file.\
+	Since OpenIMS Core HSS component is deploying a management web application on port 8080, 
+	you'll need to modify the http connector port in Mobicents Sip Servlets to avoid any conflicts.\
+	So go edit <<<JBOSS_HOME/server/default/deploy/jboss-web.deployer/server.xml file.>>>\
 	Look for the connector tag whose the port is 8080 and change it to 8081 or any other value that makes sense for you.
 
 ** Example
@@ -215,7 +217,7 @@ Diameter Sh OpenIMS Core Integration Service
 		* <<<users>>> - The users to subscribe Profile notifications (separate by comma)
 
 	It is usually only needed to modify <<<origin.ip>>> to match to your own IP address. and <<<destination.ip>>> to match to the IP address where the HSS is installed (if you installed it on the same machine as Mobicents Sip Servlets the IP address for those properties will be the same)
-	
+	 
 	Then do a <<<mvn clean install>> and deploy the war to <<<JBOSS_HOME/server/default/deploy>>>.
 	
 	Get the corresponding {{{/diameteropenims-dar.properties}dar configuration file}}.\

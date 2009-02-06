@@ -21,18 +21,18 @@ Version 0.8 is out !
 	
 	Our latest release working on top of the following containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> and now on <JBoss AS 5.0.0.GA> provides new features : 
 	
-		* {{{installation-jboss-5.html}JBoss AS 5 support - Pure sip servlet applications and converged SIP/HTTP applications}} 
+		* {{{installation-jboss-5.html}JBoss AS 5 support (Technology preview)}} - Pure sip servlet applications and converged SIP/HTTP applications support 
 		
-		* {{{mss-ims-intergation.html}Mobicents Sip servlets can now act as SIP Application Server in an IMS network}}
+		* {{{mss-ims-integration.html}Mobicents Sip servlets can now act as SIP Application Server in an IMS network}}
 		
 		* {{{mss-diameter_sh.html}Diameter Sh support}}
 		
 		* Mobicents Sip Servlets Load Balancer now features seamless integration into {{{mss-jopr-lb-plugin.html}JOPR (JBoss Administration console)}}, the JBoss Enterprise management solution.
 		
-		* {{{http://www.mobicents.org/mss-seam.html}JBoss Seam Integration improved (Technology preview)}} (you can also see {{{http://vladimirralev.blogspot.com/2009/02/rich-telco-applications-with-seam.html}vlad's blog post}} about it) 
+		* {{{http://www.mobicents.org/mss-seam.html}JBoss Seam Integration back and improved with Media support (Technology preview)}} (you can also see {{{http://vladimirralev.blogspot.com/2009/02/rich-telco-applications-with-seam.html}vlad's blog post}} about it) 
 		
 		* Two new shinny examples : {{{http://www.mobicents.org/mss-ipbx.html}a JBoss Seam-based PBX in ALPHA1 version}} 
-		 and {{{mss-diameter_sh.html}a Diameter Sh service showing integration between Mobicents Sip Servlets acting as a SIP Application Server in OpenIMS Core, using the Diameter Sh interface to receive profile updates and SIP.}} 				
+		 and {{{mss-diameter_sh.html}a Diameter Sh service}} showing integration between Mobicents Sip Servlets acting as a SIP Application Server in OpenIMS Core, using the Diameter Sh interface to receive profile updates and SIP. 				
 		
 		* {{{./mss-congestion.html}More Congestion Control mechanisms}}
 		
@@ -57,7 +57,7 @@ Version 0.8 is out !
 	 
 	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=641930}Mobicents Sip Servlet 0.7 downloads}}
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=659154}Mobicents Sip Servlet 0.8 downloads}}
 					
 					
 Roadmap
