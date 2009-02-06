@@ -648,7 +648,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		originalTransaction = null;
 		outboundInterface = null;
 		sipSessionAttributeMap = null;
-		key = null;
+//		key = null;
 		sessionCreatingDialog = null;
 		sessionCreatingTransaction = null;
 		proxy = null;
