@@ -157,11 +157,17 @@ public void doLinkEvent(MsLinkEvent linkEvent) {}
 
 @Observer("modeHalfDuplex")
 public void doLinkEvent(MsLinkEvent linkEvent) {}
+
+// Notification events (for DTMF and others)
+
+@Observer("mediaEvent")
+public void doMediaEvent(MediaEvent mediaEvent) {}
+
 			</source>
 			<p>You can handle these events and relate them to a sip session simply by injecting the SipSession object and you can store or read state from there as shown in the example below. We are reusing the
 				MSC API objects with the excpetion of MediaEvent where the
-				notification message is wrapped and carries more inforrmation than
-				the original event structure. You can see the demo for more details.
+				notification message is wrapped and carries more information than
+				the original event structure. You can see the demo for more details. And generally the est way to learn it is by playing with the examples, where more useful utility classes have been developed (the media framework demo in particular)
 			</p>
 			<p>Here is an example conference application using the most
 				common functions:</p>
