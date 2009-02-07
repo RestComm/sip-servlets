@@ -38,14 +38,14 @@
 			<ul>
 			<li>Do <code>http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/</code></li>
 			
-			<li>Set your JBOSS_HOME to a location where Mobicents Sip Servlets 7.2 or later is installed. The simply run:</li>
+			<li>Set your JBOSS_HOME to a location where Mobicents Sip Servlets 7.2 or later is installed. Then simply run:</li>
 			</ul><br/><code>
 			ant clean all
 			</code><br/>
 		</section>	
 		<section name="Usage">
 			Once the PBX is installed and running navigate to <a href="http://localhost:8080/ipbx">http://localhost:8080/ipbx</a> and follow the instructions.
-			Please note that there is a known bug when you try to add a Phone from the GUI - the first operations succeeds, then secon two attempts will fail
+			Please note that there is a known bug when you try to add a Phone from the GUI - the very first operation succeeds, then second two attempts will fail
 			(and the GUI will ask you to try again), after that no problems are expected. We are working towards solving this and other annoying issues, mostly
 			 related to the Database. And any help in this or other aspects are welcome!
 		</section>	
