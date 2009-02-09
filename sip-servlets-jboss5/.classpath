@@ -149,7 +149,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/ws/native/jbossws-native-jaxrpc/3.0.4.GA/jbossws-native-jaxrpc-3.0.4.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/ws/native/jbossws-native-jaxws/3.0.4.SP1/jbossws-native-jaxws-3.0.4.SP1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/ws/native/jbossws-native-saaj/3.0.4.SP1/jbossws-native-saaj-3.0.4.SP1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.8-SNAPSHOT/sip-servlets-spec-1.1.8-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.9-SNAPSHOT/sip-servlets-spec-1.1.9-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.4.2/slf4j-api-1.4.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/oswego-concurrent/concurrent/1.3.4-jboss-update1/concurrent-1.3.4-jboss-update1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/qdox/qdox/1.6.1/qdox-1.6.1.jar"/>

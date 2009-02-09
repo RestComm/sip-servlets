@@ -21,3 +21,5 @@ Acknowledgements
 	* {{{mailto:haukex@zero-g.net}Hauke D\xE4mpfling}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=410}Issue 410}} and {{{http://code.google.com/p/mobicents/issues/detail?id=411}Issue 411}} and contributed fixes for them
 	
 	* Joel Soderstrom from {{{http://www.telmi.se/}Telmi Communication}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=481}Issue 481}} and contributed a fix for it.
+	
+	* Alexandre Sova from {{{http://www.codeminders.com}Codeminders}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=568}Issue 568}} and contributed a fix for it.
