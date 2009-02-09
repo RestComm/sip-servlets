@@ -42,7 +42,7 @@ Version 0.8 is out !
 		
 	Check the Roadmap to see {{{roadmap.html} the feature details and the usual round of bug fixes}} too.
 	
-	Checkout the {{{http://hudson.jboss.org/hudson/job/MobicentsDocumentation/lastSuccessfulBuild/artifact/html_single/index.html#chapter-Mobicents_SIP_Servlets_Server}shiny Mobicents Sip Servlets User Guide}}, courtesy of Douglas Silas Hensley.   
+	Checkout the {{{http://hudson.jboss.org/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html}shiny Mobicents Sip Servlets User Guide}}, courtesy of Douglas Silas Hensley.   
 	 
 	It is shipped with :		
 	
