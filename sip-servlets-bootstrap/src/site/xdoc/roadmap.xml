@@ -757,13 +757,7 @@
 			</subsection>
 			<subsection name="Planned Versions">																								
 				<subsection name="Version 0.9 - 04/01/2009">
-					<p>	
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=132">
-						Parlay X support
-						</a>
-						<br />				
+					<p>										
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=322">
@@ -775,12 +769,6 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=129">
 						Eclipse plugin
 						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=128">
-						Maven 2 sar plugin
-						</a>
 						<br />	
 						<img src="red.jpeg" />
 						<a
@@ -788,7 +776,7 @@
 						JRuby integration
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=522">
 						EAR Deployer integration for MSS on JBoss 5
@@ -808,13 +796,7 @@
 					</p>
 				</subsection>
 				<subsection name="Version 1.0 - 06/01/2008">
-					<p>		
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=131">
-						XMPP support
-						</a>
-						<br />
+					<p>							
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
@@ -851,6 +833,22 @@
 							</li>
 						</ul>
 					</p>
+				</subsection>
+				<subsection name="Post 1.0 - No defined date">
+					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=132">
+						Parlay X support
+						</a>
+						<br />		
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=131">
+						XMPP support
+						</a>
+						<br />
+					</p>		
 				</subsection>
 			</subsection>
 		</section>
