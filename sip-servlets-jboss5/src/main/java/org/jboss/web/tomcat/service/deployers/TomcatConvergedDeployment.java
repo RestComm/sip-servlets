@@ -28,12 +28,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.cert.Certificate;
+import java.util.Iterator;
 import java.util.zip.ZipFile;
 
 import javax.management.Attribute;
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
@@ -42,6 +44,9 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.deployers.spi.DeploymentException;
+import org.jboss.deployers.structure.spi.DeploymentUnit;
+import org.jboss.ejb3.EJBContainer;
+import org.jboss.ejb3.Ejb3Deployment;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -309,8 +314,9 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		SipJBossContextConfig.deploymentUnitLocal.set(unit);
 		try {
 			// Start it
-			context.start();
+			context.start();			
 			// Build the ENC
+			injectSipUtilitiesIntoEJBs(context, metaData);
 		} catch (Exception e) {
 			context.destroy();
 			DeploymentException.rethrowAsDeploymentException("URL " + warUrl
@@ -401,6 +407,74 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		 */
 
 		log.debug("Initialized: " + webApp + " " + objectName);
+	}
+
+	/**
+	 * If we are deploying a sip servlet application, 
+	 * check the deployment unit in which we are to check if there is any EJB JAR present. 
+	 * For each EJB Container present in the EJB-JAR, get the private JNDI context (comp/env),
+	 * create the sip servlets JNDI Tree (sip/<appname>/SipFactory & sip/'appname'/TimerService & sip/'appname'/SipSessionsUtil)  
+	 * and inject the SIP utilities (TimerService, SipFactory and SipSessionsUtil).
+	 * @param context the sip context from which the Sip Utilities will be fecthed
+	 * @param metaData the meta Data from which we get the application Name to create the JNDI tree
+	 */
+	private void injectSipUtilitiesIntoEJBs(StandardContext context, JBossWebMetaData metaData) {
+		if(context instanceof SipContext && metaData instanceof JBossConvergedSipMetaData) {				
+			JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) metaData;
+			SipContext sipContext = (SipContext) context;
+			
+			DeploymentUnit parent = unit.getTopLevel();
+			Iterator<DeploymentUnit> it = parent.getChildren()
+					.iterator();
+			while (it.hasNext()) {
+				DeploymentUnit deploymentUnit = (DeploymentUnit) it.next();
+				Ejb3Deployment ejbDeployment = (Ejb3Deployment) deploymentUnit
+						.getAttachment(Ejb3Deployment.class);
+				if(ejbDeployment != null) {
+					if(log.isInfoEnabled()) {
+						log.info("Ejb Jar in which to inject SipUtilities " + deploymentUnit.getName());
+					}
+					for(Object container : ejbDeployment.getEjbContainers().values()) {
+						EJBContainer ejbContainer = (EJBContainer) container;
+						if(log.isDebugEnabled()) {
+							log.debug("Ejb Container in which to inject SipUtilities " + ejbContainer);
+						}
+						try {
+							Context envCtx = (Context)ejbContainer.getEnc().lookup("env");
+							Context sipSubcontext = envCtx.createSubcontext(SIP_SUBCONTEXT);
+							Context applicationNameSubcontext = sipSubcontext.createSubcontext(convergedMetaData.getApplicationName());						
+							
+							SipFactoryFacade sipFactoryFacade = (SipFactoryFacade) sipContext.getSipFactoryFacade();
+							TimerService timerService = (TimerService) sipContext.getTimerService();
+							SipSessionsUtil sipSessionsUtil = (SipSessionsUtil) sipContext.getSipSessionsUtil();
+							
+							NonSerializableFactory.rebind(
+										applicationNameSubcontext,
+										SIP_FACTORY_JNDI_NAME,
+										sipFactoryFacade);
+							 
+							NonSerializableFactory
+									.rebind(
+											applicationNameSubcontext,
+											SIP_SESSIONS_UTIL_JNDI_NAME,
+											sipSessionsUtil);
+							NonSerializableFactory
+									.rebind(
+											applicationNameSubcontext,
+											TIMER_SERVICE_JNDI_NAME,
+											timerService);
+							if (log.isDebugEnabled()) {
+								log
+										.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
+												+ convergedMetaData.getApplicationName() + "/<ObjectName>");
+							}
+						} catch (NamingException e) {
+							log.error("Unexpected exception while trying to inject Sip Utilities into following EJB Container : " + ejbContainer, e);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public class ConvergedEncListener extends EncListener
