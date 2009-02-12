@@ -261,13 +261,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if (statusCode == Response.OK ) {
 					//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
 					if(!Request.REGISTER.equals(request.getMethod()) && !Request.OPTIONS.equals(request.getMethod())) { 
-					    // Add the contact header for the dialog.
-					    String transport = ((ViaHeader) request
-						    .getHeader(ViaHeader.NAME)).getTransport();					
+					    // Add the contact header for the dialog.					    
 					    ContactHeader contactHeader = JainSipUtils
-					    .createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
+					    .createContactHeader(super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
 					    if(logger.isDebugEnabled()) {
-					    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + transport);
+					    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + JainSipUtils.findTransport(request));
 					    }
 					    response.setHeader(contactHeader);
 				    }
@@ -557,13 +555,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#setRequestURI(javax.servlet.sip.URI)
+	 */
 	public void setRequestURI(URI uri) {
 		Request request = (Request) message;
 		URIImpl uriImpl = (URIImpl) uri;
 		javax.sip.address.URI wrappedUri = uriImpl.getURI();
 		request.setRequestURI(wrappedUri);
-
+		//TODO look through all contacts of the user and change them depending of if STUN is enabled
+		//and the request is aimed to the local network or outside
 	}
 
 	/*
@@ -788,7 +790,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    }
 		    		if(message.getHeader(ViaHeader.NAME) == null) {
 			    		ViaHeader viaHeader = JainSipUtils.createViaHeader(
-			    				sipFactoryImpl.getSipNetworkInterfaceManager(), transport, null);
+			    				sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
 			    		message.addHeader(viaHeader);
 			    	}
 		    	}		    			    	
@@ -838,7 +840,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 			}
-			getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
+			if(logger.isDebugEnabled()) {
+				getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
+			}
 			if (super.getTransaction() == null) {				
 
 				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
@@ -853,7 +857,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					// Create the contact name address.
 					contactHeader = 
-						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), transport, fromName);										
+						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), request, fromName);										
 					request.addHeader(contactHeader);
 				}
 				
@@ -996,7 +1000,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		Request request = (Request) super.message;
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
-				JainSipUtils.findTransport(request));
+				request);
 		sipURI.setLrParam();
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_DIRECTIVE, 
 				routingDirective.toString());
@@ -1021,7 +1025,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
         
         javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
                         sipFactoryImpl.getSipNetworkInterfaceManager(), 
-                        JainSipUtils.findTransport(request));
+                        request);
         sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
         
         sipURI.setLrParam();

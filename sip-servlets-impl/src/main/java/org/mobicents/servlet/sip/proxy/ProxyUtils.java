@@ -102,7 +102,6 @@ public class ProxyUtils {
 				mf.setMaxForwards(mf.getMaxForwards() - 1);
 			}
 
-			String transport = JainSipUtils.findTransport(clonedRequest);			
 			if (clonedRequest.getMethod().equals(Request.CANCEL)) {				
 				// Cancel is hop by hop so remove all other via headers.
 				clonedRequest.removeHeader(ViaHeader.NAME);				
@@ -111,7 +110,7 @@ public class ProxyUtils {
 			ViaHeader viaHeader = null;
 			if(proxy.getOutboundInterface() == null) { 
 				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipNetworkInterfaceManager(), transport, Utils.generateBranchId());
+						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, Utils.generateBranchId());
 			} else { 
 				//If outbound interface is specified use it
 				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
@@ -132,7 +131,7 @@ public class ProxyUtils {
 			if(params.routeRecord != null && !Request.REGISTER.equalsIgnoreCase(originalRequest.getMethod())) {
 				javax.sip.address.SipURI rrURI = null;
 				if(proxy.getOutboundInterface() == null) {
-					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
+					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest);
 				} else {
 					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();
 				}
@@ -162,7 +161,7 @@ public class ProxyUtils {
 			// Add path header
 			if(params.path != null && Request.REGISTER.equalsIgnoreCase(originalRequest.getMethod()))
 			{
-				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), transport);
+				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest);
 
 				Iterator<String> paramNames = params.path.getParameterNames();
 				

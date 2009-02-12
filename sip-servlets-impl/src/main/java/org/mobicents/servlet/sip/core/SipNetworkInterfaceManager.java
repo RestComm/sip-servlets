@@ -24,11 +24,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.servlet.sip.SipURI;
 import javax.sip.ListeningPoint;
+import javax.sip.address.URI;
+import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
+import javax.sip.message.Message;
+import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,18 +70,25 @@ public class SipNetworkInterfaceManager {
     
 	List<ExtendedListeningPoint> extendedListeningPointList = null;
 	List<SipURI> outboundInterfaces = null;
+	//related to google code issue 563, will be used to check if a request is aimed at a local network or outside
+	Set<String> outboundInterfacesIpAddresses = null;
+	//use only to lookup the hosts for issue 563, need to find a better way and reduce coupling
+	private SipApplicationDispatcher sipApplicationDispatcher;
 	
 	//those maps are present to improve the performance of finding a listening point either from a transport
 	// or from a triplet ipaddress, port and transport
 	Map<String, List<ExtendedListeningPoint>> transportMappingCacheMap = null;	
 	Map<String, ExtendedListeningPoint> extendedListeningPointsCacheMap = null;
 	
+	
 	/**
 	 * Default Constructor
 	 */
-	public SipNetworkInterfaceManager() {
+	public SipNetworkInterfaceManager(SipApplicationDispatcher sipApplicationDispatcher) {
+		this.sipApplicationDispatcher = sipApplicationDispatcher;
 		extendedListeningPointList = new CopyOnWriteArrayList<ExtendedListeningPoint>();
 		outboundInterfaces = new CopyOnWriteArrayList<SipURI>();
+		outboundInterfacesIpAddresses = new CopyOnWriteArraySet<String>();
 		
 		// creating and populating the transport cache map with transports
 		transportMappingCacheMap = new HashMap<String, List<ExtendedListeningPoint>>();
@@ -83,7 +97,7 @@ public class SipNetworkInterfaceManager {
 		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
 		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
 		// creating the ipaddress/port/transport cache map
-		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();
+		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();		
 	}
 	
 	/**
@@ -245,6 +259,7 @@ public class SipNetworkInterfaceManager {
 			logger.debug("Outbound Interface List : ");
 		}
 		List<SipURI> newlyComputedOutboundInterfaces = new CopyOnWriteArrayList<SipURI>();
+		Set<String> newlyComputedOutboundInterfacesIpAddresses = new CopyOnWriteArraySet<String>();
 		Iterator<ExtendedListeningPoint> it = getExtendedListeningPoints();
 		while (it.hasNext()) {
 			ExtendedListeningPoint extendedListeningPoint = it
@@ -252,6 +267,7 @@ public class SipNetworkInterfaceManager {
 									
 			for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
 				try {
+					newlyComputedOutboundInterfacesIpAddresses.add(ipAddress);
 					javax.sip.address.SipURI jainSipURI = SipFactories.addressFactory.createSipURI(
 							null, ipAddress);
 					jainSipURI.setPort(extendedListeningPoint.getPort());
@@ -272,5 +288,44 @@ public class SipNetworkInterfaceManager {
 		synchronized (outboundInterfaces) {
 			outboundInterfaces  = newlyComputedOutboundInterfaces;
 		}
+		synchronized (outboundInterfacesIpAddresses) {
+			outboundInterfacesIpAddresses  = newlyComputedOutboundInterfacesIpAddresses;
+		}
+	}
+	
+	public boolean findUsePublicAddress(Message message) {
+		boolean usePublicAddress = true;
+		String host = null;		
+		if(message instanceof Request) {
+			// Get the first route header (it will be used before the request uri for request routing as per RFC3261)
+			// or the request uri if it is null 
+			Request request = (Request) message;
+			RouteHeader routeHeader = (RouteHeader) request.getHeader(RouteHeader.NAME);
+			URI uri = null;
+			if(routeHeader != null) {
+				uri = routeHeader.getAddress().getURI();
+			} else {
+				uri = request.getRequestURI();
+			}
+			if(uri instanceof javax.sip.address.SipURI) {
+				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+				host = sipUri.getHost();
+			}			
+		} else {		
+			// Get the first via header (it will be used for response routing as per RFC3261)
+			ViaHeader topmostViaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			if(topmostViaHeader != null) {
+				host = topmostViaHeader.getHost();
+			}
+		}
+		// check if it the host is part of the local network or outside
+		if(host != null && (sipApplicationDispatcher.findHostNames().contains(host) || 
+				outboundInterfacesIpAddresses.contains(host))) {
+			usePublicAddress = false;
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("STUN enabled : use public adress " + usePublicAddress + " for following host " + host);
+		}
+		return usePublicAddress;
 	}
 }

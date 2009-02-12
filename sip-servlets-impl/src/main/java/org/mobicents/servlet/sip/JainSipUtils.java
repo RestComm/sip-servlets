@@ -24,6 +24,7 @@ import javax.sip.ListeningPoint;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Message;
 import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
@@ -112,11 +113,13 @@ public class JainSipUtils {
 	 * @return
 	 */
 	public static ViaHeader createViaHeader(
-			SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport, String branch) {
-		
+			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch) {
+		String transport = findTransport(request);
 		ExtendedListeningPoint listeningPoint = 
 			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
-		return listeningPoint.createViaHeader(branch);		
+		boolean usePublicAddress = findUsePublicAddress(
+				sipNetworkInterfaceManager, request, listeningPoint);
+		return listeningPoint.createViaHeader(branch, usePublicAddress);		
     }
 	 
 	/**
@@ -125,11 +128,13 @@ public class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport, String displayName) {
-		
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName) {
+		String transport = findTransport(request);
 		ExtendedListeningPoint listeningPoint = 
-			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);						
-		return listeningPoint.createContactHeader(displayName);
+			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		boolean usePublicAddress = findUsePublicAddress(
+				sipNetworkInterfaceManager, request, listeningPoint);
+		return listeningPoint.createContactHeader(displayName, usePublicAddress);
 	}
 
 	/**
@@ -138,43 +143,71 @@ public class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, String transport) {		
-		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);							
-		return listeningPoint.createRecordRouteURI();
+	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, Message message) {
+		String transport = findTransport(message);		
+		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		boolean usePublicAddress = findUsePublicAddress(
+				sipNetworkInterfaceManager, message, listeningPoint);
+		return listeningPoint.createRecordRouteURI(usePublicAddress);
 	}
-	
+
+	/**
+	 * 
+	 * @param sipNetworkInterfaceManager
+	 * @param request
+	 * @param listeningPoint
+	 * @return
+	 */
+	public static boolean findUsePublicAddress(
+			SipNetworkInterfaceManager sipNetworkInterfaceManager,
+			Message message, ExtendedListeningPoint listeningPoint) {
+		boolean usePublicAddress = false;
+		if(listeningPoint.getGlobalIpAddress() != null) {
+			usePublicAddress = sipNetworkInterfaceManager.findUsePublicAddress(message);
+		}
+		return usePublicAddress;
+	}
+
 	/**
 	 * 
 	 * @param request
 	 * @return
 	 */
-	public static String findTransport(Request request) {
-		String transport = ListeningPoint.UDP;
+	public static String findTransport(Message message) {
+		String transport = null;
 
-		if(request.getRequestURI() instanceof SipURI) {
-			String transportParam = ((javax.sip.address.SipURI) request
-				.getRequestURI()).getTransportParam();
-			
-			if (transportParam != null
-					&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
-				transport = ListeningPoint.TLS;
-			}
-			//Fix by Filip Olsson for Issue 112
-			else if ((transportParam != null
-				&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
-				request.getContentLength().getContentLength() > 4096) {
-				transport = ListeningPoint.TCP;
-			}
+		if(message == null) {
+			transport = ListeningPoint.UDP;
+			return transport;
 		}
 		//if the request uri doesn't have any param, the request can still be on TCP so we check the topmost via header
-		ViaHeader topmostViaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+		ViaHeader topmostViaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 		if(topmostViaHeader != null) {
 			String viaTransport = topmostViaHeader.getTransport();
 			if(viaTransport != null && viaTransport.length() > 0) {
 				transport = viaTransport;
 			}
 		}
-		 
+		if(transport == null && message instanceof Request) {
+			transport = ListeningPoint.UDP;
+			Request request = (Request)message;
+
+			if(request.getRequestURI() instanceof SipURI) {
+				String transportParam = ((javax.sip.address.SipURI) request
+					.getRequestURI()).getTransportParam();
+				
+				if (transportParam != null
+						&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
+					transport = ListeningPoint.TLS;
+				}
+				//Fix by Filip Olsson for Issue 112
+				else if ((transportParam != null
+					&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+					request.getContentLength().getContentLength() > 4096) {
+					transport = ListeningPoint.TCP;
+				}
+			}
+		}
 		return transport;
 	}
 	

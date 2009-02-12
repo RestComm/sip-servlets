@@ -50,11 +50,12 @@ public class ExtendedListeningPoint {
 	// the sip provider attached to 
 	private SipProvider sipProvider;
 	private String globalIpAddress;
+	String mostOutboundAddress = null;
 	private int globalPort;
 	private List<String> ipAddresses;
 	private boolean isAnyLocalAddress;
 	
-	String host = null;
+//	String host = null;
 	int port = -1;
 	String transport;
 
@@ -92,33 +93,34 @@ public class ExtendedListeningPoint {
 			ipAddresses.add(listeningPoint.getIPAddress());
 		}		 
 		
-		initializeHostPortTransport();
+		mostOutboundAddress = JainSipUtils.getMostOutboundAddress(ipAddresses);
+		transport = listeningPoint.getTransport();
+		port = listeningPoint.getPort();
 	}
 
 	/**
 	 *
 	 */
-	private void initializeHostPortTransport() {
-		// Making use of the global ip address discovered by STUN if it is present
-		if(globalIpAddress != null) {
-			host = globalIpAddress;
-//			port = listeningPoint.getGlobalPort();
-			port = listeningPoint.getPort();
+	protected String getIpAddress(boolean usePublicAddress) {
+		// Making use of the global ip address discovered by STUN if it is present		
+		if(usePublicAddress && globalIpAddress != null) {
+			return globalIpAddress;
 		} else {
-			host = JainSipUtils.getMostOutboundAddress(ipAddresses);
-			port = listeningPoint.getPort();
+			return mostOutboundAddress;
 		}
-		transport = listeningPoint.getTransport();
+		
 	}
 
 	/**
-	 * 
-	 * @param sipNetworkInterfaceManager
-	 * @param transport
-	 * @return
+	 * Create a Contact Header based on the host, port and transport of this listening point 
+	 * @param usePublicAddress if true, the host will be the global ip address found by STUN otherwise
+	 *  it will be the local network interface ipaddress
+	 * @param displayName the display name to use
+	 * @return the Contact header 
 	 */
-	public ContactHeader createContactHeader(String displayName) {
+	public ContactHeader createContactHeader(String displayName, boolean usePublicAddress) {
 		try {
+			String host = getIpAddress(usePublicAddress);
 			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
 			sipURI.setHost(host);
 			sipURI.setPort(port);			
@@ -138,16 +140,16 @@ public class ExtendedListeningPoint {
 	}
 
 	/**
-	 * 
-	 * @param sipNetworkInterfaceManager
-	 * @param transport
-	 * @param branch
-	 * @return
+	 * Create a Via Header based on the host, port and transport of this listening point 
+	 * @param usePublicAddress if true, the host will be the global ip address found by STUN otherwise
+	 *  it will be the local network interface ipaddress
+	 * @param branch the branch id to use
+	 * @return the via header 
 	 */
-	public ViaHeader createViaHeader(String branch) {
+	public ViaHeader createViaHeader(String branch, boolean usePublicAddress) {
         try {
+        	String host = getIpAddress(usePublicAddress);
             ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, branch);
-            
             return via;
         } catch (ParseException ex) {
         	logger.error ("Unexpected error while creating a via header",ex);
@@ -159,13 +161,14 @@ public class ExtendedListeningPoint {
     }
 	
 	/**
-	 * 
-	 * @param sipProviders
-	 * @param transport
-	 * @return
+	 * Create a Record Route URI based on the host, port and transport of this listening point 
+	 * @param usePublicAddress if true, the host will be the global ip address found by STUN otherwise
+	 *  it will be the local network interface ipaddress
+	 * @return the record route uri
 	 */
-	public javax.sip.address.SipURI createRecordRouteURI() {		
+	public javax.sip.address.SipURI createRecordRouteURI(boolean usePublicAddress) {		
 		try {			
+			String host = getIpAddress(usePublicAddress);
 			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
 			sipUri.setTransportParam(transport);
@@ -218,8 +221,7 @@ public class ExtendedListeningPoint {
 	 * @param globalIpAddress the global ip address of this listening point
 	 */
 	public void setGlobalIpAddress(String globalIpAddress) {
-		this.globalIpAddress = globalIpAddress;
-		initializeHostPortTransport();
+		this.globalIpAddress = globalIpAddress;		
 	}
 	
 	/**
@@ -264,7 +266,15 @@ public class ExtendedListeningPoint {
 		return ipAddresses;
 	}
 	
-	public String getHost(){
+	/**
+	 * Retrieve either the global ip address found by STUN or the local network interface one
+	 * depending on the boolean value in parameter
+	 * @param true means we want to retrieve the global ip address found by STUN 
+	 * @return Retrieve either the global ip address found by STUN or the local network interface one
+	 * depending on the boolean value in parameter
+	 */
+	public String getHost(boolean usePublicAddress){
+		String host = getIpAddress(usePublicAddress);
 		return host;
 	}
 	

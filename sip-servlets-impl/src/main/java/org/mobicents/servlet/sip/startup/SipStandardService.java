@@ -60,7 +60,7 @@ public class SipStandardService extends StandardService implements SipService {
 	protected SipApplicationDispatcher sipApplicationDispatcher;
 	protected int sipMessageQueueSize = 1500;
 	protected int memoryThreshold = 90;
-	private long congestionControlCheckingInterval = 30000;
+	protected long congestionControlCheckingInterval = 30000;
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();

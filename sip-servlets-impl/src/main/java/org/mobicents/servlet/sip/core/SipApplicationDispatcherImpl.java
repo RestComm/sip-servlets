@@ -191,7 +191,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		sipFactoryImpl = new SipFactoryImpl(this);
 		hostNames = new CopyOnWriteArraySet<String>();
-		sipNetworkInterfaceManager = new SipNetworkInterfaceManager();
+		sipNetworkInterfaceManager = new SipNetworkInterfaceManager(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 	}
@@ -265,7 +265,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			started = Boolean.TRUE;
 		}
 		congestionControlTimerTask = new CongestionControlTimerTask();
-		congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
+				congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+		 	if(logger.isInfoEnabled()) {
+		 		logger.info("Congestion control background task started and checking every " + congestionControlCheckingInterval + " milliseconds.");
+		 	}
+		} else {
+			if(logger.isInfoEnabled()) {
+		 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
+		 	}
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("Sip Application Dispatcher started");
 		}
@@ -529,7 +538,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(ar.getApplicationName() != null) {
 					javax.sip.address.SipURI localUri = JainSipUtils.createRecordRouteURI(
 							sipFactoryImpl.getSipNetworkInterfaceManager(), 
-							JainSipUtils.findTransport(request));
+							request);
 					if(arText != null) {
 						localUri.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, ar.getApplicationName());
 						if(ar.getAppGeneratedApplicationSessionId() != null && ar.getAppGeneratedApplicationSessionId().length() > 1) {
@@ -1211,10 +1220,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setCongestionControlCheckingInterval(
 			long congestionControlCheckingInterval) {
 		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
-		if(congestionControlTimerFuture != null) {
-			congestionControlTimerFuture.cancel(false);
+		if(started) {
+			if(congestionControlTimerFuture != null) {
+				congestionControlTimerFuture.cancel(false);
+			}
 			if(congestionControlCheckingInterval > 0) {
 				congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+				if(logger.isInfoEnabled()) {
+			 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
+			 	}
+			} else {
+				if(logger.isInfoEnabled()) {
+			 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
+			 	}
 			}
 		}
 	}

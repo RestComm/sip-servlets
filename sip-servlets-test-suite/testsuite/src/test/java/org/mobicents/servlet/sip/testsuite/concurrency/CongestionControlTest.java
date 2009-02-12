@@ -78,6 +78,7 @@ public class CongestionControlTest extends SipServletTestCase {
 	}
 	
 	public void testCongestedQueueErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
 		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(5);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -104,6 +105,7 @@ public class CongestionControlTest extends SipServletTestCase {
 	}
 	
 	public void testCongestedQueueDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
 		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(5);
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.DropMessage);
 		String fromName = "sender";
@@ -131,7 +133,8 @@ public class CongestionControlTest extends SipServletTestCase {
 	}
 	
 	public void testMemoryCongestedErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
-		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(5);
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(2);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -157,6 +160,7 @@ public class CongestionControlTest extends SipServletTestCase {
 	}
 	
 	public void testMemoryCongestedDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
 		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(5);
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.DropMessage);
 		String fromName = "sender";

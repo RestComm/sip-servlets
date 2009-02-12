@@ -74,7 +74,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		//Add via header
 		String transport = JainSipUtils.findTransport(clonedRequest);		
 		ViaHeader viaHeader = JainSipUtils.createViaHeader(
-				sipNetworkInterfaceManager, transport, null);
+				sipNetworkInterfaceManager, clonedRequest, null);
 		MobicentsSipSession session = sipServletRequest.getSipSession();
 		
 		if(session != null) {			

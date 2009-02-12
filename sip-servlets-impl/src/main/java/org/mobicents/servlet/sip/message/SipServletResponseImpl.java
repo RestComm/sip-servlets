@@ -405,18 +405,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			//if this is a final response
 			if(response.getStatusCode() >= Response.TRYING && 
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE && (session.getProxy() ==null || (session.getProxy()!=null && session.getProxy().getFinalBranchForSubsequentRequests() == null))) {
-				//Issue 112 fix by folsson: use the viaheader transport
-				String transport = null;
-				ViaHeader viaHeader = ((ViaHeader) originalRequest.getMessage().getHeader(ViaHeader.NAME));
-				if(viaHeader != null) {
-					transport = viaHeader.getTransport();
-				}
-				if(transport == null || transport.length() <1) {
-					transport = JainSipUtils.findTransport((Request)originalRequest.getMessage());
-				}			     
+				//Issue 112 fix by folsson: use the viaheader transport				
 				javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
-						transport
+						response
 						);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
 				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");

@@ -479,7 +479,7 @@ public class SipFactoryImpl implements Serializable {
 					}
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 				} else {
-					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), transport, fromName);
+					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), requestToWrap, fromName);
 				}
 			}
 			// Add all headers		
@@ -655,7 +655,7 @@ public class SipFactoryImpl implements Serializable {
 			ExtendedListeningPoint listeningPoint = 
 				getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
 			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
-					listeningPoint.getHost());
+					listeningPoint.getHost(JainSipUtils.findUsePublicAddress(getSipNetworkInterfaceManager(), request, listeningPoint)));
 			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
 					"" + listeningPoint.getPort());
 			javax.sip.address.Address routeAddress = 
