@@ -7,21 +7,24 @@ Mobicents Sip Servlets Congestion Control
 	
 	Mobicents Sip Servlets currently defines 2 different congestion control mechanisms : 
 	
-	*	One based on the number of pending messages present in the queues.
-		Indeed, the messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released, see {{{./concurrency.html}Concurrency}}.\ 
-		If this queue gets full the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen. 
+		*	One based on the number of pending messages present in the queues.
+			Indeed, the messages that can not be processed immediately will go in a queue to wait for a free thread or to wait for the lock on their sessions to be released, see {{{./concurrency.html}Concurrency}}.\ 
+			If this queue gets full the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen. 
 	
-	*	The other based upon the percentage of memory currently used by the container. If the memory used goes over a configurable threshold (90% per default), the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen.
+		*	The other based upon the percentage of memory currently used by the container. If the memory used goes over a configurable threshold (90% per default), the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen.
 
 			
-	A background task is running at regular intervals within Mobicents Sip Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration (through the congestionControlCheckingInterval attribute in the server.xml, see below) or at run time (through the various management interfaces available, see below).
+	A background task is running at regular intervals within Mobicents Sip Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration (through the congestionControlCheckingInterval attribute in the server.xml, see below) or at run time (through the various management interfaces available, see below).\
+	This background task can be stopped and congestion control deactivated by setting the interval to 0 or a negative value.\
+	
+	
 	Also the congestion control policy, what to do with an incoming message when the server is overloaded, is configurable and the possible values are : 
 	
 	
 	
-	* DropMessage - drop any incoming message
+		* DropMessage - drop any incoming message
 	
-	* ErrorResponse - send a 503 - Service Unavailable response to any incoming request (Default).
+		* ErrorResponse - send a 503 - Service Unavailable response to any incoming request (Default).
 
 * Configuration
 

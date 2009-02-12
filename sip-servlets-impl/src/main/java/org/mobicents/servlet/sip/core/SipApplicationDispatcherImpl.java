@@ -1213,7 +1213,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
 		if(congestionControlTimerFuture != null) {
 			congestionControlTimerFuture.cancel(false);
-			congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+			if(congestionControlCheckingInterval > 0) {
+				congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+			}
 		}
 	}
 
