@@ -829,7 +829,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isFinalResponseReceived());
+		assertTrue(sender.isErrorResponseReceived());
 	}
 
 	private String getTomcatBackupHomePath() throws IOException {
@@ -882,22 +882,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	private NodeRegisterImpl prepareRegister() throws Exception {
 		reg=new NodeRegisterImpl(balancerAddress);
-		
-		MBeanServer server=ManagementFactory.getPlatformMBeanServer();
-		ObjectName on=new ObjectName("mobicents:name=Balancer,type=sip");
-		
-		if(server.isRegistered(on)) {
-			server.unregisterMBean(on);
-		}
-		server.registerMBean(reg, on);
-		
 		return reg;
 	}
 	
 	private void undoRegister(NodeRegisterImpl reg) throws Exception {
-		MBeanServer server=ManagementFactory.getPlatformMBeanServer();
-		ObjectName on = new ObjectName("mobicents:name=Balancer,type=sip");
-		server.unregisterMBean(on);
 		reg.stopRegistry();
 	}
 
@@ -906,8 +894,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	public void tearDown() throws Exception {
 		logger.info("Stopping BasicFailoverTest");
 		Thread.sleep(5000);
-		fwd.stop();
-		fwd = null;
+		if(fwd != null) {
+			fwd.stop();
+			fwd = null;
+		}
 		undoRegister(reg);
 		reg =null;
 		if(senderProtocolObjects != null) {

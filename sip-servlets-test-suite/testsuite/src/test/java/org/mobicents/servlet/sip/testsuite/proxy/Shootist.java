@@ -419,17 +419,18 @@ public class Shootist implements SipListener {
 
 			// Create a new CallId header
 			CallIdHeader callIdHeader = sipProvider.getNewCallId();
-
-			// Create a new Cseq header
-			CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(1L,
-					requestMethod);
-
+			
 			// Create a new MaxForwardsHeader
 			MaxForwardsHeader maxForwards = headerFactory
 					.createMaxForwardsHeader(70);
 
 			// Create the request.
 			if(requestMethod == null) requestMethod = Request.INVITE;
+			
+			// Create a new Cseq header
+			CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(1L,
+					requestMethod);
+
 			Request request = messageFactory.createRequest(requestURI,
 					requestMethod, callIdHeader, cSeqHeader, fromHeader,
 					toHeader, viaHeaders, maxForwards);
