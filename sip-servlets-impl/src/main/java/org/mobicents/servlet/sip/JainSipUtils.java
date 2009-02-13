@@ -82,11 +82,16 @@ public class JainSipUtils {
     }
 	
 	// RFC 1918 address spaces
-	private static int getAddressOutboundness(String address) {
+	public static int getAddressOutboundness(String address) {
 		if(address.startsWith("127.0")) return 0;
 		if(address.startsWith("192.168")) return 1;
 		if(address.startsWith("10.")) return 2;
-		if(address.startsWith("172.")) return 3;
+		if(address.startsWith("172.16") || address.startsWith("172.17") || address.startsWith("172.18") 
+				|| address.startsWith("172.19") || address.startsWith("172.20") || address.startsWith("172.21") 
+				|| address.startsWith("172.22") || address.startsWith("172.23") || address.startsWith("172.24")
+				|| address.startsWith("172.25") || address.startsWith("172.26") || address.startsWith("172.27")
+				|| address.startsWith("172.28") || address.startsWith("172.29") || address.startsWith("172.30")
+				|| address.startsWith("172.31")) return 3;
 		if(address.indexOf(".")>0) return 4; // match IPv4 addresses heuristically
 		return -1; // matches IPv6 or something malformed;
 	}

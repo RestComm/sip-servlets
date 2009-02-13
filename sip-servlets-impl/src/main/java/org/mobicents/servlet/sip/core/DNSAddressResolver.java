@@ -35,7 +35,7 @@ public class DNSAddressResolver implements AddressResolver {
 	//the sip factory implementation to be able
 	SipApplicationDispatcher sipApplicationDispatcher;
 	
-	ConcurrentHashMap<String, Map<String, String>> cachedLookup = null;
+	static ConcurrentHashMap<String, Map<String, String>> cachedLookup = new ConcurrentHashMap<String, Map<String, String>>();
 	
 	/**
 	 * @param sipApplicationDispatcherImpl
@@ -43,7 +43,6 @@ public class DNSAddressResolver implements AddressResolver {
 	public DNSAddressResolver(
 			SipApplicationDispatcher sipApplicationDispatcher) {		
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
-		cachedLookup = new ConcurrentHashMap<String, Map<String, String>>();
 	}
 
 	/*
@@ -96,7 +95,7 @@ public class DNSAddressResolver implements AddressResolver {
 	 * @param transport the transport
 	 * @return
 	 */
-	protected Hop resolveHostByDnsSrvLookup(Hop hop) {
+	public static Hop resolveHostByDnsSrvLookup(Hop hop) {
 		String host = hop.getHost();
 		String transport = hop.getTransport();
 		if(transport==null) {
@@ -164,7 +163,7 @@ public class DNSAddressResolver implements AddressResolver {
 				
 	}
 
-	private Map<String, String> foundCachedEntry(String host, String transport, Record[] records) {
+	public static Map<String, String> foundCachedEntry(String host, String transport, Record[] records) {
 		Map<String, String> entry = cachedLookup.get(host+transport);
 		if(entry == null) {
 			return null;

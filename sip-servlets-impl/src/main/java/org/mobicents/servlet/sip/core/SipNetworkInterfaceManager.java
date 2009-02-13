@@ -31,6 +31,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.servlet.sip.SipURI;
 import javax.sip.ListeningPoint;
+import javax.sip.address.Hop;
 import javax.sip.address.URI;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
@@ -39,6 +40,7 @@ import javax.sip.message.Request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.utils.Inet6Util;
@@ -293,9 +295,11 @@ public class SipNetworkInterfaceManager {
 		}
 	}
 	
-	public boolean findUsePublicAddress(Message message) {
+	public static boolean findUsePublicAddress(Message message) {
+		// TODO add a caching mechanism to increase perf
 		boolean usePublicAddress = true;
 		String host = null;		
+		String transport = JainSipUtils.findTransport(message);
 		if(message instanceof Request) {
 			// Get the first route header (it will be used before the request uri for request routing as per RFC3261)
 			// or the request uri if it is null 
@@ -318,14 +322,50 @@ public class SipNetworkInterfaceManager {
 				host = topmostViaHeader.getHost();
 			}
 		}
-		// check if it the host is part of the local network or outside
-		if(host != null && (sipApplicationDispatcher.findHostNames().contains(host) || 
-				outboundInterfacesIpAddresses.contains(host))) {
-			usePublicAddress = false;
+		// check if it the host is part of a private network as defined per RFC 1918 (see http://en.wikipedia.org/wiki/Private_network)
+		if(host != null) {
+			if(Inet6Util.isValidIP6Address(host)) {
+				usePublicAddress = false;
+				if(logger.isDebugEnabled()) {
+					logger.debug("host " + host + " is a numeric IPV6 address, " +
+							"no DNS SRV lookup to be done and no need for STUN");
+				}
+			} else if(Inet6Util.isValidIPV4Address(host)) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("host " + host + " is a numeric IPV4 address, " +
+							"no DNS SRV lookup to be done");
+				}
+				usePublicAddress = !isIPAddressPartOfPrivateNetwork(host);
+			} else {
+				logger.debug("host " + host + " is a hostname, " +
+					"doing DNS SRV lookup");
+				//hostname  : DNS lookup to do
+				Hop hop = new HopImpl(host, -1, transport);
+				Hop lookedupHop = DNSAddressResolver.resolveHostByDnsSrvLookup(hop);
+				if(!hop.equals(lookedupHop)) {
+					usePublicAddress = !isIPAddressPartOfPrivateNetwork(lookedupHop.getHost());
+				}
+			}
 		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("STUN enabled : use public adress " + usePublicAddress + " for following host " + host);
 		}
 		return usePublicAddress;
+	}
+	
+	public static boolean isIPAddressPartOfPrivateNetwork(String ipAddress) {
+		int addressOutboundness = JainSipUtils.getAddressOutboundness(ipAddress);
+		// check if it part of a private network
+		if(addressOutboundness < 4) {			
+			if(logger.isDebugEnabled()) {
+				logger.debug("host " + ipAddress + " is part of a private network we will not use the public address resolved by STUN");
+			}
+			return true;
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("host " + ipAddress + " is not part of a private network we will use the public address resolved by STUN");
+			}
+			return false;
+		}
 	}
 }
