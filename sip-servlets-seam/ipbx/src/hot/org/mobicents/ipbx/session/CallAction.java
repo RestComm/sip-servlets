@@ -47,7 +47,9 @@ public class CallAction {
 	@In EntityManager sipEntityManager;
 	
 	public void call(final CallParticipant fromParticipant, final CallParticipant toParticipant) {
-		final String fromUri = getAuthUri(fromParticipant);
+		String fromUriTmp = getAuthUri(toParticipant);
+		if(fromUriTmp == null) fromUriTmp = fromParticipant.getUri();
+		final String fromUri = fromUriTmp;
 		final String toUri = toParticipant.getUri();
 		//ServletContext ctx = (ServletContext) javax.faces.context.FacesContext
 		//	.getCurrentInstance().getExternalContext().getContext();
@@ -101,7 +103,7 @@ public class CallAction {
 	private String getAuthUri(CallParticipant cp) {
 		PstnGatewayAccount account = cp.getPstnGatewayAccount();
 		
-		if(account == null) return cp.getUri();
+		if(account == null) return null;
 		
 		String uri = "sip:" + account.getUsername() + "@" + account.getHostname();
 		return uri;
