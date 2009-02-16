@@ -1,0 +1,7 @@
+package ___MAIN_SERVLET_PACKAGE___;
+
+import javax.servlet.sip.SipServlet;
+
+public class ___MAIN_SERVLET_CLASSNAME___ extends SipServlet {
+
+}
