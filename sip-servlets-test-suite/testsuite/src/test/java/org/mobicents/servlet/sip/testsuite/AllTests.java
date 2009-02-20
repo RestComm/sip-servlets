@@ -53,6 +53,7 @@ import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
 import org.mobicents.servlet.sip.testsuite.replaces.ReplacesSipServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.SameContainerRoutingServletTest;
+import org.mobicents.servlet.sip.testsuite.security.CallForwardingB2BUAAuthTest;
 import org.mobicents.servlet.sip.testsuite.security.PAssertedIdentityAuthTest;
 import org.mobicents.servlet.sip.testsuite.security.ShootistSipServletAuthTest;
 import org.mobicents.servlet.sip.testsuite.security.ShootmeSipServletAuthTest;
@@ -91,6 +92,7 @@ public class AllTests {
 		suite.addTestSuite(CallForwardingJunitTest.class);
 		suite.addTestSuite(CallForwardingSipUnitTest.class);
 		suite.addTestSuite(CallForwardingB2BUAJunitTest.class);
+		suite.addTestSuite(CallForwardingB2BUAAuthTest.class);
 		suite.addTestSuite(CallControllerSipUnitTest.class);
 		suite.addTestSuite(CallControllerJunitTest.class);
 		suite.addTestSuite(CallControllerCancelTest.class);

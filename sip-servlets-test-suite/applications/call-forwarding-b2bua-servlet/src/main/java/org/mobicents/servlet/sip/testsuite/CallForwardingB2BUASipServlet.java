@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
@@ -166,10 +167,31 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				+ sipServletResponse.getReasonPhrase());		
 						
 		//create and sends the error response for the first call leg
-		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
-		responseToOriginalRequest.send();		
+		if(sipServletResponse.getStatus() == SipServletResponse.SC_UNAUTHORIZED || 
+				sipServletResponse.getStatus() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
+		
+			// Avoid re-sending if the auth repeatedly fails.
+			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
+			{
+				getServletContext().setAttribute("FirstResponseRecieved", "true");
+				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+						SIP_FACTORY);
+				AuthInfo authInfo = sipFactory.createAuthInfo();				
+				authInfo.addAuthInfo(sipServletResponse.getStatus(), "sip-servlets-realm", "user", "pass");
+				SipServletRequest req2 = sipServletResponse.getRequest();
+				B2buaHelper helper = req2.getB2buaHelper();
+//				SipServletRequest req1 = helper.getLinkedSipServletRequest(req2);
+				SipServletRequest challengeRequest = helper.createRequest(sipServletResponse.getSession(), req2,
+				null);
+				challengeRequest.addAuthHeader(sipServletResponse, authInfo);
+				challengeRequest.send();
+			}
+		} else {
+			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+			responseToOriginalRequest.send();
+		}
 	}
 	
 	// SipErrorListener methods

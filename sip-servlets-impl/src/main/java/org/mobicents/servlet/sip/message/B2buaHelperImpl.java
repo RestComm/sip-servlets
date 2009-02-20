@@ -234,9 +234,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			
 			//For non-REGISTER requests, the Contact header field is not copied 
 			//but is populated by the container as usual
-			if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
-				newSubsequentServletRequest.getMessage().removeHeader(ContactHeader.NAME);
-			}
+			
+			//commented since this is not true in this case since this is a subsequent request
+			// this is needed for sending challenge requests
+//			if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
+//				newSubsequentServletRequest.getMessage().removeHeader(ContactHeader.NAME);
+//			}
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
@@ -249,6 +252,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			//in accordance with section 4.1.3 of the specification.
 			for (String contactHeaderValue : contactHeaderSet) {
 				newSubsequentServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+			}
+			
+			//Fix for Issue 585 by alexandre sova
+			if(origRequest.getContent() != null && origRequest.getContentType() != null) {
+				newSubsequentServletRequest.setContentLength(origRequest.getContentLength());
+				newSubsequentServletRequest.setContent(origRequest.getContent(), origRequest.getContentType());
 			}
 			
 			if(logger.isDebugEnabled()) {

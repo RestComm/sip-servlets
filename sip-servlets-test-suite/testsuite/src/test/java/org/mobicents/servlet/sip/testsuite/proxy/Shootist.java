@@ -15,8 +15,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
-import gov.nist.javax.sip.header.Event;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,7 +43,6 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.address.Address;
 import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
-import javax.sip.address.TelURL;
 import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
