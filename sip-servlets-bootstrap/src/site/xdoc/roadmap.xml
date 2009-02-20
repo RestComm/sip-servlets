@@ -792,6 +792,20 @@
 									Don't use STUN for local network addresses		
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=584">
+									"Contact" header not added to request by container for challenge requests created by B2buaHelper.createRequest(session, request,...)
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=585">
+									Request's content not copied with B2buaHelper.createRequest(session, origRequest, ...)		
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
