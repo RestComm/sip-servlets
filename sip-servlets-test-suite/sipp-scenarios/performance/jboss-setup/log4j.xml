@@ -25,6 +25,7 @@
       <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
       <param name="File" value="${jboss.server.log.dir}/server.log"/>
       <param name="Append" value="false"/>
+      <param name="Threshold" value="WARN"/>
       
       <!-- Rollover at midnight each day -->
       <param name="DatePattern" value="'.'yyyy-MM-dd"/>
@@ -64,6 +65,7 @@
    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
       <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
       <param name="Target" value="System.out"/>
+      <param name="Threshold" value="WARN"/>
 
       <layout class="org.apache.log4j.PatternLayout">
          <!-- The default pattern: Date Priority [Category] Message\n -->
@@ -293,7 +295,6 @@
    <!-- ======================= -->
 
    <root>
-   	  <priority value ="ERROR" />  
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
    </root>
