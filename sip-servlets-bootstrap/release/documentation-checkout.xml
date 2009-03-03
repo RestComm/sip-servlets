@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
-    <artifactId>sip-servlets-external-modules-checkout</artifactId>
-    <groupId>org.mobicents.servlet.sip</groupId>
-    <version>0.8-SNAPSHOT</version>
+    <artifactId>mobicents-all-documentation-checkout</artifactId>
+    <groupId>org.mobicents</groupId>
+    <version>1.0</version>
+    
     <properties>
-        <checkout.basedir>${basedir}/target/dependencies</checkout.basedir>
+        <checkout.basedir>${basedir}/documentation</checkout.basedir>
         <checkout.username>mobicents-read-only</checkout.username>
         <checkout.password></checkout.password>
         
-        <media.core.1.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.0.CR5</media.core.1.x.connectionURL>
-        <media.core.2.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/media/core</media.core.2.x.connectionURL>
-        <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.0.BETA3</sip.balancer.connectionURL>
+        <media.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/Mobicents_Media_Server_Guide</media.docs.connectionURL>
+        <sipservlets.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/Mobicents_SIP_Servlets_Server_Guide</sipservlets.docs.connectionURL>
+        
+        <common.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/Staff/1.0/dhensley/Common_Content</common.docs.connectionURL>
+        
     </properties>
+    
     <profiles>
+    
         <profile>
             <id>checkout</id>
             <build>
@@ -26,43 +32,49 @@
                         <inherited>false</inherited>
                         <executions>
                             <execution>
-                                <id>media-core-1.x-checkout</id>
-                                <phase>validate</phase>
+                                <id>common-docs-checkoutd</id>
                                 <goals>
                                     <goal>checkout</goal>
                                 </goals>
+                                <phase>validate</phase>
                                 <configuration>
-                                    <checkoutDirectory>${checkout.basedir}/media/1.x/core</checkoutDirectory>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
-                                    <connectionUrl>${media.core.1.x.connectionURL}</connectionUrl>
+                                    <checkoutDirectory>${checkout.basedir}/common</checkoutDirectory>
+                                    <connectionUrl>${common.docs.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>media-core-2.x-checkout</id>
-                                <phase>validate</phase>
+                                <id>media-docs-checkout</id>
                                 <goals>
                                     <goal>checkout</goal>
                                 </goals>
+                                <phase>validate</phase>
                                 <configuration>
-                                    <checkoutDirectory>${checkout.basedir}/media/2.x/core</checkoutDirectory>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
-                                    <connectionUrl>${media.core.2.x.connectionURL}</connectionUrl>
+                                    <checkoutDirectory>${checkout.basedir}/media</checkoutDirectory>
+                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>sip-balancer-checkout</id>
-                                <phase>validate</phase>
+                                <id>sipservlets-docs-checkout</id>
                                 <goals>
                                     <goal>checkout</goal>
                                 </goals>
+                                <phase>validate</phase>
                                 <configuration>
-                                    <checkoutDirectory>${checkout.basedir}/sip-balancer</checkoutDirectory>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
-                                    <connectionUrl>${sip.balancer.connectionURL}</connectionUrl>
+                                    <checkoutDirectory>${checkout.basedir}/sip-servlets</checkoutDirectory>
+                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
@@ -72,6 +84,7 @@
                 </plugins>
             </build>
         </profile>
+        
         <profile>
             <id>update</id>
             <build>
@@ -82,46 +95,46 @@
                         <inherited>false</inherited>
                         <executions>
                             <execution>
-                                <id>media-core-1.x-update</id>
+                                <id>common-docs-update</id>
                                 <goals>
                                     <goal>update</goal>
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
-                                    <basedir>${checkout.basedir}/media/1.x/core</basedir>
+                                    <basedir>${checkout.basedir}/common</basedir>
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
-                                    <connectionUrl>${media.core.1.x.connectionURL}</connectionUrl>
+                                    <connectionUrl>${common.docs.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>media-core-2.x-update</id>
+                                <id>media-docs-update</id>
                                 <goals>
                                     <goal>update</goal>
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
-                                    <basedir>${checkout.basedir}/media/2.x/core</basedir>
+                                    <basedir>${checkout.basedir}/media</basedir>
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
-                                    <connectionUrl>${media.core.2.x.connectionURL}</connectionUrl>
+                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>sip-balancer-update</id>
+                                <id>sipservlets-docs-update</id>
                                 <goals>
                                     <goal>update</goal>
                                 </goals>
                                 <phase>validate</phase>
                                 <configuration>
-                                    <basedir>${checkout.basedir}/sip-balancer</basedir>
+                                    <basedir>${checkout.basedir}/sip-servlets</basedir>
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
-                                    <connectionUrl>${sip.balancer.connectionURL}</connectionUrl>
+                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
@@ -131,5 +144,7 @@
                 </plugins>
             </build>
         </profile>
+        
     </profiles>
+    
 </project>

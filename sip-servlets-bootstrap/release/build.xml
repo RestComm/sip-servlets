@@ -3,10 +3,11 @@
 	<property environment="sys"/>
 	<property name="release.path" location="${ant.file.mobicents.sipservlets.release}/../target" />
 	<property name="base.path" location="${ant.file.mobicents.sipservlets.release}/.." />
+	<property name="docs.stage.dir" location="${ant.file.mobicents.sipservlets.release}/../documentation" />
 	
 	<property name="mss.release.version" value="0.9-SNAPSHOT" />
 	<property name="mss.release.configurations" value="all,default" />
-	<property name="mss.release.jboss-5.profiles" value="default" />
+	<property name="mss.release.configurations.jboss5" value="default" />
 	
 	<property name="jboss.version" value="4.2.3.GA" />
 	<property name="jboss-5.version" value="5.0.0.GA" />
@@ -14,15 +15,19 @@
 	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />
 	
 	<property name="tomcat.version" value="6.0.14" />
-	<property name="tomcat.download.url" value="http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
+	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
 	
 	<property name="embjopr.version" value="1.0.0.GA" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
+	
+	<property name="diameter.mux.version" value="1.0.0.BETA2" />
+	<property name="diameter.mux.download.url" value="http://downloads.sourceforge.net/mobicents/mobicents-diameter-mux-${diameter.mux.version}.zip" />
 	
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
+	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.mux.version}.zip" />
 	
 	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
 	<property name="jboss-5.home" value="${release.path}/jboss-${jboss-5.version}" />
@@ -84,11 +89,11 @@
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server">
+				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-1.x">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
+				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
@@ -97,23 +102,23 @@
 		
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
 		<antcall target="build-mobicents-sip-load-balancer"/>
-		<antcall target="make-final-zip-jboss" />		
-		
+		<antcall target="build-documentation"/>
+		<antcall target="make-final-zip-jboss" />
 	</target>
 	
 	<target name="release-jboss-5" depends="extract-jboss-5">
-		<for delimiter="," param="jboss.config" list="${mss.release.jboss-5.profiles}">
+		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
 					<property name="jboss-5.home" value="${jboss-5.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>				
+				</ant>
 				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
 				<!-- Commented out because they don't run on JB5 yet -->
-				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-core">
+				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant-->
@@ -124,8 +129,10 @@
 		<antcall target="build-mobicents-sip-load-balancer">
 			<param name="jboss.home" value="${jboss-5.home}"/>
 		</antcall>
+		<antcall target="build-documentation">
+			<param name="jboss.home" value="${jboss-5.home}"/>
+		</antcall>
 		<antcall target="make-final-zip-jboss-5" />
-		
 	</target>
 	
 	<target name="release-jboss-node">
@@ -246,7 +253,8 @@
 	
 	<condition property="dependencies.checkedout">
 		<and>
-			<available file="${base.path}/target/dependencies/media/core/.svn/entries" />
+			<available file="${base.path}/target/dependencies/media/1.x/core/.svn/entries" />
+			<available file="${base.path}/target/dependencies/media/2.x/core/.svn/entries" />
 			<available file="${base.path}/target/dependencies/sip-balancer/.svn/entries" />
 		</and>
 	</condition>
@@ -268,15 +276,15 @@
 	
 	<!-- Build dependencies-->
 	
-	<target name="build-mobicents-media-server" depends="get-deps">
+	<target name="build-mobicents-media-server-1.x" depends="get-deps">
 		<echo>Building Mobicents Media Server 1.x</echo>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/core">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/1.x/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 	</target>
 	
 	<target name="build-mobicents-media-server-2.x" depends="get-deps">
-		<echo>Building Mobicents Media Server 2.x</echo>		
+		<echo>Building Mobicents Media Server 2.x</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
 		</exec>
@@ -297,14 +305,6 @@
 			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
 	</target>
 	
-	<target name="build-mobicents-diameter-core" depends="get-deps">
-		<echo>Building Mobicents Diameter Core</echo>
-		<copy overwrite="true" file="${base.path}/jdiameter-config.xml" tofile="${base.path}/target/dependencies/diameter/core/jar/src/main/resources/org/mobicents/diameter/stack/jdiameter-config.xml" />
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter/core">
-			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
-		</exec>
-	</target>
-	
 	<target name="build-mobicents-jopr-plugin">
 		<echo>Building Mobicents Jopr Plugin</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin">
@@ -317,6 +317,74 @@
 		<copy todir="${jboss.home}/server/${jboss.config}/deploy/${embjopr.war}">
 			<fileset dir="${embjopr.home.contents}" includes="**/*" />
 		</copy>
+	</target>
+	
+	<!-- Download dependencies from SourceForge -->
+	
+	<target name="build-mobicents-diameter-mux" depends="get-mobicents-diameter-mux">
+		<unzip overwrite="true" dest="${jboss.home}/server/${jboss.config}/deploy" src="${diameter.mux.distro.zip.path}">
+			<patternset>
+				<include name="*.sar/**" />
+			</patternset>
+		</unzip>
+	</target>
+	
+	<available file="${diameter.mux.distro.zip.path}" property="got.mobicents-diameter-mux" />
+	<target name="get-mobicents-diameter-mux" unless="got.mobicents-diameter-mux">
+		<echo>Downloading Mobicents Diameter Mux</echo>
+			<get dest="${diameter.mux.distro.zip.path}" src="${diameter.mux.download.url}" />
+	</target>
+	
+	<!-- Fetch and build documentation -->
+	
+	<condition property="docs.checked.out">
+		<and>
+			<available file="${docs.stage.dir}/common/.svn/entries" />
+			<available file="${docs.stage.dir}/media/.svn/entries" />
+			<available file="${docs.stage.dir}/sip-servlets/.svn/entries" />
+		</and>
+	</condition>
+	<target name="get-documentation" depends="checkout-documentation,update-documentation" />
+	
+	<target name="checkout-documentation" unless="docs.checked.out">
+		<echo>Checking out documentation</echo>
+		<exec executable="${mvn.executable}" dir="${ant.file.media.server.release}/../">
+			<arg line="-f documentation-checkout.xml validate -P checkout" />
+		</exec>
+	</target>
+	
+	<target name="update-documentation">
+		<echo>Updating documentation</echo>
+		<exec executable="${mvn.executable}" dir="${ant.file.media.server.release}/../">
+			<arg line="-f documentation-checkout.xml validate -P update" />
+		</exec>
+	</target>
+	
+	<target name="build-documentation" depends="get-documentation">
+		<echo>Building documentation</echo>
+		
+		<!--move todir="${docs.stage.dir}/sip-presence/en-US/Common_Content">
+			<fileset dir="${docs.stage.dir}/common" />
+		</move-->
+		
+		<symlink overwrite="true" link="${docs.stage.dir}/media/en-US/Common_Content" resource="${docs.stage.dir}/common"/>
+		<symlink overwrite="true" link="${docs.stage.dir}/sip-servlets/en-US/Common_Content" resource="${docs.stage.dir}/common"/>
+		
+		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/media/">
+			<arg line="clean compile" />
+		</exec>
+		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/sip-servlets/">
+			<arg line="clean compile" />
+		</exec>
+		
+		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-media-server">
+			<fileset dir="${docs.stage.dir}/media/target/docbook/publish/en-US/" />
+		</copy>
+		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
+			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
+		</copy>
+		
+		<!--delete dir="${docs.stage.dir}" /-->
 	</target>
 	
 	<!-- zip source project that can be used to build release -->
@@ -440,11 +508,11 @@
 		<delete dir="${jboss-5.home}" failonerror="true" />
 		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5.home}/.." />
 		
-		<propertyregex input="${mss.release.jboss-5.profiles}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations" />
-		<echo>Included profiles: ${mss.release.jboss-5.profiles} -&gt; Excludes list: ${used.configurations}</echo>
+		<propertyregex input="${mss.release.configurations.jboss5}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations.jboss5" />
+		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
 		
 		<delete includeemptydirs="true" failonerror="false" verbose="false">
-			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations}" />
+			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations.jboss5}" />
 		</delete>
 	</target>
 	
