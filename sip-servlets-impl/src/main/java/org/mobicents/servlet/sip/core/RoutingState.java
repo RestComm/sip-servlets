@@ -27,12 +27,14 @@ public enum RoutingState {
 	INITIAL,	
 	// subsequent request being routed
 	SUBSEQUENT,
-	//final response sent for this request, stop routing
+	// informational response sent for this request, stop routing
+	INFORMATIONAL_RESPONSE_SENT,
+	// final response sent for this request, stop routing
 	FINAL_RESPONSE_SENT,
 	// request has been proxied, stop routing
 	PROXIED,
-	//request has been relayed, stop routing
+	// request has been relayed, stop routing
 	RELAYED, 
-	//request has been canncelled, stop routing
+	// request has been canncelled, stop routing
 	CANCELLED
 }

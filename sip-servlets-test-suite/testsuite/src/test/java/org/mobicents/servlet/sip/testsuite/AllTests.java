@@ -51,6 +51,7 @@ import org.mobicents.servlet.sip.testsuite.publish.PublishSipServletTest;
 import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
 import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
 import org.mobicents.servlet.sip.testsuite.replaces.ReplacesSipServletTest;
+import org.mobicents.servlet.sip.testsuite.routing.ExternalApplicationRoutingTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.SameContainerRoutingServletTest;
 import org.mobicents.servlet.sip.testsuite.security.CallForwardingB2BUAAuthTest;
@@ -129,6 +130,7 @@ public class AllTests {
 		suite.addTestSuite(ReplacesSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
+		suite.addTestSuite(ExternalApplicationRoutingTest.class);
 		suite.addTestSuite(SameContainerRoutingServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);

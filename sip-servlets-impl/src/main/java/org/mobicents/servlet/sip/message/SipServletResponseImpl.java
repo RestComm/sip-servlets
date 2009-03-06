@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.message;
 
-import gov.nist.javax.sip.header.Supported;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -50,7 +48,6 @@ import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RequireHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SupportedHeader;
-import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -475,6 +472,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop
 			//processing the request
+			if(response.getStatusCode() > Response.TRYING && 
+					response.getStatusCode() < Response.OK) {				
+				originalRequest.setRoutingState(RoutingState.INFORMATIONAL_RESPONSE_SENT);				
+			}
 			if(response.getStatusCode() >= Response.OK && 
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				

@@ -78,11 +78,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("Got request: "
 				+ request.getMethod());
 		
+		if(request.getFrom().toString().contains("testExternalRoutingNoInfo")) {
+			return;
+		}
+		
 		if(request.getFrom().toString().contains("testExternalRouting")) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			sipServletResponse.send();
 			return;
-		}
+		}		
 		
 		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
 		request.getHeader(TEST_NON_EXISTING_HEADER);

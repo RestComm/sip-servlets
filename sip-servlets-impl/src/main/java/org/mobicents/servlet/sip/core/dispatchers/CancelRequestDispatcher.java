@@ -216,6 +216,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 						logger.debug("the final response has already been sent, nothing to do here");
 					}
 				} else if(RoutingState.INITIAL.equals(inviteRequest.getRoutingState()) ||
+						RoutingState.INFORMATIONAL_RESPONSE_SENT.equals(inviteRequest.getRoutingState()) ||
 						RoutingState.SUBSEQUENT.equals(inviteRequest.getRoutingState())) {			
 							
 					if(logger.isDebugEnabled()) {

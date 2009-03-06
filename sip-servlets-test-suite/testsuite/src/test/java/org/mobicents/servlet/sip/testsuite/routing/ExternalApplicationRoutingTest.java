@@ -35,7 +35,6 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 10000;	
-	private static final int TIMEOUT_CSEQ_INCREASE = 100000;
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
@@ -91,6 +90,28 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 	// When this works add another test for complete flow
 	public void testExternalRoutingWithoutFinalResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "testExternalRouting";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String r = "requestUri";
+		String ra = "127.0.0.1:5058";
+		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
+				r, ra);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
+		Thread.sleep(TIMEOUT);
+//		assertTrue(sender.getByeReceived());	
+	}
+	
+	// When this works add another test for complete flow
+	public void testExternalRoutingWithoutInfoResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "testExternalRoutingNoInfo";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);

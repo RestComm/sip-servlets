@@ -254,7 +254,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				//if a final response has been sent, or if the request has 
 				//been proxied or relayed we stop routing the request
 				RoutingState routingState = sipServletRequest.getRoutingState();
-				if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+				if(RoutingState.INFORMATIONAL_RESPONSE_SENT.equals(routingState) ||
+						RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
 						RoutingState.PROXIED.equals(routingState) ||
 						RoutingState.RELAYED.equals(routingState) ||
 						RoutingState.CANCELLED.equals(routingState)) {
