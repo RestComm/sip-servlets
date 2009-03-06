@@ -70,7 +70,8 @@ public class CallBlockingSipServlet extends SipServlet implements SipServletList
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
 			sipServletResponse.send();		
 		} else {
-			logger.info(fromUri + " has not been blocked.");
+			logger.info(fromUri + " has not been blocked, we proxy the request");
+			request.getProxy().proxyTo(request.getRequestURI());
 		}
 	}
 
