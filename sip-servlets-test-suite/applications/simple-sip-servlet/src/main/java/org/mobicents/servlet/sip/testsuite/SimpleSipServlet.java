@@ -84,6 +84,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				+ request.getMethod());
 		
 		if(request.getFrom().toString().contains("testExternalRoutingNoInfo")) {			
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable)sipServletResponse);
 			return;
 		}
 		

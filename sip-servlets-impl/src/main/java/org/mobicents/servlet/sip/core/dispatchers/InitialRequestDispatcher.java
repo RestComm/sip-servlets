@@ -56,7 +56,6 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
-import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -412,72 +411,74 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				} finally {
 					sipContext.exitSipApp();
 				}
+				//nothing more need to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing
+				
 				//if a final response has been sent, or if the request has 
 				//been proxied or relayed we stop routing the request
-				RoutingState routingState = sipServletRequest.getRoutingState();			
-				if(RoutingState.INFORMATIONAL_RESPONSE_SENT.equals(routingState) ||
-						RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
-						RoutingState.PROXIED.equals(routingState) ||
-						RoutingState.RELAYED.equals(routingState) ||
-						RoutingState.CANCELLED.equals(routingState)) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-								"The Container hence stops routing the initial request.");
-						sipContext.getSipManager().dumpSipSessions();
-					}
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-								"The Container hence continue routing the initial request.");
-					}
-					try {
-						// the app that was called didn't do anything with the request
-						// in any case we should route back to container statefully 
-//						sipServletRequest.addAppCompositionRRHeader();
-						SipApplicationRouterInfo routerInfo = sipApplicationDispatcher.getNextInterestedApplication(sipServletRequest);
-						if(routerInfo.getNextApplicationName() != null) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("routing back to the container " +
-										"since the following app is interested " + routerInfo.getNextApplicationName());
-							}
-							//add a route header to direct the request back to the container 
-							//to check if there is any other apps interested in it
-							sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
-						} else {							
-							// If a servlet does not generate final response the routing process
-							// will continue (non-terminating routing state). This code stops
-							// routing these requests.
-							javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
-							String host = sipRequestUri.getHost();
-							int port = sipRequestUri.getPort();
-							String transport = JainSipUtils.findTransport(request);
-							boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
-							if(!isAnotherDomain) {
-								if(logger.isDebugEnabled()) {
-									logger.debug("stop routing the request " +
-											"since no more apps are is interested and the request uri points to the container.");
-								}
-								return ;
-							} else {
-								if(logger.isDebugEnabled()) {
-									logger.debug("routing outside the container " +
-											"since no more apps are is interested.");
-								}
-							}
-						}
-						try {
-							forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
-						} catch (Exception e) {
-							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
-						}
-					} 
-//					catch (SipException e) {
-//						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "an exception has occured when trying to forward statefully", e);
+//				RoutingState routingState = sipServletRequest.getRoutingState();			
+//				if(RoutingState.INFORMATIONAL_RESPONSE_SENT.equals(routingState) ||
+//						RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
+//						RoutingState.PROXIED.equals(routingState) ||
+//						RoutingState.RELAYED.equals(routingState) ||
+//						RoutingState.CANCELLED.equals(routingState)) {
+//					if(logger.isDebugEnabled()) {
+//						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+//								"The Container hence stops routing the initial request.");
+//						sipContext.getSipManager().dumpSipSessions();
+//					}
+//				} else {
+//					if(logger.isDebugEnabled()) {
+//						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
+//								"The Container hence continue routing the initial request.");
+//					}
+//					try {
+//						// the app that was called didn't do anything with the request
+//						// in any case we should route back to container statefully 
+////						sipServletRequest.addAppCompositionRRHeader();
+//						SipApplicationRouterInfo routerInfo = sipApplicationDispatcher.getNextInterestedApplication(sipServletRequest);
+//						if(routerInfo.getNextApplicationName() != null) {
+//							if(logger.isDebugEnabled()) {
+//								logger.debug("routing back to the container " +
+//										"since the following app is interested " + routerInfo.getNextApplicationName());
+//							}
+//							//add a route header to direct the request back to the container 
+//							//to check if there is any other apps interested in it
+//							sipServletRequest.addInfoForRoutingBackToContainer(applicationRouterInfo.getNextApplicationName());
+//						} else {							
+//							// If a servlet does not generate final response the routing process
+//							// will continue (non-terminating routing state). This code stops
+//							// routing these requests.
+//							javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+//							String host = sipRequestUri.getHost();
+//							int port = sipRequestUri.getPort();
+//							String transport = JainSipUtils.findTransport(request);
+//							boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+//							if(!isAnotherDomain) {
+//								if(logger.isDebugEnabled()) {
+//									logger.debug("stop routing the request " +
+//											"since no more apps are is interested and the request uri points to the container.");
+//								}
+//								return ;
+//							} else {
+//								if(logger.isDebugEnabled()) {
+//									logger.debug("routing outside the container " +
+//											"since no more apps are is interested.");
+//								}
+//							}
+//						}
+//						try {
+//							forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
+//						} catch (Exception e) {
+//							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+//						}
 //					} 
-					catch (ParseException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);					
-					}	
-				}
+////					catch (SipException e) {
+////						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "an exception has occured when trying to forward statefully", e);
+////					} 
+//					catch (ParseException e) {
+//						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);					
+//					}	
+//				}
 				
 			}
 			

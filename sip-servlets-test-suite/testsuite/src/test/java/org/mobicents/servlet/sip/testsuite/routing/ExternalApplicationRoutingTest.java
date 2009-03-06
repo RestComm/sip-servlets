@@ -45,6 +45,8 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 	
 	public ExternalApplicationRoutingTest(String name) {
 		super(name);
+		startTomcatOnStartup = false;
+		autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -58,6 +60,11 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
 				"org/mobicents/servlet/sip/testsuite/simple/simple-sip-servlet-dar.properties";
+	}
+	
+	protected String getEmptyDarConfigurationFile() {
+		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
+				"org/mobicents/servlet/sip/testsuite/routing/external/empty-dar.properties";
 	}
 	
 	@Override
@@ -87,8 +94,11 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 	}
 	
 	
-	// When this works add another test for complete flow
-	public void testExternalRoutingWithoutFinalResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	// If an app is called even if it just send an informational response nothing make sure it is not forwarded outside
+	public void testExternalRoutingWithoutFinalResponse() throws Exception {
+		tomcat.startTomcat();
+		deployApplication();
+		
 		String fromName = "testExternalRouting";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -106,11 +116,15 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());	
+		assertTrue(sender.getOkToByeReceived());
+		assertFalse(receiver.isInviteReceived());	
 	}
 	
-	// When this works add another test for complete flow
-	public void testExternalRoutingWithoutInfoResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	// If an app is called even if it does nothing make sure it is not forwarded outside
+	public void testExternalRoutingWithoutInfoResponse() throws Exception {
+		tomcat.startTomcat();
+		deployApplication();
+		
 		String fromName = "testExternalRoutingNoInfo";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -128,7 +142,35 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertFalse(receiver.isInviteReceived());	
+	}
+	
+	// If no app is called make sure it is forwarded outside
+	public void testExternalRoutingNoAppCalled() throws Exception {
+		tomcat.setDarConfigurationFilePath(getEmptyDarConfigurationFile());
+		tomcat.startTomcat();		
+		
+		String fromName = "testExternalRoutingNoAppCalled";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String r = "requestUri";
+		String ra = "127.0.0.1:5058";
+		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
+				r, ra);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.isInviteReceived());	
+		assertTrue(receiver.getByeReceived());
 	}
 	
 	@Override
