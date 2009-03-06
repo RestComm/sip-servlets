@@ -106,7 +106,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
 		Thread.sleep(TIMEOUT);
-//		assertTrue(sender.getByeReceived());	
+		assertTrue(sender.getOkToByeReceived());	
 	}
 	
 	// When this works add another test for complete flow

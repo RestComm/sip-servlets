@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.annotation.Resource;
 import javax.servlet.Servlet;
@@ -24,6 +25,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
@@ -32,14 +34,15 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 import javax.servlet.sip.SipSession.State;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class SimpleSipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
 	
 	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
@@ -47,6 +50,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	
 	@Resource
 	SipFactory sipFactory;
+	@Resource
+	TimerService timerService;
 	
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
@@ -78,13 +83,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		logger.info("Got request: "
 				+ request.getMethod());
 		
-		if(request.getFrom().toString().contains("testExternalRoutingNoInfo")) {
+		if(request.getFrom().toString().contains("testExternalRoutingNoInfo")) {			
 			return;
 		}
 		
 		if(request.getFrom().toString().contains("testExternalRouting")) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			sipServletResponse.send();
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable)sipServletResponse);
 			return;
 		}		
 		
@@ -251,6 +258,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	 */
 	public void noPrackReceived(SipErrorEvent ee) {
 		logger.error("noPrackReceived.");
+	}
+
+	public void timeout(ServletTimer timer) {
+		SipServletResponse sipServletResponse = (SipServletResponse)timer.getInfo();
+		try {
+			sipServletResponse.send();
+		} catch (IOException e) {
+			logger.error("Unexpected exception while sending the OK", e);
+		}
 	}
 
 }
