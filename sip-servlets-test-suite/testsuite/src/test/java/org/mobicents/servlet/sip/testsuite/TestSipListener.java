@@ -215,6 +215,8 @@ public class TestSipListener implements SipListener {
 	private int finalResponseStatus;
 
 	private boolean errorResponseReceived;
+	
+	private boolean inviteReceived;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -805,6 +807,7 @@ public class TestSipListener implements SipListener {
 	 */
 	public void processInvite(RequestEvent requestEvent,
 			ServerTransaction serverTransaction) {
+		inviteReceived = true;
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
 		logger.info("shootme: got an Invite " + request);
@@ -1533,6 +1536,128 @@ public class TestSipListener implements SipListener {
 		}
 		this.dialogCount++;
 	}
+	
+	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents, SipURI requestUri) throws SipException, ParseException, InvalidArgumentException {
+		this.useToURIasRequestUri = useToURIasRequestUri;
+		// create >From Header
+		Address fromNameAddress = protocolObjects.addressFactory
+				.createAddress(fromURI);			
+		FromHeader fromHeader = protocolObjects.headerFactory
+				.createFromHeader(fromNameAddress, Integer.toString((int) (Math.random()*10000000)));
+
+		// create To Header			
+		Address toNameAddress = protocolObjects.addressFactory
+				.createAddress(toURI);			
+		ToHeader toHeader = protocolObjects.headerFactory.createToHeader(
+				toNameAddress, null);
+
+		this.requestURI = requestUri;
+		
+		// Create ViaHeaders
+
+		List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
+		ViaHeader viaHeader = protocolObjects.headerFactory
+				.createViaHeader("127.0.0.1", sipProvider
+						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
+						null);
+
+		// add via headers
+		viaHeaders.add(viaHeader);
+
+		// Create ContentTypeHeader
+//			ContentTypeHeader contentTypeHeader = protocolObjects.headerFactory
+//					.createContentTypeHeader("application", "sdp");
+
+		// Create a new CallId header
+		CallIdHeader callIdHeader = sipProvider.getNewCallId();
+
+		// Create a new Cseq header
+		CSeqHeader cSeqHeader = protocolObjects.headerFactory
+				.createCSeqHeader(1L, method);
+
+		// Create a new MaxForwardsHeader
+		MaxForwardsHeader maxForwards = protocolObjects.headerFactory
+				.createMaxForwardsHeader(70);
+
+		// Create the request.
+		Request request = protocolObjects.messageFactory.createRequest(
+				requestURI, method, callIdHeader, cSeqHeader,
+				fromHeader, toHeader, viaHeaders, maxForwards);
+		// Create contact headers
+		String host = "127.0.0.1";
+
+		URI contactUrl = null;
+		if(fromURI instanceof SipURI) {
+			contactUrl = protocolObjects.addressFactory.createSipURI(
+				((SipURI)fromURI).getUser(), host);
+			/**
+			 * either use tcp or udp
+			 */
+			((SipURI)contactUrl).setPort(listeningPoint.getPort());
+			((SipURI)contactUrl).setTransportParam(listeningPoint.getTransport());		
+			((SipURI)contactUrl).setLrParam();
+		} else {
+			contactUrl = fromURI;
+		}
+		
+		// Create the contact name address.	
+		Address contactAddress = protocolObjects.addressFactory
+				.createAddress(contactUrl);
+
+		// Add the contact address.
+//			contactAddress.setDisplayName(fromName);
+
+		contactHeader = protocolObjects.headerFactory
+				.createContactHeader(contactAddress);
+		request.addHeader(contactHeader);
+		
+		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
+		
+		uri.setLrParam();
+		uri.setTransportParam(protocolObjects.transport);
+		uri.setPort(this.peerPort);
+		
+		if(route != null) {
+			Address address = protocolObjects.addressFactory.createAddress(route);
+			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
+			request.addHeader(routeHeader);
+		} else {
+			Address address = protocolObjects.addressFactory.createAddress(uri);
+			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
+			request.addHeader(routeHeader);
+		}
+
+		// set the message content
+		if(messageContent != null) {
+			ContentLengthHeader contentLengthHeader = 
+				protocolObjects.headerFactory.createContentLengthHeader(messageContent.length());
+			ContentTypeHeader contentTypeHeader = 
+				protocolObjects.headerFactory.createContentTypeHeader(TEXT_CONTENT_TYPE,PLAIN_UTF8_CONTENT_SUBTYPE);
+			byte[] contents = messageContent.getBytes();
+			request.setContent(contents, contentTypeHeader);
+			request.setContentLength(contentLengthHeader);
+		}
+		
+		if(headerNames != null) {
+			for(int q=0; q<headerNames.length; q++) {
+				Header h = protocolObjects.headerFactory.createHeader(headerNames[q], headerContents[q]);
+				request.addLast(h);
+			}
+		}
+		addSpecificHeaders(method, request);
+		// Create the client transaction.
+		inviteClientTid = sipProvider.getNewClientTransaction(request);
+		// send the request out.
+		inviteClientTid.sendRequest();
+
+		this.transactionCount ++;
+		
+		logger.info("client tx = " + inviteClientTid);
+		if(!Request.MESSAGE.equalsIgnoreCase(method)) {
+			dialog = inviteClientTid.getDialog();
+		}
+		this.dialogCount++;
+	}
 
 	private void addSpecificHeaders(String method, Request request)
 			throws ParseException, InvalidArgumentException {
@@ -1979,6 +2104,13 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isReplacesRequestReceived() {
 		return replacesRequestReceived;
+	}
+	
+	/**
+	 * @return the inviteReceived
+	 */
+	public boolean isInviteReceived() {
+		return inviteReceived;
 	}
 
 }

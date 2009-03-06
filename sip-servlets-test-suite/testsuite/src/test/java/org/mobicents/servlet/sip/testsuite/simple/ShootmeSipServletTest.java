@@ -106,6 +106,27 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	public void testExternalRouting() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "testExternalRouting";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String r = "requestUri";
+		String ra = "127.0.0.1:5058";
+		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
+				r, ra);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(registerReciever.isInviteReceived());	
+	}
+	
 	public void testShootmeRegister() throws Exception {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
