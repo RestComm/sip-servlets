@@ -28,7 +28,7 @@ public enum RoutingState {
 	// subsequent request being routed
 	SUBSEQUENT,
 	// informational response sent for this request, stop routing
-	INFORMATIONAL_RESPONSE_SENT,
+//	INFORMATIONAL_RESPONSE_SENT,
 	// final response sent for this request, stop routing
 	FINAL_RESPONSE_SENT,
 	// request has been proxied, stop routing

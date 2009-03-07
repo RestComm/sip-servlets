@@ -472,10 +472,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop
 			//processing the request
-			if(response.getStatusCode() > Response.TRYING && 
-					response.getStatusCode() < Response.OK) {				
-				originalRequest.setRoutingState(RoutingState.INFORMATIONAL_RESPONSE_SENT);				
-			}
+//			if(response.getStatusCode() > Response.TRYING && 
+//					response.getStatusCode() < Response.OK) {				
+//				originalRequest.setRoutingState(RoutingState.INFORMATIONAL_RESPONSE_SENT);				
+//			}
 			if(response.getStatusCode() >= Response.OK && 
 					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
