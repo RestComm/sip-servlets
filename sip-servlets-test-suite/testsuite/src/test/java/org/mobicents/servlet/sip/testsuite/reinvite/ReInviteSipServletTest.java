@@ -41,7 +41,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
@@ -100,6 +100,24 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getByeReceived());		
+	}
+	
+	public void testReInviteSending() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "isendreinvite";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendReinvite(true);
+		sender.setSendBye(true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());		
 	}
 
 	@Override

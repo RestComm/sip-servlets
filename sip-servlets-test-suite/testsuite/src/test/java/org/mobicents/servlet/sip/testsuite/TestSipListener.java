@@ -218,6 +218,10 @@ public class TestSipListener implements SipListener {
 	
 	private boolean inviteReceived;
 
+	private boolean sendReinvite;
+	
+	private boolean reinviteSent;
+
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -1070,6 +1074,11 @@ public class TestSipListener implements SipListener {
 					ackSent = true;
 					Thread.sleep(1000);
 					// If the caller is supposed to send the bye
+					if(sendReinvite && !reinviteSent) {
+						sendInDialogSipRequest("INVITE", null, null, null, null);
+						reinviteSent = true;
+						return;
+					}
 					if(sendBye) {
 						sendBye();
 					}
@@ -1380,6 +1389,7 @@ public class TestSipListener implements SipListener {
 			TransactionUnavailableException, TransactionDoesNotExistException {
 		Request byeRequest = dialog.createRequest(Request.BYE);
 		ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+		logger.info("Sending BYE " + byeRequest);
 		dialog.sendRequest(ct);
 		byeSent = true;
 	}
@@ -2111,6 +2121,10 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isInviteReceived() {
 		return inviteReceived;
+	}
+
+	public void setSendReinvite(boolean b) {
+		sendReinvite = b;
 	}
 
 }

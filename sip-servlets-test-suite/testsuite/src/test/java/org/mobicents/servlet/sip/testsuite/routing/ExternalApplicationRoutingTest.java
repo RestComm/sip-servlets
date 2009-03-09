@@ -85,7 +85,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		recieverProtocolObjects =new ProtocolObjects(
 				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG);
 		
-		receiver = new TestSipListener(5058, 5070, recieverProtocolObjects, true);
+		receiver = new TestSipListener(5058, 5070, recieverProtocolObjects, false);
 		SipProvider registerRecieverProvider = receiver.createProvider();			
 		
 		registerRecieverProvider.addSipListener(receiver);
@@ -166,6 +166,34 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
 				r, ra);
 		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.isInviteReceived());	
+		assertTrue(receiver.getByeReceived());
+	}
+	
+	// If no app is called make sure it is forwarded outside even for ReInvite
+	public void testExternalRoutingNoAppCalledReInvite() throws Exception {
+		tomcat.setDarConfigurationFilePath(getEmptyDarConfigurationFile());
+		tomcat.startTomcat();		
+		
+		String fromName = "testExternalRoutingNoAppCalled";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String r = "requestUri";
+		String ra = "127.0.0.1:5058";
+		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
+				r, ra);
+		
+		sender.setSendReinvite(true);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestUri);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
