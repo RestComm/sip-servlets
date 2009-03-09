@@ -520,6 +520,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			logger.info("The following sip application session " + key + " has been invalidated");
 		}
 		currentRequestHandler = null;
+		semaphore = null;
 	}
 
 	private void cancelExpirationTimer() {

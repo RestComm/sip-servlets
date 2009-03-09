@@ -661,7 +661,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		state = null;
 		stateInfo = null;
 		subscriberURI = null;
-		subscriptions = null;		
+		subscriptions = null;
+		semaphore = null;
 	}
 	
 	/**
