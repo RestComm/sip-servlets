@@ -806,6 +806,20 @@
 									Request's content not copied with B2buaHelper.createRequest(session, origRequest, ...)		
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=596">
+								 	External Application Routing Problem		
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=480">
+								 	SipSession & SipApplicationSession Concurrency control modes cannot sustain load test
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
@@ -816,13 +830,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
 						Mobicents Application Router
 						</a>
-						<br />						
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=324">
-						Sip Servlets working as IMS node (HSS or CSCF)
-						</a>
-						<br />
+						<br />												
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=520">
@@ -860,6 +868,12 @@
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=131">
 						XMPP support
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=324">
+						Sip Servlets working as IMS node (HSS or CSCF)
 						</a>
 						<br />
 					</p>		

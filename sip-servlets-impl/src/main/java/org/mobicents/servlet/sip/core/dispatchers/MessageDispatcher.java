@@ -261,25 +261,14 @@ public abstract class MessageDispatcher {
 	 * This method return an ExecutorService depending on the current concurrency strategy. It can return the
 	 * executor of a sip session, app session or just threadpool executor which doesn't limit concurrent processing
 	 * of requests per app or sip session.
+	 * Since 0.8.1 it always return threadpool executor which doesn't limit concurrent processing since concurrency is achieved through semaphore
 	 * 
 	 * @param sipServletMessage the request you put here must have app and sip session associated
 	 * @return
 	 */
 	public final ExecutorService getConcurrencyModelExecutorService(
 			SipContext sipContext, SipServletMessageImpl sipServletMessage) {
-		ConcurrencyControlMode concurrencyControlMode = sipContext.getConcurrencyControlMode();
-		switch (concurrencyControlMode) {
-		case SipSession:
-			return sipServletMessage.getSipSession().getExecutorService();
-		case SipApplicationSession:
-			return ((MobicentsSipApplicationSession) sipServletMessage
-					.getApplicationSession()).getExecutorService();
-		case None:
 			return ((SipApplicationDispatcherImpl) this.sipApplicationDispatcher)
 					.getAsynchronousExecutor();
-		}
-		throw new IllegalStateException(
-				"This concurrency model is not supported: "
-						+ concurrencyControlMode);
 	}
 }

@@ -133,7 +133,7 @@ public interface SipContext extends Context {
 	
 	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions);
 	
-	void exitSipApp();
+	void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
 	
 	SipFactoryFacade getSipFactoryFacade();
 	

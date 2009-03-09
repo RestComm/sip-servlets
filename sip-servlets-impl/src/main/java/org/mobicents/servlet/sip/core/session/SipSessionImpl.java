@@ -36,6 +36,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -222,6 +223,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
 	protected transient Transaction originalTransaction = null;
 	protected transient boolean okToByeSentOrReceived = false;
+	protected transient Semaphore semaphore;
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
@@ -234,6 +236,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		this.subscriptions = new HashSet<EventHeader>();
+		semaphore = new Semaphore(1);
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -1426,5 +1429,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 				sessionCreatingDialog.delete();
 			}
 		}
+	}
+	/**
+	 * @return the semaphore
+	 */
+	public Semaphore getSemaphore() {
+		return semaphore;
 	}
 }

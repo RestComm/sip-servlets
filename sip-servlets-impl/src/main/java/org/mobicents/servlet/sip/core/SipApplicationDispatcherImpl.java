@@ -385,38 +385,39 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * Gives the number of pending messages in all queues for all concurrency control modes.
 	 */
 	public int getNumberOfPendingMessages() {
-		int size = 0;
-		Iterator<SipContext> applicationsIterator = this.applicationDeployed
-				.values().iterator();
-		boolean noneModeAlreadyCounted = false;
-		while (applicationsIterator.hasNext()) {
-			SipContext context = applicationsIterator.next();
-			SipManager manager = (SipManager) context
-					.getManager();
-			if(context.getConcurrencyControlMode().equals(
-					ConcurrencyControlMode.None) && !noneModeAlreadyCounted) {
-				size = this.asynchronousExecutor.getQueue().size();
-				noneModeAlreadyCounted = true;
-			} else if (context.getConcurrencyControlMode().equals(
-					ConcurrencyControlMode.SipApplicationSession)) {
-				Iterator<MobicentsSipApplicationSession> sessionIterator = manager
-						.getAllSipApplicationSessions();
-				while (sessionIterator.hasNext()) {
-					size += sessionIterator.next().getExecutorService()
-							.getQueue().size();
-				}
-			} else if (context.getConcurrencyControlMode().equals(
-					ConcurrencyControlMode.SipSession)) {
-				Iterator<MobicentsSipSession> sessionIterator = manager
-						.getAllSipSessions();
-				while (sessionIterator.hasNext()) {
-					size += sessionIterator.next().getExecutorService()
-							.getQueue().size();
-				}
-			}
-		}
-		
-		return size;
+		return this.asynchronousExecutor.getQueue().size();
+//		int size = 0;
+//		Iterator<SipContext> applicationsIterator = this.applicationDeployed
+//				.values().iterator();
+//		boolean noneModeAlreadyCounted = false;
+//		while (applicationsIterator.hasNext()) {
+//			SipContext context = applicationsIterator.next();
+//			SipManager manager = (SipManager) context
+//					.getManager();
+//			if(context.getConcurrencyControlMode().equals(
+//					ConcurrencyControlMode.None) && !noneModeAlreadyCounted) {
+//				size = this.asynchronousExecutor.getQueue().size();
+//				noneModeAlreadyCounted = true;
+//			} else if (context.getConcurrencyControlMode().equals(
+//					ConcurrencyControlMode.SipApplicationSession)) {
+//				Iterator<MobicentsSipApplicationSession> sessionIterator = manager
+//						.getAllSipApplicationSessions();
+//				while (sessionIterator.hasNext()) {
+//					size += sessionIterator.next().getExecutorService()
+//							.getQueue().size();
+//				}
+//			} else if (context.getConcurrencyControlMode().equals(
+//					ConcurrencyControlMode.SipSession)) {
+//				Iterator<MobicentsSipSession> sessionIterator = manager
+//						.getAllSipSessions();
+//				while (sessionIterator.hasNext()) {
+//					size += sessionIterator.next().getExecutorService()
+//							.getQueue().size();
+//				}
+//			}
+//		}
+//		
+//		return size;
 	}
 	
 	private void analyzeQueueCongestionState() {
@@ -705,7 +706,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						sipApplicationSession.tryToInvalidate();
 					}
 				} finally {
-					sipContext.exitSipApp();
+					sipContext.exitSipApp(null, null);
 				}
 			}
 		}

@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.servlet.sip.Address;
@@ -147,8 +148,8 @@ public interface MobicentsSipSession extends SipSession {
 
 	SipApplicationRoutingRegion getRegionInternal();
 	
-	ThreadPoolExecutor getExecutorService();
-
+	Semaphore getSemaphore();
+	
 	//RFC 3265
 	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;
 	void removeSubscription(SipServletMessageImpl sipServletMessage);

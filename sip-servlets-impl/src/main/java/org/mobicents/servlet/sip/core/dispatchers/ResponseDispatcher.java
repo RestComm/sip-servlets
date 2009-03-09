@@ -221,7 +221,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						}
 					} finally {
-						sipContext.exitSipApp();
+						sipContext.exitSipApp(null, sipServletResponse);
 					}
 				}
 			};

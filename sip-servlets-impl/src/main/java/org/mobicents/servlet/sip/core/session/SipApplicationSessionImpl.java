@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +82,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				try {
 					invalidate();
 				} finally {
-					sipContext.exitSipApp();
+					sipContext.exitSipApp(null, null);
 				}
 			}
 		}
@@ -124,12 +125,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	protected transient SipContext sipContext;
 	
 	protected String currentRequestHandler;
+	
+	protected transient Semaphore semaphore;
 		
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<String,MobicentsSipSession>();
 		httpSessions = new ConcurrentHashMap<String,HttpSession>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
+		semaphore = new Semaphore(1);
 		this.key = key;
 		this.sipContext = sipContext;
 		this.currentRequestHandler = sipContext.getMainServlet();
@@ -932,6 +936,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	public ThreadPoolExecutor getExecutorService() {
 		return executorService;
+	}
+
+	/**
+	 * @return the semaphore
+	 */
+	public Semaphore getSemaphore() {
+		return semaphore;
 	}
 	
 }

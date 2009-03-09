@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.servlet.http.HttpSession;
@@ -66,6 +67,6 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	
 	void tryToInvalidate();
 	
-	ThreadPoolExecutor getExecutorService();
+	Semaphore getSemaphore();
 
 }

@@ -248,7 +248,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
 					} 	 
 				} finally {
-					sipContext.exitSipApp();
+					sipContext.exitSipApp(sipServletRequest, null);
 				}
 				
 				//if a final response has been sent, or if the request has 
