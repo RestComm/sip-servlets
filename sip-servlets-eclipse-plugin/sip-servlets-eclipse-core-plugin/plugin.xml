@@ -80,5 +80,12 @@
 		</wizard-pages>
 	</extension>
 
+   
+
+<extension point="org.eclipse.wst.server.ui.editorPages">
+	<page id="com.mobicents.router.page" order="20" name="Sip Servlets Management" typeIds="*"
+		class="org.mobicents.sip.servlet.tooling.wst.server.ui.editor.ApplicationRouterEditorPart"/>
+</extension>
+
 
 </plugin>

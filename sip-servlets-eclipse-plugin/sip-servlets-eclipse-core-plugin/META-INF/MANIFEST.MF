@@ -12,10 +12,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst;bundle-version="1.0.100",
  org.eclipse.wst.common.project.facet.core;bundle-version="1.3.4",
  org.eclipse.jst.j2ee;bundle-version="1.1.204",
+ org.eclipse.wst.server.core;bundle-version="1.1.2",
  org.eclipse.jst.j2ee.core;bundle-version="1.1.202",
  org.eclipse.jst.j2ee.web;bundle-version="1.1.202",
  org.eclipse.wst.common.project.facet.ui;bundle-version="1.3.2",
  org.eclipse.jdt.core;bundle-version="3.4.2",
- org.eclipse.emf.ecore;bundle-version="2.4.1"
+ org.eclipse.emf.ecore;bundle-version="2.4.1",
+ org.eclipse.wst.server.ui;bundle-version="1.1.3",
+ org.eclipse.ui.browser;bundle-version="3.2.201"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
