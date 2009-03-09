@@ -785,7 +785,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		
 	}
 
-	public void exitSipApp() {
+	public void exitSipApp(SipServletRequestImpl request,
+			SipServletResponseImpl response) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -841,7 +842,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}
 		} finally {
-			exitSipApp();
+			exitSipApp(null, null);
 		}
 		return ok;
 	}
