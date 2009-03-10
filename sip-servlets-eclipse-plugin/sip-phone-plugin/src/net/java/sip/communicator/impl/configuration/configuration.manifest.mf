@@ -1,0 +1,18 @@
+Bundle-Activator: net.java.sip.communicator.impl.configuration.ConfigurationActivator
+Bundle-Name: Configuration Service Implementation
+Bundle-Description: A bundle that offers configuration utilities
+Bundle-Vendor: sip-communicator.org
+Bundle-Version: 0.0.1
+System-Bundle: yes
+Import-Package: org.osgi.framework,
+ org.xml.sax,
+ org.w3c.dom,
+ javax.xml.transform,
+ javax.xml.transform.dom,
+ javax.xml.transform.stream,
+ javax.xml.parsers,
+ net.java.sip.communicator.util,
+ net.java.sip.communicator.util.xml,
+ net.java.sip.communicator.service.fileaccess
+Export-Package: net.java.sip.communicator.service.configuration,
+ net.java.sip.communicator.service.configuration.event
