@@ -2536,8 +2536,18 @@ public class CallSessionImpl
         {
             try
             {
+            	Vector  packagePrefix = PackageManager.getProtocolPrefixList();
+            String myPackagePrefix = new String("net.java.sip.communicator.impl");
+            // Add new package prefix to end of the package prefix list. 
+            packagePrefix.addElement(myPackagePrefix);
+            PackageManager.setProtocolPrefixList(packagePrefix);
+            // Save the changes to the package prefix list.
+            PackageManager.commitProtocolPrefixList();
+
                 logger.debug("received a new incoming stream. " + evt);
-                DataSource ds = stream.getDataSource();
+                DataSource ds = new net.java.sip.communicator.impl.media.MonitoredRTPPushDataSource((com.sun.media.protocol.rtp.DataSource) stream.getDataSource(), "(TYPE=IN)");
+                //DataSource ds = stream.getDataSource();
+                
                 // Find out the formats.
                 RTPControl ctl = (RTPControl) ds.getControl(
                     "javax.media.rtp.RTPControl");

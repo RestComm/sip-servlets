@@ -1,6 +1,10 @@
 package org.mobicents.sip.phone.views;
 
 
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Properties;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -8,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.part.ViewPart;
 import org.mobicents.sip.phone.SipPhoneActivator;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
 
@@ -15,7 +20,8 @@ import org.osgi.framework.ServiceReference;
 
 public class SipPhoneView extends ViewPart {
 
-	private VisualizationService vis;
+	private VisualizationService outVisualization;
+	private VisualizationService inVisualization;
 	private SipCommunicatorOSGIBootstrap sipCommunicator;
 	private Keypad keypad;
 
@@ -28,15 +34,17 @@ public class SipPhoneView extends ViewPart {
 		verticalLayout.horizontalSpacing = 1;
 		main.setLayout(verticalLayout);
 		Composite upper = new Composite(main, SWT.NONE);
-		Group lower = new Group(main, SWT.NONE);
+		Composite lower = new Composite(main, SWT.NONE);
 		
 		RowLayout upperRowLayout = new RowLayout();
 		upperRowLayout.justify = false;
 		upper.setLayout(upperRowLayout);
-		vis = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 500, 100, 130);
+		
+		outVisualization = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 250, 100, 30);
+		inVisualization = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 250, 100, 30);
 		
 		RowLayout lowerRowLayout = new RowLayout();
-		lowerRowLayout.justify = false;
+		lowerRowLayout.justify = true;
 		lowerRowLayout.wrap = false;
 		lowerRowLayout.marginLeft = 0;
 		lowerRowLayout.marginRight = 0;
@@ -47,34 +55,38 @@ public class SipPhoneView extends ViewPart {
 		phoneControls.setSipPhoneView(this);
 		keypad = new Keypad(lower, SWT.NONE);
 		
-		// TODO: Add properties so we can support multiple instances
+		Dictionary propertiesOut = new Properties();
+		propertiesOut.put("TYPE", "OUT");
 		SipPhoneActivator.getDefault().getBundle().getBundleContext().registerService(
-				VisualizationService.class.getName(), vis, null);
+				VisualizationService.class.getName(), outVisualization, propertiesOut);
+		
+		Dictionary propertiesIn = new Properties();
+		propertiesIn.put("TYPE", "IN");
+		SipPhoneActivator.getDefault().getBundle().getBundleContext().registerService(
+				VisualizationService.class.getName(), inVisualization, propertiesIn);
 		
 		//phoneControls.setLayoutData(new RowData(150, 310));
 	}
 	
-	public static VisualizationService getVisualizationCanvas() {
-		ServiceReference ref = SipPhoneActivator.getDefault().getBundle().getBundleContext().getServiceReference(
-				VisualizationService.class.getName());
+	public static VisualizationService getVisualizationService(String filter) {
+		ServiceReference ref = null;
+		try {
+			ref = SipPhoneActivator.getDefault().getBundle().getBundleContext().getServiceReferences(
+					VisualizationService.class.getName(), filter)[0];
+		} catch (InvalidSyntaxException e) {
+		}
 		return (VisualizationService)SipPhoneActivator.getDefault().getBundle().getBundleContext().getService(ref);
 	}
 	
+	
 	@Override
 	public void setFocus() {
-	}
-
-	public VisualizationService getVis() {
-		return vis;
 	}
 
 	public SipCommunicatorOSGIBootstrap getSipCommunicator() {
 		return sipCommunicator;
 	}
 
-	public void setVis(VisualizationService vis) {
-		this.vis = vis;
-	}
 
 	public void setSipCommunicator(SipCommunicatorOSGIBootstrap sipCommunicator) {
 		this.sipCommunicator = sipCommunicator;

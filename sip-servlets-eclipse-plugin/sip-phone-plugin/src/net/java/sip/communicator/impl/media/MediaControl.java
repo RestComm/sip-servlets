@@ -53,7 +53,7 @@ public class MediaControl
     /**
      * The audio <tt>DataSource</tt> which provides mute support.
      */
-    private SinePushDataSource muteAudioDataSource;
+    private MonitoredPushBufferDataSource muteAudioDataSource;
 
     private SourceCloneable cloneableVideoDataSource;
 
@@ -196,8 +196,8 @@ public class MediaControl
             if (audioDataSource instanceof PushBufferDataSource)
                 audioDataSource =
                     muteAudioDataSource =
-                        new SinePushDataSource(
-                            (PushBufferDataSource) audioDataSource);
+                        new MonitoredPushBufferDataSource(
+                            (PushBufferDataSource) audioDataSource, "(TYPE=OUT)");
         }
 
         // video device
@@ -973,7 +973,7 @@ public class MediaControl
      */
     public boolean isMute()
     {
-        return (muteAudioDataSource != null) && muteAudioDataSource.isMute();
+        return false;//return (muteAudioDataSource != null) && muteAudioDataSource.isMute();
     }
 
     /**
@@ -984,8 +984,8 @@ public class MediaControl
      */
     public void setMute(boolean mute)
     {
-        if (muteAudioDataSource != null)
-            muteAudioDataSource.setMute(mute);
+        //if (muteAudioDataSource != null)
+        //    muteAudioDataSource.setMute(mute);
     }
 
     /**

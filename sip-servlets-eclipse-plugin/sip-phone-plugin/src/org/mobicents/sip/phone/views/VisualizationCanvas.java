@@ -19,7 +19,7 @@ public class VisualizationCanvas extends Canvas implements VisualizationService{
 	private int width;
 	private int height;
 	private int rate;
-	private int max = 128;
+	private int max = 200;
 	private int i = 0;
 	private Point[] dataBuffer;
 	
@@ -86,8 +86,11 @@ public class VisualizationCanvas extends Canvas implements VisualizationService{
 		for(int q=0; q<dataBuffer.length-1; q++) {
 			dataBuffer[q] = dataBuffer[q+1];
 		}
+		this.max = Math.max(this.max, value.x);
+		this.max = Math.max(this.max, value.y);
 		value.x = (value.x*this.height/2)/this.max;
 		value.y = (value.y*this.height/2)/this.max;
+		
 		dataBuffer[dataBuffer.length-1] = value;
 	}
 	

@@ -19,17 +19,6 @@ import org.mobicents.sip.phone.views.VisualizationService;
 import org.osgi.framework.ServiceReference;
 
 
-/**
- * Implements a <tt>PushBufferDataSource</tt> wrapper which provides mute
- * support for the wrapped instance.
- * <p>
- * Because the class wouldn't work for our use case without it,
- * <tt>CaptureDevice</tt> is implemented and is being delegated to the wrapped
- * <tt>DataSource</tt> (if it supports the interface in question).
- * </p>
- *
- * @author Lubomir Marinov
- */
 public class SinePushDataSource
     extends PushBufferDataSource
     implements CaptureDevice
@@ -273,7 +262,7 @@ public class SinePushDataSource
         public void updateValues(int minValue, int maxValue) {
             int mod = (int)Math.abs(phase)%(samplingRate/10);
             if(mod == 0) {
-            	VisualizationService vis = SipPhoneView.getVisualizationCanvas();
+            	VisualizationService vis = SipPhoneView.getVisualizationService("TYPE=OUT");
             	if(vis != null) {
             		vis.addValue(new Point(minValue, maxValue));
             	}
