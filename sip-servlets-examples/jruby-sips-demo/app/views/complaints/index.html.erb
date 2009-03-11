@@ -1,0 +1,26 @@
+<h1>Listing complaints</h1>
+
+<table>
+  <tr>
+    <th>Customer name</th>
+    <th>Company</th>
+    <th>Complaint</th>
+    <th>Sip uri</th>
+  </tr>
+
+<% for complaint in @complaints %>
+  <tr>
+    <td><%=h complaint.customer_name %></td>
+    <td><%=h complaint.company %></td>
+    <td><%=h complaint.complaint %></td>
+    <td><%=h complaint.sip_uri %></td>
+    <td><%= link_to 'Show', complaint %></td>
+    <td><%= link_to 'Edit', edit_complaint_path(complaint) %></td>
+    <td><%= link_to 'Destroy', complaint, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New complaint', new_complaint_path %>

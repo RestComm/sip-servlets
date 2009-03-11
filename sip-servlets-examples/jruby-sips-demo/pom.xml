@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>sip-servlets-examples-parent</artifactId>
+		<version>1.2</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<groupId>org.mobicents.servlet.sip.example</groupId>
+	<artifactId>jruby-demo-sip-servlet</artifactId>
+	<packaging>war</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>JRuby Sip Servlet Demo Application</name>
+	<url>http://www.mobicents.org/jruby-sip-servlets.html</url>
+
+	<dependencies>	
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api</artifactId>
+			<version>${mms.version}</version>			
+		</dependency>
+		<dependency>		
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-constants</artifactId>
+			<version>${mms.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.media</groupId>
+			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
+			<version>${mms.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-ri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mobicents.servers.media</groupId>
+					<artifactId>mobicents-media-server-spi</artifactId>
+				</exclusion>
+			</exclusions>		
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>					
+					<warSourceDirectory>
+						${basedir}/src/main/sipapp
+					</warSourceDirectory>
+					<webResources>
+						<resource>
+						    	<directory>tmp/war</directory>
+							<excludes>
+              							<exclude>**/web.xml</exclude>
+							</excludes>
+						</resource>
+						<resource>
+						    	<directory>log</directory>
+						    	<!-- override the destination directory for this resource -->
+						    	<targetPath>WEB-INF/log</targetPath>						    	
+						</resource>						
+					</webResources>
+				</configuration>
+			</plugin>
+		</plugins>		
+	</build>
+</project>

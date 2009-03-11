@@ -1,0 +1,23 @@
+<p>
+  <b>Customer name:</b>
+  <%=h @complaint.customer_name %>
+</p>
+
+<p>
+  <b>Company:</b>
+  <%=h @complaint.company %>
+</p>
+
+<p>
+  <b>Complaint:</b>
+  <%=h @complaint.complaint %>
+</p>
+
+<p>
+  <b>Sip uri:</b>
+  <%=h @complaint.sip_uri %>
+</p>
+
+
+<%= link_to 'Edit', edit_complaint_path(@complaint) %> |
+<%= link_to 'Back', complaints_path %>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.demo.jruby.JRubySipServletApplication</app-name>
+	
+	<servlet>
+		<servlet-name>JRubySipServlet</servlet-name>
+		<display-name>JRubySipServlet</display-name>
+		<description>JRuby SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.demo.jruby.JRubySipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>		<listener>          	<listener-class>org.mobicents.servlet.sip.demo.jruby.InitializationListener</listener-class>    </listener>
+</sip-app>
