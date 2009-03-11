@@ -59,6 +59,9 @@ import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
@@ -928,12 +931,38 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}
 		} finally {
-			exitSipApp();
+			exitSipApp(null, null);
 		}
 		return ok;
 	}
 	
-	public void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions) {
+	public void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions) {		
+		switch (concurrencyControlMode) {
+			case SipSession:
+				MobicentsSipSession sipSession = null;
+				if(request != null) {
+					sipSession = ((MobicentsSipSession)request.getSipSession());
+				} else if (response != null ) {
+					sipSession = ((MobicentsSipSession)response.getSipSession());
+				}
+				if(sipSession != null) {
+					sipSession.getSemaphore().acquireUninterruptibly();
+				}
+				break;
+			case SipApplicationSession:
+				MobicentsSipApplicationSession sipApplicationSession = null;
+				if(request != null) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+				} else if (response != null ) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+				}
+				if(sipApplicationSession != null) {
+					sipApplicationSession.getSemaphore().acquireUninterruptibly();
+				}
+				break;
+			case None:
+				break;
+		}
 		if(getDistributable()) {
 			if(bindSessions) {
 				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, manager, startCacheActivity);
@@ -943,7 +972,33 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 	}
 	
-	public void exitSipApp() {
+	public void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {
+		switch (concurrencyControlMode) {
+		case SipSession:
+			MobicentsSipSession sipSession = null;
+			if(request != null) {
+				sipSession = ((MobicentsSipSession)request.getSipSession());
+			} else if (response != null ) {
+				sipSession = ((MobicentsSipSession)response.getSipSession());
+			}
+			if(sipSession != null) {
+				sipSession.getSemaphore().release();
+			}
+			break;
+		case SipApplicationSession:
+			MobicentsSipApplicationSession sipApplicationSession = null;
+			if(request != null) {
+				sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+			} else if (response != null ) {
+				sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+			}
+			if(sipApplicationSession != null) {
+				sipApplicationSession.getSemaphore().release();
+			}
+			break;
+		case None:
+			break;
+	}
 		if (getDistributable()) {
 			if(logger.isInfoEnabled()) {
 				logger.info("We are now after the servlet invocation, We replicate no matter what");
