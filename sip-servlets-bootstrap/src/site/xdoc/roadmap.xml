@@ -770,7 +770,7 @@
 						Eclipse plugin
 						</a>
 						<br />	
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=484">
 						JRuby integration
@@ -817,7 +817,7 @@
 								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=480">
-								 	SipSession & SipApplicationSession Concurrency control modes cannot sustain load test
+								 	SipSession and SipApplicationSession Concurrency control modes cannot sustain load test
 								</a>								
 							</li>
 						</ul>
@@ -874,6 +874,12 @@
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=324">
 						Sip Servlets working as IMS node (HSS or CSCF)
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=579">
+						Support for ICE and TURN
 						</a>
 						<br />
 					</p>		

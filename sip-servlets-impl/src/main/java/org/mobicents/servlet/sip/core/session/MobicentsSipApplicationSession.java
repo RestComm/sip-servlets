@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;

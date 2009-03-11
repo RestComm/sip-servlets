@@ -399,8 +399,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the sip context");
 		}
-		((SipManager)manager).dumpSipSessions();
-		((SipManager)manager).dumpSipApplicationSessions();
+		if(manager instanceof SipManager) {
+			((SipManager)manager).dumpSipSessions();
+			((SipManager)manager).dumpSipApplicationSessions();
+		}
 		listeners.deallocateServletsActingAsListeners();
 		super.stop();
 		// this should happen after so that applications can still do some processing

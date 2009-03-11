@@ -302,6 +302,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		
 		// Set listener
 		context.setConfigClass("org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig");
+//		context.setConfigClass("org.jboss.web.tomcat.service.deployers.JBossContextConfig");
 		context.addLifecycleListener(new ConvergedEncListener(hostName, loader, webLoader, webApp));
 
 		// Pass the metadata to the RunAsListener via a thread local
@@ -499,30 +500,32 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 					Context sipSubcontext = envCtx.createSubcontext(SIP_SUBCONTEXT);
 					Context applicationNameSubcontext = sipSubcontext.createSubcontext(convergedMetaData.getApplicationName());						
 					
-					SipContext sipContext = (SipContext) event.getSource();
-					SipFactoryFacade sipFactoryFacade = (SipFactoryFacade) sipContext.getSipFactoryFacade();
-					TimerService timerService = (TimerService) sipContext.getTimerService();
-					SipSessionsUtil sipSessionsUtil = (SipSessionsUtil) sipContext.getSipSessionsUtil();
-					
-					NonSerializableFactory.rebind(
-								applicationNameSubcontext,
-								SIP_FACTORY_JNDI_NAME,
-								sipFactoryFacade);
-					 
-					NonSerializableFactory
-							.rebind(
+					if(event.getSource() instanceof SipContext) {
+						SipContext sipContext = (SipContext) event.getSource();
+						SipFactoryFacade sipFactoryFacade = (SipFactoryFacade) sipContext.getSipFactoryFacade();
+						TimerService timerService = (TimerService) sipContext.getTimerService();
+						SipSessionsUtil sipSessionsUtil = (SipSessionsUtil) sipContext.getSipSessionsUtil();
+						
+						NonSerializableFactory.rebind(
 									applicationNameSubcontext,
-									SIP_SESSIONS_UTIL_JNDI_NAME,
-									sipSessionsUtil);
-					NonSerializableFactory
-							.rebind(
-									applicationNameSubcontext,
-									TIMER_SERVICE_JNDI_NAME,
-									timerService);
-					if (log.isDebugEnabled()) {
-						log
-								.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
-										+ convergedMetaData.getApplicationName() + "/<ObjectName>");
+									SIP_FACTORY_JNDI_NAME,
+									sipFactoryFacade);
+						 
+						NonSerializableFactory
+								.rebind(
+										applicationNameSubcontext,
+										SIP_SESSIONS_UTIL_JNDI_NAME,
+										sipSessionsUtil);
+						NonSerializableFactory
+								.rebind(
+										applicationNameSubcontext,
+										TIMER_SERVICE_JNDI_NAME,
+										timerService);
+						if (log.isDebugEnabled()) {
+							log
+									.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
+											+ convergedMetaData.getApplicationName() + "/<ObjectName>");
+						}
 					}
 	            }
 	            catch (Throwable t) {

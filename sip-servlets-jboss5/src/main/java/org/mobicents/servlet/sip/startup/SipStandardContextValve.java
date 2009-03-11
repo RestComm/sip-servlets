@@ -181,8 +181,27 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             }
         }
 
-        if(request != null) {			
-			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+        if(request != null) {
+        	//the line below was replaced by the whole bunch of code because getting the parameter from the request is causing
+        	//JRuby-Rails persistence to fail, go figure...
+//			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+        	
+        	String sipApplicationKey = null;
+        	String queryString = request.getQueryString();
+        	if(queryString != null) {
+	        	int indexOfSipAppKey = queryString.indexOf(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+	        		        	
+	        	if(indexOfSipAppKey != -1) {
+	        		// +1 to remove the = sign also
+	        		String sipAppKeyParam = queryString.substring(indexOfSipAppKey + MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME.length() + 1);
+	        		int indexOfPoundSign = sipAppKeyParam.indexOf("&");
+	        		if(indexOfPoundSign != -1) {
+	        			sipAppKeyParam = sipAppKeyParam.substring(0, indexOfPoundSign);
+	        		} 
+	        		sipApplicationKey = sipAppKeyParam;
+	        	}
+        	}
+        	
 			if(sipApplicationKey != null && sipApplicationKey.length() > 0) {
 				try {
 					SipApplicationSessionKey sipApplicationSessionKey = 
@@ -191,7 +210,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 						((SipManager)context.getManager()).getSipApplicationSession(sipApplicationSessionKey, false);
 					sipApplicationSessionImpl.addHttpSession(request.getSession());
 				} catch (ParseException pe) {
-					logger.error(pe);
+					logger.error("Unexpected exception while parsing the sip application session key" + sipApplicationKey, pe);
 				}
 			} else {
 				context.getSipFactoryFacade().storeHttpSession(request.getSession());
@@ -223,48 +242,86 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
     }
 
 
+//    /**
+//     * Select the appropriate child Wrapper to process this request,
+//     * based on the specified request URI.  If no matching Wrapper can
+//     * be found, return an appropriate HTTP error.
+//     *
+//     * @param request Request to be processed
+//     * @param response Response to be produced
+//     * @param valveContext Valve context used to forward to the next Valve
+//     *
+//     * @exception IOException if an input/output error occurred
+//     * @exception ServletException if a servlet error occurred
+//     */
+//    public final void event(Request request, Response response, CometEvent event)
+//        throws IOException, ServletException {
+//
+//        // Select the Wrapper to be used for this Request
+//        Wrapper wrapper = request.getWrapper();
+//
+//        // Normal request processing
+//        // FIXME: This could be an addition to the core API too
+//        /*
+//        Object instances[] = context.getApplicationEventListeners();
+//
+//        ServletRequestEvent event = null;
+//
+//        if ((instances != null) 
+//                && (instances.length > 0)) {
+//            event = new ServletRequestEvent
+//                (((StandardContext) container).getServletContext(), 
+//                 request.getRequest());
+//            // create pre-service event
+//            for (int i = 0; i < instances.length; i++) {
+//                if (instances[i] == null)
+//                    continue;
+//                if (!(instances[i] instanceof ServletRequestListener))
+//                    continue;
+//                ServletRequestListener listener =
+//                    (ServletRequestListener) instances[i];
+//                try {
+//                    listener.requestInitialized(event);
+//                } catch (Throwable t) {
+//                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
+//                                     instances[i].getClass().getName()), t);
+//                    ServletRequest sreq = request.getRequest();
+//                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+//                    return;
+//                }
+//            }
+//        }
+//        */
+//
+//        wrapper.getPipeline().getFirst().event(request, response, event);
+//
+//        /*
+//        if ((instances !=null ) &&
+//                (instances.length > 0)) {
+//            // create post-service event
+//            for (int i = 0; i < instances.length; i++) {
+//                if (instances[i] == null)
+//                    continue;
+//                if (!(instances[i] instanceof ServletRequestListener))
+//                    continue;
+//                ServletRequestListener listener =
+//                    (ServletRequestListener) instances[i];
+//                try {
+//                    listener.requestDestroyed(event);
+//                } catch (Throwable t) {
+//                    container.getLogger().error(sm.getString("requestListenerValve.requestDestroy",
+//                                     instances[i].getClass().getName()), t);
+//                    ServletRequest sreq = request.getRequest();
+//                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+//                }
+//            }
+//        }
+//        */
+//      
+//    }
+
+
     // -------------------------------------------------------- Private Methods
-
-
-    /**
-     * Report a "bad request" error for the specified resource.  FIXME:  We
-     * should really be using the error reporting settings for this web
-     * application, but currently that code runs at the wrapper level rather
-     * than the context level.
-     *
-     * @param requestURI The request URI for the requested resource
-     * @param response The response we are creating
-     */
-    private void badRequest(String requestURI, HttpServletResponse response) {
-
-        try {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, requestURI);
-        } catch (IllegalStateException e) {
-            ;
-        } catch (IOException e) {
-            ;
-        }
-
-    }
-    
-    
-    /**
-     * Report a "forbidden" error for the specified resource. 
-     *
-     * @param requestURI The request URI for the requested resource
-     * @param response The response we are creating
-     */
-    private void forbidden(String requestURI, HttpServletResponse response) {
-
-        try {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, requestURI);
-        } catch (IllegalStateException e) {
-            ;
-        } catch (IOException e) {
-            ;
-        }
-
-    }
 
 
     /**
