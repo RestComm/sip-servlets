@@ -1,3 +1,22 @@
+Building the application :
+
+1.Create the war of the jruby-rails app with the following command :
+jruby -S warble war
+2.bundle the ruby rails with the java sip servlets app with the following command :
+mvn clean install
+
+Run the application
+
+1. deploy to Mobicents Sip Servlets :
+cp target/jruby-demo-sip-servlet-1.0-SNAPSHOT.war $JBOSS_HOME/server/default/deploy
+2. copy the jruby-sip-demo.properties dar file into $JBOSS_HOME/server/default/conf/mobicents-dar.properties
+3. Start jboss with sh $JBOSS_HOME/bin/run.sh
+4. Start your sip phone
+5. go to http://localhost:8080/jruby-demo-sip-servlet-1.0-SNAPSHOT/complaints
+6. Create a new complaint and make sure that in the sip uri field you put the address of the sip phone (sip:jean@127.0.0.1:5090 by example)
+
+
+
 == Welcome to Rails
 
 Rails is a web-application framework that includes everything needed to create 
