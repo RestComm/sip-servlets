@@ -181,8 +181,27 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             }
         }
 
-        if(request != null) {			
-			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+        if(request != null) {
+        	//the line below was replaced by the whole bunch of code because getting the parameter from the request is causing
+        	//JRuby-Rails persistence to fail, go figure...
+//			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+        	
+        	String sipApplicationKey = null;
+        	String queryString = request.getQueryString();
+        	if(queryString != null) {
+	        	int indexOfSipAppKey = queryString.indexOf(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+	        		        	
+	        	if(indexOfSipAppKey != -1) {
+	        		// +1 to remove the = sign also
+	        		String sipAppKeyParam = queryString.substring(indexOfSipAppKey + MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME.length() + 1);
+	        		int indexOfPoundSign = sipAppKeyParam.indexOf("&");
+	        		if(indexOfPoundSign != -1) {
+	        			sipAppKeyParam = sipAppKeyParam.substring(0, indexOfPoundSign);
+	        		} 
+	        		sipApplicationKey = sipAppKeyParam;
+	        	}
+        	}
+        	
 			if(sipApplicationKey != null && sipApplicationKey.length() > 0) {
 				try {
 					SipApplicationSessionKey sipApplicationSessionKey = 
@@ -191,7 +210,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 						((SipManager)context.getManager()).getSipApplicationSession(sipApplicationSessionKey, false);
 					sipApplicationSessionImpl.addHttpSession(request.getSession());
 				} catch (ParseException pe) {
-					logger.error(pe);
+					logger.error("Unexpected exception while parsing the sip application session key" + sipApplicationKey, pe);
 				}
 			} else {
 				context.getSipFactoryFacade().storeHttpSession(request.getSession());
