@@ -7,7 +7,7 @@ mvn clean install
 
 Run the application
 
-1. deploy to Mobicents Sip Servlets :
+1. deploy to Mobicents Sip Servlets at least build 293 on http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsSipServletsRelease/ :
 cp target/jruby-demo-sip-servlet-1.0-SNAPSHOT.war $JBOSS_HOME/server/default/deploy
 2. copy the jruby-sip-demo.properties dar file into $JBOSS_HOME/server/default/conf/mobicents-dar.properties
 3. Start jboss with sh $JBOSS_HOME/bin/run.sh

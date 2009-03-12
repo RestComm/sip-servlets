@@ -1,8 +1,5 @@
 package org.mobicents.servlet.sip.demo.jruby;
 
-import java.io.File;
-import java.net.URL;
-
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
@@ -102,6 +99,9 @@ public class MediaConnectionListener implements MsConnectionListener {
 				
 				MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
 		        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed};
+		        
+		        MediaResourceListener mediaResourceListener = new MediaResourceListener(response.getSession(), link);
+				link.addNotificationListener(mediaResourceListener);
 				
 		        logger.info("Executing requests...");
 		        link.getEndpoints()[0].execute(requestedSignals, requestedEvents, (MsLink) link);		
