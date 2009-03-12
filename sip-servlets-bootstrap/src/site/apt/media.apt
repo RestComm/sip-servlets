@@ -3,7 +3,7 @@ Media Support
 * Description
 
 	Mobicents Sip Servlets is providing support for applications to setup media session 
-	through the {{{http://groups.google.com/group/mobicents-public/web/mobicents-media-server}Mobicents Media Server}}.
+	through the {{{http://hudson.qa.jboss.com/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/media/index.html}Mobicents Media Server}}.
 	
 	The Mobicents Media Server is an implementation of the 
 	{{{http://jcp.org/en/jsr/detail?id=309}JSR 309 specification}} 

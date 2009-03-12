@@ -38,6 +38,7 @@
 				<item name="Media PBX" href="mss-ipbx.html" />
 				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
 				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
+				<item name="JRuby/Rails Sip Servlets Example" href="mss-jruby-example.html"/>
 			</item>
 		</menu>
 		<menu name="Advanced Features">
@@ -49,6 +50,7 @@
 			<item name="Congestion Control" href="mss-congestion.html" />
 			<item name="JBoss Seam Integration" href="mss-seam.html" />
 			<item name="JSLEE/Sip Servlets Interoperability" href="mobicents-sip-servlets-jslee-intero.html" />
+			<item name="JRuby-Rails Integration" href="mss-jruby.html" />
 		</menu>
 		<menu name="Other Protocols Support">
 			<item name="Diameter" href="mss-diameter.html" collapse="true">

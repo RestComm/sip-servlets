@@ -1,0 +1,15 @@
+JRuby on Rails integration or How to make phone calls from a JRuby on Rails application
+
+* Description
+
+	Mobicents Sip Servlets is now featuring JRuby on Rails integration so that you can make phone calls from your favorite JRuby on Rails applications.
+	
+	Check our simple {{{mss-jruby-example.html}JRuby on Rails Sip Servlets example}} showcasing this integration !
+	 
+	Check this {{{http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html}blog post}} to help you create your first converged multi language JRuby on Rails Sip Servlets application.     
+
+* Limitations
+
+	Currently the application has to be bundled as a war, but integration with JBoss Rails deployer is in progress.
+	Also only the JRuby on Rails application using Sip Servlets features has been tested not the other way around : Sip Servlets calling out
+	to JRuby on Rails applications to handle the signalling or whatever !  

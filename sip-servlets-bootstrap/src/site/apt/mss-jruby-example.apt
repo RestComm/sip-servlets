@@ -1,0 +1,40 @@
+JRuby on Rails Sip Servlets application that can make phone calls
+
+* Service Description
+
+	The application will allow one to file complaints and every time a complaint is filed, 
+	a confirmation call is made to your phone saying that is has been taken into account and has been routed to a sales representative.
+	 
+* How to activate it
+
+   <Beware : this application works only on Mobicents Sip Servlets 0.9-SNAPSHOT for now, you can check it out from the trunk or as a zip from {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsSipServletsRelease/293/artifact/mss-0.9-SNAPSHOT-jboss-4.2.3.GA-0903111539.zip}here}}>
+
+** From the binary
+
+	You can find the war file corresponding to this example
+ 	{{{http://snapshots.jboss.org/maven2/org/mobicents/servlet/sip/example/jruby-demo-sip-servlet/1.0-SNAPSHOT/jruby-demo-sip-servlet-1.0-20090312.080848-2.war}here}}.\
+ 	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
+ 	
+ 	Get the corresponding {{{/jruby-sips-demo.properties}dar configuration file}}.\
+ 	Drop it in your <<<jboss_home/server/default/conf/dars>>> directory.\
+	To use this dar file for this service, specify in the Service xml tag, 
+	darConfigurationFileLocation attribute of the <<<tomcat_home/conf/server.xml>>> file or <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\
+	<<<conf/dars/locationservice-dar.properties>>>
+
+	You can now run your JBoss container 
+
+** From the source
+
+	Please check out the location service example located under this 
+	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/jruby-sips-demo}location}} 
+	from the svn repository.\
+	Follow the instructions in the README.txt to build and run the example.  
+
+* How to play with it
+
+	Starts your favorite Sip Phone (wengo phone, linphone, ekiga, sip communicator, ...)\ 
+	The SIP phones doesn't have to be registered.
+	
+	then go to {{{http://localhost:8080/jruby-demo-sip-servlet-1.0-SNAPSHOT/complaints}http://localhost:8080/jruby-demo-sip-servlet-1.0-SNAPSHOT/complaints}}
+
+	Create a new complaint and make sure that in the sip uri field you put the address of the sip phone (such as sip:jean@127.0.0.1:5090)   
