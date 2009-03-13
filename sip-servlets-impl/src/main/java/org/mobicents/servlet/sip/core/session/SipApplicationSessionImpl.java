@@ -318,8 +318,18 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return lastAccessedTime;
 	}
 
-	private void setLastAccessedTime(long lastAccessTime) {
+	private synchronized void setLastAccessedTime(long lastAccessTime) {
 		this.lastAccessedTime= lastAccessTime;
+		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew 
+		if(sipContext.getSipApplicationSessionTimeout() > 0) {
+			cancelExpirationTimer();
+			long expirationTime = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
+			expirationTimerTask = new SipApplicationSessionTimerTask();
+			if(logger.isDebugEnabled()) {
+				logger.debug("Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
+			}
+			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
+		}
 	}
 	
 	/**
