@@ -9,6 +9,7 @@ import javax.servlet.sip.SipServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsLinkEvent;
@@ -22,14 +23,16 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 	
 	private MsEndpoint endpoint;
 	private MsSession session;
+	private MsConnection uaPrConnection;
 	private SipServletMessage message;
 	private ConcurrentHashMap<Conference, MsLink> links = new ConcurrentHashMap<Conference, MsLink>();
 	
-	public EndpointConferenceParticipant(String name, MsEndpoint endpoint, MsSession session, SipServletMessage message) {
+	public EndpointConferenceParticipant(String name, MsEndpoint endpoint, MsSession session, SipServletMessage message, MsConnection connection) {
 		this.endpoint = endpoint;
 		this.session = session;
 		this.name = name;
 		this.message = message;
+		this.uaPrConnection = connection;
 	}
 	
 	/* (non-Javadoc)
@@ -102,6 +105,7 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 	public void leave(Conference conference) {
 		try {
 			links.get(conference).release();
+			uaPrConnection.release();
 		} catch (Exception e) {
 			logger.error(e);
 		}
@@ -121,15 +125,13 @@ public class EndpointConferenceParticipant extends ConferenceParticipant {
 
 	@Override
 	public void mute(Conference conference) {
-		leave(conference);
-		join(conference, MsLinkMode.HALF_DUPLEX);
+		links.get(conference).setMode(MsLinkMode.HALF_DUPLEX);
 		muted = true;
 	}
 
 	@Override
 	public void unmute(Conference conference) {
-		leave(conference);
-		join(conference, MsLinkMode.FULL_DUPLEX);
+		links.get(conference).setMode(MsLinkMode.FULL_DUPLEX);
 		muted = false;
 	}
 

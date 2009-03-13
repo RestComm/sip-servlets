@@ -98,7 +98,7 @@ public class ConferenceConnectionListener implements MsConnectionListener, MsNot
 		String callerName = response.getTo().getURI().toString();
 
 		ConferenceParticipant participant = new EndpointConferenceParticipant(
-				callerName, endpoint, session, response);
+				callerName, endpoint, session, response, connection);
 
 		String key = SipGwtConferenceConsole.CONFERENCE_NAME;
 
@@ -126,7 +126,7 @@ public class ConferenceConnectionListener implements MsConnectionListener, MsNot
 		String callerName = inviteRequest.getFrom().getURI().toString();
 
 		ConferenceParticipant participant = new EndpointConferenceParticipant(
-				callerName, endpoint, session, inviteRequest);
+				callerName, endpoint, session, inviteRequest, connection);
 
 		String key = ((SipURI) inviteRequest.getTo().getURI()).getUser();
 
