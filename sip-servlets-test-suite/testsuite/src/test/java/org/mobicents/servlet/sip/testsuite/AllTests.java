@@ -62,6 +62,7 @@ import org.mobicents.servlet.sip.testsuite.session.RequestDispatcherSipServletTe
 import org.mobicents.servlet.sip.testsuite.session.SessionHandlerSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
+import org.mobicents.servlet.sip.testsuite.session.SipAppSessionTerminationTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
@@ -109,7 +110,8 @@ public class AllTests {
 		suite.addTestSuite(SpeedDialLocationServiceJunitTest.class);
 		suite.addTestSuite(Click2CallBasicTest.class);
 		suite.addTestSuite(ListenersSipServletTest.class);
-		suite.addTestSuite(TimersSipServletTest.class);	
+		suite.addTestSuite(TimersSipServletTest.class);
+		suite.addTestSuite(SipAppSessionTerminationTest.class);
 		suite.addTestSuite(SessionKeyTargetingSipServletTest.class);
 		suite.addTestSuite(AppKeySipServletTest.class);
 		suite.addTestSuite(SessionStateUASSipServletTest.class);

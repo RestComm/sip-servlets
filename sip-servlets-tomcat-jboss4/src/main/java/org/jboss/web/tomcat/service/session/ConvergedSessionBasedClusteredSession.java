@@ -25,8 +25,10 @@ import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
+import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionDelegate;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 /**
  * Extension of the Jboss SessionBasedClusteredSession class so that applications
@@ -38,7 +40,7 @@ import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
  *
  */
 public class ConvergedSessionBasedClusteredSession extends
-		SessionBasedClusteredSession implements ConvergedHttpSession {
+		SessionBasedClusteredSession implements ConvergedSession {
 
 	/**
      * The facade associated with this session.  NOTE:  This value is not
@@ -95,6 +97,19 @@ public class ConvergedSessionBasedClusteredSession extends
 	 * @see javax.servlet.sip.ConvergedHttpSession#getApplicationSession()
 	 */
 	public SipApplicationSession getApplicationSession() {		
-		return convergedSessionDelegate.getApplicationSession();
+		return convergedSessionDelegate.getApplicationSession(true);
+	}
+	
+	public boolean isValid() {
+		return isValidInternal();
+	}
+	
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		MobicentsSipApplicationSession sipApplicationSession = convergedSessionDelegate.getApplicationSession(false);
+		if(sipApplicationSession != null) {
+			sipApplicationSession.tryToInvalidate();
+		}
 	}
 }

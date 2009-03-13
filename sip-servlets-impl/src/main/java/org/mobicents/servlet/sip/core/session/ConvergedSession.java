@@ -16,82 +16,16 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
-import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ConvergedHttpSession;
-import javax.servlet.sip.SipApplicationSession;
-
-import org.apache.catalina.security.SecurityUtil;
-import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 
 /**
- * Extension of the Tomcat StandardSession class so that applications
- * are able to cast session to javax.servlet.sip.ConvergedHttpSession interface.
+ * Interface allowing us to check if a converged session is still valid
  * 
  * @author Jean Deruelle
  *
  */
-public class ConvergedSession 
-		extends org.apache.catalina.session.StandardSession 
-		implements ConvergedHttpSession {
-
-	/**
-     * The facade associated with this session.  NOTE:  This value is not
-     * included in the serialized version of this object.
-     */
-    protected transient ConvergedSessionFacade facade = null;
-    
-    private ConvergedSessionDelegate convergedSessionDelegate = null;
-	/**
-	 * 
-	 * @param sessionManager
-	 */
-	public ConvergedSession(SipManager manager, SipNetworkInterfaceManager sipNetworkInterfaceManager) {
-		super(manager);
-		convergedSessionDelegate = new ConvergedSessionDelegate(manager, sipNetworkInterfaceManager, this);
-	}
+public interface ConvergedSession 
+		extends ConvergedHttpSession {
 	
-	@Override
-	public HttpSession getSession() {
-        if (facade == null){
-            if (SecurityUtil.isPackageProtectionEnabled()){
-                final ConvergedHttpSession fsession = this;
-                facade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction<ConvergedSessionFacade>(){
-                    public ConvergedSessionFacade run(){
-                        return new ConvergedSessionFacade(fsession);
-                    }
-                });
-            } else {
-                facade = new ConvergedSessionFacade(this);
-            }
-        }
-        return (facade);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.ConvergedHttpSession#encodeURL(java.lang.String)
-	 */
-	public String encodeURL(String url) {
-		return convergedSessionDelegate.encodeURL(url);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.ConvergedHttpSession#encodeURL(java.lang.String, java.lang.String)
-	 */
-	public String encodeURL(String relativePath, String scheme) {
-		return convergedSessionDelegate.encodeURL(relativePath, scheme);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.ConvergedHttpSession#getApplicationSession()
-	 */
-	public SipApplicationSession getApplicationSession() {		
-		return convergedSessionDelegate.getApplicationSession();
-	}
-
+	boolean isValid();
 }

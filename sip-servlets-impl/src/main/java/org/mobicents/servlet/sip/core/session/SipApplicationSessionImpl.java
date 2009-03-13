@@ -421,33 +421,16 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#invalidate()
 	 */
 	public void invalidate() {
+		//JSR 289 Section 6.1.2.2.1
+		//When the IllegalStateException is thrown, the application is guaranteed 
+		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
+		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the following sip application session " + key);
 		}
-		//JSR 289 Section 6.1.2.2.1
-		//When the IllegalStateException is thrown, the application is guaranteed 
-		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
-		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
-		
-		//need to check before doing the real invalidation if they are eligible 
-		//for invalidation
-		
-		// checkInvalidation not needed after PFD2
-		/*
-		for(SipSessionImpl session: sipSessions.values()) {
-			if(session.isValid()) {
-				try {
-					session.checkInvalidation();
-				} catch (IllegalStateException e) {
-					throw new IllegalStateException("All SIP " +
-						"and HTTP sessions must be invalidated" +
-						" before invalidating the application session.", e);
-				}
-			}					
-		} */
 		
 		//doing the invalidation
 		for(MobicentsSipSession session: sipSessions.values()) {
@@ -456,11 +439,18 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 		for(HttpSession session: httpSessions.values()) {
-			try {
-				session.invalidate();
-			} catch(IllegalStateException ignore) {
-				//we ignore this exception, ugly but the only way to test for validity of the session since we cannot cast to catalina Session
-				//See Issue 523 http://code.google.com/p/mobicents/issues/detail?id=523
+			if(session instanceof ConvergedSession) {
+				ConvergedSession convergedSession = (ConvergedSession) session;
+				if(convergedSession.isValid()) {
+					convergedSession.invalidate();
+				}
+			} else {
+				try {
+					session.invalidate();
+				} catch(IllegalStateException ignore) {
+					//we ignore this exception, ugly but the only way to test for validity of the session since we cannot cast to catalina Session
+					//See Issue 523 http://code.google.com/p/mobicents/issues/detail?id=523
+				}
 			}
 		}
 		for (String key : sipApplicationSessionAttributeMap.keySet()) {
@@ -899,7 +889,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						break;
 					}
 				}
-				if(allSipSessionsInvalidated) {
+				boolean allHttpSessionsInvalidated = true;
+				for(HttpSession httpSession:this.httpSessions.values()) {
+					ConvergedSession convergedSession = (ConvergedSession) httpSession;
+					if(convergedSession.isValid()) {
+						allHttpSessionsInvalidated = false;
+						break;
+					}
+				}
+				if(allSipSessionsInvalidated && allHttpSessionsInvalidated) {
 					this.invalidate();
 				}
 			}

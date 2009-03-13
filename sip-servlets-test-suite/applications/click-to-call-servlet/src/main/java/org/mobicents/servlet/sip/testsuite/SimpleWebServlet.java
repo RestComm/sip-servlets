@@ -66,6 +66,8 @@ public class SimpleWebServlet extends HttpServlet
     {
         String toAddr = request.getParameter("to");
         String fromAddr = request.getParameter("from");
+        String invalidateHttpSession = request.getParameter("invalidateHttpSession");
+        
         URI to = sipFactory.createAddress(toAddr).getURI();
         URI from = sipFactory.createAddress(fromAddr).getURI();              
 
@@ -78,7 +80,9 @@ public class SimpleWebServlet extends HttpServlet
         
         // Set some attribute
         req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
-        
+        if(invalidateHttpSession != null) {
+        	req.getSession().setAttribute("invalidateHttpSession", request.getSession().getId());
+        }
         logger.info("Sending request" + req);
         // Send the INVITE request            
         req.send();

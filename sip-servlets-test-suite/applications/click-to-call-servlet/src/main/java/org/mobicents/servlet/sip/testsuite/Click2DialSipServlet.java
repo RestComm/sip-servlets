@@ -19,28 +19,35 @@ package org.mobicents.servlet.sip.testsuite;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 import javax.servlet.sip.Address;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipURI;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class Click2DialSipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class Click2DialSipServlet extends SipServlet implements SipApplicationSessionListener {
 	private static Log logger = LogFactory.getLog(Click2DialSipServlet.class);
-	private SipFactory sipFactory;
+	private static final String SIP_APP_SESSION_DESTROYED = "sipAppSessionDestroyed";
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	@Resource
+	private SipFactory sipFactory;	
 	
 	public Click2DialSipServlet() {
 	}
@@ -54,11 +61,12 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.Click2DialApplication/SipFactory");
-			logger.info("Sip Factory ref from JNDI : " + sipFactory);
+			SipFactory sipFactory2 = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.Click2DialApplication/SipFactory");
+			logger.info("Sip Factory ref from JNDI : " + sipFactory2);
 		} catch (NamingException e) {
 			throw new ServletException("Uh oh -- JNDI problem !", e);
 		}
+		logger.info("Sip Factory ref from Annotations: " + sipFactory);
 	}
 	
 	@Override
@@ -80,57 +88,59 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 			throws ServletException, IOException {
 		logger.info("Got OK");		
 		
-		SipSession session = resp.getSession();
-
-		if (resp.getStatus() == SipServletResponse.SC_OK) {
-
-			Boolean inviteSent = (Boolean) session.getAttribute("InviteSent");
-			if (inviteSent != null && inviteSent.booleanValue()) {
-				return;
-			}
-			Address secondPartyAddress = (Address) resp.getSession()
-					.getAttribute("SecondPartyAddress");
-			if (secondPartyAddress != null) {
-
-				SipServletRequest invite = sipFactory.createRequest(resp
-						.getApplicationSession(), "INVITE", session
-						.getRemoteParty(), secondPartyAddress);
-
-				logger.info("Found second party -- sending INVITE to "
-						+ secondPartyAddress);
-
-				String contentType = resp.getContentType();
-				if (contentType != null && contentType.trim().equals("application/sdp")) {
-					invite.setContent(resp.getContent(), "application/sdp");
-				}
-
-				session.setAttribute("LinkedSession", invite.getSession());
-				invite.getSession().setAttribute("LinkedSession", session);
-
-				SipServletRequest ack = resp.createAck();
-				invite.getSession().setAttribute("FirstPartyAck", ack);
-
-				invite.send();
-
-				session.setAttribute("InviteSent", Boolean.TRUE);
+		if (resp.getStatus() == SipServletResponse.SC_OK && resp.getMethod().equals("INVITE")) {
+			if(resp.getFrom().toString().contains("sipAppTest")) {
+				resp.createAck().send();
 			} else {
-				String cSeqValue = resp.getHeader("CSeq");
-				if(cSeqValue.indexOf("INVITE") != -1) {				
-					logger.info("Got OK from second party -- sending ACK");
+				SipSession session = resp.getSession();
+				Boolean inviteSent = (Boolean) session.getAttribute("InviteSent");
+				if (inviteSent != null && inviteSent.booleanValue()) {
+					return;
+				}
+				Address secondPartyAddress = (Address) resp.getSession()
+						.getAttribute("SecondPartyAddress");
+				if (secondPartyAddress != null) {
 	
-					SipServletRequest secondPartyAck = resp.createAck();
-					SipServletRequest firstPartyAck = (SipServletRequest) resp
-							.getSession().getAttribute("FirstPartyAck");
+					SipServletRequest invite = sipFactory.createRequest(resp
+							.getApplicationSession(), "INVITE", session
+							.getRemoteParty(), secondPartyAddress);
 	
-					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
-						firstPartyAck.setContent(resp.getContent(),
-								"application/sdp");
-						secondPartyAck.setContent(resp.getContent(),
-								"application/sdp");
+					logger.info("Found second party -- sending INVITE to "
+							+ secondPartyAddress);
+	
+					String contentType = resp.getContentType();
+					if (contentType != null && contentType.trim().equals("application/sdp")) {
+						invite.setContent(resp.getContent(), "application/sdp");
 					}
 	
-					firstPartyAck.send();
-					secondPartyAck.send();
+					session.setAttribute("LinkedSession", invite.getSession());
+					invite.getSession().setAttribute("LinkedSession", session);
+	
+					SipServletRequest ack = resp.createAck();
+					invite.getSession().setAttribute("FirstPartyAck", ack);
+	
+					invite.send();
+	
+					session.setAttribute("InviteSent", Boolean.TRUE);
+				} else {
+					String cSeqValue = resp.getHeader("CSeq");
+					if(cSeqValue.indexOf("INVITE") != -1) {				
+						logger.info("Got OK from second party -- sending ACK");
+		
+						SipServletRequest secondPartyAck = resp.createAck();
+						SipServletRequest firstPartyAck = (SipServletRequest) resp
+								.getSession().getAttribute("FirstPartyAck");
+		
+						if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
+							firstPartyAck.setContent(resp.getContent(),
+									"application/sdp");
+							secondPartyAck.setContent(resp.getContent(),
+									"application/sdp");
+						}
+		
+						firstPartyAck.send();
+						secondPartyAck.send();
+					}
 				}
 			}
 		}
@@ -140,46 +150,31 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got bye");
-		SipSession session = request.getSession();
-		SipSession linkedSession = (SipSession) session
-				.getAttribute("LinkedSession");
-		if (linkedSession != null) {
-			SipServletRequest bye = linkedSession.createRequest("BYE");
-			logger.info("Sending bye to " + linkedSession.getRemoteParty());
-			bye.send();
-		}
-
+		SipSession session = request.getSession();		
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
+		if(!request.getTo().toString().contains("sipAppTest")) {			
+			SipSession linkedSession = (SipSession) session
+					.getAttribute("LinkedSession");
+			if (linkedSession != null) {
+				SipServletRequest bye = linkedSession.createRequest("BYE");
+				logger.info("Sending bye to " + linkedSession.getRemoteParty());
+				bye.send();
+			}
+		} else {
+			if(session.isValid() && session.isReadyToInvalidate()) {
+				String httpSessionId = (String) session.getAttribute("invalidateHttpSession"); 
+				if(httpSessionId != null) {
+					HttpSession httpSession = (HttpSession) session.getApplicationSession().getSession(httpSessionId, Protocol.HTTP);
+					httpSession.invalidate();
+				}
+				session.invalidate();
+			}
+		}
 	}
-    
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void doResponse(SipServletResponse response)
-			throws ServletException, IOException {
 
-		logger.info("SimpleProxyServlet: Got response:\n" + response);
-		super.doResponse(response);
-	}
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noAckReceived(SipErrorEvent ee) {
-		logger.info("SimpleProxyServlet: Error: noAckReceived.");
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noPrackReceived(SipErrorEvent ee) {
-		logger.info("SimpleProxyServlet: Error: noPrackReceived.");
-	}
-	
 	protected void doRegister(SipServletRequest req) 
 	throws ServletException, IOException 
 	{
@@ -187,6 +182,44 @@ public class Click2DialSipServlet extends SipServlet implements SipErrorListener
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);
 		resp.send();
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent ev) {
+		logger.info("sip application session destroyed " +  ev.getApplicationSession());
+//		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
+		if(sipFactory != null) {
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			try {
+				SipServletRequest sipServletRequest = sipFactory .createRequest(
+						sipApplicationSession, 
+						"MESSAGE", 
+						"sip:sender@sip-servlets.com", 
+						"sip:receiver@sip-servlets.com");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5057");
+				sipServletRequest.setRequestURI(sipUri);
+				sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
+				sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);
+				sipServletRequest.send();
+			} catch (ServletParseException e) {
+				logger.error("Exception occured while parsing the addresses",e);
+			} catch (IOException e) {
+				logger.error("Exception occured while sending the request",e);			
+			}
+		}
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		
 	}
 
 }

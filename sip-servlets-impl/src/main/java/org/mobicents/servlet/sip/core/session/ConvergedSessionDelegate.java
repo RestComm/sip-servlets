@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.core.session;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -133,11 +132,11 @@ public class ConvergedSessionDelegate {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.ConvergedHttpSession#getApplicationSession()
 	 */
-	public SipApplicationSession getApplicationSession() {		
+	public MobicentsSipApplicationSession getApplicationSession(boolean create) {		
 		//the application session if currently associated is returned, 
 		MobicentsSipApplicationSession sipApplicationSession =
 			sipManager.findSipApplicationSession(httpSession);
-		if(sipApplicationSession == null) {
+		if(sipApplicationSession == null && create) {
 			//however if no application session is associated it is created, 
 			//associated with the HttpSession and returned.
 			ExtendedListeningPoint listeningPoint = 
