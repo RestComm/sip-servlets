@@ -49,9 +49,9 @@ public class ConvergedAttributeBasedClusteredSession extends
     
 	private ConvergedSessionDelegate convergedSessionDelegate = null;
 	
-	public ConvergedAttributeBasedClusteredSession(JBossCacheSipManager manager, SipNetworkInterfaceManager sipNetworkInterfaceManager) {
+	public ConvergedAttributeBasedClusteredSession(JBossCacheSipManager manager) {
 		super(manager);
-		convergedSessionDelegate = new ConvergedSessionDelegate(manager, sipNetworkInterfaceManager, this);
+		convergedSessionDelegate = new ConvergedSessionDelegate(manager, this);
 	}
 	
 	@Override

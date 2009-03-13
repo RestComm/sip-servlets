@@ -669,9 +669,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				&& this.session.getApplicationSession() != null) {
 			return this.session.getApplicationSession();
 		} else if (create) {						
+			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			SipApplicationSessionKey key = SessionManagerUtil.getSipApplicationSessionKey(
 					currentApplicationName, 
-					((CallIdHeader)message.getHeader((CallIdHeader.NAME))).getCallId(),
+					null,
 					false);
 			if(this.session == null) {
 				if(logger.isDebugEnabled()) {

@@ -54,9 +54,9 @@ public class ConvergedSessionBasedClusteredSession extends
 	 * @param manager
 	 * @param sipNetworkInterfaceManager 
 	 */
-	public ConvergedSessionBasedClusteredSession(JBossCacheSipManager manager, SipNetworkInterfaceManager sipNetworkInterfaceManager) {
+	public ConvergedSessionBasedClusteredSession(JBossCacheSipManager manager) {
 		super(manager);
-		convergedSessionDelegate = new ConvergedSessionDelegate(manager, sipNetworkInterfaceManager, this);
+		convergedSessionDelegate = new ConvergedSessionDelegate(manager, this);
 	}
 	
 	@Override

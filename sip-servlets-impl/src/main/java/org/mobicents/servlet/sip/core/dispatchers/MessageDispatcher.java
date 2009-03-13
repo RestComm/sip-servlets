@@ -163,14 +163,16 @@ public abstract class MessageDispatcher {
 				//or an invalid session id as a failure to obtain a key from the application. 
 				//It is recommended that the container create a new SipApplicationSession for the incoming request in such a case.
 //				throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");				
-				id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
+//not needed anymore since the sipappsesionkey is not a callid anymore but a rnadom uuid
+//				id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("For request target to application " + sipContext.getApplicationName() + 
 						", following annotated method " + appKeyMethod + " generated the application key : " + id);
 			}
 		} else {
-			id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
+////not needed anymore since the sipappsesionkey is not a callid anymore but a rnadom uuid		
+//			id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 

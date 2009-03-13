@@ -98,9 +98,9 @@ public class SessionManagerUtil {
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip application session key creation");
 		}
-		if(id == null) {
-			throw new NullPointerException("the callId cannot be null for sip application session key creation");
-		}
+//		if(id == null) {
+//			throw new NullPointerException("the callId cannot be null for sip application session key creation");
+//		}
 		return new SipApplicationSessionKey(
 				id,
 				applicationName,
@@ -130,10 +130,10 @@ public class SessionManagerUtil {
 			throw new ParseException("The right parenthesis could not be found in the following key " + sipApplicationKey, 0);
 		}
 		
-		String callId = sipApplicationKey.substring(indexOfLeftParenthesis + 1, indexOfComma);
+		String uuid = sipApplicationKey.substring(indexOfLeftParenthesis + 1, indexOfComma);
 		String applicationName = sipApplicationKey.substring(indexOfComma + 1, indexOfRightParenthesis);
 		
-		return getSipApplicationSessionKey(applicationName, callId, false);			
+		return getSipApplicationSessionKey(applicationName, uuid, false);			
 	}
 	
 	/**

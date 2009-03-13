@@ -37,7 +37,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class ConvergedSessionDelegate {
 
-	protected SipNetworkInterfaceManager sipNetworkInterfaceManager;		
+//	protected SipNetworkInterfaceManager sipNetworkInterfaceManager;		
 	protected SipManager sipManager;
 	protected HttpSession httpSession;
 	
@@ -45,8 +45,8 @@ public class ConvergedSessionDelegate {
 	 * 
 	 * @param sessionManager
 	 */
-	public ConvergedSessionDelegate(SipManager manager, SipNetworkInterfaceManager sipNetworkInterfaceManager, HttpSession httpSession) {
-		this.sipNetworkInterfaceManager = sipNetworkInterfaceManager;
+	public ConvergedSessionDelegate(SipManager manager, HttpSession httpSession) {
+//		this.sipNetworkInterfaceManager = sipNetworkInterfaceManager;
 		this.sipManager = manager;
 		this.httpSession = httpSession;
 	}
@@ -139,12 +139,14 @@ public class ConvergedSessionDelegate {
 		if(sipApplicationSession == null && create) {
 			//however if no application session is associated it is created, 
 			//associated with the HttpSession and returned.
-			ExtendedListeningPoint listeningPoint = 
-				sipNetworkInterfaceManager.getExtendedListeningPoints().next();			
 			
+			//not needed anymore since the sipappsesionkey is not a callid anymore but a rnadom uuid
+//			ExtendedListeningPoint listeningPoint = 
+//				sipNetworkInterfaceManager.getExtendedListeningPoints().next();			
+//			
 			SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					((SipContext)sipManager.getContainer()).getApplicationName(), 
-					listeningPoint.getSipProvider().getNewCallId().getCallId(),
+					null,
 					false);
 			
 			sipApplicationSession = 

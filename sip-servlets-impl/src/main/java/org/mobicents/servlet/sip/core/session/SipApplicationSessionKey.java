@@ -17,18 +17,20 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * <p>
  * Class representing the key (which will also be its id) for a sip application session.<br/>
- * It is composed of the Call-Id and the application Name.
+ * It is composed of a random UUID and the application Name.
  * </p>
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
 public class SipApplicationSessionKey implements Serializable {
-	String id; 
+	String uuid;
+//	String id; 
 	String applicationName;
 	boolean isAppGeneratedKey;
 	private String toString;
@@ -39,12 +41,17 @@ public class SipApplicationSessionKey implements Serializable {
 	 */
 	public SipApplicationSessionKey(String id, String applicationName, boolean isAppGeneratedKey) {
 		super();
-		this.id = id;
+		if(id == null) {
+			this.uuid = "" + System.nanoTime();
+		} else {
+			this.uuid = id;
+		}
+//		this.id = id;
 		this.applicationName = applicationName;
 		this.isAppGeneratedKey = isAppGeneratedKey;
 		StringBuffer value = new StringBuffer();
 		value = value.append("(");
-		value = value.append(id);
+		value = value.append(uuid);
 		value = value.append(",");
 		value = value.append(applicationName);
 		value = value.append(")");
@@ -54,7 +61,7 @@ public class SipApplicationSessionKey implements Serializable {
 	 * @return the Id
 	 */
 	public String getId() {
-		return id;
+		return uuid;
 	}
 	/**
 	 * @return the applicationName
@@ -77,7 +84,7 @@ public class SipApplicationSessionKey implements Serializable {
 		int result = 1;
 		result = prime * result
 				+ ((applicationName == null) ? 0 : applicationName.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
 		return result;
 	}
 	/* (non-Javadoc)
@@ -97,10 +104,10 @@ public class SipApplicationSessionKey implements Serializable {
 				return false;
 		} else if (!applicationName.equals(other.applicationName))
 			return false;
-		if (id == null) {
-			if (other.id != null)
+		if (uuid == null) {
+			if (other.uuid != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
 	}		

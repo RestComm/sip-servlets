@@ -91,7 +91,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	protected StandardSession getNewSession() {
 		//return a converged session only if it is managing a sipcontext
 		if(container instanceof SipContext) {
-			return new ConvergedStandardSession(this, sipManagerDelegate.getSipFactoryImpl().getSipNetworkInterfaceManager());
+			return new ConvergedStandardSession(this);
 		} else {
 			return super.getNewSession();
 		}

@@ -48,9 +48,9 @@ public class ConvergedStandardSession
 	 * 
 	 * @param sessionManager
 	 */
-	public ConvergedStandardSession(SipManager manager, SipNetworkInterfaceManager sipNetworkInterfaceManager) {
+	public ConvergedStandardSession(SipManager manager) {
 		super(manager);
-		convergedSessionDelegate = new ConvergedSessionDelegate(manager, sipNetworkInterfaceManager, this);
+		convergedSessionDelegate = new ConvergedSessionDelegate(manager, this);
 	}
 	
 	@Override

@@ -174,10 +174,10 @@ public class SipFactoryImpl implements Serializable {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating new application session for sip context "+ sipContext.getApplicationName());
 		}
+		//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
-				sipApplicationDispatcher.getSipNetworkInterfaceManager().getExtendedListeningPoints().next()
-					.getSipProvider().getNewCallId().getCallId(),
+				null,
 				false);		
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
 				sipApplicationSessionKey, true);		
@@ -416,13 +416,13 @@ public class SipFactoryImpl implements Serializable {
 			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 			// Fix provided by Hauke D. Issue 411
 			SipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
-			if(sipApplicationSessionKey.isAppGeneratedKey()) {				
+//			if(sipApplicationSessionKey.isAppGeneratedKey()) {				
 				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
 						getSipNetworkInterfaceManager().getExtendedListeningPoints().next().getSipProvider().getNewCallId().getCallId());	
-			} else {
-				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
-						sipApplicationSessionKey.getId());
-			}
+//			} else {
+//				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+//						sipApplicationSessionKey.getId());
+//			}
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 						URIImpl requestURI = (URIImpl)to.getURI().clone();
@@ -490,11 +490,11 @@ public class SipFactoryImpl implements Serializable {
 			SipApplicationDispatcher dispatcher = 
 				mobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
-					dispatcher.getMdToApplicationName());
+					dispatcher.getMdToApplicationName());			
 			stack.setApplicationName(sipAppSession.getApplicationName());
-			if(sipApplicationSessionKey.isAppGeneratedKey()) {
+//			if(sipApplicationSessionKey.isAppGeneratedKey()) {
 				stack.setAppGeneratedApplicationSessionId(sipApplicationSessionKey.getId());
-			}
+//			}
 			fromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(

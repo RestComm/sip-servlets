@@ -172,6 +172,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher.getMdToApplicationName(), oldFromHeader.getTag());
 			stack.setApplicationName(originalSession.getKey().getApplicationName());
+			stack.setAppGeneratedApplicationSessionId(appSession.getKey().getId());
 			newFromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
@@ -524,6 +525,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher.getMdToApplicationName(), oldFromHeader.getTag());
 			stack.setApplicationName(originalSession.getKey().getApplicationName());
+			stack.setAppGeneratedApplicationSessionId(originalAppSession.getKey().getId());
 			newFromHeader.setTag(stack.toString());
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);

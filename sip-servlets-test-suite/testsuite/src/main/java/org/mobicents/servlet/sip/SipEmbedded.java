@@ -142,6 +142,7 @@ public class SipEmbedded {
 		sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
 //		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
+		sipService.setCongestionControlCheckingInterval(30000);
 		// Create an engine		
 		SipStandardEngine engine = new SipStandardEngine();
 		engine.setName(serverName);

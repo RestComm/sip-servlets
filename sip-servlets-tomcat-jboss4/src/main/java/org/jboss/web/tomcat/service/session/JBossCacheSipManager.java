@@ -648,8 +648,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 							+ msgEnd);
 		}
 
-		ClusteredSession session = createEmptyClusteredSession(sipManagerDelegate
-				.getSipFactoryImpl().getSipNetworkInterfaceManager());
+		ClusteredSession session = createEmptyClusteredSession();
 
 		session.setNew(true);
 		session.setCreationTime(System.currentTimeMillis());
@@ -1314,8 +1313,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
 			mustAdd = true;
-			session = createEmptyClusteredSession(sipManagerDelegate
-					.getSipFactoryImpl().getSipNetworkInterfaceManager());
+			session = createEmptyClusteredSession();
 		}
 
 		synchronized (session) {
@@ -2687,20 +2685,17 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	}
 
 	public Session createEmptySession() {
-		return createEmptyClusteredSession(sipManagerDelegate
-				.getSipFactoryImpl().getSipNetworkInterfaceManager());
+		return createEmptyClusteredSession();
 	}
 
-	private ClusteredSession createEmptyClusteredSession(
-			SipNetworkInterfaceManager sipNetworkInterfaceManager) {
+	private ClusteredSession createEmptyClusteredSession() {
 		log_.debug("Creating an empty ClusteredSession");
 
 		ClusteredSession session = null;
 		switch (replicationGranularity_) {
 		case (WebMetaData.REPLICATION_GRANULARITY_ATTRIBUTE): {
 			if (super.container_ instanceof SipContext) {
-				session = new ConvergedAttributeBasedClusteredSession(this,
-						sipNetworkInterfaceManager);
+				session = new ConvergedAttributeBasedClusteredSession(this);
 			} else {
 				session = new AttributeBasedClusteredSession(this);
 			}
@@ -2708,8 +2703,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 		case (WebMetaData.REPLICATION_GRANULARITY_FIELD): {
 			if (super.container_ instanceof SipContext) {
-				session = new ConvergedFieldBasedClusteredSession(this,
-						sipNetworkInterfaceManager);
+				session = new ConvergedFieldBasedClusteredSession(this);
 			} else {
 				session = new FieldBasedClusteredSession(this);
 			}
@@ -2717,8 +2711,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 		default:
 			if (super.container_ instanceof SipContext) {
-				session = new ConvergedSessionBasedClusteredSession(this,
-						sipNetworkInterfaceManager);
+				session = new ConvergedSessionBasedClusteredSession(this);
 			} else {
 				session = new SessionBasedClusteredSession(this);
 			}

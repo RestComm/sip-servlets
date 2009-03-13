@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -148,6 +149,8 @@ public class ProxyUtils {
 						originalRequest.getSipSession().getKey().getApplicationName());
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_PROXY_APP,
 						"true");
+				rrURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, 
+						RFC2396UrlDecoder.encode(originalRequest.getSipSession().getSipApplicationSession().getKey().getId()));
 				rrURI.setLrParam();
 				
 				Address rraddress = SipFactories.addressFactory
