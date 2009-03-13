@@ -820,6 +820,34 @@
 								 	SipSession and SipApplicationSession Concurrency control modes cannot sustain load test
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=611">
+								 	SipApplicationSession is invlidated when HttpSessions are still alive
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=612">
+								 	SipApplicationSession Expiry Timer never started anew when the session or underlying sessions are accessed
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=613">
+								 	SipFactory.createSipApplicationSession from a http session creates a new SipAppSession
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=614">
+								 	Allow different call ids within a Sip Application Session
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
