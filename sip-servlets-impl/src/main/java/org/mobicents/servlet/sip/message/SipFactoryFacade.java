@@ -32,6 +32,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -82,9 +83,18 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 * @see javax.servlet.sip.SipFactory#createApplicationSession()
 	 */
 	public SipApplicationSession createApplicationSession() {
-		MobicentsSipApplicationSession sipApplicationSessionImpl = 
-			(MobicentsSipApplicationSession)sipFactoryImpl.createApplicationSessionByAppName(sipContext.getApplicationName());
-		associateHttpSession(sipApplicationSessionImpl);
+		MobicentsSipApplicationSession sipApplicationSessionImpl = null; 
+		HttpSession httpSession = threadLocalHttpSession.get();
+		// make sure we don't create a new sip app session if the http session has already one associated
+		if(httpSession != null) {
+			ConvergedSession convergedSession = (ConvergedSession) httpSession;
+			sipApplicationSessionImpl = convergedSession.getApplicationSession(false);
+		}
+		if(sipApplicationSessionImpl == null) {
+			sipApplicationSessionImpl =
+				(MobicentsSipApplicationSession)sipFactoryImpl.createApplicationSessionByAppName(sipContext.getApplicationName());
+			associateHttpSession(sipApplicationSessionImpl);
+		}
 		return sipApplicationSessionImpl;
 	}
 
@@ -201,9 +211,18 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipApplicationSession createApplicationSessionByKey(
 			String sipApplicationKey) {
-		MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)
-			sipFactoryImpl.createApplicationSessionByKey(sipApplicationKey);
-		associateHttpSession(sipApplicationSessionImpl);
+		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
+		// make sure we don't create a new sip app session if the http session has already one associated
+		HttpSession httpSession = threadLocalHttpSession.get();
+		if(httpSession != null) {
+			ConvergedSession convergedSession = (ConvergedSession) httpSession;
+			sipApplicationSessionImpl = convergedSession.getApplicationSession(false);
+		}
+		if(sipApplicationSessionImpl == null) {
+			sipApplicationSessionImpl = (MobicentsSipApplicationSession)
+				sipFactoryImpl.createApplicationSessionByKey(sipApplicationKey);
+			associateHttpSession(sipApplicationSessionImpl);
+		}
 		return sipApplicationSessionImpl;
 	}
 

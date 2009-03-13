@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.core.session;
 
 import javax.servlet.sip.ConvergedHttpSession;
+import javax.servlet.sip.SipApplicationSession;
 
 /**
  * Interface allowing us to check if a converged session is still valid
@@ -26,6 +27,8 @@ import javax.servlet.sip.ConvergedHttpSession;
  */
 public interface ConvergedSession 
 		extends ConvergedHttpSession {
+	
+	public MobicentsSipApplicationSession getApplicationSession(boolean create);
 	
 	boolean isValid();
 }

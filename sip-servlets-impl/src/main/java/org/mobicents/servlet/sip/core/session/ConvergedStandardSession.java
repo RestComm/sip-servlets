@@ -94,6 +94,10 @@ public class ConvergedStandardSession
 		return convergedSessionDelegate.getApplicationSession(true);
 	}
 	
+	public MobicentsSipApplicationSession getApplicationSession(boolean create) {		
+		return convergedSessionDelegate.getApplicationSession(create);
+	}
+	
 	public boolean isValid() {
 		return isValidInternal();
 	}
