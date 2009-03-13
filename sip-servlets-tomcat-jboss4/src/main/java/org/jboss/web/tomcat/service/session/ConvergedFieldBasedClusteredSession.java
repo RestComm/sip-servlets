@@ -112,4 +112,13 @@ public class ConvergedFieldBasedClusteredSession extends
 			sipApplicationSession.tryToInvalidate();
 		}
 	}
+	
+	@Override
+	public void access() {		
+		super.access();
+		MobicentsSipApplicationSession sipApplicationSession = convergedSessionDelegate.getApplicationSession(false);
+		if(sipApplicationSession != null) {
+			sipApplicationSession.access();
+		}
+	}
 }
