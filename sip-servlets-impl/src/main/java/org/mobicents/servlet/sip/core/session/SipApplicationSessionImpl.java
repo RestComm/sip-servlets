@@ -326,7 +326,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			long expirationTime = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
 			expirationTimerTask = new SipApplicationSessionTimerTask();
 			if(logger.isDebugEnabled()) {
-				logger.debug("Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
+				logger.debug("Starting Expiry timer anew : Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
 			}
 			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
 		}
