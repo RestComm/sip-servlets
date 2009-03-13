@@ -7,10 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipServletMessage;
-import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
 public class SipSeamRequestSessionMap implements Map<String, Object>{

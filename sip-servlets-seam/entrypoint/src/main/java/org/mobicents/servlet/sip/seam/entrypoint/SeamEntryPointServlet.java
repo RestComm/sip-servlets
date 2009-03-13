@@ -25,20 +25,27 @@ import org.jboss.seam.mock.MockHttpSession;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MsProviderContainer;
 
 public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implements SipSessionListener {
-	private LogProvider log = Logging.getLogProvider(SeamEntryPointServlet.class);
+	private static LogProvider log = Logging.getLogProvider(SeamEntryPointServlet.class);
 	
-	public void sessionCreated(SipSessionEvent arg0) {
-		arg0.getSession().setAttribute("msSession", MsProviderContainer.msProvider.createSession());
-		arg0.getSession().setAttribute("sipSession", arg0.getSession());
-		Lifecycle.beginSession(new SipSeamSessionMap(arg0.getSession()));
-		SeamEntrypointUtils.beginEvent(arg0.getSession());
-		Contexts.getSessionContext().set("sipSession", arg0.getSession());
-		Contexts.getSessionContext().set("msSession", MsProviderContainer.msProvider.createSession());
-		Contexts.getApplicationContext().set("eventFactory", MsProviderContainer.msProvider.getEventFactory());
-		
-		Events.instance().raiseEvent("sipSessionCreated", arg0.getSession());
-		SeamEntrypointUtils.endEvent();
-		log.info("SEAM SIP SESSION CREATED");
+	public void sessionCreated(final SipSessionEvent arg0) {
+		new Thread() {
+			@Override
+			public void run() {
+				arg0.getSession().setAttribute("msSession", MsProviderContainer.msProvider.createSession());
+				arg0.getSession().setAttribute("sipSession", arg0.getSession());
+				Lifecycle.beginSession(new SipSeamSessionMap(arg0.getSession()));
+				SeamEntrypointUtils.beginEvent(arg0.getSession());
+				Contexts.getSessionContext().set("sipSession", arg0.getSession());
+				Contexts.getSessionContext().set("msSession", MsProviderContainer.msProvider.createSession());
+				Contexts.getApplicationContext().set("eventFactory", MsProviderContainer.msProvider.getEventFactory());
+				
+				Events.instance().raiseEvent("sipSessionCreated", arg0.getSession());
+				SeamEntrypointUtils.endEvent();
+				log.info("SEAM SIP SESSION CREATED");
+			}
+			
+		}.start();
+
 	}
 
 	public void sessionDestroyed(SipSessionEvent arg0) {
@@ -46,7 +53,8 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 		SeamEntrypointUtils.beginEvent(arg0.getSession());
 		Events.instance().raiseEvent("sipSessionDestroyed", arg0.getSession());
 		SeamEntrypointUtils.endEvent();
-		Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
+		SeamEntrypointUtils.endSession(new SipSeamSessionMap(arg0.getSession()));
+		//Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
 		log.info("SEAM SIP SESSION DESTROYED");
 	}
 
