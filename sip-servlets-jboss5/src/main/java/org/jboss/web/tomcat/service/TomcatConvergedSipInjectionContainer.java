@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.catalina.Context;
+import org.jboss.deployers.structure.spi.DeploymentUnit;
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.deployment.MappedReferenceMetaDataResolverDeployer;
 import org.jboss.deployment.dependency.ContainerDependencyMetaData;
@@ -124,7 +125,7 @@ public class TomcatConvergedSipInjectionContainer extends
 	}
 
 	public TomcatConvergedSipInjectionContainer(WebApplication appInfo,
-			VFSDeploymentUnit unit, Context catalinaContext,
+			DeploymentUnit unit, Context catalinaContext,
 			PersistenceUnitDependencyResolver resolver) {
 		super(appInfo, unit, catalinaContext, resolver);
 		this.webDD = unit.getAttachment(JBossConvergedSipMetaData.class);

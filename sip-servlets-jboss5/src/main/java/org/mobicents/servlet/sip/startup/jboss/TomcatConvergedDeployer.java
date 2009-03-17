@@ -27,6 +27,7 @@ import javax.servlet.sip.annotation.SipApplication;
 
 import org.jboss.deployers.spi.DeploymentException;
 import org.jboss.deployers.spi.annotations.AnnotationEnvironment;
+import org.jboss.deployers.structure.spi.DeploymentUnit;
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.kernel.plugins.bootstrap.basic.KernelConstants;
 import org.jboss.logging.Logger;
@@ -130,7 +131,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	}	   
    	
    	@Override
-   	public void deploy(VFSDeploymentUnit unit, JBossWebMetaData metaData)
+   	public void deploy(DeploymentUnit unit, JBossWebMetaData metaData)
    			throws DeploymentException {   
    		JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
    		super.deploy(unit, convergedMetaData);
@@ -146,7 +147,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	 * @return TomcatDeployment instnace
 	 */
 	@Override
-	public AbstractWarDeployment getDeployment(VFSDeploymentUnit unit,
+	public AbstractWarDeployment getDeployment(DeploymentUnit unit,
 			JBossWebMetaData metaData) throws Exception {						
 
 		DeployerConfig config = new DeployerConfig();
@@ -258,7 +259,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	 * @return true if the service being deployed contains WEB-INF/sip.xml or a SipApplication annotation,
 	 *         false otherwise
 	 */
-	public static boolean isSipServletApplication(VFSDeploymentUnit unit) {
+	public static boolean isSipServletApplication(DeploymentUnit unit) {
 		boolean isSipApplication = false;
 		URL url = unit.getResourceClassLoader().getResource(SipContext.APPLICATION_SIP_XML);
 		if (url != null) {
@@ -281,7 +282,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	}
 	
 	@Override
-	protected void deployWebModule(VFSDeploymentUnit unit,
+	protected void deployWebModule(DeploymentUnit unit,
 			JBossWebMetaData metaData, AbstractWarDeployment deployment)
 			throws Exception {		
 

@@ -99,21 +99,21 @@ public class ConvergedSipResourceHandler<X extends RemoteEnvironment> extends We
 
 	
 	private static void createURLInjector(String encName, String mappedName, InjectionContainer container)
-    {
-       assert encName.length() > 0 : "encName is empty";
-       assert mappedName.length() > 0 : "mappedName is empty";
-       
-       // Create a URL from the mappedName
-       try
-       {
-          URL url = new URL(mappedName.trim());
-          container.getEncInjectors().put(encName, new ValueEncInjector(encName, url, "@Resource"));
-       }
-       catch (MalformedURLException e)
-       {
-          throw new RuntimeException("failed to create url injector for: "+ encName, e);
-       }
-    }
+	{
+	      assert encName.length() > 0 : "encName is empty";
+	      assert mappedName.length() > 0 : "mappedName is empty";
+
+	      // Create a URL from the mappedName
+	      try
+	      {
+	         URL url = new URL(mappedName.trim());
+	         container.getEncInjectors().put(encName, new ValueEncInjector(encName, url, "@Resource"));
+	      }
+	      catch (MalformedURLException e)
+	      {
+	         throw new RuntimeException("failed to create url injector for: " + encName, e);
+	      }
+	}
 	
     private void handlePropertyAnnotation(Resource ref, BeanProperty property, InjectionContainer container, Map<AccessibleObject, Injector> injectors)
     {
@@ -237,15 +237,17 @@ public class ConvergedSipResourceHandler<X extends RemoteEnvironment> extends We
           String encName = "env/" + envEntry.getEnvEntryName();
           // 16.4.1.3: If the env-entry-value is not specified, no value will be injected and it
           // will not be initialized into the naming context.
-          if(envEntry.getValue() == null)
+          if (envEntry.getValue() == null)
           {
              log.debug("ignoring env-entry " + envEntry);
              continue;
           }
           InjectionUtil.injectionTarget(encName, envEntry, container, container.getEncInjections());
-          if (container.getEncInjectors().containsKey(encName)) continue;
+          if (container.getEncInjectors().containsKey(encName))
+             continue;
           log.trace("adding env-entry injector " + encName);
-          container.getEncInjectors().put(encName, new EnvEntryEncInjector(encName, envEntry.getType(), envEntry.getValue()));
+          container.getEncInjectors().put(encName,
+                new EnvEntryEncInjector(encName, envEntry.getType(), envEntry.getValue()));
        }
     }
 

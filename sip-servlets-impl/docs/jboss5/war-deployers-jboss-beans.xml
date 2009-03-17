@@ -14,6 +14,7 @@ $Id:$
              <constructor><parameter class="java.lang.String">.jar</parameter></constructor>
           </bean>
        </property>
+       <property name="includeWebInfInClasspath">true</property>
        <property name="contextInfoOrder">1000</property>
    </bean>
 
@@ -37,9 +38,7 @@ $Id:$
 
    <!-- Allow for war local class loaders: in testing -->
    <bean name="WarClassLoaderDeployer" class="org.jboss.web.tomcat.service.deployers.WarClassLoaderDeployer">
-      <property name="relativeOrder">-1</property>
-      
-      <property name="includeWebInfInClasspath">true</property>
+      <property name="relativeOrder">-1</property>      
       <property name="filteredPackages">javax.servlet,org.apache.commons.logging</property>
       
    </bean>

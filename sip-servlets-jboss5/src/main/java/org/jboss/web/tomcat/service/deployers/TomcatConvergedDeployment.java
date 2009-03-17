@@ -101,8 +101,8 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 	}
 
 	@Override
-	protected void performDeployInternal(String hostName,
-			WebApplication webApp, String warUrl) throws Exception {
+	protected void performDeployInternal(
+			WebApplication webApp, String hostName, String warUrlStr) throws Exception {
 
 		JBossWebMetaData metaData = webApp.getMetaData();
 		String ctxPath = metaData.getContextRoot();
@@ -113,10 +113,9 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 			metaData.setContextRoot(ctxPath);
 		}
 
-		log.info("deploy, ctxPath=" + ctxPath + ", vfsUrl="
-				+ webApp.getDeploymentUnit().getFile("").getPathName());
+		log.info("deploy, ctxPath=" + ctxPath);
 
-		URL url = new URL(warUrl);
+		URL warUrl = new URL(warUrlStr);
 
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		metaData.setContextLoader(loader);
@@ -124,21 +123,22 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		StandardContext context = (StandardContext) Class.forName(
 				config.getContextClassName()).newInstance();
 
+		DeploymentUnit depUnit = webApp.getDeploymentUnit();
 		TomcatConvergedSipInjectionContainer injectionContainer = new TomcatConvergedSipInjectionContainer(
-				webApp, webApp.getDeploymentUnit(), context,
+				webApp, depUnit, context,
 				getPersistenceUnitDependencyResolver());
 
 		setInjectionContainer(injectionContainer);
 
-		Loader webLoader = webApp.getDeploymentUnit().getAttachment(
+		Loader webLoader = depUnit.getAttachment(
 				Loader.class);
 		if (webLoader == null)
-			webLoader = getWebLoader(webApp.getDeploymentUnit(), metaData,
-					loader, url);
+			webLoader = getWebLoader(depUnit, metaData,
+					loader, warUrl);
 
-		webApp.setName(url.getPath());
+		webApp.setName(warUrl.getPath());
 		webApp.setClassLoader(loader);
-		webApp.setURL(url);
+		webApp.setURL(warUrl);
 
 		String objectNameS = config.getCatalinaDomain()
 				+ ":j2eeType=WebModule,name=//"
@@ -150,64 +150,23 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		if (Registry.getRegistry(null, null).getMBeanServer().isRegistered(
 				objectName))
 			throw new DeploymentException(
-					"Web mapping already exists for deployment URL " + warUrl);
+					"Web mapping already exists for deployment URL " + warUrlStr);
 
 		Registry.getRegistry(null, null).registerComponent(context, objectName,
 				config.getContextClassName());
 
-		if (TomcatService.OLD_CODE) {
-			String ctxConfig = null;
-			File warFile = new File(url.getFile());
-			if (warFile.isDirectory() == false) {
-				// Using VFS access
-				VFSDirContext resources = new VFSDirContext();
-				resources
-						.setVirtualFile(webApp.getDeploymentUnit().getFile(""));
-				context.setResources(resources);
-				// Find META-INF/context.xml
-				VirtualFile file = webApp.getDeploymentUnit().getFile(
-						CONTEXT_CONFIG_FILE);
-				if (file != null) {
-					// Copy the META-INF/context.xml from the VFS to the temp
-					// folder
-					InputStream is = file.openStream();
-					FileOutputStream fos = null;
-					try {
-						byte[] buffer = new byte[512];
-						int bytes;
-						// FIXME: use JBoss'temp folder instead
-						File tempFile = File.createTempFile("context-", ".xml");
-						tempFile.deleteOnExit();
-						fos = new FileOutputStream(tempFile);
-						while ((bytes = is.read(buffer)) > 0) {
-							fos.write(buffer, 0, bytes);
-						}
-						ctxConfig = tempFile.getAbsolutePath();
-					} finally {
-						is.close();
-						if (fos != null) {
-							fos.close();
-						}
-					}
-				}
-			} else {
-				// Using direct filesystem access: no operation needed
-				// Find META-INF/context.xml
-				File webDD = new File(warFile, CONTEXT_CONFIG_FILE);
-				if (webDD.exists() == true) {
-					ctxConfig = webDD.getAbsolutePath();
-				}
-			}
-
-			context.setConfigFile(ctxConfig);
-		} else {
-			context.setConfigFile(CONTEXT_CONFIG_FILE);
-		}
+		context.setConfigFile(CONTEXT_CONFIG_FILE);
 		context.setInstanceManager(injectionContainer);
-		context.setDocBase(url.getFile());
 		context.setDefaultContextXml("context.xml");
 		context.setDefaultWebXml("conf/web.xml");
 		context.setPublicId(metaData.getPublicID());
+		
+		String docBase = depUnit.getAttachment("org.jboss.web.explicitDocBase", String.class);
+	    if (docBase == null)
+	    	docBase = warUrl.getFile();
+
+	    context.setDocBase(docBase);
+	      
 		// If there is an alt-dd set it
 		if (metaData.getAlternativeDD() != null) {
 			log.debug("Setting altDDName to: " + metaData.getAlternativeDD());
@@ -296,7 +255,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 
 		// Add a valve to estalish the JACC context before authorization valves
 		Certificate[] certs = null;
-		CodeSource cs = new CodeSource(url, certs);
+		CodeSource cs = new CodeSource(warUrl, certs);
 		JaccContextValve jaccValve = new JaccContextValve(metaData, cs);
 		context.addValve(jaccValve);		
 		
@@ -320,7 +279,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 			injectSipUtilitiesIntoEJBs(context, metaData);
 		} catch (Exception e) {
 			context.destroy();
-			DeploymentException.rethrowAsDeploymentException("URL " + warUrl
+			DeploymentException.rethrowAsDeploymentException("URL " + warUrlStr
 					+ " deployment failed", e);
 		} finally {
 			RunAsListener.metaDataLocal.set(null);
@@ -333,7 +292,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		}
 		if (context.getState() != 1) {
 			context.destroy();
-			throw new DeploymentException("URL " + warUrl
+			throw new DeploymentException("URL " + warUrlStr
 					+ " deployment failed");
 		}
 

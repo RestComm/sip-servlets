@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>sip-servlets-jboss5</name>
+  <name>sip-servlets-jboss-4.2.x</name>
   <comment/>
   <projects/>
   <buildSpec>
