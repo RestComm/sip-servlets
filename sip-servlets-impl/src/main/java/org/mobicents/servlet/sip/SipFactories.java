@@ -40,6 +40,7 @@ public class SipFactories {
 	public static void initialize(String pathName) {
 		if (!initialized) {
 			try {
+				System.setProperty("gov.nist.core.STRIP_ADDR_SCOPES", "true");
 				sipFactory = SipFactory.getInstance();
 				sipFactory.setPathName(pathName);
 				addressFactory = sipFactory.createAddressFactory();
