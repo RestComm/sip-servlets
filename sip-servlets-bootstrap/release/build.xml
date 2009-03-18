@@ -363,13 +363,6 @@
 	<target name="build-documentation" depends="get-documentation">
 		<echo>Building documentation</echo>
 		
-		<!--move todir="${docs.stage.dir}/sip-presence/en-US/Common_Content">
-			<fileset dir="${docs.stage.dir}/common" />
-		</move-->
-		
-		<!--symlink overwrite="true" link="${docs.stage.dir}/media/en-US/Common_Content" resource="${docs.stage.dir}/common"/>
-		<symlink overwrite="true" link="${docs.stage.dir}/sip-servlets/en-US/Common_Content" resource="${docs.stage.dir}/common"/>
-		
 		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/media/">
 			<arg line="clean compile" />
 		</exec>
@@ -382,7 +375,7 @@
 		</copy>
 		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
 			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
-		</copy-->
+		</copy>
 		
 		<!--delete dir="${docs.stage.dir}" /-->
 	</target>
