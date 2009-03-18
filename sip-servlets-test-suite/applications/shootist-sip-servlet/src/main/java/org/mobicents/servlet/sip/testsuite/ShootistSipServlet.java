@@ -43,7 +43,7 @@ public class ShootistSipServlet
 		extends SipServlet 
 		implements SipServletListener,TimerListener {
 
-	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);
+	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;
 	
@@ -66,9 +66,14 @@ public class ShootistSipServlet
 		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			ackRequest.send();
-			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-			ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), 2000, false, (Serializable)sipServletRequest);
-			sipServletResponse.getApplicationSession().setAttribute("timer", timer);
+			if(sipServletResponse.getRequest().isInitial()) {
+				SipServletRequest request=sipServletResponse.getSession().createRequest("INVITE");				
+				request.send();
+			}  else {
+				SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
+				ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), 2000, false, (Serializable)sipServletRequest);
+				sipServletResponse.getApplicationSession().setAttribute("timer", timer);
+			}
 		}
 	}
 
@@ -89,7 +94,11 @@ public class ShootistSipServlet
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		
-		URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
+		String userName = ce.getServletContext().getInitParameter("username");
+		if(userName == null || userName.length() < 1) {
+			userName = "BigGuy";
+		}
+		URI fromURI = sipFactory.createSipURI(userName, "here.com");
 		URI toURI = null;
 		if(ce.getServletContext().getInitParameter("urlType") != null && ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
 			try {

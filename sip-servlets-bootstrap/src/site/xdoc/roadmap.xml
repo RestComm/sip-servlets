@@ -848,6 +848,13 @@
 								 	Allow different call ids within a Sip Application Session
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=622">
+								 	Move to JBoss AS 5.0.1.GA
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>

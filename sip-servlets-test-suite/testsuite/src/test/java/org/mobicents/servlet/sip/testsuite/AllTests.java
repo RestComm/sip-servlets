@@ -50,6 +50,7 @@ import org.mobicents.servlet.sip.testsuite.proxy.ProxyRecordRouteReInviteTest;
 import org.mobicents.servlet.sip.testsuite.publish.PublishSipServletTest;
 import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
 import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
+import org.mobicents.servlet.sip.testsuite.reinvite.UACReInviteSipServletTest;
 import org.mobicents.servlet.sip.testsuite.replaces.ReplacesSipServletTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalApplicationRoutingTest;
 import org.mobicents.servlet.sip.testsuite.routing.ExternalRoutingServletTest;
@@ -125,6 +126,7 @@ public class AllTests {
 		suite.addTestSuite(InDialogNotifierSipServletTest.class);
 		suite.addTestSuite(InDialogSubscriberSipServletTest.class);
 		suite.addTestSuite(ReInviteSipServletTest.class);
+		suite.addTestSuite(UACReInviteSipServletTest.class);
 		suite.addTestSuite(UpdateSipServletTest.class);
 		suite.addTestSuite(PublishSipServletTest.class);
 		suite.addTestSuite(ReferSipServletTest.class);
