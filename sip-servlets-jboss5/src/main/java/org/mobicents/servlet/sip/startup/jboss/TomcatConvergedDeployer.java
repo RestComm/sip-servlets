@@ -134,7 +134,11 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
    	public void deploy(DeploymentUnit unit, JBossWebMetaData metaData)
    			throws DeploymentException {   
    		JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
-   		super.deploy(unit, convergedMetaData);
+   		if(convergedMetaData == null) {
+   			super.deploy(unit, metaData);
+   		} else {
+   			super.deploy(unit, convergedMetaData);
+   		}
    	}
    	
    /**
