@@ -26,6 +26,8 @@
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
+	<property name="jboss-5.jboss.rails.deployer.url" value="http://repo.oddthesis.org/maven2/SNAPSHOTS/org/jboss/rails/jboss-rails/1.0.0.Beta5-SNAPSHOT/jboss-rails-1.0.0.Beta5-20090319.150347-3-deployer.jar"/>
+	<property name="jboss-5.jboss.rails.deployer.zip.path" value="${base.path}/jboss-rails-deployer.zip"/>
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.mux.version}.zip" />
 	
@@ -106,17 +108,17 @@
 		<antcall target="make-final-zip-jboss" />
 	</target>
 	
-	<target name="release-jboss-5" depends="extract-jboss-5">
+	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-rails-deployer">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
 					<property name="jboss-5.home" value="${jboss-5.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
+				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
+				</ant-->
 				<!-- Commented out because they don't run on JB5 yet -->
 				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
 					<property name="jboss.home" value="${jboss.home}"/>
@@ -485,6 +487,12 @@
 		<get dest="${jboss-5.distro.zip.path}" src="${jboss-5.download.url}"/>
 	</target>
 	
+	<available file="${jboss-5.jboss.rails.deployer.zip.path}" property="got.jboss-5-rails-deployer" />
+	<target name="get-jboss-5-rails-deployer" unless="got.jboss-5-rails-deployer">
+		<echo>Downloading JBoss AS 5 Rails Deployer</echo>
+		<get dest="${jboss-5.jboss.rails.deployer.zip.path}" src="${jboss-5.jboss.rails.deployer.url}"/>
+	</target>
+	
 	<target name="extract-jboss" depends="get-jboss">
 		<delete dir="${jboss.home}" failonerror="true" />
 		<unzip src="${jboss.distro.zip.path}" dest="${jboss.home}/.." />
@@ -507,6 +515,10 @@
 		<delete includeemptydirs="true" failonerror="false" verbose="false">
 			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations.jboss5}" />
 		</delete>
+	</target>
+	
+	<target name="extract-jboss-5-rails-deployer" depends="get-jboss-5-rails-deployer">			
+		<unzip src="${jboss-5.jboss.rails.deployer.zip.path}" dest="${jboss-5.home}/server/default/deployers/jboss-rails.deployer" />					
 	</target>
 	
 	<available file="${tomcat.distro.zip.path}" property="got.tomcat" />
