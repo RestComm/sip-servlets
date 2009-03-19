@@ -19,7 +19,7 @@ public class SipURITest extends junit.framework.TestCase {
 			{"sip:alice@atlanta.com?subject=project%20x&priority=urgent", "sip:alice@atlanta.com?priority=urgent&subject=project%20x"},
 			{"sip:carol@chicago.com", "sip:carol@chicago.com;security=on"},
 			{"sip:carol@chicago.com;security=on", "sip:carol@chicago.com"},
-//			{"sip:[0:0:0:0:0:0:0:1%1]:5070;transport=udp", "sip:[0:0:0:0:0:0:0:1%1]:5070;transport=udp"}
+			{"sip:[0:0:0:0:0:0:0:1%1]:5070;transport=udp", "sip:[0:0:0:0:0:0:0:1%1]:5070;transport=udp"}
 	};
 	
 	static String[][] different = {
@@ -34,8 +34,8 @@ public class SipURITest extends junit.framework.TestCase {
 	
 	private SipFactoryImpl sipFactory;
 	
-	public void setUp() {
-		SipFactories.initialize("gov.nist");
+	public void setUp() {		
+		SipFactories.initialize("gov.nist");		
 		sipFactory = new SipFactoryImpl(null);
 	}
 	
