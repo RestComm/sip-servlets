@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+
+  <!-- 
+     |
+     | Ruby
+     |
+     -->
+
+  <!-- Crypto -->
+
+  <bean name="CryptoYamlParsingDeployer"            class="org.jboss.ruby.enterprise.crypto.deployers.CryptoYamlParsingDeployer" />
+
+  <!-- Rack and Web --> 
+
+  <bean name="WebYamlParsingDeployer"               class="org.jboss.ruby.enterprise.web.rack.deployers.WebYamlParsingDeployer"/>
+
+  <bean name="RubyRackApplicationFactoryDeployer"   class="org.jboss.ruby.enterprise.web.rack.deployers.RubyRackApplicationFactoryDeployer"/>
+  <bean name="RackWebApplicationDeployer"           class="org.jboss.ruby.enterprise.web.rack.deployers.RackWebApplicationDeployer"/>
+
+  <!-- SIP -->
+  <bean name="SipYamlParsingDeployer"               class="org.jboss.ruby.enterprise.sip.deployers.SipYamlParsingDeployer"/>
+  <bean name="ConvergedSipRackWebApplicationDeployer"           class="org.jboss.ruby.enterprise.sip.deployers.ConvergedSipRackWebApplicationDeployer"/>
+
+  <!-- Runtime factories -->
+
+  <bean name="RubyRuntimeFactoryDeployer"           class="org.jboss.ruby.runtime.deployers.RubyRuntimeFactoryDeployer">
+    <property name="kernel"><inject bean="jboss.kernel:service=Kernel"/></property>
+  </bean>
+  <bean name="RubyRuntimeFactoryPublishingDeployer" class="org.jboss.ruby.runtime.deployers.RubyRuntimeFactoryPublishingDeployer"/>
+  <bean name="RubyRuntimePoolDeployer"              class="org.jboss.ruby.runtime.deployers.RubyRuntimePoolDeployer"/>
+
+  <!-- Job Scheduling -->
+
+  <bean name="JobsYamlParsingDeployer"              class="org.jboss.ruby.enterprise.jobs.deployers.JobsYamlParsingDeployer"/>
+  <bean name="RubySchedulerDeployer"                class="org.jboss.ruby.enterprise.jobs.deployers.RubySchedulerDeployer"/>
+  <bean name="RubyJobDeployer"                      class="org.jboss.ruby.enterprise.jobs.deployers.RubyJobDeployer"/>
+
+  <!-- Endpoint Infrastructure) -->
+
+  <bean name="CXFBusDeployer"                       class="org.jboss.ruby.enterprise.endpoints.cxf.deployers.CXFBusDeployer"/>
+  <bean name="CXFServletDeployer"                   class="org.jboss.ruby.enterprise.endpoints.cxf.deployers.CXFServletDeployer"/>
+
+  <!-- Endpoint Databinding -->
+
+  <bean name="RubyTypeSpaceDeployer"                class="org.jboss.ruby.enterprise.endpoints.deployers.RubyTypeSpaceDeployer"/>
+
+  <!-- Endpoint Services -->
+
+  <bean name="RubyEndpointIntrospectionDeployer"    class="org.jboss.ruby.enterprise.endpoints.deployers.RubyEndpointIntrospectionDeployer"/>
+  <bean name="RubyEndpointDeployer"                 class="org.jboss.ruby.enterprise.endpoints.deployers.RubyEndpointDeployer"/>
+
+  <!-- 
+     |
+     | Rails
+     |
+     -->
+
+  <!-- RAILS_ROOT structure & recognition -->
+  <bean name="RailsStructure"                       class="org.jboss.rails.core.deployers.RailsStructure"/>
+  <bean name="RailsRootRecognizingDeployer"         class="org.jboss.rails.core.deployers.RailsRootRecognizingDeployer"/>
+
+
+  <!-- Crypto -->
+  <bean name="RailsCryptoYamlPostParsingDeployer"   class="org.jboss.rails.crypto.deployers.RailsCryptoYamlPostParsingDeployer"/>
+
+  <!-- Rack -->
+  <bean name="RailsRackDeployer"                    class="org.jboss.rails.web.deployers.RailsRackDeployer"/>
+
+  <!-- rails-env.yml -->
+  <bean name="RailsEnvYamlParsingDeployer"          class="org.jboss.rails.core.deployers.RailsEnvYamlParsingDeployer"/>
+
+  <!-- vendor/rails/.../version.rb -->
+  <bean name="RailsVersionDeployer"            class="org.jboss.rails.core.deployers.RailsVersionDeployer"/>
+
+  <bean name="AppRailsYamlParsingDeployer" class="org.jboss.rails.core.deployers.ConvergedAppRailsYamlParsingDeployer"/>
+
+  <bean name="RailsRubyRuntimeFactoryDescriber"  class="org.jboss.rails.runtime.deployers.RailsRubyRuntimeFactoryDescriber"/>
+
+  <!-- Endpoint Deployment  -->
+  <bean name="RailsEndpointsParsingDeployer"       class="org.jboss.rails.endpoints.deployers.RailsEndpointsParsingDeployer"/>
+
+  <bean name="RailsJobsRubyLoadPathDescriber"      class="org.jboss.rails.jobs.deployers.RailsJobsRubyLoadPathDescriber"/>
+
+</deployment>
