@@ -34,6 +34,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.sip.ListeningPoint;
+import javax.sip.SipException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -662,10 +663,13 @@ public class SipFactoryImpl implements Serializable {
 				SipFactories.addressFactory.createAddress(sipUri);
 			RouteHeader routeHeader = 
 				SipFactories.headerFactory.createRouteHeader(routeAddress);
-			request.addHeader(routeHeader);
+			request.addFirst(routeHeader);			
 		} catch (ParseException e) {
 			//this should never happen
-			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !");
+			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);
+		} catch (SipException e) {
+			//this should never happen
+			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);
 		}
 	}
 }

@@ -995,8 +995,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * Add a route header to route back to the container
 	 * @param applicationName the application name that was chosen by the AR to route the request
 	 * @throws ParseException
+	 * @throws SipException 
+	 * @throws NullPointerException 
 	 */
-	public void addInfoForRoutingBackToContainer(String applicationName) throws ParseException {		
+	public void addInfoForRoutingBackToContainer(String applicationName) throws ParseException, SipException {		
 		Request request = (Request) super.message;
 		javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -1010,7 +1012,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipFactories.addressFactory.createAddress(sipURI);
 		RouteHeader routeHeader = 
 			SipFactories.headerFactory.createRouteHeader(routeAddress);
-		request.addHeader(routeHeader);						
+		request.addFirst(routeHeader);						
 	}
 
 	/**
