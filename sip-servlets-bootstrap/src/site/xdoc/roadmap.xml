@@ -862,10 +862,16 @@
 					<p>							
 						<img src="red.jpeg" />
 						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=627">
+						Sip Servlets Presence Client Libraries
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
 						Mobicents Application Router
 						</a>
-						<br />												
+						<br />																		
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=520">
