@@ -325,9 +325,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			cancelExpirationTimer();
 			long expirationTime = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
 			expirationTimerTask = new SipApplicationSessionTimerTask();
-			if(logger.isDebugEnabled()) {
-				logger.debug("Starting Expiry timer anew : Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
-			}
+//			if(logger.isDebugEnabled()) {
+//				logger.debug("Starting Expiry timer anew : Scheduling sip application session "+ key +" to expire in " + (expirationTime / 1000 / 60) + " minutes");
+//			}
 			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
 		}
 	}
@@ -525,13 +525,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	private void cancelExpirationTimer() {
 		boolean removed = ExecutorServiceWrapper.getInstance().remove((Runnable)expirationTimerFuture);
-		if(logger.isDebugEnabled()) {
-			logger.debug("expiration timer on sip application session " + key + " removed : " + removed);
-		}
+//		if(logger.isDebugEnabled()) {
+//			logger.debug("expiration timer on sip application session " + key + " removed : " + removed);
+//		}
 		boolean cancelled = expirationTimerFuture.cancel(true);
-		if(logger.isDebugEnabled()) {
-			logger.debug("expiration timer on sip application session " + key + " Cancelled : " + cancelled);
-		}
+//		if(logger.isDebugEnabled()) {
+//			logger.debug("expiration timer on sip application session " + key + " Cancelled : " + cancelled);
+//		}
 		ExecutorServiceWrapper.getInstance().purge();
 	}
 
