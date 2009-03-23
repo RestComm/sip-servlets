@@ -19,9 +19,7 @@ package org.mobicents.servlet.sip.core.session;
 import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
-import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 
 /**
@@ -30,13 +28,13 @@ import javax.servlet.sip.SipApplicationSession;
  * @author Jean Deruelle
  *
  */
-public class ConvergedSessionFacade implements HttpSession, javax.servlet.sip.ConvergedHttpSession {
-	javax.servlet.sip.ConvergedHttpSession session;
+public class ConvergedSessionFacade implements ConvergedSession {
+	ConvergedSession session;
 
     /**
      * Construct a new session facade.
      */
-    public ConvergedSessionFacade(ConvergedHttpSession session) {
+    public ConvergedSessionFacade(ConvergedSession session) {
         super();
         this.session = session;
     }
@@ -200,5 +198,13 @@ public class ConvergedSessionFacade implements HttpSession, javax.servlet.sip.Co
 	 */
 	public SipApplicationSession getApplicationSession() {
 		return session.getApplicationSession();
+	}
+
+	public MobicentsSipApplicationSession getApplicationSession(boolean create) {		
+		return session.getApplicationSession(create);
+	}
+
+	public boolean isValid() {
+		return session.isValid();
 	}
 }

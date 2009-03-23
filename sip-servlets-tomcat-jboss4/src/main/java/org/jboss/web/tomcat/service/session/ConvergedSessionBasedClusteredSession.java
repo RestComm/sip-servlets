@@ -20,11 +20,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.security.SecurityUtil;
-import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionDelegate;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
@@ -63,7 +61,7 @@ public class ConvergedSessionBasedClusteredSession extends
 	public HttpSession getSession() {
         if (facade == null){
             if (SecurityUtil.isPackageProtectionEnabled()){
-                final ConvergedHttpSession fsession = this;
+                final ConvergedSession fsession = this;
                 facade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction<ConvergedSessionFacade>(){
                     public ConvergedSessionFacade run(){
                         return new ConvergedSessionFacade(fsession);

@@ -20,11 +20,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.security.SecurityUtil;
-import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 
 /**
  * Extension of the Tomcat StandardSession class so that applications
@@ -57,7 +55,7 @@ public class ConvergedStandardSession
 	public HttpSession getSession() {
         if (facade == null){
             if (SecurityUtil.isPackageProtectionEnabled()){
-                final ConvergedHttpSession fsession = this;
+                final ConvergedSession fsession = this;
                 facade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction<ConvergedSessionFacade>(){
                     public ConvergedSessionFacade run(){
                         return new ConvergedSessionFacade(fsession);
