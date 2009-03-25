@@ -49,17 +49,11 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 	}
 
 	public void sessionDestroyed(final SipSessionEvent arg0) {
-		new Thread() {
-			@Override
-			public void run() {
-				SeamEntrypointUtils.beginEvent(arg0.getSession());
-				Events.instance().raiseEvent("sipSessionDestroyed", arg0.getSession());
-				SeamEntrypointUtils.endEvent();
-				Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
-				log.info("SEAM SIP SESSION DESTROYED");
-			}
-			
-		}.start();
+		SeamEntrypointUtils.beginEvent(arg0.getSession());
+		Events.instance().raiseEvent("sipSessionDestroyed", arg0.getSession());
+		SeamEntrypointUtils.endEvent();
+		Lifecycle.endSession(new SipSeamSessionMap(arg0.getSession()));
+		log.info("SEAM SIP SESSION DESTROYED");
 	}
 
 	public void sessionReadyToInvalidate(SipSessionEvent arg0) {
