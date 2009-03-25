@@ -69,8 +69,9 @@ public class CallAction {
 		log.info("Calling " + requestUri + " from " + fromUri + " to " + toUri);
 
 		try {
-			FacesContext context = FacesContext.getCurrentInstance();
-			ConvergedHttpSession session = (ConvergedHttpSession) context.getExternalContext().getSession(false);
+			// Don't use this because we might call it from SIP context (faces context not available)
+			//FacesContext context = FacesContext.getCurrentInstance();
+			//ConvergedHttpSession session = (ConvergedHttpSession) context.getExternalContext().getSession(false);
 
 			//SipApplicationSession appSession = session.getApplicationSession();//sipFactory.createApplicationSession();
 			SipApplicationSession appSession = sipFactory.createApplicationSession();

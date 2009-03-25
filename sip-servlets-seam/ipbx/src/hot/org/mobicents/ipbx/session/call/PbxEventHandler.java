@@ -30,27 +30,20 @@ import org.mobicents.ipbx.session.call.framework.IVRHelper;
 import org.mobicents.ipbx.session.call.framework.IVRHelperManager;
 import org.mobicents.ipbx.session.call.framework.MediaEventDispatcher;
 import org.mobicents.ipbx.session.call.framework.MediaSessionStore;
-import org.mobicents.ipbx.session.call.framework.SessionIVRHelper;
 import org.mobicents.ipbx.session.call.model.CallParticipant;
 import org.mobicents.ipbx.session.call.model.CallParticipantManager;
-import org.mobicents.ipbx.session.call.model.WorkspaceStateManager;
 import org.mobicents.ipbx.session.call.model.Conference;
 import org.mobicents.ipbx.session.call.model.ConferenceManager;
+import org.mobicents.ipbx.session.call.model.WorkspaceStateManager;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.ipbx.session.security.SimpleSipAuthenticator;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsEndpoint;
-import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsLinkEvent;
 import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
-import org.mobicents.mscontrol.events.MsRequestedEvent;
-import org.mobicents.mscontrol.events.MsRequestedSignal;
-import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
-import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
 
 
@@ -147,6 +140,7 @@ public class PbxEventHandler {
 			conf = ConferenceManager.instance().getNewConference();
 			fromParticipant.setConference(conf);
 			toParticipant.setConference(conf);
+			toParticipant.setCallState(CallState.CONNECTING);
 			fromParticipant.setCallState(CallState.CONNECTING);
 			
 			callAction.call(fromParticipant, toParticipant);

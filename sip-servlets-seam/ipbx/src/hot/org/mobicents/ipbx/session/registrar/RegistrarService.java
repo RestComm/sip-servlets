@@ -361,7 +361,10 @@ public class RegistrarService {
 				SipURI uri = (SipURI) request.getFrom().getURI();
 				String user = uri.getUser();
 				registration = findNotStrictRegistration(user, uri.toString());
-				Events.instance().raiseAsynchronousEvent("globalSettingsChanged", (Object[]) null);
+				if(registration == null) {
+					throw new BadRegistrationException(SipServletResponse.SC_NOT_FOUND, "Address of Record not found");
+				}
+				//Events.instance().raiseAsynchronousEvent("globalSettingsChanged", (Object[]) null);
 			}
 		}
 		return registration;
