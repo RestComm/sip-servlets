@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mobicents.servlet.seam</groupId>
 	<artifactId>sip-servlets-seam-entrypoint</artifactId>
-	<version>1.0</version>
+	<version>2.0-SNAPSHOT</version>
 	<name>Sip Servlets Seam Entrypoint Project</name>
 	<packaging>jar</packaging>
 	<repositories>
