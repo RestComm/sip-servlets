@@ -39,6 +39,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.jboss.seam.ScopeType;
@@ -49,12 +50,14 @@ import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Transactional;
+import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.Binding;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.entity.User;
 import org.mobicents.ipbx.session.DataLoader;
-import org.mobicents.ipbx.session.call.model.CallStateManager;
+import org.mobicents.ipbx.session.call.model.WorkspaceStateManager;
+import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.ipbx.session.util.URIUtil;
 
 /**
@@ -79,7 +82,7 @@ public class RegistrarService {
 	private int defaultExpires = 3600;
 	
 	@Logger Log log;	
-	@In EntityManager sipEntityManager;
+	@In EntityManager entityManager;
 	@In DataLoader dataLoader;
 	@In SipFactory sipFactory;
 	@In(required=true) SipSession sipSession;
@@ -198,7 +201,7 @@ public class RegistrarService {
 				}
 			}
 		}
-		CallStateManager.getUserState(registration.getUser().getName()).makeRegistrationsDirty();
+		WorkspaceStateManager.instance().getWorkspace(registration.getUser().getName()).makeRegistrationsDirty();
 	}	
 
 	/**
@@ -267,7 +270,7 @@ public class RegistrarService {
 		newBinding.setExpires(expires);
 		newBinding.setRegistration(registration);
 		registration.addBinding(newBinding);
-		sipEntityManager.persist(newBinding);
+		entityManager.persist(newBinding);
 		if(log.isDebugEnabled()) {
 			log.debug("Added binding: " + newBinding);
 		}		
@@ -289,7 +292,7 @@ public class RegistrarService {
 		binding.setCSeq(cseq);
 		binding.setExpires(expires);
 		registration.updateBinding(binding);
-		sipEntityManager.persist(binding);
+		entityManager.persist(binding);
 		if(log.isInfoEnabled()) {
 			log.info("Updated binding: " + binding);
 		}
@@ -302,7 +305,7 @@ public class RegistrarService {
 	 */
 	private void removeBinding(Registration registration, Binding binding) {
 		registration.removeBinding(binding);
-		sipEntityManager.remove(binding);
+		entityManager.remove(binding);
 		if(log.isInfoEnabled()) {
 			log.info("Removed binding: " + binding);
 		}
@@ -349,7 +352,17 @@ public class RegistrarService {
 		String addressOfRecord = URIUtil.toCanonical(toURI);
 		Registration registration = findRegistration(addressOfRecord);
 		if(registration == null) {
-			throw new BadRegistrationException(SipServletResponse.SC_NOT_FOUND, "Address of Record not found");			
+			String strict = PbxConfiguration.getProperty("pbx.registration.strict");
+			if("true".equals(strict)) {
+				throw new BadRegistrationException(SipServletResponse.SC_NOT_FOUND, "Address of Record not found");		
+			}
+			
+			if(request.getFrom().getURI() instanceof SipURI) {
+				SipURI uri = (SipURI) request.getFrom().getURI();
+				String user = uri.getUser();
+				registration = findNotStrictRegistration(user, uri.toString());
+				Events.instance().raiseAsynchronousEvent("globalSettingsChanged", (Object[]) null);
+			}
 		}
 		return registration;
 	}
@@ -392,7 +405,7 @@ public class RegistrarService {
 	}
 	
 	public Registration findRegistration(String uri) {
-    	List<Registration> registrations = sipEntityManager.createQuery(
+    	List<Registration> registrations = entityManager.createQuery(
     			"SELECT registration FROM Registration registration WHERE registration.uri = :requestUri")
     		.setParameter("requestUri", uri).getResultList();
     	
@@ -405,6 +418,25 @@ public class RegistrarService {
     	if(user == null) return null;
     	
     	this.user = user;
+    	sipSession.setAttribute("user", user);
+    	
+        return reg;
+    }
+	
+	public Registration findNotStrictRegistration(String name, String uri) {
+    	List<User> users = entityManager.createQuery(
+    			"SELECT user FROM User user WHERE user.name = :name")
+    		.setParameter("name", name).getResultList();
+    	
+    	if(users.size() <= 0) return null;
+    	
+    	User user = users.get(0);
+    	
+    	Registration reg = new Registration();
+    	reg.setUser(user);
+    	reg.setUri(uri);
+    	user.getRegistrations().add(reg);
+    	entityManager.persist(reg);
     	sipSession.setAttribute("user", user);
     	
         return reg;

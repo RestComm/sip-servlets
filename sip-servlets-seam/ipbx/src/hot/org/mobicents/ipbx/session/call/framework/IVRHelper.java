@@ -1,15 +1,8 @@
 package org.mobicents.ipbx.session.call.framework;
 
-import static org.jboss.seam.annotations.Install.FRAMEWORK;
-
 import javax.servlet.sip.SipSession;
 
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Install;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Startup;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.events.MsEventAction;
@@ -21,18 +14,23 @@ import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
 import org.mobicents.mscontrol.events.pkg.DTMF;
 import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
+import org.mobicents.servlet.sip.seam.entrypoint.media.MsProviderContainer;
 
-@Name("linkIVRHelper")
-@Scope(ScopeType.APPLICATION)
-@Install(precedence=FRAMEWORK)
-@Startup(depends={"mediaController"})
-public class LinkIVRHelper {
+public class IVRHelper {
+	SipSession sipSession;
+	MsEventFactory eventFactory;
+	MediaController mediaController;
+	MediaSessionStore mediaSessionStore;
 	
-	@In(required=false) SipSession sipSession;
-	@In(required=false) MsEventFactory eventFactory;
-	@In(required=false) MediaController mediaController;
-	@In(required=false) MediaSessionStore mediaSessionStore;
-	
+	public IVRHelper(SipSession sipSession,
+			MediaSessionStore mediaSessionStore,
+			MediaController mediaController) {
+		this.sipSession = sipSession;
+		this.mediaSessionStore = mediaSessionStore;
+		this.mediaController = mediaController;
+		this.eventFactory = MsProviderContainer.msProvider.getEventFactory();
+	}
+
 	public void playAnnouncement(String file) {
 		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
 		onCompleted.setEventAction(MsEventAction.NOTIFY);
@@ -46,7 +44,21 @@ public class LinkIVRHelper {
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed};
         
         MsLink msLink = mediaSessionStore.getMsLink();
-        mediaController.execute(msLink.getEndpoints()[0], requestedSignals, requestedEvents, msLink);
+        MsConnection msConnection = mediaSessionStore.getMsConnection();
+        
+        if(msLink != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msLink);
+        } else if (msConnection != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msConnection);
+        }
 		
 	}
 	
@@ -65,7 +77,21 @@ public class LinkIVRHelper {
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
         
         MsLink msLink = mediaSessionStore.getMsLink();
-        mediaController.execute(msLink.getEndpoints()[0], requestedSignals, requestedEvents, msLink);
+        MsConnection msConnection = mediaSessionStore.getMsConnection();
+        
+        if(msLink != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msLink);
+        } else if (msConnection != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msConnection);
+        }
 	}
 	
 	public void detectDtmf() {
@@ -74,15 +100,43 @@ public class LinkIVRHelper {
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] {  };
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { dtmf };
         
-        MsLink msLink = mediaSessionStore.getMsLink();  
-        mediaController.execute(msLink.getEndpoints()[0], requestedSignals, requestedEvents, msLink);
+        MsLink msLink = mediaSessionStore.getMsLink();
+        MsConnection msConnection = mediaSessionStore.getMsConnection();
+        
+        if(msLink != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msLink);
+        } else if (msConnection != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msConnection);
+        }
 	}
 	
 	public void endAll() {
 		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] {  };
         MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { };
         
-        MsLink msLink = mediaSessionStore.getMsLink();  
-        mediaController.execute(msLink.getEndpoints()[0], requestedSignals, requestedEvents, msLink);
+        MsLink msLink = mediaSessionStore.getMsLink();
+        MsConnection msConnection = mediaSessionStore.getMsConnection();
+        
+        if(msLink != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msLink);
+        } else if (msConnection != null) {
+        	mediaController.execute(
+        			mediaSessionStore.getMsEndpoint(), 
+        			requestedSignals, 
+        			requestedEvents, 
+        			msConnection);
+        }
 	}
 }

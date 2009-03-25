@@ -22,6 +22,7 @@ public class Contact implements Serializable {
 	private boolean selected;
 	private CallState callState;
 	private Integer version;
+	private String name;
 	
     @Version
     public Integer getVersion() {
@@ -74,5 +75,13 @@ public class Contact implements Serializable {
 
 	public void setCallState(CallState callState) {
 		this.callState = callState;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

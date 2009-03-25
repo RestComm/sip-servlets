@@ -16,7 +16,7 @@
                  http://jboss.com/products/seam/mail http://jboss.com/products/seam/mail-2.1.xsd
                  http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.1.xsd">
 
-   <core:init debug="true" jndi-pattern="@jndiPattern@"/>
+   <core:init debug="true" jndi-pattern="\#{ejbName}/local"/>
      
    <core:manager concurrent-request-timeout="500" 
                  conversation-timeout="120000" 
@@ -25,10 +25,6 @@
     
    <persistence:managed-persistence-context name="entityManager"
                                      auto-create="true"
-                          entity-manager-factory="#{ipbxEntityManagerFactory}"/>
-   <persistence:managed-persistence-context name="sipEntityManager"
-                                     auto-create="true"
-                                     scope="event"
                           entity-manager-factory="#{ipbxEntityManagerFactory}"/>
 
    <persistence:entity-manager-factory name="ipbxEntityManagerFactory" 

@@ -133,7 +133,7 @@ public class CallParticipant {
 	}
 	
 	public String toString() {
-		return "[uri=" + uri + ", conf=" + conference.getName() + ", name=" + name + "]";
+		return "[uri=" + uri + ", conf=" + conference.getId() + ", name=" + name + "]";
 	}
 
 	public Binding getBinding() {

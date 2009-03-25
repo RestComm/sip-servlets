@@ -3,16 +3,18 @@ package org.mobicents.ipbx.session.call.model;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Startup;
-
-@Name("conferenceManager")
-@Scope(ScopeType.APPLICATION)
-@Startup
 public class ConferenceManager {
-	private static AtomicInteger confId = new AtomicInteger(0);
+	
+	private static ConferenceManager conferenceManager;
+	
+	public static ConferenceManager instance() {
+		if(conferenceManager == null) {
+			conferenceManager = new ConferenceManager();
+		}
+		return conferenceManager;
+	}
+	
+	private AtomicInteger confId = new AtomicInteger(0);
 
 	private HashMap<String, Conference> conferences = 
 		new HashMap<String, Conference>();
@@ -30,7 +32,7 @@ public class ConferenceManager {
 		confId.incrementAndGet();
 		if(conferences.get(confIdString) == null) {
 			Conference conf = new Conference();
-			conf.setName(confIdString);
+			conf.setId(confIdString);
 			conferences.put(confIdString, conf);
 		}
 		return conferences.get(confIdString);

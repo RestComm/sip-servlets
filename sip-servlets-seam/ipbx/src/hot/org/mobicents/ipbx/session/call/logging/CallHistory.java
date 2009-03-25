@@ -17,7 +17,7 @@ import org.mobicents.ipbx.entity.Contact;
 import org.mobicents.ipbx.entity.History;
 import org.mobicents.ipbx.entity.User;
 import org.mobicents.ipbx.session.DataLoader;
-import org.mobicents.ipbx.session.call.model.CallStateManager;
+import org.mobicents.ipbx.session.call.model.WorkspaceStateManager;
 import org.mobicents.ipbx.session.util.DateUtil;
 
 @Name("callHistory")
@@ -27,8 +27,7 @@ public class CallHistory {
 	@In EntityManagerFactory ipbxEntityManagerFactory;
 	@In SipSession sipSession;
 	@In DataLoader dataLoader;
-	@In CallStateManager callStateManager;
-	@In EntityManager sipEntityManager;
+	@In EntityManager entityManager;
 	@In(scope=ScopeType.SESSION, required=false) @Out(scope=ScopeType.SESSION, required=false) List historyCache;
 	
 	@Observer("RESPONSE")
@@ -64,6 +63,7 @@ public class CallHistory {
 	
 	public void addHistory(String message) {
 		// The database logging is deisabled for now and is replaced by this in-memory logging
+		
 		try {
 			User user = (User) sipSession.getAttribute("user");
 			if(user == null) return;
@@ -76,16 +76,17 @@ public class CallHistory {
 			history.setUser(user);
 			DataLoader.history.get(user.getName()).add(history);
 
-			callStateManager.getCurrentState(user.getName()).makeHistoryDirty();
+			WorkspaceStateManager.instance().getWorkspace(user.getName()).makeHistoryDirty();
 		} catch(Exception e) {
 			// if something fails here we don't care because loggig is secondary function
 			e.printStackTrace();
 		}
 		/*
 		try {
-			EntityManager em = sipEntityManager;//ipbxEntityManagerFactory.createEntityManager();
-			em.flush();
+			EntityManager em = entityManager;//ipbxEntityManagerFactory.createEntityManager();
+			//em.flush();
 			User user = (User) sipSession.getAttribute("user");
+			if(user == null) return;
 			user = (User) em.createQuery(
 			"SELECT user FROM User user where user.id=:uid")
 			.setParameter("uid", user.getId()).getSingleResult();
@@ -100,11 +101,19 @@ public class CallHistory {
 			user.getHistory().add(history);
 			em.persist(history);
 			
-			callStateManager.getCurrentState(user.getName()).makeHistoryDirty();
+			//workspaceStateManager.getCurrentState(user.getName()).makeHistoryDirty();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
 	}
 	
-
+	@Observer("INVITE")
+	public void logInvite(SipServletRequest request) {
+		addHistory("Incoming INVITE from "+ request.getFrom());
+	}
+	
+	@Observer("REGISTER")
+	public void logRegister(SipServletRequest request) {
+		addHistory("Registering "+ request.getFrom());
+	}
 }

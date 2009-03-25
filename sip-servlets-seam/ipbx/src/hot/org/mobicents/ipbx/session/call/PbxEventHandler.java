@@ -26,9 +26,14 @@ import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.session.CallAction;
+import org.mobicents.ipbx.session.call.framework.IVRHelper;
+import org.mobicents.ipbx.session.call.framework.IVRHelperManager;
+import org.mobicents.ipbx.session.call.framework.MediaEventDispatcher;
+import org.mobicents.ipbx.session.call.framework.MediaSessionStore;
+import org.mobicents.ipbx.session.call.framework.SessionIVRHelper;
 import org.mobicents.ipbx.session.call.model.CallParticipant;
 import org.mobicents.ipbx.session.call.model.CallParticipantManager;
-import org.mobicents.ipbx.session.call.model.CallStateManager;
+import org.mobicents.ipbx.session.call.model.WorkspaceStateManager;
 import org.mobicents.ipbx.session.call.model.Conference;
 import org.mobicents.ipbx.session.call.model.ConferenceManager;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
@@ -56,12 +61,11 @@ public class PbxEventHandler {
 	@In MsSession msSession;
 	@In SipSession sipSession;
 	@In MediaController mediaController;
-	@In ConferenceManager conferenceManager;
-	@In CallStateManager callStateManager;
-	@In CallParticipantManager callParticipantManager;
+	@In MediaEventDispatcher mediaEventDispatcher;
+	@In MediaSessionStore mediaSessionStore;
+	@In IVRHelper sessionIVRHelper;
 	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In SipFactory sipFactory;
-	@In PbxConfiguration pbxConfiguration;
 	@In MsEventFactory eventFactory;
 	
 	@In(create=true) CallAction callAction;
@@ -111,14 +115,14 @@ public class PbxEventHandler {
 		String sdp = new String(sdpBytes);
 		
 		// Create call participants to join a call
-		CallParticipant fromParticipant = callParticipantManager.getCallParticipant(
+		CallParticipant fromParticipant = CallParticipantManager.instance().getCallParticipant(
 				fromUri);
 		fromParticipant.setName(fromUser);
 		fromParticipant.setRegistration(fromRegistration);
 		fromParticipant.setUri(fromRegistration.getUri());
 		fromParticipant.setInitiator(true);
 		
-		CallParticipant toParticipant = callParticipantManager.getCallParticipant(
+		CallParticipant toParticipant = CallParticipantManager.instance().getCallParticipant(
 				toUri);
 		toParticipant.setName(toUser);
 		toParticipant.setRegistration(toRegistration);
@@ -140,7 +144,7 @@ public class PbxEventHandler {
 		if(!CallState.CONNECTED.equals(toParticipant.getCallState())) {
 		// Otherwise just call all his registered phones and join them to a new
 		// conference where you can talk to him
-			conf = conferenceManager.getNewConference();
+			conf = ConferenceManager.instance().getNewConference();
 			fromParticipant.setConference(conf);
 			toParticipant.setConference(conf);
 			fromParticipant.setCallState(CallState.CONNECTING);
@@ -151,8 +155,8 @@ public class PbxEventHandler {
 			fromParticipant.setConference(conf);
 			fromParticipant.setCallState(CallState.ASKING);
 		}
-		callStateManager.getCurrentState(toUser).setIncoming(fromParticipant);
-		callStateManager.getCurrentState(fromUser).setOutgoing(toParticipant);
+		WorkspaceStateManager.instance().getWorkspace(toUser).setIncoming(fromParticipant);
+		WorkspaceStateManager.instance().getWorkspace(fromUser).setOutgoing(toParticipant);
 		
 		mediaController.createConnection(PR_JNDI_NAME).modify("$", sdp);
 		Events.instance().raiseEvent("incomingCall", request);
@@ -231,19 +235,19 @@ public class PbxEventHandler {
 			participant.setConference(null);
 			
 			// Remove the call from the callee GUI
-			CallStateManager.getUserState(participant.getName()).removeCall(participant);
+			WorkspaceStateManager.instance().getWorkspace(participant.getName()).removeCall(participant);
 
 			CallParticipant[] callParticipants = conf.getParticipants();
 			log.info("number of participants left in the conference = #0", callParticipants.length);
 			if(callParticipants.length == 1) {
 				CallParticipant cp = callParticipants[0];
-				CallStateManager.getUserState(cp.getName()).endCall(cp);
+				WorkspaceStateManager.instance().getWorkspace(cp.getName()).endCall(cp);
 			}
 			
 			// Remove the call from other users' GUIs
 			for(CallParticipant cp : callParticipants) {
-				CallStateManager.getUserState(cp.getName()).removeCall(participant);
-				CallStateManager.getUserState(participant.getName()).removeCall(cp);
+				WorkspaceStateManager.instance().getWorkspace(cp.getName()).removeCall(participant);
+				WorkspaceStateManager.instance().getWorkspace(participant.getName()).removeCall(cp);
 			}
 			
 			// Release media stuff if possible
@@ -317,11 +321,16 @@ public class PbxEventHandler {
 	}
 	
 	
-	@Observer("linkConnected")
+	@Observer("storeLinkConnected")
 	public synchronized void doLinkConnected(MsLinkEvent event) {
 		MsEndpoint endpoint = event.getSource().getEndpoints()[0];
+		
 		CallParticipant participant = 
 			(CallParticipant) sipSession.getAttribute("participant");
+		
+		mediaSessionStore.setMsEndpoint(endpoint);
+		sessionIVRHelper.detectDtmf();
+		
 		Conference conf = participant.getConference();
 		// We should upgrade the call state to "active" for all participants (most already have it)
 		CallParticipant[] ps = conf.getParticipants();
@@ -331,10 +340,10 @@ public class PbxEventHandler {
 				if(p.getCallState().equals(CallState.CONNECTED)) {
 					p.setCallState(CallState.CONNECTED);
 					try {
-						endRingback(p.getMsLink(), endpoint);
+						endRingback(p);
 					} catch (Exception e) {}
-					callStateManager.getCurrentState(p.getName()).setOngoing(participant);
-					callStateManager.getCurrentState(participant.getName()).setOngoing(p);
+					WorkspaceStateManager.instance().getWorkspace(p.getName()).setOngoing(participant);
+					WorkspaceStateManager.instance().getWorkspace(participant.getName()).setOngoing(p);
 				}
 				participant.setCallState(CallState.CONNECTED);
 				
@@ -348,31 +357,19 @@ public class PbxEventHandler {
 			participant.setMsLink(event.getSource());
 			if(conf.getEndpoint() == null) {
 				conf.setEndpoint(endpoint);
-				playRingback(event.getSource(), endpoint);
+				playRingback(participant);
 			}
 		}
 	}
 	
-	public void playRingback(MsLink link, MsEndpoint endpoint) {		
-		String tone = pbxConfiguration.getProperty("pbx.default.ringback.tone");
+	public void playRingback(CallParticipant participant) {		
+		String tone = PbxConfiguration.getProperty("pbx.default.ringback.tone");
 		log.info("playing following ringbacktone #0", tone);
-		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
-		onCompleted.setEventAction(MsEventAction.NOTIFY);
-
-		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
-		play.setURL(tone);
-		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted};
-        
-        mediaController.execute(endpoint, requestedSignals, requestedEvents, link);
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(tone);
 	}
 	
-	private void endRingback(MsLink link, MsEndpoint endpoint) {
-
-		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] {};
-        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] {};
-        
-        mediaController.execute(link.getEndpoints()[0], requestedSignals, requestedEvents, link);
+	private void endRingback(CallParticipant participant) {
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).detectDtmf();
 	}
 
 	// Extract username from URI

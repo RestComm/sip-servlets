@@ -44,6 +44,7 @@ public class Registration implements Serializable {
 	private boolean selected;
 	private Integer version;
 	private Set<Binding> bindings;
+	private String name;
 	
 	@Version
 	public Integer getVersion() {
@@ -133,32 +134,40 @@ public class Registration implements Serializable {
 	public void setBindings(Set<Binding> bindings) {
 		this.bindings = bindings;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 	
-//	@Transient
-//	public String[] getCallableUris() {
-//		LinkedList<String> uris = new LinkedList<String>();
-//		uris.add(getUri());
-//		if(getBindings() != null) {
-//			Iterator<Binding> bindings = getBindings().iterator();
-//			while(bindings.hasNext()) {
-//				Binding binding = bindings.next();
-//				uris.add(binding.getContactAddress());
-//			}
-//		}
-//		return uris.toArray(new String[]{});
-//	}
-//	
-//	// This method doesn't return this.uri in the list
-//	@Transient
-//	public Binding[] getCallableBindings() {
-//		LinkedList<Binding> uris = new LinkedList<Binding>();
-//		if(getBindings() != null) {
-//			Iterator<Binding> bindings = getBindings().iterator();
-//			while(bindings.hasNext()) {
-//				Binding binding = bindings.next();
-//				uris.add(binding);
-//			}
-//		}
-//		return uris.toArray(new Binding[]{});
-//	}
+	@Transient
+	public String[] getCallableUris() {
+		LinkedList<String> uris = new LinkedList<String>();
+		uris.add(getUri());
+		if(getBindings() != null) {
+			Iterator<Binding> bindings = getBindings().iterator();
+			while(bindings.hasNext()) {
+				Binding binding = bindings.next();
+				uris.add(binding.getContactAddress());
+			}
+		}
+		return uris.toArray(new String[]{});
+	}
+	
+	// This method doesn't return this.uri in the list
+	@Transient
+	public Binding[] getCallableBindings() {
+		LinkedList<Binding> uris = new LinkedList<Binding>();
+		if(getBindings() != null) {
+			Iterator<Binding> bindings = getBindings().iterator();
+			while(bindings.hasNext()) {
+				Binding binding = bindings.next();
+				uris.add(binding);
+			}
+		}
+		return uris.toArray(new Binding[]{});
+	}
 }

@@ -5,26 +5,25 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
     template="layout/template.xhtml">
 
 <ui:define name="body">
 
-    <h:form id="contactForm">
+    <h:form id="globalPropertyForm" rendered="#{identity.hasRole('admin')}">
 
         <rich:panel>
-            <f:facet name="header">Contact</f:facet>
+            <f:facet name="header">Global Property</f:facet>
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Name</ui:define>
                 <h:inputText id="name" required="true"
-                             value="#{contactHome.instance.name}"/>
+                             value="#{globalPropertyHome.instance.name}"/>
             </s:decorate>
-            
-            <s:decorate id="uriField" template="layout/edit.xhtml">
-                <ui:define name="label">URI</ui:define>
-                <h:inputText id="name" required="true"
-                             value="#{contactHome.instance.uri}"/>
+            <s:decorate id="valueField" template="layout/edit.xhtml">
+                <ui:define name="label">Value</ui:define>
+                <h:inputText id="value" required="true"
+                             value="#{globalPropertyHome.instance.value}"/>
             </s:decorate>
 
             <div style="clear:both"/>
@@ -34,21 +33,21 @@
         <div class="actionButtons">
             <h:commandButton id="save"
                           value="Save"
-                         action="#{contactHome.persist}"
-                       rendered="#{!contactHome.managed}"/>
+                         action="#{globalPropertyHome.persist}"
+                       rendered="#{!globalPropertyHome.managed}"/>
             <h:commandButton id="update"
                           value="Save"
-                         action="#{contactHome.update}"
-                       rendered="#{contactHome.managed}"/>
+                         action="#{globalPropertyHome.update}"
+                       rendered="#{globalPropertyHome.managed}"/>
             <h:commandButton id="delete"
                           value="Delete"
-                         action="#{contactHome.remove}"
+                         action="#{globalPropertyHome.remove}"
                       immediate="true"
-                       rendered="#{contactHome.managed}"/>
+                       rendered="#{globalPropertyHome.managed}"/>
             <s:button propagation="end"
                                id="done"
                             value="Done"
-                             view="/contactList.xhtml"/>
+                             view="/home.xhtml"/>
         </div>
 
     </h:form>

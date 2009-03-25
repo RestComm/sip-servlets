@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.sip.SipSession;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
@@ -27,6 +28,7 @@ import org.mobicents.servlet.sip.seam.entrypoint.media.MediaEvent;
 @Install(precedence=FRAMEWORK)
 @Startup
 public class MediaEventDispatcher {
+	@In(required=false) MediaSessionStore mediaSessionStore;
 	private ConcurrentHashMap<Object, StringBuffer> dtmfBuffer =
 		new ConcurrentHashMap<Object, StringBuffer>();
 	
@@ -69,6 +71,20 @@ public class MediaEventDispatcher {
         	Events.instance().raiseEvent("audioFailed");
         }
         
+	}
+	
+	@Observer("linkConnected")
+	public void doLinkConnected(MsLinkEvent linkEvent) {
+		mediaSessionStore.setMsLink(linkEvent.getSource());
+		mediaSessionStore.setMsEndpoint(linkEvent.getSource().getEndpoints()[0]);
+		Events.instance().raiseEvent("storeLinkConnected", linkEvent);
+	}
+	
+	@Observer("connectionOpen")
+	public void doConnectionOpen(MsConnectionEvent connectionEvent) {
+		mediaSessionStore.setMsConnection(connectionEvent.getConnection());
+		mediaSessionStore.setMsEndpoint(connectionEvent.getConnection().getEndpoint());
+		Events.instance().raiseEvent("storeConnectionOpen", connectionEvent);
 	}
 	
 	@Observer("sipSessionDestroyed")

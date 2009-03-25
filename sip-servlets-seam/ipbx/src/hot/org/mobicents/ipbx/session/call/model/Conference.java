@@ -8,6 +8,7 @@ import org.mobicents.mscontrol.MsEndpoint;
 
 public class Conference {
 	private static final String CONFERENCE_ENDPOINT_NAME = "media/trunk/Conference/$";
+	private String id;
 	private String name;
 	private MsEndpoint endpoint;
 	private HashSet<CallParticipant> participants =
@@ -70,5 +71,13 @@ public class Conference {
 			}
 		}
 		return filtered.toArray(new CallParticipant[]{});
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }

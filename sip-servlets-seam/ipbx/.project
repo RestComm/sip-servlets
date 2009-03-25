@@ -31,12 +31,12 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.jboss.tools.seam.core.seambuilder</name>
+			<name>org.hibernate.eclipse.console.hibernateBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.hibernate.eclipse.console.hibernateBuilder</name>
+			<name>org.jboss.tools.seam.core.seambuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -48,7 +48,7 @@
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>org.jboss.tools.jsf.jsfnature</nature>
-		<nature>org.jboss.tools.seam.core.seamnature</nature>
 		<nature>org.hibernate.eclipse.console.hibernateNature</nature>
+		<nature>org.jboss.tools.seam.core.seamnature</nature>
 	</natures>
 </projectDescription>

@@ -15,24 +15,20 @@ import org.mobicents.ipbx.entity.PstnGatewayAccount;
 @Startup
 @Transactional
 public class PbxConfiguration {
-	@In EntityManager sipEntityManager;
+	@In EntityManager entityManager;
 	@Logger Log log;
 	
-	private List<PstnGatewayAccount> pstnAccounts;
-	private HashMap<String,GlobalProperty> globalProperties;
 	
-	public List<PstnGatewayAccount> getPstnAccounts() {
-		if(pstnAccounts == null) pstnAccounts = loadPstnAccounts();
-		return pstnAccounts;
+	public static List<PstnGatewayAccount> getPstnAccounts() {
+		return PbxConfigurationHolder.pstnAccounts;
 	}
 	
 	
-	public HashMap<String,GlobalProperty> getGlobalProperties() {
-		if(globalProperties == null) globalProperties = loadGlobalProperties();
-		return globalProperties;
+	public static HashMap<String,GlobalProperty> getGlobalProperties() {
+		return PbxConfigurationHolder.globalProperties;
 	}
 	
-	public String getProperty(String property) {
+	public static String getProperty(String property) {
 		return getGlobalProperties().get(property).getValue();
 	}
 
@@ -41,20 +37,20 @@ public class PbxConfiguration {
 	public void updateAll() throws InterruptedException {
 		Thread.sleep(300);
 		log.info("Global settings updated");
-		pstnAccounts = loadPstnAccounts();
-		globalProperties = loadGlobalProperties();
+		loadPstnAccounts();
+		loadGlobalProperties();
 	}
 	
-	public HashMap<String,GlobalProperty> loadGlobalProperties() {
-        List<GlobalProperty> props = sipEntityManager.createQuery("SELECT global FROM GlobalProperty global").getResultList();
+	public void loadGlobalProperties() {
+        List<GlobalProperty> props = entityManager.createQuery("SELECT global FROM GlobalProperty global").getResultList();
         HashMap<String,GlobalProperty> globalProperties = new HashMap<String, GlobalProperty>();
 		for(GlobalProperty p : props) {
 			globalProperties.put(p.getName(), p);
 		}
-		return globalProperties;
+		PbxConfigurationHolder.globalProperties = globalProperties;
 	}
 	
-	public List loadPstnAccounts() {
-		return sipEntityManager.createQuery("SELECT pstn FROM PstnGatewayAccount pstn").getResultList();
+	public void loadPstnAccounts() {
+		PbxConfigurationHolder.pstnAccounts = entityManager.createQuery("SELECT pstn FROM PstnGatewayAccount pstn").getResultList();
 	}
 }

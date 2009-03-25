@@ -2,19 +2,19 @@ package org.mobicents.ipbx.session.call.model;
 
 import java.util.HashMap;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Startup;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 
-@Name("callParticipantManager")
-@Scope(ScopeType.APPLICATION)
-@Startup
 public class CallParticipantManager {
-	@In PbxConfiguration pbxConfiguration;
+	private static CallParticipantManager callParticipantManager;
+	
+	public synchronized static CallParticipantManager instance() {
+		if(callParticipantManager == null) {
+			callParticipantManager = new CallParticipantManager();
+		}
+		return callParticipantManager;
+	}
+	
 	private HashMap<String, CallParticipant> callParticipants =
 		new HashMap<String, CallParticipant>();
 	
@@ -29,7 +29,7 @@ public class CallParticipantManager {
 			// If this is a phone number, set up auth 
 			if(!uri.startsWith("sip")) {
 				p.setName(uri);
-				PstnGatewayAccount account = pbxConfiguration.getPstnAccounts().get(0);
+				PstnGatewayAccount account = PbxConfiguration.getPstnAccounts().get(0);
 				p.setPstnGatewayAccount(account);
 			}
 		}
@@ -55,7 +55,7 @@ public class CallParticipantManager {
 					newUri.append(c);
 				}
 			}
-			PstnGatewayAccount account = pbxConfiguration.getPstnAccounts().get(0);
+			PstnGatewayAccount account = PbxConfiguration.getPstnAccounts().get(0);
 			uri = "sip:" + newUri + "@" + account.getHostname();
 		}
 		return uri;

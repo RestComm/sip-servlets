@@ -1,0 +1,53 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+<div class="helphint">You can add SIP URIs and PSTN Phone numbers for you account in this panel. Later you can register against the SIP URIs from SIP phones and the registration bindings will appear in this panel.
+			 When initiation calls from this UI only the phones you have selected with <b>Ring</b> will be called.</div>
+    <rich:panel>
+        <f:facet name="header">Registrations</f:facet>
+
+        <div class="results">
+
+            <h:outputText value="No registration exists"
+                       rendered="#{empty registrationList.resultList}"/>
+
+            <h:dataTable id="registrationList" var="registration"
+                      value="#{registrationList.resultList}"
+                   rendered="#{not empty registrationList.resultList}">
+                <h:column>
+                    <f:facet name="header">Id</f:facet>
+                    #{registration.id}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Name</f:facet>
+                    <s:link id="registration"
+                         value="#{registration.uri}"
+                   propagation="none"
+                         view="/registration.xhtml">
+                        <f:param name="registrationId"
+                                value="#{registration.id}"/>
+                    </s:link>
+                </h:column>
+            </h:dataTable>
+
+        </div>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+        <s:button id="done"
+               value="Create registration"
+                view="/registration.xhtml"/>
+    </div>
+
+</ui:define>
+
+</ui:composition>

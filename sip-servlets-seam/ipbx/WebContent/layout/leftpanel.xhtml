@@ -5,25 +5,30 @@
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:s="http://jboss.com/products/seam/taglib"
 	xmlns:rich="http://richfaces.org/rich" rendered="#{identity.loggedIn}">
-	<div class="leftpanel">
-	<rich:simpleTogglePanel switchType="client" >
+	<div class="leftpanel"><rich:simpleTogglePanel
+		switchType="client">
 		<f:facet name="header">My Phones</f:facet>
 		<a4j:form>
 			<rich:dataTable id="registration"
 				value="#{dataLoader.loadRegistrations()}" var="registration"
-				rows="10"
-				>
-
+				rows="10" rowClasses="leftpanelcolumn">
 				<rich:column>
 					<f:facet name="header">Phone</f:facet>
+
 					<s:link id="registration"
-                         value="#{registration.uri}"
-                   		 propagation="none"
-                         view="/registration.xhtml">
-                        <f:param name="registrationId"
-                                value="#{registration.id}"/>
-                    </s:link>
-                    <a4j:region rendered="#{not empty registration.bindings}"> <span style="color:red"> (#{registration.bindings.size()} bindings)</span></a4j:region>
+						propagation="none" view="/registration.xhtml">
+						<f:param name="registrationId" value="#{registration.id}" />
+						<h:outputText rendered="#{registration.name != null}"
+							value="#{registration.name}" styleClass="regUriName" />
+						<h:outputText rendered="#{registration.name == null}"
+							value="Unnamed" styleClass="regUriName" />
+						<br />
+						<h:outputText value="#{registration.uri}" styleClass="uriSub" />
+
+					</s:link> <a4j:region rendered="#{not empty registration.bindings}">
+						<span style="color: red"> (#{registration.bindings.size()}
+						bindings)</span>
+					</a4j:region>
 				</rich:column>
 				<rich:column width="20">
 					<f:facet name="header">
@@ -36,78 +41,95 @@
 					</h:selectBooleanCheckbox>
 				</rich:column>
 				<rich:column width="20">
-					<a4j:commandLink immediate="true" value="" 
-						action="#{registrationAction.remove(registration)}" reRender="registration">
-						<h:graphicImage value="/img/trash.png" style="border:0"/>
+					<a4j:commandLink immediate="true" value=""
+						action="#{registrationAction.remove(registration)}"
+						reRender="registration">
+						<h:graphicImage value="/img/trash.png" style="border:0" />
 					</a4j:commandLink>
-				</rich:column>	
+				</rich:column>
 				<f:facet name="footer">
-                	<rich:datascroller renderIfSinglePage="false"/>
-            	</f:facet>				
+					<rich:datascroller renderIfSinglePage="false" />
+				</f:facet>
 			</rich:dataTable>
-			<br/>
-<h:graphicImage style="float:right" id="regHelp" value="/img/help.png" />
+			<br />
+			<h:graphicImage style="float:right" id="regHelp"
+				value="/img/help.png" />
 			<h:inputText value="#{registrationAction.registrationUri}" size="15" />
 
 			<rich:spacer width="15"></rich:spacer>
 			<a4j:commandLink value="Add phone" id="addPhone"
 				action="#{registrationAction.addRegistration()}"
-				reRender="registration,messages"> 
+				reRender="registration,messages">
 
 			</a4j:commandLink>
-			
-			<rich:toolTip for="regHelp" layout="block"><div style="width:350px;">You can add SIP URIs and PSTN Phone numbers for your account in this panel. Later you can register against the SIP URIs from SIP phones and the registration bindings will appear in this panel. When initiation calls from this UI only the phones you have selected with <b>Ring</b> will be called.</div></rich:toolTip>
-			
-				<!--rich:spacer width="15"></rich:spacer><a4j:commandLink value="Refresh" reRender="registration"></a4j:commandLink-->
+
+			<rich:toolTip for="regHelp" layout="block">
+				<div style="width: 350px;">You can add SIP URIs and PSTN Phone
+				numbers for your account in this panel. Later you can register
+				against the SIP URIs from SIP phones and the registration bindings
+				will appear in this panel. When initiation calls from this UI only
+				the phones you have selected with <b>Ring</b> will be called.</div>
+			</rich:toolTip>
+
+			<!--rich:spacer width="15"></rich:spacer><a4j:commandLink value="Refresh" reRender="registration"></a4j:commandLink-->
 		</a4j:form>
 
-	</rich:simpleTogglePanel> 		
-	<a4j:form>
-		<rich:simpleTogglePanel switchType="client" >
+	</rich:simpleTogglePanel> <a4j:form>
+		<rich:simpleTogglePanel switchType="client">
 			<f:facet name="header">Contacts</f:facet>
 
 			<rich:dataTable id="contacts" value="#{dataLoader.loadContacts()}"
 				var="contact" rows="30">
 
-				<rich:column>
+				<rich:column styleClass="leftpanelcolumn">
 					<f:facet name="header">Name</f:facet>
-					<s:link id="contact"
-                         value="#{contact.uri}"
-                   		 propagation="none"
-                         view="/contact.xhtml">
-                        <f:param name="contactId"
-                                value="#{contact.id}"/>
-                    </s:link>
-				</rich:column>
-				<rich:column width="40">
-					<f:facet name="header">
-					</f:facet>
+				
+					<div style="float:left">
+					<s:link id="contact" propagation="none" view="/contact.xhtml">
+						<f:param name="contactId" value="#{contact.id}" />
+						<h:outputText rendered="#{contact.name != null}"
+							value="#{contact.name}" styleClass="conUriName" />
+						<h:outputText rendered="#{contact.name == null}" value="Unnamed"
+							styleClass="conUriName" />
+						<br />
+						<h:outputText value="#{contact.uri}" styleClass="uriSub" />
+					</s:link></div>
+					<div style="float:right">
 					<h:commandLink ajaxSingle="true"
-						action="#{callAction.call(contact.uri)}">Call</h:commandLink>
-				</rich:column>
-				<rich:column width="20">
-					<a4j:commandLink immediate="true" value="" 
+						action="#{callAction.call(contact.uri)}">
+						<h:graphicImage value="/img/call.png" style="border:0" alt="Call" />
+					</h:commandLink>
+					<rich:spacer width="4" />
+					<a4j:commandLink immediate="true" value=""
 						action="#{contactAction.remove(contact)}" reRender="contacts">
-						 <h:graphicImage value="/img/trash.png" style="border:0"/>
+						<h:graphicImage value="/img/trash.png" style="border:0"
+							alt="Delete" />
 					</a4j:commandLink>
+					</div>
 				</rich:column>
+
 				<f:facet name="footer">
-                	<rich:datascroller renderIfSinglePage="false"/>
-            	</f:facet>	
+					<rich:datascroller renderIfSinglePage="false" />
+				</f:facet>
 			</rich:dataTable>
-			<br /><h:graphicImage id="conHelp" style="float:right" value="/img/help.png" />
+			<br />
+			<h:graphicImage id="conHelp" style="float:right"
+				value="/img/help.png" />
 			<h:inputText value="#{contactAction.contactUri}" size="15" />
 			<rich:spacer width="15"></rich:spacer>
 			<a4j:commandLink value="Add contact"
 				action="#{contactAction.addContact()}" reRender="contacts,messages">
 
 			</a4j:commandLink>
-			
-			<rich:toolTip for="conHelp" layout="block"><div style="width:350px;">You can add SIP URIs and PSTN Phone numbers for your account in this panel. Then you can initiate calls by clicking the <b>Call</b> button.</div></rich:toolTip>
-			
+
+			<rich:toolTip for="conHelp" layout="block">
+				<div style="width: 350px;">You can add SIP URIs and PSTN Phone
+				numbers for your account in this panel. Then you can initiate calls
+				by clicking the <img src="img/call.png" /> button.</div>
+			</rich:toolTip>
+
 		</rich:simpleTogglePanel>
-	</a4j:form>
-	<a4j:form>		
+	</a4j:form> <a4j:form>
 		<rich:simpleTogglePanel switchType="client" id="historyPanel">
 			<f:facet name="header">History</f:facet>
 			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"

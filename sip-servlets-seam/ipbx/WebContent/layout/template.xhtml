@@ -5,7 +5,8 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:s="http://jboss.com/products/seam/taglib"
-	xmlns:a4j="http://richfaces.org/a4j">
+	xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>sip-servlets-pbx</title>
@@ -14,10 +15,10 @@
 
 
 <body>
-
+ <f:view contextType="text/html">
 <a4j:outputPanel id="globalAll">
 <a4j:region rendered="#{identity.loggedIn}">
-	<a4j:push id="pushStatus" interval="1000" enabled="true" eventProducer="#{currentUserState.addGlobalListener}"
+	<a4j:push id="pushStatus" interval="1000" enabled="true" eventProducer="#{currentWorkspaceState.addGlobalListener}"
 			reRender="globalAll" />
 </a4j:region>
 
@@ -45,7 +46,12 @@
 		</td>
 		<td><h:messages id="messages" globalOnly="true" styleClass="message"
         errorClass="errormsg" infoClass="infomsg" warnClass="warnmsg"/>
-		<ui:insert name="body" />
+        <ui:include src="status.xhtml">
+</ui:include><rich:spacer height="44">
+	
+</rich:spacer>
+<div style="width: 400px">
+		<ui:insert name="body" /></div>
 		<div class="footer">Powered by <a
 			href="http://www.mobicents.org">Mobicents</a> and <a
 			href="http://jboss.com/products/seam">Seam</a>.</div>
@@ -53,5 +59,6 @@
 	</tr>
 </table></div>
 </a4j:outputPanel>
+</f:view>
 </body>
 </html>

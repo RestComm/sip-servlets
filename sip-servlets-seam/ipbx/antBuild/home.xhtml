@@ -1,0 +1,97 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich" template="layout/template.xhtml"
+	xmlns:a4j="http://richfaces.org/a4j">
+
+	<ui:define name="body">
+
+		
+
+		<div><a4j:region rendered="true">
+			<h1>Mobicents Sip Servlets Media IPBX</h1>
+			<div style="width:804px;height:821px;position:absolute;z-index: -999; top:-120px;right:0;background-image:url('img/ipbx-theme.png')">
+			</div></a4j:region></div>
+		
+		<div class="rightpanel">
+		<a4j:region rendered="#{not identity.loggedIn}">Please log in or register to get started. Administrator username is <i>admin</i> and the password is <i>admin</i>. You can register normal users from the registration link at the top-right corner.</a4j:region>
+		
+		<a4j:form id="callStatusPanel"
+			rendered="#{identity.loggedIn}">
+			<a4j:region rendered="#{not currentWorkspaceState.anythingGoingOn()}"><div style="padding:5px;">Nothing going on at the moment. <b>No active calls.</b></div></a4j:region>
+			<a4j:region rendered="#{currentWorkspaceState.anythingGoingOn()}"><div style="padding:5px;">Calls in progress... <b> Call controls are displayed.</b></div></a4j:region>
+			<br/>			
+			<div style="padding:4px;margin:7px;border:1px solid #CCC;">
+			<s:label>Phone number or SIP URI</s:label><rich:spacer width="10"></rich:spacer>
+			<h:inputText value="#{callPhoneAction.number}" /><rich:spacer width="10"/>
+			<h:commandLink style="color:#444" value="Dial" action="#{callPhoneAction.call()}"/></div>
+			<rich:panel >
+
+				<rich:dataTable id="ongoingCall"
+					rendered="#{currentWorkspaceState.hasOngoingCalls()}"
+					value="#{currentWorkspaceState.ongoingCalls}" var="ongoing" rows="5">
+					<f:facet name="header">Active call</f:facet>
+
+					<rich:column>
+						<h:outputText value="#{ongoing.uri}" />
+					</rich:column>
+					<rich:column width="40">
+						<a4j:commandLink action="#{currentWorkspaceState.endCall(ongoing)}"
+							reRender="callStatusPanel">Close</a4j:commandLink>
+					</rich:column>
+					<rich:column width="40">
+						<a4j:commandLink action="#{currentWorkspaceState.mute(ongoing)}"
+							ajaxSingle="true" rendered="#{not ongoing.muted}">Mute</a4j:commandLink>
+						<a4j:commandLink action="#{currentWorkspaceState.unmute(ongoing)}"
+							ajaxSingle="true" rendered="#{ongoing.muted}">Unmute</a4j:commandLink>
+					</rich:column>
+				</rich:dataTable>
+				<rich:dataTable id="incomingCall"
+					rendered="#{currentWorkspaceState.hasIncomingCalls()}"
+					value="#{currentWorkspaceState.incomingCalls}" var="incoming" rows="5">
+					<f:facet name="header">Incoming calls</f:facet>
+
+					<rich:column>
+						<h:outputText value="#{incoming.uri}" />
+					</rich:column>
+					<rich:column width="40">
+						<a4j:commandLink action="#{currentWorkspaceState.reject(incoming)}"
+							reRender="callStatusPanel">Reject</a4j:commandLink>
+					</rich:column>
+					<rich:column width="40">
+						<h:commandLink rendered="#{currentWorkspaceState.hasOngoingCalls()}"
+							action="#{currentWorkspaceState.join(incoming)}">Accept</h:commandLink>
+					</rich:column>
+					<rich:column width="140">
+					Forward to <rich:suggestionbox height="16" width="80">
+
+						</rich:suggestionbox>
+					</rich:column>
+				</rich:dataTable>
+				<rich:dataTable id="outgoingCall"
+					rendered="#{currentWorkspaceState.hasOutgoingCalls()}"
+					value="#{currentWorkspaceState.outgoingCalls}" var="outgoing" rows="5">
+					<f:facet name="header">Outgoing calls</f:facet>
+
+					<rich:column>
+						<h:outputText value="#{outgoing.uri}" />
+					</rich:column>
+					<rich:column width="40">
+						<a4j:commandLink action="#{currentWorkspaceState.cancel(outgoing)}"
+							reRender="callStatusPanel">Cancel</a4j:commandLink>
+					</rich:column>
+					<rich:column width="140">
+					Forward to <rich:suggestionbox height="16" width="80">
+
+						</rich:suggestionbox>
+					</rich:column>
+				</rich:dataTable>
+
+			</rich:panel>
+		</a4j:form></div>
+	</ui:define>
+</ui:composition>

@@ -57,6 +57,7 @@ public class RegistrationAction {
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage("Error. Try Again!"));
+			e.printStackTrace();
 		}
 	}
 	

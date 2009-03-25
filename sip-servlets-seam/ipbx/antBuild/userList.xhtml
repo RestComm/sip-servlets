@@ -1,0 +1,55 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+<a4j:region rendered="#{identity.hasRole('admin')}">
+<div class="helphint">As an administrator you can edit the user accounts from here. Change names, password, remove users, etc..</div>
+    <rich:panel>
+        <f:facet name="header">Users</f:facet>
+
+        <div class="results">
+
+            <h:outputText value="No user exists"
+                       rendered="#{empty userList.resultList}"/>
+
+            <h:dataTable id="userList" var="user"
+                      value="#{userList.resultList}"
+                   rendered="#{not empty userList.resultList}">
+                <h:column>
+                    <f:facet name="header">Id</f:facet>
+                    #{user.id}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Name</f:facet>
+                    <s:link id="user"
+                         value="#{user.name}"
+                   propagation="none"
+                         view="/user.xhtml">
+                        <f:param name="userId"
+                                value="#{user.id}"/>
+                    </s:link>
+                </h:column>
+            </h:dataTable>
+
+        </div>
+
+    </rich:panel>
+    
+     <div class="actionButtons">
+        <s:button id="newUser"
+               value="Create new user"
+                view="/user.xhtml"/>
+    </div>
+
+</a4j:region>
+</ui:define>
+
+</ui:composition>

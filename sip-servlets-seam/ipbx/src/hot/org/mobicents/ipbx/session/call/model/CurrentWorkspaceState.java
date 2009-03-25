@@ -9,23 +9,25 @@ import java.util.LinkedList;
 import org.ajax4jsf.event.PushEventListener;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Unwrap;
+import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.entity.User;
+import org.mobicents.ipbx.session.call.framework.IVRHelperManager;
+import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.mscontrol.MsLinkMode;
-import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
 
-@Name("currentUserState")
-@Scope(ScopeType.STATELESS)
-public class CurrentUserState {
-	@In CallStateManager callStateManager;
-	@In CallParticipantManager callParticipantManager;
+@Name("currentWorkspaceState")
+@Scope(ScopeType.SESSION)
+public class CurrentWorkspaceState {
+	@Logger 
+	private static Log log;
+	
 	@In(value="sessionUser") User sessionUser;
-	@In ConferenceManager conferenceManager;
-	@In MediaController mediaController;
 	
 	//using a global push listener instead of 3 listener because browsers can't handle more than 2 simulteanous connections 
 	private PushEventListener globalListener;
@@ -45,8 +47,8 @@ public class CurrentUserState {
 	}
 	
 	@Unwrap
-	public CurrentUserState getState() {
-		CurrentUserState cus = callStateManager.getCurrentState(sessionUser.getName());
+	public CurrentWorkspaceState getState() {
+		CurrentWorkspaceState cus = WorkspaceStateManager.instance().getWorkspace(sessionUser.getName());
 		return cus;
 	}
 	
@@ -66,7 +68,7 @@ public class CurrentUserState {
 			CallParticipant[] ps = conf.getParticipants();
 			for(CallParticipant cp : ps) {
 				if(cp.getName() != null) {
-					CallStateManager.getUserState(cp.getName()).removeCall(participant);
+					WorkspaceStateManager.instance().getWorkspace(cp.getName()).removeCall(participant);
 				}
 			}
 			participant.setConference(null);
@@ -83,7 +85,7 @@ public class CurrentUserState {
 					String name = other.getName();
 					
 					// We can't use the injected callmanager here for some reason !! TODO: FIXME
-					CurrentUserState cus = CallStateManager.getUserState(name);
+					CurrentWorkspaceState cus = WorkspaceStateManager.instance().getWorkspace(name);
 					try {
 						cus.endCall(other, true);
 					} catch (Exception e) {}
@@ -112,6 +114,8 @@ public class CurrentUserState {
 		participant.setMuted(true);
 		participant.getMsLink().setMode(MsLinkMode.HALF_DUPLEX);
 		makeStatusDirty();
+		String ann = PbxConfiguration.getProperty("pbx.default.muted.announcement");
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(ann);
 	}
 	
 	// Unmute an active participant
@@ -119,6 +123,8 @@ public class CurrentUserState {
 		participant.setMuted(false);
 		participant.getMsLink().setMode(MsLinkMode.FULL_DUPLEX);
 		makeStatusDirty();
+		String ann = PbxConfiguration.getProperty("pbx.default.unmuted.announcement");
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(ann);
 	}
 	
 	// Cancel an outgoing call
@@ -130,6 +136,7 @@ public class CurrentUserState {
 	
 	// Simply removed a call from the GUI, sip/media release is done elsewhere
 	public void removeCall(CallParticipant participant) {
+		log.info("Removing " + participant.getUri() + " from " + sessionUser);
 		incomingCalls.remove(participant);
 		outgoingCalls.remove(participant);
 		ongoingCalls.remove(participant);
@@ -148,20 +155,6 @@ public class CurrentUserState {
 		outgoingCalls.remove(participant);
 		ongoingCalls.add(participant);
 		makeStatusDirty();
-	}
-	
-	public void join(CallParticipant participant) {
-		Conference[] confs = getConferences();
-		if(participant.getPrEndpoint() == null) return;
-		if(confs.length > 0) {
-			Conference conf = getConferences()[0];
-			participant.setConference(conf);
-			participant.setCallState(CallState.CONNECTED);
-			String confEndpointName = conf.getEndpointName();
-			mediaController.createLink(MsLinkMode.FULL_DUPLEX)
-			.join(confEndpointName, participant.getPrEndpoint().getLocalName());
-		}
-		
 	}
 	
 	// Update the UI when there is an incoming call
@@ -197,7 +190,7 @@ public class CurrentUserState {
 		Iterator<Registration> regs = sessionUser.getRegistrations().iterator();
 		while(regs.hasNext()) {
 			Registration reg = regs.next();
-			CallParticipant cp = callParticipantManager.getExistingCallParticipant(reg.getUri());
+			CallParticipant cp = CallParticipantManager.instance().getExistingCallParticipant(reg.getUri());
 			if(cp != null) {
 				if(CallState.CONNECTED.equals(cp.getCallState())) {
 					if(cp.getConference() != null) {

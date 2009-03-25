@@ -1,0 +1,68 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="pstnGatewayAccountForm" rendered="#{identity.hasRole('admin')}">
+
+        <rich:panel>
+            <f:facet name="header">PSTN Gateway Account</f:facet>
+<s:decorate id="acnameField" template="layout/edit.xhtml">
+                <ui:define name="label">Account name</ui:define>
+                <h:inputText id="name" required="true"
+                             value="#{pstnGatewayAccountHome.instance.name}"/>
+            </s:decorate>
+            <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Username</ui:define>
+                <h:inputText id="name" required="true"
+                             value="#{pstnGatewayAccountHome.instance.username}"/>
+            </s:decorate>
+            
+            <s:decorate id="hostnameField" template="layout/edit.xhtml">
+                <ui:define name="label">Hostname</ui:define>
+                <h:inputText id="hostname" required="true"
+                             value="#{pstnGatewayAccountHome.instance.hostname}"/>
+            </s:decorate>
+            
+            <s:decorate id="passField" template="layout/edit.xhtml">
+                <ui:define name="label">Password</ui:define>
+                <h:inputText id="password" required="true"
+                             value="#{pstnGatewayAccountHome.instance.password}"/>
+            </s:decorate>
+
+            <div style="clear:both"/>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{pstnGatewayAccountHome.persist}"
+                       rendered="#{!pstnGatewayAccountHome.managed}"/>
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{pstnGatewayAccountHome.update}"
+                       rendered="#{pstnGatewayAccountHome.managed}"/>
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{pstnGatewayAccountHome.remove}"
+                      immediate="true"
+                       rendered="#{pstnGatewayAccountHome.managed}"/>
+            <s:button propagation="end"
+                               id="done"
+                            value="Done"
+                             view="/home.xhtml"/>
+        </div>
+
+    </h:form>
+
+</ui:define>
+
+</ui:composition>
