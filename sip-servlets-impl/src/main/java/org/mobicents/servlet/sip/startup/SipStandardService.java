@@ -107,6 +107,7 @@ public class SipStandardService extends StandardService implements SipService {
 	public void initialize() throws LifecycleException {
 		//load the sip application disptacher from the class name specified in the server.xml file
 		//and initializes it
+		StaticServiceHolder.sipStandardService = this;
 		try {
 			sipApplicationDispatcher = (SipApplicationDispatcher)
 				Class.forName(sipApplicationDispatcherClassName).newInstance();					

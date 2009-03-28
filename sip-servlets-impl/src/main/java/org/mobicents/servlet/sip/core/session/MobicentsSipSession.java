@@ -34,6 +34,7 @@ import javax.sip.SipException;
 import javax.sip.Transaction;
 
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
+import org.mobicents.servlet.sip.message.MobicentsSipSessionReference;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -153,5 +154,7 @@ public interface MobicentsSipSession extends SipSession {
 	//RFC 3265
 	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;
 	void removeSubscription(SipServletMessageImpl sipServletMessage);
+	
+	MobicentsSipSessionReference getMobicentsSipSessionReference();
 
 }

@@ -1094,7 +1094,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 					sipFactoryImpl, sipApplicationSessionImpl);
 			this.session.setSessionCreatingTransaction(transaction);
 		}
-		return this.session;
+		if(this.session == null) {
+			return null;
+		} else {
+			return this.session.getMobicentsSipSessionReference();
+		}
 	}
 	
 	/**

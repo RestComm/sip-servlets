@@ -81,6 +81,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
+import org.mobicents.servlet.sip.message.MobicentsSipSessionReference;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -225,6 +226,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient boolean okToByeSentOrReceived = false;
 	protected transient Semaphore semaphore;
 	
+	protected transient MobicentsSipSessionReference mobicentsSipSessionReference = null;
+	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
 		setSipApplicationSession(mobicentsSipApplicationSession);
@@ -237,6 +240,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		this.subscriptions = new HashSet<EventHeader>();
 		semaphore = new Semaphore(1);
+		mobicentsSipSessionReference = new MobicentsSipSessionReference(this);
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -1436,5 +1440,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Semaphore getSemaphore() {
 		return semaphore;
+	}
+	public MobicentsSipSessionReference getMobicentsSipSessionReference() {
+		return mobicentsSipSessionReference;
 	}
 }
