@@ -14,7 +14,9 @@ import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsLink;
 
 /**
- *  Each Sip Session will have exactly one instance of this class.
+ *  Each Sip Session will have exactly one instance of this class. Here we store the
+ *  Media objects associated with the SipSession. We make some attempts to fill in the
+ *  objects automatically, but it is recommended that you set them manually.
  *
  */
 

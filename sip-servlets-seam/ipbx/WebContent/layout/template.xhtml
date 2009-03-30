@@ -6,7 +6,7 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:s="http://jboss.com/products/seam/taglib"
 	xmlns:a4j="http://richfaces.org/a4j"
-      xmlns:rich="http://richfaces.org/rich">
+	xmlns:rich="http://richfaces.org/rich">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>sip-servlets-pbx</title>
@@ -15,50 +15,58 @@
 
 
 <body>
- <f:view contextType="text/html">
-<a4j:outputPanel id="globalAll">
-<a4j:region rendered="#{identity.loggedIn}">
-	<a4j:push id="pushStatus" interval="1000" enabled="true" eventProducer="#{currentWorkspaceState.addGlobalListener}"
-			reRender="globalAll" />
-</a4j:region>
+<f:view contextType="text/html">
+	<a4j:outputPanel id="globalAll">
+		<a4j:region rendered="#{identity.loggedIn}">
+			<a4j:push id="pushStatus" interval="1000" enabled="true"
+				eventProducer="#{currentWorkspaceState.addGlobalListener}"
+				reRender="globalAll" />
+		</a4j:region>
 
 
-<!--  
+		<!--  
 <script type="text/javascript"
 	src="seam/resource/remoting/resource/remote.js"></script>
 <s:remote include="dataLoader" />
 -->
 
-<div style="background-color: #000; width: 100%"><h:graphicImage value="/img/mpbx.png"/><br/></div>
+		<div class="titleHeader"><h:graphicImage
+			value="/img/mpbx.png" /><rich:spacer width="14"/>
+Powered by <a
+					href="http://www.mobicents.org">Mobicents</a> and <a
+					href="http://jboss.com/products/seam">Seam</a>
+		</div>
+<div class="back-logo">
+			</div>
+			<div style="width: 940px;">
+		<ui:include src="menu.xhtml">
+			<ui:param name="projectName" value="sip-servlets-pbx" />
+		</ui:include></div>
 
-<ui:include src="menu.xhtml">
-	<ui:param name="projectName" value="sip-servlets-pbx" />
-</ui:include>
+		<ui:include src="leftpanel.xhtml">
+		</ui:include>
+		
+		
 
-<ui:include src="leftpanel.xhtml">
-</ui:include>
+		<div class="body">
+		<table width="900">
+			<tr>
+				<td width="340">
+				<div class="mainbody" />
+				</td>
+				<td width="560"><h:messages id="messages" globalOnly="true"
+					styleClass="message" errorClass="errormsg" infoClass="infomsg"
+					warnClass="warnmsg" /> <ui:include src="status.xhtml">
+				</ui:include><rich:spacer height="44">
 
-<div class="body">
-<table width="100%">
-	<tr>
-		<td width="340">
-		<div class="mainbody" />
-		</td>
-		<td><h:messages id="messages" globalOnly="true" styleClass="message"
-        errorClass="errormsg" infoClass="infomsg" warnClass="warnmsg"/>
-        <ui:include src="status.xhtml">
-</ui:include><rich:spacer height="44">
-	
-</rich:spacer>
-<div style="width: 400px">
-		<ui:insert name="body" /></div>
-		<div class="footer">Powered by <a
-			href="http://www.mobicents.org">Mobicents</a> and <a
-			href="http://jboss.com/products/seam">Seam</a>.</div>
-		</td>
-	</tr>
-</table></div>
-</a4j:outputPanel>
+				</rich:spacer>
+				<div><ui:insert name="body" /></div>
+				
+				</td>
+			</tr>
+		</table>
+		</div>
+	</a4j:outputPanel>
 </f:view>
 </body>
 </html>

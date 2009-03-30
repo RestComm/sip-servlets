@@ -154,12 +154,14 @@ public class CallAction {
 		if(toRegistration != null && toParticipant.getName() == null) {
 			toParticipant.setName(toRegistration.getUser().getName());
 		}
-		for(CallParticipant cp : fromParticipants) {
-			cp.setName(user.getName());
-			call(cp, toParticipant);
-			WorkspaceStateManager.instance().getWorkspace(user.getName()).setOutgoing(toParticipant);
-			WorkspaceStateManager.instance().getWorkspace(toParticipant.getName()).setIncoming(cp);
-		}
+		
+		// Take one of the from Participants and use him as a callee for the other side
+		CallParticipant cp = fromParticipants.getFirst();
+		cp.setName(user.getName());
+		call(cp, toParticipant);
+		WorkspaceStateManager.instance().getWorkspace(user.getName()).setOutgoing(toParticipant);
+		WorkspaceStateManager.instance().getWorkspace(toParticipant.getName()).setIncoming(cp);
+		
 		
 		if(!alreadyInCall) { 
 			//TODO: it doesnt matter what we put as fromParticipant here, but do it more cleanly

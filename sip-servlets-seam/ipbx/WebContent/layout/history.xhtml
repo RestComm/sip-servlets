@@ -1,0 +1,23 @@
+<a4j:region xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:rich="http://richfaces.org/rich" rendered="#{identity.loggedIn}">
+	<div class="history">
+	<div class="roundcont">
+	<a4j:form>
+			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"
+				rows="5">
+				<b><h:outputText value="#{hist.message} " /></b>
+				<h:outputText value="(#{hist.timestamp})" />
+			</rich:dataList>
+	</a4j:form></div>
+	   <div class="roundbottom">
+	 <img src="bl.gif" alt="" 
+	 width="15" height="15" class="corner" 
+	 style="display: none" />
+   </div>
+</div>	
+</a4j:region>

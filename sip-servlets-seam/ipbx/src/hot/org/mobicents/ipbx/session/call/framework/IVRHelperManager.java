@@ -6,6 +6,12 @@ import javax.servlet.sip.SipSession;
 
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaControllerHolder;
 
+/**
+ * Central place for all IVRHelpers in the application.
+ * 
+ * @author vralev
+ *
+ */
 public class IVRHelperManager {
 	
 	private static IVRHelperManager ivrHelperManager;

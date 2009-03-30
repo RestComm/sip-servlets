@@ -1,5 +1,6 @@
 package org.mobicents.ipbx.session.call.logging;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,13 +69,13 @@ public class CallHistory {
 			User user = (User) sipSession.getAttribute("user");
 			if(user == null) return;
 			if(DataLoader.history.get(user.getName()) == null) {
-				DataLoader.history.put(user.getName(), new LinkedList<History>());
+				DataLoader.history.put(user.getName(), new ArrayList<History>());
 			}
 			History history = new History();
 			history.setMessage(message);
 			history.setTimestamp(DateUtil.now());
 			history.setUser(user);
-			DataLoader.history.get(user.getName()).add(history);
+			DataLoader.history.get(user.getName()).add(0, history);
 
 			WorkspaceStateManager.instance().getWorkspace(user.getName()).makeHistoryDirty();
 		} catch(Exception e) {

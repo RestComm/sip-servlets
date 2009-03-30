@@ -30,6 +30,7 @@ public class CallParticipant {
 	private Registration registration;
 	private boolean initiator;
 	private boolean muted;
+	private boolean onhold;
 	private Binding binding;
 	private PstnGatewayAccount pstnGatewayAccount;
 	
@@ -142,5 +143,13 @@ public class CallParticipant {
 
 	public void setBinding(Binding binding) {
 		this.binding = binding;
+	}
+
+	public boolean isOnhold() {
+		return onhold;
+	}
+
+	public void setOnhold(boolean onhold) {
+		this.onhold = onhold;
 	}
 }

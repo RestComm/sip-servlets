@@ -7,9 +7,8 @@
 	xmlns:a4j="http://richfaces.org/a4j">
 
 		<div><a4j:region rendered="true">
-			<h1>Mobicents Sip Servlets Media IPBX</h1>
-			<div style="width:804px;height:821px;position:absolute;z-index: -999; top:-120px;right:0;background-image:url('img/ipbx-theme.png')">
-			</div></a4j:region></div>
+			<h1>IPBX Status</h1>
+			</a4j:region></div>
 		
 		<div class="rightpanel">
 		<a4j:region rendered="#{not identity.loggedIn}">Please log in or register to get started. Administrator username is <i>admin</i> and the password is <i>admin</i>. You can register normal users from the registration link at the top-right corner.</a4j:region>
@@ -31,7 +30,8 @@
 					<f:facet name="header">Active call</f:facet>
 
 					<rich:column>
-						<h:outputText value="#{ongoing.uri}" />
+						<h:outputText value="#{ongoing.name}" />
+						<h:outputText value=" (#{ongoing.uri})" />
 					</rich:column>
 					<rich:column width="40">
 						<a4j:commandLink action="#{currentWorkspaceState.endCall(ongoing)}"

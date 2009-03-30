@@ -1,5 +1,6 @@
 package org.mobicents.ipbx.session;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +89,7 @@ public class DataLoader {
 	}
 	
 	public void refreshHistory() {
-		if(history.get(user.getName()) == null) history.put(user.getName(), new LinkedList<History>());
+		if(history.get(user.getName()) == null) history.put(user.getName(), new ArrayList<History>());
 		/*
 		User u = entityManager.find(User.class, user.getId());
 		historyCache = entityManager.createQuery("SELECT history FROM History history where history.user=:u order by history.timestamp desc").setParameter("u", u).getResultList();

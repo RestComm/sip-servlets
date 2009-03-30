@@ -1,6 +1,7 @@
 package org.mobicents.ipbx.entity;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
@@ -37,7 +38,6 @@ import org.jboss.seam.annotations.Name;
  */
 public class Registration implements Serializable {
 	private String uri;
-	private boolean isIpAddressURI;
 	private long id;
 	private User user;
 	private CallState callState;
@@ -99,18 +99,17 @@ public class Registration implements Serializable {
 		this.selected = selected;
 	}
 
-	/**
-	 * @return the isIpAddressURI
-	 */
 	@Transient
-	public boolean isIpAddressURI() {
-		return isIpAddressURI;
+	public boolean isIpPhone() {
+		if(uri==null) return true;
+		return uri.startsWith("sip");
 	}
 
 	/**
 	 * 
 	 */
 	public void addBinding(Binding binding) {
+		if(this.bindings == null) this.bindings = new HashSet<Binding>();
 		this.bindings.add(binding);
 	}
 
@@ -146,7 +145,6 @@ public class Registration implements Serializable {
 	@Transient
 	public String[] getCallableUris() {
 		LinkedList<String> uris = new LinkedList<String>();
-		uris.add(getUri());
 		if(getBindings() != null) {
 			Iterator<Binding> bindings = getBindings().iterator();
 			while(bindings.hasNext()) {
@@ -154,6 +152,8 @@ public class Registration implements Serializable {
 				uris.add(binding.getContactAddress());
 			}
 		}
+		// If no bindings, use the address
+		if(uris.size() == 0) uris.add(getUri());
 		return uris.toArray(new String[]{});
 	}
 	

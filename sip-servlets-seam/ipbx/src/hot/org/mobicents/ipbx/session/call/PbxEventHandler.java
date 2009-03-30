@@ -56,7 +56,7 @@ public class PbxEventHandler {
 	@In MediaController mediaController;
 	@In MediaEventDispatcher mediaEventDispatcher;
 	@In MediaSessionStore mediaSessionStore;
-	@In IVRHelper sessionIVRHelper;
+	@In IVRHelper ivrHelper;
 	@In(create=true) SimpleSipAuthenticator sipAuthenticator;
 	@In SipFactory sipFactory;
 	@In MsEventFactory eventFactory;
@@ -323,7 +323,7 @@ public class PbxEventHandler {
 			(CallParticipant) sipSession.getAttribute("participant");
 		
 		mediaSessionStore.setMsEndpoint(endpoint);
-		sessionIVRHelper.detectDtmf();
+		ivrHelper.detectDtmf();
 		
 		Conference conf = participant.getConference();
 		// We should upgrade the call state to "active" for all participants (most already have it)

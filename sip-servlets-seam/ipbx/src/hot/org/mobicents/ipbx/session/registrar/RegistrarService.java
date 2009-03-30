@@ -319,6 +319,7 @@ public class RegistrarService {
 	 * @return the binding found, null otherwise
 	 */
 	private Binding findBinding(Set<Binding> bindings, Address contact) {
+		if(bindings == null) return null;
 		for (Binding binding : bindings) {
 			URI contactUri = null;
 			try {

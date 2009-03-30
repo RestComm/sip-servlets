@@ -44,6 +44,7 @@ input[type='submit'],input[type='button'] {
 
 .footer {
 	text-align: right;
+	float:right;
 	font-size: 10px;
 }
 
@@ -58,7 +59,7 @@ input[type='submit'],input[type='button'] {
 
 h1 {
 	font-family: Arial, sans-serif;
-	color: #578BB8;
+	color: #666;
 	font-size: 1.6em;
 	margin-top: 0;
 }
@@ -195,11 +196,15 @@ A:hover {
 }
 
 .rightpanel {
-	background-color: #FFCA11;
+	background-color: #ccf;
 	padding-right: 4px;
 	padding-top: 1px;
 	padding-bottom: 1px;
 	padding-left: 6px;
+		filter:alpha(opacity=77);
+	-moz-opacity:0.77;
+	-khtml-opacity: 0.77;
+	opacity: 0.77;
 }
 
 .helphint {
@@ -220,8 +225,61 @@ A:hover {
 	color: #447;
 }
 
+.titleHeader {
+	background-color: #000; width: 940px; color:#777;
+}
+.titleHeader A:link {
+	text-decoration: none;
+	color: #999;
+}
+
+.titleHeaderA:visited {
+	text-decoration: none;
+	color: #999;
+}
+
+.titleHeader A:active {
+	text-decoration: none;
+	color: #999;
+}
+
 .uriSub {
 	font-weight: 100;
 	font-size: 82%;
 	color: #aaa;
+}
+
+
+.roundcont {
+	background-color:#000; /*#f90;*/
+	color: #fff;
+}
+
+.roundcont p {
+	margin: 0 10px;
+}
+
+.back-logo {
+	 width:804px;
+	 height:821px;
+	 position:absolute;
+	 z-index: -999; 
+	 top:-120px; 
+	 left:140px; 
+	 background-image:url('../img/ipbx-theme.png');
+	 filter:alpha(opacity=60);
+	-moz-opacity:0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
+}
+	
+.history {
+	filter:alpha(opacity=50);
+	-moz-opacity:0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+	/*
+width:700px;position:absolute;z-index: 999; bottom:50px;left:400px;
+*/
+			
 }

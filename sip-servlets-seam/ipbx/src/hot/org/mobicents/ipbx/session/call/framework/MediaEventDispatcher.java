@@ -23,6 +23,14 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 import org.mobicents.mscontrol.events.pkg.MsAudio;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaEvent;
 
+/**
+ * This class keeps track of some Media events and produces other events for convenience.
+ * It also keeps track on the DTMF numbers entered in the context of every SipSession.
+ * 
+ * @author vralev
+ *
+ */
+
 @Name("mediaEventDispatcher")
 @Scope(ScopeType.APPLICATION)
 @Install(precedence=FRAMEWORK)
@@ -39,10 +47,21 @@ public class MediaEventDispatcher {
 		dtmfBuffer.get(object).append(number);
 	}
 	
+	/**
+	 * Reset the DTMF buffer for give object (SipSession, MsLink or MsConnection)
+	 * 
+	 * @param object
+	 */
 	public void reset(Object object) {
 		dtmfBuffer.put(object, new StringBuffer());
 	}
 	
+	/**
+	 * Get the DTMF buffer for a given object (SipSession, MsLink or MsConnection)
+	 * 
+	 * @param object
+	 * @return Returns null for unknown objects.
+	 */
 	public String getDtmfArchive(Object object) {
 		return dtmfBuffer.get(object).toString();
 	}
@@ -53,6 +72,10 @@ public class MediaEventDispatcher {
 		return stringDigits.substring(numDigits - digits, numDigits);
 	}
 	
+	/**
+	 * You can use this method to simulate some event, BUT THIS IS NOT RECOMMENDED!
+	 * @param mediaEvent
+	 */
 	@Observer("mediaEvent")
 	public void doMediaEvent(MediaEvent mediaEvent) {
 		MsEventIdentifier identifier = mediaEvent.getMsNotifyEvent().getEventID();
@@ -73,6 +96,9 @@ public class MediaEventDispatcher {
         
 	}
 	
+	/**
+	 * You can use this method to simulate some event, BUT THIS IS NOT RECOMMENDED!
+	 */
 	@Observer("linkConnected")
 	public void doLinkConnected(MsLinkEvent linkEvent) {
 		mediaSessionStore.setMsLink(linkEvent.getSource());
@@ -80,6 +106,9 @@ public class MediaEventDispatcher {
 		Events.instance().raiseEvent("storeLinkConnected", linkEvent);
 	}
 	
+	/**
+	 * You can use this method to simulate some event, BUT THIS IS NOT RECOMMENDED!
+	 */
 	@Observer("connectionOpen")
 	public void doConnectionOpen(MsConnectionEvent connectionEvent) {
 		mediaSessionStore.setMsConnection(connectionEvent.getConnection());
@@ -87,16 +116,25 @@ public class MediaEventDispatcher {
 		Events.instance().raiseEvent("storeConnectionOpen", connectionEvent);
 	}
 	
+	/**
+	 * You can use this method to simulate some event, BUT THIS IS NOT RECOMMENDED!
+	 */
 	@Observer("sipSessionDestroyed")
 	public void doSipSessionDestroyed(SipSession sipSession) {
 		dtmfBuffer.remove(sipSession);
 	}
 	
+	/**
+	 * You can use this method to simulate some event, BUT THIS IS NOT RECOMMENDED!
+	 */
 	@Observer("linkDisconnected")
 	public void doLinkDisconnected(MsLinkEvent linkEvent) {
 		dtmfBuffer.remove(linkEvent.getSource());
 	}
 	
+	/**
+	 * You can use this method to simulate some event, BUT THIS IS NOT RECOMMENDED!
+	 */
 	@Observer("connectionDisconnected")
 	public void doConnectionDisconnected(MsConnectionEvent connectionEvent) {
 		dtmfBuffer.remove(connectionEvent.getConnection());

@@ -11,7 +11,7 @@ import org.jboss.seam.annotations.Unwrap;
 import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
 
-@Name("sessionIVRHelper")
+@Name("ivrHelper")
 @Scope(ScopeType.SESSION)
 @Startup(depends={"ivrHelperManager"})
 public class SessionIVRHelper {

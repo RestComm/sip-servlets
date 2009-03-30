@@ -3,8 +3,6 @@ package org.mobicents.ipbx.session.call.model;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 import org.ajax4jsf.event.PushEventListener;
 import org.jboss.seam.ScopeType;
@@ -15,7 +13,6 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Unwrap;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.CallState;
-import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.entity.User;
 import org.mobicents.ipbx.session.call.framework.IVRHelperManager;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
@@ -28,6 +25,8 @@ public class CurrentWorkspaceState {
 	private static Log log;
 	
 	@In(value="sessionUser") User sessionUser;
+	
+	private CallParticipant removedCallParticipant;
 	
 	//using a global push listener instead of 3 listener because browsers can't handle more than 2 simulteanous connections 
 	private PushEventListener globalListener;
@@ -55,8 +54,12 @@ public class CurrentWorkspaceState {
 	public void endCall(CallParticipant participant) {
 		endCall(participant, true);
 	}
-	// Ends a call with another participant while keeping everyone else in the conf
+	
 	public void endCall(CallParticipant participant, boolean sendBye) {
+		endCall(participant, sendBye, true);
+	}
+	// Ends a call with another participant while keeping everyone else in the conf
+	public void endCall(CallParticipant participant, boolean sendBye, boolean disconnectOthers) {
 		try {
 			removeCall(participant);
 			
@@ -79,7 +82,7 @@ public class CurrentWorkspaceState {
 			participant.setInitialRequest(null);
 
 			// If there is only one other participant, attempt to disconnect him
-			if(ps.length == 1) {
+			if(ps.length == 1 && disconnectOthers) {
 				try {
 					CallParticipant other = ps[0];
 					String name = other.getName();
@@ -125,6 +128,24 @@ public class CurrentWorkspaceState {
 		makeStatusDirty();
 		String ann = PbxConfiguration.getProperty("pbx.default.unmuted.announcement");
 		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(ann);
+	}
+	
+	// Put on-hold an active participant
+	public void putOnhold(CallParticipant participant) {
+		participant.setOnhold(true);
+		participant.getMsLink().setMode(MsLinkMode.HALF_DUPLEX);
+		makeStatusDirty();
+		String ann = PbxConfiguration.getProperty("pbx.default.onhold.announcement");
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(ann);
+	}
+	
+	// Restore user from on-hold as active participant
+	public void unputOnhold(CallParticipant participant) {
+		participant.setOnhold(false);
+		participant.getMsLink().setMode(MsLinkMode.FULL_DUPLEX);
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).endAll();
+		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).detectDtmf();
+		makeStatusDirty();
 	}
 	
 	// Cancel an outgoing call
@@ -185,23 +206,6 @@ public class CurrentWorkspaceState {
 		return hasOngoingCalls() || hasOutgoingCalls() || hasIncomingCalls();
 	}
 	
-	public Conference[] getConferences() {
-		LinkedList<Conference> list = new LinkedList<Conference>();
-		Iterator<Registration> regs = sessionUser.getRegistrations().iterator();
-		while(regs.hasNext()) {
-			Registration reg = regs.next();
-			CallParticipant cp = CallParticipantManager.instance().getExistingCallParticipant(reg.getUri());
-			if(cp != null) {
-				if(CallState.CONNECTED.equals(cp.getCallState())) {
-					if(cp.getConference() != null) {
-						list.add(cp.getConference());
-					}
-				}
-			}
-		}
-		return list.toArray(new Conference[]{});
-	}
-	
 	public void makeStatusDirty() {
 		if(this.globalListener != null) {
 			this.globalListener.onEvent(new EventObject(this));
@@ -227,5 +231,25 @@ public class CurrentWorkspaceState {
 			}
 		}
 	}
+	public Conference getConference() {
+		for(CallParticipant cp : ongoingCalls.toArray(new CallParticipant[]{})) {
+			return cp.getConference();
+		}
+		for(CallParticipant cp : outgoingCalls.toArray(new CallParticipant[]{})) {
+			return cp.getConference();
+		}
+		for(CallParticipant cp : incomingCalls.toArray(new CallParticipant[]{})) {
+			return cp.getConference();
+		}
+		return null;
+	}
+	
+	public CallParticipant getRemovedCallParticipant() {
+		return removedCallParticipant;
+	}
+	public void setRemovedCallParticipant(CallParticipant removedCallParticipant) {
+		this.removedCallParticipant = removedCallParticipant;
+	}
+	
 
 }

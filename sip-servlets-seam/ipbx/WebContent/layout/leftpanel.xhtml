@@ -17,6 +17,8 @@
 
 					<s:link id="registration"
 						propagation="none" view="/registration.xhtml">
+						<h:graphicImage value="/img/ip-phone.png" rendered="#{registration.isIpPhone()}" style="border:0;margin-right:5px"/>
+						<h:graphicImage value="/img/pstn-phone.png" rendered="#{not registration.isIpPhone()}" style="border:0;margin-right:5px"/>
 						<f:param name="registrationId" value="#{registration.id}" />
 						<h:outputText rendered="#{registration.name != null}"
 							value="#{registration.name}" styleClass="regUriName" />
@@ -26,7 +28,7 @@
 						<h:outputText value="#{registration.uri}" styleClass="uriSub" />
 
 					</s:link> <a4j:region rendered="#{not empty registration.bindings}">
-						<span style="color: red"> (#{registration.bindings.size()}
+						<span style="color: #f66"> (#{registration.bindings.size()}
 						bindings)</span>
 					</a4j:region>
 				</rich:column>
@@ -75,14 +77,13 @@
 		</a4j:form>
 
 	</rich:simpleTogglePanel> <a4j:form>
-		<rich:simpleTogglePanel switchType="client">
+		<rich:simpleTogglePanel switchType="client" styleClass="contactTogglePanel">
 			<f:facet name="header">Contacts</f:facet>
-
+<div style="overflow:auto;width:300px;height:220px">
 			<rich:dataTable id="contacts" value="#{dataLoader.loadContacts()}"
 				var="contact" rows="30">
 
 				<rich:column styleClass="leftpanelcolumn">
-					<f:facet name="header">Name</f:facet>
 				
 					<div style="float:left">
 					<s:link id="contact" propagation="none" view="/contact.xhtml">
@@ -111,7 +112,7 @@
 				<f:facet name="footer">
 					<rich:datascroller renderIfSinglePage="false" />
 				</f:facet>
-			</rich:dataTable>
+			</rich:dataTable></div>
 			<br />
 			<h:graphicImage id="conHelp" style="float:right"
 				value="/img/help.png" />
@@ -129,14 +130,7 @@
 			</rich:toolTip>
 
 		</rich:simpleTogglePanel>
-	</a4j:form> <a4j:form>
-		<rich:simpleTogglePanel switchType="client" id="historyPanel">
-			<f:facet name="header">History</f:facet>
-			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"
-				rows="5">
-				<b><h:outputText value="#{hist.message} " /></b>
-				<h:outputText value="(#{hist.timestamp})" />
-			</rich:dataList>
-		</rich:simpleTogglePanel>
-	</a4j:form></div>
+	</a4j:form> 
+	<ui:include src="/layout/history.xhtml" /> 
+	</div>
 </a4j:region>

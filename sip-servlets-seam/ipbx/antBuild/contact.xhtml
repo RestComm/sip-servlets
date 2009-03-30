@@ -16,6 +16,12 @@
             <f:facet name="header">Contact</f:facet>
 
             <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Name</ui:define>
+                <h:inputText id="name" required="true"
+                             value="#{contactHome.instance.name}"/>
+            </s:decorate>
+            
+            <s:decorate id="uriField" template="layout/edit.xhtml">
                 <ui:define name="label">URI</ui:define>
                 <h:inputText id="name" required="true"
                              value="#{contactHome.instance.uri}"/>
