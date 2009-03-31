@@ -34,8 +34,7 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This example shows Proxying on 2 different location.
@@ -46,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LocationServiceSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(LocationServiceSipServlet.class);
+	private static Logger logger = Logger.getLogger(LocationServiceSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	Map<String, List<URI>> registeredUsers = null;
 	

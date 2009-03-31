@@ -31,8 +31,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.SipSession.State;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This example shows a simple User agent that can any accept call and reply to BYE or initiate BYE 
@@ -42,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class SimpleSipServlet extends SipServlet implements TimerListener {
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	
 	private static final String CALLEE_SEND_BYE = "YouSendBye";
 	//60 sec

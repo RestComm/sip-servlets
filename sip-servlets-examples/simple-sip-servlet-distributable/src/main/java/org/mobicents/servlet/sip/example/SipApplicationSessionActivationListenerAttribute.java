@@ -21,8 +21,7 @@ import java.io.Serializable;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionEvent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -31,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class SipApplicationSessionActivationListenerAttribute implements
 		Serializable, SipApplicationSessionActivationListener {
 
-	private static Log logger = LogFactory.getLog(SipApplicationSessionActivationListenerAttribute.class);
+	private static Logger logger = Logger.getLogger(SipApplicationSessionActivationListenerAttribute.class);
 	
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipApplicationSessionEvent)

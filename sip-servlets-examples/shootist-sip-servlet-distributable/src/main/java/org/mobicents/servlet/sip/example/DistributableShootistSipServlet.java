@@ -30,14 +30,13 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class DistributableShootistSipServlet 
 		extends SipServlet 
 		implements SipServletListener {
 
-	private static Log logger = LogFactory.getLog(DistributableShootistSipServlet.class);
+	private static Logger logger = Logger.getLogger(DistributableShootistSipServlet.class);
 		
 	private static final String SENT = "Sent";
 	

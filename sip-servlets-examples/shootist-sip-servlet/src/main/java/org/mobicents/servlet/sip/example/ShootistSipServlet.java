@@ -30,14 +30,13 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class ShootistSipServlet 
 		extends SipServlet 
 		implements SipServletListener {
 
-	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);
+	private static Logger logger = Logger.getLogger(ShootistSipServlet.class);
 	
 	
 	/** Creates a new instance of ShootistSipServlet */
