@@ -253,10 +253,7 @@ A:hover {
 .roundcont {
 	background-color:#000; /*#f90;*/
 	color: #fff;
-}
-
-.roundcont p {
-	margin: 0 10px;
+	padding-right:5px;
 }
 
 .back-logo {
@@ -274,10 +271,11 @@ A:hover {
 }
 	
 .history {
-	filter:alpha(opacity=50);
-	-moz-opacity:0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.5;
+	filter:alpha(opacity=87);
+	-moz-opacity:0.87;
+	-khtml-opacity: 0.87;
+	opacity: 0.87;
+	font-size:93%;
 	/*
 width:700px;position:absolute;z-index: 999; bottom:50px;left:400px;
 */

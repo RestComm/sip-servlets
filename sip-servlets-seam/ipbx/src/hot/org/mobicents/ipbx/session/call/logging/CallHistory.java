@@ -18,6 +18,7 @@ import org.mobicents.ipbx.entity.Contact;
 import org.mobicents.ipbx.entity.History;
 import org.mobicents.ipbx.entity.User;
 import org.mobicents.ipbx.session.DataLoader;
+import org.mobicents.ipbx.session.call.model.CallParticipant;
 import org.mobicents.ipbx.session.call.model.WorkspaceStateManager;
 import org.mobicents.ipbx.session.util.DateUtil;
 
@@ -55,6 +56,16 @@ public class CallHistory {
 	@Observer("incomingCall")
 	public void acceptedCall(SipServletRequest request) {
 		addHistory("Incoming call from " + request.getFrom().getURI());
+	}
+	
+	@Observer("onHold")
+	public void onHold(CallParticipant participant) {
+		addHistory(participant.getUri() + " is on hold");
+	}
+	
+	@Observer("unonHold")
+	public void unonHold(CallParticipant participant) {
+		addHistory(participant.getUri() + " is back in the call");
 	}
 	
 	@Observer("rejectedCall")

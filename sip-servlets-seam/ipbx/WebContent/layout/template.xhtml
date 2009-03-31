@@ -18,7 +18,7 @@
 <f:view contextType="text/html">
 	<a4j:outputPanel id="globalAll">
 		<a4j:region rendered="#{identity.loggedIn}">
-			<a4j:push id="pushStatus" interval="1000" enabled="true"
+			<a4j:push id="pushStatus" interval="700" enabled="true"
 				eventProducer="#{currentWorkspaceState.addGlobalListener}"
 				reRender="globalAll" />
 		</a4j:region>

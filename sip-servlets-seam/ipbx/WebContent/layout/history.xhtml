@@ -5,15 +5,19 @@
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:s="http://jboss.com/products/seam/taglib"
 	xmlns:rich="http://richfaces.org/rich" rendered="#{identity.loggedIn}">
+	<br/>
+	<div style="height: 3px; background-color:black;"/>
 	<div class="history">
 	<div class="roundcont">
+	
+	<br/>
 	<a4j:form>
 			<rich:dataList value="#{dataLoader.loadHistory()}" var="hist"
 				rows="5">
 				<b><h:outputText value="#{hist.message} " /></b>
 				<h:outputText value="(#{hist.timestamp})" />
 			</rich:dataList>
-	</a4j:form></div>
+	</a4j:form><br/></div>
 	   <div class="roundbottom">
 	 <img src="bl.gif" alt="" 
 	 width="15" height="15" class="corner" 

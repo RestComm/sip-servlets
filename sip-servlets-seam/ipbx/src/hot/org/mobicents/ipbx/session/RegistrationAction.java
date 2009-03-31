@@ -82,17 +82,12 @@ public class RegistrationAction {
 		if(reg.isSelected()) {
 			// We have selected a new active phone!
 			// If we are currently in a call, make a new call to the selected location
-			Conference conf = null;
-			if(currentWorkspaceState.getRemovedCallParticipant() != null) {
-				conf = currentWorkspaceState.getRemovedCallParticipant().getConference();
-			} else {
-				conf = currentWorkspaceState.getConference();
-			}
-
-			if(conf != null) {
+			Conference conf = currentWorkspaceState.getConference();
+			
+			if(conf != null && conf.getParticipants().length>0) {
 				String[] callableUris = reg.getCallableUris();
 				for(String uri: callableUris) {
-					callAction.call(uri);
+					callAction.establishCallToRegisteredPhone(uri);
 				}
 			}
 
@@ -101,8 +96,6 @@ public class RegistrationAction {
 			for(String uri: reg.getCallableUris()) {
 				CallParticipant cp = CallParticipantManager.instance().getCallParticipant(uri);
 				if(cp != null) {
-					
-					currentWorkspaceState.setRemovedCallParticipant(cp);
 					currentWorkspaceState.endCall(cp, true, false);
 				}
 			}

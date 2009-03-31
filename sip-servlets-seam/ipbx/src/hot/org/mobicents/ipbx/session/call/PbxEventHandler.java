@@ -126,15 +126,13 @@ public class PbxEventHandler {
 		fromParticipant.setInitialRequest(request);
 		
 		// Store reusable info for later in this session
-		sipSession.setAttribute("fromParticipant", fromParticipant);
-		sipSession.setAttribute("toParticipant", toParticipant);
 		sipSession.setAttribute("participant", fromParticipant);
 		sipSession.setAttribute("firstSipMessage", request);
 		
 		Conference conf = null;
 		
 		// If the callee is in a call already we must ask to join that call
-		if(!CallState.CONNECTED.equals(toParticipant.getCallState())) {
+		if(!CallState.INCALL.equals(toParticipant.getCallState())) {
 		// Otherwise just call all his registered phones and join them to a new
 		// conference where you can talk to him
 			conf = ConferenceManager.instance().getNewConference();
@@ -143,7 +141,7 @@ public class PbxEventHandler {
 			toParticipant.setCallState(CallState.CONNECTING);
 			fromParticipant.setCallState(CallState.CONNECTING);
 			
-			callAction.call(fromParticipant, toParticipant);
+			callAction.dialParticipant(toParticipant);
 		} else {
 			conf = toParticipant.getConference();
 			fromParticipant.setConference(conf);
@@ -241,7 +239,17 @@ public class PbxEventHandler {
 			// Remove the call from other users' GUIs
 			for(CallParticipant cp : callParticipants) {
 				WorkspaceStateManager.instance().getWorkspace(cp.getName()).removeCall(participant);
-				WorkspaceStateManager.instance().getWorkspace(participant.getName()).removeCall(cp);
+				String disconnectedUsername = participant.getName();
+				
+				// Determine if there are more call legs to phones registered under that user. If there are other
+				// call legs, don't remove that call from user's workspace
+				boolean remove = true;
+				for(CallParticipant cp2 : callParticipants) {
+					if(cp2.getName().equals(disconnectedUsername)) {
+						remove = false;
+					}
+				}
+				if(remove) WorkspaceStateManager.instance().getWorkspace(disconnectedUsername).removeCall(cp);
 			}
 			
 			// Release media stuff if possible
@@ -325,26 +333,38 @@ public class PbxEventHandler {
 		mediaSessionStore.setMsEndpoint(endpoint);
 		ivrHelper.detectDtmf();
 		
+		participant.setCallState(CallState.CONNECTED);
+		
 		Conference conf = participant.getConference();
 		// We should upgrade the call state to "active" for all participants (most already have it)
 		CallParticipant[] ps = conf.getParticipants();
 		for(CallParticipant p : ps) {
-			if(!p.getUri().equals(participant.getUri())) {
+			if(p!=participant) {
 
 				if(p.getCallState().equals(CallState.CONNECTED)) {
-					p.setCallState(CallState.CONNECTED);
+					p.setCallState(CallState.INCALL);
 					try {
 						endRingback(p);
 					} catch (Exception e) {}
+					participant.setCallState(CallState.INCALL);
+					
+					// Many of these are not needed, but it's hard to debug what is missing in corner cases
 					WorkspaceStateManager.instance().getWorkspace(p.getName()).setOngoing(participant);
 					WorkspaceStateManager.instance().getWorkspace(participant.getName()).setOngoing(p);
+					WorkspaceStateManager.instance().getWorkspace(participant.getName()).setOngoing(participant);
+					WorkspaceStateManager.instance().getWorkspace(p.getName()).setOngoing(p);
 				}
-				participant.setCallState(CallState.CONNECTED);
 				
 			}
-
+			if(p.getCallState().equals(CallState.INCALL)) {
+				participant.setCallState(CallState.INCALL);
+				// Many of these are not needed, but it's hard to debug what is missing in corner cases
+				WorkspaceStateManager.instance().getWorkspace(participant.getName()).setOngoing(p);
+				WorkspaceStateManager.instance().getWorkspace(p.getName()).setOngoing(participant);
+				WorkspaceStateManager.instance().getWorkspace(participant.getName()).setOngoing(participant);
+				WorkspaceStateManager.instance().getWorkspace(p.getName()).setOngoing(p);
+			}	
 		}
-
 		
 		// And if this is the first participant in the conference, let's determine which endpoint we use
 		if(participant != null) {

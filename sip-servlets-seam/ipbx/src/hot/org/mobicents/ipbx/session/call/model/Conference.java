@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.mobicents.ipbx.entity.CallState;
+import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.mscontrol.MsEndpoint;
 
 public class Conference {
@@ -66,7 +67,7 @@ public class Conference {
 		CallParticipant[] ret = getParticipants();
 		LinkedList<CallParticipant> filtered = new LinkedList<CallParticipant>();
 		for(CallParticipant cp:ret) {
-			if(!CallState.CONNECTED.equals(cp.getCallState())) {
+			if(!CallState.INCALL.equals(cp.getCallState())) {
 				filtered.add(cp);
 			}
 		}
@@ -79,5 +80,9 @@ public class Conference {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public String getConferenceUri() {
+		return "sip:conference-" + this.getId() + "@" + PbxConfiguration.getProperty("pbx.hostname");
 	}
 }

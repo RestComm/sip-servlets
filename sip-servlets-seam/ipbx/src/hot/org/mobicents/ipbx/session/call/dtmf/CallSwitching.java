@@ -39,21 +39,33 @@ public class CallSwitching {
 		
 		if(participants.length>2) {
 			// This operation makes sense only when there are more than two participants
-			if(dtmfNumber < participants.length && // make sure we are not puting ourselves on hold
-					participants[dtmfNumber].getUri().equals(participant.getUri())) {
+			if(dtmfNumber < participants.length && // make sure the dtmf is in range
+					participants[dtmfNumber] != participant) {// make sure we dont end up talking to ourselves
+				
+				// Play the switched announcement to tell the current user than the switch is happening
+				try {
+					// It's not a vital operation, if it fails, we dont care
+					String file = PbxConfiguration.getProperty("pbx.default.switched.announcement");
+					IVRHelperManager.instance().getIVRHelper(participant.getSipSession())
+					.playAnnouncementWithDtmf(file);
+				} catch (Exception e) {
+					// TODO: log it somewhere
+				}
+				
+				// Put other users on hold
 				for(int q=0; q<participants.length; q++) {
-					if(q!=dtmfNumber) {
+					if(participants[q] != participant && q != dtmfNumber) {
 						currentWorkspaceState.putOnhold(participants[q]);
 					}
 				}
+				
+				// And just in case the callee is onhold from previous switch, unput him
 				currentWorkspaceState.unputOnhold(participants[dtmfNumber]);
 			}
 		}
-		if(dtmfNumber == 0) {
+		if(dtmfNumber == 9) {
 			for(int q=0; q<participants.length; q++) {
-				if(q!=dtmfNumber) {
-					currentWorkspaceState.unputOnhold(participants[q]);
-				}
+				currentWorkspaceState.unputOnhold(participants[q]);
 			}
 		}
 	}

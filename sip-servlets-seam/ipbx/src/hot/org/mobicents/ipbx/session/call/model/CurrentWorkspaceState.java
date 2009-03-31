@@ -11,6 +11,7 @@ import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Unwrap;
+import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.User;
@@ -26,7 +27,7 @@ public class CurrentWorkspaceState {
 	
 	@In(value="sessionUser") User sessionUser;
 	
-	private CallParticipant removedCallParticipant;
+	private Conference conference;
 	
 	//using a global push listener instead of 3 listener because browsers can't handle more than 2 simulteanous connections 
 	private PushEventListener globalListener;
@@ -132,20 +133,26 @@ public class CurrentWorkspaceState {
 	
 	// Put on-hold an active participant
 	public void putOnhold(CallParticipant participant) {
-		participant.setOnhold(true);
-		participant.getMsLink().setMode(MsLinkMode.HALF_DUPLEX);
-		makeStatusDirty();
-		String ann = PbxConfiguration.getProperty("pbx.default.onhold.announcement");
-		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(ann);
+		if(!participant.isOnhold()) {
+			participant.setOnhold(true);
+			participant.getMsLink().setMode(MsLinkMode.HALF_DUPLEX);
+			makeStatusDirty();
+			String ann = PbxConfiguration.getProperty("pbx.default.onhold.announcement");
+			IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).playAnnouncementWithDtmf(ann);
+			Events.instance().raiseEvent("onHold", participant);
+		}
 	}
-	
+
 	// Restore user from on-hold as active participant
 	public void unputOnhold(CallParticipant participant) {
-		participant.setOnhold(false);
-		participant.getMsLink().setMode(MsLinkMode.FULL_DUPLEX);
-		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).endAll();
-		IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).detectDtmf();
-		makeStatusDirty();
+		if(participant.isOnhold()) {
+			participant.setOnhold(false);
+			participant.getMsLink().setMode(MsLinkMode.FULL_DUPLEX);
+			IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).endAll();
+			IVRHelperManager.instance().getIVRHelper(participant.getSipSession()).detectDtmf();
+			makeStatusDirty();
+			Events.instance().raiseEvent("unonHold", participant);
+		}
 	}
 	
 	// Cancel an outgoing call
@@ -175,18 +182,22 @@ public class CurrentWorkspaceState {
 		incomingCalls.remove(participant);
 		outgoingCalls.remove(participant);
 		ongoingCalls.add(participant);
+		this.conference = participant.getConference();
 		makeStatusDirty();
 	}
 	
 	// Update the UI when there is an incoming call
 	public void setIncoming(CallParticipant participant) {
 		incomingCalls.add(participant);
+		this.conference = participant.getConference();
 		makeStatusDirty();
 	}
 	
 	// Update the UI for outgoing call
 	public void setOutgoing(CallParticipant participant) {
 		outgoingCalls.add(participant);
+		this.conference = participant.getConference();
+		makeStatusDirty();
 	}
 	
 	// These methods are about what is the status of the calls now
@@ -232,23 +243,11 @@ public class CurrentWorkspaceState {
 		}
 	}
 	public Conference getConference() {
-		for(CallParticipant cp : ongoingCalls.toArray(new CallParticipant[]{})) {
-			return cp.getConference();
-		}
-		for(CallParticipant cp : outgoingCalls.toArray(new CallParticipant[]{})) {
-			return cp.getConference();
-		}
-		for(CallParticipant cp : incomingCalls.toArray(new CallParticipant[]{})) {
-			return cp.getConference();
-		}
-		return null;
+		return conference;
 	}
 	
-	public CallParticipant getRemovedCallParticipant() {
-		return removedCallParticipant;
-	}
-	public void setRemovedCallParticipant(CallParticipant removedCallParticipant) {
-		this.removedCallParticipant = removedCallParticipant;
+	public void setConference(Conference conference) {
+		this.conference = conference;
 	}
 	
 

@@ -17,8 +17,10 @@
 
 					<s:link id="registration"
 						propagation="none" view="/registration.xhtml">
-						<h:graphicImage value="/img/ip-phone.png" rendered="#{registration.isIpPhone()}" style="border:0;margin-right:5px"/>
-						<h:graphicImage value="/img/pstn-phone.png" rendered="#{not registration.isIpPhone()}" style="border:0;margin-right:5px"/>
+						<div style="float:left">
+						<h:graphicImage id="ip-phone" value="/img/ip-phone.png" rendered="#{registration.isIpPhone()}" style="border:0;margin-right:5px"/>
+						<h:graphicImage id="pstn-phone" value="/img/pstn-phone.png" rendered="#{not registration.isIpPhone()}" style="border:0;margin-right:5px"/>
+						</div>
 						<f:param name="registrationId" value="#{registration.id}" />
 						<h:outputText rendered="#{registration.name != null}"
 							value="#{registration.name}" styleClass="regUriName" />
@@ -97,7 +99,7 @@
 					</s:link></div>
 					<div style="float:right">
 					<h:commandLink ajaxSingle="true"
-						action="#{callAction.call(contact.uri)}">
+						action="#{callAction.establishCallByUser(contact.uri)}">
 						<h:graphicImage value="/img/call.png" style="border:0" alt="Call" />
 					</h:commandLink>
 					<rich:spacer width="4" />
@@ -131,6 +133,6 @@
 
 		</rich:simpleTogglePanel>
 	</a4j:form> 
-	<ui:include src="/layout/history.xhtml" /> 
+	
 	</div>
 </a4j:region>

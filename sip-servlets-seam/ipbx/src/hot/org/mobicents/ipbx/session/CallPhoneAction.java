@@ -18,6 +18,6 @@ public class CallPhoneAction {
 	}
 
 	public void call() {
-		callAction.call(number);
+		callAction.establishCallByUser(number);
 	}
 }
