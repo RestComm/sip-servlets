@@ -23,7 +23,9 @@ import gov.nist.javax.sip.stack.SIPServerTransaction;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.security.AccessController;
 import java.security.Principal;
+import java.security.PrivilegedAction;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -73,6 +75,7 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.JainSipUtils;
@@ -81,7 +84,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
-import org.mobicents.servlet.sip.message.MobicentsSipSessionReference;
+import org.mobicents.servlet.sip.message.MobicentsSipSessionFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -226,7 +229,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient boolean okToByeSentOrReceived = false;
 	protected transient Semaphore semaphore;
 	
-	protected transient MobicentsSipSessionReference mobicentsSipSessionReference = null;
+	protected transient MobicentsSipSessionFacade facade = null;
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
@@ -239,8 +242,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		this.subscriptions = new HashSet<EventHeader>();
-		semaphore = new Semaphore(1);
-		mobicentsSipSessionReference = new MobicentsSipSessionReference(this);
+		semaphore = new Semaphore(1);		
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			notifySipSessionListeners(SipSessionEventType.CREATION);
@@ -405,7 +407,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getApplicationSession()
 	 */
 	public SipApplicationSession getApplicationSession() {
-		return this.sipApplicationSession;
+		if(this.sipApplicationSession == null) {
+			return null;
+		} else {
+			return sipApplicationSession.getSession();
+		}
 	}
 
 	/*
@@ -666,7 +672,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		stateInfo = null;
 		subscriberURI = null;
 		subscriptions = null;
-		semaphore = null;
+		if(semaphore != null) {
+			semaphore.release();
+			semaphore = null;
+		}
+		facade = null;
 	}
 	
 	/**
@@ -1441,7 +1451,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public Semaphore getSemaphore() {
 		return semaphore;
 	}
-	public MobicentsSipSessionReference getMobicentsSipSessionReference() {
-		return mobicentsSipSessionReference;
+	
+	public MobicentsSipSessionFacade getSession() {		
+
+        if (facade == null){
+            if (SecurityUtil.isPackageProtectionEnabled()){
+                final MobicentsSipSession fsession = this;
+                facade = (MobicentsSipSessionFacade)AccessController.doPrivileged(new PrivilegedAction(){
+                    public Object run(){
+                        return new MobicentsSipSessionFacade(fsession);
+                    }
+                });
+            } else {
+                facade = new MobicentsSipSessionFacade(this);
+            }
+        }
+        return (facade);	  
 	}
 }

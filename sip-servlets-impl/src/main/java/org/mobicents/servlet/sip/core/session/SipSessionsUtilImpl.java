@@ -30,6 +30,7 @@ import javax.servlet.sip.SipSessionsUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -71,7 +72,12 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 			return null;
 		}
 		if(applicationSessionKey.getApplicationName().equals(sipContext.getApplicationName())) {
-			return ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, false);
+			MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, false);
+			if(sipApplicationSession == null) {
+				return null;
+			} else {
+				return sipApplicationSession.getSession();
+			}
 		} else {
 			logger.warn("the given application session id : " + applicationSessionId + 
 					" tried to be retrieved from incorret application " + sipContext.getApplicationName());
@@ -89,7 +95,12 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(applicationSessionKey, sipContext.getApplicationName(), true);
 		
-		return ((SipManager)sipContext.getManager()).getSipApplicationSession(sipApplicationSessionKey, create);		
+		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(sipApplicationSessionKey, create);
+		if(sipApplicationSession == null) {
+			return null;
+		} else {
+			return sipApplicationSession.getSession();
+		}
 	}
 
 	/**

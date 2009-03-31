@@ -360,10 +360,17 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, null);
 		if(logger.isDebugEnabled()) {
-			logger.debug("Linked Session found : " + linkedSession.getKey() + " for this session " + session.getId());
+			if(linkedSession != null) {
+				logger.debug("Linked Session found : " + linkedSession.getKey() + " for this session " + session.getId());
+			} else {
+				logger.debug("No Linked Session found for this session " + session.getId());
+			}
 		}
-		return linkedSession;
-		
+		if(linkedSession != null) {
+			return linkedSession.getSession();
+		} else {
+			return null;
+		}		
 	}
 
 	/*

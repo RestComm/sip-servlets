@@ -181,8 +181,9 @@ public class SipFactoryImpl implements Serializable {
 				null,
 				false);		
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
-				sipApplicationSessionKey, true);		
-		return sipApplicationSession;
+				sipApplicationSessionKey, true);
+			
+		return sipApplicationSession.getSession();
 	}
 
 	/*
@@ -581,7 +582,7 @@ public class SipFactoryImpl implements Serializable {
 		}
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
 				sipApplicationSessionKey, true);		
-		return sipApplicationSession;
+		return sipApplicationSession.getSession();
 	}
 
 	/*

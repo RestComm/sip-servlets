@@ -49,7 +49,6 @@ import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -300,8 +299,9 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		}
 		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
 		try {
-			newSession.setHandler(((SipSessionImpl)this.originalRequest.getSession()).getHandler());
+			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSession()).getHandler());
 		} catch (ServletException e) {
+			logger.error("could not set the session handler while forwarding the request", e);
 			throw new RuntimeException(e);
 		}
 		

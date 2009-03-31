@@ -50,7 +50,6 @@ import org.jboss.logging.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.jboss.web.tomcat.service.JBossWeb;
-import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;

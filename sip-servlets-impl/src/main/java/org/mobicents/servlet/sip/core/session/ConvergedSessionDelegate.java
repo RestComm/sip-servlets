@@ -25,6 +25,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
+import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -37,7 +38,6 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class ConvergedSessionDelegate {
 
-//	protected SipNetworkInterfaceManager sipNetworkInterfaceManager;		
 	protected SipManager sipManager;
 	protected HttpSession httpSession;
 	
@@ -46,7 +46,6 @@ public class ConvergedSessionDelegate {
 	 * @param sessionManager
 	 */
 	public ConvergedSessionDelegate(SipManager manager, HttpSession httpSession) {
-//		this.sipNetworkInterfaceManager = sipNetworkInterfaceManager;
 		this.sipManager = manager;
 		this.httpSession = httpSession;
 	}
@@ -153,7 +152,12 @@ public class ConvergedSessionDelegate {
 				sipManager.getSipApplicationSession(sipApplicationSessionKey, true);			
 			sipApplicationSession.addHttpSession(httpSession);
 		}
-		return sipApplicationSession;
+		if(sipApplicationSession != null) {
+			return sipApplicationSession.getSession();
+		} else {
+			return null;
+		}
+//		return sipApplicationSession;
 	}
 
 }

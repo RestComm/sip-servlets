@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,10 +42,12 @@ import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
+import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -128,6 +132,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected transient Semaphore semaphore;
 		
+	protected transient MobicentsSipApplicationSessionFacade facade = null;
+	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		sipSessions = new ConcurrentHashMap<String,MobicentsSipSession>();
@@ -318,6 +324,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return lastAccessedTime;
 	}
 
+	// FIXME will be a bottleneck due to synchronized access and perf hit due to timer cancellation and restart
+	// need to find a better way to do it 
 	private synchronized void setLastAccessedTime(long lastAccessTime) {
 		this.lastAccessedTime= lastAccessTime;
 		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew 
@@ -520,10 +528,16 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			logger.info("The following sip application session " + key + " has been invalidated");
 		}
 		currentRequestHandler = null;
-		semaphore = null;
+		if(semaphore != null) {
+			semaphore.release();
+			semaphore = null;
+		}
+		facade = null;
 	}
 
 	private void cancelExpirationTimer() {
+		//CANCEL needs to remove the shceduled timer see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6602600
+		//to improve perf
 		boolean removed = ExecutorServiceWrapper.getInstance().remove((Runnable)expirationTimerFuture);
 //		if(logger.isDebugEnabled()) {
 //			logger.debug("expiration timer on sip application session " + key + " removed : " + removed);
@@ -954,4 +968,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return semaphore;
 	}
 	
+	public MobicentsSipApplicationSessionFacade getSession() {		
+
+        if (facade == null){
+            if (SecurityUtil.isPackageProtectionEnabled()){
+                final MobicentsSipApplicationSession fsession = this;
+                facade = (MobicentsSipApplicationSessionFacade)AccessController.doPrivileged(new PrivilegedAction(){
+                    public Object run(){
+                        return new MobicentsSipApplicationSessionFacade(fsession);
+                    }
+                });
+            } else {
+                facade = new MobicentsSipApplicationSessionFacade(this);
+            }
+        }
+        return (facade);	  
+	}
 }

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 
+import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -67,5 +68,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	void tryToInvalidate();
 	
 	Semaphore getSemaphore();
+	
+	MobicentsSipApplicationSessionFacade getSession();
 
 }

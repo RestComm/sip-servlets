@@ -1097,7 +1097,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if(this.session == null) {
 			return null;
 		} else {
-			return this.session.getMobicentsSipSessionReference();
+			return this.session.getSession();
 		}
 	}
 	

@@ -20,8 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
@@ -29,34 +27,35 @@ import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
- * The only purpose of this class is to be a serializable session class that can be put as
- * a session attribute in other sessions or even its own session. Basically instead of replicating
- * the whole attribute map, we will replicate the id, then on the remote side we will
+ * The purpose of this class is to be a facade to the real sip session as well as a 
+ * serializable session class that can be put as a session attribute in other sessions or even its own session. 
+ * Basically instead of replicating the whole attribute map, we will replicate the id, then on the remote side we will
  * read the ID and look it up in the remote session manager.
  * 
  * @author vralev
+ * @author jean.deruelle@gmail.com
  *
  */
-public class MobicentsSipSessionReference implements MobicentsSipSession, Externalizable{
+public class MobicentsSipSessionFacade implements MobicentsSipSession, Externalizable {
 	private static final long serialVersionUID = 1L;
+	private transient static final Log logger = LogFactory.getLog(MobicentsSipSessionFacade.class);
 	private MobicentsSipSession sipSession;
 	
-	public MobicentsSipSessionReference() { }
+	public MobicentsSipSessionFacade() { }
 	
-	public MobicentsSipSessionReference(MobicentsSipSession sipSession) {
+	public MobicentsSipSessionFacade(MobicentsSipSession sipSession) {
 		this.sipSession = sipSession;
 	}
 
@@ -166,6 +165,7 @@ public class MobicentsSipSessionReference implements MobicentsSipSession, Extern
 		try {
 			key = SessionManagerUtil.parseSipSessionKey(sipSessionId);
 		} catch (ParseException e) {
+			logger.error("Couldn't parse the following sip session key " + sipSessionId, e);
 			throw new RuntimeException(e);
 		}
 		this.sipSession = ((SipManager)sipContext.getManager()).getSipSession(key, false, null, null);
@@ -173,9 +173,9 @@ public class MobicentsSipSessionReference implements MobicentsSipSession, Extern
 	}
 
 	public void writeExternal(ObjectOutput arg0) throws IOException {
-		SipSessionImpl sipSessionImpl = (SipSessionImpl) this.sipSession;
-		SipApplicationSessionImpl sipAppSession = (SipApplicationSessionImpl) 
-			sipSessionImpl.getApplicationSession();
+		MobicentsSipSession sipSessionImpl = (MobicentsSipSession) this.sipSession;
+		MobicentsSipApplicationSession sipAppSession = (MobicentsSipApplicationSession) 
+			sipSessionImpl.getSipApplicationSession();
 		arg0.writeUTF(sipSessionImpl.getId());
 		arg0.writeUTF(sipAppSession.getApplicationName());
 	}
@@ -367,8 +367,8 @@ public class MobicentsSipSessionReference implements MobicentsSipSession, Extern
 		sipSession.updateStateOnSubsequentRequest(sipServletRequestImpl, receive);
 	}
 
-	public MobicentsSipSessionReference getMobicentsSipSessionReference() {
-		return sipSession.getMobicentsSipSessionReference();
+	public MobicentsSipSessionFacade getSession() {
+		return sipSession.getSession();
 	}
 
 }

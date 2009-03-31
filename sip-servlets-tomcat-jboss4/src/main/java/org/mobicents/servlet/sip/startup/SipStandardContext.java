@@ -974,31 +974,31 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	public void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {
 		switch (concurrencyControlMode) {
-		case SipSession:
-			MobicentsSipSession sipSession = null;
-			if(request != null) {
-				sipSession = ((MobicentsSipSession)request.getSipSession());
-			} else if (response != null ) {
-				sipSession = ((MobicentsSipSession)response.getSipSession());
-			}
-			if(sipSession != null) {
-				sipSession.getSemaphore().release();
-			}
-			break;
-		case SipApplicationSession:
-			MobicentsSipApplicationSession sipApplicationSession = null;
-			if(request != null) {
-				sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
-			} else if (response != null ) {
-				sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
-			}
-			if(sipApplicationSession != null) {
-				sipApplicationSession.getSemaphore().release();
-			}
-			break;
-		case None:
-			break;
-	}
+			case SipSession:
+				MobicentsSipSession sipSession = null;
+				if(request != null) {
+					sipSession = ((MobicentsSipSession)request.getSipSession());
+				} else if (response != null ) {
+					sipSession = ((MobicentsSipSession)response.getSipSession());
+				}
+				if(sipSession != null && sipSession.getSemaphore() != null) {
+					sipSession.getSemaphore().release();
+				}
+				break;
+			case SipApplicationSession:
+				MobicentsSipApplicationSession sipApplicationSession = null;
+				if(request != null) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+				} else if (response != null ) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+				}
+				if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
+					sipApplicationSession.getSemaphore().release();
+				}
+				break;
+			case None:
+				break;
+		}
 		if (getDistributable()) {
 			if(logger.isInfoEnabled()) {
 				logger.info("We are now after the servlet invocation, We replicate no matter what");
