@@ -27,8 +27,7 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
@@ -54,7 +53,7 @@ public class JainSipUtils {
     public static final int    MIN_PORT_NUMBER = 1024;
     
 	
-	private static Log logger = LogFactory.getLog(JainSipUtils.class);
+    private static transient Logger logger = Logger.getLogger(JainSipUtils.class);
 
 	public static String GLOBAL_IPADDRESS = "0.0.0.0";
 	

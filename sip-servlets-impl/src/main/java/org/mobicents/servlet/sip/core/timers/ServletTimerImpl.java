@@ -24,12 +24,11 @@ import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
-	private transient static final Log logger = LogFactory.getLog(ServletTimerImpl.class);
+	private static transient Logger logger = Logger.getLogger(ServletTimerImpl.class);
 	
 	private MobicentsSipApplicationSession appSession;
 	/**

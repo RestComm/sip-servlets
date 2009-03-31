@@ -32,8 +32,7 @@ import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ViaHeader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 
@@ -43,7 +42,7 @@ e@gmail.com">Jean Deruelle</A>
  *
  */
 public class ExtendedListeningPoint {
-	private static Log logger = LogFactory.getLog(ExtendedListeningPoint.class);		
+	private static transient Logger logger = Logger.getLogger(ExtendedListeningPoint.class);		
 	
 	// the listening point this class is extending
 	private ListeningPoint listeningPoint;

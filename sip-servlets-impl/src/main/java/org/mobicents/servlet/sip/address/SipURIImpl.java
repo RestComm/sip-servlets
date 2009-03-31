@@ -25,8 +25,7 @@ import java.util.Iterator;
 import javax.servlet.sip.SipURI;
 import javax.sip.InvalidArgumentException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -38,7 +37,7 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 
-	private static Log logger = LogFactory.getLog(SipURIImpl.class.getCanonicalName());
+	private static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName());
 
 	public SipURIImpl(javax.sip.address.SipURI sipUri) {
 		super(sipUri);

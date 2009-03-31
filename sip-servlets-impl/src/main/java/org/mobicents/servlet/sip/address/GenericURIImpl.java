@@ -20,8 +20,7 @@ import java.text.ParseException;
 
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -32,7 +31,7 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class GenericURIImpl extends URIImpl {
 
-	private static Log logger = LogFactory.getLog(GenericURIImpl.class.getCanonicalName());
+	private static Logger logger = Logger.getLogger(GenericURIImpl.class.getCanonicalName());
 
 	public GenericURIImpl(javax.sip.address.URI uri) {
 		super(uri);

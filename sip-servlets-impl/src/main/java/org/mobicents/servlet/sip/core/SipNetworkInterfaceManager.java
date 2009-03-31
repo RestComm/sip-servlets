@@ -38,8 +38,7 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -57,7 +56,7 @@ import org.mobicents.servlet.sip.utils.Inet6Util;
  *
  */
 public class SipNetworkInterfaceManager {
-	private static Log logger = LogFactory.getLog(SipNetworkInterfaceManager.class);
+	private static transient Logger logger = Logger.getLogger(SipNetworkInterfaceManager.class);
 	
 	/**
      * The maximum int value that could correspond to a port nubmer.

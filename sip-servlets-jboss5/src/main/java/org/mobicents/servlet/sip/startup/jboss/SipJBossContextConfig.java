@@ -19,8 +19,7 @@ package org.mobicents.servlet.sip.startup.jboss;
 import java.util.List;
 
 import org.apache.catalina.core.StandardWrapper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.DescriptionImpl;
 import org.jboss.metadata.javaee.spec.DescriptionsImpl;
@@ -32,15 +31,15 @@ import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.sip.jboss.JBossServletsMetaData;
+import org.jboss.metadata.sip.spec.ListenerMetaData;
 import org.jboss.metadata.sip.spec.ParamValueMetaData;
+import org.jboss.metadata.sip.spec.ServletMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionsMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
-import org.jboss.metadata.sip.spec.ServletMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.jboss.metadata.sip.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -58,8 +57,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  */
 public class SipJBossContextConfig extends JBossContextConfig {
 
-	private static transient Log logger = LogFactory
-			.getLog(SipJBossContextConfig.class);
+	private static transient Logger logger = Logger.getLogger(SipJBossContextConfig.class);
 
 	@Override
 	protected void processContextParameters() {		

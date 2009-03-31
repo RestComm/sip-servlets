@@ -43,10 +43,9 @@ import net.java.stun4j.StunAddress;
 import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
 import net.java.stun4j.client.StunDiscoveryReport;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
+import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -69,7 +68,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  */
 public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	// the logger
-	private static transient Log logger = LogFactory.getLog(SipProtocolHandler.class.getName());
+	private static transient Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
 	// *
     protected ObjectName tpOname = null;
     // *

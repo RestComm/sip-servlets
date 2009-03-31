@@ -38,7 +38,6 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
 import org.apache.catalina.Container;
@@ -52,14 +51,12 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -86,8 +83,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  */
 public class SipStandardContext extends StandardContext implements SipContext {
 	//	 the logger
-	private static transient Log logger = LogFactory
-			.getLog(SipStandardContext.class);
+	private static transient final Logger logger = Logger.getLogger(SipStandardContext.class);
 
 	/**
      * The descriptive information string for this implementation.

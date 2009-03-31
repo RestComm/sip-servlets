@@ -31,8 +31,7 @@ import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -47,7 +46,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	
 	protected transient Parameters header = null;
 	
-	protected static final Log logger= LogFactory.getLog(ParameterableImpl.class.getCanonicalName());
+	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());
 	protected boolean isModifiable = true;
 	
 	protected ParameterableImpl() {

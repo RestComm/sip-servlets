@@ -27,8 +27,7 @@ import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
@@ -47,8 +46,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  */
 public class ClassFileScanner {
 
-	private static transient Log logger = LogFactory
-	.getLog(ClassFileScanner.class);
+	private static transient final Logger logger = Logger.getLogger(ClassFileScanner.class);
 			
 	private String docbase;
 	

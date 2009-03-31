@@ -36,8 +36,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipApplicationRoutingRegionType;
 import javax.servlet.sip.ar.SipRouteModifier;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This is a utility class used for parsing the default application router file as
@@ -47,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultApplicationRouterParser {
 	private static final int SIP_APPLICATION_ROUTER_INFO_PARAM_NB = 6;
 	//the logger
-	private static Log log = LogFactory.getLog(DefaultApplicationRouterParser.class);
+	private static Logger log = Logger.getLogger(DefaultApplicationRouterParser.class);
 	private Properties properties;
 	
 	public DefaultApplicationRouterParser() {

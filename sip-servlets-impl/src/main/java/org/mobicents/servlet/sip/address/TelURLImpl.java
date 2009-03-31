@@ -23,8 +23,7 @@ import java.util.Iterator;
 
 import javax.servlet.sip.TelURL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -36,7 +35,7 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class TelURLImpl extends URIImpl implements TelURL {
 
-	private static Log logger = LogFactory.getLog(TelURLImpl.class
+	private static Logger logger = Logger.getLogger(TelURLImpl.class
 			.getCanonicalName());
 
 	private javax.sip.address.TelURL telUrl;		

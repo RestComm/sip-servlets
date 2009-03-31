@@ -27,8 +27,7 @@ import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -50,7 +49,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  */
 public class MobicentsSipSessionFacade implements MobicentsSipSession, Externalizable {
 	private static final long serialVersionUID = 1L;
-	private transient static final Log logger = LogFactory.getLog(MobicentsSipSessionFacade.class);
+	private static transient Logger logger = Logger.getLogger(MobicentsSipSessionFacade.class);
 	private MobicentsSipSession sipSession;
 	
 	public MobicentsSipSessionFacade() { }

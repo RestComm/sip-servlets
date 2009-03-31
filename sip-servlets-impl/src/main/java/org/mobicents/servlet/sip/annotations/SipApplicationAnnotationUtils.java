@@ -8,8 +8,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 /**
  * Utils for parwing SipApplication annotation without a classloader
  * 
@@ -17,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class SipApplicationAnnotationUtils {
-	private static transient Log logger = LogFactory.getLog(SipApplicationAnnotationUtils.class);
+	private static transient Logger logger = Logger.getLogger(SipApplicationAnnotationUtils.class);
 	
 	private final static byte[] SIP_APPLICATION_BYTES = "SipApplication".getBytes();
 	private final static byte[] ANNOTATION_BYTES = "annotation".getBytes();

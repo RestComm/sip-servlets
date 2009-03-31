@@ -90,8 +90,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
@@ -111,7 +110,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class SipServletMessageImpl implements SipServletMessage, Serializable {
 
-	private transient static Log logger = LogFactory.getLog(SipServletMessageImpl.class
+	private static transient Logger logger = Logger.getLogger(SipServletMessageImpl.class
 			.getCanonicalName());
 	
 	private transient static final String CONTENT_TYPE_TEXT = "text";

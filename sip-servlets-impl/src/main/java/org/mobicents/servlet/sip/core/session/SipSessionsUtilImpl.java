@@ -28,9 +28,7 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionsUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -38,7 +36,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
-	private static transient Log logger = LogFactory.getLog(SipSessionsUtilImpl.class);
+	private static transient Logger logger = Logger.getLogger(SipSessionsUtilImpl.class);
 	
 	private transient SipContext sipContext;
 	

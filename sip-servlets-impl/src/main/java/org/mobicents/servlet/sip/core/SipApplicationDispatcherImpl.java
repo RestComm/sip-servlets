@@ -75,8 +75,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
@@ -128,8 +127,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	} 
 	
 	//the logger
-	private static transient Log logger = LogFactory
-			.getLog(SipApplicationDispatcherImpl.class);
+	private static transient Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
 		
 	//the sip factory implementation, it is not clear if the sip factory should be the same instance
 	//for all applications
@@ -424,16 +422,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
 		if(rejectRequests) {
 			if(numberOfMessagesInQueue<queueSize) {
-				if(logger.isWarnEnabled()) {
-					logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the queue Size : " + queueSize + " => stopping to reject requests");
-				}
+				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the queue Size : " + queueSize + " => stopping to reject requests");
 				rejectRequests = false;
 			}
 		} else {
 			if(numberOfMessagesInQueue>queueSize) {
-				if(logger.isWarnEnabled()) {
-					logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize + " => starting to reject requests");
-				}
+				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize + " => starting to reject requests");
 				rejectRequests = true;
 			}
 		}
@@ -450,16 +444,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 		if(memoryToHigh) {
 			if(percentageOfMemoryUsed < memoryThreshold) {
-				if(logger.isWarnEnabled()) {
-					logger.warn("Memory used: " + percentageOfMemoryUsed + "% < to the memory threshold : " + memoryThreshold + " => stopping to reject requests");
-				}
+				logger.warn("Memory used: " + percentageOfMemoryUsed + "% < to the memory threshold : " + memoryThreshold + " => stopping to reject requests");
 				memoryToHigh = false;				
 			}
 		} else {
 			if(percentageOfMemoryUsed > memoryThreshold) {
-				if(logger.isWarnEnabled()) {
-					logger.warn("Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold + " => starting to reject requests");
-				}
+				logger.warn("Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold + " => starting to reject requests");
 				memoryToHigh = true;
 			}
 		}

@@ -23,8 +23,7 @@ import java.util.jar.JarFile;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.annotations.SipApplicationAnnotationUtils;
 
 /**
@@ -37,8 +36,7 @@ public class SipHostConfig extends HostConfig {
 	public static final String SIP_CONTEXT_CLASS = "org.mobicents.servlet.sip.startup.SipStandardContext";
 	public static final String SIP_CONTEXT_CONFIG_CLASS = "org.mobicents.servlet.sip.startup.SipContextConfig";
 	
-	private static transient Log logger = LogFactory
-		.getLog(SipHostConfig.class);
+	private static transient Logger logger = Logger.getLogger(SipHostConfig.class);
 	/**
 	 * 
 	 */

@@ -30,9 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.ProtocolHandler;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 import org.mobicents.servlet.sip.startup.SipStandardService;
 import org.mobicents.servlet.sip.utils.Inet6Util;
@@ -55,7 +54,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 	private static final String BALANCERS_CHAR_SEPARATOR = ";";
 	private static final int DEFAULT_LB_SIP_PORT = 5065;
 	//the logger
-	private static Log logger = LogFactory.getLog(SipStandardBalancerNodeService.class);
+	private static transient Logger logger = Logger.getLogger(SipStandardBalancerNodeService.class);
 	/**
      * The descriptive information string for this implementation.
      */

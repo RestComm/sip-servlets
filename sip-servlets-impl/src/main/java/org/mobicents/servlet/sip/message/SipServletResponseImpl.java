@@ -52,8 +52,7 @@ import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -69,7 +68,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
 	private transient static final String REL100_OPTION_TAG = "100rel";
 
-	private transient static Log logger =  LogFactory.getLog(SipServletResponseImpl.class);
+	private static transient Logger logger = Logger.getLogger(SipServletResponseImpl.class);
 	
 	Response response;
 	SipServletRequestImpl originalRequest;

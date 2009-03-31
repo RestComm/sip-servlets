@@ -31,8 +31,7 @@ import javax.sip.Transaction;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
@@ -91,7 +90,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  */
 public class CancelRequestDispatcher extends RequestDispatcher {
 
-	private static Log logger = LogFactory.getLog(CancelRequestDispatcher.class);
+	private static transient Logger logger = Logger.getLogger(CancelRequestDispatcher.class);
 	
 	public CancelRequestDispatcher(
 			SipApplicationDispatcher sipApplicationDispatcher) {

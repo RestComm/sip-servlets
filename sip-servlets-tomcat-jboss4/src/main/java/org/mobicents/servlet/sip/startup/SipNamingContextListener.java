@@ -26,8 +26,7 @@ import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.core.NamingContextListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.naming.ContextAccessController;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 
@@ -39,8 +38,7 @@ import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
  *
  */
 public class SipNamingContextListener extends NamingContextListener {
-	private static transient Log logger = LogFactory
-		.getLog(SipNamingContextListener.class);
+	private static transient final Logger logger = Logger.getLogger(SipNamingContextListener.class);
 	
 	public static final String NAMING_CONTEXT_SIP_SUBCONTEXT_ADDED_EVENT = "addSipSubcontext";
 	public static final String NAMING_CONTEXT_SIP_SUBCONTEXT_REMOVED_EVENT = "removeSipSubContext";

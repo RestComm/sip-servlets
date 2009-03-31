@@ -31,22 +31,17 @@ import java.util.Map;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.SipFactory;
-import javax.sip.SipProvider;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
@@ -60,7 +55,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyImpl implements Proxy, Serializable {
-	private transient static Log logger = LogFactory.getLog(ProxyImpl.class);
+	private static transient Logger logger = Logger.getLogger(ProxyImpl.class);
 	
 	private transient SipServletRequestImpl originalRequest;
 	private transient SipServletResponseImpl bestResponse;

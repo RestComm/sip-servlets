@@ -36,8 +36,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.SipTargetedRequestInfo;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * Implementation of the default application router as defined per JSR 289 Appendix C
@@ -164,7 +163,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultApplicationRouter implements SipApplicationRouter, ManageableApplicationRouter{	
 	//	the logger
-	private static Log log = LogFactory.getLog(DefaultApplicationRouter.class);
+	private static Logger log = Logger.getLogger(DefaultApplicationRouter.class);
 	//the prefix used in the dar configuration file to specify the subscriber URI to use
 	//when reusing the information from one header
 	private static final String DAR_SUSCRIBER_PREFIX = "DAR:";

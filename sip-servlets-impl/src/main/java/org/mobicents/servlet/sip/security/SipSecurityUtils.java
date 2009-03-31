@@ -16,23 +16,20 @@
  */
 package org.mobicents.servlet.sip.security;
 
-import java.lang.reflect.InvocationTargetException;
+import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
+
 import java.lang.reflect.Method;
 import java.security.Principal;
-
-import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
 
 import javax.servlet.sip.SipServletResponse;
 import javax.sip.address.SipURI;
 import javax.sip.address.TelURL;
-import javax.sip.header.Header;
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -44,7 +41,7 @@ import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 
 public class SipSecurityUtils {
 	
-	private static Log log = LogFactory.getLog(SipSecurityUtils.class);
+	private static transient Logger log = Logger.getLogger(SipSecurityUtils.class);
 	
 	public static boolean authenticate(SipContext sipStandardContext,
 			SipServletRequestImpl request,

@@ -27,8 +27,7 @@ import javax.sip.SipStack;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
@@ -48,7 +47,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  */
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
-	private static Log logger = LogFactory.getLog(SipStandardService.class);
+	private static transient Logger logger = Logger.getLogger(SipStandardService.class);
 	/**
      * The descriptive information string for this implementation.
      */

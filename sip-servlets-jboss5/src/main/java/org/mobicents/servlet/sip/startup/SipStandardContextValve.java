@@ -33,8 +33,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.Constants;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -75,7 +74,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
         StringManager.getManager(Constants.Package);
 
 
-    private static Log logger = LogFactory.getLog(SipStandardContextValve.class);
+    private static transient Logger logger = Logger.getLogger(SipStandardContextValve.class);
 
     
     private SipStandardContext context = null;

@@ -43,8 +43,7 @@ import javax.servlet.sip.SipApplicationSessionListener;
 import org.apache.catalina.Globals;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -64,7 +63,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public abstract class ClusteredSipApplicationSession extends SipApplicationSessionImpl
 	implements Externalizable {
 
-	private transient static final Log logger = LogFactory.getLog(ClusteredSipApplicationSession.class);
+	private static transient Logger logger = Logger.getLogger(ClusteredSipApplicationSession.class);
 	
 	/**
 	 * Descriptive information describing this Session implementation.

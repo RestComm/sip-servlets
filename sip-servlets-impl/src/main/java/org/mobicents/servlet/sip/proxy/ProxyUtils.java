@@ -30,8 +30,7 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -47,7 +46,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyUtils {
-	private transient static Log logger = LogFactory.getLog(ProxyUtils.class);
+	private static transient Logger logger = Logger.getLogger(ProxyUtils.class);
 	private SipFactoryImpl sipFactoryImpl;
 	private ProxyImpl proxy;
 	

@@ -46,8 +46,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -71,7 +70,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
 public abstract class ClusteredSipSession extends SipSessionImpl  
 	implements Externalizable {
 
-	private transient static final Log logger = LogFactory.getLog(ClusteredSipSession.class);
+	private static transient final Logger logger = Logger.getLogger(ClusteredSipSession.class);
 
 	/**
 	 * Descriptive information describing this Session implementation.

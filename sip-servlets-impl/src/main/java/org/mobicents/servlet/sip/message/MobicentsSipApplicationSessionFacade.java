@@ -36,8 +36,7 @@ import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -61,7 +60,7 @@ public class MobicentsSipApplicationSessionFacade implements
 		MobicentsSipApplicationSession, Externalizable {
 
 	private static final long serialVersionUID = 1L;
-	private transient static final Log logger = LogFactory.getLog(MobicentsSipApplicationSessionFacade.class);
+	private static transient Logger logger = Logger.getLogger(MobicentsSipApplicationSessionFacade.class);
 	private MobicentsSipApplicationSession sipApplicationSession;
 
 	public MobicentsSipApplicationSessionFacade() {

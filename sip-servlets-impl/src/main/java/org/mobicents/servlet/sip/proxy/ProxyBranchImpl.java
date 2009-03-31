@@ -41,8 +41,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -58,7 +57,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  *
  */
 public class ProxyBranchImpl implements ProxyBranch, Serializable {
-	private transient static Log logger = LogFactory.getLog(ProxyBranchImpl.class);
+	private static transient Logger logger = Logger.getLogger(ProxyBranchImpl.class);
 	private ProxyImpl proxy;
 	private transient SipServletRequestImpl originalRequest;
 	private transient SipServletRequestImpl prackOriginalRequest;

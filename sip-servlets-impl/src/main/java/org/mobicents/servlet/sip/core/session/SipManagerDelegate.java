@@ -25,8 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -39,7 +38,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class SipManagerDelegate {
 
-	private static transient Log logger = LogFactory.getLog(SipManagerDelegate.class);
+	private static transient Logger logger = Logger.getLogger(SipManagerDelegate.class);
 	
 	protected ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
 		new ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession>();

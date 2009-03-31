@@ -25,13 +25,12 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 public class TimerServiceImpl implements TimerService, Serializable {
 	
-	private transient static Log logger = LogFactory.getLog(TimerServiceImpl.class
+	private static transient Logger logger = Logger.getLogger(TimerServiceImpl.class
 			.getName());
 	
 	private transient ExecutorServiceWrapper eService = ExecutorServiceWrapper.getInstance();

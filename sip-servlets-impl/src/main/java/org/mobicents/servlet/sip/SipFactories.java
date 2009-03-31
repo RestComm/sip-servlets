@@ -21,11 +21,10 @@ import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class SipFactories {
-	private static Log logger = LogFactory.getLog(SipFactories.class.getCanonicalName());
+	private static transient Logger logger = Logger.getLogger(SipFactories.class.getCanonicalName());
 
 	private static boolean initialized;
 

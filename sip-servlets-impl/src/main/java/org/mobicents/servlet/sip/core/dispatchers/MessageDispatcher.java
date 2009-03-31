@@ -25,15 +25,12 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
-import javax.sip.header.CallIdHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.catalina.Wrapper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -53,7 +50,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class MessageDispatcher {
 
-	private static Log logger = LogFactory.getLog(MessageDispatcher.class);
+	private static transient Logger logger = Logger.getLogger(MessageDispatcher.class);
 	
 	public static final String ROUTE_PARAM_DIRECTIVE = "directive";
 	

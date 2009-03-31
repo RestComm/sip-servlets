@@ -48,8 +48,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
@@ -84,7 +83,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  */
 public class InitialRequestDispatcher extends RequestDispatcher {
 
-	private static Log logger = LogFactory.getLog(InitialRequestDispatcher.class);
+	private static transient Logger logger = Logger.getLogger(InitialRequestDispatcher.class);
 	private SipApplicationRouter sipApplicationRouter;
 	
 	public InitialRequestDispatcher(

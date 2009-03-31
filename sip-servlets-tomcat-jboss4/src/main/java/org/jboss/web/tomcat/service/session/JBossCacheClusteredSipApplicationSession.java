@@ -20,8 +20,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -36,7 +35,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public abstract class JBossCacheClusteredSipApplicationSession extends ClusteredSipApplicationSession {
-	private transient static final Log logger = LogFactory.getLog(JBossCacheClusteredSipApplicationSession.class);
+	private static transient final Logger logger = Logger.getLogger(JBossCacheClusteredSipApplicationSession.class);
 
 	/**
 	 * Our proxy to the cache.

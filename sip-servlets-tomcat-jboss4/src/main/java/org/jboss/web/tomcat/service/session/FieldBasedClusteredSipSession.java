@@ -26,8 +26,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSessionActivationListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.aspects.patterns.observable.Observer;
 import org.jboss.aspects.patterns.observable.Subject;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -76,7 +75,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  *
  */
 public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession implements Observer {
-	private transient static final Log logger = LogFactory.getLog(AttributeBasedClusteredSipSession.class);
+	private static transient final Logger logger = Logger.getLogger(AttributeBasedClusteredSipSession.class);
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */

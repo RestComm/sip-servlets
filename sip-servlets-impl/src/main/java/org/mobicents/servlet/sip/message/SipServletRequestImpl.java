@@ -68,8 +68,7 @@ import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -88,7 +87,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
-	private transient static Log logger = LogFactory.getLog(SipServletRequestImpl.class);
+	private static transient Logger logger = Logger.getLogger(SipServletRequestImpl.class);
 		
 	public transient static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	

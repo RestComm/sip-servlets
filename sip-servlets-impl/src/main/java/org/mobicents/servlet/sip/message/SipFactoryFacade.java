@@ -30,8 +30,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -45,7 +44,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class SipFactoryFacade implements SipFactory, Serializable {
-	private transient static final Log logger = LogFactory.getLog(SipFactoryFacade.class
+	private static transient Logger logger = Logger.getLogger(SipFactoryFacade.class
 			.getName());
 	
 	private SipFactoryImpl sipFactoryImpl;

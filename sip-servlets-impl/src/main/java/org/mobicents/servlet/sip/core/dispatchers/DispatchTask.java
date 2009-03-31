@@ -21,8 +21,7 @@ import javax.sip.SipProvider;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 
@@ -35,8 +34,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
  */
 public abstract class DispatchTask implements Runnable {
 	
-	private static transient Log logger = LogFactory
-	.getLog(DispatchTask.class);
+	private static transient Logger logger = Logger.getLogger(DispatchTask.class);
 	
 	private SipServletMessageImpl sipServletMessage;
 	private SipProvider sipProvider;

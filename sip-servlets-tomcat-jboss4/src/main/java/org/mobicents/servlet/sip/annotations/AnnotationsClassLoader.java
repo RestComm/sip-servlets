@@ -62,8 +62,7 @@ import org.apache.catalina.loader.Constants;
 import org.apache.catalina.loader.Reloader;
 import org.apache.catalina.loader.ResourceEntry;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.naming.JndiPermission;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
@@ -113,8 +112,7 @@ public class AnnotationsClassLoader
     implements Reloader, Lifecycle
  {
 
-    protected static Log log = LogFactory
-	.getLog(AnnotationsClassLoader.class);
+	private static transient final Logger log = Logger.getLogger(AnnotationsClassLoader.class);
 
     public static final boolean ENABLE_CLEAR_REFERENCES = 
         Boolean.valueOf(System.getProperty("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "true")).booleanValue();

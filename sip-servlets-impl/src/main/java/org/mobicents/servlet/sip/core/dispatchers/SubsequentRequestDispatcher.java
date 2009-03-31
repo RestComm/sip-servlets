@@ -34,9 +34,7 @@ import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mobicents.servlet.sip.JainSipUtils;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -66,7 +64,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SubsequentRequestDispatcher extends RequestDispatcher {
 
-	private static Log logger = LogFactory.getLog(SubsequentRequestDispatcher.class);
+	private static transient Logger logger = Logger.getLogger(SubsequentRequestDispatcher.class);
 	
 	public SubsequentRequestDispatcher(
 			SipApplicationDispatcher sipApplicationDispatcher) {

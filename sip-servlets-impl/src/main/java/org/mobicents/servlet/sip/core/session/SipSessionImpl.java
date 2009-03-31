@@ -76,8 +76,7 @@ import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -117,7 +116,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		CREATION, DELETION, READYTOINVALIDATE;
 	}
 	
-	private transient static final Log logger = LogFactory.getLog(SipSessionImpl.class);
+	private static transient Logger logger = Logger.getLogger(SipSessionImpl.class);
 	
 	protected transient MobicentsSipApplicationSession sipApplicationSession;			
 	

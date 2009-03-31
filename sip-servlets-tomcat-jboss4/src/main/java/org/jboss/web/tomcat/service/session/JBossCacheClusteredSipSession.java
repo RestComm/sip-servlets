@@ -26,8 +26,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -42,7 +41,7 @@ import org.mobicents.servlet.sip.startup.SipService;
  *
  */
 public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession {
-	private transient static final Log logger = LogFactory.getLog(JBossCacheClusteredSipSession.class);
+	private static transient final Logger logger = Logger.getLogger(JBossCacheClusteredSipSession.class);
 
 	/**
 	 * Our proxy to the cache.

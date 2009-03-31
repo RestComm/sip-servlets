@@ -31,8 +31,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * Copied from Apache Excalibur project.
@@ -44,7 +43,7 @@ public class RFC2396UrlDecoder {
 
 	static BitSet charactersDontNeedingEncoding;
 	static final int characterCaseDiff = ('a' - 'A');
-	private static Log logger = LogFactory.getLog(RFC2396UrlDecoder.class.getCanonicalName());
+	private static Logger logger = Logger.getLogger(RFC2396UrlDecoder.class.getCanonicalName());
 	
 	/** Initialize the BitSet */
 	static {

@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -56,7 +55,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  */
 public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClusteredSipApplicationSession {
-	private transient static final Log logger = LogFactory.getLog(AttributeBasedClusteredSipSession.class);
+	private static transient Logger logger = Logger.getLogger(AttributeBasedClusteredSipSession.class);
 	
 	protected static final String EMPTY_ARRAY[] = new String[0];
 	/**

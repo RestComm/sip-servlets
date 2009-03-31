@@ -43,8 +43,7 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
@@ -65,7 +64,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  */
 public class SipApplicationSessionImpl implements MobicentsSipApplicationSession {
-	private transient static final Log logger = LogFactory.getLog(SipApplicationSessionImpl.class);
+	private static transient Logger logger = Logger.getLogger(SipApplicationSessionImpl.class);
 
 	/**
 	 * Timer task that will notify the listeners that the sip application session has expired 

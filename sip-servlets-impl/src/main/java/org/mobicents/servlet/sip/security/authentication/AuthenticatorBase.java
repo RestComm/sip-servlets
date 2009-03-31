@@ -26,8 +26,7 @@ import org.apache.catalina.Authenticator;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -44,7 +43,7 @@ import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 public abstract class AuthenticatorBase
     implements Authenticator{
 	
-	private static Log log = LogFactory.getLog(AuthenticatorBase.class);
+	private static transient Logger log = Logger.getLogger(AuthenticatorBase.class);
 
 
     // ----------------------------------------------------- Instance Variables

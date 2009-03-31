@@ -46,8 +46,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -71,7 +70,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
 public class SipFactoryImpl implements Serializable {
-	private static final transient Log logger = LogFactory.getLog(SipFactoryImpl.class
+	private static transient Logger logger = Logger.getLogger(SipFactoryImpl.class
 			.getCanonicalName());
 
 	private boolean useLoadBalancer = false;

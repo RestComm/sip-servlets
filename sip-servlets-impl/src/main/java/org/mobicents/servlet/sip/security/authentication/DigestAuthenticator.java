@@ -31,8 +31,7 @@ import javax.sip.header.WWWAuthenticateHeader;
 import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.util.MD5Encoder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -49,7 +48,7 @@ import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 
 public class DigestAuthenticator
     extends AuthenticatorBase {
-    private static Log log = LogFactory.getLog(DigestAuthenticator.class);
+	private static transient Logger log = Logger.getLogger(DigestAuthenticator.class);
 
 
     // -------------------------------------------------------------- Constants

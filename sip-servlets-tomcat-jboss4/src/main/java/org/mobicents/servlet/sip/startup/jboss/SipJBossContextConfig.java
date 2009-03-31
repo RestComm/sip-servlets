@@ -32,8 +32,7 @@ import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.DigesterFactory;
 import org.apache.catalina.startup.ExpandWar;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
 import org.jboss.web.tomcat.security.config.JBossContextConfig;
@@ -58,8 +57,7 @@ import org.xml.sax.EntityResolver;
 public class SipJBossContextConfig extends JBossContextConfig 
 	implements LifecycleListener{
 
-	private static transient Log logger = LogFactory
-			.getLog(SipContextConfig.class);
+	private static transient final Logger logger = Logger.getLogger(SipContextConfig.class);
 
 	@Override
 	public void lifecycleEvent(LifecycleEvent event) {

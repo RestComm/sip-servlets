@@ -24,8 +24,7 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class is used as a central place to get a session be it a sip session
@@ -42,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * remove methods when the sessions are no longer used.
  */
 public class SessionManagerUtil {
-	private transient static final Log logger = LogFactory.getLog(SessionManagerUtil.class);
+	private static transient Logger logger = Logger.getLogger(SessionManagerUtil.class);
 	
 	public final static String TAG_PARAMETER_NAME = "tag";
 	

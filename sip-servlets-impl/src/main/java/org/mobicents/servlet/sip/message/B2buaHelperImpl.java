@@ -53,8 +53,7 @@ import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
@@ -76,7 +75,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  */
 
 public class B2buaHelperImpl implements B2buaHelper, Serializable {
-	private static Log logger = LogFactory.getLog(B2buaHelperImpl.class);
+	private static transient Logger logger = Logger.getLogger(B2buaHelperImpl.class);
 	
 	protected transient static final HashSet<String> singletonHeadersNames = new HashSet<String>();
 	static {

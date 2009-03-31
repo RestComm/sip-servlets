@@ -3,10 +3,8 @@ package org.mobicents.servlet.sip.core;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.GenericUtils;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
  * This class manipulates strings representing the AR stack for cases when the container
@@ -19,7 +17,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  *
  */
 public class ApplicationRoutingHeaderComposer {
-	private static final transient Log logger = LogFactory.getLog(ApplicationRoutingHeaderComposer.class
+	private static transient Logger logger = Logger.getLogger(ApplicationRoutingHeaderComposer.class
 			.getCanonicalName());
 	
 	private static Random random = new Random();
