@@ -28,8 +28,7 @@ import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This examle shows Call Blocking Capabilities. It makes the sip servlet acts as
@@ -41,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CallBlockingSipServlet extends SipServlet implements SipServletListener {
 
-	private static Log logger = LogFactory.getLog(CallBlockingSipServlet.class);
+	private static Logger logger = Logger.getLogger(CallBlockingSipServlet.class);
 	List<String> blockedUris = null;
 	
 	/** Creates a new instance of CallBlockingSipServlet */

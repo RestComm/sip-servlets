@@ -14,8 +14,7 @@ import javax.management.ReflectionException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jdiameter.api.Answer;
 import org.jdiameter.api.ApplicationId;
 import org.jdiameter.api.Avp;
@@ -42,7 +41,7 @@ public class DiameterShClient implements DiameterProvider, DiameterListener
 
   private static final long serialVersionUID = 1L;
 
-  private static Log logger = LogFactory.getLog(DiameterShClient.class);
+  private static Logger logger = Logger.getLogger(DiameterShClient.class);
 
   private DiameterStackMultiplexer muxMBean = null;
   private DiameterMessageFactory msgFactory = null;

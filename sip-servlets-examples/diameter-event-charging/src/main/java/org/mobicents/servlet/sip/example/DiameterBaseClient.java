@@ -8,8 +8,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jdiameter.api.Answer;
 import org.jdiameter.api.ApplicationId;
 import org.jdiameter.api.Avp;
@@ -28,7 +27,7 @@ public class DiameterBaseClient implements DiameterProvider, DiameterListener
 
   private static final long serialVersionUID = 1L;
  
-  private static Log logger = LogFactory.getLog(DiameterBaseClient.class);
+  private static Logger logger = Logger.getLogger(DiameterBaseClient.class);
 
   private DiameterStackMultiplexer muxMBean = null;
   private DiameterMessageFactory msgFactory = null;

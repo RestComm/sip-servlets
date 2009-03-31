@@ -33,12 +33,11 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class ChatroomSipServlet extends SipServlet {
 	
-	private static Log logger = LogFactory.getLog(ChatroomSipServlet.class);
+	private static Logger logger = Logger.getLogger(ChatroomSipServlet.class);
 	
 	/** Context attribute key to store user list. */
     public static String USER_LIST="userList";

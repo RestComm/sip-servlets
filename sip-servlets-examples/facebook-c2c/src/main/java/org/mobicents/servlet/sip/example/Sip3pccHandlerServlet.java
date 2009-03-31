@@ -37,12 +37,11 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class Sip3pccHandlerServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-	private static Log logger = LogFactory.getLog(Sip3pccHandlerServlet.class);
+	private static Logger logger = Logger.getLogger(Sip3pccHandlerServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	
 	private SipFactory sipFactory;

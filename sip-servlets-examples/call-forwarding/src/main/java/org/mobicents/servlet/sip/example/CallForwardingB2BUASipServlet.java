@@ -32,8 +32,7 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This Sip Servlet shows how a B2BUA can be used to forward a request on another call leg.
@@ -44,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CallForwardingB2BUASipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);	
+	private static Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);	
 	Map<String, String[]> forwardingUris = null;
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */

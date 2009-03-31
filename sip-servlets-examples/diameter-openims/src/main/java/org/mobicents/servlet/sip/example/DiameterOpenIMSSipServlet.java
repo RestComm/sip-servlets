@@ -32,8 +32,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This is the SIP Servlet for OpenIMS Integration example.
@@ -45,7 +44,7 @@ public class DiameterOpenIMSSipServlet extends SipServlet {
 
   private static final long serialVersionUID = 1L;
 
-  private static Log logger = LogFactory.getLog(DiameterOpenIMSSipServlet.class);
+  private static Logger logger = Logger.getLogger(DiameterOpenIMSSipServlet.class);
 
   DiameterShClient diameterShClient = null;
 
