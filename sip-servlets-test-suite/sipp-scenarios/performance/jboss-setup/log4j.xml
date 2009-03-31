@@ -294,9 +294,14 @@
    <!-- Setup the Root category -->
    <!-- ======================= -->
 
-   <root>
+   <!--root>
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
+   </root-->
+   <root>    
+      <priority value ="WARN" /> 
+      <appender-ref ref="CONSOLE"/>
+      <!--appender-ref ref="FILE"/-->
    </root>
 
 </log4j:configuration>
