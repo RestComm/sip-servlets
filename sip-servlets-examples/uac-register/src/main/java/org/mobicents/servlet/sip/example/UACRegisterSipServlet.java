@@ -33,8 +33,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This Sip Servlet acts as as a UAC registering to callwithus
@@ -43,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UACRegisterSipServlet extends SipServlet implements SipServletListener {
 
-	private static Log logger = LogFactory.getLog(UACRegisterSipServlet.class);		
+	private static transient final Logger logger = Logger.getLogger(UACRegisterSipServlet.class);		
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {

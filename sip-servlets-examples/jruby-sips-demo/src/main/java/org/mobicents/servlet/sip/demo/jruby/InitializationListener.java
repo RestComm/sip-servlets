@@ -22,22 +22,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  * 
  */
 public class InitializationListener implements ServletContextListener {
-	private static Log logger = LogFactory.getLog(InitializationListener.class);
+	private static Logger logger = Logger.getLogger(InitializationListener.class);
 	private static final String AUDIO_DIR = "/audio";
 	private static final String FILE_PROTOCOL = "file://";
 	private static final String[] AUDIO_FILES = new String[] {

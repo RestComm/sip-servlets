@@ -3,8 +3,7 @@ package org.mobicents.servlet.sip.demo.jruby;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
@@ -32,7 +31,7 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
  *
  */
 public class MediaConnectionListener implements MsConnectionListener {
-	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
+	private static Logger logger = Logger.getLogger(MediaConnectionListener.class);
 	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
 	
 	private SipServletResponse response;

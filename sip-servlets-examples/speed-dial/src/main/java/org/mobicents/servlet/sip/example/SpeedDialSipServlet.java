@@ -29,8 +29,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This example shows Speed Dial capabilities.
@@ -41,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SpeedDialSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(SpeedDialSipServlet.class);
+	private static transient final Logger logger = Logger.getLogger(SpeedDialSipServlet.class);
 	Map<String, String> dialNumberToSipUriMapping = null;
 	
 	/** Creates a new instance of SpeedDialSipServlet */

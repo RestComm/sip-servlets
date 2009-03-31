@@ -17,15 +17,13 @@
 package org.mobicents.servlet.sip.demo.jruby;
 
 import java.io.IOException;
-import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
@@ -34,7 +32,7 @@ import org.mobicents.mscontrol.MsSession;
 
 public class JRubySipServlet extends SipServlet {
 	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
-	private static Log logger = LogFactory.getLog(JRubySipServlet.class);
+	private static Logger logger = Logger.getLogger(JRubySipServlet.class);
 	private static final String AUDIO_DIR = "/audio";
 		
 	@Override
