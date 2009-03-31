@@ -90,18 +90,18 @@
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-node">
 					<property name="jboss.home" value="${jboss.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-1.x">
-					<property name="jboss.home" value="${jboss.home}"/>
-					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
-				<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
-					<property name="jboss.home" value="${jboss.home}"/>
-					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
+				</ant>				
 			</sequential>
 		</for>
-		
+		<!-- removing diameter and mms from ha node -->
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-1.x">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
 		<antcall target="build-mobicents-sip-load-balancer"/>
 		<antcall target="build-documentation"/>
