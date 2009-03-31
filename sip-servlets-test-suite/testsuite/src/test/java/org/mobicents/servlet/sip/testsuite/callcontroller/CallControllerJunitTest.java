@@ -19,8 +19,7 @@ package org.mobicents.servlet.sip.testsuite.callcontroller;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -33,7 +32,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	private static final String FROM_DOMAIN = "sip-servlets.com";
 	private static final String TO_DOMAIN = "127.0.0.1:5090";	
 
-	private static Log logger = LogFactory.getLog(CallControllerJunitTest.class);
+	private static transient Logger logger = Logger.getLogger(CallControllerJunitTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;

@@ -29,13 +29,12 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class JoinReceiverSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(JoinReceiverSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(JoinReceiverSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	
 	@Resource

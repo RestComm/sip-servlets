@@ -37,8 +37,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -55,7 +54,7 @@ public class TimersSipServlet
 	private static final String ALREADY_INVALIDATED = "alreadyInvalidated";
 	
 
-	private static Log logger = LogFactory.getLog(TimersSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(TimersSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String SIP_APP_SESSION_EXPIRED = "sipAppSessionExpired";

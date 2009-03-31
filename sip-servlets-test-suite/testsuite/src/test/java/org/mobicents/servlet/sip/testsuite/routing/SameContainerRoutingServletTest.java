@@ -22,8 +22,7 @@ import java.util.List;
 import javax.sip.SipProvider;
 
 import org.apache.catalina.deploy.ApplicationParameter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -42,7 +41,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  */
 public class SameContainerRoutingServletTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(SameContainerRoutingServletTest.class);
+	private static transient Logger logger = Logger.getLogger(SameContainerRoutingServletTest.class);
 	
 	private static final int TIMEOUT = 20000;
 	private static final String TRANSPORT = "udp";

@@ -27,14 +27,13 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class ServletMappingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(ServletMappingSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(ServletMappingSipServlet.class);
 	
 	
 	/** Creates a new instance of ServletMappingSipServlet */

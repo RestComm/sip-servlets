@@ -37,14 +37,13 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class ShootistSipServlet 
 		extends SipServlet 
 		implements SipServletListener,TimerListener {
 
-	private static Log logger = LogFactory.getLog(ShootistSipServlet.class);	
+	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;
 	

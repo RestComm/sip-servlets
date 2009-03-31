@@ -55,8 +55,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class ListenersSipServlet
@@ -66,7 +65,7 @@ public class ListenersSipServlet
 		SipApplicationSessionListener, SipApplicationSessionActivationListener, SipApplicationSessionBindingListener,
 		SipSessionAttributeListener, SipApplicationSessionAttributeListener, TimerListener {
 
-	private static Log logger = LogFactory.getLog(ListenersSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(ListenersSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	

@@ -19,8 +19,7 @@ package org.mobicents.servlet.sip.testsuite.composition;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -31,7 +30,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  */
 public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 
-	private static Log logger = LogFactory.getLog(SpeedDialLocationServiceJunitTest.class);
+	private static transient Logger logger = Logger.getLogger(SpeedDialLocationServiceJunitTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;

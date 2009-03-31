@@ -36,14 +36,13 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(CallForwardingB2BUASipServlet.class);
+	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);
 	B2buaHelper helper = null;
 	Map<String, String[]> forwardingUris = null;
 	

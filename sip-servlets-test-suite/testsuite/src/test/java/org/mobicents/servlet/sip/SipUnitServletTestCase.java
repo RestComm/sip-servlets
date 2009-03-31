@@ -24,8 +24,7 @@ import java.util.Properties;
 
 import javax.sip.ListeningPoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipResponse;
 import org.cafesip.sipunit.SipTestCase;
@@ -37,7 +36,7 @@ import org.cafesip.sipunit.SipTestCase;
  * since it should map to the test case.
  */
 public abstract class SipUnitServletTestCase extends SipTestCase {
-	private static Log logger = LogFactory.getLog(SipUnitServletTestCase.class);
+	private static transient Logger logger = Logger.getLogger(SipUnitServletTestCase.class);
 	protected String tomcatBasePath;
 	protected String projectHome;
 	protected SipEmbedded tomcat;

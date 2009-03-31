@@ -28,8 +28,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class ShootmeSipServletAuth extends SipServlet implements SipErrorListener,
@@ -42,7 +41,7 @@ public class ShootmeSipServletAuth extends SipServlet implements SipErrorListene
 		super.doBranchResponse(resp);
 	}
 
-	private static Log logger = LogFactory.getLog(ShootmeSipServletAuth.class);
+	private static transient Logger logger = Logger.getLogger(ShootmeSipServletAuth.class);
 	private static String TEST_REINVITE_USERNAME = "reinvite";
 	private static String TEST_CANCEL_USERNAME = "cancel";
 	

@@ -28,13 +28,12 @@ import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ParallelProxyWithRecordRouteTest extends SipServletTestCase implements SipListener {
 
-	private static Log logger = LogFactory.getLog(ParallelProxyWithRecordRouteTest.class);
+	private static transient Logger logger = Logger.getLogger(ParallelProxyWithRecordRouteTest.class);
 
 	protected Shootist shootist;
 

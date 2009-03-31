@@ -34,15 +34,14 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
 	B2buaHelper helper = null;
 	
-	private static Log logger = LogFactory.getLog(B2BUASipServlet.class);
+	private static transient Logger logger = Logger.getLogger(B2BUASipServlet.class);
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,

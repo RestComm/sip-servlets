@@ -21,8 +21,7 @@ import java.util.Properties;
 
 import javax.sip.ListeningPoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipEmbedded;
@@ -41,7 +40,7 @@ import org.mobicents.servlet.sip.SipUnitServletTestCase;
  */
 public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(ExternalRoutingServletTest.class);
+	private static transient Logger logger = Logger.getLogger(ExternalRoutingServletTest.class);
 	
 	private static final int TIMEOUT = 5000;
 	

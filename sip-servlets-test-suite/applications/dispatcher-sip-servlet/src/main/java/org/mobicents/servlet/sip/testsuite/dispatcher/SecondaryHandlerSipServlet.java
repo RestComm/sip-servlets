@@ -29,8 +29,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -40,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 public class SecondaryHandlerSipServlet
 		extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(SecondaryHandlerSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(SecondaryHandlerSipServlet.class);
 	
 	private SipFactory sipFactory;	
 	

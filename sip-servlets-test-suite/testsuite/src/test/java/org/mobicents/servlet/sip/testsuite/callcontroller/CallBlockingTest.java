@@ -20,8 +20,7 @@ import java.util.Properties;
 
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
@@ -29,7 +28,7 @@ import org.mobicents.servlet.sip.SipUnitServletTestCase;
 
 public class CallBlockingTest extends SipUnitServletTestCase {
 
-	private static Log logger = LogFactory.getLog(CallBlockingTest.class);
+	private static transient Logger logger = Logger.getLogger(CallBlockingTest.class);
 
 	private SipStack sipStackSender;
 	private SipPhone sipPhoneSender;	

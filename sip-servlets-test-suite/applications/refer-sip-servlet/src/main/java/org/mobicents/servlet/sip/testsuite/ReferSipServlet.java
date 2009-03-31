@@ -37,8 +37,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -48,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
 public class ReferSipServlet extends SipServlet implements SipServletListener, TimerListener, SipSessionListener {
 
 	private static final String REFER_SESSION = "referSession";
-	private static Log logger = LogFactory.getLog(ReferSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(ReferSipServlet.class);
 	private final static String TRYING_CONTENT = "SIP/2.0 100 Trying";
 	private final static String OK_CONTENT = "SIP/2.0 200 OK";
 	private final static String SUBSEQUENT_CONTENT = "SIP/2.0 100 Subsequent";

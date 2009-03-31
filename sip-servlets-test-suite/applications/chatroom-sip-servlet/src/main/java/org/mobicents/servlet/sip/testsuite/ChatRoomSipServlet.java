@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -26,43 +25,20 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.ServletParseException;
-import javax.servlet.sip.ServletTimer;
-import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipApplicationSessionActivationListener;
-import javax.servlet.sip.SipApplicationSessionAttributeListener;
-import javax.servlet.sip.SipApplicationSessionBindingEvent;
-import javax.servlet.sip.SipApplicationSessionBindingListener;
-import javax.servlet.sip.SipApplicationSessionEvent;
-import javax.servlet.sip.SipApplicationSessionListener;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
-import javax.servlet.sip.SipServletContextEvent;
-import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSessionActivationListener;
-import javax.servlet.sip.SipSessionAttributeListener;
-import javax.servlet.sip.SipSessionBindingEvent;
-import javax.servlet.sip.SipSessionBindingListener;
-import javax.servlet.sip.SipSessionEvent;
-import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
-import javax.servlet.sip.TimerListener;
-import javax.servlet.sip.TimerService;
 import javax.servlet.sip.annotation.SipApplicationKey;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class ChatRoomSipServlet
 		extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(ChatRoomSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(ChatRoomSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	

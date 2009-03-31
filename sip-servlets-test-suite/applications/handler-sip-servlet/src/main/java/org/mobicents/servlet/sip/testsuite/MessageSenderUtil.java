@@ -22,8 +22,7 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -32,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MessageSenderUtil {
 	
-	private static Log logger = LogFactory.getLog(MessageSenderUtil.class);
+	private static transient Logger logger = Logger.getLogger(MessageSenderUtil.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	

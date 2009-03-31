@@ -36,8 +36,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -48,7 +47,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 
 	private static final String SUBSCRIBER_SESSIONS = "subscriberSessions";
 	private static final String PUBLISH_SIP_ETAGS = "publishSIP-ETag_s";
-	private static Log logger = LogFactory.getLog(PublishSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(PublishSipServlet.class);
 	
 	
 	/** Creates a new instance of PublishSipServlet */

@@ -34,12 +34,11 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class SimpleWebServlet extends HttpServlet
 { 	
-	private static Log logger = LogFactory.getLog(SimpleWebServlet.class);
+	private static transient Logger logger = Logger.getLogger(SimpleWebServlet.class);
 	private SipFactory sipFactory;
 	
 	@Override

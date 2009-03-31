@@ -21,10 +21,8 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
@@ -38,8 +36,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -51,7 +48,7 @@ public class SubscriberSipServlet
 		implements SipServletListener, TimerListener, SipSessionListener {
 
 	private static final String TEST_SAME_CONTAINER_USER_NAME = "sameContainerUserName";
-	private static Log logger = LogFactory.getLog(SubscriberSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(SubscriberSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String SIP_SESSION_READY_TO_BE_INVALIDATED = "sipSessionReadyToBeInvalidated";
 	

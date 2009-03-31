@@ -34,9 +34,8 @@ import org.apache.catalina.loader.StandardClassLoader;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.catalina.startup.CatalinaProperties;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.coyote.http11.Http11Protocol;
+import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
@@ -56,7 +55,7 @@ import org.mobicents.servlet.sip.startup.SipStandardService;
  *  @author Vladimir Ralev
  */
 public class SipEmbedded {		
-	private static Log log = LogFactory.getLog(SipEmbedded.class);
+	private static transient Logger log = Logger.getLogger(SipEmbedded.class);
 
 	private String loggingFilePath = null;
 	

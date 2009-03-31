@@ -31,8 +31,7 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.header.CSeqHeader;
 import javax.sip.message.Request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 /*
@@ -41,7 +40,7 @@ import org.mobicents.servlet.sip.SipServletTestCase;
  */
 public class ProxySubsequentPublishRequestTest extends SipServletTestCase implements SipListener {
 
-	private static Log logger = LogFactory.getLog(ProxySubsequentPublishRequestTest.class);
+	private static transient Logger logger = Logger.getLogger(ProxySubsequentPublishRequestTest.class);
 
 	protected Shootist shootist;
 

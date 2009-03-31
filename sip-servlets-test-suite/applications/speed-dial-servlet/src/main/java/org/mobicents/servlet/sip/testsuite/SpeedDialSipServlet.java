@@ -32,14 +32,13 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(SpeedDialSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(SpeedDialSipServlet.class);
 	Map<String, String> dialNumberToSipUriMapping = null;
 	
 	/** Creates a new instance of SpeedDialSipServlet */

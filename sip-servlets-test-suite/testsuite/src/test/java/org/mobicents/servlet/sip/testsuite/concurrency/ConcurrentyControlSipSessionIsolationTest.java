@@ -23,8 +23,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
@@ -35,7 +34,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(ConcurrentyControlSipSessionIsolationTest.class);
+	private static transient Logger logger = Logger.getLogger(ConcurrentyControlSipSessionIsolationTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;

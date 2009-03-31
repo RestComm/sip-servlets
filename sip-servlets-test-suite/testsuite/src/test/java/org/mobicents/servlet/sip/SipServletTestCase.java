@@ -22,10 +22,9 @@ import java.util.Properties;
 
 import javax.sip.ListeningPoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import junit.framework.TestCase;
+
+import org.apache.log4j.Logger;
 
 /**
  * This class is responsible for reading up the properties configuration file
@@ -34,7 +33,7 @@ import junit.framework.TestCase;
  * since it should map to the test case.
  */
 public abstract class SipServletTestCase extends TestCase {
-	private static Log logger = LogFactory.getLog(SipServletTestCase.class);
+	private static transient Logger logger = Logger.getLogger(SipServletTestCase.class);
 	protected String tomcatBasePath;
 	protected String projectHome;
 	protected SipEmbedded tomcat;

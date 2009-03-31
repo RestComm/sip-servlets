@@ -59,12 +59,11 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class Shootist implements SipListener {
-	private static Log logger = LogFactory.getLog(Shootist.class);
+	private static transient Logger logger = Logger.getLogger(Shootist.class);
 	
 	private static SipProvider sipProvider;
 

@@ -30,8 +30,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -41,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
 public class DispatcherSipServlet
 		extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(DispatcherSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(DispatcherSipServlet.class);
 	
 	private SipFactory sipFactory;	
 	private static String TEST_BAD_HANDLER_USERNAME = "badHandler";

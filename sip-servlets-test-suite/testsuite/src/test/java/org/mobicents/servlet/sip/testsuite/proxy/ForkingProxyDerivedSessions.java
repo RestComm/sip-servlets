@@ -16,8 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 /**
@@ -28,7 +27,7 @@ import org.mobicents.servlet.sip.SipServletTestCase;
  */
 public class ForkingProxyDerivedSessions extends SipServletTestCase {
 
-	private static Log logger = LogFactory.getLog(ForkingProxyDerivedSessions.class);
+	private static transient Logger logger = Logger.getLogger(ForkingProxyDerivedSessions.class);
 
 	protected Shootist shootist;
 

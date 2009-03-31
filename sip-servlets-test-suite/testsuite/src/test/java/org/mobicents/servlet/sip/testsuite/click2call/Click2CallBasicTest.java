@@ -22,8 +22,7 @@ import java.util.Properties;
 
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
@@ -33,7 +32,7 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
 	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
 	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
-	private static Log logger = LogFactory.getLog(Click2CallBasicTest.class);
+	private static transient Logger logger = Logger.getLogger(Click2CallBasicTest.class);
 
 	private SipStack[] sipStackReceivers;
 

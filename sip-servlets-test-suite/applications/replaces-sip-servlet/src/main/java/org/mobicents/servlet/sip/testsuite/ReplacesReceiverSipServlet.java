@@ -29,14 +29,13 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class ReplacesReceiverSipServlet extends SipServlet {
 
 	private static final String REPLACES = "Replaces";
-	private static Log logger = LogFactory.getLog(ReplacesReceiverSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(ReplacesReceiverSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	
 	@Resource

@@ -20,14 +20,13 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class ProxyRecordRouteReInviteTest extends SipServletTestCase {	
-	private static Log logger = LogFactory.getLog(ProxyRecordRouteReInviteTest.class);
+	private static transient Logger logger = Logger.getLogger(ProxyRecordRouteReInviteTest.class);
 	private static final boolean AUTODIALOG = true;
 	TestSipListener sender;
 	TestSipListener receiver;

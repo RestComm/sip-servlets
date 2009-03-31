@@ -21,8 +21,7 @@ import java.util.Properties;
 import javax.sip.ListeningPoint;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
@@ -30,7 +29,7 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
-	private static Log logger = LogFactory.getLog(ProxyBranchTimeoutTest.class);
+	private static transient Logger logger = Logger.getLogger(ProxyBranchTimeoutTest.class);
 
 	private SipStack sipStackSender;
 	private SipStack[] sipStackReceivers;

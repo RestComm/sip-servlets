@@ -34,13 +34,12 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class ReplacesSenderSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(ReplacesSenderSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(ReplacesSenderSipServlet.class);
 	Map<String, List<URI>> registeredUsers = null;
 	
 	@Resource

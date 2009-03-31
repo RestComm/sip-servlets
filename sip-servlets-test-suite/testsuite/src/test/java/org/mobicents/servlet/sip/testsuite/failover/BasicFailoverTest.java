@@ -19,19 +19,15 @@ package org.mobicents.servlet.sip.testsuite.failover;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.util.Properties;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
 import org.apache.catalina.deploy.ApplicationParameter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
@@ -61,7 +57,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 
 	private static final String SIP_SERVICE_CLASS_NAME = "org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService";
 
-	private static Log logger = LogFactory.getLog(BasicFailoverTest.class);
+	private static transient Logger logger = Logger.getLogger(BasicFailoverTest.class);
 	
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;

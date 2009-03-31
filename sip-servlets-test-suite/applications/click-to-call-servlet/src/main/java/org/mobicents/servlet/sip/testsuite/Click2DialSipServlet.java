@@ -39,11 +39,10 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.SipApplicationSession.Protocol;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class Click2DialSipServlet extends SipServlet implements SipApplicationSessionListener {
-	private static Log logger = LogFactory.getLog(Click2DialSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(Click2DialSipServlet.class);
 	private static final String SIP_APP_SESSION_DESTROYED = "sipAppSessionDestroyed";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	@Resource

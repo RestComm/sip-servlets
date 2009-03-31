@@ -22,8 +22,7 @@ import java.util.Iterator;
 
 import javax.sip.SipProvider;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -32,7 +31,7 @@ public class SipAppSessionTerminationTest extends SipServletTestCase {
 
 	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
 	private static final String CLICK2DIAL_PARAMS = "?from=sip:sipAppTest@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
-	private static Log logger = LogFactory.getLog(SipAppSessionTerminationTest.class);
+	private static transient Logger logger = Logger.getLogger(SipAppSessionTerminationTest.class);
 
 	TestSipListener receiver;
 	ProtocolObjects receiverProtocolObjects;

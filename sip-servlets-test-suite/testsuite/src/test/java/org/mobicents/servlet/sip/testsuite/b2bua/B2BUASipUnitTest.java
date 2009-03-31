@@ -20,15 +20,14 @@ import java.util.Properties;
 
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class B2BUASipUnitTest extends SipServletTestCase {
-	private static Log logger = LogFactory.getLog(B2BUASipUnitTest.class);
+	private static transient Logger logger = Logger.getLogger(B2BUASipUnitTest.class);
 	private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000; 
 	SipStack sipStackA;

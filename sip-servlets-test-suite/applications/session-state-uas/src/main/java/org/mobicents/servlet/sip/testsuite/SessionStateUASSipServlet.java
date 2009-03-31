@@ -33,14 +33,13 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.SipSession.State;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class SessionStateUASSipServlet
 		extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(SessionStateUASSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(SessionStateUASSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";		
 	private static final String SEND_1XX_2XX = "send1xx_2xx";

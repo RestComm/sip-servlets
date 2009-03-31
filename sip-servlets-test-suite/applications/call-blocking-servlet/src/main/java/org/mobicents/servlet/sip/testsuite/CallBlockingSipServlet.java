@@ -29,14 +29,13 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class CallBlockingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	private static Log logger = LogFactory.getLog(CallBlockingSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(CallBlockingSipServlet.class);
 	List<String> blockedUris = null;
 	
 	/** Creates a new instance of CallBlockingSipServlet */

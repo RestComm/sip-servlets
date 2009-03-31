@@ -51,11 +51,10 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class Shootme implements SipListener {
-	private static Log logger = LogFactory.getLog(Shootme.class);
+	private static transient Logger logger = Logger.getLogger(Shootme.class);
 	private static AddressFactory addressFactory;
 
 	private static MessageFactory messageFactory;

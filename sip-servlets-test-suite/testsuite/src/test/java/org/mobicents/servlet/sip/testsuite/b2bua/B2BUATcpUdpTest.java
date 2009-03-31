@@ -20,8 +20,7 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -34,7 +33,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  */
 public class B2BUATcpUdpTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(B2BUATcpUdpTest.class);
+	private static transient Logger logger = Logger.getLogger(B2BUATcpUdpTest.class);
 
 	private static final String TRANSPORT_UDP = "udp";
 	private static final String TRANSPORT_TCP = "tcp";

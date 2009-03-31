@@ -23,26 +23,22 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class LocationServiceSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(LocationServiceSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(LocationServiceSipServlet.class);
 	Map<String, List<URI>> registeredUsers = null;
 	
 	/** Creates a new instance of SpeedDialSipServlet */

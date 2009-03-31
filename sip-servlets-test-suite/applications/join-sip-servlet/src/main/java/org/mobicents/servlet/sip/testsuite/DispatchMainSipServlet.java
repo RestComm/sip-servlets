@@ -27,13 +27,12 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class DispatchMainSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(DispatchMainSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(DispatchMainSipServlet.class);
 	
 	@Resource
 	private SipFactory sipFactory;

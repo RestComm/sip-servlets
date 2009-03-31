@@ -24,8 +24,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -34,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UpdateSipServlet extends SipServlet {
 
-	private static Log logger = LogFactory.getLog(UpdateSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(UpdateSipServlet.class);
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public UpdateSipServlet() {

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import javax.annotation.Resource;
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -38,8 +37,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.SipSession.State;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
@@ -60,7 +58,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		super.doBranchResponse(resp);
 	}
 
-	private static Log logger = LogFactory.getLog(SimpleSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static String TEST_REINVITE_USERNAME = "reinvite";
 	private static String TEST_CANCEL_USERNAME = "cancel";
 	

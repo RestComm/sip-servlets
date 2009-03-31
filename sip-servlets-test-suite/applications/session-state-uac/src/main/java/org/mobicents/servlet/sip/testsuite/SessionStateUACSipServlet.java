@@ -30,15 +30,14 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 
 public class SessionStateUACSipServlet
 		extends SipServlet 
 		implements SipServletListener {
 
-	private static Log logger = LogFactory.getLog(SessionStateUACSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(SessionStateUACSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";		
 	private static final String SEND_1XX_2XX = "send1xx_2xx";

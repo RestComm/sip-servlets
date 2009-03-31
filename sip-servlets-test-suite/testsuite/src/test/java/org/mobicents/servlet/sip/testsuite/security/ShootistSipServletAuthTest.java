@@ -21,14 +21,13 @@ import java.util.List;
 import javax.sip.SipProvider;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class ShootistSipServletAuthTest extends SipServletTestCase {
-	private static Log logger = LogFactory.getLog(ShootistSipServletAuthTest.class);		
+	private static transient Logger logger = Logger.getLogger(ShootistSipServletAuthTest.class);		
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 30000;	

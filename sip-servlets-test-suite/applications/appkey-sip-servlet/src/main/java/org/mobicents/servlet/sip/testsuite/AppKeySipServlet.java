@@ -21,7 +21,6 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
@@ -33,14 +32,13 @@ import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 public class AppKeySipServlet 
 		extends SipServlet 
 		implements SipServletListener {
 
-	private static Log logger = LogFactory.getLog(AppKeySipServlet.class);
+	private static transient Logger logger = Logger.getLogger(AppKeySipServlet.class);
 	@Resource
 	SipFactory sipFactory;
 	@Resource

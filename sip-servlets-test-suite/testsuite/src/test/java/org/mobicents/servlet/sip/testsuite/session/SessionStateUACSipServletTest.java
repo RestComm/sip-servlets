@@ -27,15 +27,14 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.message.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class SessionStateUACSipServletTest extends SipServletTestCase {
 	
-	private static Log logger = LogFactory.getLog(SessionStateUACSipServletTest.class);
+	private static transient Logger logger = Logger.getLogger(SessionStateUACSipServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;

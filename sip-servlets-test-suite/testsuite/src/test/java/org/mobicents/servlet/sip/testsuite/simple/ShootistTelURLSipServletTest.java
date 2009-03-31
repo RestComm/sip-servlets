@@ -18,9 +18,7 @@ package org.mobicents.servlet.sip.testsuite.simple;
 import javax.sip.SipProvider;
 
 import org.apache.catalina.deploy.ApplicationParameter;
-import org.apache.catalina.realm.MemoryRealm;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -29,7 +27,7 @@ import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class ShootistTelURLSipServletTest extends SipServletTestCase {
-	private static Log logger = LogFactory.getLog(ShootistTelURLSipServletTest.class);		
+	private static transient Logger logger = Logger.getLogger(ShootistTelURLSipServletTest.class);		
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 5000;	

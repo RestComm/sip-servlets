@@ -29,8 +29,7 @@ import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -39,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class NotifierSipServlet extends SipServlet implements SipSessionListener {
 
-	private static Log logger = LogFactory.getLog(NotifierSipServlet.class);
+	private static transient Logger logger = Logger.getLogger(NotifierSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String SIP_SESSION_READY_TO_BE_INVALIDATED = "sipSessionReadyToBeInvalidated";
 	
