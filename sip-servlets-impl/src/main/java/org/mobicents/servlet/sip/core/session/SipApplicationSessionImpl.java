@@ -31,6 +31,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.mobicents.servlet.sip.utils.*;
+
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
@@ -214,16 +216,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addHttpSession(HttpSession httpSession) {
-		this.httpSessions.putIfAbsent(httpSession.getId(), httpSession);
+		this.httpSessions.putIfAbsent(JvmRouteUtil.removeJvmRoute(httpSession.getId()), httpSession);
 		readyToInvalidate = false;
+		// TODO: We assume that there is only one HTTP session in the app session. In this case
+		// we are safe to only assign jvmRoute once here. When we support multiple http sessions
+		// we will need something more sophisticated.
+		setJvmRoute(JvmRouteUtil.extractJvmRoute(httpSession.getId()));
 	}
 	
 	public HttpSession removeHttpSession(HttpSession httpSession) {
-		return this.httpSessions.remove(httpSession.getId());
+		return this.httpSessions.remove(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
 	}
 	
 	public HttpSession findHttpSession (HttpSession httpSession) {
-		return this.httpSessions.get(httpSession.getId());
+		return this.httpSessions.get(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
 	}
 	
 	/**
@@ -845,7 +851,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				return sipSessions.get(id);
 				
 			case HTTP :
-				return httpSessions.get(id);
+				return httpSessions.get(JvmRouteUtil.removeJvmRoute(id));
 		}
 		return null;
 	}
@@ -982,5 +988,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             }
         }
         return (facade);	  
+	}
+
+	private String jvmRoute;
+	
+	public String getJvmRoute() {
+		return this.jvmRoute;
+	}
+
+	public void setJvmRoute(String jvmRoute) {
+		this.jvmRoute = jvmRoute;
 	}
 }

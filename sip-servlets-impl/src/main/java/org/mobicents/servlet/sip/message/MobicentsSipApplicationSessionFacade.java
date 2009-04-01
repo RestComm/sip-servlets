@@ -65,6 +65,10 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public MobicentsSipApplicationSessionFacade() {
 	}
+	
+	public MobicentsSipApplicationSession getMobicentstSipApplicationSession() {
+		return this.sipApplicationSession;
+	}
 
 	public MobicentsSipApplicationSessionFacade(
 			MobicentsSipApplicationSession sipApplicationSession) {

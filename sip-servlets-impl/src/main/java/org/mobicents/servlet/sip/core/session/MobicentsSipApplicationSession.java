@@ -70,5 +70,8 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	Semaphore getSemaphore();
 	
 	MobicentsSipApplicationSessionFacade getSession();
+	
+	String getJvmRoute();
+	void setJvmRoute(String jvmRoute);
 
 }

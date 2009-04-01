@@ -23,9 +23,6 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
-import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
-import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
