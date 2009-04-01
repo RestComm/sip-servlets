@@ -28,6 +28,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.catalina.Container;
+import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.ProtocolHandler;
@@ -313,6 +315,9 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			if(protocolHandler instanceof SipProtocolHandler) {
 				SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) protocolHandler;
 				String address = sipProtocolHandler.getIpAddress();
+				// From Vladimir: for some reason I get "localhost" here instead of IP and this confiuses the LB
+				if(address.equals("localhost")) address = "127.0.0.1";
+				
 				int port = sipProtocolHandler.getPort();
 				String transport = sipProtocolHandler.getSignalingTransport();
 				String[] transports = new String[] {transport};
@@ -328,9 +333,16 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				} catch (UnknownHostException e) {
 					logger.error("An exception occurred while trying to retrieve the hostname of a sip connector", e);
 				}
-
+				Engine e = null;
+				for (Container c = connector.getContainer(); e == null && c != null; c = c.getParent())
+				{
+					if (c != null && c instanceof Engine)
+					{
+						e = (Engine) c;
+					}
+				}
 				SIPNode node = new SIPNode(hostName, address, port,
-						transports);
+						transports, e.getJvmRoute());
 
 				info.add(node);
 			}
