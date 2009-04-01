@@ -63,7 +63,7 @@ public class DistributableClick2CallHttpServletServlet extends HttpServlet
 		SipApplicationSession appSession = 
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
 		
-		appSession.setAttribute("setFromSipServlet", appSession.getId());
+		appSession.setAttribute("setFromHttpServlet", appSession.getId());
 		
 
 		{
