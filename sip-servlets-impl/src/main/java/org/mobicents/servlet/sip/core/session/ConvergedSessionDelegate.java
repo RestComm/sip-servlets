@@ -31,10 +31,14 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  * 
  * @author Jean Deruelle
+ * @author Vladimir Ralev
  *
  */
 public class ConvergedSessionDelegate {
 
+	// We are storing the app session id in the http sessions (since they are replicated) under this key
+	private static final String APPLICATION_SESSION_ID_ATTRIBUTE_NAME = "org.mobicents.servlet.sip.SipApplicationSessionId";
+	
 	protected SipManager sipManager;
 	protected HttpSession httpSession;
 	
@@ -129,7 +133,17 @@ public class ConvergedSessionDelegate {
 	 * @see javax.servlet.sip.ConvergedHttpSession#getApplicationSession()
 	 */
 	public MobicentsSipApplicationSession getApplicationSession(boolean create) {		
-		//the application session if currently associated is returned, 
+		
+		//First check if the http session has the app session id in its attributes
+		SipApplicationSessionKey key = (SipApplicationSessionKey) 
+			httpSession.getAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME);
+		if(key != null) {
+			return sipManager.getSipApplicationSession(key, false);
+		}
+		
+		//Otherwise proceed as normally
+		
+		//the application session if currently associated is returned,
 		MobicentsSipApplicationSession sipApplicationSession =
 			sipManager.findSipApplicationSession(httpSession);
 		if(sipApplicationSession == null && create) {
@@ -146,7 +160,11 @@ public class ConvergedSessionDelegate {
 					false);
 			
 			sipApplicationSession = 
-				sipManager.getSipApplicationSession(sipApplicationSessionKey, true);			
+				sipManager.getSipApplicationSession(sipApplicationSessionKey, true);
+			
+			// Store the App Session ID in the HTTP sessions to recover it from there when it's transfered to a new node.
+			httpSession.setAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME, 
+					sipApplicationSession.getKey());
 			sipApplicationSession.addHttpSession(httpSession);
 		}
 		if(sipApplicationSession != null) {
