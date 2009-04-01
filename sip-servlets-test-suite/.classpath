@@ -46,7 +46,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.14/coyote-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.14/servlet-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA3/sip-balancer-1.0.BETA3.jar" sourcepath="/SIP_BALANCER/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA4-SNAPSHOT/sip-balancer-1.0.BETA4-SNAPSHOT.jar" sourcepath="/SIP_BALANCER/src/main/java"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.12/log4j-1.2.12.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-tomcat-jboss4"/>
