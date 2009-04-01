@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app>
+	<display-name>Distributable Click2Call Servlet</display-name>
+	<description>Distributable Click2Call Servlet</description>
+	<distributable/>
+	<servlet>
+        <servlet-name>ClickToCall</servlet-name>
+        <servlet-class>org.mobicents.servlet.sip.example.DistributableClick2CallHttpServletServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>        
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClickToCall</servlet-name>
+        <url-pattern>/call</url-pattern>
+    </servlet-mapping>
+</web-app>

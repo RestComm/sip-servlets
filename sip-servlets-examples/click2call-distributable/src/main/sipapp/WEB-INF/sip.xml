@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>DistributableClick2Call</app-name>
+	<display-name>Distributable Simple Sip Servlet</display-name>
+	<description>Distributable Simple Sip Servlet</description>
+	<distributable/>
+	
+	<servlet-selection>
+		<main-servlet>
+			DistributableSimpleSipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>DistributableSimpleSipServlet</servlet-name>
+		<display-name>DistributableSimpleSipServlet</display-name>
+		<description>Distributable Simple SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.DistributableClick2CallSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<context-param>
+      <param-name>bye.delay</param-name>
+      <param-value>180000</param-value>
+    </context-param>
+
+</sip-app>
