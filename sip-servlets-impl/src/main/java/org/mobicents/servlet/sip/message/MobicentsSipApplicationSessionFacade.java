@@ -269,4 +269,12 @@ public class MobicentsSipApplicationSessionFacade implements
 		arg0.writeUTF(sipApplicationSession.getId());
 	}
 
+	public String getJvmRoute() {
+		return this.sipApplicationSession.getJvmRoute();
+	}
+
+	public void setJvmRoute(String jvmRoute) {
+		this.sipApplicationSession.setJvmRoute(jvmRoute);
+	}
+
 }

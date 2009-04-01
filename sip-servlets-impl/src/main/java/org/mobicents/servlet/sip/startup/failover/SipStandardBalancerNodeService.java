@@ -383,6 +383,36 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 	/**
 	 * @param info
 	 */
+	public void sendSwitchoverInstruction(String fromJvmRoute, String toJvmRoute) {
+		for(BalancerDescription  balancerDescription:new HashSet<BalancerDescription>(register.values())) {
+			try {
+				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
+				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
+				reg.switchover(fromJvmRoute, toJvmRoute);
+				displayBalancerWarining = true;
+				if(displayBalancerFound) {
+					logger.info("SIP Load Balancer Found!");
+					displayBalancerFound = false;
+				}
+			} catch (Exception e) {
+				if(displayBalancerWarining) {
+					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
+							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
+					logger.debug("Cannot access the SIP load balancer RMI registry: " , e);
+					displayBalancerWarining = false;
+				}
+				displayBalancerFound = true;
+			}
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Finished gathering");
+			logger.debug("Gathered info[" + info + "]");
+		}
+	}
+	
+	/**
+	 * @param info
+	 */
 	private void removeNodesFromBalancers(ArrayList<SIPNode> info) {
 		for(BalancerDescription balancerDescription:new HashSet<BalancerDescription>(register.values())) {
 			try {

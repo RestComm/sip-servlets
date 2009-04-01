@@ -32,6 +32,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.mobicents.servlet.sip.utils.*;
+import org.mobicents.servlet.sip.startup.*;
+import org.mobicents.servlet.sip.startup.failover.*;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
@@ -997,6 +999,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	public void setJvmRoute(String jvmRoute) {
-		this.jvmRoute = jvmRoute;
+		if(jvmRoute != null && !jvmRoute.equals(this.jvmRoute)) {
+			// We have either a failover or a new session. We must tell the SIP LB to stick
+			// all SIP session in this APP session to the new jvmRoute.
+			if(StaticServiceHolder.sipStandardService instanceof SipStandardBalancerNodeService) {
+				SipStandardBalancerNodeService service = 
+					(SipStandardBalancerNodeService) StaticServiceHolder.sipStandardService;
+				service.sendSwitchoverInstruction(this.jvmRoute, jvmRoute);
+			} else {
+				logger.error("The tomcat service is not a SipStandardBalancerNodeService service!!!!!");
+			}
+			// Assign the new jvmRoute
+			this.jvmRoute = jvmRoute;
+			
+		}
+		
 	}
 }
