@@ -2568,7 +2568,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			log_.info("We are using mod_jk(2) for load-balancing. "
 					+ "Will add JvmRouteValve.");
 
-			installContextValve(new JvmRouteValve(this));
+			installContextValve(new ConvergedJvmRouteValve(this));
 		}
 
 		// Add batch replication valve if needed.
