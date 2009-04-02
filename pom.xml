@@ -187,7 +187,8 @@
 		<profile>			
 			<id>release</id>
 			<modules>
-				<module>sip-servlets-tomcat-jboss4</module>	
+				<module>sip-servlets-tomcat-jboss4</module>
+				<module>sip-servlets-jboss5-metadata</module>	
 				<module>sip-servlets-jboss5</module>			
 				<module>sip-servlets-management</module>
 				<module>jopr-plugin</module>
@@ -215,7 +216,8 @@
 		</profile>
 		<profile>			
 			<id>jboss-5</id>
-			<modules>				
+			<modules>		
+				<module>sip-servlets-jboss5-metadata</module>		
 				<module>sip-servlets-jboss5</module>				
 			</modules>			
 		</profile>
