@@ -26,7 +26,7 @@
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
-	<property name="jboss-5.jboss.rails.deployer.url" value="http://repo.oddthesis.org/maven2/SNAPSHOTS/org/jboss/rails/jboss-rails/1.0.0.Beta5-SNAPSHOT/jboss-rails-1.0.0.Beta5-20090320.052751-4-deployer.jar"/>
+	<property name="jboss-5.jboss.rails.deployer.url" value="http://repo.oddthesis.org/maven2/SNAPSHOTS/org/jboss/rails/jboss-rails/1.0.0.Beta6-SNAPSHOT/jboss-rails-1.0.0.Beta6-20090402.160710-2-deployer.jar"/>
 	<property name="jboss-5.jboss.rails.deployer.zip.path" value="${base.path}/jboss-rails-deployer.zip"/>
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.mux.version}.zip" />
