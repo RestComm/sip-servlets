@@ -49,8 +49,14 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
+import org.jboss.kernel.Kernel;
+import org.jboss.kernel.spi.registry.KernelRegistryEntry;
+import org.jboss.ruby.enterprise.web.rack.RackApplication;
+import org.jboss.ruby.enterprise.web.rack.RackApplicationPool;
+import org.jboss.ruby.enterprise.web.rack.RackFilter;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -78,6 +84,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 public class SipStandardContext extends StandardContext implements SipContext {
 	//	 the logger
 	private static transient Logger logger = Logger.getLogger(SipStandardContext.class);
+	private static final String KERNEL_NAME = "jboss.kernel:service=Kernel";
+	private RackApplicationPool rackAppFactory;
+	private String rubyController;
 
 	/**
      * The descriptive information string for this implementation.
@@ -854,4 +863,77 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.concurrencyControlMode = mode;
 	}
 	
+	public String getRubyController() {
+		return rubyController;
+	}
+
+	public void setRubyController(String rubyController) {
+		this.rubyController = rubyController;
+	}
+
+	public void routeSipRequestToRubyApp(SipServletRequestImpl request) {
+		initRubyEnv();
+		RackApplication rackApp = null;
+		
+		if(logger.isInfoEnabled()) {
+			logger.info("Dispatching request " + request.toString() + 
+				" to following App/ruby controller => " + request.getSipSession().getKey().getApplicationName()+ 
+				"/" + rubyController);
+		}
+		try {			
+			rackApp = rackAppFactory.borrowApplication();
+//			Object rackEnv = rackApp.createEnvironment(getServletContext(), request);
+			rackApp.dispatchSipRequest(request, rubyController);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rackApp != null) {
+				rackAppFactory.releaseApplication(rackApp);
+				rackApp = null;
+			}
+		}
+	}	
+	
+	public void routeSipResponseToRubyApp(SipServletResponseImpl response) {
+		
+		initRubyEnv();
+		RackApplication rackApp = null;
+
+		if(logger.isInfoEnabled()) {
+			logger.info("Dispatching response " + response.toString() + 
+				" to following App/ruby controller => " + response.getSipSession().getKey().getApplicationName()+ 
+				"/" + rubyController);
+		}
+		try {
+			rackApp = rackAppFactory.borrowApplication();
+//			Object rackEnv = rackApp.createEnvironment(getServletContext(), response);
+			
+			rackApp.dispatchSipResponse(response, rubyController);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rackApp != null) {
+				rackAppFactory.releaseApplication(rackApp);
+				rackApp = null;
+			}
+		}
+	}
+	
+	private void initRubyEnv() {
+		if (this.rackAppFactory == null) {
+			String rackAppFactoryName = null;
+			FilterDef[] filterDefs = findFilterDefs();
+			int i =0;
+			while(i < filterDefs.length && rackAppFactoryName == null) {
+				FilterDef filterDef = filterDefs[i];
+				rackAppFactoryName = (String)filterDef.getParameterMap().get(RackFilter.RACK_APP_POOL_INIT_PARAM);
+				i++;
+			}			
+			Kernel kernel = (Kernel) getServletContext().getAttribute(KERNEL_NAME);
+			KernelRegistryEntry entry = kernel.getRegistry().findEntry(rackAppFactoryName);
+			if (entry != null) {
+				this.rackAppFactory = (RackApplicationPool) entry.getTarget();
+			}
+		}
+	}	
 }

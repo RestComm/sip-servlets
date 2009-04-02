@@ -1025,5 +1025,20 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
 		this.concurrencyControlMode = mode;
 	}
+ 
+	public void routeSipRequestToRubyApp(SipServletRequestImpl request) {
+		throw new UnsupportedOperationException("Routing requests to ruby applications is not supported on Tomcat or JBoss 4.X versions");
+	}
 	
+	public void routeSipResponseToRubyApp(SipServletResponseImpl response) {
+		throw new UnsupportedOperationException("Routing responses to ruby applications is not supported on Tomcat or JBoss 4.X versions");
+	}
+
+	public String getRubyController() {
+		return null;
+	}
+
+	public void setRubyController(String rubyController) {
+		throw new UnsupportedOperationException("ruby application are not supported on Tomcat or JBoss 4.X versions");
+	}
 }

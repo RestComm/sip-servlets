@@ -143,4 +143,10 @@ public interface SipContext extends Context {
 
 	void setConcurrencyControlMode(ConcurrencyControlMode mode);
 	ConcurrencyControlMode getConcurrencyControlMode();
+
+	void routeSipRequestToRubyApp(SipServletRequestImpl request);
+	void routeSipResponseToRubyApp(SipServletResponseImpl request);
+
+	void setRubyController(String rubyController);
+	String getRubyController();
 }

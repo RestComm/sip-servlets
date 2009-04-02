@@ -861,21 +861,25 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isValid) {
 			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
 		}
-		if(name.equals(handlerServlet)) {
+		if(name != null && name.equals(handlerServlet)) {
 			return ;
 		}
 		SipContext sipContext = getSipApplicationSession().getSipContext();
 		Map<String, Container> childrenMap = sipContext.getChildrenMap();
 		Container container = childrenMap.get(name);
 		
-		if(container == null) {
+		if(container == null && sipContext.getRubyController() == null) {
 			throw new ServletException("the sip servlet with the name "+ name + 
 					" doesn't exist in the sip application " + sipContext.getApplicationName());
 		}		
 		this.handlerServlet = name;
 		sipApplicationSession.setCurrentRequestHandler(handlerServlet);
 		if(logger.isDebugEnabled()) {
-			logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
+			if(name !=null) {
+				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
+			} else {
+				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + sipContext.getRubyController());
+			}
 		}
 	}
 	

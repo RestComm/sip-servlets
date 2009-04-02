@@ -48,6 +48,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.catalina.Wrapper;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -382,20 +383,22 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							sipSessionHandlerName = mainServlet;				
 						} else {
 							SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
-							if(sipServletMapping == null) {
+							if(sipServletMapping == null && sipContext.getRubyController() == null) {
 								logger.error("Sending 404 because no matching servlet found for this request ");
 								sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
 								return;
-							} else {
+							} else if(sipServletMapping != null) {
 								sipSessionHandlerName = sipServletMapping.getServletName();
 							}
 						}
-						try {
-							sipSessionImpl.setHandler(sipSessionHandlerName);
-						} catch (ServletException e) {
-							// this should never happen
-							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing an initial request",e);
-						} 
+						if(sipSessionHandlerName!= null) {							
+							try {
+								sipSessionImpl.setHandler(sipSessionHandlerName);
+							} catch (ServletException e) {
+								// this should never happen
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing an initial request",e);
+							} 
+						}
 					}
 					try {
 						callServlet(sipServletRequest);

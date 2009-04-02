@@ -42,6 +42,7 @@ import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
@@ -84,7 +85,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 	@Override
 	protected void processWebMetaData(JBossWebMetaData metaData) {
 		super.processWebMetaData(metaData);
-		if(metaData instanceof JBossConvergedSipMetaData && context instanceof SipStandardContext) {			
+		if(metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {			
 			processSipMetaData((JBossConvergedSipMetaData)metaData);
 		}				
 	}
@@ -93,7 +94,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 	 * @param convergedMetaData
 	 */
 	protected void processSipMetaData(JBossConvergedSipMetaData convergedMetaData) {
-		SipStandardContext convergedContext = (SipStandardContext) context;
+		SipContext convergedContext = (SipContext) context;
 		convergedContext.setWrapperClass(SipServletImpl.class.getName());
 		/* 
 		 * sip sepcific treatment 
@@ -189,7 +190,10 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			if(mainServlet != null && mainServlet.length() > 0) {
 				convergedContext.setMainServlet(mainServlet);
 				servletSelectionSet = true;
-			} else if(servletSelectionMetaData.getSipServletMappings() != null || servletSelectionMetaData.getSipServletMappings().size() > 0) {
+			} else if(servletSelectionMetaData.getSipServletMappings() != null && servletSelectionMetaData.getSipServletMappings().size() > 0) {
+				servletSelectionSet = true;
+			} else if(servletSelectionMetaData.getRubyController() != null && servletSelectionMetaData.getRubyController().length() > 0) {
+				convergedContext.setRubyController(servletSelectionMetaData.getRubyController());
 				servletSelectionSet = true;
 			}
 		}

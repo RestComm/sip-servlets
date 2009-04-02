@@ -170,7 +170,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 				: getDeploymentClass();
 		//if the application is a sip servlet application or converged one we use the TomcatConvergedDeployment to be able to deploy it 
 		// in accordance with sip servlets spec
-		if(isSipServletApplication(unit)) { 
+		if(isSipServletApplication(unit, metaData)) { 
 			className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
 					: getDeploymentClass();
 			config.setContextClassName(SipHostConfig.SIP_CONTEXT_CLASS);			
@@ -260,25 +260,37 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 	 * 
 	 * @param unit
 	 *            the service deployment info
+	 * @param metaData 
 	 * @return true if the service being deployed contains WEB-INF/sip.xml or a SipApplication annotation,
 	 *         false otherwise
 	 */
-	public static boolean isSipServletApplication(DeploymentUnit unit) {
+	public static boolean isSipServletApplication(DeploymentUnit unit, JBossWebMetaData metaData) {
 		boolean isSipApplication = false;
-		URL url = unit.getResourceClassLoader().getResource(SipContext.APPLICATION_SIP_XML);
-		if (url != null) {
-			try {
-				url.openStream();
+		
+		if(metaData instanceof JBossConvergedSipMetaData) {
+			//this can happen for ruby app
+			JBossConvergedSipMetaData convergedSipMetaData = (JBossConvergedSipMetaData) metaData;
+			if(convergedSipMetaData.getApplicationName() != null) {
 				isSipApplication = true;
-			} catch (IOException e) {
-				isSipApplication= false;
 			}
-		} else {
-			AnnotationEnvironment env = unit.getAttachment(AnnotationEnvironment.class);
-			if(env != null) {
-				isSipApplication = env.hasClassAnnotatedWith(SipApplication.class);
-			}		    
 		}
+		if(!isSipApplication) {
+			URL url = unit.getResourceClassLoader().getResource(SipContext.APPLICATION_SIP_XML);
+			if (url != null) {
+				try {
+					url.openStream();
+					isSipApplication = true;
+				} catch (IOException e) {
+					isSipApplication= false;
+				}
+			} else {
+				AnnotationEnvironment env = unit.getAttachment(AnnotationEnvironment.class);
+				if(env != null) {
+					isSipApplication = env.hasClassAnnotatedWith(SipApplication.class);
+				}		    
+			}
+		}
+		
 		if(log.isInfoEnabled()) {
 			log.info(unit.getName() + " is a sip servlet application ? " + isSipApplication);
 		}

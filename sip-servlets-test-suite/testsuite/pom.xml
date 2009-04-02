@@ -126,6 +126,7 @@
 			<version>0.0.6-BETA</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/sipunit.jar</systemPath>
+			<optional>true</optional>
 		</dependency>
 		
 		<dependency>

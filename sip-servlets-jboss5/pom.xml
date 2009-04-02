@@ -42,7 +42,14 @@
 			<artifactId>sip-servlets-annotations</artifactId>
 			<version>0.9-SNAPSHOT</version>
 			<scope>provided</scope>
-		</dependency>					
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-jboss5-metadata</artifactId>
+			<version>0.9-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>						
 		
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -58,6 +65,7 @@
 			<version>${jboss.version}</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jboss-web-service-${jboss.version}.jar</systemPath>
+			<optional>true</optional>
 		</dependency>
 		
 		<dependency>
@@ -66,6 +74,7 @@
 			<version>${jboss.version}</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jboss-web-deployer-${jboss.version}.jar</systemPath>
+			<optional>true</optional>
 		</dependency>					
 		
 		<dependency>
@@ -145,7 +154,46 @@
 			<version>1.0-rc4</version>
 			<scope>provided</scope>
 		</dependency>
+	
+		<!-- jruby rails -->
+    	<dependency>
+      		<groupId>org.jruby</groupId>
+      		<artifactId>jruby-complete</artifactId>
+      		<version>1.2.0</version>
+      		<scope>compile</scope>
+    	</dependency>
+		<dependency>
+			<groupId>org.jboss.rails</groupId>
+  			<artifactId>jboss-rails</artifactId>
+			<version>1.0.0.Beta6-SNAPSHOT</version>
+			<scope>compile</scope>			
+		</dependency>
 	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>oddthesis.repo</id>
+			<name>Odd Thesis repository</name>
+			<url>http://repo.oddthesis.org/maven2/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>oddthesis.SNAPSHOT.repo</id>
+			<name>Odd Thesis SNAPSHOT repository</name>
+			<url>http://repo.oddthesis.org/maven2/SNAPSHOTS</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>		
 			<plugin>
@@ -159,7 +207,7 @@
 					</classpathExcludes-->
 					<generateProjectsForModules>true</generateProjectsForModules>	
 					<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
-					<eclipseProjectName>sip-servlets-jboss-4.2.x</eclipseProjectName>
+					<eclipseProjectName>sip-servlets-jboss-5</eclipseProjectName>
 				</configuration>
 			</plugin>
 		</plugins>
