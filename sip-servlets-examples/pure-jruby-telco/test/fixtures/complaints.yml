@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  customer_name: MyString
+  company: MyString
+  complaint: MyText
+  sip_uri: MyString
+
+two:
+  customer_name: MyString
+  company: MyString
+  complaint: MyText
+  sip_uri: MyString

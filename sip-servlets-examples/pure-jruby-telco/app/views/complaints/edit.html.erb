@@ -1,0 +1,28 @@
+<h1>Editing complaint</h1>
+
+<% form_for(@complaint) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :customer_name %><br />
+    <%= f.text_field :customer_name %>
+  </p>
+  <p>
+    <%= f.label :company %><br />
+    <%= f.text_field :company %>
+  </p>
+  <p>
+    <%= f.label :complaint %><br />
+    <%= f.text_area :complaint %>
+  </p>
+  <p>
+    <%= f.label :sip_uri %><br />
+    <%= f.text_field :sip_uri %>
+  </p>
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @complaint %> |
+<%= link_to 'Back', complaints_path %>

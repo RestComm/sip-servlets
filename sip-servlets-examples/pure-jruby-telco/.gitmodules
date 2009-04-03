@@ -1,0 +1,3 @@
+[submodule "vendor/plugins/jboss-rails-support"]
+	path = vendor/plugins/jboss-rails-support
+	url = git://github.com/bobmcwhirter/jboss-rails-support.git
