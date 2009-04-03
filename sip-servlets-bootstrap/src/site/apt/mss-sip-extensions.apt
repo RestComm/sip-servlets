@@ -23,6 +23,10 @@ Mobicents Sip Servlets Sip Extensions/RFCs supported
 	* REPLACES : {{{http://www.ietf.org/rfc/rfc3891.txt}RFC 3891}}
 	
 	* STUN : {{{http://www.ietf.org/rfc/rfc3489.txt}RFC 3489}}
+	
+	* DNS : {{{http://www.ietf.org/rfc/rfc3263.txt}RFC 3263}}
+	
+	* IPv6 : {{{http://www.ietf.org/rfc/rfc2460.txt}RFC 2460}}
 
 * SIP Extensions planned :	
 	

@@ -758,13 +758,13 @@
 			<subsection name="Planned Versions">																								
 				<subsection name="Version 0.9 - 04/01/2009">
 					<p>										
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=322">
 						Mid Call Failover Support for Converged Applications
 						</a>
 						<br />	
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=129">
 						Eclipse plugin
@@ -846,6 +846,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=614">
 								 	Allow different call ids within a Sip Application Session
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=643">
+								 	Replication doesnt work for sessions stored in sessions
 								</a>								
 							</li>
 							<li>
