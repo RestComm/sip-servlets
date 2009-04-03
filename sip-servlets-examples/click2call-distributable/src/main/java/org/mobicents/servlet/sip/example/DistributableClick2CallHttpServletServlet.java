@@ -55,6 +55,10 @@ public class DistributableClick2CallHttpServletServlet extends HttpServlet
 	{
 		String toAddr = request.getParameter("to");
 		String fromAddr = request.getParameter("from");
+		
+		String bye = request.getParameter("bye");
+		
+
 
 		URI to = toAddr==null? null : sipFactory.createAddress(toAddr).getURI();
 		URI from = fromAddr==null? null : sipFactory.createAddress(fromAddr).getURI();  
@@ -63,9 +67,18 @@ public class DistributableClick2CallHttpServletServlet extends HttpServlet
 		SipApplicationSession appSession = 
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
 		
+		if(bye != null) {
+			Iterator i = appSession.getSessions();
+			while(i.hasNext()) {
+				SipSession s = (SipSession) i.next();
+				s.createRequest("BYE").send();
+			}
+			
+		}
+		
 		appSession.setAttribute("setFromHttpServlet", appSession.getId());
 		
-
+		if(to != null && from != null)
 		{
 
 			SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);

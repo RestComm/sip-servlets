@@ -108,7 +108,7 @@ public class DistributableClick2CallSipServlet
 						+ secondPartyAddress);
 
 				String contentType = resp.getContentType();
-				if (contentType.trim().equals("application/sdp")) {
+				if (contentType != null && contentType.trim().equals("application/sdp")) {
 					invite.setContent(resp.getContent(), "application/sdp");
 				}
 
@@ -132,12 +132,12 @@ public class DistributableClick2CallSipServlet
 					SipServletRequest firstPartyAck = (SipServletRequest) resp
 							.getSession().getAttribute("FirstPartyAck");
 	
-//					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
+					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
 						firstPartyAck.setContent(resp.getContent(),
 								"application/sdp");
 						secondPartyAck.setContent(resp.getSession().getAttribute("FirstPartyContent"),
 								"application/sdp");
-//					}
+					}
 	
 					firstPartyAck.send();
 					secondPartyAck.send();
