@@ -160,7 +160,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 		String sipAppName = arg0.readUTF();
 		SipContext sipContext = StaticServiceHolder.sipStandardService
 			.getSipApplicationDispatcher().findSipApplication(sipAppName);
-		SipSessionKey key =null;
+		SipSessionKey key = null;
 		try {
 			key = SessionManagerUtil.parseSipSessionKey(sipSessionId);
 		} catch (ParseException e) {
@@ -168,6 +168,10 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 			throw new RuntimeException(e);
 		}
 		this.sipSession = ((SipManager)sipContext.getManager()).getSipSession(key, false, null, null);
+		if(this.sipSession == null)
+			throw new NullPointerException(
+					"We just tried to pull a SipSession from the distributed cache and it's null, key="
+					+ key);
 		
 	}
 
