@@ -36,6 +36,8 @@ import org.apache.catalina.valves.ValveBase;
 import org.jboss.logging.Logger;
 
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
+import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 
 /**
  * Web request valve to specifically handle Tomcat jvmRoute using mod_jk(2)
@@ -157,9 +159,9 @@ public class ConvergedJvmRouteValve extends ValveBase implements Lifecycle
          {
             // We just had a failover since jvmRoute does not match. 
             // We will replace the old one with the new one.         
-            if (log_.isDebugEnabled())
+            if (log_.isInfoEnabled())
             {
-               log_.debug("handleJvmRoute(): We have detected a failover with different jvmRoute." +
+               log_.info("handleJvmRoute(): We have detected a failover with different jvmRoute." +
                   " old one: " + requestedJvmRoute + " new one: " + jvmRoute + ". Will reset the session id.");
             }
             
@@ -171,6 +173,13 @@ public class ConvergedJvmRouteValve extends ValveBase implements Lifecycle
             	
             	// Change the jvmRoute in case of failover
             	sessionFacade.getApplicationSession(true).setJvmRoute(jvmRoute);
+            	if(StaticServiceHolder.sipStandardService instanceof SipStandardBalancerNodeService) {
+    				SipStandardBalancerNodeService service = 
+    					(SipStandardBalancerNodeService) StaticServiceHolder.sipStandardService;
+    				service.sendSwitchoverInstruction(requestedJvmRoute, jvmRoute);
+    			} else {
+    				log_.error("The tomcat service is not a SipStandardBalancerNodeService service!!!!!");
+    			}
             }
          }
          
