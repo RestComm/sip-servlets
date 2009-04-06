@@ -89,7 +89,7 @@ public class DistributableClick2CallSipServlet
 		logger.info("Got OK");
 		SipSession session = resp.getSession();
 
-		if (resp.getStatus() == SipServletResponse.SC_OK) {
+		if ("INVITE".equals(resp.getMethod()) && resp.getStatus() == SipServletResponse.SC_OK) {
 
 			Boolean inviteSent = (Boolean) session.getAttribute("InviteSent");
 			if (inviteSent != null && inviteSent.booleanValue()) {
