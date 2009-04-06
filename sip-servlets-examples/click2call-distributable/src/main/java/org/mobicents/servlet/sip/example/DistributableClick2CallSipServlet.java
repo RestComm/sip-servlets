@@ -164,6 +164,8 @@ public class DistributableClick2CallSipServlet
 			SipServletRequest bye = linkedSession.createRequest("BYE");
 			logger.info("Sending bye to " + linkedSession.getRemoteParty());
 			bye.send();
+		} else {
+			throw new RuntimeException("linkedSession is not replicated correctly");
 		}
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
