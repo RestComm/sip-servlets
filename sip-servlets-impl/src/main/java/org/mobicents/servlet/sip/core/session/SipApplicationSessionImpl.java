@@ -992,27 +992,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         return (facade);	  
 	}
 
-	private String jvmRoute;
+	protected String jvmRoute;
 	
 	public String getJvmRoute() {
 		return this.jvmRoute;
 	}
 
 	public void setJvmRoute(String jvmRoute) {
-		if(jvmRoute != null && !jvmRoute.equals(this.jvmRoute)) {
-			// We have either a failover or a new session. We must tell the SIP LB to stick
-			// all SIP session in this APP session to the new jvmRoute.
-			if(StaticServiceHolder.sipStandardService instanceof SipStandardBalancerNodeService) {
-				SipStandardBalancerNodeService service = 
-					(SipStandardBalancerNodeService) StaticServiceHolder.sipStandardService;
-				service.sendSwitchoverInstruction(this.jvmRoute, jvmRoute);
-			} else {
-				logger.error("The tomcat service is not a SipStandardBalancerNodeService service!!!!!");
-			}
-			// Assign the new jvmRoute
-			this.jvmRoute = jvmRoute;
-			
-		}
-		
+		// Assign the new jvmRoute
+		this.jvmRoute = jvmRoute;
 	}
 }
