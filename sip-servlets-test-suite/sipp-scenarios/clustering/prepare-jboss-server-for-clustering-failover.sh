@@ -52,8 +52,8 @@ if [ $# -ne 0 ]; then
 	    c2c)
 	    		echo "Distributed example used is Click To call";
 	    		mvn clean install -o -f ../../../sip-servlets-examples/click2call-distributable/pom.xml
-				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-1/deploy
-				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-1/deploy/click2call-distributable.war
+				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-2/deploy/click2call-distributable.war
 				;;
 	    uac)
 	            echo "Distributed example used is uac";
