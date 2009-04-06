@@ -12,6 +12,13 @@
 	<version>1.3-SNAPSHOT</version>
 	<name>Distributable Click2Call Converged Sip Servlet Example</name>
 	<url>http://www.mobicents.org/examples.html</url>
+	<dependencies>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
