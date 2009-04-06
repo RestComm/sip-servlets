@@ -35,7 +35,11 @@ Examples
 	
 	* {{{mss-ipbx.html}Media IPBX}} : a JBoss Seam-based PBX
 	
-	* {{{mss-jruby-example.html}JRuby on Rails Sip Servlets Example}} : a JRuby on Rails application that can make phone calls
+	* {{{mss-jruby-example.html}JRuby on Rails Sip Servlets Example}} : a JRuby on Rails multi language application that can make phone calls
+	
+	* {{{mss-pure-jruby-telco.html}Pure JRuby on Rails Telco Example}} : a pure JRuby on Rails application that can make and receive phone calls
+	
+	
 
 	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)

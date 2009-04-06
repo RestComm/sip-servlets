@@ -1,0 +1,29 @@
+Pure JRuby on Rails Sip Servlets application that can <make and receive phone calls>
+
+* Service Description
+
+	The application will allow one to file complaints and every time a complaint is filed, 
+	a confirmation call is made to your phone saying that is has been taken into account and has been routed to a sales representative.\
+	Moreover you can call directly the application and the pure jruby application will be able to handle the SIP signalling and setup and teardown the call. 
+	 
+* How to activate it
+
+   <Beware : this application works only on Mobicents Sip Servlets 0.9-SNAPSHOT on JBoss 5 for now, you can check it out from the trunk or as a zip from {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsSipServletsRelease}here}}>
+
+** From the source
+
+	Please check out the location service example located under this 
+	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/pure-jruby-telco}location}} 
+	from the svn repository.\
+	Follow the instructions in the README.txt to build and run the example.  
+
+* How to play with it
+
+	Starts your favorite Sip Phone (wengo phone, linphone, ekiga, sip communicator, ...)\ 
+	The SIP phones doesn't have to be registered.
+	
+	then go to {{{http://localhost:8080/pure-jruby-telco/complaints}http://localhost:8080/pure-jruby-telco/complaints}}
+
+	Create a new complaint and make sure that in the sip uri field you put the address of the sip phone (such as sip:jean@127.0.0.1:5090)
+	
+	Alternatively you can also call directly the application by dialing sip:whatever@127.0.0.1:5080 from your sip phone.    

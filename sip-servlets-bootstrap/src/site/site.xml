@@ -39,6 +39,7 @@
 				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
 				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
 				<item name="JRuby/Rails Sip Servlets Example" href="mss-jruby-example.html"/>
+				<item name="Pure JRuby/Rails Telco Example" href="mss-pure-jruby-telco.html"/>
 			</item>
 		</menu>
 		<menu name="Advanced Features">
