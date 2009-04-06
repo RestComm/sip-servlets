@@ -1,3 +1,31 @@
+Pure JRuby on Rails Sip Servlets application that can <make and receive phone calls>
+
+* Service Description
+
+	The application will allow one to file complaints and every time a complaint is filed, 
+	a confirmation call is made to your phone saying that is has been taken into account and has been routed to a sales representative.\
+	Moreover you can call directly the application and the pure jruby application will be able to handle the SIP signalling and setup and teardown the call. 
+	 
+Deploy the application :
+
+modify the ruby-teclo-app-rails.yml located in this directory to map the RAILS_ROOT variable to where this application is located on your filesystem
+
+Run the application
+
+1. deploy to Mobicents Sip Servlets on JBoss 5 (build 306 at least) from http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsSipServletsRelease/ :
+cp ruby-teclo-app-rails.yml $JBOSS_HOME/server/default/deploy
+2. copy the contents of the pure-jruby-telco.properties dar file into $JBOSS_HOME/server/default/conf/mobicents-dar.properties
+3. Start jboss with sh $JBOSS_HOME/bin/run.sh
+4. Start your sip phone
+5. go to http://localhost:8080/pure-jruby-telco/complaints
+6. Create a new complaint and make sure that in the sip uri field you put the address of the sip phone (sip:jean@127.0.0.1:5090 by example)
+
+Alternatively you can also call directly the application by dialing sip:whatever@127.0.0.1:5080 from your sip phone.
+
+
+
+
+
 == Welcome to Rails
 
 Rails is a web-application framework that includes everything needed to create 
