@@ -49,6 +49,12 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 	            ;;
+	    c2c)
+	    		echo "Distributed example used is Click To call";
+	    		mvn clean install -o -f ../../../sip-servlets-examples/click2call-distributable/pom.xml
+				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				;;
 	    uac)
 	            echo "Distributed example used is uac";
 	    		mvn clean process-resources -Dsend.on.init=true install -o -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
