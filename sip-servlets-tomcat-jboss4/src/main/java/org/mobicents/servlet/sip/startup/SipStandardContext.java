@@ -68,6 +68,7 @@ import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.ruby.SipRubyController;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
@@ -1026,19 +1027,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.concurrencyControlMode = mode;
 	}
  
-	public void routeSipRequestToRubyApp(SipServletRequestImpl request) {
-		throw new UnsupportedOperationException("Routing requests to ruby applications is not supported on Tomcat or JBoss 4.X versions");
-	}
-	
-	public void routeSipResponseToRubyApp(SipServletResponseImpl response) {
-		throw new UnsupportedOperationException("Routing responses to ruby applications is not supported on Tomcat or JBoss 4.X versions");
-	}
-
-	public String getRubyController() {
+	public SipRubyController getSipRubyController() {
 		return null;
 	}
 
-	public void setRubyController(String rubyController) {
-		throw new UnsupportedOperationException("ruby application are not supported on Tomcat or JBoss 4.X versions");
+	public void setSipRubyController(SipRubyController rubyController) {
+		throw new UnsupportedOperationException("ruby applications are not supported on Tomcat or JBoss 4.X versions");
 	}
 }

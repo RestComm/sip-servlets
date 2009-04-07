@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.jboss.metadata.javaee.support.IdMetaDataImpl;
+import org.mobicents.servlet.sip.ruby.SipRubyController;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -38,7 +39,7 @@ public class ServletSelectionMetaData extends IdMetaDataImpl {
 
 	private String mainServlet;
 
-	private String rubyController;
+	private SipRubyController sipRubyController;
 
 	private List<SipServletMappingMetaData> sipServletMappings;
 
@@ -73,14 +74,14 @@ public class ServletSelectionMetaData extends IdMetaDataImpl {
 	 * @param rubyController
 	 *            the rubyController to set
 	 */
-	public void setRubyController(String rubyController) {
-		this.rubyController = rubyController;
+	public void setSipRubyController(SipRubyController sipRubyController) {
+		this.sipRubyController = sipRubyController;
 	}
 
 	/**
 	 * @return the rubyController
 	 */
-	public String getRubyController() {
-		return rubyController;
+	public SipRubyController getSipRubyController() {
+		return sipRubyController;
 	}
 }

@@ -192,8 +192,8 @@ public class SipJBossContextConfig extends JBossContextConfig {
 				servletSelectionSet = true;
 			} else if(servletSelectionMetaData.getSipServletMappings() != null && servletSelectionMetaData.getSipServletMappings().size() > 0) {
 				servletSelectionSet = true;
-			} else if(servletSelectionMetaData.getRubyController() != null && servletSelectionMetaData.getRubyController().length() > 0) {
-				convergedContext.setRubyController(servletSelectionMetaData.getRubyController());
+			} else if(servletSelectionMetaData.getSipRubyController() != null) {
+				convergedContext.setSipRubyController(servletSelectionMetaData.getSipRubyController());
 				servletSelectionSet = true;
 			}
 		}

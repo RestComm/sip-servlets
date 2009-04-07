@@ -35,6 +35,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.ruby.SipRubyController;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
@@ -144,9 +145,6 @@ public interface SipContext extends Context {
 	void setConcurrencyControlMode(ConcurrencyControlMode mode);
 	ConcurrencyControlMode getConcurrencyControlMode();
 
-	void routeSipRequestToRubyApp(SipServletRequestImpl request);
-	void routeSipResponseToRubyApp(SipServletResponseImpl request);
-
-	void setRubyController(String rubyController);
-	String getRubyController();
+	void setSipRubyController(SipRubyController rubyController);
+	SipRubyController getSipRubyController();
 }

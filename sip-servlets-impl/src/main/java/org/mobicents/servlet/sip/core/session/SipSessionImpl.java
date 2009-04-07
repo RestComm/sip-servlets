@@ -868,7 +868,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		Map<String, Container> childrenMap = sipContext.getChildrenMap();
 		Container container = childrenMap.get(name);
 		
-		if(container == null && sipContext.getRubyController() == null) {
+		if(container == null && sipContext.getSipRubyController() == null) {
 			throw new ServletException("the sip servlet with the name "+ name + 
 					" doesn't exist in the sip application " + sipContext.getApplicationName());
 		}		
@@ -878,7 +878,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			if(name !=null) {
 				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
 			} else {
-				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + sipContext.getRubyController());
+				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + sipContext.getSipRubyController());
 			}
 		}
 	}

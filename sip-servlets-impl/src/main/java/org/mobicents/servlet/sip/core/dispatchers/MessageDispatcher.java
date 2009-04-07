@@ -206,9 +206,14 @@ public abstract class MessageDispatcher {
 			} finally {			
 				sipServletImpl.deallocate(servlet);
 			}
-		} else if(sipContext.getRubyController() != null) {
+		} else if(sipContext.getSipRubyController() != null) {
 			//handling the ruby case
-			sipContext.routeSipRequestToRubyApp(request);
+			if(logger.isInfoEnabled()) {
+				logger.info("Dispatching request " + request.toString() + 
+					" to following App/ruby controller => " + request.getSipSession().getKey().getApplicationName()+ 
+					"/" + sipContext.getSipRubyController().getName());
+			}
+			sipContext.getSipRubyController().routeSipRequestToRubyApp(request);
 		}				
 	}
 	
@@ -221,9 +226,14 @@ public abstract class MessageDispatcher {
 		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		
 		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
-			if(sipContext.getRubyController() != null) {
-				//handling the ruby case				
-				sipContext.routeSipResponseToRubyApp(response);
+			if(sipContext.getSipRubyController() != null) {
+				//handling the ruby case	
+				if(logger.isInfoEnabled()) {
+					logger.info("Dispatching response " + response.toString() + 
+						" to following App/ruby controller => " + response.getSipSession().getKey().getApplicationName()+ 
+						"/" + sipContext.getSipRubyController().getName());
+				}
+				sipContext.getSipRubyController().routeSipResponseToRubyApp(response);
 			} else {
 				logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
 			}
