@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
@@ -157,6 +158,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 	public void readExternal(ObjectInput arg0) throws IOException,
 			ClassNotFoundException {
 		String sipSessionId = arg0.readUTF();
+		String sipAppSessionId = arg0.readUTF();
 		String sipAppName = arg0.readUTF();
 		SipContext sipContext = StaticServiceHolder.sipStandardService
 			.getSipApplicationDispatcher().findSipApplication(sipAppName);
@@ -167,7 +169,15 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 			logger.error("Couldn't parse the following sip session key " + sipSessionId, e);
 			throw new RuntimeException(e);
 		}
-		this.sipSession = ((SipManager)sipContext.getManager()).getSipSession(key, false, null, null);
+		SipApplicationSessionKey sipAppKey = null;
+		try {
+			sipAppKey = SessionManagerUtil.parseSipApplicationSessionKey(sipAppSessionId);
+		} catch (ParseException e) {
+			logger.error("Couldn't parse the following sip application session key " + sipAppSessionId, e);
+			throw new RuntimeException(e);
+		}
+		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(sipAppKey, false);
+		this.sipSession = ((SipManager)sipContext.getManager()).getSipSession(key, false, null, sipApplicationSession);
 		if(this.sipSession == null)
 			throw new NullPointerException(
 					"We just tried to pull a SipSession from the distributed cache and it's null, key="
@@ -180,6 +190,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 		MobicentsSipApplicationSession sipAppSession = (MobicentsSipApplicationSession) 
 			sipSessionImpl.getSipApplicationSession();
 		arg0.writeUTF(sipSessionImpl.getId());
+		arg0.writeUTF(sipAppSession.getId());
 		arg0.writeUTF(sipAppSession.getApplicationName());
 	}
 

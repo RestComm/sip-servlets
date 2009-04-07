@@ -1400,6 +1400,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (key == null) {
 			return null;
 		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("load sip session " + key + ", create = " + create + " sip app session = "+ sipApplicationSessionImpl);
+		}
 		SipFactoryImpl sipFactory = sipFactoryImpl;
 		if(sipFactory == null) {
 			sipFactory = this.getSipFactoryImpl();
@@ -2880,6 +2883,23 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		// Find it from the local store first
 		ClusteredSipSession session = findLocalSipSession(key, false, sipApplicationSessionImpl);
 
+		if(session == null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("sip session " + key
+					+ " not found in the local store");
+			}
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("sip session " + key
+						+ " found in the local store " + session);
+			}
+		}
+		boolean isSipSessionBoundAndExpired = ConvergedSessionReplicationContext
+		 	.isSipSessionBoundAndExpired(key.toString(), snapshotManager_);
+		if (logger.isDebugEnabled()) {
+			logger.debug("sip session " + key
+					+ " bound and expired ? " + isSipSessionBoundAndExpired);
+		}
 		// If we didn't find it locally, only check the distributed cache
 		// if we haven't previously handled this session id on this request.
 		// If we handled it previously but it's no longer local, that means
@@ -2892,8 +2912,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		// session from the other nodes to be gravitated, thus resuscitating
 		// the session.
 		if (session == null
-				&& !ConvergedSessionReplicationContext
-						.isSipSessionBoundAndExpired(key.toString(), snapshotManager_)) {
+				&& !isSipSessionBoundAndExpired) {
 			if (logger.isDebugEnabled())
 				logger.debug("Checking for sip session " + key
 						+ " in the distributed cache");
