@@ -363,6 +363,57 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 	}
 	
+	public void testBasicFailoverUASReInviteStickiness() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG);
+		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		senderProvider.addSipListener(sender);
+		senderProtocolObjects.start();	
+		//start the sip balancer
+		startSipBalancer();				
+		//starts the first server
+		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		tomcat.setDarConfigurationFilePath(getDarConfigurationFile());
+		tomcat.startTomcat();			
+		//starts the second server
+		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
+		secondTomcatServer.setLoggingFilePath(  
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
+		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFile());
+		getTomcatBackupHomePath();
+		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
+		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
+		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		secondTomcatServer.startTomcat();
+		//first test
+		Thread.sleep(TIMEOUT);
+		deployApplication(tomcat);
+		deployApplication(secondTomcatServer);
+		Thread.sleep(TIMEOUT);
+		
+		String fromName = "isendreinvite";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendReinvite(true);
+		sender.setSendBye(true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());						
+	}
+	
 	public void testBasicFailoverCancelTest() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
 				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG);
