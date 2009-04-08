@@ -758,7 +758,7 @@
 			<subsection name="Planned Versions">																								
 				<subsection name="Version 0.9 - 04/01/2009">
 					<p>										
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=322">
 						Mid Call Failover Support for Converged Applications
@@ -788,6 +788,13 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=480">
+								 	SipSession and SipApplicationSession Concurrency control modes cannot sustain load test
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=563">
 									Don't use STUN for local network addresses		
 								</a>								
@@ -812,14 +819,7 @@
 									href="http://code.google.com/p/mobicents/issues/detail?id=596">
 								 	External Application Routing Problem		
 								</a>								
-							</li>
-							<li>
-								<img src="green.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=480">
-								 	SipSession and SipApplicationSession Concurrency control modes cannot sustain load test
-								</a>								
-							</li>
+							</li>							
 							<li>
 								<img src="green.jpeg" />
 								<a
@@ -853,6 +853,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=643">
 								 	Replication doesnt work for sessions stored in sessions
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=648">
+								 	SipServletMessage not serialized correctly 
 								</a>								
 							</li>
 							<li>
