@@ -1,7 +1,5 @@
 package org.mobicents.servlet.sip.example;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mobicents.mscontrol.MsConnection;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
@@ -14,7 +12,7 @@ import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
 import org.mobicents.mscontrol.events.pkg.DTMF;
 
 public class DTMFListener implements MsNotificationListener {
-	private static Log logger = LogFactory.getLog(DTMFListener.class);
+	private static Logger logger = Logger.getLogger(DTMFListener.class);
 	
 	MsEventFactory eventFactory;
 	MsLink link;

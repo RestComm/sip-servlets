@@ -24,11 +24,11 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
@@ -44,7 +44,7 @@ import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
  *
  */
 public class MediaPlaybackServlet extends SipServlet {
-	private static Log logger = LogFactory.getLog(MediaPlaybackServlet.class);
+	private static Logger logger = Logger.getLogger(MediaPlaybackServlet.class);
 	
 	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
 	
@@ -69,9 +69,13 @@ public class MediaPlaybackServlet extends SipServlet {
 		Object sdpObj = request.getContent();
 		byte[] sdpBytes = (byte[]) sdpObj;
 		String sdp = new String(sdpBytes); 
-		try {
-			buildAudio("Hey " + request.getFrom().getDisplayName() +
-			". This is Mobicents Sip Servlets.", "speech.wav");
+		try {			
+			String user = request.getFrom().getDisplayName();
+			if(user == null && request.getFrom().getURI() instanceof SipURI) {
+				user = ((SipURI)request.getFrom().getURI()).getUser();
+			}
+			buildAudio("Hey " + user +
+					". This is Mobicents Sip Servlets.", "speech.wav");
 			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
 			MsSession session = provider.createSession();
@@ -80,7 +84,8 @@ public class MediaPlaybackServlet extends SipServlet {
 			listener.setInviteRequest(request);
 			connection.addConnectionListener(listener);
 			connection.modify("$", sdp);
-
+			
+			request.getSession().setAttribute("connection", connection);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -140,15 +145,8 @@ public class MediaPlaybackServlet extends SipServlet {
 		logger.info("MediaPlaybackServlet: Got BYE request:\n" + request);
 		SipServletResponse sipServletResponse = request.createResponse(200);
 		sipServletResponse.send();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void doResponse(SipServletResponse response)
-			throws ServletException, IOException {
-
-		logger.info("MediaPlaybackServlet: Got response:\n" + response);
-		super.doResponse(response);
+		// releasing the media connection
+		MsConnection connection = (MsConnection) sipServletResponse.getSession().getAttribute("connection");
+		connection.release();
 	}
 }

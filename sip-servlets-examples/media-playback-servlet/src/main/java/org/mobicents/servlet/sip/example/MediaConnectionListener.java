@@ -6,12 +6,15 @@ import java.io.IOException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.mscontrol.MsEndpoint;
+import org.mobicents.mscontrol.MsLink;
+import org.mobicents.mscontrol.MsLinkEvent;
+import org.mobicents.mscontrol.MsLinkListener;
+import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventAction;
@@ -22,10 +25,6 @@ import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
 import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
 import org.mobicents.mscontrol.events.pkg.DTMF;
 import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
-import org.mobicents.mscontrol.MsLink;
-import org.mobicents.mscontrol.MsLinkEvent;
-import org.mobicents.mscontrol.MsLinkListener;
-import org.mobicents.mscontrol.MsLinkMode;
 
 
 /**
@@ -37,7 +36,7 @@ import org.mobicents.mscontrol.MsLinkMode;
  *
  */
 public class MediaConnectionListener implements MsConnectionListener{
-	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
+	private static Logger logger = Logger.getLogger(MediaConnectionListener.class);
 	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
 	
 	private SipServletRequest inviteRequest;
