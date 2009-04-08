@@ -30,6 +30,7 @@ import javax.sound.sampled.AudioSystem;
 
 import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
@@ -148,5 +149,7 @@ public class MediaPlaybackServlet extends SipServlet {
 		// releasing the media connection
 		MsConnection connection = (MsConnection) sipServletResponse.getSession().getAttribute("connection");
 		connection.release();
+		MsLink link = (MsLink) sipServletResponse.getSession().getAttribute("link");
+		link.release();
 	}
 }

@@ -72,6 +72,7 @@ public class MediaConnectionListener implements MsConnectionListener{
 		MsEndpoint endpoint = connection.getEndpoint();
 		final MsSession session = connection.getSession();
 		final MsLink link = session.createLink(MsLinkMode.FULL_DUPLEX);
+		inviteRequest.setAttribute("link", link);
 		link.addLinkListener(new MsLinkListener() {
 
 			public void linkCreated(MsLinkEvent evt) {
