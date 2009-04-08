@@ -5,4 +5,5 @@
 
 	<import>org.mobicents.servlet.sip.seam.entrypoint</import>
 	<import>org.mobicents.servlet.sip.seam.entrypoint.media</import>
+	<import>org.mobicents.servlet.sip.seam.media.framework</import>
 </components>

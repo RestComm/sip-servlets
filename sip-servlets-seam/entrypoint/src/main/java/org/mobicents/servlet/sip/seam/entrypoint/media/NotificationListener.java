@@ -8,12 +8,14 @@ import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.events.MsEventFactory;
-import org.mobicents.mscontrol.events.MsEventIdentifier;
-import org.mobicents.mscontrol.events.dtmf.MsDtmfNotifyEvent;
-import org.mobicents.mscontrol.events.pkg.DTMF;
 import org.mobicents.servlet.sip.seam.entrypoint.SeamEntrypointUtils;
 
+/**
+ * The default media notification listener. It just relays the event to Seam.
+ * 
+ * @author vralev
+ *
+ */
 public class NotificationListener implements MsNotificationListener {
 
 	private SipSession sipSession;

@@ -5,6 +5,15 @@ import javax.servlet.sip.SipSession;
 import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsNotifyEvent;
 
+/**
+ * This is a structure that carries information associated with an event produced by the Media Server.
+ * The MsNotifyEvent is the original event and the rest are just the related objects for the event - 
+ * the link is the MsLink or the MsConnection object where the event occured. The endpoint is the endpoint
+ * where the event occured. And of course the SipSession is the the SIP session where the event occured.
+ * 
+ * @author vralev
+ *
+ */
 public class MediaEvent {
 	private SipSession sipSession;
 	private MsEndpoint endpoint;

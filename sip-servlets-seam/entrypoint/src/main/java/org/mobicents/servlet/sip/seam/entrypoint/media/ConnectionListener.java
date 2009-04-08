@@ -7,7 +7,13 @@ import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
 import org.mobicents.servlet.sip.seam.entrypoint.SeamEntrypointUtils;
 
-public class ConnectionListener implements MsConnectionListener{
+/**
+ * Default connection listener that relays events to Seam.
+ * 
+ * @author vralev
+ *
+ */
+public class ConnectionListener implements MsConnectionListener {
 
 	private SipSession sipSession;
 	

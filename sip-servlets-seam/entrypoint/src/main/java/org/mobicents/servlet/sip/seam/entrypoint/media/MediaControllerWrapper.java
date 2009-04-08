@@ -10,6 +10,12 @@ import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.Unwrap;
 import org.mobicents.mscontrol.MsSession;
 
+/**
+ * This class provides the session scoped media controller for each SIP session.
+ * 
+ * @author vralev
+ *
+ */
 @Name("mediaController")
 @Scope(ScopeType.SESSION)
 @Startup

@@ -1,7 +1,5 @@
 package org.mobicents.servlet.sip.seam.entrypoint.media;
 
-
-
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;

@@ -10,7 +10,7 @@ import org.mobicents.mscontrol.MsNotificationListener;
  * We need separate class to hold the static objects that is not under Seam management, because 
  * javassist creates another class with another static instance and causes confusion.
  * 
- * Static stuff in this case is safe.
+ * Static objects in this case are safe.
  * 
  * @author vralev
  *

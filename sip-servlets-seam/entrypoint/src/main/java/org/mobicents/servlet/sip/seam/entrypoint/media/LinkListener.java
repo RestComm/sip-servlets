@@ -3,11 +3,16 @@ package org.mobicents.servlet.sip.seam.entrypoint.media;
 import javax.servlet.sip.SipSession;
 
 import org.jboss.seam.core.Events;
-import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsLinkEvent;
 import org.mobicents.mscontrol.MsLinkListener;
 import org.mobicents.servlet.sip.seam.entrypoint.SeamEntrypointUtils;
 
+/**
+ * The default link listener that delivers events to Seam.
+ * 
+ * @author vralev
+ *
+ */
 public class LinkListener implements MsLinkListener {
 
 	private SipSession sipSession;
