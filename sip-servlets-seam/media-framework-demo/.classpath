@@ -52,9 +52,9 @@
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-core/2.2.0/lucene-core-2.2.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.CR3/mobicents-media-server-constants-1.0.0.CR3.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.CR3/mobicents-media-server-msc-api-1.0.0.CR3.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.0.CR3/mobicents-media-server-msc-api-local-impl-1.0.0.CR3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.GA/mobicents-media-server-constants-1.0.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.GA/mobicents-media-server-msc-api-1.0.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.0.GA/mobicents-media-server-msc-api-local-impl-1.0.0.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/nekohtml/nekohtml/0.9.4/nekohtml-0.9.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/pdfbox/pdfbox/0.6.4/pdfbox-0.6.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar"/>
@@ -63,7 +63,7 @@
   <classpathentry kind="var" path="M2_REPO/org/richfaces/framework/richfaces-impl/3.2.2.SR1/richfaces-impl-3.2.2.SR1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/richfaces/ui/richfaces-ui/3.2.2.SR1/richfaces-ui-3.2.2.SR1.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/seam/sip-servlets-seam-entrypoint/1.0/sip-servlets-seam-entrypoint-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/seam/sip-servlets-seam-entrypoint/2.0-SNAPSHOT/sip-servlets-seam-entrypoint-2.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.7/sip-servlets-spec-1.1.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/textmining/tm-extractors/0.4/tm-extractors-0.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar"/>

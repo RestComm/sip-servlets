@@ -19,9 +19,9 @@ import org.jboss.seam.log.Log;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
-import org.mobicents.servlet.sip.seam.session.framework.ConnectionIVRHelper;
-import org.mobicents.servlet.sip.seam.session.framework.MediaEventDispatcher;
-import org.mobicents.servlet.sip.seam.session.framework.MediaSessionStore;
+import org.mobicents.servlet.sip.seam.media.framework.IVRHelper;
+import org.mobicents.servlet.sip.seam.media.framework.MediaEventDispatcher;
+import org.mobicents.servlet.sip.seam.media.framework.MediaSessionStore;
 
 
 @Name("mediaFrameworkDemo")
@@ -32,7 +32,7 @@ public class MediaFrameworkDemo {
 	@In MediaController mediaController;
 	@In SipSession sipSession;
 	@In MediaSessionStore mediaSessionStore;
-	@In ConnectionIVRHelper connectionIVRHelper;
+	@In IVRHelper ivrHelper;
 	@In MediaEventDispatcher mediaEventDispatcher;
 	
 	@In(scope=ScopeType.APPLICATION, required=false)
@@ -63,10 +63,10 @@ public class MediaFrameworkDemo {
 				sdp); // also updates the SDP in Media Server to match capabilities of UA
 	}
 
-	@Observer("connectionOpen")
+	@Observer("storeConnectionOpen")
 	public void doConnectionOpen(MsConnectionEvent event) throws IOException {
 		// Save this connection where the framework can read it
-		mediaSessionStore.setMsConnection(event.getConnection());
+		// mediaSessionStore.setMsConnection(event.getConnection());// This is done automatically in STF 2.0
 		
 		// The conference endpoint is now assiged after we are connected, so save it too
 		conferenceEndpointName = event.getConnection().getEndpoint()
@@ -87,17 +87,17 @@ public class MediaFrameworkDemo {
 		response.send();
 		
 		// And start listening for DTMF signals
-		connectionIVRHelper.detectDtmf();
+		ivrHelper.detectDtmf();
 	}
 	
 	@Observer("DTMF")
 	public void dtmf(String button) {
 		// If the other side presses the button "0" stop the playback
 		if("0".equals(button)) {
-			connectionIVRHelper.endAll();
+			ivrHelper.endAll();
 		} else {
 			// otherwise play announcement
-			connectionIVRHelper.playAnnouncementWithDtmf(announcement);
+			ivrHelper.playAnnouncementWithDtmf(announcement);
 		}
 		// Also log the DTMF buttons pressed so far in this session
 		log.info("Current DTMF Stack for the SIP Session: "
