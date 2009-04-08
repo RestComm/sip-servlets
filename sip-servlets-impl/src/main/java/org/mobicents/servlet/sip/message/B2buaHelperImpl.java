@@ -145,7 +145,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
 					.removeParameter("tag");
 			// Remove the route header ( will point to us ).
-			newRequest.removeHeader(RouteHeader.NAME);
+//			newRequest.removeHeader(RouteHeader.NAME);
 			String tag = Integer.toString((int) (Math.random()*1000));
 			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
 			
@@ -505,7 +505,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
 					.removeParameter("tag");
 			// Remove the route header ( will point to us ).
-			newRequest.removeHeader(RouteHeader.NAME);
+//			newRequest.removeHeader(RouteHeader.NAME);
 			
 			// Remove the record route headers. This is a new call leg.
 			newRequest.removeHeader(RecordRouteHeader.NAME);
