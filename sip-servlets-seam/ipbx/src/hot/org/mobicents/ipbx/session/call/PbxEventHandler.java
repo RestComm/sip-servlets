@@ -26,10 +26,6 @@ import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.PstnGatewayAccount;
 import org.mobicents.ipbx.entity.Registration;
 import org.mobicents.ipbx.session.CallAction;
-import org.mobicents.ipbx.session.call.framework.IVRHelper;
-import org.mobicents.ipbx.session.call.framework.IVRHelperManager;
-import org.mobicents.ipbx.session.call.framework.MediaEventDispatcher;
-import org.mobicents.ipbx.session.call.framework.MediaSessionStore;
 import org.mobicents.ipbx.session.call.model.CallParticipant;
 import org.mobicents.ipbx.session.call.model.CallParticipantManager;
 import org.mobicents.ipbx.session.call.model.Conference;
@@ -45,6 +41,10 @@ import org.mobicents.mscontrol.MsLinkMode;
 import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
+import org.mobicents.servlet.sip.seam.media.framework.IVRHelper;
+import org.mobicents.servlet.sip.seam.media.framework.IVRHelperManager;
+import org.mobicents.servlet.sip.seam.media.framework.MediaEventDispatcher;
+import org.mobicents.servlet.sip.seam.media.framework.MediaSessionStore;
 
 
 @Name("pbxEventHandler")

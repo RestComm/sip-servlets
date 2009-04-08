@@ -1,20 +1,20 @@
 package org.mobicents.ipbx.session.call.logging;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.LockModeType;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.*;
-import org.mobicents.ipbx.entity.Contact;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Observer;
+import org.jboss.seam.annotations.Out;
+import org.jboss.seam.annotations.Scope;
 import org.mobicents.ipbx.entity.History;
 import org.mobicents.ipbx.entity.User;
 import org.mobicents.ipbx.session.DataLoader;
@@ -24,7 +24,6 @@ import org.mobicents.ipbx.session.util.DateUtil;
 
 @Name("callHistory")
 @Scope(ScopeType.STATELESS)
-@Transactional
 public class CallHistory {
 	@In EntityManagerFactory ipbxEntityManagerFactory;
 	@In SipSession sipSession;

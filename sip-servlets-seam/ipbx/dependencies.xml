@@ -8,7 +8,7 @@
 	<version>1</version>
 	<properties>
 		<seam.version>2.1.1.GA</seam.version>
-		<media.server.version>1.0.0.CR3</media.server.version>
+		<media.server.version>1.0.0.GA</media.server.version>
 	</properties>
 	<build>
 		<plugins>
@@ -64,6 +64,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>3.0.0.GA</version>
+			<scope>compile</scope>
+		</dependency>
+				<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>ejb3-persistence</artifactId>
+			<version>1.0.2.GA</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

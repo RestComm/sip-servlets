@@ -10,8 +10,12 @@
 		<os family="windows"/>
 	</condition>
     <path id="jboss.runtime">
+    	<!--
     	<fileset dir="${env.JBOSS_HOME}/server/default">
     	        <include name="**/*.jar"/>
+    	</fileset> -->
+    	<fileset dir="${maven.deps}">
+    	    	<include name="**/*.jar"/>
     	</fileset>
     	<fileset dir="${target.dir}/WEB-INF/lib">
     	    	<include name="**/*.jar"/>
@@ -69,13 +73,13 @@
 		<mkdir dir="${target.dir}/WEB-INF/lib"/>
     	<copy todir="${target.dir}/WEB-INF/lib">
     		<fileset dir="${maven.deps}" 
-    			includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api-local-impl* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
+    			includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
     	</copy>
 		<!-- Copy the dependencies to the folder where JB Tools expects them to be -->
 		<mkdir dir="WebContent/WEB-INF/lib"/>
 		<copy todir="WebContent/WEB-INF/lib">
 		    <fileset dir="${maven.deps}" 
-		    	includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api-local-impl* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
+		    	includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
 		</copy>
 	</target>
 </project>

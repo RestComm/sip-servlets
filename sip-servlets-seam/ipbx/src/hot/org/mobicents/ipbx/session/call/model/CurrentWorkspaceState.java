@@ -15,7 +15,7 @@ import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.User;
-import org.mobicents.ipbx.session.call.framework.IVRHelperManager;
+import org.mobicents.servlet.sip.seam.media.framework.IVRHelperManager;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.mscontrol.MsLinkMode;
 
