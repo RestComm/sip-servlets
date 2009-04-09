@@ -15,7 +15,7 @@ import org.mobicents.mscontrol.MsNotificationListener;
  * @author vralev
  *
  */
-public class MediaControllerHolder {
+public class MediaControllerManager {
 	public HashMap<Object, MsNotificationListener> listenerMap = 
 		new HashMap<Object, MsNotificationListener>();
 	
@@ -34,11 +34,11 @@ public class MediaControllerHolder {
 		mediaControllers.remove(sipSession);
 	}
 	
-	private static MediaControllerHolder mediaControllerHolder;
+	private static MediaControllerManager mediaControllerHolder;
 	
-	public synchronized static MediaControllerHolder instance() {
+	public synchronized static MediaControllerManager instance() {
 		if(mediaControllerHolder == null) {
-			mediaControllerHolder = new MediaControllerHolder();
+			mediaControllerHolder = new MediaControllerManager();
 		}
 		return mediaControllerHolder;
 	}

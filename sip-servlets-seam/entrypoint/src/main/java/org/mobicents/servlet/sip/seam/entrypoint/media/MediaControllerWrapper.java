@@ -28,10 +28,10 @@ public class MediaControllerWrapper {
 		// If not SIP session
 		if(sipSession == null) return null;
 		
-		MediaController mediaController = MediaControllerHolder.instance().getMediaController(sipSession);
+		MediaController mediaController = MediaControllerManager.instance().getMediaController(sipSession);
 		if(mediaController == null) {
 			mediaController = new MediaController(sipSession, msSession);
-			MediaControllerHolder.instance().putMediaController(sipSession, mediaController);
+			MediaControllerManager.instance().putMediaController(sipSession, mediaController);
 		}
 		return mediaController;
 	}

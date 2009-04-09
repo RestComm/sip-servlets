@@ -5,7 +5,7 @@
 	<groupId>org.mobicents.servlet.seam</groupId>
 	<artifactId>sip-servlets-seam-entrypoint</artifactId>
 	<version>2.0-SNAPSHOT</version>
-	<name>Sip Servlets Seam Entrypoint Project</name>
+	<name>Sip Servlets Seam Telco Framework Entrypoint Project</name>
 	<packaging>jar</packaging>
 	<repositories>
 		<repository>

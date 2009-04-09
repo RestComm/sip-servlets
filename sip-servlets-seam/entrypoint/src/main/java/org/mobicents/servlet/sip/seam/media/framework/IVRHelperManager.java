@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import javax.servlet.sip.SipSession;
 
-import org.mobicents.servlet.sip.seam.entrypoint.media.MediaControllerHolder;
+import org.mobicents.servlet.sip.seam.entrypoint.media.MediaControllerManager;
 
 /**
  * Central place for all IVRHelpers in the application.
@@ -33,7 +33,7 @@ public class IVRHelperManager {
 	
 	public IVRHelper getIVRHelper(SipSession sipSession) {
 		return new IVRHelper(sipSession, getMediaSessionStore(sipSession),
-				MediaControllerHolder.instance().getMediaController(sipSession));
+				MediaControllerManager.instance().getMediaController(sipSession));
 	}
 	
 	public synchronized static IVRHelperManager instance() {

@@ -73,10 +73,10 @@ public class MediaController {
 			MsRequestedSignal[] signals,
 			MsRequestedEvent[] events) {
 		endpoint.execute(signals, events);
-		if(MediaControllerHolder.instance().listenerMap.get(endpoint) == null) {
+		if(MediaControllerManager.instance().listenerMap.get(endpoint) == null) {
 			MsNotificationListener newListener = 
 				new NotificationListener(sipSession, msSession, endpoint, null);
-			MediaControllerHolder.instance().listenerMap.put(endpoint, newListener);
+			MediaControllerManager.instance().listenerMap.put(endpoint, newListener);
 			endpoint.addNotificationListener(newListener);
 		}
 	}
@@ -95,10 +95,10 @@ public class MediaController {
 			MsRequestedEvent[] events,
 			MsConnection connection) {
 		endpoint.execute(signals, events, connection);
-		if(MediaControllerHolder.instance().listenerMap.get(connection) == null) {
+		if(MediaControllerManager.instance().listenerMap.get(connection) == null) {
 			MsNotificationListener newListener = 
 				new NotificationListener(sipSession, msSession, endpoint, connection);
-			MediaControllerHolder.instance().listenerMap.put(connection, newListener);
+			MediaControllerManager.instance().listenerMap.put(connection, newListener);
 			connection.addNotificationListener(newListener);
 		}
 	}
@@ -117,10 +117,10 @@ public class MediaController {
 			MsRequestedEvent[] events,
 			MsLink link) {
 		endpoint.execute(signals, events, link);
-		if(MediaControllerHolder.instance().listenerMap.get(link) == null) {
+		if(MediaControllerManager.instance().listenerMap.get(link) == null) {
 			MsNotificationListener newListener = 
 				new NotificationListener(sipSession, msSession, endpoint, link);
-			MediaControllerHolder.instance().listenerMap.put(link, newListener);
+			MediaControllerManager.instance().listenerMap.put(link, newListener);
 			link.addNotificationListener(newListener);
 		}
 	}
