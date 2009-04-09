@@ -43,6 +43,7 @@ import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipDeploymentException;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
@@ -118,6 +119,9 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			}
 		}
 		//app name
+		if(convergedMetaData.getApplicationName() == null) {
+			throw new SipDeploymentException("No app-name present in the sip.xml deployment descriptor or no SipApplication annotation defined");
+		}
 		convergedContext.setApplicationName(convergedMetaData.getApplicationName());		
 		//sip proxy config
 		if(convergedMetaData.getProxyConfig() != null) {
@@ -201,7 +205,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 		JBossServletsMetaData sipServlets = convergedMetaData.getSipServlets();
 		if (sipServlets != null) {
 			if(sipServlets.size() > 1 && !servletSelectionSet) {
-				throw new IllegalArgumentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
+				throw new SipDeploymentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
 			}
 			for (ServletMetaData value : sipServlets) {
 				SipServletImpl wrapper = (SipServletImpl)convergedContext.createWrapper();

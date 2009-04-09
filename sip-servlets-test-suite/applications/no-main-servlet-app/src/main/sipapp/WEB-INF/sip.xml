@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.NoMainServletSipApplication</app-name>
+	<servlet>
+		<servlet-name>NoMainServletSipServlet</servlet-name>
+		<display-name>NoMainServletSipServlet</display-name>
+		<description>NoMainServlet SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.NoMainServletSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>NoMainServletSipServlet2</servlet-name>
+		<display-name>NoMainServletSipServlet2</display-name>
+		<description>NoMainServlet SIP servlet 2</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.NoMainServletSipServlet2
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.NoMainServletSipServlet
+		</listener-class>
+	</listener>
+</sip-app>

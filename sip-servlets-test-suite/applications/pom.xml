@@ -38,6 +38,8 @@
 		<module>publish-sip-servlet</module>
 		<module>join-sip-servlet</module>
 		<module>replaces-sip-servlet</module>
+		<module>no-app-name-servlet</module>
+		<module>no-main-servlet-app</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->

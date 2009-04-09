@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	
+	<servlet>
+		<servlet-name>NoAppNameSipServlet</servlet-name>
+		<display-name>NoAppNameSipServlet</display-name>
+		<description>NoAppName SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.NoAppNameSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.NoAppNameSipServlet
+		</listener-class>
+	</listener>
+</sip-app>

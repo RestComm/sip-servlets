@@ -361,7 +361,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		List<String> applicationsUndeployed = new ArrayList<String>();
 		applicationsUndeployed.add(sipApplicationName);
 		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
-		((SipManager)sipContext.getManager()).removeAllSessions();
+		if(sipContext != null) {
+			((SipManager)sipContext.getManager()).removeAllSessions();
+		}
 		mdToApplicationName.remove(GenericUtils.hashString(sipApplicationName));
 		if(logger.isInfoEnabled()) {
 			logger.info("the following sip servlet application has been removed : " + sipApplicationName);

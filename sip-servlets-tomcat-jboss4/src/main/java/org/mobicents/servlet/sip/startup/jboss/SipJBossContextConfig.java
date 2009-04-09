@@ -23,6 +23,7 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -40,6 +41,7 @@ import org.mobicents.servlet.sip.annotations.AnnotationVerificationException;
 import org.mobicents.servlet.sip.annotations.ClassFileScanner;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipDeploymentException;
 import org.mobicents.servlet.sip.startup.SipEntityResolver;
 import org.mobicents.servlet.sip.startup.SipRuleSet;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -140,6 +142,8 @@ public class SipJBossContextConfig extends JBossContextConfig
 				context.setWrapperClass(StandardWrapper.class.getName());
 			}
 			
+			checkSipDeploymentRequirements(context);
+			
 			// Make our application available if no problems were encountered
 			if (ok) {
 				if(logger.isDebugEnabled()) {
@@ -153,6 +157,30 @@ public class SipJBossContextConfig extends JBossContextConfig
 		} else {
 			super.start();
 		}				
+	}
+
+	private void checkSipDeploymentRequirements(Context context) {
+		if(((SipContext) context).getApplicationName() == null) {
+			ok = false;
+			context.setConfigured(false);				
+			throw new SipDeploymentException("No app-name present in the sip.xml deployment descriptor or no SipApplication annotation defined");
+		}
+		
+		boolean servletSelectionSet = false;
+		String mainServlet = ((SipContext) context).getMainServlet();
+		if(mainServlet != null && mainServlet.length() > 0) {
+			servletSelectionSet = true;
+		} else if(((SipContext) context).findSipServletMappings() != null && ((SipContext) context).findSipServletMappings().size() > 0) {
+			servletSelectionSet = true;
+		} else if(((SipContext) context).getSipRubyController() != null) {
+			servletSelectionSet = true;
+		}
+		
+		if(((SipContext) context).getChildrenMap().keySet().size() > 1 && !servletSelectionSet) {
+			ok = false;
+			context.setConfigured(false);
+			throw new SipDeploymentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
+		}
 	}
 
 	@Override
