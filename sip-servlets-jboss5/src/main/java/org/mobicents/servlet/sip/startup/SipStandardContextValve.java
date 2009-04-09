@@ -179,7 +179,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 }
             }
         }
-
+        context.enterSipApp(null, null, context.getSipManager(), false, false);
         if(request != null) {
         	//the line below was replaced by the whole bunch of code because getting the parameter from the request is causing
         	//JRuby-Rails persistence to fail, go figure...
@@ -216,7 +216,8 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 			}
 		}
         wrapper.getPipeline().getFirst().invoke(request, response);
-
+        context.exitSipApp(null, null);
+        
         if ((instances !=null ) &&
                 (instances.length > 0)) {
             // create post-service event
