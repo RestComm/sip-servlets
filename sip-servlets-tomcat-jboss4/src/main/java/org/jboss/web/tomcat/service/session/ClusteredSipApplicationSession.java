@@ -1026,7 +1026,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			lastAccessedTime = in.readLong();
 
 			futureExpirationTimeOnPassivation = in.readLong();
-			expirationTimerTask = new SipApplicationSessionTimerTask();
+			expirationTimerTask = new SipApplicationSessionTimerTask(sipContext.getSipApplicationSessionTimeout() * 60 * 1000);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Scheduling reactivted sip application session "+ key +" to expire in " + (futureExpirationTimeOnPassivation / 1000 / 60) + " minutes");
 			}
