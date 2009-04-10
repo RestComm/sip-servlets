@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import net.java.sip.communicator.impl.protocol.sip.ProtocolProviderServiceSipImpl;
 import net.java.sip.communicator.impl.protocol.sip.SipActivator;
+import net.java.sip.communicator.impl.protocol.sip.SipStackSharing;
 import net.java.sip.communicator.service.protocol.Call;
 import net.java.sip.communicator.service.protocol.CallParticipant;
 import net.java.sip.communicator.service.protocol.CallState;
@@ -55,7 +56,7 @@ public class PhoneControls extends Composite{
 		final Text uri = new Text(group, SWT.BORDER);
 		uri.setText("sip:server@127.0.0.1:5080");
 		
-		new Label(group, SWT.NONE).setText("SIP port");
+		new Label(group, SWT.NONE).setText("Phone SIP port");
 		final Text sipPort = new Text(group, SWT.BORDER);
 		sipPort.setText("5060");
 		
@@ -98,7 +99,7 @@ public class PhoneControls extends Composite{
 							// If successful do new initialization
 							if(service == null) {
 								SipActivator.getConfigurationService().
-			                    setProperty(ProtocolProviderServiceSipImpl.PREFERRED_SIP_PORT, sipPort.getText());
+			                    setProperty(SipStackSharing.PREFERRED_CLEAR_PORT_PROPERTY_NAME, sipPort.getText());
 								sipCommunicator.setUp(props);
 								service = sipCommunicator.getProtocolProviderService();
 							}
@@ -177,11 +178,13 @@ public class PhoneControls extends Composite{
 											if(!cs.equals(CallState.CALL_ENDED)) {
 												logger.info("Establishing a call");
 												remoteSide = evt.getSourceCall().getCallParticipants().next();
+												sipPhoneView.getKeypad().setRemoteSide(remoteSide);
 												callButton.setText("End");
 											} else {
 												logger.info("Edning call");
 												callButton.setText("Call");
 												remoteSide = null;
+												sipPhoneView.getKeypad().setRemoteSide(null);
 											}
 											callState.setText(cs.getStateString());
 										}

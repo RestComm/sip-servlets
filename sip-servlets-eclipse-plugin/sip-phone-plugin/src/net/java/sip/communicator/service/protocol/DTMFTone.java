@@ -90,7 +90,7 @@ public final class DTMFTone
      *
      * @param value one of te DTMF_XXX fields, indicating the value of the tone.
      */
-    private DTMFTone(String value)
+    public DTMFTone(String value)
     {
         this.value = value;
     }

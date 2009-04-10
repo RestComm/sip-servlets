@@ -49,6 +49,8 @@ public class VisualizationCanvas extends Canvas implements VisualizationService{
 					Point a = dataBuffer[q];
 					if(a != null) {
 						buffer.drawLine(q, verticalCenter + a.x, q, verticalCenter+a.y);
+					} else {
+						buffer.drawLine(q, verticalCenter + 0, q, verticalCenter+0);
 					}
 				}
 				

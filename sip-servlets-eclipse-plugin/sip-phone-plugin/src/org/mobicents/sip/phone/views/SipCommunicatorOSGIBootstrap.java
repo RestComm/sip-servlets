@@ -9,9 +9,11 @@ import net.java.sip.communicator.impl.media.MediaActivator;
 import net.java.sip.communicator.impl.netaddr.NetaddrActivator;
 import net.java.sip.communicator.impl.protocol.ProtocolProviderActivator;
 import net.java.sip.communicator.impl.protocol.sip.ProtocolProviderFactorySipImpl;
+import net.java.sip.communicator.impl.protocol.sip.SipAccountID;
 import net.java.sip.communicator.impl.protocol.sip.SipActivator;
 import net.java.sip.communicator.impl.resources.ResourceManagementActivator;
 import net.java.sip.communicator.service.audionotifier.AudioNotifierService;
+import net.java.sip.communicator.service.protocol.AccountID;
 import net.java.sip.communicator.service.protocol.Call;
 import net.java.sip.communicator.service.protocol.OperationSetBasicTelephony;
 import net.java.sip.communicator.service.protocol.ProtocolNames;
@@ -67,7 +69,11 @@ public class SipCommunicatorOSGIBootstrap {
 	}
 
 	public void setUp(Hashtable props) {
+		try{
+			protocolProviderFactorySipImpl.uninstallAccount(protocolProviderService.getAccountID());
+		} catch (Exception e) {}
 		protocolProviderFactorySipImpl.installAccount("test", props);
+		
 		//find the protocol providers exported for the two accounts
 		ServiceReference[] sipProviderRefs;
 		try {

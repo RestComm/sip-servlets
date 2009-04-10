@@ -77,7 +77,7 @@ public class SipStackSharing
      * The property indicating the preferred UDP and TCP
      * port to bind to for clear communications.
      */
-    private static final String PREFERRED_CLEAR_PORT_PROPERTY_NAME
+    public static final String PREFERRED_CLEAR_PORT_PROPERTY_NAME
         = "net.java.sip.communicator.SIP_PREFERRED_CLEAR_PORT";
 
     /**

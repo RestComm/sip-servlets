@@ -9,7 +9,7 @@
             id="sip_phone_plugin">
       </category>
       <view
-            name="SipPhone"
+            name="SIP Phone"
             icon="icons/sample.gif"
             category="sip_phone_plugin"
             class="org.mobicents.sip.phone.views.SipPhoneView"

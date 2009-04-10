@@ -41,8 +41,8 @@ public class SipPhoneView extends ViewPart {
 		upperRowLayout.justify = false;
 		upper.setLayout(upperRowLayout);
 		
-		outVisualization = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 250, 100, 30);
-		inVisualization = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 250, 100, 30);
+		outVisualization = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 250, 80, 90);
+		inVisualization = new VisualizationCanvas(upper, SWT.NO_REDRAW_RESIZE, 250, 80, 90);
 		
 		RowLayout lowerRowLayout = new RowLayout();
 		lowerRowLayout.justify = true;
@@ -92,6 +92,10 @@ public class SipPhoneView extends ViewPart {
 
 	public void setSipCommunicator(SipCommunicatorOSGIBootstrap sipCommunicator) {
 		this.sipCommunicator = sipCommunicator;
+	}
+
+	public Keypad getKeypad() {
+		return keypad;
 	}
 
 

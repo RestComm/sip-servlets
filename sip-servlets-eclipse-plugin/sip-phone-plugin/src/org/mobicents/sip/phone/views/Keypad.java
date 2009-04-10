@@ -1,8 +1,13 @@
 package org.mobicents.sip.phone.views;
 
 import java.net.URL;
+import java.util.Iterator;
 
 import net.java.sip.communicator.service.audionotifier.AudioNotifierService;
+import net.java.sip.communicator.service.protocol.CallParticipant;
+import net.java.sip.communicator.service.protocol.DTMFTone;
+import net.java.sip.communicator.service.protocol.OperationFailedException;
+import net.java.sip.communicator.service.protocol.OperationSetDTMF;
 import net.java.sip.communicator.util.Logger;
 
 import org.eclipse.swt.SWT;
@@ -27,6 +32,7 @@ public class Keypad extends Composite{
 	};
 	
 	private Listener buttonListener;
+	private CallParticipant remoteSide;
 	
 	public Keypad(Composite parent, int style) {
 		super(parent, style);
@@ -38,6 +44,7 @@ public class Keypad extends Composite{
 				if(event.widget instanceof Button) {
 					Button b = (Button) event.widget;
 					String digit = b.getText();
+					sendDtmfTone(new DTMFTone(digit));
 					AudioNotifierService audio = SipCommunicatorOSGIBootstrap.getAudioNotifier();
 					int buttonNumber = -1;
 					try {
@@ -74,11 +81,42 @@ public class Keypad extends Composite{
 
 	}
 	
+	private void sendDtmfTone(DTMFTone dtmfTone)
+    {
+        if(remoteSide != null) {
+                CallParticipant participant
+                    = remoteSide;
+
+                if (participant.getProtocolProvider()
+                    .getOperationSet(OperationSetDTMF.class) != null)
+                {
+                    OperationSetDTMF dtmfOpSet
+                        = (OperationSetDTMF) participant.getProtocolProvider()
+                            .getOperationSet(OperationSetDTMF.class);
+
+                    try {
+						dtmfOpSet.sendDTMF(participant, dtmfTone);
+					} catch (Exception e) {
+						logger.error(e);
+					}
+                }
+            }
+        
+    }
+	
 	public Button addButton(Composite parent, String text) {
 		Button b = new Button(parent, SWT.PUSH);
 		b.setText(text);
 		b.addListener(SWT.Selection, buttonListener);
 		return b;
+	}
+
+	public CallParticipant getRemoteSide() {
+		return remoteSide;
+	}
+
+	public void setRemoteSide(CallParticipant remoteSide) {
+		this.remoteSide = remoteSide;
 	}
 
 }
