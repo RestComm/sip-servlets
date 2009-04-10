@@ -28,7 +28,7 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 	private static LogProvider log = Logging.getLogProvider(SeamEntryPointServlet.class);
 	
 	public void sessionCreated(final SipSessionEvent arg0) {
-		new Thread() {
+		Thread t =new Thread() {
 			@Override
 			public void run() {
 				arg0.getSession().setAttribute("msSession", MsProviderContainer.msProvider.createSession());
@@ -44,7 +44,13 @@ public class SeamEntryPointServlet extends javax.servlet.sip.SipServlet implemen
 				log.info("SEAM SIP SESSION CREATED IN NEW THREAD");
 			}
 			
-		}.start();
+		};
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			log.error("Error joining a thread for session creation", e);
+		}
 
 	}
 
