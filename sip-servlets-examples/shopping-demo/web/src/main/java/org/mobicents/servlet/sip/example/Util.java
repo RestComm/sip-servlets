@@ -18,12 +18,11 @@ package org.mobicents.servlet.sip.example;
 
 import javax.naming.InitialContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
 
 public class Util {
-	private static Log logger = LogFactory.getLog(Util.class);
+	private static Logger logger = Logger.getLogger(Util.class);
 	
     public static OrderManager getOrderManager () {
         try {

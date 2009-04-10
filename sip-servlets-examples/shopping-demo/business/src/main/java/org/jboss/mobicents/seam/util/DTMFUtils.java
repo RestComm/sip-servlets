@@ -22,14 +22,13 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.sip.SipSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaResourceListener;
 import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsEndpoint;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
 import org.mobicents.mscontrol.events.MsRequestedEvent;
@@ -43,7 +42,7 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
  */
 public class DTMFUtils {
 	
-	private static Log logger = LogFactory.getLog(DTMFUtils.class);
+	private static Logger logger = Logger.getLogger(DTMFUtils.class);
 	
 	public static void adminApproval(SipSession session, String signal, String pathToAudioDirectory) {			
 		

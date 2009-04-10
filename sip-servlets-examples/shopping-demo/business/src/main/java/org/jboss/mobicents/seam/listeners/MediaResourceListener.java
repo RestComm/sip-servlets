@@ -21,8 +21,7 @@ import java.io.IOException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
@@ -33,7 +32,7 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
  *
  */
 public class MediaResourceListener implements MsNotificationListener {
-	private static Log logger = LogFactory.getLog(MediaResourceListener.class);
+	private static Logger logger = Logger.getLogger(MediaResourceListener.class);
 	private SipSession session;
 	private MsLink link;
 	

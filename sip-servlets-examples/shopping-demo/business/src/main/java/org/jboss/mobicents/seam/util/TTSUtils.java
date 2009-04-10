@@ -21,8 +21,7 @@ import java.io.File;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
@@ -34,7 +33,7 @@ import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
  */
 public class TTSUtils {
 	
-	private static Log logger = LogFactory.getLog(TTSUtils.class);
+	private static Logger logger = Logger.getLogger(TTSUtils.class);
 	
 	public static void buildAudio(String text, String filename) throws Exception {
 		VoiceManager mgr = VoiceManager.getInstance();

@@ -23,8 +23,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
@@ -46,7 +45,7 @@ public class ShoppingSipServlet
 	extends SipServlet  
 	implements TimerListener {
 	
-	private static Log logger = LogFactory.getLog(ShoppingSipServlet.class);
+	private static Logger logger = Logger.getLogger(ShoppingSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	
 	/** Creates a new instance of ShoppingSipServlet */
