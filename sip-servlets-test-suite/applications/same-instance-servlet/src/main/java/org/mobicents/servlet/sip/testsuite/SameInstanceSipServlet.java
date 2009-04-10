@@ -17,8 +17,12 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.annotation.Resource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
@@ -58,7 +62,18 @@ public class SameInstanceSipServlet
 		logger.info("the NoAppName sip servlet has been started");
 		super.init(servletConfig);
     	System.out.println("servlet instance<init>:" + this);
-    	instance = this;    	    	
+    	instance = this;   
+    	try { 			
+			// Getting the Sip factory from the JNDI Context
+			Properties jndiProps = new Properties();			
+			Context initCtx = new InitialContext(jndiProps);
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			SipFactory jndiSipFactory = (SipFactory) envCtx.lookup("sip/SameInstanceServletTestApplication/SipFactory");
+			logger.info("Sip Factory ref from JNDI : " + jndiSipFactory);
+		} catch (NamingException e) {
+			throw new ServletException("Uh oh -- JNDI problem !", e);			
+		}
+		logger.info("Sip Factory ref from JNDI : " + sipFactory);
 	}
 	
 	@Override

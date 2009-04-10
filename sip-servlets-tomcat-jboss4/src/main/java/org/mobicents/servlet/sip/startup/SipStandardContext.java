@@ -128,6 +128,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
     
     protected Map<String, Container> childrenMap;
     protected Map<String, Container> childrenMapByClassName;
+
+	protected boolean sipJNDIContextLoaded = false;
     
 	/**
 	 * 
@@ -362,6 +364,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if (logger.isDebugEnabled())
             logger.debug("Configuring sip listeners");
 
+		if(!sipJNDIContextLoaded) {
+			loadSipJNDIContext();
+		}
+		
         // Instantiate the required listeners
         ClassLoader loader = getLoader().getClassLoader();
         ok = listeners.loadListeners(findSipApplicationListeners(), loader);
@@ -478,7 +484,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			} else {
 				logger.error("the application name is null for the following context : " + name);
 			}
-		}	
+		}
+		sipJNDIContextLoaded = false;
 		// not needed since the JNDI will be destroyed automatically
 //		if(isUseNaming()) {
 //			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);
@@ -505,6 +512,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	@Override
 	public void loadOnStartup(Container[] containers) {
+		if(!sipJNDIContextLoaded) {
+			loadSipJNDIContext();
+		}
+		super.loadOnStartup(containers);	
+	}
+	
+	protected void loadSipJNDIContext() {
 		if(getAnnotationProcessor() instanceof SipAnnotationProcessor) {
 			if(getNamingContextListener() != null) {
 				((SipAnnotationProcessor)getAnnotationProcessor()).setContext(getNamingContextListener().getEnvContext());
@@ -539,8 +553,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				logger.error("Impossible to get the naming context ", e);
 				throw new IllegalStateException(e);
 			}	        			
-        }		
-		super.loadOnStartup(containers);	
+        }
+		sipJNDIContextLoaded  = true;
 	}
 
 	@Override
