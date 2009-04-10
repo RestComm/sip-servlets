@@ -711,13 +711,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isSupervisedMode()) {
 			return false;
 		} else {
-			for (Transaction transaction : ongoingTransactions) {
-				if(TransactionState.CALLING.equals(transaction.getState()) ||
-					TransactionState.TRYING.equals(transaction.getState()) ||
-					TransactionState.PROCEEDING.equals(transaction.getState()) ||
-					TransactionState.COMPLETED.equals(transaction.getState()) ||
-					TransactionState.CONFIRMED.equals(transaction.getState())) {
-						return true;
+			if(ongoingTransactions != null) {
+				for (Transaction transaction : ongoingTransactions) {
+					if(TransactionState.CALLING.equals(transaction.getState()) ||
+						TransactionState.TRYING.equals(transaction.getState()) ||
+						TransactionState.PROCEEDING.equals(transaction.getState()) ||
+						TransactionState.COMPLETED.equals(transaction.getState()) ||
+						TransactionState.CONFIRMED.equals(transaction.getState())) {
+							return true;
+					}
 				}
 			}
 			return false;
@@ -991,7 +993,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
 		
-		if(!ongoingTransactions.contains(transaction)) { 
+		if(ongoingTransactions != null && !ongoingTransactions.contains(transaction)) { 
 			this.ongoingTransactions.add(transaction);
 			if(logger.isDebugEnabled()) {
 				logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );

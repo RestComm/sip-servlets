@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.B2buaHelper;
@@ -405,19 +406,22 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		MobicentsSipSession sipSessionImpl = (MobicentsSipSession) session;
 		List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
 		if (mode.equals(UAMode.UAC)) {
-			for ( Transaction transaction: sipSessionImpl.getOngoingTransactions()) {
-				if ( transaction instanceof ClientTransaction) {
-					TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-					SipServletMessage sipServletMessage = tad.getSipServletMessage();
-					//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
-					//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
-					//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
-					if (!sipServletMessage.isCommitted() && !Request.ACK.equals(sipServletMessage.getMethod()) && !Request.PRACK.equals(sipServletMessage.getMethod())) {
-						retval.add(sipServletMessage);
-					}
-					for(SipServletResponseImpl sipServletResponseImpl : tad.getSipServletResponses()) {
-						if (!sipServletResponseImpl.isCommitted()) {
-							retval.add(sipServletResponseImpl);
+			Set<Transaction> ongoingTransactions = sipSessionImpl.getOngoingTransactions();
+			if(ongoingTransactions != null) {
+				for ( Transaction transaction: ongoingTransactions) {
+					if ( transaction instanceof ClientTransaction) {
+						TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+						SipServletMessage sipServletMessage = tad.getSipServletMessage();
+						//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
+						//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
+						//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
+						if (!sipServletMessage.isCommitted() && !Request.ACK.equals(sipServletMessage.getMethod()) && !Request.PRACK.equals(sipServletMessage.getMethod())) {
+							retval.add(sipServletMessage);
+						}
+						for(SipServletResponseImpl sipServletResponseImpl : tad.getSipServletResponses()) {
+							if (!sipServletResponseImpl.isCommitted()) {
+								retval.add(sipServletResponseImpl);
+							}
 						}
 					}
 				}

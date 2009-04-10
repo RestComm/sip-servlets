@@ -604,10 +604,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			//This request must be a request created in a new SipSession 
 			//or from an initial request, and must not have been sent. 
 			//If any one of these preconditions are not met, the method throws an IllegalStateException.
-			if(!State.INITIAL.equals(session.getState()) && session.getOngoingTransactions().size() > 0) {
+			Set<Transaction> ongoingTransactions = session.getOngoingTransactions();
+			if(!State.INITIAL.equals(session.getState()) && ongoingTransactions != null && ongoingTransactions.size() > 0) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("session state : " + session.getState());
-					logger.debug("numbers of ongoing transactions : " + session.getOngoingTransactions().size());
+					logger.debug("numbers of ongoing transactions : " + ongoingTransactions.size());
 				}
 				throw new IllegalStateException(
 					"Bad state -- cannot set routing directive");
