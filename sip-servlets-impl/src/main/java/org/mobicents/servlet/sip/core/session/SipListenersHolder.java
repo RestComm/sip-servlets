@@ -95,14 +95,14 @@ public class SipListenersHolder {
 				Class listenerClass = Class.forName(className, false, classLoader);
 				EventListener listener = (EventListener) listenerClass.newInstance();
 				((SipContext)sipContext).getAnnotationProcessor().processAnnotations(listener);
-				SipServletImpl sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(className);
+				SipServletImpl sipServletImpl = (SipServletImpl)sipContext.findChildrenByClassName(className);
 				if(sipServletImpl != null) {
 					listener = (EventListener) sipServletImpl.allocate();
 					listenerServlets.put(listener, sipServletImpl);
 				} else {
 					SipServlet servlet = (SipServlet) listenerClass.getAnnotation(SipServlet.class);
 					if (servlet != null) {						
-						sipServletImpl = (SipServletImpl)sipContext.getChildrenMap().get(servlet.name());
+						sipServletImpl = (SipServletImpl)sipContext.findChildrenByName(servlet.name());
 						if(sipServletImpl != null) {
 							listener = (EventListener) sipServletImpl.allocate();
 							listenerServlets.put(listener, sipServletImpl);

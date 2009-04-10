@@ -886,6 +886,13 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=652">
+								 	The behavior of SipServletListener is not based upon Servlet 2.4 Specification.
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=622">
 								 	Move to JBoss AS 5.0.1.GA
 								</a>								

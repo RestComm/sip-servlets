@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>SameInstanceServletTestApplication</app-name>
+	<servlet>
+		<servlet-name>SameInstanceSipServlet</servlet-name>
+		<display-name>SameInstanceSipServlet</display-name>
+		<description>SameInstance SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.SameInstanceSipServlet
+		</servlet-class>		
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.SameInstanceSipServlet
+		</listener-class>
+	</listener>
+</sip-app>

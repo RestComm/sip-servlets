@@ -38,6 +38,7 @@ import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJ
 import org.mobicents.servlet.sip.testsuite.concurrency.ConcurrentyControlSipSessionIsolationTest;
 import org.mobicents.servlet.sip.testsuite.concurrency.CongestionControlTest;
 import org.mobicents.servlet.sip.testsuite.deployment.DeploymentTest;
+import org.mobicents.servlet.sip.testsuite.deployment.SameInstanceServletTest;
 import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.join.JoinSipServletTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
@@ -138,6 +139,7 @@ public class AllTests {
 		suite.addTestSuite(ExternalApplicationRoutingTest.class);
 		suite.addTestSuite(SameContainerRoutingServletTest.class);
 		suite.addTestSuite(DeploymentTest.class);
+		suite.addTestSuite(SameInstanceServletTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);
 		suite.addTestSuite(AddressTest.class);

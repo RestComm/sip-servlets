@@ -115,6 +115,8 @@ public interface SipContext extends Context {
 	SipServletMapping findSipServletMappings(SipServletRequest sipServletRequest);
 	
 	Map<String, Container> getChildrenMap();
+	public Container findChildrenByName(String name);	
+	Container findChildrenByClassName(String className);
 	
 	void addChild(SipServletImpl child);
 	

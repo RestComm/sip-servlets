@@ -122,6 +122,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected SipApplicationDispatcher sipApplicationDispatcher = null;
     
     protected Map<String, Container> childrenMap;
+    protected Map<String, Container> childrenMapByClassName;
 
 	/**
 	 * 
@@ -132,6 +133,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		pipeline.setBasic(new SipStandardContextValve());
 		listeners = new SipListenersHolder(this);
 		childrenMap = new HashMap<String, Container>();
+		childrenMapByClassName = new HashMap<String, Container>();
 	}
 
 	@Override
@@ -435,15 +437,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//we remove the previous one (annoations) because it may not have init parameters that has been defined in sip.xml
 			//See TCK Test ContextTest.testContext1
 			childrenMap.remove(sipServletImpl.getName());
+			childrenMapByClassName.remove(sipServletImpl.getServletClass());
 			super.removeChild(existingSipServlet);
 		}
 		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
+		childrenMapByClassName.put(sipServletImpl.getServletClass(), sipServletImpl);
 		super.addChild(sipServletImpl);
 	}
 	
 	public void removeChild(SipServletImpl sipServletImpl) {
 		super.removeChild(sipServletImpl);
 		childrenMap.remove(sipServletImpl.getName());
+		childrenMapByClassName.remove(sipServletImpl.getServletClass());
 	}
 	
 	/**
@@ -451,6 +456,20 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public Map<String, Container> getChildrenMap() {		
 		return childrenMap;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Container findChildrenByName(String name) {		
+		return childrenMap.get(name);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Container findChildrenByClassName(String className) {		
+		return childrenMapByClassName.get(className);
 	}
 
 	/* (non-Javadoc)
