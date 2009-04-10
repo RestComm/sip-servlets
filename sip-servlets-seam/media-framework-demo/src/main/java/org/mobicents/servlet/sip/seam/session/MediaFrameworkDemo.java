@@ -26,7 +26,6 @@ import org.mobicents.servlet.sip.seam.media.framework.MediaSessionStore;
 
 @Name("mediaFrameworkDemo")
 @Scope(ScopeType.STATELESS)
-@Transactional
 public class MediaFrameworkDemo {
 	@Logger Log log;
 	@In MediaController mediaController;
@@ -104,14 +103,18 @@ public class MediaFrameworkDemo {
 				+ mediaEventDispatcher.getDtmfArchive(sipSession));
 	}
 
-	// Just say OK to these messages.
-	@Observer( { "BYE", "REGISTER" })
-	public void sayOK(SipServletRequest request) throws Exception {
+	@Observer( { "BYE" })
+	public void doBye(SipServletRequest request) throws Exception {
 		request.createResponse(200).send();
 		
 		// And clean up the connections
 		MsConnection connection = mediaSessionStore.getMsConnection();
 		connection.release();
 	}
+	
+	@Observer("REGISTER")
+	public void doRegister(SipServletRequest request) throws Exception {
+		request.createResponse(200).send();
+	} 
 
 }
