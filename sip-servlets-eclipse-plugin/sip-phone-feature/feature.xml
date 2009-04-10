@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="sip_phone_feature"
+      label="Sip Phone"
+      version="1.0.0">
+
+   <description url="http://www.mobicents.org">
+      Sip Phone plugin based on SIP communicator
+   </description>
+
+   <copyright url="http://www.mobicents.org">
+      Mobicents Copyright
+   </copyright>
+
+   <license url="http://www.mobicents.org">
+      LGPL
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+   </requires>
+
+   <plugin
+         id="sip_phone_plugin"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
