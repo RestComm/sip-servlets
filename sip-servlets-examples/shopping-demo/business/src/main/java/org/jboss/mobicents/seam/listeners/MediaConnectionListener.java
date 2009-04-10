@@ -5,8 +5,7 @@ import java.io.IOException;
 
 import javax.servlet.sip.SipServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionEvent;
 import org.mobicents.mscontrol.MsConnectionListener;
@@ -36,7 +35,7 @@ import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
  *
  */
 public class MediaConnectionListener implements MsConnectionListener {
-	private static Log logger = LogFactory.getLog(MediaConnectionListener.class);
+	private static Logger logger = Logger.getLogger(MediaConnectionListener.class);
 	
 	public static final String IVR_JNDI_NAME = "media/trunk/IVR/$";
 	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
@@ -58,6 +57,17 @@ public class MediaConnectionListener implements MsConnectionListener {
 	
 	public void connectionCreated(MsConnectionEvent event) {		
 		logger.info("connection created " + event);
+//		logger.info("connection hal opened " + event);
+//		MsConnection connection = event.getConnection();
+//		String sdp = connection.getLocalDescriptor();
+//		try {
+//			inviteRequest.setContentLength(sdp.length());
+//			inviteRequest.setContent(sdp.getBytes(), "application/sdp");						
+//			inviteRequest.send();
+//		} catch (IOException e) {
+//			logger.error("An unexpected exception occured while sending the request", e);
+//		}								
+//		logger.info("Local Media Connection half created " + event.getEventID());
 	}
 
 	public void connectionInitialized(MsConnectionEvent arg0) {

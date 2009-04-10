@@ -1,10 +1,8 @@
 package org.jboss.mobicents.seam.listeners;
 import javax.servlet.sip.SipSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.util.DTMFUtils;
-import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
@@ -20,7 +18,7 @@ public class DTMFListener implements MsNotificationListener{
 	public static final int DTMF_SESSION_STARTED = 1;
 	public static final int DTMF_SESSION_STOPPED = 2;
 	
-	private static Log logger = LogFactory.getLog(DTMFListener.class);
+	private static Logger logger = Logger.getLogger(DTMFListener.class);
 	
 	MsEventFactory eventFactory;
 	MsLink link;

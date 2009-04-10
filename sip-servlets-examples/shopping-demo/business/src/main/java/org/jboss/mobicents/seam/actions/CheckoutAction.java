@@ -90,8 +90,12 @@ public class CheckoutAction implements Checkout, Serializable {
 	@Out(value = "cutomerphone", scope = ScopeType.BUSINESS_PROCESS, required = false)
 	String customerPhone;
 
-	@Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;	
-	
+	//jboss 5, compliant with sip spec 1.1
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+
+    //jboss 4
+    @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+
 	@Begin(nested = true, pageflow = "checkout")
 	public void createOrder() {
 		currentOrder = new Order();

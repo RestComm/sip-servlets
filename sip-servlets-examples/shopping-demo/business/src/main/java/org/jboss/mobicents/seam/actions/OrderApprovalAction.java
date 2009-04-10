@@ -42,7 +42,12 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 	@In
 	Long orderId;
 	
-	@Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	//jboss 5, compliant with sip spec 1.1
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+
+    //jboss 4
+    @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+
 	
 	public void fireOrderApprovedEvent() {
 

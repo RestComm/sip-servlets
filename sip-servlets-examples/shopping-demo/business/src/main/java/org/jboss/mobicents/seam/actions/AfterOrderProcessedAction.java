@@ -40,7 +40,11 @@ public class AfterOrderProcessedAction implements AfterOrderProcessed, Serializa
 
 	@In
 	Long orderId;
-	
+	//jboss 5, compliant with sip spec 1.1
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/TimerService") TimerService timerService;
+
+    //jboss 4
     @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
 	@Resource(mappedName="java:/sip/shopping-demo/TimerService") TimerService timerService;
 

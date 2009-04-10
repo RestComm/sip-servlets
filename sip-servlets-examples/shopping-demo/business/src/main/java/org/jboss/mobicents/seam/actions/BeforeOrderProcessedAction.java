@@ -27,9 +27,14 @@ public class BeforeOrderProcessedAction implements BeforeOrderProcessed, Seriali
     @In BigDecimal amount;
     @In Long orderId;	     
     
+    //jboss 5, compliant with sip spec 1.1
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/TimerService") TimerService timerService;
+
+    //jboss 4
     @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
 	@Resource(mappedName="java:/sip/shopping-demo/TimerService") TimerService timerService;
-	
+
     public void fireBeforeOrderProcessedEvent()
     {
         log.info( "***************Fire BEFORE_ORDER_PROCESSED . Custom event to call user to set date ***************************" );

@@ -53,7 +53,12 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 	@In
 	Order order;
 	
-	@Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+	//jboss 5, compliant with sip spec 1.1
+	//@Resource(mappedName="java:comp/env/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+
+    //jboss 4
+    @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
+
 
 	public void orderShipped() {
 		log.info("*************** Fire ORDER_SHIPPED  ***************************");
