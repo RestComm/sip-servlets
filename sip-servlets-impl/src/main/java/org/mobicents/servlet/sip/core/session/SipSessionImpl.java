@@ -1004,8 +1004,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * Remove an ongoing tx to the session.
 	 */
 	public void removeOngoingTransaction(Transaction transaction) {
-		
-		this.ongoingTransactions.remove(transaction);
+
+		if(this.ongoingTransactions != null) {
+			this.ongoingTransactions.remove(transaction);
+		}
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("transaction "+ transaction +" has been removed from sip session's ongoingTransactions" );
