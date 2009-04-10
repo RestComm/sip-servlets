@@ -20,7 +20,7 @@ import org.osgi.framework.*;
  */
 public class AudioNotifierActivator implements BundleActivator
 {
-    private AudioNotifierServiceImpl audioNotifier;
+    private AudioNotifierService audioNotifier;
     
     private ConfigurationService configService;
     

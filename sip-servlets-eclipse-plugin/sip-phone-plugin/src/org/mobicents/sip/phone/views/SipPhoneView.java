@@ -5,6 +5,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.apache.log4j.helpers.AbsoluteTimeDateFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -49,6 +50,7 @@ public class SipPhoneView extends ViewPart {
 		lowerRowLayout.marginLeft = 0;
 		lowerRowLayout.marginRight = 0;
 		lowerRowLayout.spacing = 0;
+		
 		lower.setLayout(lowerRowLayout);
 		
 		PhoneControls phoneControls = new PhoneControls(lower, SWT.NONE);

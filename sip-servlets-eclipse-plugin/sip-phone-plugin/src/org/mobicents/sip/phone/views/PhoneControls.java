@@ -2,6 +2,8 @@ package org.mobicents.sip.phone.views;
 
 import java.util.Hashtable;
 
+import net.java.sip.communicator.impl.protocol.sip.ProtocolProviderServiceSipImpl;
+import net.java.sip.communicator.impl.protocol.sip.SipActivator;
 import net.java.sip.communicator.service.protocol.Call;
 import net.java.sip.communicator.service.protocol.CallParticipant;
 import net.java.sip.communicator.service.protocol.CallState;
@@ -40,15 +42,23 @@ public class PhoneControls extends Composite{
 		//group.setText("Call control");
 		GridLayout grid = new GridLayout(2, false);
 		group.setLayout(grid);
+		
 		new Label(group, SWT.NONE).setText("Server");
 		final Text server = new Text(group, SWT.BORDER);
 		server.setText("127.0.0.1");
+		
 		new Label(group, SWT.NONE).setText("Port");
 		final Text port = new Text(group, SWT.BORDER);
 		port.setText("5080");
+		
 		new Label(group, SWT.NONE).setText("Dial URI");
 		final Text uri = new Text(group, SWT.BORDER);
-		uri.setText("sip:here@127.0.0.1:5080");
+		uri.setText("sip:server@127.0.0.1:5080");
+		
+		new Label(group, SWT.NONE).setText("SIP port");
+		final Text sipPort = new Text(group, SWT.BORDER);
+		sipPort.setText("5060");
+		
 		final Button registerButton = new Button(group, SWT.NONE);
 		//registerButton.setLayoutData(new RowData(100, 50)); // Eclipse crashes wow
 		final Button callButton = new Button(group, SWT.NONE);
@@ -78,10 +88,21 @@ public class PhoneControls extends Composite{
 							Hashtable props = SipCommunicatorOSGIBootstrap.createSipAccountProperties("user", "display", "pass",
 									server.getText(), port.getText(), server.getText(), port.getText());
 							
+							// Reset the service
+							if(service != null) {
+								service.shutdown();
+								service = null;
+								System.gc();
+							}
+							
+							// If successful do new initialization
 							if(service == null) {
+								SipActivator.getConfigurationService().
+			                    setProperty(ProtocolProviderServiceSipImpl.PREFERRED_SIP_PORT, sipPort.getText());
 								sipCommunicator.setUp(props);
 								service = sipCommunicator.getProtocolProviderService();
 							}
+							
 							service.addRegistrationStateChangeListener(
 									new RegistrationStateChangeListener() {
 

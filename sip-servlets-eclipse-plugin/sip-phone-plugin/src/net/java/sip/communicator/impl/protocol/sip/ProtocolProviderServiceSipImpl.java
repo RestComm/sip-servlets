@@ -99,7 +99,7 @@ public class ProtocolProviderServiceSipImpl
      * The name of the property under which the user may specify the number of
      * the port where they would prefer us to bind our sip socket.
      */
-    private static final String PREFERRED_SIP_PORT =
+    public static final String PREFERRED_SIP_PORT =
         "net.java.sip.communicator.service.protocol.sip.PREFERRED_SIP_PORT";
 
 

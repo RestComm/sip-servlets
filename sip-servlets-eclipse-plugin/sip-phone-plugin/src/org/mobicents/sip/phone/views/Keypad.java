@@ -1,11 +1,14 @@
 package org.mobicents.sip.phone.views;
 
+import java.net.URL;
+
 import net.java.sip.communicator.service.audionotifier.AudioNotifierService;
 import net.java.sip.communicator.util.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+import org.mobicents.sip.phone.SipPhoneActivator;
 
 public class Keypad extends Composite{
 	
@@ -36,12 +39,14 @@ public class Keypad extends Composite{
 					Button b = (Button) event.widget;
 					String digit = b.getText();
 					AudioNotifierService audio = SipCommunicatorOSGIBootstrap.getAudioNotifier();
-					int d = -1;
+					int buttonNumber = -1;
 					try {
-						d = Integer.parseInt(digit);
+						buttonNumber = Integer.parseInt(digit);
 					} catch (Throwable t) {}
-					if(d>=0) {
-						
+					if(buttonNumber >= 0) {
+						URL url = SipPhoneActivator.getDefault().getBundle().getEntry(
+								"/resources/sounds/" + dtmfFiles[buttonNumber+1]);
+						audio.createAudio(url).play();
 					}
 					logger.info(digit);
 				}

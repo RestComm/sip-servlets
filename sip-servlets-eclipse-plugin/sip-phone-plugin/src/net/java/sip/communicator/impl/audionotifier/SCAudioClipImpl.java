@@ -64,6 +64,22 @@ public class SCAudioClipImpl implements SCAudioClip
         this.audioNotifier = audioNotifier;
     }
     
+    public SCAudioClipImpl(InputStream inputstream, AudioNotifierService audioNotifier)
+    {   
+        try {
+            this.createAppletAudioClip(inputstream);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        this.audioListener = new PlayAudioListener(audioClip);
+        this.playAudioTimer.addActionListener(audioListener);
+        
+        this.audioNotifier = audioNotifier;
+    }
+    
     /**
      * Plays this audio.
      */

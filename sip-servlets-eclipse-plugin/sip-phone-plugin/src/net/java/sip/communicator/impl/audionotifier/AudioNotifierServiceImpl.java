@@ -19,7 +19,7 @@ import net.java.sip.communicator.service.audionotifier.*;
 public class AudioNotifierServiceImpl
     implements AudioNotifierService
 {
-    private static final Map<String, SCAudioClipImpl> audioClips =
+    public static final Map<String, SCAudioClipImpl> audioClips =
         new HashMap<String, SCAudioClipImpl>();
 
     private boolean isMute;
@@ -65,7 +65,20 @@ public class AudioNotifierServiceImpl
 
         return audioClip;
     }
+    public SCAudioClip createAudio(URL url)
+    {
+        SCAudioClipImpl audioClip;
 
+        synchronized (audioClips)
+        {
+            {
+                audioClip = new SCAudioClipImpl(url, this);
+
+            }
+        }
+
+        return audioClip;
+    }
     /**
      * Removes the given audio from the list of available audio clips.
      *

@@ -6,6 +6,10 @@
  */
 package net.java.sip.communicator.service.audionotifier;
 
+import java.net.URL;
+
+import net.java.sip.communicator.impl.audionotifier.SCAudioClipImpl;
+
 /**
  * The AudioNotifierService is meant to be used to control all sounds in the
  * application. An audio could be created by calling the createAudio method.
@@ -40,4 +44,6 @@ public interface AudioNotifierService
      * @return TRUE if currently the sound is off, FALSE otherwise
      */
     public boolean isMute();
+
+	public SCAudioClip createAudio(URL url);
 }
