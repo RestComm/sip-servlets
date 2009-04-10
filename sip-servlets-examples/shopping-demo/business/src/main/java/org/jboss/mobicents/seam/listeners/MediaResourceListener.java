@@ -22,6 +22,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
+import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsNotificationListener;
 import org.mobicents.mscontrol.MsNotifyEvent;
@@ -35,15 +36,18 @@ public class MediaResourceListener implements MsNotificationListener {
 	private static Logger logger = Logger.getLogger(MediaResourceListener.class);
 	private SipSession session;
 	private MsLink link;
+	private MsConnection connection;
 	
 	/**
 	 * @param session
+	 * @param connection 
 	 * @param connection
 	 */
-	public MediaResourceListener(SipSession session, MsLink link) {
+	public MediaResourceListener(SipSession session, MsLink link, MsConnection connection) {
 		super();
 		this.session = session;
 		this.link = link;
+		this.connection = connection;
 	}
 
 	/* (non-Javadoc)
@@ -58,7 +62,8 @@ public class MediaResourceListener implements MsNotificationListener {
 			} catch (IOException e) {
 				logger.error("Unexpected error while sending the BYE request", e);				
 			}
-			link.release();			
+			link.release();		
+			connection.release();
 		}
 	}
 

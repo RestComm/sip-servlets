@@ -39,15 +39,15 @@ public class DTMFListener implements MsNotificationListener{
             MsDtmfNotifyEvent event = (MsDtmfNotifyEvent) evt;
             String signal = event.getSequence();
 			
-			if(session.getApplicationSession().getAttribute("orderApproval") != null) {
-				if(session.getApplicationSession().getAttribute("adminApproval") != null) {
+			if(session.getAttribute("orderApproval") != null) {
+				if(session.getAttribute("adminApproval") != null) {
 					logger.info("admin approval in progress.");
 					DTMFUtils.adminApproval(session, signal, pathToAudioDirectory);
 				} else {
 					logger.info("customer approval in progress.");
 					DTMFUtils.orderApproval(session, signal, pathToAudioDirectory);
 				}
-			} else if(session.getApplicationSession().getAttribute("deliveryDate") != null) {
+			} else if(session.getAttribute("deliveryDate") != null) {
 				logger.info("delivery date update in progress.");
 				if(!DTMFUtils.updateDeliveryDate(session, signal)) {				
 					MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);

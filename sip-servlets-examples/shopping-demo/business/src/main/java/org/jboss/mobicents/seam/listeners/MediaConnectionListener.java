@@ -115,11 +115,11 @@ public class MediaConnectionListener implements MsConnectionListener {
 						" " + link.getEndpoints()[1].getLocalName());
 				MsProvider provider = session.getProvider();
 				MsEventFactory eventFactory = provider.getEventFactory();
-				inviteRequest.getSession().getApplicationSession().setAttribute("link", link);
+				inviteRequest.getSession().setAttribute("link", link);
 				
 				MsEndpoint endpoint = link.getEndpoints()[0];
 				
-				String pathToAudioDirectory = (String) inviteRequest.getSession().getApplicationSession().getAttribute("audioFilePath");
+				String pathToAudioDirectory = (String) inviteRequest.getSession().getAttribute("audioFilePath");
 				
 				// Let us request for Announcement Complete event or Failure
 				// in case if it happens
@@ -138,9 +138,9 @@ public class MediaConnectionListener implements MsConnectionListener {
 				MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
 		        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
 				
-				if(inviteRequest.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
+				if(inviteRequest.getSession().getAttribute("orderApproval") != null) {
 					java.io.File speech = new File("speech.wav");
-					if(inviteRequest.getSession().getApplicationSession().getAttribute("adminApproval") != null) {
+					if(inviteRequest.getSession().getAttribute("adminApproval") != null) {
 						speech = new File("adminspeech.wav");	
 					}			
 					logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
@@ -149,17 +149,17 @@ public class MediaConnectionListener implements MsConnectionListener {
 			        endpoint.execute(requestedSignals, requestedEvents, link);
 			        
 					logger.info("Waiting for DTMF at the same time..");
-				} else if (inviteRequest.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {			
+				} else if (inviteRequest.getSession().getAttribute("deliveryDate") != null) {			
 					String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
 					logger.info("Playing Delivery Date Announcement : " + announcementFile);
 					play.setURL(announcementFile);
 					endpoint.execute(requestedSignals, requestedEvents, link);
 					
 					logger.info("Waiting for DTMF at the same time..");
-				} else if (inviteRequest.getSession().getApplicationSession().getAttribute("shipping") != null) {			
+				} else if (inviteRequest.getSession().getAttribute("shipping") != null) {			
 					java.io.File speech = new File("shipping.wav");
 					logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
-					MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), link);
+					MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), link, connection);
 					link.addNotificationListener(mediaResourceListener);
 					play.setURL("file://"+ speech.getAbsolutePath());
 					endpoint.execute(requestedSignals, requestedEvents, link);

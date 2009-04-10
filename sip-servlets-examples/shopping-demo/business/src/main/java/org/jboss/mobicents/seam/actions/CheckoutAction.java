@@ -203,15 +203,15 @@ public class CheckoutAction implements Checkout, Serializable {
 			connection.addConnectionListener(listener);
 			log.info("waiting to get the SDP from Media Server before sending the INVITE to " + callerAddress + "@" + callerDomain);
 			connection.modify("$", null);
-			sipApplicationSession.setAttribute("customerName", customerName);
-			sipApplicationSession.setAttribute("customerPhone", customerPhone);
-			sipApplicationSession.setAttribute("amountOrder", amount);
-			sipApplicationSession.setAttribute("orderId", orderId);
-			sipApplicationSession.setAttribute("connection", connection);
-			sipApplicationSession.setAttribute("orderApproval", true);
-			sipApplicationSession.setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
-			sipApplicationSession.setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
-			sipApplicationSession.setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
+			sipServletRequest.getSession().setAttribute("customerName", customerName);
+			sipServletRequest.getSession().setAttribute("customerPhone", customerPhone);
+			sipServletRequest.getSession().setAttribute("amountOrder", amount);
+			sipServletRequest.getSession().setAttribute("orderId", orderId);
+			sipServletRequest.getSession().setAttribute("connection", connection);
+			sipServletRequest.getSession().setAttribute("orderApproval", true);
+			sipServletRequest.getSession().setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
+			sipServletRequest.getSession().setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
+			sipServletRequest.getSession().setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for checkout confirmation", uoe);
 		} catch (Exception e) {

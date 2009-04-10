@@ -62,7 +62,7 @@ public class DTMFUtils {
 	}
 
 	public static void orderApproval(SipSession session, String signal, String pathToAudioDirectory) {
-		long orderId = (Long) session.getApplicationSession().getAttribute("orderId");
+		long orderId = (Long) session.getAttribute("orderId");
 		
 		if("1".equalsIgnoreCase(signal)) {
 			// Order Confirmed
@@ -100,7 +100,7 @@ public class DTMFUtils {
 		} catch (java.lang.NumberFormatException e) {
 			return false;
 		}
-		MsLink link = (MsLink)session.getApplicationSession().getAttribute("link");
+		MsLink link = (MsLink)session.getAttribute("link");
 		synchronized(session) {
 			String dateAndTime = (String) session.getAttribute("dateAndTime");
 			if(dateAndTime == null) {
@@ -224,7 +224,7 @@ public class DTMFUtils {
 				try {
 					InitialContext ctx = new InitialContext();
 					OrderManager orderManager = (OrderManager) ctx.lookup("shopping-demo/OrderManagerBean/remote");
-					orderManager.setDeliveryDate(session.getApplicationSession().getAttribute("orderId"), timeStamp);
+					orderManager.setDeliveryDate(session.getAttribute("orderId"), timeStamp);
 				} catch (NamingException e) {
 					logger.error("An exception occured while retrieving the EJB OrderManager",e);
 				}				
@@ -236,7 +236,7 @@ public class DTMFUtils {
 							.getProvider().getEventFactory();
 					java.io.File speech = new File("deliveryDate.wav");
 					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
-					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, link);
+					MediaResourceListener mediaResourceListener = new MediaResourceListener(session, link, (MsConnection)session.getAttribute("connection"));
 					link.addNotificationListener(mediaResourceListener);
 
 					// Let us request for Announcement Complete event or Failure
@@ -278,11 +278,11 @@ public class DTMFUtils {
 	public static void playFileInResponseToDTMFInfo(SipSession session,
 			String audioFile) {
 		logger.info("playing " + audioFile + " in response to DTMF");
-		MsConnection connection = (MsConnection)session.getApplicationSession().getAttribute("connection");
-		MsLink link = (MsLink)session.getApplicationSession().getAttribute("link");
+		MsConnection connection = (MsConnection)session.getAttribute("connection");
+		MsLink link = (MsLink)session.getAttribute("link");
 		MsEndpoint endpoint = link.getEndpoints()[0];
 		MsEventFactory eventFactory = connection.getSession().getProvider().getEventFactory();		
-		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, link);
+		MediaResourceListener mediaResourceListener = new MediaResourceListener(session, link, connection);
 		link.addNotificationListener(mediaResourceListener);
 
 		// Let us request for Announcement Complete event or Failure

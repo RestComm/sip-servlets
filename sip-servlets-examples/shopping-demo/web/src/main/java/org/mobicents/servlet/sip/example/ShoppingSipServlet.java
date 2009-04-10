@@ -5,8 +5,11 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.annotation.Resource;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
@@ -19,6 +22,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.URI;
@@ -30,6 +34,7 @@ import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.jboss.mobicents.seam.util.TTSUtils;
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
@@ -47,6 +52,9 @@ public class ShoppingSipServlet
 	
 	private static Logger logger = Logger.getLogger(ShoppingSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
+	
+	@Resource
+	SipFactory sipFactory;
 	
 	/** Creates a new instance of ShoppingSipServlet */
 	public ShoppingSipServlet() {
@@ -79,8 +87,8 @@ public class ShoppingSipServlet
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
 			String sdp = new String(sdpBytes);
-			sipServletResponse.getSession().getApplicationSession().setAttribute("audioFilePath", (String)getServletContext().getAttribute("audioFilePath"));
-			MsConnection connection = (MsConnection)sipServletResponse.getSession().getApplicationSession().getAttribute("connection");
+			sipServletResponse.getSession().setAttribute("audioFilePath", (String)getServletContext().getAttribute("audioFilePath"));
+			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
 			connection.modify("$", sdp);			
 		}
 	}
@@ -94,10 +102,10 @@ public class ShoppingSipServlet
 		if(response.getStatus() == SipServletResponse.SC_UNAUTHORIZED || 
 				response.getStatus() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
 			// Avoid re-sending if the auth repeatedly fails.
-			if(!"true".equals(response.getApplicationSession().getAttribute("FirstResponseRecieved")))
+			if(!"true".equals(response.getSession().getAttribute("FirstResponseRecieved")))
 			{
-				SipApplicationSession sipApplicationSession = response.getApplicationSession();
-				sipApplicationSession.setAttribute("FirstResponseRecieved", "true");
+				SipSession sipSession = response.getSession();
+				sipSession.setAttribute("FirstResponseRecieved", "true");
 				AuthInfo authInfo = sipFactory.createAuthInfo();
 				authInfo.addAuthInfo(
 						response.getStatus(), 
@@ -112,7 +120,7 @@ public class ShoppingSipServlet
 				logger.info("Sending the challenge request " + challengeRequest);
 				
 				MsConnection connection =  (MsConnection) 
-					sipApplicationSession.getAttribute("connection");
+					sipSession.getAttribute("connection");
 				String sdp = connection.getLocalDescriptor();
 				try {
 					challengeRequest.setContentLength(sdp.length());
@@ -148,15 +156,15 @@ public class ShoppingSipServlet
 				String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
 				logger.info("Signal received " + signal );													
 				
-				if(request.getSession().getApplicationSession().getAttribute("orderApproval") != null) {
-					if(request.getSession().getApplicationSession().getAttribute("adminApproval") != null) {
+				if(request.getSession().getAttribute("orderApproval") != null) {
+					if(request.getSession().getAttribute("adminApproval") != null) {
 						logger.info("customer approval in progress.");
 						DTMFUtils.adminApproval(request.getSession(), signal, pathToAudioDirectory);
 					} else {
 						logger.info("customer approval in progress.");
 						DTMFUtils.orderApproval(request.getSession(), signal, pathToAudioDirectory);
 					}
-				} else if(request.getSession().getApplicationSession().getAttribute("deliveryDate") != null) {
+				} else if(request.getSession().getAttribute("deliveryDate") != null) {
 					DTMFUtils.updateDeliveryDate(request.getSession(), signal);
 				} 
 			}
@@ -168,12 +176,16 @@ public class ShoppingSipServlet
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-		logger.info("Got bye " + request);		
-		MsConnection connection = (MsConnection)request.getSession().getApplicationSession().getAttribute("connection");
-		connection.release();
+		logger.info("Got bye " + request);
+		MsConnection connection = (MsConnection)request.getSession().getAttribute("connection");
+		MsLink link = (MsLink)request.getSession().getAttribute("link");
+		
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
+		
+		connection.release();
+		link.release();
 	}
 	
 	@Override	
@@ -215,19 +227,20 @@ public class ShoppingSipServlet
 	 * @see javax.servlet.sip.TimerListener#timeout(javax.servlet.sip.ServletTimer)
 	 */
 	public void timeout(ServletTimer timer) {
-		SipApplicationSession sipApplicationSession = timer.getApplicationSession();		
-		SipFactory sipFactory = (SipFactory) sipApplicationSession.getAttribute("sipFactory");
+		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
+		Map<String, Object> attributes = (Map<String, Object>)timer.getInfo();
 		try {			
-			String callerAddress = (String)sipApplicationSession.getAttribute("caller");
-			String callerDomain = (String)sipApplicationSession.getAttribute("callerDomain");
+			String callerAddress = (String)attributes.get("caller");
+			String callerDomain = (String)attributes.get("callerDomain");
 			SipURI fromURI = sipFactory.createSipURI(callerAddress, callerDomain);
 			Address fromAddress = sipFactory.createAddress(fromURI);
-			String customerName = (String) sipApplicationSession.getAttribute("customerName");
-			BigDecimal amount = (BigDecimal) sipApplicationSession.getAttribute("amountOrder");
-			String customerPhone = (String) sipApplicationSession.getAttribute("customerPhone");
-			String customerContact = (String) sipApplicationSession.getAttribute("customerContact");
-			if(sipApplicationSession.getAttribute("adminApproval") != null) {
-				customerContact = (String) sipApplicationSession.getAttribute("adminContactAddress");
+			String customerName = (String) attributes.get("customerName");
+			BigDecimal amount = (BigDecimal) attributes.get("amountOrder");
+			String customerPhone = (String) attributes.get("customerPhone");
+			String customerContact = (String) attributes.get("customerContact");
+			if(attributes.get("adminApproval") != null) {
+				logger.info("preparing speech for admin approval");
+				customerContact = (String) attributes.get("adminContactAddress");
 				//TTS file creation		
 				StringBuffer stringBuffer = new StringBuffer();
 				stringBuffer.append(customerName);
@@ -243,7 +256,15 @@ public class ShoppingSipServlet
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
 			URI requestURI = sipFactory.createURI(customerContact);			
 			sipServletRequest.setRequestURI(requestURI);
-														
+							
+			//copying the attributes in the sip session since the media listener depends on it
+			Iterator<Entry<String,Object>> attrIterator = attributes.entrySet().iterator();
+			while (attrIterator.hasNext()) {
+				Map.Entry<java.lang.String, java.lang.Object> entry = (Map.Entry<java.lang.String, java.lang.Object>) attrIterator
+						.next();
+				sipServletRequest.getSession().setAttribute(entry.getKey(), entry.getValue());
+			}
+			
 			//Media Server Control Creation
 			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
 			MsProvider provider = peer.getProvider();
@@ -253,7 +274,7 @@ public class ShoppingSipServlet
 			listener.setInviteRequest(sipServletRequest);
 //			provider.addConnectionListener(listener);
 			connection.addConnectionListener(listener);
-			sipApplicationSession.setAttribute("connection", connection);
+			sipServletRequest.getSession().setAttribute("connection", connection);
 			connection.modify("$", null);
 			logger.info("waiting to get the SDP from Media Server before sending the INVITE to " + callerAddress + "@" + callerDomain);
 		} catch (Exception e) {

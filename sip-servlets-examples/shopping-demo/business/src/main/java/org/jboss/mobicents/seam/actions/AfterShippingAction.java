@@ -162,12 +162,12 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 			listener.setInviteRequest(sipServletRequest);
 			connection.addConnectionListener(listener);
 			connection.modify("$", null);
-			sipApplicationSession.setAttribute("customerName", customerfullname);
-			sipApplicationSession.setAttribute("customerPhone", cutomerphone);
-			sipApplicationSession.setAttribute("amountOrder", amount);
-			sipApplicationSession.setAttribute("orderId", orderId);
-			sipApplicationSession.setAttribute("connection", connection);
-			sipApplicationSession.setAttribute("shipping", true);
+			sipServletRequest.getSession().setAttribute("customerName", customerfullname);
+			sipServletRequest.getSession().setAttribute("customerPhone", cutomerphone);
+			sipServletRequest.getSession().setAttribute("amountOrder", amount);
+			sipServletRequest.getSession().setAttribute("orderId", orderId);
+			sipServletRequest.getSession().setAttribute("connection", connection);
+			sipServletRequest.getSession().setAttribute("shipping", true);
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for shipping call", uoe);
 		} catch (Exception e) {

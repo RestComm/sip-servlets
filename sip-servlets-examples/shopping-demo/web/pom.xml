@@ -22,6 +22,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-ejb_3.0_spec</artifactId>
 			<version>1.0</version>

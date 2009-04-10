@@ -86,15 +86,15 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 			listener.setInviteRequest(sipServletRequest);
 			connection.addConnectionListener(listener);
 			connection.modify("$", null);
-			sipApplicationSession.setAttribute("customerName", customerfullname);
-			sipApplicationSession.setAttribute("customerPhone", cutomerphone);
-			sipApplicationSession.setAttribute("amountOrder", amount);
-			sipApplicationSession.setAttribute("orderId", orderId);
-			sipApplicationSession.setAttribute("connection", connection);			
-			sipApplicationSession.setAttribute("deliveryDate", true);
-			sipApplicationSession.setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
-			sipApplicationSession.setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
-			sipApplicationSession.setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
+			sipServletRequest.getSession().setAttribute("customerName", customerfullname);
+			sipServletRequest.getSession().setAttribute("customerPhone", cutomerphone);
+			sipServletRequest.getSession().setAttribute("amountOrder", amount);
+			sipServletRequest.getSession().setAttribute("orderId", orderId);
+			sipServletRequest.getSession().setAttribute("connection", connection);			
+			sipServletRequest.getSession().setAttribute("deliveryDate", true);
+			sipServletRequest.getSession().setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
+			sipServletRequest.getSession().setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
+			sipServletRequest.getSession().setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for delivery date", uoe);
 		} catch (Exception e) {
