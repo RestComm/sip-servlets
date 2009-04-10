@@ -2,15 +2,12 @@ package org.mobicents.sip.phone.views;
 
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Properties;
 
-import org.apache.log4j.helpers.AbsoluteTimeDateFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.part.ViewPart;
 import org.mobicents.sip.phone.SipPhoneActivator;
 import org.osgi.framework.InvalidSyntaxException;

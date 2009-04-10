@@ -20,6 +20,7 @@ import net.java.sip.communicator.service.protocol.event.RegistrationStateChangeL
 import net.java.sip.communicator.util.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
@@ -44,21 +45,29 @@ public class PhoneControls extends Composite{
 		GridLayout grid = new GridLayout(2, false);
 		group.setLayout(grid);
 		
+		GridData cellWidthGridHint = new GridData();
+		cellWidthGridHint.grabExcessHorizontalSpace = true;
+		cellWidthGridHint.minimumWidth = 180;
 		new Label(group, SWT.NONE).setText("Server");
 		final Text server = new Text(group, SWT.BORDER);
 		server.setText("127.0.0.1");
+		server.setLayoutData(cellWidthGridHint);
 		
-		new Label(group, SWT.NONE).setText("Port");
+		new Label(group, SWT.NONE).setText("Server Port");
 		final Text port = new Text(group, SWT.BORDER);
 		port.setText("5080");
-		
-		new Label(group, SWT.NONE).setText("Dial URI");
-		final Text uri = new Text(group, SWT.BORDER);
-		uri.setText("sip:server@127.0.0.1:5080");
+		port.setLayoutData(cellWidthGridHint);
 		
 		new Label(group, SWT.NONE).setText("Phone SIP port");
 		final Text sipPort = new Text(group, SWT.BORDER);
 		sipPort.setText("5060");
+		sipPort.setLayoutData(cellWidthGridHint);
+		
+		new Label(group, SWT.NONE).setText("Dial URI");
+		final Text uri = new Text(group, SWT.BORDER);
+		uri.setText("sip:server@127.0.0.1:5080");
+		uri.setLayoutData(cellWidthGridHint);
+
 		
 		final Button registerButton = new Button(group, SWT.NONE);
 		//registerButton.setLayoutData(new RowData(100, 50)); // Eclipse crashes wow
