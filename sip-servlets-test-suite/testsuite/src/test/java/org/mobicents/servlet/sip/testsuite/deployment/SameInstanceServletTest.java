@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.testsuite.deployment;
 
-import java.text.ParseException;
-
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -26,7 +24,8 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 /**
- * This test ensures that an application with no appname cannot be deployed successfully into Mobicents Sip Servlets
+ * This test ensures that The behavior of SipServletListener is not based upon Servlet 2.4 Specification.
+ * and that the same instance is always used for a sip servlet in compliance with Servlet 2.4 Section 2.2
  * @author jean.deruelle@gmail.com
  *
  */
