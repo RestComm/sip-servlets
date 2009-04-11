@@ -266,7 +266,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
 			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());	
-			SipSessionEvent sipSessionEvent = new SipSessionEvent(this);
+			SipSessionEvent sipSessionEvent = new SipSessionEvent(this.getSession());
 			for (SipSessionListener sipSessionListener : sipSessionListeners) {
 				try {
 					if(SipSessionEventType.CREATION.equals(sipSessionEventType)) {

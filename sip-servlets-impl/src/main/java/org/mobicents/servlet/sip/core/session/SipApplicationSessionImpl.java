@@ -248,7 +248,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(listeners.size() > 0) {
 			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
 			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
-			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this);
+			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this.getSession());
 			if(logger.isDebugEnabled()) {
 				logger.debug("notifying sip application session listeners of context " + 
 						key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
