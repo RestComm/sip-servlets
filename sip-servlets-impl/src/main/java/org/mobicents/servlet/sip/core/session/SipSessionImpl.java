@@ -1478,4 +1478,20 @@ public class SipSessionImpl implements MobicentsSipSession {
         }
         return (facade);	  
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof MobicentsSipSession) {
+			((MobicentsSipSession)obj).getKey().equals(getKey());
+			return super.equals(obj);
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		return getKey().hashCode();
+	}
+	@Override
+	public String toString() {
+		return getKey().toString();
+	}
 }

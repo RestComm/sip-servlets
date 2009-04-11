@@ -66,6 +66,7 @@ import org.mobicents.servlet.sip.utils.JvmRouteUtil;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  */
 public class SipApplicationSessionImpl implements MobicentsSipApplicationSession {
+
 	private static transient Logger logger = Logger.getLogger(SipApplicationSessionImpl.class);
 
 	/**
@@ -1063,5 +1064,23 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public void setJvmRoute(String jvmRoute) {
 		// Assign the new jvmRoute
 		this.jvmRoute = jvmRoute;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof MobicentsSipApplicationSession) {
+			return ((MobicentsSipApplicationSession)obj).getKey().equals(getKey());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getKey().hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return getId();
 	}
 }

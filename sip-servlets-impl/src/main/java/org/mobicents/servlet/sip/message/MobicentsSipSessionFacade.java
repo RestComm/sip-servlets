@@ -49,6 +49,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  *
  */
 public class MobicentsSipSessionFacade implements MobicentsSipSession, Externalizable {
+
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(MobicentsSipSessionFacade.class);
 	private MobicentsSipSession sipSession;
@@ -383,6 +384,21 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 
 	public MobicentsSipSessionFacade getSession() {
 		return sipSession.getSession();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return sipSession.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return sipSession.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return sipSession.toString();
 	}
 
 }

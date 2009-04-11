@@ -277,4 +277,19 @@ public class MobicentsSipApplicationSessionFacade implements
 		this.sipApplicationSession.setJvmRoute(jvmRoute);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return this.sipApplicationSession.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.sipApplicationSession.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return this.sipApplicationSession.toString();
+	}
+
 }
