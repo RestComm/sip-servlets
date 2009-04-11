@@ -1481,8 +1481,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof MobicentsSipSession) {
-			((MobicentsSipSession)obj).getKey().equals(getKey());
-			return super.equals(obj);
+			return ((MobicentsSipSession)obj).getKey().equals(getKey());
 		}
 		return false;
 	}
