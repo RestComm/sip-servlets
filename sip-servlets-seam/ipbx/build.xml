@@ -30,6 +30,7 @@
     </target>
     <target name="clean">
         <delete dir="WebContent/WEB-INF/classes"/>
+    	<delete dir="WebContent/WEB-INF/lib"/>
     	<delete dir="${target.dir}"/>
     	<delete dir="${maven.deps}"/>
     	<delete dir="warbuild"/>
