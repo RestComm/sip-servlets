@@ -32,6 +32,7 @@
         <delete dir="WebContent/WEB-INF/classes"/>
     	<delete dir="${target.dir}"/>
     	<delete dir="${maven.deps}"/>
+    	<delete dir="warbuild"/>
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="build-project" name="build"/>
@@ -61,7 +62,7 @@
     	       basedir="${target.dir}"
     	  />
     </target>
-	<target name="deploy"> 
+	<target name="deploy" depends="build"> 
 		<copy todir="${env.JBOSS_HOME}/server/default/deploy" file="warbuild/ipbx.war"/>
 		<copy todir="${env.JBOSS_HOME}/server/default/deploy" file="resources/ipbx-ds.xml"/>
 	</target>

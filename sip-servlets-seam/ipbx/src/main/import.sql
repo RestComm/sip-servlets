@@ -40,11 +40,11 @@ insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (1,1
 insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (2,1,'pbx.call.timeout','80000')
 insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (3,1,'pbx.default.ringback.tone','http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/audio/ringback.wav')
 insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (4,1,'pbx.default.rejected.announcement','rejected.wav')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (5,1,'pbx.default.muted.announcement','file:///home/vralev/mobicents/servers/sip-servlets/sip-servlets-seam/ipbx/audio/muted.wav')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (6,1,'pbx.default.unmuted.announcement','file:///home/vralev/mobicents/servers/sip-servlets/sip-servlets-seam/ipbx/audio/unmuted.wav')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (7,1,'pbx.default.switched.announcement','file:///home/vralev/mobicents/servers/sip-servlets/sip-servlets-seam/ipbx/audio/switched.wav')
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (8,1,'pbx.default.everyone.announcement','file:///home/vralev/mobicents/servers/sip-servlets/sip-servlets-seam/ipbx/audio/everyone.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (5,1,'pbx.default.muted.announcement','http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/audio/muted.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (6,1,'pbx.default.unmuted.announcement','http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/audio/unmuted.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (7,1,'pbx.default.switched.announcement','http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/audio/switched.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (8,1,'pbx.default.everyone.announcement','http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/audio/everyone.wav')
 insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (9,1,'pbx.registration.strict','false') -- If we should parse registrations by uri or just by name (the first part of the URI
-insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (10,1,'pbx.default.onhold.announcement','file:///home/vralev/mobicents/servers/sip-servlets/sip-servlets-seam/ipbx/audio/muted.wav')
+insert into GLOBALPROPERTIES(GLOBALPROPERTYID, VERSION, NAME, VALUE) values (10,1,'pbx.default.onhold.announcement','http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/audio/muted.wav')
 
 insert into PSTNGATEWAYACCOUNTS(PSTNACCOUNTID, VERSION, NAME, USERNAME, HOSTNAME, PASSWORD) values(1,1,'Callwithus account','189964505','uk.callwithus.com','412944')

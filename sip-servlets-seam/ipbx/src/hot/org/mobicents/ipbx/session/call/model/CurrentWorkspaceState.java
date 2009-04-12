@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import org.ajax4jsf.event.PushEventListener;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
@@ -20,7 +21,8 @@ import org.mobicents.ipbx.session.configuration.PbxConfiguration;
 import org.mobicents.mscontrol.MsLinkMode;
 
 @Name("currentWorkspaceState")
-@Scope(ScopeType.SESSION)
+@Scope(ScopeType.STATELESS)
+@AutoCreate
 public class CurrentWorkspaceState {
 	@Logger 
 	private static Log log;
