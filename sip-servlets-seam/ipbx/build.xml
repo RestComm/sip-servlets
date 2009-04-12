@@ -70,14 +70,14 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir=".">
 			<arg line="-f dependencies.xml install" />
 		</exec>
-		<delete dir="${target.dir}/WEB-INF/lib"></delete>
-		<mkdir dir="${target.dir}/WEB-INF/lib"/>
+		<delete failonerror="false" dir="${target.dir}/WEB-INF/lib"></delete>
+		<mkdir failonerror="false" dir="${target.dir}/WEB-INF/lib"/>
     	<copy todir="${target.dir}/WEB-INF/lib">
     		<fileset dir="${maven.deps}" 
     			includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
     	</copy>
 		<!-- Copy the dependencies to the folder where JB Tools expects them to be -->
-		<mkdir dir="WebContent/WEB-INF/lib"/>
+		<mkdir failonerror="false" dir="WebContent/WEB-INF/lib"/>
 		<copy todir="WebContent/WEB-INF/lib">
 		    <fileset dir="${maven.deps}" 
 		    	includes="jboss-seam* drools* richfaces* mvel* jboss-el* jboss-el* commons-beanutils* commons-digest* antlr-run* mobicents-media-server-msc-api* jsf-facelet* jxl* jbpm* sip-servlets-seam*"></fileset>
