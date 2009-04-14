@@ -16,8 +16,12 @@ import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
 import org.mobicents.ipbx.entity.CallState;
 import org.mobicents.ipbx.entity.User;
+import org.mobicents.servlet.sip.seam.entrypoint.media.MediaController;
+import org.mobicents.servlet.sip.seam.entrypoint.media.MediaControllerManager;
+import org.mobicents.servlet.sip.seam.media.framework.IVRHelper;
 import org.mobicents.servlet.sip.seam.media.framework.IVRHelperManager;
 import org.mobicents.ipbx.session.configuration.PbxConfiguration;
+import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsLinkMode;
 
 @Name("currentWorkspaceState")
@@ -177,6 +181,21 @@ public class CurrentWorkspaceState {
 	public void reject(CallParticipant participant) {
 		endCall(participant, true);
 		// TODO: analyze who is that guy calling and cancel it
+	}
+	
+	// Join a user in the conference
+	public void join(CallParticipant participant) {
+		MediaController mediaController = MediaControllerManager.instance().getMediaController(participant.getSipSession());
+		MsLink link = mediaController.createLink(MsLinkMode.FULL_DUPLEX);
+		Conference conf = getConference();
+		link.join(participant.getPrEndpoint().getLocalName(), 
+				conf.getEndpointName());
+		conf.addParticipant(participant);
+		for(CallParticipant cp:conf.getParticipants(CallState.INCALL)) {
+			CurrentWorkspaceState cws = WorkspaceStateManager.instance()
+				.getWorkspace(cp.getName());
+			cws.setOngoing(cp);
+		}
 	}
 	
 	// Update the UI when a call is active

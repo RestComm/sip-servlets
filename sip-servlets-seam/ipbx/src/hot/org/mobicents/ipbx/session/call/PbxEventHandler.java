@@ -68,7 +68,7 @@ public class PbxEventHandler {
 	@Observer("INVITE")
 	public void doInvite(SipServletRequest request) {
 		String fromUri = request.getFrom().getURI().toString();
-		String toUri = request.getTo().getURI().toString();
+		String toUri = request.getTo().getURI().toString(); 
 		
 		// Authentication just by user name for now
 		Registration fromRegistration = sipAuthenticator.authenticate(fromUri);
@@ -131,24 +131,27 @@ public class PbxEventHandler {
 		
 		Conference conf = null;
 		
-		// If the callee is in a call already we must ask to join that call
-		if(!CallState.INCALL.equals(toParticipant.getCallState())) {
-		// Otherwise just call all his registered phones and join them to a new
-		// conference where you can talk to him
+		
+		if(toParticipant.getConference() == null) {
+			// If the callee is in a call, just call all his registered phones and join them to a new
+			// conference where you can talk to him
 			conf = ConferenceManager.instance().getNewConference();
 			fromParticipant.setConference(conf);
 			toParticipant.setConference(conf);
 			toParticipant.setCallState(CallState.CONNECTING);
 			fromParticipant.setCallState(CallState.CONNECTING);
-			
+			WorkspaceStateManager.instance().getWorkspace(fromUser).setOutgoing(toParticipant);
 			callAction.dialParticipant(toParticipant);
+			log.info("Calling inactive user");
 		} else {
+			// If the callee is in a call already we must ask to join that call
 			conf = toParticipant.getConference();
 			fromParticipant.setConference(conf);
 			fromParticipant.setCallState(CallState.ASKING);
+			log.info("Calling an active user, we must ask for permission");
 		}
 		WorkspaceStateManager.instance().getWorkspace(toUser).setIncoming(fromParticipant);
-		WorkspaceStateManager.instance().getWorkspace(fromUser).setOutgoing(toParticipant);
+		
 		
 		mediaController.createConnection(PR_JNDI_NAME).modify("$", sdp);
 		Events.instance().raiseEvent("incomingCall", request);
@@ -315,7 +318,9 @@ public class PbxEventHandler {
 			log.error(e);
 		}
 		
-		if(participant.getConference() != null) {
+		if(participant.getConference() != null &&
+				!CallState.ASKING.equals(participant.getCallState()) // Yeah, we must ask for permissing in this case
+				) {
 			mediaController.createLink(MsLinkMode.FULL_DUPLEX)
 			.join(participant.getConference().getEndpointName(),
 					connection.getEndpoint().getLocalName());
