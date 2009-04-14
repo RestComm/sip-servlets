@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -88,7 +89,6 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -181,6 +181,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private ThreadPoolExecutor asynchronousExecutor = new ThreadPoolExecutor(4, 32, 90, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<Runnable>());
 	
+	//used for the congestion control mechanism
+	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
+	
 	/**
 	 * 
 	 */
@@ -192,6 +195,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
+		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
+				new ThreadPoolExecutor.CallerRunsPolicy());
+		congestionControlThreadPool.prestartAllCoreThreads();
 	}
 	
 	/**
@@ -264,7 +270,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		congestionControlTimerTask = new CongestionControlTimerTask();
 		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
-				congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+				congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
 		 	if(logger.isInfoEnabled()) {
 		 		logger.info("Congestion control background task started and checking every " + congestionControlCheckingInterval + " milliseconds.");
 		 	}
@@ -1218,7 +1224,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				congestionControlTimerFuture.cancel(false);
 			}
 			if(congestionControlCheckingInterval > 0) {
-				congestionControlTimerFuture = ExecutorServiceWrapper.getInstance().scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+				congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
 				if(logger.isInfoEnabled()) {
 			 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
 			 	}

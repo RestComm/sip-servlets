@@ -221,26 +221,28 @@ public abstract class SipManagerDelegate {
 		}
 		// check if this session key has a to tag.
 		if(sipSessionImpl != null) {
-			String toTag = sipSessionImpl.getKey().getToTag();
-			if(toTag == null && key.getToTag() != null) {
-				sipSessionImpl.getKey().setToTag(key.getToTag());
+			String currentKeyToTag = key.getToTag();
+			SipSessionKey existingKey = sipSessionImpl.getKey();
+			String toTag = existingKey.getToTag();
+			if(toTag == null && currentKeyToTag != null) {
+				existingKey.setToTag(currentKeyToTag );
 				if(logger.isDebugEnabled()) {
-					logger.debug("Setting the To tag " + key.getToTag() + 
+					logger.debug("Setting the To tag " + currentKeyToTag + 
 							" to the session " + key);
 				}
-			} else if (key.getToTag() != null && !toTag.equals(key.getToTag())) {
-				MobicentsSipSession derivedSipSession = sipSessionImpl.findDerivedSipSession(key.getToTag());
+			} else if (currentKeyToTag != null && !toTag.equals(currentKeyToTag)) {
+				MobicentsSipSession derivedSipSession = sipSessionImpl.findDerivedSipSession(currentKeyToTag );
 				if(derivedSipSession == null) {
 					// if the to tag is different a sip session is created
 					if(logger.isDebugEnabled()) {
-						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
-								" creates new derived session with following to Tag " + key.getToTag());
+						logger.debug("Original session " + key + " with To Tag " + toTag + 
+								" creates new derived session with following to Tag " + currentKeyToTag );
 					}
 					derivedSipSession = createDerivedSipSession(sipSessionImpl, key);
 				} else {
 					if(logger.isDebugEnabled()) {
-						logger.debug("Original session " + key + " with To Tag " + sipSessionImpl.getKey().getToTag() + 
-								" already has a derived session with following to Tag " + key.getToTag() + " - reusing it");
+						logger.debug("Original session " + key + " with To Tag " + toTag + 
+								" already has a derived session with following to Tag " + currentKeyToTag  + " - reusing it");
 					}
 				}
 				return derivedSipSession;	

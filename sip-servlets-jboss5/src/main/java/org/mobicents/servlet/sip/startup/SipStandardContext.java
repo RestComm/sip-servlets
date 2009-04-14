@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.naming.NamingException;
 import javax.servlet.Servlet;
@@ -124,6 +126,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected Map<String, Container> childrenMap;
     protected Map<String, Container> childrenMapByClassName;
 
+    protected ScheduledThreadPoolExecutor executor = null;
 	/**
 	 * 
 	 */
@@ -134,6 +137,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		listeners = new SipListenersHolder(this);
 		childrenMap = new HashMap<String, Container>();
 		childrenMapByClassName = new HashMap<String, Container>();
+		int idleTime = getSipApplicationSessionTimeout();
+		if(idleTime <= 0) {
+			idleTime = 1;
+		}
+		executor = new ScheduledThreadPoolExecutor(4);
 	}
 
 	@Override
@@ -881,5 +889,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	public void setSipRubyController(SipRubyController sipRubyController) {
 		this.rubyController = sipRubyController;
-	}			
+	}
+	
+	public ScheduledThreadPoolExecutor getThreadPoolExecutor() {
+		return executor;
+	}
 }

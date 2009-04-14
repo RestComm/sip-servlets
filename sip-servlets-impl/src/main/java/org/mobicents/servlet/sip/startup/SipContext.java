@@ -19,9 +19,9 @@ package org.mobicents.servlet.sip.startup;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
 import org.apache.AnnotationProcessor;
@@ -143,6 +143,8 @@ public interface SipContext extends Context {
 	SipSessionsUtilImpl getSipSessionsUtil();
 	
 	TimerService getTimerService();
+	
+	ScheduledThreadPoolExecutor getThreadPoolExecutor();
 
 	void setConcurrencyControlMode(ConcurrencyControlMode mode);
 	ConcurrencyControlMode getConcurrencyControlMode();

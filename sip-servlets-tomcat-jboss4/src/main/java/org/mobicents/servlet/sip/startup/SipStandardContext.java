@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -130,7 +134,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected Map<String, Container> childrenMapByClassName;
 
 	protected boolean sipJNDIContextLoaded = false;
-    
+	
+    protected ScheduledThreadPoolExecutor executor = null;
 	/**
 	 * 
 	 */
@@ -141,6 +146,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		listeners = new SipListenersHolder(this);
 		childrenMap = new HashMap<String, Container>();
 		childrenMapByClassName = new HashMap<String, Container>();
+		int idleTime = getSipApplicationSessionTimeout();
+		if(idleTime <= 0) {
+			idleTime = 1;
+		}
+		executor = new ScheduledThreadPoolExecutor(4);
 	}
 
 	@Override
@@ -1066,5 +1076,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	public void setSipRubyController(SipRubyController rubyController) {
 		throw new UnsupportedOperationException("ruby applications are not supported on Tomcat or JBoss 4.X versions");
+	}
+	
+	public ScheduledThreadPoolExecutor getThreadPoolExecutor() {
+		return executor;
 	}
 }

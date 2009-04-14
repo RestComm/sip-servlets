@@ -29,8 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
@@ -45,12 +43,10 @@ import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
-import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.core.timers.ExecutorServiceWrapper;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -1026,12 +1022,16 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			lastAccessedTime = in.readLong();
 
 			futureExpirationTimeOnPassivation = in.readLong();
-			expirationTimerTask = new SipApplicationSessionTimerTask(sipContext.getSipApplicationSessionTimeout() * 60 * 1000);
-			if(logger.isDebugEnabled()) {
-				logger.debug("Scheduling reactivted sip application session "+ key +" to expire in " + (futureExpirationTimeOnPassivation / 1000 / 60) + " minutes");
+			if(expirationTimerTask == null && sipContext.getSipApplicationSessionTimeout() > 0) {
+				expirationTimerTask = new SipApplicationSessionTimerTask();
 			}
-			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, futureExpirationTimeOnPassivation, TimeUnit.MILLISECONDS);
-			
+			if(expirationTimerTask != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Scheduling reactivted sip application session "+ key +" to expire at " + futureExpirationTimeOnPassivation);
+				}
+				expirationTime = futureExpirationTimeOnPassivation;
+//				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, futureExpirationTimeOnPassivation, TimeUnit.MILLISECONDS);
+			}
 			int nbOfSipSessions = in.readInt();
 			for (int i = 0; i < nbOfSipSessions; i++) {
 				String sipSessionKeyStringified = in.readUTF();
@@ -1122,7 +1122,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			out.writeBoolean(isValid);
 			out.writeLong(lastAccessedTime);
 
-			out.writeLong(expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS));
+			out.writeLong(expirationTime);
 			
 			out.writeInt(sipSessions.size());
 			for (String sipSessionKey : sipSessions.keySet()) {

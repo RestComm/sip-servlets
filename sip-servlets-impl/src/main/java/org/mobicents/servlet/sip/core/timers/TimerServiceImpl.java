@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.core.timers;
 
 import java.io.Serializable;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.sip.ServletTimer;
@@ -33,12 +34,16 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	private static transient Logger logger = Logger.getLogger(TimerServiceImpl.class
 			.getName());
 	
-	private transient ExecutorServiceWrapper eService = ExecutorServiceWrapper.getInstance();
+	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
+	
+	private static transient ScheduledThreadPoolExecutor scheduledExecutor = null;
 	
 	private static final TimerServiceImpl instance = new TimerServiceImpl();
 	
 	// using Threadsafe static lazy initialization from joshua block
 	public static TimerServiceImpl getInstance() {
+		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);
+		scheduledExecutor.prestartAllCoreThreads();
 		return instance;
 	}
 	
@@ -104,7 +109,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 		ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
 		// logger.log(Level.FINE, "starting timer
 		// at:"+System.currentTimeMillis());
-		ScheduledFuture<?> future = eService.schedule(servletTimer, delay, TimeUnit.MILLISECONDS);
+		ScheduledFuture<?> future = scheduledExecutor.schedule(servletTimer, delay, TimeUnit.MILLISECONDS);
 		servletTimer.setFuture(future);
 //		sipApplicationSession.timerScheduled(st);
 		sipApplicationSession.addServletTimer(servletTimer);
@@ -131,10 +136,10 @@ public class TimerServiceImpl implements TimerService, Serializable {
 				info, delay, fixedDelay, period, listener, sipApplicationSession);
 		ScheduledFuture<?> future = null;
 		if (fixedDelay) {
-			future = eService.scheduleWithFixedDelay(servletTimer, delay, period,
+			future = scheduledExecutor.scheduleWithFixedDelay(servletTimer, delay, period,
 					TimeUnit.MILLISECONDS);
 		} else {
-			future = eService.scheduleAtFixedRate(servletTimer, delay, period,
+			future = scheduledExecutor.scheduleAtFixedRate(servletTimer, delay, period,
 					TimeUnit.MILLISECONDS);
 		}
 		servletTimer.setFuture(future);

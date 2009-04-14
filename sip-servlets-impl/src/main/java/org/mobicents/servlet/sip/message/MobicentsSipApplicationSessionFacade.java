@@ -144,10 +144,6 @@ public class MobicentsSipApplicationSessionFacade implements
 				.setCurrentRequestHandler(currentRequestHandler);
 	}
 
-	public void setExpired(boolean isExpired) {
-		this.sipApplicationSession.setExpired(isExpired);
-	}
-
 	public void tryToInvalidate() {
 		this.sipApplicationSession.tryToInvalidate();
 	}
