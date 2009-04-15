@@ -25,6 +25,7 @@ import gov.nist.javax.sip.header.extensions.ReferredByHeader;
 import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -87,7 +88,6 @@ import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
-import javax.sip.message.Response;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.log4j.Logger;
@@ -150,6 +150,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 	protected Dialog dialog;
 
+	public static final String INITIAL_REMOTE_ADDR_HEADER_NAME = "MSS_Initial_Remote_Addr";
+	public static final String INITIAL_REMOTE_PORT_HEADER_NAME = "MSS_Initial_Remote_Port";
+	public static final String INITIAL_REMOTE_TRANSPORT_HEADER_NAME = "MSS_Initial_Remote_Transport";
+	
 	/**
 	 * List of headers that ARE system at all times
 	 */
@@ -172,6 +176,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		// headers also.
 		systemHeaders.add(RSeqHeader.NAME);
 		systemHeaders.add(RAckHeader.NAME);
+		//custom header used by Mobicents Sip Servlets and not allowed to be overriden by apps
+		systemHeaders.add(INITIAL_REMOTE_ADDR_HEADER_NAME);
+		systemHeaders.add(INITIAL_REMOTE_PORT_HEADER_NAME);
+		systemHeaders.add(INITIAL_REMOTE_TRANSPORT_HEADER_NAME);
 	}
 
 	protected static final HashSet<String> addressHeadersNames = new HashSet<String>();
@@ -1009,29 +1017,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public String getInitialTransport() {		
 		return transactionApplicationData.getInitialRemoteTransport();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getRemoteAddr()
 	 */
 	public String getRemoteAddr() {
-		// So for reqeust it will be top via
-		// For response Via ontop of local host ?
-		if (this.message instanceof Response) {
-			// FIXME:....
-			return null;
+		if(getTransaction() != null) {
+			return ((SIPTransaction)getTransaction()).getPeerAddress();
 		} else {
-			// isntanceof Reqeust
-			ListIterator<ViaHeader> vias = this.message
-					.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
-			if (vias.hasNext()) {
-				ViaHeader via = vias.next();
-				return via.getHost();
-			} else {
-				// those ethods
-				return null;
-			}
-
+			return null;
 		}
 	}
 
@@ -1040,26 +1035,25 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * @see javax.servlet.sip.SipServletMessage#getRemotePort()
 	 */
 	public int getRemotePort() {
-		// So for reqeust it will be top via
-		// For response Via ontop of local host ?
-		if (this.message instanceof Response) {
-			// FIXME:....
-			return -1;
+		if(getTransaction() != null) {
+			return ((SIPTransaction)getTransaction()).getPeerPort();
 		} else {
-			// isntanceof Reqeust
-			ListIterator<ViaHeader> vias = this.message
-					.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
-			if (vias.hasNext()) {
-				ViaHeader via = vias.next();
-				return via.getPort();
-			} else {
-				// those ethods
-				return -1;
-			}
-
+			return -1;
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getTransport()
+	 */
+	public String getTransport() {
+		if(getTransaction() != null) {
+			return ((SIPTransaction)getTransaction()).getTransport();
+		} else {
+			return null;
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getRemoteUser()
@@ -1124,32 +1118,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			.getHeader(getCorrectHeaderName(ToHeader.NAME));
 		return new AddressImpl(to.getAddress(), ((To)to).getParameters(), transaction == null ? true : false);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletMessage#getTransport()
-	 */
-	public String getTransport() {
-		// So for reqeust it will be top via
-		// For response Via ontop of local host ?
-		if (this.message instanceof Response) {
-			// FIXME:....
-			return null;
-		} else {
-			// isntanceof Reqeust
-			ListIterator<ViaHeader> vias = this.message
-					.getHeaders(getCorrectHeaderName(ViaHeader.NAME));
-			if (vias.hasNext()) {
-				ViaHeader via = vias.next();
-				return via.getTransport();
-			} else {
-				// those ethods
-				return null;
-			}
-
-		}
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getUserPrincipal()
@@ -1212,6 +1181,28 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 		this.message.removeHeader(nameToSearch);
 
+	}
+	
+	public void removeHeaderInternal(String name, boolean bypassSystemHeaderCheck) {
+		String hName = getFullHeaderName(name);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Removing header under name [" + hName + "]");
+
+		if (!bypassSystemHeaderCheck && isSystemHeader(hName)) {
+
+			logger.error("Cant remove system header [" + hName + "]");
+
+			throw new IllegalArgumentException("Header[" + hName
+					+ "] is system header, can't remove it!!!");
+		}
+
+		String nameToRemove = getCorrectHeaderName(hName);
+		try {
+			message.removeHeader(nameToRemove);			
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Illegal args supplied ", ex);
+		}
 	}
 
 	/*

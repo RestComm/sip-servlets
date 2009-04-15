@@ -430,12 +430,13 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		Request clonedRequest = 
 			proxy.getProxyUtils().createProxiedRequest(request, this, params);
 
-		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
-		if(routeHeader != null) {
-			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
-				clonedRequest.removeFirst(RouteHeader.NAME);	
-			}
-		}		
+//      There is no need for that, it makes application composition fail (The subsequent request is not dispatched to the next application since the route header is removed)
+//		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
+//		if(routeHeader != null) {
+//			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
+//				clonedRequest.removeFirst(RouteHeader.NAME);	
+//			}
+//		}		
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(

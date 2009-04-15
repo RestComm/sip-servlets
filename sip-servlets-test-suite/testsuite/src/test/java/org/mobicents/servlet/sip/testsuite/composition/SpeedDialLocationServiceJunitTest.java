@@ -198,6 +198,35 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
 	}
+
+	public void testRemoteAddrPortAndTransport() throws Exception {		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "remote";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "1";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+	}
 	
 	@Override
 	protected void tearDown() throws Exception {	

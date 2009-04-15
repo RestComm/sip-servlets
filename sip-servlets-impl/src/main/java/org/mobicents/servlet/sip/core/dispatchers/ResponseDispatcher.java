@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.stack.SIPTransaction;
+
 import java.io.IOException;
 import java.util.ListIterator;
 
@@ -26,6 +28,7 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.Transaction;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -86,6 +89,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 				//add the response for access from B2BUAHelper.getPendingMessages
 				applicationData.addSipServletResponse(sipServletResponse);
+				//
+				ViaHeader nextViaHeader = null;
+				if(viaHeaders.hasNext()) {
+					nextViaHeader = viaHeaders.next();
+				}
+				checkInitialRemoteInformation(sipServletMessage, nextViaHeader);
 			} //there is no client transaction associated with it, it means that this is a retransmission
 			else if(dialog != null) {				
 				applicationData = (TransactionApplicationData)dialog.getApplicationData();
@@ -283,5 +292,49 @@ public class ResponseDispatcher extends MessageDispatcher {
 						"It was either an endpoint or a B2BUA, ie an endpoint too " + newResponse);
 			}
 		}			
+	}
+	
+	/**
+	 * This method checks if the initial remote information as specified by SIP Servlets 1.1 Section 15.7
+	 * is available. If not we add it as headers only if the next via header is for the container 
+	 * (so that this information stays within the container boundaries)
+	 * @param sipServletMessage
+	 * @param nextViaHeader
+	 */
+	public void checkInitialRemoteInformation(SipServletMessageImpl sipServletMessage, ViaHeader nextViaHeader) {		
+		SIPTransaction transaction = (SIPTransaction)sipServletMessage.getTransaction();
+		String initialRemoteAddr = transaction.getPeerAddress();
+		int initialRemotePort = transaction.getPeerPort();
+		String initialRemoteTransport = transaction.getTransport();
+		// if the message comes from an external source we add the initial remote info from the transaction
+		if(sipApplicationDispatcher.isExternal(initialRemoteAddr, initialRemotePort, initialRemoteTransport)) {
+			sipServletMessage.getTransactionApplicationData().setInitialRemoteHostAddress(initialRemoteAddr);
+			sipServletMessage.getTransactionApplicationData().setInitialRemotePort(initialRemotePort);
+			sipServletMessage.getTransactionApplicationData().setInitialRemoteTransport(initialRemoteTransport);
+			// there is no other way to pass the information to the next applications in chain  
+			// (to avoid maintaining in memory information that would be to be clustered as well...)
+			// than adding it as a custom information, we add it as headers only if 
+			// the next via header is for the container
+			if(nextViaHeader != null && !sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
+				sipServletMessage.addHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_ADDR_HEADER_NAME, initialRemoteAddr, true); 
+				sipServletMessage.addHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_PORT_HEADER_NAME, "" + initialRemotePort, true);
+				sipServletMessage.addHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, initialRemoteTransport, true);
+			}
+		} else {
+			// if the message comes from an internal source we add the initial remote info from the previously added headers
+			sipServletMessage.getTransactionApplicationData().setInitialRemoteHostAddress(sipServletMessage.getHeader(SipServletMessageImpl.INITIAL_REMOTE_ADDR_HEADER_NAME));
+			String remotePort = sipServletMessage.getHeader(SipServletMessageImpl.INITIAL_REMOTE_PORT_HEADER_NAME);
+			int intRemotePort = -1;
+			if(remotePort != null) {
+				intRemotePort = Integer.parseInt(remotePort);
+			}
+			sipServletMessage.getTransactionApplicationData().setInitialRemotePort(intRemotePort);
+			sipServletMessage.getTransactionApplicationData().setInitialRemoteTransport(sipServletMessage.getHeader(SipServletMessageImpl.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));
+			if(nextViaHeader == null || sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
+				sipServletMessage.removeHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_ADDR_HEADER_NAME, true); 
+				sipServletMessage.removeHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_PORT_HEADER_NAME, true);
+				sipServletMessage.removeHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, true);
+			}			
+		}
 	}
 }

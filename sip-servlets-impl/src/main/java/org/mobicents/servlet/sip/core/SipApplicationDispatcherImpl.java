@@ -651,8 +651,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				clientTransaction, 
 				null, 
 				dialog);
-		
+		SipProvider sipProvider = (SipProvider)responseEvent.getSource();
 		try {
+			sipServletResponse.setLocalAddr(InetAddress.getByName(sipProvider.getListeningPoint(JainSipUtils.findTransport(response)).getIPAddress()));
+			sipServletResponse.setLocalPort(sipProvider.getListeningPoint(JainSipUtils.findTransport(response)).getPort());
+		
 			MessageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
 				dispatchMessage(null, sipServletResponse);
 		} catch (Throwable e) {
