@@ -15,6 +15,8 @@ Mobicents SIP Load Balancer
 	
 	The Mobicents SIP Load Balancer will distribute requests across the healthy and available instances in cluster to increase throughput of the overall system. 
 	It can also fail-over mid-call requests from unhealthy/inaccessible instances to healthy and available instances.
+	
+	The Load Balancer accepts instructions from application servers how and where to stick calls. For example, when The Load Balancer must work together with mod_jk, the routes are updated after every failover to the newly selected node.
 
 	More information can also be found in the {{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-balancer}Mobicents SIP High Availability and Clustering document}}. 
 	
@@ -74,6 +76,8 @@ Mobicents SIP Load Balancer
 		* balancers : the sip balancer(s) host names with the corresponding <<<addBalancerAddress>>> and <<<removeBalancerAddress>>> methods.
 	
 		* heartBeatInterval : the interval at which each heartbeat is sent to the sip balancer(s)
+		
+	* For configuring the complete converged Load Balancing architecture see read below "Converged Load-Balancing".
 	
 
 * Step-By-Step Example
@@ -107,7 +111,7 @@ Mobicents SIP Load Balancer
 	
 * Converged Load-Balancing
 
-	When you need to cluster your converged applications with HTTP and SIP, you can configure mod_jk and our SIP Balancer with your Mobicents distribution. Your HTTP and SIP session that belog to the same application session will be stuck to the same node. The SIP LB will follow the HTTP LB whenever there is a change. In order to configure the converged Load Balancer, all you need to do is to configure the apache mod_jk load-balancer with JBoss. To do this follow {{{http://jboss.org/community/wiki/UsingModjk12WithJBoss}}these instructions}. To understand better, how it works you can see {{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-servlets-converged-load-balancing?hl=en}}this diagram}.
+	When you need to cluster your converged applications with HTTP and SIP, you can configure mod_jk and our SIP Balancer with your Mobicents distribution. Your HTTP and SIP session that belog to the same application session will be stuck to the same node. The SIP LB will follow the HTTP LB whenever there is a change. In order to configure the converged Load Balancer, all you need to do is to configure the apache mod_jk load-balancer with JBoss. To do this follow {{{http://jboss.org/community/wiki/UsingModjk12WithJBoss}these instructions}}. To understand better, how it works you can see {{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-servlets-converged-load-balancing?hl=en}this diagram}}.
 	
 * Limitations
 	

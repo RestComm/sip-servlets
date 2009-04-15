@@ -25,7 +25,7 @@
 				 call recording will be added. Another application of the PBX is to act as Session Border Controller.
 				 <a style="color:red">For now the PBX runs only on Mobicents Sip Servlets with JBoss AS 4.2.3</a>
 			</p>
-			<a href="./ipbx.png"><img src="ipbx_small.png" /></a>
+			<a href="./ipbx-live.png"><img src="ipbx-live-small.png" /></a>
 			
 		</section>	
 		<section name="Features">
