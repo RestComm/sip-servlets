@@ -105,10 +105,12 @@ Mobicents SIP Load Balancer
 	
 	* Redo it another, from first sip client, start a call to sip:receiver-failover@sip-servlets.com. Tear down the call when you're done. The request should have been handled by the other node 
 	
-* Current Limitations
+* Converged Load-Balancing
 
-	* It can handle only SIP(S) requests not HTTP(S).
+	When you need to cluster your converged applications with HTTP and SIP, you can configure mod_jk and our SIP Balancer with your Mobicents distribution. Your HTTP and SIP session that belog to the same application session will be stuck to the same node. The SIP LB will follow the HTTP LB whenever there is a change. In order to configure the converged Load Balancer, all you need to do is to configure the apache mod_jk load-balancer with JBoss. To do this follow {{{http://jboss.org/community/wiki/UsingModjk12WithJBoss}}these instructions}. To understand better, how it works you can see {{{http://groups.google.com/group/mobicents-public/web/mobicents-sip-servlets-converged-load-balancing?hl=en}}this diagram}.
 	
-	* It cannot load-balance converged application (application having web and sip components) or pure web applications, only sip applications.
+* Limitations
+	
+	* Currently, the HTTP, SIP and the Sip Application sessions are replicated ad you can put references from one session to another safely, however the Servlet Contexts are not replicated, you should use a database of some other clustered storage (like JBoss Cache or memchache) if you need replication of servlet context - scoped data. Note that replication the servlet context is against the HTTP servlet specifications and it is not certain when and how it will be implemented. We could replicate only a subset of the attributes.
 	
 	
