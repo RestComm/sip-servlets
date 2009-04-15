@@ -47,7 +47,8 @@
 				<li>Automatically adding phones for users using the SIP REGISTER request by matching the username or username and hostname (in strict mode)</li>
 				</ul>
 			<p>
-				You can find a lot of other smaller features in the IPBX. Many of them are explained in the hints that appear on the web pages.
+				You can find a lot of other smaller features in the IPBX. Many of them are explained in the hints that appear on the web pages. You can see a few demonstrations on YouTube - 
+				<a href="http://www.youtube.com/watch?v=lONo_gW6eHw">Basic Demo</a> and <a href="http://www.youtube.com/watch?v=JvsC87nEw0w">Calls Demo</a>.
 			</p>
 			
 		</section>	
