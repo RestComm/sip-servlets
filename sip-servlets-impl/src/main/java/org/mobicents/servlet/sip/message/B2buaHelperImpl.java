@@ -160,6 +160,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				newRequest.removeHeader(ContactHeader.NAME);
 			}
 	
+			//Creating new call id
+			ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
+			CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+			newRequest.setHeader(callIdHeader);
+			
 			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);			
 			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
