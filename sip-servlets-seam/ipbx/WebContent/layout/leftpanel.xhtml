@@ -15,12 +15,13 @@
 				<rich:column>
 					<f:facet name="header">Phone</f:facet>
 
-					<s:link id="registration"
-						propagation="none" view="/registration.xhtml">
+					
 						<div style="float:left">
 						<h:graphicImage id="ip-phone" value="/img/ip-phone.png" rendered="#{registration.isIpPhone()}" style="border:0;margin-right:5px"/>
 						<h:graphicImage id="pstn-phone" value="/img/pstn-phone.png" rendered="#{not registration.isIpPhone()}" style="border:0;margin-right:5px"/>
 						</div>
+						<s:link id="registration"
+						propagation="none" view="/registration.xhtml">
 						<f:param name="registrationId" value="#{registration.id}" />
 						<h:outputText rendered="#{registration.name != null}"
 							value="#{registration.name}" styleClass="regUriName" />
@@ -28,8 +29,8 @@
 							value="Unnamed" styleClass="regUriName" />
 						<br />
 						<h:outputText value="#{registration.uri}" styleClass="uriSub" />
-
-					</s:link> <a4j:region rendered="#{not empty registration.bindings}">
+</s:link>
+					 <a4j:region rendered="#{not empty registration.bindings}">
 						<span style="color: #f66"> (#{registration.bindings.size()}
 						bindings)</span>
 					</a4j:region>
