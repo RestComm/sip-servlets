@@ -893,6 +893,34 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=654">
+								 	Implement hash,equals methods on SipSession and SipApplicationSession.
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=657">
+								 	B2buaHelper new request has the same call-ID
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=658">
+								 	Allow sip servlets applications to work in non distributable environment even if marked as distributable
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=659">
+								 	SIP Servlets 1.1 Section 15.7 not implemented for responses
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=622">
 								 	Move to JBoss AS 5.0.1.GA
 								</a>								
