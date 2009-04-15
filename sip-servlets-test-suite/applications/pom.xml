@@ -41,6 +41,7 @@
 		<module>no-app-name-servlet</module>
 		<module>no-main-servlet-app</module>
 		<module>same-instance-servlet</module>
+		<module>distributable-servlet</module>
 	</modules>
 	<dependencies>
 		<!-- test dependencies -->

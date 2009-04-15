@@ -61,6 +61,7 @@ import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -112,6 +113,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected SipSessionsUtilImpl sipSessionsUtil;
 	protected SipLoginConfig sipLoginConfig;
 	
+	protected boolean hasDistributableManager;
+	
     protected String namingContextName;
     
     protected Method sipApplicationKeyMethod;
@@ -150,6 +153,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(idleTime <= 0) {
 			idleTime = 1;
 		}
+		hasDistributableManager = false;
 		executor = new ScheduledThreadPoolExecutor(4);
 	}
 
@@ -341,9 +345,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
+			if(manager instanceof DistributableSipManager) {
+				hasDistributableManager = true;
+				if(logger.isInfoEnabled()) {
+					logger.info("this context contains a manager that allows applications to work in a distributed environment");
+				}
+			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context started");
-			}
+			}			
 		} else {
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context didn't started due to errors");
@@ -1003,7 +1013,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			case None:
 				break;
 		}
-		if(getDistributable()) {
+		if(getDistributable() && hasDistributableManager) {
 			if(bindSessions) {
 				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, manager, startCacheActivity);
 			} else {
@@ -1039,7 +1049,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			case None:
 				break;
 		}
-		if (getDistributable()) {
+		if (getDistributable() && hasDistributableManager) {
 			if(logger.isInfoEnabled()) {
 				logger.info("We are now after the servlet invocation, We replicate no matter what");
 			}

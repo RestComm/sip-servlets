@@ -24,14 +24,14 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 /**
- * This test ensures that The behavior of SipServletListener is not based upon Servlet 2.4 Specification.
- * and that the same instance is always used for a sip servlet in compliance with Servlet 2.4 Section 2.2
+ * This test ensures that a sip application whose the sip.xml dd contains the distributable tag
+ * is able to work in a non distributed environment
  * @author jean.deruelle@gmail.com
  *
  */
-public class SameInstanceServletTest extends SipServletTestCase {
+public class DistributableServletTest extends SipServletTestCase {
 	
-	private static transient Logger logger = Logger.getLogger(SameInstanceServletTest.class);
+	private static transient Logger logger = Logger.getLogger(DistributableServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
@@ -41,14 +41,21 @@ public class SameInstanceServletTest extends SipServletTestCase {
 	TestSipListener sender;
 	ProtocolObjects senderProtocolObjects;	
 	
-	public SameInstanceServletTest(String name) {
+	public DistributableServletTest(String name) {
 		super(name);
+	}
+
+	@Override
+	protected void deployApplication() {
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/distributable-servlet/src/main/sipapp",
+				"sip-test-context", "sip-test"));
 	}
 	
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/deployment/same-instance-servlet-dar.properties";
+				"org/mobicents/servlet/sip/testsuite/deployment/distributable-servlet-dar.properties";
 	}
 	
 	@Override
@@ -58,7 +65,7 @@ public class SameInstanceServletTest extends SipServletTestCase {
 		senderProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
 		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
 		
 		senderProvider.addSipListener(sender);
@@ -67,7 +74,7 @@ public class SameInstanceServletTest extends SipServletTestCase {
 	}
 	
 	
-	public void testSameInstanceServletApp() throws Exception {
+	public void testDistributableApp() throws Exception {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -82,21 +89,12 @@ public class SameInstanceServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertFalse(sender.isErrorResponseReceived());
 		assertTrue(sender.isAckSent());
-		assertTrue(sender.getAllMessagesContent().size() < 1);
+		assertTrue(sender.getOkToByeReceived());
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();	
 		super.tearDown();
 	}
-
-	@Override
-	protected void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/same-instance-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
-	}
-
-
 }

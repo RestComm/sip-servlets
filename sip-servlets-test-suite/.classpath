@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/distributable-servlet/src/main/sipapp/WEB-INF/classes" path="applications/distributable-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/same-instance-servlet/src/main/sipapp/WEB-INF/classes" path="applications/same-instance-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/no-main-servlet-app/src/main/sipapp/WEB-INF/classes" path="applications/no-main-servlet-app/src/main/java"/>
 	<classpathentry kind="src" output="applications/no-app-name-servlet/src/main/sipapp/WEB-INF/classes" path="applications/no-app-name-servlet/src/main/java"/>

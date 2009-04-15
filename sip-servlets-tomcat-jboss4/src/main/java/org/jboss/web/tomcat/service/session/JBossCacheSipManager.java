@@ -50,11 +50,11 @@ import org.jboss.logging.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.jboss.web.tomcat.service.JBossWeb;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -74,7 +74,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  */
 public class JBossCacheSipManager extends JBossCacheManager implements
-		SipManager {
+		DistributableSipManager {
 
 	/**
      * The descriptive information about this implementation.
