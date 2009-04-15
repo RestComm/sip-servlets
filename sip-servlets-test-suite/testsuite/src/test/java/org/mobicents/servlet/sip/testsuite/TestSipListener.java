@@ -1544,6 +1544,9 @@ public class TestSipListener implements SipListener {
 		if(!Request.MESSAGE.equalsIgnoreCase(method)) {
 			dialog = inviteClientTid.getDialog();
 		}
+		if(Request.INVITE.equalsIgnoreCase(method)) {
+			inviteRequest = request;
+		}
 		this.dialogCount++;
 	}
 	
@@ -2125,6 +2128,10 @@ public class TestSipListener implements SipListener {
 
 	public void setSendReinvite(boolean b) {
 		sendReinvite = b;
+	}
+
+	public Request getInviteRequest() {
+		return inviteRequest;
 	}
 
 }

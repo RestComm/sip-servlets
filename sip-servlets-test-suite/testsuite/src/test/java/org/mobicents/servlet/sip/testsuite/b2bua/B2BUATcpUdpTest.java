@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite.b2bua;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.CallIdHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -110,6 +111,9 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
+		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
 	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
@@ -138,7 +142,10 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());		
+		assertTrue(sender.getByeReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);		
+		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
 	}
 
 	public void testCancelCallForwarding() throws Exception {
@@ -171,6 +178,9 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);		
+		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
 	}
 	
 	@Override
