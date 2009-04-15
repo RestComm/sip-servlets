@@ -52,6 +52,7 @@
 			<item name="JBoss Seam Integration" href="mss-seam.html" />
 			<item name="JSLEE/Sip Servlets Interoperability" href="mobicents-sip-servlets-jslee-intero.html" />
 			<item name="JRuby-Rails Integration" href="mss-jruby.html" />
+			<item name="Eclipse Development Tools" href="mss-eclipse-tools.html" />
 		</menu>
 		<menu name="Other Protocols Support">
 			<item name="Diameter" href="mss-diameter.html" collapse="true">

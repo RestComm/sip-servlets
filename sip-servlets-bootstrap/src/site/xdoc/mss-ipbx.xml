@@ -8,7 +8,7 @@
 		</p>
 		<section name="Description">
 			<p>
-				The Media IPBX project is based on the Seam Sip Servlets framework and it's goal is
+				The Media IPBX project is based on the Seam Telco Framework and it's goal is
 				 to demonstrate the technology and eventually become a real useful PBX product. The
 				  primary design requirements for the PBX are:
 				<br/>
@@ -28,6 +28,29 @@
 			<a href="./ipbx.png"><img src="ipbx_small.png" /></a>
 			
 		</section>	
+		<section name="Features">
+			<p>
+				The most notable features currently implemented in the PBX are the following:
+				<br/>
+			</p>
+					<ul>
+				<li>Registration, login and configuration from the GUI</li>
+				<li>Call monitoring and control the the GUI per user</li>
+				<li>Users can have multiple phones and switch between them from the Web UI (call parking), they can assign phones that are active or unactive (ringing or not when calls are coming)</li>
+				<li>Calling multiple users in a conference by making normal calls</li>
+				<li>Call control from the Web UI - mute, close calls. Audio announcement is made to the users being muted</li>
+				<li>Incoming calls can be joined in an active conference or rejected</li>
+				<li>Ringback tones when waiting for the other participants in the call to join</li>
+				<li>PSTN phone calling with PSTN admin functions</li>
+				<li>Audio notifications (wav files) and other options configurable from the administrator account</li>
+				<li>Putting users on hold and isolating a single speaker with DTMF when in a conference (experimental)</li>
+				<li>Automatically adding phones for users using the SIP REGISTER request by matching the username or username and hostname (in strict mode)</li>
+				</ul>
+			<p>
+				You can find a lot of other smaller features in the IPBX. Many of them are explained in the hints that appear on the web pages.
+			</p>
+			
+		</section>	
 		<section name="Downloading">
 			You can download the binaries from here <a href="http://mobicents.googlecode.com/svn/downloads/list/ipbx.zip">here</a>, unzip it and  drop it into JBOSS_HOME/server/default/deploy directory.
 			The PBX needs a data source, a default datasource is provided in the zip file, but you can configure your own as well.
@@ -38,9 +61,9 @@
 			<ul>
 			<li>Do <code>http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/</code></li>
 			
-			<li>Set your JBOSS_HOME to a location where Mobicents Sip Servlets 7.2 or later is installed. Then simply run:</li>
+			<li>Set your JBOSS_HOME to a location where Mobicents Sip Servlets 0.9 or later is installed. Then simply run:</li>
 			</ul><br/><code>
-			ant clean all
+			ant clean all deploy
 			</code><br/>
 		</section>	
 		<section name="Usage">
