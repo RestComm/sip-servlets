@@ -28,8 +28,8 @@ cp log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 mvn clean install -o -f ../../../pom.xml -P jboss -Dnode=port-1
 mvn clean install -o -f ../../../pom.xml -P jboss -Dnode=port-2
 
-mkdir $JBOSS_HOME/server/port-1/conf/dars
-mkdir $JBOSS_HOME/server/port-2/conf/dars
+#mkdir $JBOSS_HOME/server/port-1/conf/dars
+#mkdir $JBOSS_HOME/server/port-2/conf/dars
 
 if [ $# -ne 0 ]; then
 	case $1 in	
@@ -52,8 +52,10 @@ if [ $# -ne 0 ]; then
 	    c2c)
 	    		echo "Distributed example used is Click To call";
 	    		mvn clean install -o -f ../../../sip-servlets-examples/click2call-distributable/pom.xml
-				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-1/deploy/click2call-distributable.war
-				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable-*.war $JBOSS_HOME/server/port-2/deploy/click2call-distributable.war
+				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable*.war $JBOSS_HOME/server/port-1/deploy/click2call-distributable.war
+				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable*.war $JBOSS_HOME/server/port-2/deploy/click2call-distributable.war
+				echo "" > $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				echo "" > $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 				;;
 	    uac)
 	            echo "Distributed example used is uac";
