@@ -58,7 +58,7 @@ public class PhoneControls extends Composite{
 		port.setText("5080");
 		port.setLayoutData(cellWidthGridHint);
 		
-		new Label(group, SWT.NONE).setText("Phone SIP port");
+		new Label(group, SWT.NONE).setText("Local SIP Port");
 		final Text sipPort = new Text(group, SWT.BORDER);
 		sipPort.setText("5060");
 		sipPort.setLayoutData(cellWidthGridHint);
@@ -190,7 +190,7 @@ public class PhoneControls extends Composite{
 												sipPhoneView.getKeypad().setRemoteSide(remoteSide);
 												callButton.setText("End");
 											} else {
-												logger.info("Edning call");
+												logger.info("Ending call");
 												callButton.setText("Call");
 												remoteSide = null;
 												sipPhoneView.getKeypad().setRemoteSide(null);
