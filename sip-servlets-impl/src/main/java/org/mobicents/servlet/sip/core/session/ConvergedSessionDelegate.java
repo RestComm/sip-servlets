@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -40,13 +38,13 @@ public class ConvergedSessionDelegate {
 	private static final String APPLICATION_SESSION_ID_ATTRIBUTE_NAME = "org.mobicents.servlet.sip.SipApplicationSessionId";
 	
 	protected SipManager sipManager;
-	protected HttpSession httpSession;
+	protected ConvergedSession httpSession;
 	
 	/**
 	 * 
 	 * @param sessionManager
 	 */
-	public ConvergedSessionDelegate(SipManager manager, HttpSession httpSession) {
+	public ConvergedSessionDelegate(SipManager manager, ConvergedSession httpSession) {
 		this.sipManager = manager;
 		this.httpSession = httpSession;
 	}
@@ -134,9 +132,12 @@ public class ConvergedSessionDelegate {
 	 */
 	public MobicentsSipApplicationSession getApplicationSession(boolean create) {		
 		
-		//First check if the http session has the app session id in its attributes
-		SipApplicationSessionKey key = (SipApplicationSessionKey) 
-			httpSession.getAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME);
+		//First check if the http session has the app session id in its attributes		
+		SipApplicationSessionKey key = null;
+		// need to check if the session is still valid
+		if(httpSession.isValid()) {
+			key = (SipApplicationSessionKey) httpSession.getAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME); 
+		}
 		if(key != null) {
 			return sipManager.getSipApplicationSession(key, false);
 		}
