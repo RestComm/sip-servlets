@@ -1,6 +1,8 @@
 package org.mobicents.sip.servlet.tooling;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -10,7 +12,8 @@ import org.eclipse.wst.common.project.facet.ui.AbstractFacetWizardPage;
 
 public final class SipServletFacetWizard extends AbstractFacetWizardPage
 {
-    private SipServletApplicationConfig config;
+    private static final String DEFAULT_PACKAGE = "org.example.servlet.sip.";
+	private SipServletApplicationConfig config;
 	private Text appName;
 	private Text description;
 	private Text mainServletName;
@@ -25,17 +28,24 @@ public final class SipServletFacetWizard extends AbstractFacetWizardPage
         setDescription( "Configure the SIP Application and the main servlet for the application." );
     }
     
-    private String capitalizeFirstLetter(String string) {
+    private static  String capitalizeFirstLetter(String string) {
     	if(string.length()<1) return "";
     	return string.substring(0, 1).toUpperCase() + string.substring(1, string.length());
+    }
+    
+    private static String fixProjectName(String name) {
+    	return capitalizeFirstLetter(
+    			name.replace("-", "").replace(".", "").replace(" ", ""));
     }
 
     public void createControl( final Composite parent )
     {
     	String projectName = context.getProjectName();
     	if(projectName == null) projectName = "";
-    	String fixedProjectName = capitalizeFirstLetter(
-    			projectName.replace("-", "").replace(".", ""));
+    	if(projectName.equals("")) {
+    		projectName = "MySipServlet";
+    	}
+    	String fixedProjectName = fixProjectName(projectName);
         final Composite composite = new Composite( parent, SWT.NONE );
         composite.setLayout( new GridLayout( 1, false ) );
 
@@ -46,6 +56,24 @@ public final class SipServletFacetWizard extends AbstractFacetWizardPage
         this.appName = new Text( composite, SWT.BORDER );
         this.appName.setLayoutData( gdhfill() );
         this.appName.setText( projectName );
+        this.appName.addKeyListener(new KeyListener() {
+
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void keyReleased(KeyEvent e) {
+				String appNameString = appName.getText();
+				String fixedProjectName = fixProjectName(appNameString);
+				description.setText(appNameString);
+				mainServletName.setText(fixedProjectName);
+				mainServletDesciption.setText(fixedProjectName);
+				mainServletClass.setText(DEFAULT_PACKAGE + fixedProjectName);
+				
+			}
+        	
+        });
         
         label = new Label( composite, SWT.NONE );
         label.setLayoutData( gdhfill() );
@@ -77,7 +105,7 @@ public final class SipServletFacetWizard extends AbstractFacetWizardPage
         
         this.mainServletClass = new Text( composite, SWT.BORDER );
         this.mainServletClass.setLayoutData( gdhfill() );
-        this.mainServletClass.setText("org.example.servlet.sip." + fixedProjectName);
+        this.mainServletClass.setText(DEFAULT_PACKAGE + fixedProjectName);
 
         setControl( composite );
     }
@@ -100,4 +128,5 @@ public final class SipServletFacetWizard extends AbstractFacetWizardPage
     {
         return new GridData( GridData.FILL_HORIZONTAL );
     }
+ 
 }
