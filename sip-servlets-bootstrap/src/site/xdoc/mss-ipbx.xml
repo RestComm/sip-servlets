@@ -48,6 +48,7 @@
 				<li>Automatically adding phones for users using the SIP REGISTER request by matching the username or username and hostname (in strict mode)</li>
 				</ul>
 			<p>
+			<p>Note that most of the announcements and tones are being downloaded from the internet at runtime by default. Depending on your internet connectivity you an experience delayed announcements or ringback tones. If you want to improve the response time you can configure local files used in announcements from the configuration panel. </p>
 				You can find a lot of other smaller features in the IPBX. Many of them are explained in the hints that appear on the web pages. You can see a few demonstrations on YouTube:
 			</p>
 			<div>
