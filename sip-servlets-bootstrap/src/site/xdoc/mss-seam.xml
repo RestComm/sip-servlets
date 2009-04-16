@@ -4,21 +4,21 @@
 	</properties>
 	<body>
 			<section name="The Seam Telco Framework (STF)">
-			<p>On top of Seam, Sip Servlets and MSC API (Media Server), we have built another framework that
+			<p>On top of <a href="http://www.seamframework.org/">JBoss Seam</a>, Sip Servlets and MSC API (from Mobicents Media Server), we have built another framework that
 			allows you to handle SIP and Media events in your Seam components. The STF application are extremely
-			lean and simple to code. There are a number of other advantages to using Seam - easier to mix
-			Web and SIP and Media applications, hot deployment with JBoss Tools, unified component model for Web and Telco application.
+			lean and simple to code. You could use it for both rapid prototyping or real applications. There are a number of other advantages to using Seam - easier to mix
+			Web and SIP and Media components, hot deployment with JBoss Tools, unified component model, transaction management, IoC, AOP and many others.
 			<a href="http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets?hl=en">Click here to read the complete documentation of The Seam Telco Framework.</a>
 			
-			There are a number of examples you can see in the documenation. We are also building <a href="mss-ipbx.html">our Mobicents IPBX</a> on top of it.
+			There are a number of examples you can see in the documentation. We are also building <a href="mss-ipbx.html">our Mobicents IPBX</a> using STF.
 </p>
 		</section>
 		<section name="Using JBoss Seam as a Web Framework without STF">
 			<p>
-				<a href="http://www.seamframework.org/">JBoss Seam</a>
-				is a great Web Framework to use for the GUI of your Telco Applications. Seam comes with many
-				AJAX-enabled components like A4J and Richfaces, it also has a great integration with there enterprise middleware features in JBoss.
-				Mobicents Sip Servlets has been tested with Seam and we have two example application that can help you get started -
+				<a href="http://www.seamframework.org/">Seam</a>
+				is also a great Web framework. You can use it for the Web GUI of your Telco Applications without depending on STF. Seam comes with many
+				AJAX-enabled components from A4J and Richfaces, it also has a great integration with the enterprise middle-ware features in JBoss.
+				Mobicents Sip Servlets has been tested heavily with Seam and we have two example application that can help you get started -
 				 <a href="shopping-demo.html">Shopping Demo</a> and <a href="mss-ipbx.html">Mobicents IPBX</a>
 			</p>
 
