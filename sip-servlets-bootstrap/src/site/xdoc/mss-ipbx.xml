@@ -7,9 +7,10 @@
 			<b><i>Throughout this page you can click on the images to see them larger.</i></b>
 		</p>
 		<section name="Description">
+		
 			<p>
 				The Media IPBX project is based on the Seam Telco Framework and it's goal is
-				 to demonstrate the technology and eventually become a real useful PBX product. The
+				 to demonstrate the technology and eventually become a real useful PBX product. </p><a href="./ipbx-live.png"><img src="ipbx-live-small.png" /></a><p>The
 				  primary design requirements for the PBX are:
 				<br/>
 			</p>
@@ -25,7 +26,7 @@
 				 call recording will be added. Another application of the PBX is to act as Session Border Controller.
 				 <a style="color:red">For now the PBX runs only on Mobicents Sip Servlets with JBoss AS 4.2.3</a>
 			</p>
-			<a href="./ipbx-live.png"><img src="ipbx-live-small.png" /></a>
+			
 			
 		</section>	
 		<section name="Features">
@@ -47,10 +48,17 @@
 				<li>Automatically adding phones for users using the SIP REGISTER request by matching the username or username and hostname (in strict mode)</li>
 				</ul>
 			<p>
-				You can find a lot of other smaller features in the IPBX. Many of them are explained in the hints that appear on the web pages. You can see a few demonstrations on YouTube - 
-				<a href="http://www.youtube.com/watch?v=lONo_gW6eHw">Basic Demo</a> and <a href="http://www.youtube.com/watch?v=JvsC87nEw0w">Calls Demo</a>.
+				You can find a lot of other smaller features in the IPBX. Many of them are explained in the hints that appear on the web pages. You can see a few demonstrations on YouTube:
 			</p>
-			
+			<div>
+			<object type="application/x-shockwave-flash" style="width:455px; height:400px;" data="http://www.youtube.com/v/lONo_gW6eHw"><param name="movie" value="http://www.youtube.com/v/lONo_gW6eHw" /></object> 
+			</div>
+			<p>and another one:</p>
+			<div><object type="application/x-shockwave-flash" style="width:455px; height:350px;" data="http://www.youtube.com/v/JvsC87nEw0w"><param name="movie" value="http://www.youtube.com/v/JvsC87nEw0w" /></object> 
+			</div><p><br/>
+			<b>HD Versions </b>  - 
+				<a href="http://www.youtube.com/watch?v=lONo_gW6eHw">Basic Demo</a> and <a href="http://www.youtube.com/watch?v=JvsC87nEw0w">Calls Demo</a>.
+	</p>
 		</section>	
 		<section name="Downloading">
 			You can download the binaries from here <a href="http://mobicents.googlecode.com/svn/downloads/list/ipbx.zip">here</a>, unzip it and  drop it into JBOSS_HOME/server/default/deploy directory.
@@ -60,7 +68,7 @@
 		You can download the source code from <a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/">here</a>.
 			First you need SVN, Ant and Maven  properly configured on your system.
 			<ul>
-			<li>Do <code>http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/</code></li>
+			<li>Do <code>svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/</code></li>
 			
 			<li>Set your JBOSS_HOME to a location where Mobicents Sip Servlets 0.9 or later is installed. Then simply run:</li>
 			</ul><br/><code>
