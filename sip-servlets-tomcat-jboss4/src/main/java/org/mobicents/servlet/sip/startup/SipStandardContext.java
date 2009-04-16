@@ -25,10 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -838,6 +835,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			((SipManager)manager).setSipFactoryImpl(
 					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
 			((SipManager)manager).setContainer(this);
+		}
+    	if(manager instanceof DistributableSipManager) {
+			hasDistributableManager = true;
+			if(logger.isInfoEnabled()) {
+				logger.info("this context contains a manager that allows applications to work in a distributed environment");
+			}
 		}
     	super.setManager(manager);
     }

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.naming.NamingException;
 import javax.servlet.Servlet;
@@ -55,6 +54,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
@@ -104,6 +104,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected SipFactoryFacade sipFactoryFacade;	
 	protected SipSessionsUtilImpl sipSessionsUtil;
 	protected SipLoginConfig sipLoginConfig;
+	
+	protected boolean hasDistributableManager;
 	
     protected String namingContextName;
     
@@ -271,6 +273,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
+			if(manager instanceof DistributableSipManager) {
+				hasDistributableManager = true;
+				if(logger.isInfoEnabled()) {
+					logger.info("this context contains a manager that allows applications to work in a distributed environment");
+				}
+			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context started");
 			}
@@ -692,6 +700,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			((SipManager)manager).setSipFactoryImpl(
 					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
 			((SipManager)manager).setContainer(this);
+		}
+    	if(manager instanceof DistributableSipManager) {
+			hasDistributableManager = true;
+			if(logger.isInfoEnabled()) {
+				logger.info("this context contains a manager that allows applications to work in a distributed environment");
+			}
 		}
     	super.setManager(manager);
     }
