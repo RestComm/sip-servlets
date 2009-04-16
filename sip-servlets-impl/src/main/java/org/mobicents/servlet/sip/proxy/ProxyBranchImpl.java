@@ -366,23 +366,24 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		boolean recursed = false;
 		if(response.getStatus() >= 300 && response.getStatus()<400 && recurse) {
 			String contact = response.getHeader("Contact");
-			//javax.sip.address.SipURI uri = SipFactories.addressFactory.createAddress(contact);
-			try {
-				int start = contact.indexOf('<');
-				int end = contact.indexOf('>');
-				contact = contact.substring(start + 1, end);
-				URI uri = proxy.getSipFactoryImpl().createURI(contact);
-				ArrayList<SipURI> list = new ArrayList<SipURI>();
-				list.add((SipURI)uri);
-				List<ProxyBranch> pblist = proxy.createProxyBranches(list);
-				ProxyBranchImpl pbi = (ProxyBranchImpl)pblist.get(0);
-				this.addRecursedBranch(pbi);
-				pbi.start();
-				recursed = true;
-			} catch (ServletParseException e) {
-				throw new RuntimeException("Can not parse contact header", e);
+			if(contact != null) {
+				//javax.sip.address.SipURI uri = SipFactories.addressFactory.createAddress(contact);
+				try {
+					int start = contact.indexOf('<');
+					int end = contact.indexOf('>');
+					contact = contact.substring(start + 1, end);
+					URI uri = proxy.getSipFactoryImpl().createURI(contact);
+					ArrayList<SipURI> list = new ArrayList<SipURI>();
+					list.add((SipURI)uri);
+					List<ProxyBranch> pblist = proxy.createProxyBranches(list);
+					ProxyBranchImpl pbi = (ProxyBranchImpl)pblist.get(0);
+					this.addRecursedBranch(pbi);
+					pbi.start();
+					recursed = true;
+				} catch (ServletParseException e) {
+					throw new RuntimeException("Can not parse contact header", e);
+				}
 			}
-			
 		}
 		if(response.getStatus() >= 200 && !recursed)
 		{
