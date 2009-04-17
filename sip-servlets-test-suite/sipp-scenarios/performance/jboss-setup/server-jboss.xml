@@ -13,7 +13,8 @@
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		concurrencyControlMode="SipSession" 
+  		concurrencyControlMode="None"
+  		congestionControlCheckingInterval="-1" 
   		darConfigurationFileLocation="conf/dars/simple-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
