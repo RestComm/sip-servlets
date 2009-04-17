@@ -164,7 +164,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	private boolean rejectRequests = false;
 	
-	private boolean memoryToHigh = false;
+	private boolean memoryToHigh = false;	
 	
 	private double maxMemory;
 	
@@ -478,8 +478,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if((rejectRequests || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
 			logger.error("dropping request, memory is too high or too many messages present in queues");
 			return;
-		}
-		requestsProcessed.incrementAndGet();		
+		}	
 		SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction transaction =  requestEvent.getServerTransaction();
 		Dialog dialog = requestEvent.getDialog();
@@ -519,6 +518,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						transaction,
 						dialog,
 						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));
+			requestsProcessed.incrementAndGet();	
 			if(transaction != null) {
 				TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
 				if(transactionApplicationData != null && transactionApplicationData.getInitialRemoteHostAddress() == null) {
@@ -651,7 +651,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			return;
 		}
 		responsesProcessed.incrementAndGet();
-		ClientTransaction clientTransaction = responseEvent.getClientTransaction();
+		ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
 		Dialog dialog = responseEvent.getDialog();
 		// Transate the response to SipServletResponse
 		SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
