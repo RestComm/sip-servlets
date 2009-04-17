@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip;
 
 
+import gov.nist.javax.sip.message.SIPMessage;
+
 import java.util.List;
 import java.util.TreeSet;
 
@@ -177,11 +179,13 @@ public class JainSipUtils {
 	 * @param request
 	 * @return
 	 */
-	public static String findTransport(Message message) {
-		String transport = null;
-
+	public static String findTransport(Message message) {		
 		if(message == null) {
-			transport = ListeningPoint.UDP;
+			return ListeningPoint.UDP;
+		}
+		// check if the transport is present in the message application data for maximizing perf
+		String transport = (String)((SIPMessage)message).getApplicationData();
+		if(transport != null) {			
 			return transport;
 		}
 		//if the request uri doesn't have any param, the request can still be on TCP so we check the topmost via header
@@ -212,6 +216,9 @@ public class JainSipUtils {
 				}
 			}
 		}
+		// storing the transport is present in the message application data for maximizing perf 
+		// in speeding up the retrieval later on
+		((SIPMessage)message).setApplicationData(transport);
 		return transport;
 	}
 	

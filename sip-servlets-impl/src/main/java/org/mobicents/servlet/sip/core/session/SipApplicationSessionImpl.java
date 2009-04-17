@@ -330,7 +330,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getExpirationTime()
 	 */
 	public long getExpirationTime() {
-		if(!isValid()) {
+		if(!isValid) {
 			throw new IllegalStateException("this sip application session is not valid anymore");
 		}
 		long expirationTime = expirationTimerTask.getDelay();
@@ -590,7 +590,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public void removeAttribute(String name) {
 
-		if (!isValid())
+		if (!isValid)
 			throw new IllegalStateException(
 					"Can not bind object to session that has been invalidated!!");
 
@@ -635,7 +635,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public void setAttribute(String key, Object attribute) {
 
-		if (!isValid())
+		if (!isValid)
 			throw new IllegalStateException(
 					"Can not bind object to session that has been invalidated!!");
 
@@ -712,7 +712,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#setExpires(int)
 	 */
 	public int setExpires(int deltaMinutes) {
-		if(!isValid()) {
+		if(!isValid) {
 			throw new IllegalStateException("Impossible to change the sip application " +
 					"session timeout when it has been invalidated !");
 		}
@@ -903,29 +903,24 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		updateReadyToInvalidateState();
 	}
 	
-	synchronized private void updateReadyToInvalidateState() {
-		if(isValid) {
-			boolean allSipSessionsReadyToInvalidate = true;			
-			for(MobicentsSipSession sipSession:this.sipSessions.values()) {
+	private void updateReadyToInvalidateState() {
+		if(isValid && !readyToInvalidate) {
+			for(MobicentsSipSession sipSession : this.sipSessions.values()) {
 				if(sipSession.isValid() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Session not ready to be invalidated : " + sipSession.getKey());
 					}
-					allSipSessionsReadyToInvalidate = false;
-					break;
+					return;
 				}
 			}
 			
-			if(allSipSessionsReadyToInvalidate) {
-				if(this.servletTimers.size() <= 0) {
-					this.readyToInvalidate = true;
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug(servletTimers.size() + " Timers still alive, cannot invalidate this application session " + key);
-					}
+			if(this.servletTimers.size() <= 0) {
+				this.readyToInvalidate = true;
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug(servletTimers.size() + " Timers still alive, cannot invalidate this application session " + key);
 				}
 			}
-						
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Sip application session already invalidated "+ key);

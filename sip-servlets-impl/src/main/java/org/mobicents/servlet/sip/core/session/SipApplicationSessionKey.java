@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * <p>
@@ -30,7 +29,6 @@ import java.util.UUID;
  */
 public class SipApplicationSessionKey implements Serializable {
 	String uuid;
-//	String id; 
 	String applicationName;
 	boolean isAppGeneratedKey;
 	private String toString;
@@ -46,7 +44,6 @@ public class SipApplicationSessionKey implements Serializable {
 		} else {
 			this.uuid = id;
 		}
-//		this.id = id;
 		this.applicationName = applicationName;
 		this.isAppGeneratedKey = isAppGeneratedKey;
 		StringBuffer value = new StringBuffer();

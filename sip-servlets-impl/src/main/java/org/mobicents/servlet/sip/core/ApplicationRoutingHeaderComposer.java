@@ -1,10 +1,8 @@
 package org.mobicents.servlet.sip.core;
 
-import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.GenericUtils;
 
 /**
  * This class manipulates strings representing the AR stack for cases when the container
@@ -38,18 +36,18 @@ public class ApplicationRoutingHeaderComposer {
 	
 	private String uniqueValue;
 	
-	private Map<String, String> mdToAppName = null;
+	private SipApplicationDispatcher sipApplicationDispatcher = null;
 
 	private String applicationName = null;
 	
 	private String appGeneratedApplicationSessionId = null;	
 
-	public ApplicationRoutingHeaderComposer(Map<String, String> hashMap) {
-		this(hashMap, null);
+	public ApplicationRoutingHeaderComposer(SipApplicationDispatcher sipApplicationDispatcher) {
+		this(sipApplicationDispatcher, null);
 	}
 	
-	public ApplicationRoutingHeaderComposer(Map<String, String> hashMap, String text) {
-		this.mdToAppName = hashMap;
+	public ApplicationRoutingHeaderComposer(SipApplicationDispatcher sipApplicationDispatcher, String text) {
+		this.sipApplicationDispatcher = sipApplicationDispatcher;
 		
 		if(text == null) {
 			uniqueValue = randomString();
@@ -68,7 +66,7 @@ public class ApplicationRoutingHeaderComposer {
 		// Otherwise extract the uniqueValue from the tag string, it's the first token.
 		uniqueValue = tokens[0];
 		String hashedAppName = tokens[1];
-		String appName = mdToAppName.get(hashedAppName);
+		String appName = sipApplicationDispatcher.getApplicationNameFromHash(hashedAppName);
 		if(appName == null) 
 			throw new NullPointerException("The hash doesn't correspond to any app name: " + hashedAppName);
 		applicationName = appName;
@@ -78,7 +76,7 @@ public class ApplicationRoutingHeaderComposer {
 	}
 	
 	public void setApplicationName(String applicationName) {
-		this.applicationName = GenericUtils.hashString(applicationName);
+		this.applicationName = sipApplicationDispatcher.getHashFromApplicationName(applicationName);
 	}
 	
 	public String getApplicationName() {

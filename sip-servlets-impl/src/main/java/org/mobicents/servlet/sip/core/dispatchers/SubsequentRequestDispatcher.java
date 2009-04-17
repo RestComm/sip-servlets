@@ -29,12 +29,14 @@ import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -99,12 +101,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "The popped route shouldn't be null for not proxied requests.");
 			}
 		}
-		//Extract information from the Record Route Header		
-		String applicationName = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
-		final String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
-		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
+		//Extract information from the Record Route Header
+		Parameters jsipAddress = ((Parameters)((AddressImpl)poppedAddress).getAddress().getURI());
+		String applicationNameHashed = jsipAddress.getParameter(RR_PARAM_APPLICATION_NAME);
+		String applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+		final String finalResponse = jsipAddress.getParameter(FINAL_RESPONSE);
+		String applicationId = jsipAddress.getParameter(APP_ID);
+		String generatedApplicationKey = jsipAddress.getParameter(GENERATED_APP_KEY);
+		boolean isAppGenerated = false;
 		if(generatedApplicationKey != null) {
-			generatedApplicationKey = RFC2396UrlDecoder.decode(generatedApplicationKey);
+			applicationId = RFC2396UrlDecoder.decode(generatedApplicationKey);
+			isAppGenerated = true;
 		}
 		if(applicationName == null || applicationName.length() < 1) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
@@ -122,11 +129,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		final SipManager sipManager = (SipManager)sipContext.getManager();		
 		SipApplicationSessionKey sipApplicationSessionKey = null;
-		if(generatedApplicationKey != null && generatedApplicationKey.length() > 0) {
+		if(applicationId != null && applicationId.length() > 0) {
 			sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					applicationName, 
-					generatedApplicationKey,
-					true);
+					applicationId,
+					isAppGenerated);
 		} else {
 			sipApplicationSessionKey = makeAppSessionKey(
 				sipContext, sipServletRequest, applicationName);

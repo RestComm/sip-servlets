@@ -53,6 +53,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -175,8 +176,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			ackRequest.removeHeader(RouteHeader.NAME);
 			while (routeHeaders.hasNext()) {
 				RouteHeader routeHeader = routeHeaders.next();
-				String routeAppName = ((SipURI)routeHeader .getAddress().getURI()).
+				String routeAppNameHashed = ((SipURI)routeHeader .getAddress().getURI()).
 					getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
+				String routeAppName = sipFactoryImpl.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
 				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
 					ackRequest.addHeader(routeHeader);
 				}
@@ -219,8 +221,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			prackRequest.removeHeader(RouteHeader.NAME);
 			while (routeHeaders.hasNext()) {
 				RouteHeader routeHeader = routeHeaders.next();
-				String routeAppName = ((SipURI)routeHeader .getAddress().getURI()).
+				String routeAppNameHashed = ((SipURI)routeHeader .getAddress().getURI()).
 					getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
+				String routeAppName = sipFactoryImpl.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
 				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
 					prackRequest.addHeader(routeHeader);
 				}
@@ -406,11 +409,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
 						response
 						);
-				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
+				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
 				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");
-//				if(session.getSipApplicationSession().getKey().isAppGeneratedKey()) {
-				sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(session.getSipApplicationSession().getKey().getId()));
-//				}
+				if(session.getSipApplicationSession().getKey().isAppGeneratedKey()) {
+					sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(session.getSipApplicationSession().getKey().getId()));
+				} else {
+					sipURI.setParameter(MessageDispatcher.APP_ID, session.getSipApplicationSession().getKey().getId());
+				}
 				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);

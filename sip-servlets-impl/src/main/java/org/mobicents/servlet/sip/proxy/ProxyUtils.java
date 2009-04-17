@@ -31,12 +31,14 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -144,12 +146,16 @@ public class ProxyUtils {
 							params.routeRecord.getParameter(paramName));
 				}
 				
+				SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
-						originalRequest.getSipSession().getKey().getApplicationName());
+						proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName()));
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_PROXY_APP,
-						"true");
-				rrURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, 
-						RFC2396UrlDecoder.encode(originalRequest.getSipSession().getSipApplicationSession().getKey().getId()));
+						"true");				
+				if(sipAppKey.isAppGeneratedKey()) {
+					rrURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(sipAppKey.getId()));
+				} else {
+					rrURI.setParameter(MessageDispatcher.APP_ID, sipAppKey.getId());
+				}
 				rrURI.setLrParam();
 				
 				Address rraddress = SipFactories.addressFactory

@@ -69,6 +69,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -963,7 +964,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
-					session.getKey().getApplicationName());
+					sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
 			
 			getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			//updating the last accessed times 

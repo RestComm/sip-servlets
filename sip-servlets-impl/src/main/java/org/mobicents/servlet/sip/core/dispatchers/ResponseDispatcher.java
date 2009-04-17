@@ -28,7 +28,6 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.Transaction;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -106,7 +105,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					if(logger.isDebugEnabled()) {
 						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
 					}
-					forwardResponseStatefully(sipServletResponse);
+//					forwardResponseStatefully(sipServletResponse);
 					return ;
 				}
 			}
@@ -128,7 +127,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 				forwardResponseStatefully(sipServletResponse);
 				return ;
 			}
-			String appName = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME); 
+			String appNameHashed = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME);
+			String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
 			boolean inverted = false;
 			if(dialog != null && dialog.isServer()) {
 				inverted = true;
@@ -251,11 +251,17 @@ public class ResponseDispatcher extends MessageDispatcher {
 	private final static void forwardResponseStatefully(SipServletResponseImpl sipServletResponse) {
 		final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
 		final Dialog dialog = sipServletResponse.getDialog();
-		
-		Response newResponse = (Response) sipServletResponse.getResponse().clone();
-		newResponse.removeFirst(ViaHeader.NAME);
-		ListIterator<ViaHeader> viaHeadersLeft = newResponse.getHeaders(ViaHeader.NAME);
+		Response response = sipServletResponse.getResponse();
+				
+		ListIterator<ViaHeader> viaHeadersLeft = response.getHeaders(ViaHeader.NAME);
+		// we cannot remove the via header on the original response (and we don't to proactively clone the response for perf reasons)
+		// otherwise it will make subsequent request creation fails (because JSIP dialog check the topmostviaHeader of the response)
 		if(viaHeadersLeft.hasNext()) {
+			viaHeadersLeft.next();
+		}
+		if(viaHeadersLeft.hasNext()) {
+			Response newResponse = (Response) response.clone();
+			newResponse.removeFirst(ViaHeader.NAME);
 			//forward it statefully
 			//TODO should decrease the max forward header to avoid infinite loop
 			if(logger.isDebugEnabled()) {
@@ -289,7 +295,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			//no more via header B2BUA is the end point
 			if(logger.isDebugEnabled()) {
 				logger.debug("Not forwarding the response statefully. " +
-						"It was either an endpoint or a B2BUA, ie an endpoint too " + newResponse);
+						"It was either an endpoint or a B2BUA, ie an endpoint too " + response);
 			}
 		}			
 	}

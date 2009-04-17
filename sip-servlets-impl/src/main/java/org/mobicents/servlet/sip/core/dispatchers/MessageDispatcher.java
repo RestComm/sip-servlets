@@ -73,6 +73,10 @@ public abstract class MessageDispatcher {
 	 */
 	public static final String GENERATED_APP_KEY = "gen_app_key";
 	/* 
+	 * This parameter is to know the application id
+	 */
+	public static final String APP_ID = "app_id";
+	/* 
 	 * This parameter is to know when an app was not deployed and couldn't handle the request
 	 * used so that the response doesn't try to call the app not deployed
 	 */
@@ -129,7 +133,6 @@ public abstract class MessageDispatcher {
 	protected static SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) throws DispatcherException {
 		String id = null;
 		boolean isAppGeneratedKey = false;
-		Request request = (Request) sipServletRequestImpl.getMessage();
 		Method appKeyMethod = null;
 		// Session Key Based Targeted Mechanism is oly for Initial Requests 
 		// see JSR 289 Section 15.11.2 Session Key Based Targeting Mechanism 
@@ -160,16 +163,11 @@ public abstract class MessageDispatcher {
 				//or an invalid session id as a failure to obtain a key from the application. 
 				//It is recommended that the container create a new SipApplicationSession for the incoming request in such a case.
 //				throw new IllegalStateException("SipApplicationKey annotated method shoud not return null");				
-//not needed anymore since the sipappsesionkey is not a callid anymore but a rnadom uuid
-//				id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("For request target to application " + sipContext.getApplicationName() + 
 						", following annotated method " + appKeyMethod + " generated the application key : " + id);
 			}
-		} else {
-////not needed anymore since the sipappsesionkey is not a callid anymore but a rnadom uuid		
-//			id = ((CallIdHeader)request.getHeader((CallIdHeader.NAME))).getCallId();
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
@@ -235,7 +233,7 @@ public abstract class MessageDispatcher {
 				}
 				sipContext.getSipRubyController().routeSipResponseToRubyApp(response);
 			} else {
-				logger.warn(sipServletImpl.getName()+ " is unavailable, dropping response " + response);
+				logger.warn(sessionHandler + " is unavailable, dropping response " + response);
 			}
 		} else {
 			Servlet servlet = sipServletImpl.allocate();

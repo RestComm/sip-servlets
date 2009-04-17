@@ -42,6 +42,7 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -493,7 +494,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
-					request.getSipSession().getKey().getApplicationName());
+					proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(request.getSipSession().getKey().getApplicationName()));
 		} catch (ParseException pe) {
 			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", pe);
 		}

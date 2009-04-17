@@ -192,36 +192,31 @@ public class SipNetworkInterfaceManager {
 	 * If none has been found, null is returned.
 	 */
 	public ExtendedListeningPoint findMatchingListeningPoint(String ipAddress, int port, String transport) {
-		boolean isNumericalIPAddress = false;
-		InetAddress[] inetAddresses = new InetAddress[0];
-		if(Inet6Util.isValidIP6Address(ipAddress) 
-				|| Inet6Util.isValidIPV4Address(ipAddress)) {
-			isNumericalIPAddress = true;
-		} else {
+		int portChecked = checkPortRange(port, transport);
+		if(transport == null) {
+			transport = ListeningPoint.UDP;
+		}	
+		// we check first if a listening point can be found (we only do the host resolving if not found to have better perf )
+		ExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + transport.toLowerCase());
+		if(listeningPoint == null && !Inet6Util.isValidIP6Address(ipAddress) 
+					&& !Inet6Util.isValidIPV4Address(ipAddress)) {
+			// if no listening point has been found and the ipaddress is not a valid IP6 address nor a valid IPV4 address 
+			// then we try to resolve it as a hostname
+			InetAddress[] inetAddresses = new InetAddress[0];
 			try {
 				inetAddresses = InetAddress.getAllByName(ipAddress);
 			} catch (UnknownHostException e) {
-				//not important it can mean that the ipAddress provided is not a hostname
+				// not important it can mean that the ipAddress provided is not a hostname
 				// but an ip address not found in the searched listening points above				
 			}
-		}
-		if(transport == null) {
-			transport = ListeningPoint.UDP;
-		}
-		int portChecked = checkPortRange(port, transport);
-		
-		if(isNumericalIPAddress) {
-			return extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + transport.toLowerCase());
-		} else {
 			for (InetAddress inetAddress : inetAddresses) {
-				ExtendedListeningPoint extendedListeningPoint = extendedListeningPointsCacheMap.get(inetAddress.getHostAddress() + "/" + portChecked + ":" + transport.toLowerCase());
-				if(extendedListeningPoint != null) {
-					return extendedListeningPoint;
+				listeningPoint = extendedListeningPointsCacheMap.get(inetAddress.getHostAddress() + "/" + portChecked + ":" + transport.toLowerCase());
+				if(listeningPoint != null) {
+					return listeningPoint;
 				}
 			}
 		}
-						
-		return null; 
+		return listeningPoint;
 	}
 	
 	/**

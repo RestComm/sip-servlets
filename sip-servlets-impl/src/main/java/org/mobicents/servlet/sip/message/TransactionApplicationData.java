@@ -40,7 +40,7 @@ public class TransactionApplicationData implements Serializable {
 	private transient int initialRemotePort;
 	private transient String initialRemoteTransport;
 	private transient Address initialPoppedRoute;
-	private transient AtomicInteger rseqNumber;
+	private transient AtomicInteger rseqNumber;	
 		
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;

@@ -491,7 +491,7 @@ public class SipFactoryImpl implements Serializable {
 			SipApplicationDispatcher dispatcher = 
 				mobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
 			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
-					dispatcher.getMdToApplicationName());			
+					dispatcher);			
 			stack.setApplicationName(sipAppSession.getApplicationName());
 //			if(sipApplicationSessionKey.isAppGeneratedKey()) {
 				stack.setAppGeneratedApplicationSessionId(sipApplicationSessionKey.getId());

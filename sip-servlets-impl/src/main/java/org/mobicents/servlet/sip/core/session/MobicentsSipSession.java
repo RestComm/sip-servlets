@@ -156,5 +156,4 @@ public interface MobicentsSipSession extends SipSession {
 	void removeSubscription(SipServletMessageImpl sipServletMessage);
 	
 	MobicentsSipSessionFacade getSession();
-
 }

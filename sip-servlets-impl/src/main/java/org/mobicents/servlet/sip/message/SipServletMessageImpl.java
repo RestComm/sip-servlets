@@ -149,6 +149,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected boolean isMessageSent;
 	
 	protected Dialog dialog;
+	
+	protected String method;
 
 	public static final String INITIAL_REMOTE_ADDR_HEADER_NAME = "MSS_Initial_Remote_Addr";
 	public static final String INITIAL_REMOTE_PORT_HEADER_NAME = "MSS_Initial_Remote_Port";
@@ -393,6 +395,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if (transaction != null && transaction.getApplicationData() == null) {
 			transaction.setApplicationData(transactionApplicationData);
 		}
+		method = message instanceof Request ? ((Request) message).getMethod()
+				: ((CSeqHeader) message.getHeader(CSeqHeader.NAME)).getMethod();
 	}
 
 	private void checkCommitted() {
@@ -924,8 +928,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public String getMethod() {
 
-		return message instanceof Request ? ((Request) message).getMethod()
-				: ((CSeqHeader) message.getHeader(CSeqHeader.NAME)).getMethod();
+		return method;
 	}
 
 	/*
