@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.core.session;
 
 import gov.nist.javax.sip.header.From;
 import gov.nist.javax.sip.header.To;
+import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
 
 import java.io.Serializable;
@@ -330,7 +331,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)
 					&& sessionCreatingTransaction instanceof ClientTransaction) {
-				Request request = (Request) sessionCreatingTransaction.getRequest().clone();				
+				Request request = (Request) sessionCreatingTransaction.getRequest().clone();
+				((SIPMessage)request).setApplicationData(null);
 				
 				CSeqHeader cSeq = (CSeqHeader) request.getHeader((CSeqHeader.NAME));
 				try {

@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
@@ -261,6 +262,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 		}
 		if(viaHeadersLeft.hasNext()) {
 			Response newResponse = (Response) response.clone();
+			((SIPMessage)newResponse).setApplicationData(null);
 			newResponse.removeFirst(ViaHeader.NAME);
 			//forward it statefully
 			//TODO should decrease the max forward header to avoid infinite loop

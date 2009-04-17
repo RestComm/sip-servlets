@@ -293,7 +293,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						else if(dialog == null && transaction == null) {
 							try{
 								// FIXME send it statefully
-								sipProvider.sendRequest((Request)request.clone());
+								sipProvider.sendRequest((Request)request.clone());								
 								if(logger.isInfoEnabled()) {
 									logger.info("Subsequent Request dispatched outside the container " + request.toString());
 								}

@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
+import gov.nist.javax.sip.message.SIPMessage;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -101,6 +103,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		// will clone this request (with it's custome headers and routes), but we will override
 		// the modified RR and Path parameters (as defined in the spec).
 		Request cloned = (Request)originalRequest.getMessage().clone();
+		((SIPMessage)cloned).setApplicationData(null);
 		this.outgoingRequest = new SipServletRequestImpl(
 				cloned,
 				proxy.getSipFactoryImpl(),

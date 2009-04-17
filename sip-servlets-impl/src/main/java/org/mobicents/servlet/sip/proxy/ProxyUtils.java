@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.proxy;
 import gov.nist.javax.sip.Utils;
 import gov.nist.javax.sip.header.HeaderFactoryImpl;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.message.SIPMessage;
 
 import java.util.Iterator;
 
@@ -61,6 +62,7 @@ public class ProxyUtils {
 	{
 		try {
 			Request clonedRequest = (Request) originalRequest.getMessage().clone();
+			((SIPMessage)clonedRequest).setApplicationData(null);
 
 			// The target is null when proxying subsequent requests (the Route header is already there)
 			if(params.destination != null)
@@ -201,6 +203,7 @@ public class ProxyUtils {
 	{
 		Response response = (Response)sipServetResponse.getMessage();
 		Response clonedResponse = (Response)  response.clone();
+		((SIPMessage)clonedResponse).setApplicationData(null);
 
 		// 1. Update timer C for provisional responses
 		if(sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE)) {

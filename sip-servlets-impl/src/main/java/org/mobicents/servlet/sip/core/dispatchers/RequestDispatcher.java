@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.message.SIPMessage;
+
 import java.text.ParseException;
 
 import javax.servlet.sip.ar.SipRouteModifier;
@@ -71,7 +73,8 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		Request clonedRequest = (Request)sipServletRequest.getMessage().clone();		
 		
 		//Add via header
-		String transport = JainSipUtils.findTransport(clonedRequest);		
+		String transport = JainSipUtils.findTransport(clonedRequest);
+		((SIPMessage)clonedRequest).setApplicationData(null);
 		ViaHeader viaHeader = JainSipUtils.createViaHeader(
 				sipNetworkInterfaceManager, clonedRequest, null);
 		MobicentsSipSession session = sipServletRequest.getSipSession();
