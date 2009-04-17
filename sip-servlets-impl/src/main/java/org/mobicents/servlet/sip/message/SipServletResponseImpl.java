@@ -178,7 +178,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				RouteHeader routeHeader = routeHeaders.next();
 				String routeAppNameHashed = ((SipURI)routeHeader .getAddress().getURI()).
 					getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
-				String routeAppName = sipFactoryImpl.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
+				String routeAppName = null;
+				if(routeAppNameHashed != null) {
+					routeAppName = sipFactoryImpl.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
+				}
 				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
 					ackRequest.addHeader(routeHeader);
 				}
@@ -223,7 +226,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				RouteHeader routeHeader = routeHeaders.next();
 				String routeAppNameHashed = ((SipURI)routeHeader .getAddress().getURI()).
 					getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
-				String routeAppName = sipFactoryImpl.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
+				String routeAppName = null;
+				if(routeAppNameHashed != null) {
+					routeAppName = sipFactoryImpl.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
+				}
 				if(routeAppName == null || !routeAppName.equals(getSipSession().getKey().getApplicationName())) {
 					prackRequest.addHeader(routeHeader);
 				}

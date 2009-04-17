@@ -399,7 +399,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 			RouteHeader routeHeader = routeHeaders.next();
 			String routeAppNameHashed = ((javax.sip.address.SipURI)routeHeader .getAddress().getURI()).
 				getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
-			String routeAppName = sipFactory.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
+			String routeAppName = null;
+			if(routeAppNameHashed != null) {
+				routeAppName = sipFactory.getSipApplicationDispatcher().getApplicationNameFromHash(routeAppNameHashed);
+			}
 			if(routeAppName == null || !routeAppName.equals(getKey().getApplicationName())) {
 				request.addHeader(routeHeader);
 			}

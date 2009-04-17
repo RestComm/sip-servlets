@@ -103,8 +103,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		//Extract information from the Record Route Header
 		Parameters jsipAddress = ((Parameters)((AddressImpl)poppedAddress).getAddress().getURI());
-		String applicationNameHashed = jsipAddress.getParameter(RR_PARAM_APPLICATION_NAME);
-		String applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+		String applicationNameHashed = jsipAddress.getParameter(RR_PARAM_APPLICATION_NAME);	
 		final String finalResponse = jsipAddress.getParameter(FINAL_RESPONSE);
 		String applicationId = jsipAddress.getParameter(APP_ID);
 		String generatedApplicationKey = jsipAddress.getParameter(GENERATED_APP_KEY);
@@ -113,10 +112,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			applicationId = RFC2396UrlDecoder.decode(generatedApplicationKey);
 			isAppGenerated = true;
 		}
-		if(applicationName == null || applicationName.length() < 1) {
+		if(applicationNameHashed == null || applicationNameHashed.length() < 1) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
+		String applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
 		boolean inverted = false;
 		if(dialog != null && !dialog.isServer()) {
 			inverted = true;
