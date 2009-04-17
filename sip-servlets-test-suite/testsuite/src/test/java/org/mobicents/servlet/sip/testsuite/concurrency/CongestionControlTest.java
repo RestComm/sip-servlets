@@ -96,6 +96,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+			Thread.sleep(500);
 		}
 		sender.sendBye();
 		Thread.sleep(10000);
@@ -124,6 +125,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+			Thread.sleep(500);
 		}
 		sender.sendBye();
 		Thread.sleep(10000);
@@ -151,6 +153,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+			Thread.sleep(500);
 		}
 		sender.sendBye();
 		Thread.sleep(10000);
@@ -160,7 +163,7 @@ public class CongestionControlTest extends SipServletTestCase {
 	
 	public void testMemoryCongestedDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
-		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(5);
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(2);
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.DropMessage);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -177,8 +180,9 @@ public class CongestionControlTest extends SipServletTestCase {
 		Thread.sleep(3000);
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
-		for(int q=0; q<40; q++) {
+		for(int q=0; q<40; q++) {			
 			sender.sendInDialogSipRequest("INFO", new Integer(q).toString(), "text", "plain", null);
+			Thread.sleep(500);
 		}
 		sender.sendBye();
 		Thread.sleep(10000);

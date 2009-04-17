@@ -62,6 +62,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 15000;
+	private static final int CANCEL_TIMEOUT = 500;
 	InetAddress balancerAddress = null;
 	private final static int BALANCER_EXTERNAL_PORT = 5060;
 	private final static int BALANCER_INTERNAL_PORT = 5065;
@@ -456,7 +457,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(200);
+		Thread.sleep(CANCEL_TIMEOUT);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
@@ -468,7 +469,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
-		Thread.sleep(200);
+		Thread.sleep(CANCEL_TIMEOUT);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());

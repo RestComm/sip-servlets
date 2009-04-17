@@ -191,7 +191,7 @@ public class SpeedDialLocationServiceJunitTest extends SipServletTestCase {
 				toUser, toHost);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
