@@ -562,7 +562,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
     // Counts the number of cancelled tasks
-    private int numCancelled = 0;
+    private static int numCancelled = 0;
 
 	private void cancelExpirationTimer() {
 		//CANCEL needs to remove the shceduled timer see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6602600
