@@ -561,6 +561,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		facade = null;
 	}
 
+    // Counts the number of cancelled tasks
+    private int numCancelled = 0;
+
 	private void cancelExpirationTimer() {
 		//CANCEL needs to remove the shceduled timer see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6602600
 		//to improve perf
@@ -573,7 +576,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(logger.isDebugEnabled()) {
 			logger.debug("expiration timer on sip application session " + key + " Cancelled : " + cancelled);
 		}
-		sipContext.getThreadPoolExecutor().purge();
+
+        // Purge is expensive when called frequently, only call it every now and then.
+        // We do not sync the numCancelled variable. We dont care about correctness of
+        // the number, and we will still call purge rought once on every 25 cancels.
+        numCancelled++;
+        if(numCancelled % 25 == 0) {
+            sipContext.getThreadPoolExecutor().purge();
+        }
 	}
 
 	/*
