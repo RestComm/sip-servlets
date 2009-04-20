@@ -501,6 +501,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	//check if the submitted value is of the form header-value *(COMMA header-value)
 	private boolean isMultipleValue(String value) {
 		StringTokenizer tokenizer = new StringTokenizer(value, ",");
+		tokenizer.nextToken();
 		return tokenizer.hasMoreTokens();
 	}
 
