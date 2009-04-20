@@ -21,10 +21,6 @@ import gov.nist.javax.sip.header.AddressParametersHeader;
 import gov.nist.javax.sip.header.From;
 import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.header.To;
-import gov.nist.javax.sip.header.extensions.ReferredByHeader;
-import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
-import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
-import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
@@ -36,7 +32,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,43 +50,25 @@ import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
+import javax.sip.SipFactory;
 import javax.sip.Transaction;
-import javax.sip.header.AcceptEncodingHeader;
-import javax.sip.header.AcceptHeader;
 import javax.sip.header.AcceptLanguageHeader;
-import javax.sip.header.AlertInfoHeader;
-import javax.sip.header.AllowEventsHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
-import javax.sip.header.CallInfoHeader;
-import javax.sip.header.ContactHeader;
-import javax.sip.header.ContentDispositionHeader;
-import javax.sip.header.ContentEncodingHeader;
 import javax.sip.header.ContentLanguageHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
-import javax.sip.header.ErrorInfoHeader;
-import javax.sip.header.EventHeader;
 import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
-import javax.sip.header.RAckHeader;
-import javax.sip.header.RSeqHeader;
-import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.ReferToHeader;
-import javax.sip.header.ReplyToHeader;
-import javax.sip.header.RetryAfterHeader;
-import javax.sip.header.RouteHeader;
-import javax.sip.header.SubjectHeader;
-import javax.sip.header.SupportedHeader;
 import javax.sip.header.ToHeader;
-import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
@@ -153,210 +130,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected Dialog dialog;
 	
 	protected String method;
-
-	public static final String INITIAL_REMOTE_ADDR_HEADER_NAME = "MSS_Initial_Remote_Addr";
-	public static final String INITIAL_REMOTE_PORT_HEADER_NAME = "MSS_Initial_Remote_Port";
-	public static final String INITIAL_REMOTE_TRANSPORT_HEADER_NAME = "MSS_Initial_Remote_Transport";
 	
-	/**
-	 * List of headers that ARE system at all times
-	 */
-	protected static final HashSet<String> systemHeaders = new HashSet<String>();
-	static {
-
-		systemHeaders.add(FromHeader.NAME);
-		systemHeaders.add(ToHeader.NAME);
-		systemHeaders.add(CallIdHeader.NAME);
-		systemHeaders.add(CSeqHeader.NAME);
-		systemHeaders.add(ViaHeader.NAME);
-		systemHeaders.add(RouteHeader.NAME);
-		systemHeaders.add(RecordRouteHeader.NAME);
-		systemHeaders.add(PathHeader.NAME);
-		// This is system in messages other than REGISTER!!! ContactHeader.NAME
-		// Contact is a system header field in messages other than REGISTER
-		// requests and responses, 3xx and 485 responses, and 200/OPTIONS
-		// responses. Additionally, for containers implementing the reliable
-		// provisional responses extension, RAck and RSeq are considered system
-		// headers also.
-		systemHeaders.add(RSeqHeader.NAME);
-		systemHeaders.add(RAckHeader.NAME);
-		//custom header used by Mobicents Sip Servlets and not allowed to be overriden by apps
-		systemHeaders.add(INITIAL_REMOTE_ADDR_HEADER_NAME);
-		systemHeaders.add(INITIAL_REMOTE_PORT_HEADER_NAME);
-		systemHeaders.add(INITIAL_REMOTE_TRANSPORT_HEADER_NAME);
-	}
-
-	protected static final HashSet<String> addressHeadersNames = new HashSet<String>();
-
-	static {
-
-		// Section 4.1 The baseline SIP specification defines the following set of header
-		// fields that conform to this grammar: From, To, Contact, Route,
-		// Record-Route, Reply-To, Alert-Info, Call-Info, and Error-Info
-		// The SipServletMessage interface defines a set of methods which operate 
-		// on any address header field (see section 5.4.1 Parameterable and Address Header Fields ). 
-		// This includes the RFC 3261 defined header fields listed above as well as extension headers 
-		// such as Refer-To [refer] and P-Asserted-Identity [privacy]. 
-
-		addressHeadersNames.add(FromHeader.NAME);
-		addressHeadersNames.add(ToHeader.NAME);
-		addressHeadersNames.add(ContactHeader.NAME);
-		addressHeadersNames.add(RouteHeader.NAME);
-		addressHeadersNames.add(RecordRouteHeader.NAME);
-		addressHeadersNames.add(ReplyToHeader.NAME);
-		addressHeadersNames.add(AlertInfoHeader.NAME);
-		addressHeadersNames.add(CallInfoHeader.NAME);
-		addressHeadersNames.add(ErrorInfoHeader.NAME);
-		addressHeadersNames.add(ReferToHeader.NAME);
-		addressHeadersNames.add(PAssertedIdentityHeader.NAME);
-			
-	}
-
-	protected static final HashSet<String> parameterableHeadersNames = new HashSet<String>();
-
-	static {
-
-		// All of the Address header fields are Parameterable, including Contact, From, To, Route, Record-Route, and Reply-To. 
-		// In addition, the header fields Accept, Accept-Encoding, Alert-Info, 
-		// Call-Info, Content-Disposition, Content-Type, Error-Info, Retry-After and Via are also Parameterable. 
-		parameterableHeadersNames.add(FromHeader.NAME);
-		parameterableHeadersNames.add(ToHeader.NAME);
-		parameterableHeadersNames.add(ContactHeader.NAME);
-		parameterableHeadersNames.add(RouteHeader.NAME);
-		parameterableHeadersNames.add(RecordRouteHeader.NAME);
-		parameterableHeadersNames.add(ReplyToHeader.NAME);
-		parameterableHeadersNames.add(AcceptHeader.NAME);
-		parameterableHeadersNames.add(AcceptEncodingHeader.NAME);
-		parameterableHeadersNames.add(AlertInfoHeader.NAME);
-		parameterableHeadersNames.add(CallInfoHeader.NAME);
-		parameterableHeadersNames.add(ContentDispositionHeader.NAME);
-		parameterableHeadersNames.add(ContentTypeHeader.NAME);
-		parameterableHeadersNames.add(ErrorInfoHeader.NAME);
-		parameterableHeadersNames.add(RetryAfterHeader.NAME);
-		parameterableHeadersNames.add(ViaHeader.NAME);
-			
-	}
-
-	
-	protected static final HashMap<String, String> headerCompact2FullNamesMappings = new HashMap<String, String>();
-
-	{ // http://www.iana.org/assignments/sip-parameters
-		// Header Name compact Reference
-		// ----------------- ------- ---------
-		// Call-ID i [RFC3261]
-		// From f [RFC3261]
-		// To t [RFC3261]
-		// Via v [RFC3261]
-		// =========== NON SYSTEM HEADERS ========
-		// Contact m [RFC3261] <-- Possibly system header
-		// Accept-Contact a [RFC3841]
-		// Allow-Events u [RFC3265]
-		// Content-Encoding e [RFC3261]
-		// Content-Length l [RFC3261]
-		// Content-Type c [RFC3261]
-		// Event o [RFC3265]
-		// Identity y [RFC4474]
-		// Identity-Info n [RFC4474]
-		// Refer-To r [RFC3515]
-		// Referred-By b [RFC3892]
-		// Reject-Contact j [RFC3841]
-		// Request-Disposition d [RFC3841]
-		// Session-Expires x [RFC4028]
-		// Subject s [RFC3261]
-		// Supported k [RFC3261]
-
-		headerCompact2FullNamesMappings.put("i", CallIdHeader.NAME);
-		headerCompact2FullNamesMappings.put("f", FromHeader.NAME);
-		headerCompact2FullNamesMappings.put("t", ToHeader.NAME);
-		headerCompact2FullNamesMappings.put("v", ViaHeader.NAME);
-		headerCompact2FullNamesMappings.put("m", ContactHeader.NAME);
-		// headerCompact2FullNamesMappings.put("a",); // Where is this header?
-		headerCompact2FullNamesMappings.put("u", AllowEventsHeader.NAME);
-		headerCompact2FullNamesMappings.put("e", ContentEncodingHeader.NAME);
-		headerCompact2FullNamesMappings.put("l", ContentLengthHeader.NAME);
-		headerCompact2FullNamesMappings.put("c", ContentTypeHeader.NAME);
-		headerCompact2FullNamesMappings.put("o", EventHeader.NAME);
-		// headerCompact2FullNamesMappings.put("y", IdentityHeader); // Where is
-		// sthis header?
-		// headerCompact2FullNamesMappings.put("n",IdentityInfoHeader );
-		headerCompact2FullNamesMappings.put("r", ReferToHeader.NAME);
-		 headerCompact2FullNamesMappings.put("b", ReferredByHeader.NAME);
-		// headerCompact2FullNamesMappings.put("j", RejectContactHeader);
-		headerCompact2FullNamesMappings.put("d", ContentDispositionHeader.NAME);
-		 headerCompact2FullNamesMappings.put("x", SessionExpiresHeader.NAME);
-		headerCompact2FullNamesMappings.put("s", SubjectHeader.NAME);
-		headerCompact2FullNamesMappings.put("k", SupportedHeader.NAME);
-	}
-
-	protected static final HashMap<String, String> headerFull2CompactNamesMappings = new HashMap<String, String>();
-
-	static { // http://www.iana.org/assignments/sip-parameters
-		// Header Name compact Reference
-		// ----------------- ------- ---------
-		// Call-ID i [RFC3261]
-		// From f [RFC3261]
-		// To t [RFC3261]
-		// Via v [RFC3261]
-		// =========== NON SYSTEM HEADERS ========
-		// Contact m [RFC3261] <-- Possibly system header
-		// Accept-Contact a [RFC3841]
-		// Allow-Events u [RFC3265]
-		// Content-Encoding e [RFC3261]
-		// Content-Length l [RFC3261]
-		// Content-Type c [RFC3261]
-		// Event o [RFC3265]
-		// Identity y [RFC4474]
-		// Identity-Info n [RFC4474]
-		// Refer-To r [RFC3515]
-		// Referred-By b [RFC3892]
-		// Reject-Contact j [RFC3841]
-		// Request-Disposition d [RFC3841]
-		// Session-Expires x [RFC4028]
-		// Subject s [RFC3261]
-		// Supported k [RFC3261]
-
-		headerFull2CompactNamesMappings.put(CallIdHeader.NAME, "i");
-		headerFull2CompactNamesMappings.put(FromHeader.NAME, "f");
-		headerFull2CompactNamesMappings.put(ToHeader.NAME, "t");
-		headerFull2CompactNamesMappings.put(ViaHeader.NAME, "v");
-		headerFull2CompactNamesMappings.put(ContactHeader.NAME, "m");
-		// headerFull2CompactNamesMappings.put(,"a"); // Where is this header?
-		headerFull2CompactNamesMappings.put(AllowEventsHeader.NAME, "u");
-		headerFull2CompactNamesMappings.put(ContentEncodingHeader.NAME, "e");
-		headerFull2CompactNamesMappings.put(ContentLengthHeader.NAME, "l");
-		headerFull2CompactNamesMappings.put(ContentTypeHeader.NAME, "c");
-		headerFull2CompactNamesMappings.put(EventHeader.NAME, "o");
-		// headerCompact2FullNamesMappings.put(IdentityHeader,"y"); // Where is
-		// sthis header?
-		// headerCompact2FullNamesMappings.put(IdentityInfoHeader ,"n");
-		headerFull2CompactNamesMappings.put(ReferToHeader.NAME, "r");
-		// headerCompact2FullNamesMappings.put(ReferedByHeader,"b");
-		// headerCompact2FullNamesMappings.put(RejectContactHeader,"j");
-		headerFull2CompactNamesMappings.put(ContentDispositionHeader.NAME, "d");
-		// headerCompact2FullNamesMappings.put(SessionExpiresHeader,"x");
-		headerFull2CompactNamesMappings.put(SubjectHeader.NAME, "s");
-		headerFull2CompactNamesMappings.put(SupportedHeader.NAME, "k");
-	}
-	
-	protected static final HashSet<String> ianaAllowedContentTypes = new HashSet<String>();	
-
-	static {
-
-		// All of the Address header fields are Parameterable, including Contact, From, To, Route, Record-Route, and Reply-To. 
-		// In addition, the header fields Accept, Accept-Encoding, Alert-Info, 
-		// Call-Info, Content-Disposition, Content-Type, Error-Info, Retry-After and Via are also Parameterable. 
-		ianaAllowedContentTypes.add("application");
-		ianaAllowedContentTypes.add("audio");
-		ianaAllowedContentTypes.add("example");
-		ianaAllowedContentTypes.add("image");
-		ianaAllowedContentTypes.add("message");
-		ianaAllowedContentTypes.add("model");
-		ianaAllowedContentTypes.add("multipart");
-		ianaAllowedContentTypes.add("text");
-		ianaAllowedContentTypes.add("video");
-			
-	}
-
 	protected SipServletMessageImpl(Message message,
 			SipFactoryImpl sipFactoryImpl, Transaction transaction,
 			MobicentsSipSession sipSession, Dialog dialog) {
@@ -479,19 +253,17 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 		String nameToAdd = getCorrectHeaderName(hName);
 		
-		boolean isMultipleValue = isMultipleValue(value);
-		
 		try {
-			if(isMultipleValue) {
-				List<Header> headers = SipFactories.headerFactory.createHeaders(nameToAdd + HCOLON +
+			if(JainSipUtils.multiValueHeaders.contains(name)) {
+				List<Header> headers = SipFactory.getInstance().createHeaderFactory().createHeaders(nameToAdd + ":" +
 						value);
 				for (Header header : headers) {
 					this.message.addLast(header);
 				}
 			} else {
-				Header header = SipFactories.headerFactory.createHeader(nameToAdd,
-					value);
-				this.message.addLast(header);
+				Header header = SipFactory.getInstance().createHeaderFactory()
+					.createHeader(nameToAdd, value);
+				this.message.setHeader(header);
 			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
@@ -1349,10 +1121,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 		int indexOfSlash = contentType.indexOf("/");
 		if(indexOfSlash != -1) { 
-			if(!ianaAllowedContentTypes.contains(contentType.substring(0, indexOfSlash))) {
+			if(!JainSipUtils.ianaAllowedContentTypes.contains(contentType.substring(0, indexOfSlash))) {
 				throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
 			}
-		} else if(!ianaAllowedContentTypes.contains(contentType.toLowerCase())) {
+		} else if(!JainSipUtils.ianaAllowedContentTypes.contains(contentType.toLowerCase())) {
 			throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
 		}
 	}
@@ -1436,16 +1208,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		boolean isMultipleValue = isMultipleValue(value);
 		
 		try {
-			if(isMultipleValue) {
-				List<Header> headers = SipFactories.headerFactory.createHeaders(name + HCOLON +
+			if(JainSipUtils.multiValueHeaders.contains(name)) {
+				List<Header> headers = SipFactory.getInstance().createHeaderFactory().createHeaders(name + ":" +
 						value);
 				for (Header header : headers) {
 					this.message.addLast(header);
 				}
 			} else {
-				Header header = SipFactories.headerFactory.createHeader(name,
-					value);
-				this.message.addLast(header);
+				Header header = SipFactory.getInstance().createHeaderFactory()
+					.createHeader(name, value);
+				this.message.setHeader(header);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating header!", e);
@@ -1527,7 +1299,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public static boolean isAddressTypeHeader(String headerName) {
 
-		return addressHeadersNames.contains(getFullHeaderName(headerName));
+		return JainSipUtils.addressHeadersNames.contains(getFullHeaderName(headerName));
 
 	}
 
@@ -1541,8 +1313,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected static String getFullHeaderName(String headerName) {
 
 		String fullName = null;
-		if (headerCompact2FullNamesMappings.containsKey(headerName)) {
-			fullName = headerCompact2FullNamesMappings.get(headerName);
+		if (JainSipUtils.headerCompact2FullNamesMappings.containsKey(headerName)) {
+			fullName = JainSipUtils.headerCompact2FullNamesMappings.get(headerName);
 		} else {
 			fullName = headerName;
 		}
@@ -1565,11 +1337,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public static String getCompactName(String headerName) {
 
 		String compactName = null;
-		if (headerCompact2FullNamesMappings.containsKey(headerName)) {
-			compactName = headerCompact2FullNamesMappings.get(headerName);
+		if (JainSipUtils.headerCompact2FullNamesMappings.containsKey(headerName)) {
+			compactName = JainSipUtils.headerCompact2FullNamesMappings.get(headerName);
 		} else {
 			// This can be null if there is no mapping!!!
-			compactName = headerFull2CompactNamesMappings.get(headerName);
+			compactName = JainSipUtils.headerFull2CompactNamesMappings.get(headerName);
 		}
 		if (logger.isDebugEnabled())
 			logger.debug("Fetching compact header name for [" + headerName
@@ -1729,14 +1501,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			}
 		}		
 
-		boolean isNotModifiable = systemHeaders.contains(header.getName());
+		boolean isNotModifiable = JainSipUtils.systemHeaders.contains(header.getName());
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
 				header, value, paramMap, isNotModifiable);
 		return parameterable;
 	}
 
 	public static boolean isParameterable(String header) {
-		if(parameterableHeadersNames.contains(header)) {
+		if(JainSipUtils.parameterableHeadersNames.contains(header)) {
 			return true;
 		}
 		return false;

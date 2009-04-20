@@ -97,13 +97,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
 		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
-		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
+		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isDebugEnabled()) {
 			logger.debug("Routing of Initial Request " + sipServletRequest);
 		}		
 		final Request request = (Request) sipServletRequest.getMessage();
 		
-		RouteHeader poppedRoute = sipServletRequest.getPoppedRouteHeader();
+		final RouteHeader poppedRoute = sipServletRequest.getPoppedRouteHeader();
 		if(logger.isDebugEnabled()) {
 			logger.debug("popped route : " + poppedRoute);
 		}
@@ -251,7 +251,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//the application router shouldn't modify the request
 		sipServletRequest.setReadOnly(true);
 		
-		SipApplicationRouterInfo applicationRouterInfo = 
+		final SipApplicationRouterInfo applicationRouterInfo = 
 			sipApplicationRouter.getNextApplication(
 					sipServletRequest, 
 					routingRegion, 
@@ -300,8 +300,8 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		}			
 		final SipManager sipManager = (SipManager)sipContext.getManager();
 		
-		JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
-		ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
+		final JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
+		final ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
 		String headerName = null;
 		if(joinHeader != null) {
 			headerName = JoinHeader.NAME;
@@ -334,7 +334,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//sip application session association
 		final MobicentsSipApplicationSession appSession = sipApplicationSession;
 		//sip session association
-		SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
+		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
 		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
 		sipServletRequest.setSipSession(sipSessionImpl);
 

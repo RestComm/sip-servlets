@@ -178,7 +178,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());

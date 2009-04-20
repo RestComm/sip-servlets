@@ -479,39 +479,39 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.error("dropping request, memory is too high or too many messages present in queues");
 			return;
 		}	
-		SipProvider sipProvider = (SipProvider)requestEvent.getSource();
-		ServerTransaction transaction =  requestEvent.getServerTransaction();
-		Dialog dialog = requestEvent.getDialog();
-		Request request = requestEvent.getRequest();
+		final SipProvider sipProvider = (SipProvider)requestEvent.getSource();
+		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
+		final Dialog dialog = requestEvent.getDialog();
+		final Request request = requestEvent.getRequest();
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Got a request event "  + request.toString());
 			}			
-			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
+			if (!Request.ACK.equals(request.getMethod()) && requestTransaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
 				    if(request.getHeader(MaxForwardsHeader.NAME)==null){
 					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
 					}
-					transaction = sipProvider.getNewServerTransaction(request);					
+				    requestTransaction = sipProvider.getNewServerTransaction(request);					
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
 					// Sends a 500 Internal server error and stops processing.				
-					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);				
+					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);				
 	                return;
 				} catch ( TransactionAlreadyExistsException taex ) {
 					// Already processed this request so just return.
 					return;				
 				} 
 			} 	
-			
+			final ServerTransaction transaction = requestTransaction;
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("ServerTx ref "  + transaction);				
 				logger.debug("Dialog ref "  + dialog);				
 			}
 			
-			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
 						request,
 						sipFactoryImpl,
 						null,
@@ -520,28 +520,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));
 			requestsProcessed.incrementAndGet();	
 			if(transaction != null) {
-				TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
+				final TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
 				if(transactionApplicationData != null && transactionApplicationData.getInitialRemoteHostAddress() == null) {
-					ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);					
+					final ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);					
 					transactionApplicationData.setInitialRemoteHostAddress(viaHeader.getHost());
 					transactionApplicationData.setInitialRemotePort(viaHeader.getPort());
 					transactionApplicationData.setInitialRemoteTransport(viaHeader.getTransport());
 				}
 			}
-			String transport = JainSipUtils.findTransport(request);
-			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
+			final String transport = JainSipUtils.findTransport(request);
+			final ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
 			sipServletRequest.setLocalAddr(InetAddress.getByName(listeningPoint.getIPAddress()));
 			sipServletRequest.setLocalPort(listeningPoint.getPort());
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
-			RouteHeader routeHeader = (RouteHeader) request
+			RouteHeader requestRouteHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
 			
 			javax.sip.address.SipURI requestURI = null;
 			if(request.getRequestURI() instanceof javax.sip.address.SipURI) {
 				requestURI = (javax.sip.address.SipURI)request.getRequestURI();
 			}
-			if(routeHeader == null && requestURI != null && 
+			if(requestRouteHeader == null && requestURI != null && 
 					!isExternal(requestURI.getHost(), requestURI.getPort(), requestURI.getTransportParam())) {
 				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 				String arText = toHeader.getTag();
@@ -559,16 +559,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						}
 						javax.sip.address.Address address = 
 							SipFactories.addressFactory.createAddress(localUri);
-						routeHeader = SipFactories.headerFactory.createRouteHeader(address);
+						requestRouteHeader = SipFactories.headerFactory.createRouteHeader(address);
 					}
 				}
 			}
+			final RouteHeader routeHeader = requestRouteHeader;
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
 			if(!isRouteExternal(routeHeader)) {
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
-				Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
+				final Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
 				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("the request is for a proxy application, thus it is a subsequent request ");
@@ -613,7 +614,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.error("Unexpected exception while processing request " + request,e);
 			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
-				MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, transaction, request, sipProvider);
+				MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);
 			}
 			return;
 		}
@@ -631,8 +632,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isInfoEnabled()) {
 			logger.info("Response " + responseEvent.getResponse().toString());
 		}
-		Response response = responseEvent.getResponse();
-		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
+		final Response response = responseEvent.getResponse();
+		final CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		//if this is a response to a cancel, the response is dropped
 		if(Request.CANCEL.equalsIgnoreCase(cSeqHeader.getMethod())) {
 			if(logger.isDebugEnabled()) {
@@ -656,19 +657,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			return;
 		}
 		responsesProcessed.incrementAndGet();
-		ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
-		Dialog dialog = responseEvent.getDialog();
+		final ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
+		final Dialog dialog = responseEvent.getDialog();
 		// Transate the response to SipServletResponse
-		SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
+		final SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
 				response, 
 				sipFactoryImpl,
 				clientTransaction, 
 				null, 
 				dialog);
-		SipProvider sipProvider = (SipProvider)responseEvent.getSource();
+		final SipProvider sipProvider = (SipProvider)responseEvent.getSource();
 		try {
-			String transport = JainSipUtils.findTransport(response);
-			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);			
+			final String transport = JainSipUtils.findTransport(response);
+			final ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);			
 			sipServletResponse.setLocalAddr(InetAddress.getByName(listeningPoint.getIPAddress()));
 			sipServletResponse.setLocalPort(listeningPoint.getPort());
 		
@@ -709,16 +710,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				try {
 					if(logger.isInfoEnabled()) {
 						logger.info("session " + sipSessionImpl.getId() + " is valid ? :" + sipSessionImpl.isValid());
-					}
-					if(sipSessionImpl.isValid()) {
-						if(logger.isInfoEnabled()) {
+						if(sipSessionImpl.isValid()) {
 							logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 						}
 					}
-					MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
+					
 					if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
 						sipSessionImpl.onTerminatedState();
 					}
+					MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
 					if(sipApplicationSession != null && sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {
 						sipApplicationSession.tryToInvalidate();
 					}

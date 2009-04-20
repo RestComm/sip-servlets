@@ -176,7 +176,7 @@ public abstract class SipManagerDelegate {
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		if(sipApplicationSessionImpl == null && create) {
-			MobicentsSipApplicationSession newSipApplicationSessionImpl = 
+			final MobicentsSipApplicationSession newSipApplicationSessionImpl = 
 				getNewMobicentsSipApplicationSession(key, (SipContext) container);
 			sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
 			if (sipApplicationSessionImpl == null) {
@@ -209,7 +209,7 @@ public abstract class SipManagerDelegate {
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipSession sipSessionImpl = sipSessions.get(key);
 		if(sipSessionImpl == null && create) {
-			MobicentsSipSession newSipSessionImpl = getNewMobicentsSipSession(key, sipFactoryImpl, sipApplicationSessionImpl);
+			final MobicentsSipSession newSipSessionImpl = getNewMobicentsSipSession(key, sipFactoryImpl, sipApplicationSessionImpl);
 			sipSessionImpl = sipSessions.putIfAbsent(key, newSipSessionImpl);
 			if(sipSessionImpl == null) {
 				if(logger.isDebugEnabled()) {
@@ -221,9 +221,9 @@ public abstract class SipManagerDelegate {
 		}
 		// check if this session key has a to tag.
 		if(sipSessionImpl != null) {
-			String currentKeyToTag = key.getToTag();
-			SipSessionKey existingKey = sipSessionImpl.getKey();
-			String toTag = existingKey.getToTag();
+			final String currentKeyToTag = key.getToTag();
+			final SipSessionKey existingKey = sipSessionImpl.getKey();
+			final String toTag = existingKey.getToTag();
 			if(toTag == null && currentKeyToTag != null) {
 				existingKey.setToTag(currentKeyToTag );
 				if(logger.isDebugEnabled()) {

@@ -34,6 +34,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -324,24 +325,24 @@ public class ResponseDispatcher extends MessageDispatcher {
 			// than adding it as a custom information, we add it as headers only if 
 			// the next via header is for the container
 			if(nextViaHeader != null && !sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
-				sipServletMessage.addHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_ADDR_HEADER_NAME, initialRemoteAddr, true); 
-				sipServletMessage.addHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_PORT_HEADER_NAME, "" + initialRemotePort, true);
-				sipServletMessage.addHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, initialRemoteTransport, true);
+				sipServletMessage.addHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, initialRemoteAddr, true); 
+				sipServletMessage.addHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, "" + initialRemotePort, true);
+				sipServletMessage.addHeaderInternal(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, initialRemoteTransport, true);
 			}
 		} else {
 			// if the message comes from an internal source we add the initial remote info from the previously added headers
-			sipServletMessage.getTransactionApplicationData().setInitialRemoteHostAddress(sipServletMessage.getHeader(SipServletMessageImpl.INITIAL_REMOTE_ADDR_HEADER_NAME));
-			String remotePort = sipServletMessage.getHeader(SipServletMessageImpl.INITIAL_REMOTE_PORT_HEADER_NAME);
+			sipServletMessage.getTransactionApplicationData().setInitialRemoteHostAddress(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME));
+			String remotePort = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME);
 			int intRemotePort = -1;
 			if(remotePort != null) {
 				intRemotePort = Integer.parseInt(remotePort);
 			}
 			sipServletMessage.getTransactionApplicationData().setInitialRemotePort(intRemotePort);
-			sipServletMessage.getTransactionApplicationData().setInitialRemoteTransport(sipServletMessage.getHeader(SipServletMessageImpl.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));
+			sipServletMessage.getTransactionApplicationData().setInitialRemoteTransport(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));
 			if(nextViaHeader == null || sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
-				sipServletMessage.removeHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_ADDR_HEADER_NAME, true); 
-				sipServletMessage.removeHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_PORT_HEADER_NAME, true);
-				sipServletMessage.removeHeaderInternal(SipServletMessageImpl.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, true);
+				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, true); 
+				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, true);
+				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, true);
 			}			
 		}
 	}

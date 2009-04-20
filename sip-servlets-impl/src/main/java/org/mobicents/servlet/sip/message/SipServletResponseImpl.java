@@ -53,13 +53,14 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 
 /**
  * Implementation of the sip servlet response interface
@@ -121,7 +122,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		 */
 
 		// This doesnt contain contact!!!!
-		boolean isSystemHeader = systemHeaders.contains(hName);
+		boolean isSystemHeader = JainSipUtils.systemHeaders.contains(hName);
 
 		if (isSystemHeader) {
 			return isSystemHeader;
@@ -406,21 +407,24 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		if(isMessageSent) {
 			throw new IllegalStateException("message already sent");
 		}
-		try {			
+		try {	
+			final int statusCode = response.getStatusCode();
+			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
+			final SipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
 			//if this is a final response
-			if(response.getStatusCode() >= Response.TRYING && 
-					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE && (session.getProxy() ==null || (session.getProxy()!=null && session.getProxy().getFinalBranchForSubsequentRequests() == null))) {
+			if(statusCode >= Response.TRYING && 
+					statusCode <= Response.SESSION_NOT_ACCEPTABLE && (session.getProxy() ==null || (session.getProxy()!=null && session.getProxy().getFinalBranchForSubsequentRequests() == null))) {
 				//Issue 112 fix by folsson: use the viaheader transport				
-				javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
+				final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
 						response
 						);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
 				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");
-				if(session.getSipApplicationSession().getKey().isAppGeneratedKey()) {
-					sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(session.getSipApplicationSession().getKey().getId()));
+				if(sipAppSessionKey.isAppGeneratedKey()) {
+					sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
 				} else {
-					sipURI.setParameter(MessageDispatcher.APP_ID, session.getSipApplicationSession().getKey().getId());
+					sipURI.setParameter(MessageDispatcher.APP_ID, sipAppSessionKey.getId());
 				}
 				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
@@ -429,12 +433,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
 				response.addFirst(recordRouteHeader);
 			}
-			ServerTransaction st = (ServerTransaction) getTransaction();
+			final ServerTransaction transaction = (ServerTransaction) getTransaction();
+			 
 			// Update Session state
 			session.updateStateOnResponse(this, false);						
 			// RFC 3265 : If a 200-class response matches such a SUBSCRIBE request,
 			// it creates a new subscription and a new dialog.
-			if(Request.SUBSCRIBE.equals(getMethod()) && getStatus() >= 200 && getStatus() <= 300) {					
+			if(Request.SUBSCRIBE.equals(getMethod()) && statusCode >= 200 && statusCode <= 300) {					
 				session.addSubscription(this);
 			}
 			// RFC 3262 Section 3 UAS Behavior
@@ -444,40 +449,41 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				Header rseqHeader = SipFactories.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
 				response.addHeader(rseqHeader);
 			}
-			if(logger.isInfoEnabled()) {
-				logger.info("sending response "+ this.message);
+			if(logger.isDebugEnabled()) {
+				logger.debug("sending response "+ this.message);
 			}
 			//if a response is sent for an initial request, it means that the application
 			//acted as an endpoint so a dialog must be created but only for dialog creating method
-			CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
+			final CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 			if(!Request.CANCEL.equals(originalRequest.getMethod())					
 					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
 							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
 					&& getTransaction().getDialog() == null 
 					&& JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod())) {					
-				String transport = JainSipUtils.findTransport(st.getRequest());
-				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				final String transport = JainSipUtils.findTransport(transaction.getRequest());
+				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
 				
 				Dialog dialog = null;
 				// Creates a dialog only for non trying responses
-				if(this.getStatus() != Response.TRYING) {
+				if(statusCode != Response.TRYING) {
 					dialog = sipProvider.getNewDialog(this
 						.getTransaction());				
 				}
-				getSipSession().setSessionCreatingDialog(dialog);
+				session.setSessionCreatingDialog(dialog);
 				if(logger.isDebugEnabled()) {
 					logger.debug("created following dialog since the application is acting as an endpoint " + dialog);
 				}
 			}
+			final Dialog dialog  = transaction.getDialog();
 			//keeping track of application data and transaction in the dialog
-			if(getTransaction() != null && getTransaction().getDialog() != null) {
-				if(getTransaction().getDialog().getApplicationData() == null) {
-					getTransaction().getDialog().setApplicationData(
+			if(transaction != null && dialog != null) {
+				if(dialog.getApplicationData() == null) {
+					dialog.setApplicationData(
 							originalRequest.getTransactionApplicationData());	
 				}				
-				((TransactionApplicationData)getTransaction().getDialog().getApplicationData()).
-					setTransaction(getTransaction());
+				((TransactionApplicationData)dialog.getApplicationData()).
+					setTransaction(transaction);
 			}
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop
@@ -486,20 +492,20 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 //					response.getStatusCode() < Response.OK) {				
 //				originalRequest.setRoutingState(RoutingState.INFORMATIONAL_RESPONSE_SENT);				
 //			}
-			if(response.getStatusCode() >= Response.OK && 
-					response.getStatusCode() <= Response.SESSION_NOT_ACCEPTABLE) {				
+			if(statusCode >= Response.OK && 
+					statusCode <= Response.SESSION_NOT_ACCEPTABLE) {				
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
 			}
 			if(originalRequest != null) {				
 				originalRequest.setResponse(this);					
 			}
 			//updating the last accessed times 
-			getSipSession().access();
-			getSipSession().getSipApplicationSession().access();
+			session.access();
+			sipApplicationSession.access();
 			if(sendReliably) {
-				getTransaction().getDialog().sendReliableProvisionalResponse((Response)this.message);
+				dialog.sendReliableProvisionalResponse((Response)this.message);
 			} else {
-				st.sendResponse( (Response)this.message );
+				transaction.sendResponse( (Response)this.message );
 			}
 			isMessageSent = true;
 			if(isProxiedResponse) {
