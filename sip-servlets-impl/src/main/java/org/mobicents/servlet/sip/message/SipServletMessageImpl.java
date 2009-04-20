@@ -39,9 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,7 +55,6 @@ import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
-import javax.sip.SipFactory;
 import javax.sip.Transaction;
 import javax.sip.header.AcceptEncodingHeader;
 import javax.sip.header.AcceptHeader;
@@ -114,6 +115,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			.getCanonicalName());
 	
 	private transient static final String CONTENT_TYPE_TEXT = "text";
+	private transient static final String HCOLON = " : ";
 	private transient static HeaderFactory headerFactory = SipFactories.headerFactory;
 	
 	protected Message message;
@@ -336,7 +338,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		headerFull2CompactNamesMappings.put(SupportedHeader.NAME, "k");
 	}
 	
-	protected static final HashSet<String> ianaAllowedContentTypes = new HashSet<String>();
+	protected static final HashSet<String> ianaAllowedContentTypes = new HashSet<String>();	
 
 	static {
 
@@ -476,15 +478,32 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 
 		String nameToAdd = getCorrectHeaderName(hName);
+		
+		boolean isMultipleValue = isMultipleValue(value);
+		
 		try {
-			Header header = SipFactories.headerFactory.createHeader(nameToAdd,
+			if(isMultipleValue) {
+				List<Header> headers = SipFactories.headerFactory.createHeaders(nameToAdd + HCOLON +
+						value);
+				for (Header header : headers) {
+					this.message.addLast(header);
+				}
+			} else {
+				Header header = SipFactories.headerFactory.createHeader(nameToAdd,
 					value);
-			this.message.addLast(header);
+				this.message.addLast(header);
+			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
 		}
 	}
 	
+	//check if the submitted value is of the form header-value *(COMMA header-value)
+	private boolean isMultipleValue(String value) {
+		StringTokenizer tokenizer = new StringTokenizer(value, ",");
+		return tokenizer.hasMoreTokens();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#addHeader(java.lang.String, java.lang.String)
@@ -1413,10 +1432,20 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 		checkCommitted();
 		
+		boolean isMultipleValue = isMultipleValue(value);
+		
 		try {
-			Header header = SipFactory.getInstance().createHeaderFactory()
-					.createHeader(name, value);
-			this.message.setHeader(header);
+			if(isMultipleValue) {
+				List<Header> headers = SipFactories.headerFactory.createHeaders(name + HCOLON +
+						value);
+				for (Header header : headers) {
+					this.message.addLast(header);
+				}
+			} else {
+				Header header = SipFactories.headerFactory.createHeader(name,
+					value);
+				this.message.addLast(header);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating header!", e);
 		}

@@ -100,7 +100,7 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/callforwarding_debug_" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/callforwarding_server_" + port + ".txt");
+				"logs/callforwarding_server_" + port + ".xml");
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		
 		return new SipStack(transport, port, properties);		

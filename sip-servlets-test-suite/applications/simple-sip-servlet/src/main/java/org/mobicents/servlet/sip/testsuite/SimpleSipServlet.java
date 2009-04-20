@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
 	
 	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
+	private static final String TEST_ALLOW_HEADER = "TestAllowHeader";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
 	
@@ -93,7 +94,16 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable)sipServletResponse);
 			return;
-		}		
+		}
+		
+		if(request.getFrom().toString().contains(TEST_ALLOW_HEADER)) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_METHOD_NOT_ALLOWED);
+			sipServletResponse.setHeader("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
+			sipServletResponse.addHeader("Allow", "SUBSCRIBE, NOTIFY");
+			sipServletResponse.addHeader("Allow", "REFER");
+			sipServletResponse.send();
+			return;
+		}	
 		
 		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
 		request.getHeader(TEST_NON_EXISTING_HEADER);

@@ -154,6 +154,18 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		}
 		assertTrue(sender.getAllMessagesContent().contains("cancelReceived"));
 	}
+	
+	public void testShootmeMultipleValueHeaders() throws Exception {
+		String fromName = "TestAllowHeader";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isFinalResponseReceived());
+		assertEquals(405, sender.getFinalResponseStatus());
+	}
 
 	@Override
 	protected void tearDown() throws Exception {					
