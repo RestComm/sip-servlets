@@ -229,7 +229,8 @@
 		</profile>
 		<profile>			
 			<id>jboss-5-distro</id>
-			<modules>				
+			<modules>
+				<module>sip-servlets-jboss5-metadata</module>				
 				<module>sip-servlets-jboss5</module>				
 			</modules>			
 		</profile>
