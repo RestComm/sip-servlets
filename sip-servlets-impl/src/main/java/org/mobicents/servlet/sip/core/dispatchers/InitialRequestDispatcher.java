@@ -44,11 +44,11 @@ import javax.sip.SipProvider;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
 import javax.sip.header.Header;
+import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.catalina.Wrapper;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -67,7 +67,6 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
@@ -99,35 +98,36 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
 		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
-		if(logger.isInfoEnabled()) {
-			logger.info("Routing of Initial Request " + sipServletRequest);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Routing of Initial Request " + sipServletRequest);
 		}		
 		final Request request = (Request) sipServletRequest.getMessage();
 		
-		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
-		if(logger.isInfoEnabled()) {
-			logger.info("popped route : " + poppedAddress);
+		RouteHeader poppedRoute = sipServletRequest.getPoppedRouteHeader();
+		if(logger.isDebugEnabled()) {
+			logger.debug("popped route : " + poppedRoute);
 		}
 		MobicentsSipSession sipSessionImpl = sipServletRequest.getSipSession();
 		//set directive from popped route header if it is present			
 		Serializable stateInfo = null;
 		//If request is received from an external SIP entity, directive is set to NEW. 
 		SipApplicationRoutingDirective sipApplicationRoutingDirective = SipApplicationRoutingDirective.NEW;
-		if(poppedAddress != null) {
+		if(poppedRoute != null) {
+			Parameters poppedAddress = (Parameters)poppedRoute.getAddress().getURI();
 			// get the state info associated with the request because it means 
 			// that is has been routed back to the container			
 			String directive = poppedAddress.getParameter(ROUTE_PARAM_DIRECTIVE);
 			if(directive != null && directive.length() > 0) {
 				//If request is received from an application, directive is set either implicitly 
 				//or explicitly by the application. 
-				if(logger.isInfoEnabled()) {
-					logger.info("directive before the request has been routed back to container : " + directive);
+				if(logger.isDebugEnabled()) {
+					logger.debug("directive before the request has been routed back to container : " + directive);
 				}
 				sipApplicationRoutingDirective = SipApplicationRoutingDirective.valueOf(
 						SipApplicationRoutingDirective.class, directive);
 				String previousAppName = poppedAddress.getParameter(ROUTE_PARAM_PREV_APPLICATION_NAME);
-				if(logger.isInfoEnabled()) {
-					logger.info("application name before the request has been routed back to container : " + previousAppName);
+				if(logger.isDebugEnabled()) {
+					logger.debug("application name before the request has been routed back to container : " + previousAppName);
 				}
 				SipContext sipContext = sipApplicationDispatcher.findSipApplication(previousAppName);				
 				SipSessionKey sipSessionKey = SessionManagerUtil.getSipSessionKey(previousAppName, request, false);
@@ -136,15 +136,15 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				//stateInfo is set to that of the original request that this request is associated with. 
 				stateInfo = sipSessionImpl.getStateInfo();
 				sipServletRequest.setSipSession(sipSessionImpl);
-				if(logger.isInfoEnabled()) {
-					logger.info("state info before the request has been routed back to container : " + stateInfo);
+				if(logger.isDebugEnabled()) {
+					logger.debug("state info before the request has been routed back to container : " + stateInfo);
 				}
 			}
 		} else if(sipSessionImpl != null) {
 			stateInfo = sipSessionImpl.getStateInfo();
 			sipApplicationRoutingDirective = sipServletRequest.getRoutingDirective();
-			if(logger.isInfoEnabled()) {
-				logger.info("previous state info : " + stateInfo);
+			if(logger.isDebugEnabled()) {
+				logger.debug("previous state info : " + stateInfo);
 			}
 		}
 		SipApplicationRoutingRegion routingRegion = null;
@@ -156,13 +156,14 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// Upon receiving an initial request for processing, a container MUST check the topmost Route header and 
 		// Request-URI (in that order) to see if it contains an encoded URI. 
 		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
-		String targetedApplicationKey = sipServletRequest.getRequestURI().getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+		String targetedApplicationKey = ((Parameters)request.getRequestURI()).getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
 		if(targetedApplicationKey != null) {
 			targetedApplicationKey = RFC2396UrlDecoder.decode(targetedApplicationKey);
 		}
 		SipTargetedRequestInfo targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
-		if(targetedRequestInfo == null && poppedAddress != null) {
-			targetedApplicationKey = poppedAddress.getURI().getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+		if(targetedRequestInfo == null && poppedRoute != null) {
+			Parameters poppedAddress = (Parameters)poppedRoute.getAddress().getURI();
+			targetedApplicationKey = poppedAddress.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
 			targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
 		}	
 		
@@ -248,17 +249,17 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// 15.4.1 Procedure : point 1			
 		
 		//the application router shouldn't modify the request
-		SipServletRequestReadOnly sipServletRequestReadOnly = new SipServletRequestReadOnly(sipServletRequest);
+		sipServletRequest.setReadOnly(true);
 		
 		SipApplicationRouterInfo applicationRouterInfo = 
 			sipApplicationRouter.getNextApplication(
-					sipServletRequestReadOnly, 
+					sipServletRequest, 
 					routingRegion, 
 					sipApplicationRoutingDirective,
 					targetedRequestInfo,
 					stateInfo);
 		
-		sipServletRequestReadOnly = null;
+		sipServletRequest.setReadOnly(false);
 		
 		// 15.4.1 Procedure : point 2
 		if(checkRouteModifier(applicationRouterInfo, sipServletRequest)) {

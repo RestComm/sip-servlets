@@ -17,7 +17,7 @@
 package org.mobicents.servlet.sip.startup;
 
 
-import gov.nist.javax.sip.SipStackImpl;
+import gov.nist.javax.sip.SipStackExt;
 
 import java.io.File;
 import java.util.TooManyListenersException;
@@ -161,11 +161,11 @@ public class SipStandardService extends StandardService implements SipService {
 					connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
 				if(extendedListeningPoint != null && sipStack != null) {
 					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
-					if(sipStack instanceof SipStackImpl) {
+					if(sipStack instanceof SipStackExt) {
 						if(logger.isDebugEnabled()) {
 							logger.debug(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
 						}
-						((SipStackImpl) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
+						((SipStackExt) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
 					}
 					try {
 						extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);

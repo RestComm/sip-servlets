@@ -69,6 +69,7 @@ import javax.sip.address.Address;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -92,7 +93,6 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
@@ -484,8 +484,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		Dialog dialog = requestEvent.getDialog();
 		Request request = requestEvent.getRequest();
 		try {
-			if(logger.isInfoEnabled()) {
-				logger.info("Got a request event "  + request.toString());
+			if(logger.isDebugEnabled()) {
+				logger.debug("Got a request event "  + request.toString());
 			}			
 			if (!Request.ACK.equals(request.getMethod()) && transaction == null ) {
 				try {
@@ -506,9 +506,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} 	
 			
 			
-			if(logger.isInfoEnabled()) {
-				logger.info("ServerTx ref "  + transaction);				
-				logger.info("Dialog ref "  + dialog);				
+			if(logger.isDebugEnabled()) {
+				logger.debug("ServerTx ref "  + transaction);				
+				logger.debug("Dialog ref "  + dialog);				
 			}
 			
 			SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
@@ -537,7 +537,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
 			
-			if(routeHeader == null && !isExternal(((javax.sip.address.SipURI)request.getRequestURI()).getHost(), ((javax.sip.address.SipURI)request.getRequestURI()).getPort(), ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam())) {
+			javax.sip.address.SipURI requestURI = null;
+			if(request.getRequestURI() instanceof javax.sip.address.SipURI) {
+				requestURI = (javax.sip.address.SipURI)request.getRequestURI();
+			}
+			if(routeHeader == null && requestURI != null && 
+					!isExternal(requestURI.getHost(), requestURI.getPort(), requestURI.getTransportParam())) {
 				ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 				String arText = toHeader.getTag();
 				ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(this, arText);
@@ -563,10 +568,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(!isRouteExternal(routeHeader)) {
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
-				javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
+				Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
 				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null) {
-					if(logger.isInfoEnabled()) {
-						logger.info("the request is for a proxy application, thus it is a subsequent request ");
+					if(logger.isDebugEnabled()) {
+						logger.debug("the request is for a proxy application, thus it is a subsequent request ");
 					}
 					sipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
 				}
@@ -577,8 +582,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 				}
 			}							
-			if(logger.isInfoEnabled()) {
-				logger.info("Routing State " + sipServletRequest.getRoutingState());
+			if(logger.isDebugEnabled()) {
+				logger.debug("Routing State " + sipServletRequest.getRoutingState());
 			}
 			
 			try {
@@ -1003,14 +1008,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		Request request = (Request) sipServletRequest.getMessage();
 		
-		SipServletRequestReadOnly sipServletRequestReadOnly = new SipServletRequestReadOnly(sipServletRequest);
+		sipServletRequest.setReadOnly(true);
 		SipApplicationRouterInfo applicationRouterInfo = sipApplicationRouter.getNextApplication(
-			sipServletRequestReadOnly, 
+			sipServletRequest, 
 			routingRegion, 
 			sipServletRequest.getRoutingDirective(), 
 			null,
 			stateInfo);
-		sipServletRequestReadOnly = null;
+		sipServletRequest.setReadOnly(false);
 		// 15.4.1 Procedure : point 2
 		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 		String[] routes = applicationRouterInfo.getRoutes();		

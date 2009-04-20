@@ -39,7 +39,6 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.SipServletRequestReadOnly;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -144,9 +143,9 @@ public abstract class MessageDispatcher {
 				logger.debug("For request target to application " + sipContext.getApplicationName() + 
 						", using the following annotated method to generate the application key " + appKeyMethod);
 			}
-			SipServletRequestReadOnly readOnlyRequest = new SipServletRequestReadOnly(sipServletRequestImpl);
+			sipServletRequestImpl.setReadOnly(true);
 			try {
-				id = (String) appKeyMethod.invoke(null, new Object[] {readOnlyRequest});
+				id = (String) appKeyMethod.invoke(null, new Object[] {sipServletRequestImpl});
 				isAppGeneratedKey = true;
 			} catch (IllegalArgumentException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't invoke the app session key annotated method !" ,e);		
@@ -155,7 +154,7 @@ public abstract class MessageDispatcher {
 			} catch (InvocationTargetException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "A Problem occured while invoking the app session key annotated method !" ,e);
 			} finally {
-				readOnlyRequest = null;
+				sipServletRequestImpl.setReadOnly(false);
 			}
 			if(id == null) {
 				isAppGeneratedKey = false;

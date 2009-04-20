@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
-import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
@@ -36,11 +35,8 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
-import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -80,17 +76,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
 		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
-		if(logger.isInfoEnabled()) {
-			logger.info("Routing of Subsequent Request " + sipServletRequest);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Routing of Subsequent Request " + sipServletRequest);
 		}	
 		
 		final ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
 		final Request request = (Request) sipServletRequest.getMessage();
-		final Dialog dialog = sipServletRequest.getDialog();
-		
-		javax.servlet.sip.Address poppedAddress = sipServletRequest.getPoppedRoute();
+		final Dialog dialog = sipServletRequest.getDialog();				
 				
-		if(poppedAddress==null){
+		if(sipServletRequest.getPoppedRouteHeader() ==null){
 			if(Request.ACK.equals(request.getMethod())) {
 				//Means that this is an ACK to a container generated error response, so we can drop it
 				if(logger.isDebugEnabled()) {
@@ -101,12 +95,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "The popped route shouldn't be null for not proxied requests.");
 			}
 		}
-		//Extract information from the Record Route Header
-		Parameters jsipAddress = ((Parameters)((AddressImpl)poppedAddress).getAddress().getURI());
-		String applicationNameHashed = jsipAddress.getParameter(RR_PARAM_APPLICATION_NAME);	
-		final String finalResponse = jsipAddress.getParameter(FINAL_RESPONSE);
-		String applicationId = jsipAddress.getParameter(APP_ID);
-		String generatedApplicationKey = jsipAddress.getParameter(GENERATED_APP_KEY);
+		Parameters poppedAddress = (Parameters)sipServletRequest.getPoppedRouteHeader().getAddress().getURI();
+		//Extract information from the Route Header		
+		String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);	
+		final String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
+		String applicationId = poppedAddress.getParameter(APP_ID);
+		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
 		boolean isAppGenerated = false;
 		if(generatedApplicationKey != null) {
 			applicationId = RFC2396UrlDecoder.decode(generatedApplicationKey);
@@ -255,73 +249,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				} finally {
 					sipContext.exitSipApp(sipServletRequest, null);
 				}
-				
-				//if a final response has been sent, or if the request has 
-				//been proxied or relayed we stop routing the request
-				RoutingState routingState = sipServletRequest.getRoutingState();
-				if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) ||
-//						RoutingState.INFORMATIONAL_RESPONSE_SENT.equals(routingState) ||
-						RoutingState.PROXIED.equals(routingState) ||
-						RoutingState.RELAYED.equals(routingState) ||
-						RoutingState.CANCELLED.equals(routingState)) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Routing State : " + sipServletRequest.getRoutingState() +
-								"The Container hence stops routing the subsequent request.");
-					}
-				} 
-				else {					
-					if(finalResponse != null && finalResponse.length() > 0) {
-						if(logger.isInfoEnabled()) {
-							logger.info("Subsequent Request reached the servlet application " +
-								"that sent a final response, stop routing the subsequent request " + request.toString());
-						}
-						return ;
-					}
-					// Check if the request is meant for me. 
-					RouteHeader routeHeader = (RouteHeader) request
-							.getHeader(RouteHeader.NAME);
-					
-					if(logger.isInfoEnabled()) {
-						logger.info("Checking route header " + routeHeader + " to know what to do next with the subsequent request " + request.toString());
-					}
-					if(routeHeader == null || sipApplicationDispatcher.isRouteExternal(routeHeader)) {
-						// no route header and request URI meant for the container, we drop the request
-						if(routeHeader == null && !sipApplicationDispatcher.isExternal(((javax.sip.address.SipURI)request.getRequestURI()).getHost(), ((javax.sip.address.SipURI)request.getRequestURI()).getPort(), ((javax.sip.address.SipURI)request.getRequestURI()).getTransportParam())) {
-							logger.info("Since no final response has been sent by the application to this request and there is no route header and the request URI is meant for the container, we drop the Request " + request.toString());
-						}
-						// no route header or external, send outside the container						
-						else if(dialog == null && transaction == null) {
-							try{
-								// FIXME send it statefully
-								sipProvider.sendRequest((Request)request.clone());								
-								if(logger.isInfoEnabled()) {
-									logger.info("Subsequent Request dispatched outside the container " + request.toString());
-								}
-							} catch (Exception ex) {			
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Error sending request",ex);
-							}	
-						} else {
-							try{
-								if(logger.isInfoEnabled()) {
-									logger.info("Subsequent Request forwarded statefully " + request.toString());
-								}
-								forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.ROUTE);
-							} catch (Exception e) {
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
-							}
-						}
-					} else {
-						if(logger.isInfoEnabled()) {
-							logger.info("Subsequent Request forwarded statefully " + request.toString());
-						}
-						//route header is meant for the container hence we continue
-						try {
-							forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.CURRENT_SESSION, SipRouteModifier.NO_ROUTE);
-						} catch (Exception e) {
-							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
-						}
-					}
-				}		
+				//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	
 			}
 		};
 		getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);

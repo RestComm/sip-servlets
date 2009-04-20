@@ -20,6 +20,7 @@ import gov.nist.javax.sip.header.ims.PathHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
+import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -89,7 +91,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
 	private static transient Logger logger = Logger.getLogger(SipServletRequestImpl.class);
-		
+	
+	private static final String EXCEPTION_MESSAGE = "The context does not allow you to modify this request !";
+	
 	public transient static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
@@ -110,6 +114,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * header
 	 */
 	private Address poppedRoute;
+	private RouteHeader poppedRouteHeader;
 
 	/* Cache the application routing directive in the record route header */
 	private SipApplicationRoutingDirective routingDirective = SipApplicationRoutingDirective.NEW;
@@ -127,13 +132,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private transient URI subscriberURI;
 
-	private transient Address initialPoppedRoute;
-	
 	private boolean isInitial;
 	
 	private boolean isFinalResponseGenerated;
 	
-	private boolean is1xxResponseGenerated;
+	private boolean is1xxResponseGenerated;	
+	
+	private transient boolean isReadOnly; 
 	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
@@ -183,7 +188,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public SipServletRequest createCancel() {
-
+		checkReadOnly();
 		if (!((Request) message).getMethod().equals(Request.INVITE)) {
 			throw new IllegalStateException(
 					"Cannot create CANCEL for non inivte");
@@ -226,6 +231,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public SipServletResponse createResponse(int statusCode, String reasonPhrase) {
+		checkReadOnly();
 		if (super.getTransaction() == null
 				|| super.getTransaction() instanceof ClientTransaction) {
 			throw new IllegalStateException(
@@ -299,6 +305,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	public B2buaHelper getB2buaHelper() {
+		checkReadOnly();
 		if (session.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
 		B2buaHelperImpl b2buaHelper = session.getB2buaHelper();
@@ -347,7 +354,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#getPoppedRoute()
 	 */
 	public Address getPoppedRoute() {
+		if(this.poppedRoute == null && poppedRouteHeader != null) {
+			this.poppedRoute = new AddressImpl(poppedRouteHeader.getAddress(), null, getTransaction() == null ? true : false);
+		}
 		return poppedRoute;
+	}
+	
+	public RouteHeader getPoppedRouteHeader() {
+		return poppedRouteHeader;
 	}
 
 	/**
@@ -357,15 +371,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 *            the popped route header to set
 	 */
 	public void setPoppedRoute(RouteHeader routeHeader) {
-		if(routeHeader != null) {
-			this.poppedRoute = new AddressImpl(routeHeader.getAddress(), null, getTransaction() == null ? true : false);
-		}
+		this.poppedRouteHeader = routeHeader;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public Proxy getProxy() throws TooManyHopsException {
+		checkReadOnly();
 		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		return getProxy(true);
 	}
@@ -374,6 +387,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
+		checkReadOnly();
 		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		
 		MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
@@ -465,7 +479,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public void pushPath(Address uri) {
-
+		checkReadOnly();
 		if(!Request.REGISTER.equalsIgnoreCase(((Request)message).getMethod())) {
 			throw new IllegalStateException("Cannot push a Path on a non REGISTER request !");
 		}
@@ -491,6 +505,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public void pushRoute(Address address) {
+		checkReadOnly();
 		if(address.getURI() instanceof TelURL) {
 			throw new IllegalArgumentException("Cannot push a TelUrl as a route !");
 		}
@@ -504,7 +519,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletRequest#pushRoute(javax.servlet.sip.SipURI)
 	 */
-	public void pushRoute(SipURI uri) {		
+	public void pushRoute(SipURI uri) {	
+		checkReadOnly();
 		javax.sip.address.SipURI sipUri = ((SipURIImpl) uri).getSipURI();
 			sipUri.setLrParam();
 		pushRoute(sipUri);
@@ -514,7 +530,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * Pushes a route header on initial request based on the jain sip sipUri given on parameter
 	 * @param sipUri the jain sip sip uri to use to construct the route header to push on the request
 	 */
-	private void pushRoute(javax.sip.address.SipURI sipUri) {
+	private void pushRoute(javax.sip.address.SipURI sipUri) {		
 		if(isInitial()) {
 			if (logger.isDebugEnabled())
 				logger.debug("Pushing route into message of value [" + sipUri
@@ -542,6 +558,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 	
 	public void setMaxForwards(int n) {
+		checkReadOnly();
 		MaxForwardsHeader mfh = (MaxForwardsHeader) this.message
 				.getHeader(MaxForwardsHeader.NAME);
 		try {
@@ -560,6 +577,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#setRequestURI(javax.servlet.sip.URI)
 	 */
 	public void setRequestURI(URI uri) {
+		checkReadOnly();
 		Request request = (Request) message;
 		URIImpl uriImpl = (URIImpl) uri;
 		javax.sip.address.URI wrappedUri = uriImpl.getURI();
@@ -574,6 +592,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void setRoutingDirective(SipApplicationRoutingDirective directive,
 			SipServletRequest origRequest) throws IllegalStateException {
+		checkReadOnly();
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 		//@jean.deruelle Commenting this out, why origRequestImpl.isCommitted() is needed ?
 //			if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
@@ -769,7 +788,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	@Override
 	public void send() {
-
+		checkReadOnly();
 		try {
 			Request request = (Request) super.message;
 			String transport = JainSipUtils.findTransport(request);
@@ -1081,6 +1100,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
 			AuthInfo authInfo) {
+		checkReadOnly();
 		AuthInfoImpl authInfoImpl = (AuthInfoImpl) authInfo;
 		
 		SipServletResponseImpl challengeResponseImpl = 
@@ -1131,6 +1151,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
 			String username, String password) {
+		checkReadOnly();
 		SipServletResponseImpl challengeResponseImpl = 
 			(SipServletResponseImpl) challengeResponse;
 		
@@ -1298,5 +1319,121 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public SipServletResponse getLastInformationalResponse() {
 		return lastInformationalResponse;
+	}
+
+	public void setReadOnly(boolean isReadOnly) {
+		this.isReadOnly = isReadOnly;
+	}
+	
+	protected void checkReadOnly() {
+		if(isReadOnly) {
+			throw new IllegalStateException(EXCEPTION_MESSAGE);
+		}
+	}
+	
+	@Override
+	public void addAcceptLanguage(Locale locale) {
+		checkReadOnly();
+		super.addAcceptLanguage(locale);
+	}
+	
+	@Override
+	public void addAddressHeader(String name, Address addr, boolean first)
+			throws IllegalArgumentException {
+		checkReadOnly();
+		super.addAddressHeader(name, addr, first);
+	}
+	
+	@Override
+	public void addHeader(String name, String value) {
+		checkReadOnly();
+		super.addHeader(name, value);
+	}
+	
+	@Override
+	public void addParameterableHeader(String name, Parameterable param,
+			boolean first) {
+		checkReadOnly();
+		super.addParameterableHeader(name, param, first);
+	}
+	
+	@Override
+	public void removeAttribute(String name) {
+		checkReadOnly();
+		super.removeAttribute(name);
+	}
+	
+	@Override
+	public void removeHeader(String name) {
+		checkReadOnly();
+		super.removeHeader(name);
+	}
+	
+	@Override
+	public void setAcceptLanguage(Locale locale) {
+		checkReadOnly();
+		super.setAcceptLanguage(locale);
+	}
+	
+	@Override
+	public void setAddressHeader(String name, Address addr) {
+		checkReadOnly();
+		super.setAddressHeader(name, addr);
+	}
+	
+	@Override
+	public void setAttribute(String name, Object o) {
+		checkReadOnly();
+		super.setAttribute(name, o);
+	}
+	
+	@Override
+	public void setCharacterEncoding(String enc)
+			throws UnsupportedEncodingException {
+		checkReadOnly();
+		super.setCharacterEncoding(enc);
+	}
+	
+	@Override
+	public void setContent(Object content, String contentType)
+			throws UnsupportedEncodingException {
+		checkReadOnly();
+		super.setContent(content, contentType);
+	}
+	
+	@Override
+	public void setContentLanguage(Locale locale) {
+		checkReadOnly();
+		super.setContentLanguage(locale);
+	}
+	
+	@Override
+	public void setContentType(String type) {
+		checkReadOnly();
+		super.setContentType(type);
+	}
+	
+	@Override
+	public void setExpires(int seconds) {
+		checkReadOnly();
+		super.setExpires(seconds);
+	}
+	
+	@Override
+	public void setHeader(String name, String value) {
+		checkReadOnly();
+		super.setHeader(name, value);
+	}
+	
+	@Override
+	public void setHeaderForm(HeaderForm form) {
+		checkReadOnly();
+		super.setHeaderForm(form);
+	}
+	
+	@Override
+	public void setParameterableHeader(String name, Parameterable param) {
+		checkReadOnly();
+		super.setParameterableHeader(name, param);
 	}
 }

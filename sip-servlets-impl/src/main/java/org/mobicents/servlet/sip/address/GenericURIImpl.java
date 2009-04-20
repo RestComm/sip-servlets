@@ -49,7 +49,6 @@ public class GenericURIImpl extends URIImpl {
 	public void setValue(String value) {
 		try {
 			this.uri = SipFactories.addressFactory.createURI(value);
-			gov.nist.javax.sip.address.GenericURI uri = (gov.nist.javax.sip.address.GenericURI) this.uri;
 		} catch (ParseException ex) {
 			logger.error("Bad input arg", ex);
 			throw new IllegalArgumentException("Bad input arg", ex);
