@@ -198,6 +198,23 @@
 			<arg line="clean install -U -P set-svn-revision,jboss-5-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
 		</exec>
 		
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-annotations.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-impl.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-spec.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-annotations.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-annotations-*.jar" />
+		</copy>
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-impl.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-impl-*.jar" />
+		</copy>
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-spec.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-spec-*.jar" />
+		</copy>
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
+		</copy>
+		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
