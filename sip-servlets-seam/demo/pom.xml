@@ -13,6 +13,11 @@
 			<name>JBoss Repository</name>
 			<url>http://repository.jboss.org/maven2</url>
 		</repository>
+		<repository>
+			<id>backup.repository.jboss.org</id>
+			<name>JBoss Repository Backup</name>
+			<url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
+		</repository>
 	</repositories>
 	<properties>
 		<seam.version>2.1.1.GA</seam.version>
