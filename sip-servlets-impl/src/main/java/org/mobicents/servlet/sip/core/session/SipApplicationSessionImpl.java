@@ -755,18 +755,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				deltaMilliseconds = deltaMinutes * 1000 * 60;
 			}
 			if(expirationTimerTask != null) {				
-				expirationTime = System.currentTimeMillis() + sipApplicationSessionTimeout;
+				expirationTime = System.currentTimeMillis() + deltaMilliseconds;
 				if(logger.isDebugEnabled()) {
 					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + deltaMinutes + " minutes");
 					logger.debug("Re-Scheduling sip application session "+ key +" will expires in " + deltaMilliseconds + " milliseconds");
 					logger.debug("sip application session "+ key +" will expires at " + expirationTime);
 				}
-//				cancelExpirationTimer();
-//				expirationTimerTask = null;
-//				expirationTimerFuture = null;
-//				expirationTimerTask = new SipApplicationSessionTimerTask(expirationTime);
-//				timer.schedule(expirationTimerTask, expirationTime);
-//				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, expirationTime, TimeUnit.MILLISECONDS);
+				cancelExpirationTimer();
+				expirationTimerTask = null;
+				expirationTimerFuture = null;
+				expirationTimerTask = new SipApplicationSessionTimerTask();
+				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getThreadPoolExecutor().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
 			}
 			return deltaMinutes;
 		}				
