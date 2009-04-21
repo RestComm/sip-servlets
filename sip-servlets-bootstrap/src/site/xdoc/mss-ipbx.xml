@@ -36,14 +36,14 @@
 			</p>
 					<ul>
 				<li>Registration, login and configuration from the GUI</li>
-				<li>Call monitoring and control the the GUI per user</li>
+				<li>Call monitoring and management from the individual user views</li>
 				<li>Users can have multiple phones and switch between them from the Web UI (call parking), they can assign phones that are active or unactive (ringing or not when calls are coming)</li>
 				<li>Calling multiple users in a conference by making normal calls</li>
-				<li>Call control from the Web UI - mute, close calls. Audio announcement is made to the users being muted</li>
+				<li>Call control from the Web UI - mute, close calls and others. Audio announcement is made to the affected users.</li>
 				<li>Incoming calls can be joined in an active conference or rejected</li>
 				<li>Ringback tones when waiting for the other participants in the call to join</li>
 				<li>PSTN phone calling with PSTN admin functions</li>
-				<li>Audio notifications (wav files) and other options configurable from the administrator account</li>
+				<li>Audio notification sources (wav files) and other options configurable from the administrator account</li>
 				<li>Putting users on hold and isolating a single speaker with DTMF when in a conference (experimental)</li>
 				<li>Automatically adding phones for users using the SIP REGISTER request by matching the username or username and hostname (in strict mode)</li>
 				</ul>
