@@ -9,7 +9,7 @@
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>jopr-mobicents-sip-servlets-plugin</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.2</version>
 	<packaging>jar</packaging>
 
 	<name>Jopr Mobicents Sip Servlets Plugin</name>
@@ -164,4 +164,10 @@
 			</plugin>
 		</plugins>
 	</build>
+
+  <scm>
+    <connection>scm:svn:https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-0.9</connection>
+    <developerConnection>scm:svn:https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-0.9</developerConnection>
+    <url>http://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-0.9</url>
+  </scm>
 </project>
