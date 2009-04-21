@@ -483,13 +483,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @throws DispatcherException a proble occured while checking the information returned by the AR
 	 */
 	private boolean checkRouteModifier(SipApplicationRouterInfo applicationRouterInfo, SipServletRequestImpl sipServletRequest) throws DispatcherException {
-		Request request = (Request) sipServletRequest.getMessage();
-		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
+		final Request request = (Request) sipServletRequest.getMessage();
+		final SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 		if(logger.isDebugEnabled()) {
 			logger.debug("the AR returned the following sip route modifier" + sipRouteModifier);
 		}
 		if(sipRouteModifier != null) {
-			String[] routes = applicationRouterInfo.getRoutes();
+			final String[] routes = applicationRouterInfo.getRoutes();
 			switch(sipRouteModifier) {
 				// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
 				// it is up to container to decide whether it is external or internal.

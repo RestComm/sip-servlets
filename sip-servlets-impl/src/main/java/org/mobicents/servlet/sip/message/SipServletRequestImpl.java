@@ -112,7 +112,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * Popped route header - when we are the UAS we pop and keep the route
 	 * header
 	 */
-	private Address poppedRoute;
+	private AddressImpl poppedRoute;
 	private RouteHeader poppedRouteHeader;
 
 	/* Cache the application routing directive in the record route header */
@@ -356,7 +356,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#getPoppedRoute()
 	 */
 	public Address getPoppedRoute() {
-		if(this.poppedRoute == null && poppedRouteHeader != null) {
+		if((this.poppedRoute == null && poppedRouteHeader != null) ||
+				(poppedRoute != null && poppedRouteHeader != null && !poppedRoute.getAddress().equals(poppedRouteHeader.getAddress()))) {
 			this.poppedRoute = new AddressImpl(poppedRouteHeader.getAddress(), null, getTransaction() == null ? true : false);
 		}
 		return poppedRoute;
