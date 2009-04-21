@@ -66,10 +66,10 @@
 			The PBX needs a data source, a default datasource is provided in the zip file, but you can configure your own as well.
 		</section>
 		<section name="Building and installing">
-		You can download the source code from <a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/">here</a>.
+		You can download the source code from <a href="http://mobicents.googlecode.com/svn/trunk/applications/ipbx/">here</a>.
 			First you need SVN, Ant and Maven  properly configured on your system.
 			<ul>
-			<li>Do <code>svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-seam/ipbx/</code></li>
+			<li>Do <code>svn co http://mobicents.googlecode.com/svn/trunk/applications/ipbx/</code></li>
 			
 			<li>Set your JBOSS_HOME to a location where Mobicents Sip Servlets 0.9 or later is installed. Then simply run:</li>
 			</ul><br/><code>
