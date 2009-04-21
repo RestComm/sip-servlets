@@ -27,7 +27,7 @@ Version 0.9 is out !
 		
 		* {{{mss-jruby.html}JRuby integration to be able to add telco features to existing or new JRuby applications}}
 		
-		* {{{mss-ipbx.html}Improved JBoss Seam-based PBX in BETA1 version.
+		* {{{mss-ipbx.html}The Mobicents IPBX advances to BETA1 version}} with the {{{http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets?hl=en}new Seam Telco Framework 2.0}}.
 		
 		* {{{http://code.google.com/p/mobicents/issues/detail?id=522}Java EE/EJBs/SIP converged applications are now supported for the JBoss 5 version}}
 				
