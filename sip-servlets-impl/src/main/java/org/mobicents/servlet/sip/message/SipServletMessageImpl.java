@@ -263,7 +263,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			} else {
 				Header header = SipFactory.getInstance().createHeaderFactory()
 					.createHeader(nameToAdd, value);
-				this.message.setHeader(header);
+				this.message.addLast(header);
 			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
@@ -1204,8 +1204,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
 		checkCommitted();
-		
-		boolean isMultipleValue = isMultipleValue(value);
 		
 		try {
 			if(JainSipUtils.multiValueHeaders.contains(name)) {
