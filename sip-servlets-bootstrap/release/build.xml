@@ -102,6 +102,28 @@
 			<property name="jboss.home" value="${jboss.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>		
+		<copy tofile="${jboss.home}/server/default/deploy/diameter-event-charging.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
+		</copy>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/default/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>		
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/all/deploy/click2call-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click2call-distributable/target/" includes="click2call-distributable-*.war" />
+		</copy>
+		
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
 		<antcall target="build-mobicents-sip-load-balancer"/>
 		<antcall target="build-documentation"/>
@@ -150,23 +172,7 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
-		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-svn-revision" />
-		</exec>
-		
-		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/click2call.war">
-			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
-		</copy>
-		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
-			<arg line="clean install -U -P set-svn-revision" />
-		</exec>
-		
-		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/diameter-event-charging.war">
-			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
-		</copy>
-		
+				
 		<antcall target="deploy-mgmnt" >
 			<param name="management.deploy.folder" value="${jboss.home}/server/${jboss.config}/deploy" />
 		</antcall>
