@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<components xmlns="http://jboss.com/products/seam/components"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.1.xsd">
-
-	<import>org.mobicents.servlet.sip.seam.entrypoint</import>
-	<import>org.mobicents.servlet.sip.seam.entrypoint.media</import>
-	<import>org.mobicents.servlet.sip.seam.media.framework</import>
-</components>
