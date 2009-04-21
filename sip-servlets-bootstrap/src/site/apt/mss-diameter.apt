@@ -11,7 +11,7 @@ Diameter Support
 
 ** From source
 
-	Checkout Mobicents Diameter from <<<svn checkout http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.0.0.BETA2 diameter-BETA2>>>
+	Checkout Mobicents Diameter from <<<svn checkout http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.0.0.BETA3 diameter-BETA3>>>
 	
 	Set JBOSS_HOME to your JBoss application server where Mobicents Sip Servlets is already installed and do a <<<mvn clean install>>>. The sar will be automatically deployed to JBoss deploy directory
 

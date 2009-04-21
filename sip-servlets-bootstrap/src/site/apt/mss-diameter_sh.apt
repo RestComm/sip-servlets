@@ -24,7 +24,7 @@ Diameter Sh OpenIMS Core Integration Service
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/diameter-openims/1.2/diameter-openims-1.2.war}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/diameter-openims/1.3/diameter-openims-1.3.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/diameteropenims-dar.properties}dar configuration file}}.\
@@ -183,7 +183,7 @@ Diameter Sh OpenIMS Core Integration Service
 	
 	{{{mss-diameter.html}Install Mobicents Diameter}} or make sure it is already installed (it comes prepackaged with the Mobicents Sip Servlets JBoss Version)
 	
-	You have one file to modify so that it can connect to OpenIMS Core. In <<<JBOSS_HOME/server/default/deploy/mobicents-diameter-mux-1.0.0.BETA2.sar/lib>>>, you need to modify the <<<org/mobicents/diameter/stack/jdiameter-config.xml>>> file in the <<<mobicents-diameter-mux-jar-1.0.0.BETA2.jar>>> archive
+	You have one file to modify so that it can connect to OpenIMS Core. In <<<JBOSS_HOME/server/default/deploy/mobicents-diameter-mux-1.0.0.BETA3.sar/lib>>>, you need to modify the <<<org/mobicents/diameter/stack/jdiameter-config.xml>>> file in the <<<mobicents-diameter-mux-jar-1.0.0.BETA3.jar>>> archive
 	
 	Modify it with the file located at {{{http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/diameter-openims/conf/mobicents-jdiameter/jdiameter-config.xml}http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/diameter-openims/conf/mobicents-jdiameter/jdiameter-config.xml}} (Make sure you modify all the 192.168.0.10 IP addresses in that file to map to your own IP address)
 	

@@ -74,4 +74,5 @@ Mobicents Sip Servlets Failover support
 		
 * Limitations
 
-	Mobicents Sip Servlets doesn't currently support mid call failover for converged applications only pure sip applications (Uas, Uac, B2BUA, Proxy).
+	Mobicents Sip Servlets currently support mid call failover for converged applications and pure sip applications (Uas, Uac, B2BUA, Proxy).\
+	However failover support for dialogs not yet established is not supported.

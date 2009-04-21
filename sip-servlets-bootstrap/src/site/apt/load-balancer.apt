@@ -82,7 +82,7 @@ Mobicents SIP Load Balancer
 
 * Step-By-Step Example
 
-	* Download {{{http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0.BETA3/sip-balancer-1.0.BETA3-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
+	* Download {{{http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0.BETA4/sip-balancer-1.0.BETA4-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
 	
 	* Get the default {{{http://code.google.com/p/mobicents/source/browse/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties}load balancer configuration properties files}}
 	
@@ -94,7 +94,7 @@ Mobicents SIP Load Balancer
 		
 		* the rest of the properties are jain sip stack properties that you can tune (refer to jain sip javadoc for SipStack and SipStackImpl classes to get more information on jain sip stack properties)
 	
-	* Fire up the sip balancer with following command <<<java -jar sip-balancer-1.0-BETA3-jar-with-dependencies.jar -mobicents-balancer-config=load-balancer-configuration.properties>>> (if you need to stop it just do Ctrl+C) :		
+	* Fire up the sip balancer with following command <<<java -jar sip-balancer-1.0-BETA4-jar-with-dependencies.jar -mobicents-balancer-config=load-balancer-configuration.properties>>> (if you need to stop it just do Ctrl+C) :		
 	
 	* Start 2 nodes either tomcat or jboss (or even a mix of them both but beware Tomcat nodes won't benefit from clustering since this advanced feature is available for JBoss only) with the above server.xml modified configuration. You can find an example for tomcat {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-tomcat-6.xml}here}} and one for jboss {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs/failover-server-jboss.xml}here}}; only the Service tag has been modified as compared to a standard version of Mobicents Sip Servlets.
 	(make sure they don't listen on same port for http or sip connectors)
@@ -115,6 +115,6 @@ Mobicents SIP Load Balancer
 	
 * Limitations
 	
-	* Currently, the HTTP, SIP and the Sip Application sessions are replicated ad you can put references from one session to another safely, however the Servlet Contexts are not replicated, you should use a database of some other clustered storage (like JBoss Cache or memchache) if you need replication of servlet context - scoped data. Note that replication the servlet context is against the HTTP servlet specifications and it is not certain when and how it will be implemented. We could replicate only a subset of the attributes.
+	* Currently, the HTTP, SIP and the Sip Application sessions are replicated and you can put references from one session to another safely, however the Servlet Contexts are not replicated, you should use a database of some other clustered storage (like JBoss Cache or memchache) if you need replication of servlet context - scoped data. Note that replication of the servlet context is against the HTTP servlet specifications and it is not certain when and how it will be implemented. We could replicate only a subset of the attributes.
 	
 	

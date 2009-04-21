@@ -15,19 +15,19 @@ Installation Instructions
 	To run the sip servlet container :\
 	Check that the following files have been copied during the <<<mvn clean install -P jboss>>>
 	
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-impl-0.9-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-impl-1.0-SNAPSHOT.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-application-router-0.9-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-servlets-application-router-1.0-SNAPSHOT.jar
 	
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-balancer-1.0-BETA3.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer directory, there should be a sip-balancer-1.0-BETA4.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-spec-1.1.9-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-spec-1.1.10-SNAPSHOT.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-tomcat-jboss4-0.8-SNAPSHOT.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-tomcat-jboss4-1.0-SNAPSHOT.jar
 		
 		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-api-1.2.jar
 		
-		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-ri-1.2.90.jar
+		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-ri-1.2.96.jar
 		
 		* in JBOSS_HOME/server/default/deploy/jboss-web.deployer/ directory, there should be a stun4j-1.0-MOBICENTS.jar
 	
