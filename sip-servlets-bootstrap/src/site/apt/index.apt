@@ -25,7 +25,7 @@ Version 0.9 is out !
 		
 		* {{{mss-eclipse-tools.html}Tooling with the Mobicents Sip Servlets Eclipse Plugin (Technology preview)}}
 		
-		* {{{mss-jruby.html}JRuby integration to be able to add telco features to existing or new JRuby applications}}
+		* {{{mss-jruby.html}JRuby integration}} to be able to add telco features to existing or new JRuby applications
 		
 		* {{{mss-ipbx.html}The Mobicents IPBX advances to BETA1 version}} with the {{{http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets?hl=en}new Seam Telco Framework 2.0}}.
 		
@@ -50,7 +50,7 @@ Version 0.9 is out !
 	 
 	To download this release and try it out, follow the following link : 
 
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=659154}Mobicents Sip Servlet 0.8 downloads}}
+	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=677419}Mobicents Sip Servlet 0.9 downloads}}
 					
 					
 Roadmap
