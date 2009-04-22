@@ -17,10 +17,12 @@ Mobicents Sip Servlets Clustering support
     
     *	Load-balance of incoming invocations. {{{./load-balancer.html}See Mobicents SIP Load Balancer}}
     
+    
     SIP Session State replication can be handled directly by JBoss. When you run JBoss in the all configuration, SIP session state replication can be enabled. 
     See below on how to configure the server to enable it.
 
-	SIP Session State replication is comprised of two things : the replication of your sip application session and the underlying sip sessions belonging to that application.
+	SIP Session State replication is comprised of two things : the replication of your sip application session and the underlying sip and http sessions belonging to that application.
+	This will replicate all the attributes you put in those sessions. (Don't forget to mark the application as distributable)
 	JBoss Cache and JGroups technologies are used as the underlying replication mechanism.
 	
 * Installation & Configuration
