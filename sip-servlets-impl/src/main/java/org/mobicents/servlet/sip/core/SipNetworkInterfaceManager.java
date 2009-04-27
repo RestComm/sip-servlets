@@ -226,7 +226,7 @@ public class SipNetworkInterfaceManager {
 	 * @return the smae port number if in range, otherwise 5060 if UDP, TCP or SCTP or to 5061 if TLS
 	 */
 	public static int checkPortRange(int port, String transport) {
-		if(port < MIN_PORT_NUMBER && port > MAX_PORT_NUMBER) {		
+		if(port < MIN_PORT_NUMBER || port > MAX_PORT_NUMBER) {		
 			if(transport.equalsIgnoreCase(ListeningPoint.TLS)) {
 				return ListeningPoint.PORT_5061;
 			} else {

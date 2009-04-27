@@ -43,6 +43,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String listeningPointTransport = ListeningPoint.UDP;
 	protected boolean autoDeployOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
+	protected boolean addSipConnectorOnStartup = true;
 		
 	public SipServletTestCase(String name) {
 		super(name);
@@ -94,7 +95,9 @@ public abstract class SipServletTestCase extends TestCase {
 		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
 		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 		 */
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		if(addSipConnectorOnStartup) {
+			tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		}
 		if(startTomcatOnStartup) {
 			tomcat.startTomcat();
 		}
