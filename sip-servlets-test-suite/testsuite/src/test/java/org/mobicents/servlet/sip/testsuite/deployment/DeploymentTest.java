@@ -16,8 +16,13 @@
  */
 package org.mobicents.servlet.sip.testsuite.deployment;
 
+import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
+
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import org.mobicents.servlet.sip.testsuite.TestSipListener;
 /**
  * This test ensures that an application with no appname cannot be deployed successfully into Mobicents Sip Servlets
  * @author jean.deruelle@gmail.com
@@ -27,10 +32,17 @@ public class DeploymentTest extends SipServletTestCase {
 	
 	private static transient Logger logger = Logger.getLogger(DeploymentTest.class);
 
+	private static final String TRANSPORT = "udp";
+	private static final boolean AUTODIALOG = true;
+	private static final int TIMEOUT = 10000;	
+
+	TestSipListener sender;
+	ProtocolObjects senderProtocolObjects;	
 	
 	public DeploymentTest(String name) {
 		super(name);
 		autoDeployOnStartup = false;
+		startTomcatOnStartup = false;
 	}
 
 	public void deployNoAppNameApplication() {
@@ -45,10 +57,16 @@ public class DeploymentTest extends SipServletTestCase {
 				"sip-test-context", "sip-test"));
 	}
 	
+	public void deployShootmeApplication() {
+		assertTrue(tomcat.deployContext(
+				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
+				"sip-test-context", "sip-test"));
+	}
+	
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/simple/simple-sip-servlet-dar.properties";
+			"org/mobicents/servlet/sip/testsuite/deployment/blank dir/simple-sip-servlet-dar.properties";
 	}
 	
 	@Override
@@ -56,12 +74,45 @@ public class DeploymentTest extends SipServletTestCase {
 		super.setUp();						
 	}
 	
-	public void testDeployApplicationWithNoAppName() {
+	public void testDeployApplicationWithNoAppName() throws Exception {
+		tomcat.startTomcat();
 		deployNoAppNameApplication();
 	}
 	
-	public void testNoMainServletApp() {
+	public void testNoMainServletApp() throws Exception {
+		tomcat.startTomcat();
 		deployNoMainServletApplication();
+	}
+	
+	public void testBlankSpaceInDarPath() throws Exception {
+		tomcat.startTomcat();
+		deployShootmeApplication();
+		senderProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();		
+		
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());
+		
+		senderProtocolObjects.destroy();	
 	}
 
 	@Override

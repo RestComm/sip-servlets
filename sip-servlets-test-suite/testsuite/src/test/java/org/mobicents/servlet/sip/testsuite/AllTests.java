@@ -39,6 +39,7 @@ import org.mobicents.servlet.sip.testsuite.concurrency.ConcurrentyControlSipSess
 import org.mobicents.servlet.sip.testsuite.concurrency.CongestionControlTest;
 import org.mobicents.servlet.sip.testsuite.deployment.DeploymentTest;
 import org.mobicents.servlet.sip.testsuite.deployment.DistributableServletTest;
+import org.mobicents.servlet.sip.testsuite.deployment.NoApplicationDeployedTest;
 import org.mobicents.servlet.sip.testsuite.deployment.SameInstanceServletTest;
 import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.join.JoinSipServletTest;
@@ -136,6 +137,7 @@ public class AllTests {
 		suite.addTestSuite(JoinSipServletTest.class);
 		suite.addTestSuite(ReplacesSipServletTest.class);
 		suite.addTestSuite(NoApplicationDeployedJunitTest.class);
+		suite.addTestSuite(NoApplicationDeployedTest.class);
 		suite.addTestSuite(ExternalRoutingServletTest.class);
 		suite.addTestSuite(ExternalApplicationRoutingTest.class);
 		suite.addTestSuite(SameContainerRoutingServletTest.class);

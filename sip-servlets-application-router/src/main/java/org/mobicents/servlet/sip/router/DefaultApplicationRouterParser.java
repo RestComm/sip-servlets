@@ -21,8 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,11 +66,20 @@ public class DefaultApplicationRouterParser {
 			log.debug("Default Application Router file Location : "+darConfigurationFileLocation);
 		}
 		File darConfigurationFile = null;
+		//hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html, 
+		// we create a URL since it's permissive enough
+		URL url = null;
+		try {
+			url = new URL(darConfigurationFileLocation);
+		} catch (MalformedURLException e) {
+			log.fatal("Cannot find the default application router file ! ",e);
+			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" is not valid ! ",e);
+		}
 		try {
 			darConfigurationFile = new File(new URI(darConfigurationFileLocation));
 		} catch (URISyntaxException e) {
-			log.fatal("Cannot find the default application router file ! ",e);
-			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" is not valid ! ",e);
+			//if the uri contains space this will fail, so getting the path will work
+			darConfigurationFile = new File(url.getPath());
 		}				
 		try {
 			FileInputStream fis = new FileInputStream(darConfigurationFile);
