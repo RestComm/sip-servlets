@@ -16,8 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -68,7 +68,6 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
-import javax.sip.header.HeaderAddress;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -1140,8 +1139,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		//state updated to TERMINATED for CANCEL only if no final response had been received on the inviteTransaction
 		if(((Request.CANCEL.equalsIgnoreCase(request.getMethod())))) {
 			Transaction inviteTransaction = null;
-			if(request.getTransaction() instanceof SIPServerTransaction) {
-				inviteTransaction = ((SIPServerTransaction) request.getTransaction()).getCanceledInviteTransaction();
+			if(request.getTransaction() instanceof ServerTransactionExt) {
+				inviteTransaction = ((ServerTransactionExt) request.getTransaction()).getCanceledInviteTransaction();
 			} else {
 				return ;
 			}

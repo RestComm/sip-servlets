@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.header.Via;
-import gov.nist.javax.sip.message.SIPRequest;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -38,6 +37,7 @@ import javax.servlet.sip.URI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -118,14 +118,19 @@ public class ProxyImpl implements Proxy, Serializable {
 				uri = new SipURIImpl(sipUri);
 			} else { 
 				// If no record route is found then use the last via (the originating endpoint)
-				SIPRequest sipRequest = (SIPRequest) request.getMessage();
-				Via via = (Via)sipRequest.getViaHeaders().getLast();
-				String uriString = via.getSentBy().toString();
-				uri = sipFactoryImpl.createSipURI(null, uriString);
-				if(via.getTransport() != null) {
-					uri.setTransportParam(via.getTransport());
-				} else {
-					uri.setTransportParam("udp");
+				ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
+				ViaHeader lastVia = null;
+				while(viaHeaders.hasNext()) {
+					lastVia = viaHeaders.next();
+				}
+				if(lastVia != null) {
+					String uriString = ((Via)lastVia).getSentBy().toString();
+					uri = sipFactoryImpl.createSipURI(null, uriString);
+					if(lastVia.getTransport() != null) {
+						uri.setTransportParam(lastVia.getTransport());
+					} else {
+						uri.setTransportParam("udp");
+					}
 				}
 			}
 		} catch (Exception e) {

@@ -17,7 +17,7 @@
 package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.Utils;
-import gov.nist.javax.sip.header.HeaderFactoryImpl;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
@@ -32,7 +32,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -186,7 +185,7 @@ public class ProxyUtils {
 					.createAddress(null, pathURI);
 				
 				// Here I need to reference the header factory impl class because can't create path header otherwise
-				PathHeader pathHeader = ((HeaderFactoryImpl)SipFactories.headerFactory)
+				PathHeader pathHeader = ((HeaderFactoryExt)SipFactories.headerFactory)
 					.createPathHeader(pathAddress);
 				
 				clonedRequest.addFirst(pathHeader);
