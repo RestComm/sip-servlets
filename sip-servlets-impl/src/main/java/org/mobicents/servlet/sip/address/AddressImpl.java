@@ -16,22 +16,20 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.core.NameValue;
-import gov.nist.core.NameValueList;
-import gov.nist.javax.sip.address.RFC2396UrlDecoder;
-import gov.nist.javax.sip.header.AddressParametersHeader;
-import gov.nist.javax.sip.header.Contact;
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.URI;
 import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.Header;
+import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.Parameters;
 
@@ -64,7 +62,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	public AddressImpl() {}
 	
 	@SuppressWarnings("unchecked")
-	public AddressImpl (javax.sip.address.Address address, NameValueList parameters, boolean isModifiable) {
+	public AddressImpl (javax.sip.address.Address address, Map<String, String> parameters, boolean isModifiable) {
 		super();
 		super.isModifiable = isModifiable;
 		this.address = address;				
@@ -76,7 +74,8 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 			Iterator<String> parameterNames = uri.getParameterNames();
 			while (parameterNames.hasNext()) {
 				String parameterName = (String) parameterNames.next();
-				this.parameters.set(parameterName, uri.getParameter(parameterName));		
+				String value = uri.getParameter(parameterName);
+				this.parameters.put(parameterName.toLowerCase(), value);		
 			}
 		}
 	}
@@ -106,9 +105,13 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	 *            </b>
 	 * @throws ParseException
 	 */
-	public AddressImpl(AddressParametersHeader header, boolean modifiable) throws ParseException {
+	public AddressImpl(HeaderAddress header, boolean modifiable) throws ParseException {
 		this.address = header.getAddress();
-		super.parameters = header.getParameters();
+		if(header instanceof Parameters) {
+			super.parameters = getParameters((Parameters)header);
+		} else {
+			super.parameters = new ConcurrentHashMap<String, String>();
+		}
 		super.isModifiable = modifiable;
 
 	}
@@ -242,7 +245,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	public Object clone() {
 		AddressImpl retval = new AddressImpl();
 		retval.address = (javax.sip.address.Address) address.clone();
-		retval.parameters = (NameValueList) this.parameters.clone();
+		retval.parameters = ParameterableHeaderImpl.cloneParameters(this.parameters);
 		return retval;
 	}
 
@@ -254,11 +257,11 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 		retval.append(address.toString());
 		//excluding the parameters already present in the address uri
 		if ( parameters!= null && parameters.size() > 0 && this.address.getURI() instanceof Parameters) {
-			Iterator<java.util.Map.Entry<String, NameValue>> parametersIt = parameters.entrySet().iterator();
+			Iterator<java.util.Map.Entry<String, String>> parametersIt = parameters.entrySet().iterator();
 			while (parametersIt.hasNext()) {
-				Map.Entry<java.lang.String, gov.nist.core.NameValue> entry = parametersIt.next();
+				Map.Entry<java.lang.String, String> entry = parametersIt.next();
 				if(((Parameters)address.getURI()).getParameter(entry.getKey()) == null) {
-					retval.append(PARAM_SEPARATOR).append(entry.getValue().encode());
+					retval.append(PARAM_SEPARATOR).append(entry.getValue());
 				}
 			}
 		}
@@ -282,7 +285,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 			ContactHeader contactHeader = (ContactHeader) headerFactory.createHeader(
 					ContactHeader.NAME, value);
 			this.address = addressFactory.createAddress(value);
-			this.parameters = ((Contact) contactHeader).getParameters();
+			this.parameters = getParameters(((Parameters) contactHeader));
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal argument", ex);
 		}
@@ -341,11 +344,11 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 			if (other.parameters != null)
 				return false;
 		} else {
-			for (Iterator<String> it = parameters.getNames(); it.hasNext();) {
+			for (Iterator<String> it = parameters.keySet().iterator(); it.hasNext();) {
 				String pname = it.next();
 				
-				String p1 = parameters.getParameter(pname);
-				String p2 = other.parameters.getParameter(pname);
+				String p1 = parameters.get(pname);
+				String p2 = other.parameters.get(pname);
 				
 				// those present in both must match (case-insensitive)
 				if (p1!=null && p2!=null && !RFC2396UrlDecoder.decode(p1).equalsIgnoreCase(RFC2396UrlDecoder.decode(p2))) return false;
@@ -353,4 +356,16 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 		}
 		return true;
 	}
+	
+	public static final Map<String, String> getParameters(Parameters headerParams) {
+		Map<String, String> params = new ConcurrentHashMap<String, String>();
+		Iterator<String> parameterNames = headerParams.getParameterNames();			
+		while (parameterNames.hasNext()) {
+			String name = (String) parameterNames.next();
+			String value = headerParams.getParameter(name);
+			params.put(name, value);
+		}
+		return params;
+	}
+	
 }

@@ -16,7 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
-import gov.nist.javax.sip.stack.SIPServerTransaction;
+import gov.nist.javax.sip.ServerTransactionExt;
 
 import java.io.IOException;
 
@@ -136,7 +136,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
 		}				
-		final Transaction inviteTransaction = ((SIPServerTransaction) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
+		final Transaction inviteTransaction = ((ServerTransactionExt) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
 		final TransactionApplicationData inviteAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
 		final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
 			inviteAppData.getSipServletMessage();

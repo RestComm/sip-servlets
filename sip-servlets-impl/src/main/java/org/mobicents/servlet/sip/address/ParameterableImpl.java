@@ -16,9 +16,6 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.core.NameValue;
-import gov.nist.core.NameValueList;
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -26,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
@@ -42,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 
 public abstract class ParameterableImpl implements Parameterable ,Cloneable, Serializable {
-	protected NameValueList parameters = new NameValueList();
+	protected Map<String,String> parameters = new ConcurrentHashMap<String, String>();
 	
 	protected transient Parameters header = null;
 	
@@ -50,7 +48,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	protected boolean isModifiable = true;
 	
 	protected ParameterableImpl() {
-		this.parameters = new NameValueList();	
+		this.parameters = new ConcurrentHashMap<String, String>();	
 	}
 	
 	/**
@@ -67,7 +65,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
 			while (entries.hasNext()) {
 				Map.Entry<String, String> e=entries.next();
-				parameters.put(e.getKey(), new NameValue(e.getKey(),e.getValue()));
+				parameters.put(e.getKey(), e.getValue());
 			}
 		}
 	}
@@ -77,15 +75,11 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @see javax.servlet.sip.Parameterable#getParameter(java.lang.String)
 	 */
 	public String getParameter(String name) {
-		NameValue nv = this.parameters.get(name);
-		if(nv != null) {
-			if(nv.getValue() != null) {
-				return RFC2396UrlDecoder.decode(this.parameters.get(name).getValue());
-			} else {
-				if("lr".equals(name)) return "";// special case to pass Addressing spec test from 289 TCK
-			}
+		String value = this.parameters.get(name);
+		if(value != null) {			
+			return RFC2396UrlDecoder.decode(value);
 		} else {
-			return null;
+			if("lr".equals(name)) return "";// special case to pass Addressing spec test from 289 TCK
 		}
 		return null;
 	}
@@ -129,8 +123,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(!isModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
-		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502
-		this.parameters.set(name,value);
+		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502		
+		this.parameters.put(name.toLowerCase(),value);
 		if(header != null) {
 			try {
 				header.setParameter(name, value);
@@ -146,7 +140,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 */
 	public Set<Entry<String, String>> getParameters() {
 		HashSet<Entry<String,String>> retval = new HashSet<Entry<String,String>> ();
-		for(NameValue nameValue : this.parameters.values()) {
+		for(Entry<String, String> nameValue : this.parameters.entrySet()) {
 			nameValue.setValue(RFC2396UrlDecoder.decode(nameValue.getValue()));
 			retval.add(nameValue);
 		}
@@ -157,7 +151,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#getParameters()
 	 */
-	public NameValueList getInternalParameters() {
+	public Map<String, String> getInternalParameters() {
 		return parameters;
 	}
 
@@ -169,14 +163,12 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		return this.parameters.toString();
 	}
 	
-	public void setParameters(NameValueList parameters) {
+	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
-		if(header != null) {
-			Iterator<NameValue> it = parameters.iterator();
-			while (it.hasNext()) {
-				NameValue nameValue = (NameValue) it.next();			
+		if(header != null) {			
+			for(Entry<String, String> nameValue : this.parameters.entrySet()) {
 				try {
-					header.setParameter(nameValue.getName(), nameValue.getValue());
+					header.setParameter(nameValue.getKey(), nameValue.getValue());
 				} catch (ParseException e) {
 					throw new IllegalArgumentException("Problem setting parameter",e);
 				}

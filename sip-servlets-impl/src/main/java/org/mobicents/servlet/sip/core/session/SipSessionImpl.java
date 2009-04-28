@@ -16,8 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import gov.nist.javax.sip.header.From;
-import gov.nist.javax.sip.header.To;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
 
@@ -70,6 +68,8 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.HeaderAddress;
+import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -502,7 +502,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		} else if (sessionCreatingTransaction != null){
 			try {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader.getAddress(), ((From)fromHeader).getParameters(), false);
+				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader), false);
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);
 			}
@@ -563,10 +563,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 			try {
 				if(sessionCreatingTransaction instanceof ClientTransaction) {
 					ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
-					return new AddressImpl(toHeader.getAddress(), ((To)toHeader).getParameters(),  false);
+					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  false);
 				} else {
 					FromHeader toHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-					return new AddressImpl(toHeader.getAddress(), ((From)toHeader).getParameters(),  false);
+					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  false);
 				}
 			} catch(Exception e) {
 				throw new RuntimeException("Error creating Address", e);

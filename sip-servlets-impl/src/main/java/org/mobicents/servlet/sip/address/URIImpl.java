@@ -17,8 +17,10 @@
 package org.mobicents.servlet.sip.address;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.URI;
+import javax.sip.header.Parameters;
 
 public abstract class URIImpl extends ParameterableImpl implements URI, Serializable {
 
@@ -33,14 +35,20 @@ public abstract class URIImpl extends ParameterableImpl implements URI, Serializ
 
 	public URIImpl(javax.sip.address.TelURL telUrl) {
 		this.uri = telUrl;
-		super.setParameters(((gov.nist.javax.sip.address.TelURLImpl) telUrl)
-				.getParameters());
+		if(this.uri instanceof Parameters) {
+			super.setParameters(AddressImpl.getParameters((Parameters)uri));
+		} else {
+			super.setParameters(new ConcurrentHashMap<String, String>());
+		}	
 	}
 
 	public URIImpl(javax.sip.address.SipURI sipUri) {
 		this.uri = sipUri;
-		super.setParameters(((gov.nist.javax.sip.address.SipUri) sipUri)
-				.getParameters());
+		if(this.uri instanceof Parameters) {
+			super.setParameters(AddressImpl.getParameters((Parameters)uri));
+		} else {
+			super.setParameters(new ConcurrentHashMap<String, String>());
+		}
 	}
 
 	public javax.sip.address.URI getURI() {

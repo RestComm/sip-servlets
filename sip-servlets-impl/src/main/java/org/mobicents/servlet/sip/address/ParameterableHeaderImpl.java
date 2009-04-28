@@ -16,9 +16,9 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.core.NameValueList;
-
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
@@ -46,7 +46,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	@Override
 	public Object clone() {
 		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl();
-		cloned.parameters = (NameValueList) super.parameters.clone();
+		cloned.parameters = cloneParameters(super.parameters);
 		cloned.value = new String(this.value);
 		cloned.header = (Parameters)((Header)super.header).clone();
 		return cloned;
@@ -108,5 +108,12 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		}
 		return retVal;
 	}
-	
+
+	public static final Map<String, String> cloneParameters(Map<String, String> parametersToClone) {
+		Map<String, String> params = new ConcurrentHashMap<String, String>();
+		for(Entry<String, String> param : parametersToClone.entrySet()) {			
+			params.put(param.getKey(), param.getValue());
+		}
+		return params;
+	}
 }

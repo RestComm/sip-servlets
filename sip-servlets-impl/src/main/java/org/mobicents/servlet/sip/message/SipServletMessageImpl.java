@@ -16,11 +16,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
-
-import gov.nist.javax.sip.header.AddressParametersHeader;
-import gov.nist.javax.sip.header.From;
 import gov.nist.javax.sip.header.SIPHeader;
-import gov.nist.javax.sip.header.To;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
@@ -61,7 +57,9 @@ import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
+import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
+import javax.sip.header.Parameters;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
@@ -383,12 +381,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 		if (lit != null && lit.hasNext()) {
 			Header first = lit.next();
-			if (first instanceof AddressParametersHeader) {
+			if (first instanceof HeaderAddress) {
 				try {
 					if(this.isCommitted()) {
-						return new AddressImpl((AddressParametersHeader) first, false);
+						return new AddressImpl((HeaderAddress) first, false);
 					} else {
-						return new AddressImpl((AddressParametersHeader) first, true);
+						return new AddressImpl((HeaderAddress) first, true);
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
@@ -431,11 +429,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		for (Iterator<Header> it = this.message.getHeaders(nameToSearch); it
 				.hasNext();) {
 			Header header = (Header) it.next();
-			if (header instanceof AddressParametersHeader) {
-				AddressParametersHeader aph = (AddressParametersHeader) header;
+			if (header instanceof HeaderAddress) {
+				HeaderAddress aph = (HeaderAddress) header;
 				try {
 					AddressImpl addressImpl = new AddressImpl(
-							(AddressParametersHeader) aph, true);
+							aph, true);
 					retval.add(addressImpl);
 				} catch (ParseException ex) {
 					throw new ServletParseException("Bad header", ex);
@@ -634,7 +632,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress(), ((From)from).getParameters(), transaction == null ? true : false);
+		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), transaction == null ? true : false);
 		return address;
 	}
 	
@@ -648,7 +646,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		String value = null;
 		if (this.message.getHeader(nameToSearch) != null) {
 			value = ((SIPHeader) this.message.getHeader(nameToSearch))
-					.getHeaderValue();
+					.getValue();
 		}
 //		if(logger.isDebugEnabled()) {
 //			logger.debug("getHeader "+ name+ ", value="+ value	);
@@ -911,7 +909,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public Address getTo() {
 		ToHeader to = (ToHeader) this.message
 			.getHeader(getCorrectHeaderName(ToHeader.NAME));
-		return new AddressImpl(to.getAddress(), ((To)to).getParameters(), transaction == null ? true : false);
+		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), transaction == null ? true : false);
 	}
 	
 	/*

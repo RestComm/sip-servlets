@@ -16,14 +16,16 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.javax.sip.address.SipUri;
+import gov.nist.javax.sip.address.SipURIExt;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipURI;
 import javax.sip.InvalidArgumentException;
+import javax.sip.header.Parameters;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
@@ -317,8 +319,11 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	public void setValue(String value) {
 		try {
 			this.uri = SipFactories.addressFactory.createURI(value);
-			gov.nist.javax.sip.address.SipUri sipUri = (gov.nist.javax.sip.address.SipUri) this.uri;
-			super.setParameters(sipUri.getParameters());
+			if(this.uri instanceof Parameters) {
+				super.setParameters(AddressImpl.getParameters((Parameters)uri));
+			} else {
+				super.setParameters(new ConcurrentHashMap<String, String>());
+			}
 		} catch (ParseException ex) {
 			logger.error("Bad input arg", ex);
 			throw new IllegalArgumentException("Bad input arg", ex);
@@ -348,7 +353,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	 */
 	public void removeHeader(String name) {
 		//FIXME it's using jain sip RI implementation classes, it should not
-		((SipUri)getSipURI()).removeHeader(name);
+		((SipURIExt)getSipURI()).removeHeader(name);
 	}
 
 	@Override
@@ -362,7 +367,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 		}
 		super.setParameter(name, value);
 		try {
-			((SipUri)getSipURI()).setParameter(name, value);
+			((Parameters)getSipURI()).setParameter(name, value);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Problem setting parameter",e);
 		}
