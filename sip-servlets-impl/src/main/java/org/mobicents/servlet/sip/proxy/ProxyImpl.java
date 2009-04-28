@@ -122,15 +122,13 @@ public class ProxyImpl implements Proxy, Serializable {
 				ViaHeader lastVia = null;
 				while(viaHeaders.hasNext()) {
 					lastVia = viaHeaders.next();
-				}
-				if(lastVia != null) {
-					String uriString = ((Via)lastVia).getSentBy().toString();
-					uri = sipFactoryImpl.createSipURI(null, uriString);
-					if(lastVia.getTransport() != null) {
-						uri.setTransportParam(lastVia.getTransport());
-					} else {
-						uri.setTransportParam("udp");
-					}
+				} 
+				String uriString = ((Via)lastVia).getSentBy().toString();
+				uri = sipFactoryImpl.createSipURI(null, uriString);
+				if(lastVia.getTransport() != null) {
+					uri.setTransportParam(lastVia.getTransport());
+				} else {
+					uri.setTransportParam("udp");
 				}
 			}
 		} catch (Exception e) {
