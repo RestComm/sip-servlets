@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Address;
@@ -28,7 +27,6 @@ import javax.servlet.sip.URI;
 import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.Header;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.Parameters;
@@ -50,6 +48,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	private static final String Q_PARAM_NAME = "q";
 	private static final String EXPIRES_PARAM_NAME = "expires";
 	private static final String PARAM_SEPARATOR = ";";
+	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
 	private javax.sip.address.Address address;	
 	
 	private static HeaderFactory headerFactory = SipFactories.headerFactory;
@@ -261,7 +260,12 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 			while (parametersIt.hasNext()) {
 				Map.Entry<java.lang.String, String> entry = parametersIt.next();
 				if(((Parameters)address.getURI()).getParameter(entry.getKey()) == null) {
-					retval.append(PARAM_SEPARATOR).append(entry.getValue());
+					String value = entry.getValue();
+					if(value != null && value.length() > 0) {
+						retval.append(PARAM_SEPARATOR).append(entry.getKey()).append(PARAM_NAME_VALUE_SEPARATOR).append(value);
+					} else {
+						retval.append(PARAM_SEPARATOR).append(entry.getKey());
+					}
 				}
 			}
 		}
