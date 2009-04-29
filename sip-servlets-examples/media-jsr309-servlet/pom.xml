@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>sip-servlets-examples-parent</artifactId>
+		<version>1.4-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>media-jsr309-servlet</artifactId>
+	<packaging>war</packaging>
+	<version>1.4-SNAPSHOT</version>
+	<name>Simple Media JSR309 Servlet Example</name>
+	<url>http://www.mobicents.org/media-demo.html</url>
+	<dependencies>
+		<!-- test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- logging dependency -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging-api</artifactId>
+			<version>${commons-logging.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- media dependencies -->
+		<dependency>
+			<groupId>org.mobicents.external.jsr309</groupId>
+			<artifactId>mscontrol</artifactId>
+			<version>0.2</version>
+		</dependency>
+		<!-- j2ee dependencies -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-spec</artifactId>
+			<version>1.1.10-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+	<build>
+		 <finalName>media-jsr309-servlet</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warSourceDirectory>
+						${basedir}/src/main/sipapp
+					</warSourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<configuration>
+							<tasks>
+
+								<!-- 
+								<move todir="${basedir}/target/media-playback-servlet-1.0/WEB-INF/lib/" includeemptydirs="false" verbose="true">
+									<fileset dir="${basedir}/target/media-playback-servlet-1.0/WEB-INF/lib/">
+										<include name="**/*-1.0.jar" />
+									</fileset>
+									<mapper type="glob" from="*-1.0.jar" to="*.jar" />
+								</move>
+								-->
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+	
+</project>

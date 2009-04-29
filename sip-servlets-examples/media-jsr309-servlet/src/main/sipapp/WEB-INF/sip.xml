@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.MediaPlaybackServlet</app-name>
+	<display-name>MediaPlaybackServlet</display-name>
+	<description>MediaPlaybackServlet</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			MediaPlaybackServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>MediaPlaybackServlet</servlet-name>
+		<display-name>MediaPlaybackServlet</display-name>
+		<description>MediaPlaybackServlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.MediaPlaybackServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>
