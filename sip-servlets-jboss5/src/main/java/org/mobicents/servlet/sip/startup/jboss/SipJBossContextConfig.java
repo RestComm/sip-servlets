@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.startup.jboss;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.catalina.core.StandardWrapper;
@@ -31,14 +32,24 @@ import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.sip.jboss.JBossServletsMetaData;
+import org.jboss.metadata.sip.spec.AndMetaData;
+import org.jboss.metadata.sip.spec.ConditionMetaData;
+import org.jboss.metadata.sip.spec.ContainsMetaData;
+import org.jboss.metadata.sip.spec.EqualMetaData;
+import org.jboss.metadata.sip.spec.ExistsMetaData;
 import org.jboss.metadata.sip.spec.ListenerMetaData;
+import org.jboss.metadata.sip.spec.NotMetaData;
+import org.jboss.metadata.sip.spec.OrMetaData;
 import org.jboss.metadata.sip.spec.ParamValueMetaData;
+import org.jboss.metadata.sip.spec.PatternMetaData;
 import org.jboss.metadata.sip.spec.ServletMetaData;
 import org.jboss.metadata.sip.spec.ServletSelectionMetaData;
 import org.jboss.metadata.sip.spec.SipLoginConfigMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionMetaData;
 import org.jboss.metadata.sip.spec.SipResourceCollectionsMetaData;
 import org.jboss.metadata.sip.spec.SipSecurityConstraintMetaData;
+import org.jboss.metadata.sip.spec.SipServletMappingMetaData;
+import org.jboss.metadata.sip.spec.SubdomainOfMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
@@ -48,6 +59,18 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
+import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
+import org.mobicents.servlet.sip.startup.loading.rules.AndRule;
+import org.mobicents.servlet.sip.startup.loading.rules.ContainsRule;
+import org.mobicents.servlet.sip.startup.loading.rules.EqualsRule;
+import org.mobicents.servlet.sip.startup.loading.rules.ExistsRule;
+import org.mobicents.servlet.sip.startup.loading.rules.MatchingRule;
+import org.mobicents.servlet.sip.startup.loading.rules.NotRule;
+import org.mobicents.servlet.sip.startup.loading.rules.OrRule;
+import org.mobicents.servlet.sip.startup.loading.rules.SubdomainRule;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures
@@ -195,6 +218,17 @@ public class SipJBossContextConfig extends JBossContextConfig {
 				convergedContext.setMainServlet(mainServlet);
 				servletSelectionSet = true;
 			} else if(servletSelectionMetaData.getSipServletMappings() != null && servletSelectionMetaData.getSipServletMappings().size() > 0) {
+				Iterator<SipServletMappingMetaData> sipServletMapping = servletSelectionMetaData.getSipServletMappings().iterator();
+				while (sipServletMapping.hasNext()) {
+					SipServletMappingMetaData sipServletMappingMetaData = (SipServletMappingMetaData) sipServletMapping
+							.next();
+					SipServletMapping sipMapping = new SipServletMapping();
+					sipMapping.setServletName(sipServletMappingMetaData.getServletName());
+					PatternMetaData  pattern = sipServletMappingMetaData.getPattern();
+					MatchingRule matchingRule = buildRule(pattern.getCondition());
+					sipMapping.setMatchingRule(matchingRule);
+					convergedContext.addSipServletMapping(sipMapping);					
+				}
 				servletSelectionSet = true;
 			} else if(servletSelectionMetaData.getSipRubyController() != null) {
 				convergedContext.setSipRubyController(servletSelectionMetaData.getSipRubyController());
@@ -244,5 +278,55 @@ public class SipJBossContextConfig extends JBossContextConfig {
 		convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
 		convergedContext.setWrapperClass(StandardWrapper.class.getName());
 	}
+	
+	public static MatchingRule buildRule(ConditionMetaData condition) {
+		
+		
+		if (condition instanceof AndMetaData) {
+			AndMetaData andMetaData = (AndMetaData) condition;
+			AndRule and = new AndRule();
+			List<ConditionMetaData> list = andMetaData.getConditions();
+			for(ConditionMetaData newCondition : list) {
+				and.addCriterion(buildRule(newCondition));
+			}
+			return and;
+		} else if (condition instanceof EqualMetaData) {
+			EqualMetaData equalMetaData = (EqualMetaData) condition;
+			String var = equalMetaData.getVar();
+			String value = equalMetaData.getValue();
+			boolean ignoreCase = equalMetaData.isIgnoreCase();
+			return new EqualsRule(var, value, ignoreCase);
+		} else if (condition instanceof SubdomainOfMetaData) {
+			SubdomainOfMetaData subdomainOfMetaData = (SubdomainOfMetaData) condition;
+			String var = subdomainOfMetaData.getVar();
+			String value = subdomainOfMetaData.getValue();
+			return new SubdomainRule(var, value);
+		} else if (condition instanceof OrMetaData) {
+			OrMetaData orMetaData = (OrMetaData) condition;
+			OrRule or = new OrRule();
+			List<ConditionMetaData> list = orMetaData.getConditions();
+			for(ConditionMetaData newCondition : list) {
+				or.addCriterion(buildRule(newCondition));
+			}
+			return or;
+		} else if (condition instanceof NotMetaData) {
+			NotMetaData notMetaData = (NotMetaData) condition;
+			NotRule not = new NotRule();
+			not.setCriterion(buildRule(notMetaData.getCondition()));
+			return not;
+		} else if (condition instanceof ContainsMetaData) {
+			ContainsMetaData containsMetaData = (ContainsMetaData) condition;
+			String var = containsMetaData.getVar();
+			String value = containsMetaData.getValue();
+			boolean ignoreCase = containsMetaData.isIgnoreCase();
+			return new ContainsRule(var, value, ignoreCase);
+		} else if (condition instanceof ExistsMetaData) {
+			ExistsMetaData existsMetaData = (ExistsMetaData) condition;
+			return new ExistsRule(existsMetaData.getVar());
+		} else {
+			throw new IllegalArgumentException("Unknown rule: " + condition);
+		} 
+	} 
+
 
 }
