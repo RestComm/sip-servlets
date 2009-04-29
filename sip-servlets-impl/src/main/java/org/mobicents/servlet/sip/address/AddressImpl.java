@@ -257,11 +257,13 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 		//excluding the parameters already present in the address uri
 		if ( parameters!= null) {
 			for(Map.Entry<java.lang.String, String> entry : parameters.entrySet()) {
-				String value = entry.getValue();
-				if(value != null && value.length() > 0) {
-					retval.append(PARAM_SEPARATOR).append(entry.getKey()).append(PARAM_NAME_VALUE_SEPARATOR).append(value);
-				} else {
-					retval.append(PARAM_SEPARATOR).append(entry.getKey());
+				if((!(address.getURI() instanceof Parameters)) || ((Parameters)address.getURI()).getParameter(entry.getKey()) == null) {
+					String value = entry.getValue();
+					if(value != null && value.length() > 0) {
+						retval.append(PARAM_SEPARATOR).append(entry.getKey()).append(PARAM_NAME_VALUE_SEPARATOR).append(value);
+					} else {
+						retval.append(PARAM_SEPARATOR).append(entry.getKey());
+					}
 				}
 			}
 		}
