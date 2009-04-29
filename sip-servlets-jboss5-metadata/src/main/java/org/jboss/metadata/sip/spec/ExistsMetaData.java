@@ -21,6 +21,8 @@
  */
 package org.jboss.metadata.sip.spec;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * @author jean.deruelle@gmail.com
  *
@@ -31,6 +33,7 @@ public class ExistsMetaData extends ConditionMetaData {
 	/**
 	 * @param var the var to set
 	 */
+	@XmlElement(name="var")
 	public void setVar(String var) {
 		this.var = var;
 	}

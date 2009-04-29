@@ -21,23 +21,28 @@
  */
 package org.jboss.metadata.sip.spec;
 
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * @author jean.deruelle@gmail.com
  *
  */
 public class AndMetaData extends ConditionMetaData {
 	private static final long serialVersionUID = 1;
-	private ConditionMetaData condition;
+	private List<ConditionMetaData> conditions;
 	/**
 	 * @param condition the condition to set
 	 */
-	public void setCondition(ConditionMetaData condition) {
-		this.condition = condition;
+	@XmlElement(name="condition")
+	public void setConditions(List<ConditionMetaData> conditions) {
+		this.conditions = conditions;
 	}
 	/**
 	 * @return the condition
 	 */
-	public ConditionMetaData getCondition() {
-		return condition;
+	public List<ConditionMetaData> getConditions() {
+		return conditions;
 	}
 }

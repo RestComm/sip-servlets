@@ -21,8 +21,6 @@
  */
 package org.jboss.metadata.sip.spec;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 
 import org.jboss.metadata.javaee.support.IdMetaDataImpl;
@@ -37,7 +35,7 @@ public class SipServletMappingMetaData extends IdMetaDataImpl
 {
    private static final long serialVersionUID = 1;
    protected String servletName;
-   protected List<PatternMetaData> patterns;
+   protected PatternMetaData pattern;
 
    public String getServletName()
    {
@@ -48,14 +46,14 @@ public class SipServletMappingMetaData extends IdMetaDataImpl
       this.servletName = servletName;
    }
 
-   public List<PatternMetaData> getPatterns()
+   public PatternMetaData getPattern()
    {
-      return patterns;
+      return pattern;
    }
    @XmlElement(name="pattern")
-   public void setPatterns(List<PatternMetaData> patterns)
+   public void setPattern(PatternMetaData patterns)
    {
-      this.patterns = patterns;
+      this.pattern = pattern;
    }
 
    public String toString()
@@ -64,8 +62,8 @@ public class SipServletMappingMetaData extends IdMetaDataImpl
       tmp.append(getId());
       tmp.append(",servletName=");
       tmp.append(servletName);
-      tmp.append(",patterns=");
-      tmp.append(patterns);
+      tmp.append(",pattern=");
+      tmp.append(pattern);
       tmp.append(')');
       return tmp.toString();
    }

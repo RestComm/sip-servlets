@@ -21,6 +21,8 @@
  */
 package org.jboss.metadata.sip.spec;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * @author jean.deruelle@gmail.com
  *
@@ -31,6 +33,7 @@ public class NotMetaData extends ConditionMetaData {
 	/**
 	 * @param condition the condition to set
 	 */
+	@XmlElement(name="condition")
 	public void setCondition(ConditionMetaData condition) {
 		this.condition = condition;
 	}

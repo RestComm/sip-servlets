@@ -1,16 +1,11 @@
 package org.jboss.metadata.sip.spec;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.jboss.metadata.sip.spec.ParamValueMetaData;
 import org.jboss.xb.annotations.JBossXmlSchema;
 
 /**

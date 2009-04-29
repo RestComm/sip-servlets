@@ -21,6 +21,8 @@
  */
 package org.jboss.metadata.sip.spec;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import org.jboss.metadata.javaee.support.IdMetaDataImpl;
 
 /**
@@ -43,6 +45,7 @@ public class PatternMetaData extends IdMetaDataImpl {
 	/**
 	 * @return the condition
 	 */
+	@XmlElement(name="condition")
 	public ConditionMetaData getCondition() {
 		return condition;
 	}
