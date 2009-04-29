@@ -36,15 +36,20 @@ import org.apache.log4j.Logger;
  * Implementation of the parameterable interface.
  * 
  * @author mranga
+ * @author jean.deruelle@gmail.com
  *
  */
 
 public abstract class ParameterableImpl implements Parameterable ,Cloneable, Serializable {
+	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());
+	
+	private static final String PARAM_SEPARATOR = ";";
+	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
+	
 	protected Map<String,String> parameters = new ConcurrentHashMap<String, String>();
 	
 	protected transient Parameters header = null;
 	
-	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());
 	protected boolean isModifiable = true;
 	
 	protected ParameterableImpl() {
@@ -160,7 +165,20 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return this.parameters.toString();
+		StringBuffer retVal = new StringBuffer();
+		boolean firstTime = true;
+		for(java.util.Map.Entry<String, String> entry : parameters.entrySet()) {
+			String value = entry.getValue();
+			if(!firstTime) {
+				retVal.append(PARAM_SEPARATOR);
+			}
+			if(value != null && value.length() > 0) {
+				retVal.append(entry.getKey()).append(PARAM_NAME_VALUE_SEPARATOR).append(value);
+			} else {
+				retVal.append(entry.getKey());
+			}
+		}
+		return retVal.toString();
 	}
 	
 	public void setParameters(Map<String, String> parameters) {

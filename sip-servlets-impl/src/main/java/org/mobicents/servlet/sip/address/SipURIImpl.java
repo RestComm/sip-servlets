@@ -39,6 +39,12 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 
+	private static final String LR_PARAM = "lr";
+	private static final String MADDR = "maddr";
+	protected static final String METHOD = "method";
+	protected static final String TTL = "ttl";
+	protected static final String USER = "user";
+	protected static final String TRANSPORT = "transport";
 	private static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName());
 
 	public SipURIImpl(javax.sip.address.SipURI sipUri) {
@@ -180,8 +186,10 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	public void setLrParam(boolean flag) {
 		if (flag) {
 			getSipURI().setLrParam();
+			super.parameters.put(LR_PARAM, "");
 		} else {
-			getSipURI().removeParameter("lr");
+			getSipURI().removeParameter(LR_PARAM);
+			super.parameters.remove(LR_PARAM);
 		}
 	}
 	
@@ -192,6 +200,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	public void setMAddrParam(String maddr) {
 		try {
 			getSipURI().setMAddrParam(maddr);
+			super.parameters.put(MADDR, maddr);
 		} catch (ParseException e) {
 			logger.error("parse exception occured", e);
 		}
@@ -205,6 +214,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	public void setMethodParam(String method) {
 		try {
 			getSipURI().setMethodParam(method);
+			super.parameters.put(METHOD, method);
 		} catch (ParseException e) {
 			logger.error("parse exception occured", e);
 			throw new IllegalArgumentException("Bad arg " + method, e);
@@ -234,6 +244,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	public void setTTLParam(int ttl) {
 		try {
 			getSipURI().setTTLParam(ttl);
+			super.parameters.put(TTL, "" + ttl);
 		} catch (InvalidArgumentException e) {
 			logger.error("invalid argument", e);
 		}
@@ -245,7 +256,8 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	 */
 	public void setTransportParam(String transport) {
 		try {
-			getSipURI().setParameter("transport",transport);
+			getSipURI().setParameter(TRANSPORT, transport);
+			super.parameters.put(TRANSPORT, transport);
 		} catch (ParseException e) {
 			logger.error("error setting transport ", e);
 		}
@@ -257,7 +269,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	 */
 	public void setUser(String user) {
 		try {
-			getSipURI().setUser(user);
+			getSipURI().setUser(user);			
 		} catch (ParseException e) {
 			logger.error("error setting parameter ", e);
 		}
@@ -270,6 +282,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	public void setUserParam(String user) {
 		try {
 			getSipURI().setUserParam(user);
+			super.parameters.put(USER, user);
 		} catch (ParseException e) {
 			logger.error("error setting parameter ", e);
 		}
@@ -359,7 +372,7 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 	@Override
 	public void setParameter(String name, String value) {
 		//Special case to pass Addressing spec test from 289 TCK
-		if("lr".equals(name)) {
+		if(LR_PARAM.equals(name)) {
 			if(value == null || value.length()<1) {
 				this.setLrParam(true);
 				return;
