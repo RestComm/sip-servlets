@@ -967,7 +967,7 @@
 						JSR 309 Sip Servlets Example
 						</a>
 						<br />															
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -975,6 +975,34 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=485">
 									Asterisk Interop/Integration Example
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=670">
+									loop for invite request on the default port when no application is configured in the AR
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=671">
+									Cannot load dar file located in a path with a blank space
+								</a>								
+							</li>
+							<li>
+								<img src="orange.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=675">
+									MSS on JBoss 5 is missing support for servlet-selection in sip.xml  
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=676">
+									Tags not removed when using SipFactory.createRequest()
 								</a>								
 							</li>
 						</ul>
@@ -1006,6 +1034,12 @@
 						Support for ICE and TURN
 						</a>
 						<br />
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=674">
+						Remove dependency on JAIN SIP internal classes	  
+						</a>	
+						<br />							
 					</p>		
 				</subsection>
 			</subsection>
