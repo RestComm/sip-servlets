@@ -34,7 +34,7 @@ import org.jboss.metadata.javaee.support.IdMetaDataImpl;
  * @author jean.deruelle@gmail.com
  * @version $Revision$
  */
-@XmlType(name = "patternType")
+@XmlType(name = "patternType", propOrder={"condition"})
 public class PatternMetaData extends IdMetaDataImpl {
 
 	private static final long serialVersionUID = 1;
