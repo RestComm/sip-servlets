@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.address;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,6 +31,8 @@ import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
 import org.apache.log4j.Logger;
+
+import com.sun.jndi.ldap.EntryChangeResponseControl;
 
 
 /**
@@ -144,12 +147,11 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @see javax.servlet.sip.Parameterable#getParameters()
 	 */
 	public Set<Entry<String, String>> getParameters() {
-		HashSet<Entry<String,String>> retval = new HashSet<Entry<String,String>> ();
+		Map<String,String> retval = new HashMap<String,String> ();
 		for(Entry<String, String> nameValue : this.parameters.entrySet()) {
-			nameValue.setValue(RFC2396UrlDecoder.decode(nameValue.getValue()));
-			retval.add(nameValue);
+			retval.put(nameValue.getKey(), (RFC2396UrlDecoder.decode(nameValue.getValue())));
 		}
-		return retval;
+		return retval.entrySet();
 	}
 	
 	/*
@@ -167,11 +169,12 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	public String toString() {
 		StringBuffer retVal = new StringBuffer();
 		boolean firstTime = true;
-		for(java.util.Map.Entry<String, String> entry : parameters.entrySet()) {
-			String value = entry.getValue();
+		for(java.util.Map.Entry<String, String> entry : parameters.entrySet()) {			
 			if(!firstTime) {
-				retVal.append(PARAM_SEPARATOR);
+				retVal.append(PARAM_SEPARATOR);				
 			}
+			firstTime = false;
+			String value = entry.getValue();
 			if(value != null && value.length() > 0) {
 				retVal.append(entry.getKey()).append(PARAM_NAME_VALUE_SEPARATOR).append(value);
 			} else {
