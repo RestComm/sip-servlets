@@ -20,9 +20,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
@@ -69,9 +70,16 @@ import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
-public class SipFactoryImpl implements Serializable {
+public class SipFactoryImpl implements Serializable {	
+
 	private static transient Logger logger = Logger.getLogger(SipFactoryImpl.class
 			.getCanonicalName());
+	private static final String TAG_PARAM = "tag";
+	private static final String METHOD_PARAM = "method";
+	private static final String MADDR_PARAM = "maddr";
+	private static final String TTL_PARAM = "ttl";
+	private static final String TRANSPORT_PARAM = "transport";
+	private static final String LR_PARAM = "lr";
 
 	private boolean useLoadBalancer = false;
 	private BalancerDescription loadBalancerToUse = null;
@@ -82,11 +90,15 @@ public class SipFactoryImpl implements Serializable {
 		}
 	}
 	
-	private static final TreeSet<String> forbbidenToHeaderParams = new TreeSet<String>(
-			new NamesComparator());
+	private static final Set<String> forbbidenParams = new HashSet<String>();
 
 	static {
-		forbbidenToHeaderParams.add("tag");
+		forbbidenParams.add(TAG_PARAM);
+		forbbidenParams.add(METHOD_PARAM);
+		forbbidenParams.add(MADDR_PARAM);
+		forbbidenParams.add(TTL_PARAM);
+		forbbidenParams.add(TRANSPORT_PARAM);
+		forbbidenParams.add(LR_PARAM);
 	}	
 
 	private transient SipApplicationDispatcher sipApplicationDispatcher = null;
@@ -205,8 +217,9 @@ public class SipFactoryImpl implements Serializable {
 
 		validateCreation(method, sipAppSession);
 
-		try {
-			return createSipServletRequest(sipAppSession, method, from, to, handler);
+		try { 
+			//javadoc specifies that a copy of the address should be done hence the clone
+			return createSipServletRequest(sipAppSession, method, (Address)from.clone(), (Address)to.clone(), handler);
 		} catch (ServletParseException e) {
 			logger.error("Error creating sipServletRequest", e);
 			return null;
@@ -232,8 +245,9 @@ public class SipFactoryImpl implements Serializable {
 
 		validateCreation(method, sipAppSession);
 
-		Address toA = this.createAddress(to);
-		Address fromA = this.createAddress(from);
+		//javadoc specifies that a copy of the uri should be done hence the clone
+		Address toA = this.createAddress(to.clone());
+		Address fromA = this.createAddress(from.clone());
 
 		try {
 			return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
@@ -394,16 +408,35 @@ public class SipFactoryImpl implements Serializable {
 		// LETS CREATE OUR HEADERS			
 		javax.sip.address.Address fromAddress = null;
 		try {
+			// Issue 676 : Any component of the from and to URIs not allowed in the context of
+			// SIP From and To headers are removed from the copies [refer Table 1, Section
+			// 19.1.1, RFC3261]
+			for(String param : forbbidenParams) {
+				from.getURI().removeParameter(param);	
+			}
+			
+			// Issue 676 : from tags not removed so removing the tag
+			from.removeParameter(TAG_PARAM);
+			
 			fromAddress = SipFactories.addressFactory
 					.createAddress(from.getURI().toString());
-			fromAddress.setDisplayName(from.getDisplayName());
-
+			fromAddress.setDisplayName(from.getDisplayName());		
+			
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddress, null);			
 		} catch (Exception pe) {
 			throw new ServletParseException("Impossoible to parse the given From " + from.toString(), pe);
 		}
 		javax.sip.address.Address toAddress = null; 
 		try{
+			// Issue 676 : Any component of the from and to URIs not allowed in the context of
+			// SIP From and To headers are removed from the copies [refer Table 1, Section
+			// 19.1.1, RFC3261]
+			for(String param : forbbidenParams) {
+				to.getURI().removeParameter(param);	
+			}
+			// Issue 676 : to tags not removed so removing the tag
+			to.removeParameter(TAG_PARAM);
+			
 			toAddress = SipFactories.addressFactory
 				.createAddress(to.getURI().toString());
 			
@@ -413,6 +446,7 @@ public class SipFactoryImpl implements Serializable {
 		} catch (Exception pe) {
 			throw new ServletParseException("Impossoible to parse the given To " + to.toString(), pe);
 		}
+		
 		try {
 			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 			// Fix provided by Hauke D. Issue 411
@@ -428,23 +462,19 @@ public class SipFactoryImpl implements Serializable {
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 						URIImpl requestURI = (URIImpl)to.getURI().clone();
 
-			// now lets put header params into headers.
+			// copying address params into headers.
 			Iterator<String> keys = to.getParameterNames();
 
 			while (keys.hasNext()) {
-				String key = keys.next();
-				if (forbbidenToHeaderParams.contains(key)) {
-					continue;
-				}
+				String key = keys.next();				
 				toHeader.setParameter(key, to.getParameter(key));
 			}
 
 			keys = from.getParameterNames();
 
 			while (keys.hasNext()) {
-				String key = keys.next();
-
-				toHeader.setParameter(key, from.getParameter(key));
+				String key = keys.next();				
+				fromHeader.setParameter(key, from.getParameter(key));
 			}
 			//Issue 112 by folsson : no via header to add will be added when the request will be sent out
 			List<Header> viaHeaders = new ArrayList<Header>();

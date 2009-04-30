@@ -385,4 +385,10 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 			throw new IllegalArgumentException("Problem setting parameter",e);
 		}
 	}
+	
+	@Override
+	public void removeParameter(String name) {
+		super.removeParameter(name);
+		((Parameters)getSipURI()).removeParameter(name);
+	}
 }
