@@ -144,7 +144,7 @@ Diameter Sh OpenIMS Core Integration Service
 	 		
 	 		* Detach the current iFC <<<default_ifc>>>
 	 		
-	 		* Detach the MSS iFC <<<MSS iFC>>>
+	 		* Attach the MSS iFC <<<MSS iFC>>>
 	 		
 	 		* Click on Save Button 
 	 	
