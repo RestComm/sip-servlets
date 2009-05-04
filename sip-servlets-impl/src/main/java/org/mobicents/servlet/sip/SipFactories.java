@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip;
 
+import gov.nist.javax.sip.header.HeaderFactoryImpl;
+
 import javax.sip.SipFactory;
 import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
@@ -36,14 +38,17 @@ public class SipFactories {
 
 	public static MessageFactory messageFactory;
 
-	public static void initialize(String pathName) {
+	public static void initialize(String pathName, boolean prettyEncoding) {
 		if (!initialized) {
 			try {
 				System.setProperty("gov.nist.core.STRIP_ADDR_SCOPES", "true");
 				sipFactory = SipFactory.getInstance();
 				sipFactory.setPathName(pathName);
-				addressFactory = sipFactory.createAddressFactory();
+				addressFactory = sipFactory.createAddressFactory();				
 				headerFactory = sipFactory.createHeaderFactory();
+				if(prettyEncoding) {
+					((HeaderFactoryImpl)headerFactory).setPrettyEncoding(prettyEncoding);
+				}
 				messageFactory = sipFactory.createMessageFactory();
 				initialized = true;
 			} catch (Exception ex) {

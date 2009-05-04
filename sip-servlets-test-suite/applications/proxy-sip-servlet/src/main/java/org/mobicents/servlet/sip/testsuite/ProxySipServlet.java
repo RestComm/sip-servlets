@@ -146,7 +146,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 
 		logger.info("Got response: " + response);
 		logger.info("Sip Session is :" + response.getSession(false));
-		if(!"PRACK".equals(response.getMethod())) {
+		if(!"PRACK".equals(response.getMethod()) && response.getProxy() != null && response.getProxy().getOriginalRequest() != null) {
 			logger.info("Original Sip Session is :" + response.getProxy().getOriginalRequest().getSession(false));
 		}
 		super.doResponse(response);

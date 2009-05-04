@@ -118,7 +118,10 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * Stun Server Port
 	 */
 	private int stunServerPort;
-	
+	/*
+	 * use Pretty Encoding
+	 */
+	private boolean usePrettyEncoding;
 
 	/**
 	 * {@inheritDoc}
@@ -181,7 +184,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * {@inheritDoc}
 	 */
 	public void init() throws Exception {		
-		SipFactories.initialize("gov.nist");
+		SipFactories.initialize("gov.nist", usePrettyEncoding);
 		setAttribute("isSipConnector",Boolean.TRUE);
 	}
 
@@ -502,6 +505,20 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public void setUseStun(boolean useStun) {
 		this.useStun = useStun;
+	}	
+	
+	/**
+	 * @param usePrettyEncoding the usePrettyEncoding to set
+	 */
+	public void setUsePrettyEncoding(boolean usePrettyEncoding) {
+		this.usePrettyEncoding = usePrettyEncoding;
+	}
+
+	/**
+	 * @return the usePrettyEncoding
+	 */
+	public boolean isUsePrettyEncoding() {
+		return usePrettyEncoding;
 	}	
 
 	public InetAddress getAddress() {

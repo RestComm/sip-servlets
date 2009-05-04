@@ -35,7 +35,7 @@ public class SipURITest extends junit.framework.TestCase {
 	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {		
-		SipFactories.initialize("gov.nist");		
+		SipFactories.initialize("gov.nist", true);		
 		sipFactory = new SipFactoryImpl(null);
 	}
 	
