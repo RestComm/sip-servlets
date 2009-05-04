@@ -21,7 +21,7 @@
     <dependency>
       <groupId>org.mobicents.servers.diameter</groupId>
       <artifactId>mobicents-diameter-mux-jar</artifactId>
-      <version>1.0.0.BETA34</version>
+      <version>1.0.0.BETA4</version>
       <scope>provided</scope>
     </dependency>    
     <dependency>
