@@ -103,6 +103,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		toAddress.setParameter("foo", "fighter");
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getFinalResponseStatus() == 404);
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 	
@@ -119,6 +120,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		toAddress.setParameter("foo", "fighter");
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getFinalResponseStatus() == 404);
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 	
@@ -134,6 +136,38 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getFinalResponseStatus() == 404);
+		assertTrue(sender.isFinalResponseReceived());		
+	}
+	
+	public void testServletSecondMappingOK() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "servlet-mapping2";
+		String toSipAddress = "mobicents.sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getFinalResponseStatus() == 410);
+		assertTrue(sender.isFinalResponseReceived());		
+	}
+	public void testServletSecondMappingKO() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "servlet-mapping3";
+		String toSipAddress = "mobicents.sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getFinalResponseStatus() == 404);
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 

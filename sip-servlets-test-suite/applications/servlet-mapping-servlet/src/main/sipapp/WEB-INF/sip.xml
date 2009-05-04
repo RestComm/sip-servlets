@@ -44,6 +44,21 @@
 				</and>
 			</pattern>
 		</servlet-mapping>
+		<servlet-mapping>
+			<servlet-name>SecondServlet</servlet-name>
+			<pattern>
+				<and>
+					<equal>
+						<var>request.method</var>
+						<value>INVITE</value>
+					</equal>	
+					<equal>
+						<var>request.uri.user</var>
+						<value>servlet-mapping2</value>
+					</equal>
+				</and>
+			</pattern>
+		</servlet-mapping>
 	</servlet-selection>
 
 	<servlet>
@@ -52,6 +67,16 @@
 		<description>Servlet Mappingservlet</description>
 		<servlet-class>
 			org.mobicents.servlet.sip.testsuite.ServletMappingSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>SecondServlet</servlet-name>
+		<display-name>SecondServlet</display-name>
+		<description>SecondServlet Mappingservlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.SecondServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
