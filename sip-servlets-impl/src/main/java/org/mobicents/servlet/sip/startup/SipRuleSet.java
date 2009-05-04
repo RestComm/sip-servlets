@@ -193,7 +193,7 @@ public class SipRuleSet extends RuleSetBase {
 //        digester.addCallParam(prefix + "sip-app/servlet/security-role-ref/description", 2);
         
         //Handles servlet mapping rules
-        digester.addRule(prefix + "sip-app/servlet-selection/servlet-mapping",
+        digester.addRule(prefix + "sip-app/servlet-selection",
                 servletSelection);
         digester.addObjectCreate(prefix + "sip-app/servlet-selection/servlet-mapping",        		
         	"org.mobicents.servlet.sip.startup.loading.SipServletMapping");
