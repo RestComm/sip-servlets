@@ -31,7 +31,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/jboss-embedded-all/beta3/jboss-embedded-all-beta3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/jboss-embedded-api/beta3/jboss-embedded-api-beta3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/embedded/thirdparty-all/beta3/thirdparty-all-beta3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.0.GA/mobicents-media-server-constants-1.0.0.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.0.GA/mobicents-media-server-msc-api-1.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.1.GA/mobicents-media-server-constants-1.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.1.GA/mobicents-media-server-msc-api-1.0.1.GA.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

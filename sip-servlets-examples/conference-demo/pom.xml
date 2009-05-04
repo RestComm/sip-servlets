@@ -111,17 +111,17 @@
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api</artifactId>
-			<version>1.0.0.GA</version>
+			<version>1.0.1.GA</version>
 		</dependency>
 		<dependency>		
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-constants</artifactId>
-			<version>1.0.0.GA</version>
+			<version>1.0.1.GA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.media</groupId>
 			<artifactId>mobicents-media-server-msc-api-local-impl</artifactId>
-			<version>1.0.0.GA</version>
+			<version>1.0.1.GA</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.sip</groupId>
