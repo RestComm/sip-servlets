@@ -18,6 +18,7 @@
 		<module>call-forwarding-distributable</module>
 		<module>chatserver</module>
 		<module>click-to-call</module>
+		<module>click2call-distributable</module>
 		<module>conference-demo</module>
 		<module>diameter-event-charging</module>
 		<module>diameter-openims</module>
@@ -37,7 +38,7 @@
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>1.0.0.GA</mms.version>
+		<mms.version>1.0.1.GA</mms.version>
                 <war.plugin.version>2.1-beta-1</war.plugin.version>
 	</properties>
 
