@@ -961,7 +961,7 @@
 						Clustering for MSS on JBoss AS 5
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=663">
 						JSR 309 Sip Servlets Example
@@ -992,7 +992,7 @@
 								</a>								
 							</li>
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=675">
 									MSS on JBoss 5 is missing support for servlet-selection in sip.xml  
