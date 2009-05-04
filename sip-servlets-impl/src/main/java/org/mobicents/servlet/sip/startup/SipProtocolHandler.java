@@ -183,7 +183,10 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init() throws Exception {		
+	public void init() throws Exception {
+		if(logger.isInfoEnabled()) {
+			logger.info("Pretty encoding of headers enabled ? " + usePrettyEncoding);
+		}
 		SipFactories.initialize("gov.nist", usePrettyEncoding);
 		setAttribute("isSipConnector",Boolean.TRUE);
 	}
