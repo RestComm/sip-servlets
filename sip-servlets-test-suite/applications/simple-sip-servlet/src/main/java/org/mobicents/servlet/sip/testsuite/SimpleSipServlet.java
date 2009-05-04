@@ -44,6 +44,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	
 	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
 	private static final String TEST_ALLOW_HEADER = "TestAllowHeader";
+	private static final String TEST_TO_TAG = "TestToTag";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
 	
@@ -104,6 +105,19 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			sipServletResponse.send();
 			return;
 		}	
+		
+		if(request.getFrom().toString().contains(TEST_TO_TAG)) {
+			//checking if the to tag is not
+			Address fromAddress = request.getFrom();
+			Address toAddress   = sipFactory.createAddress(request.getRequestURI(), request.getTo().getDisplayName());
+	        SipServletRequest newRequest = sipFactory.createRequest(request.getApplicationSession(), "INVITE", fromAddress, toAddress);
+	        if(newRequest.getTo().getParameter("tag") != null) {
+				logger.error("the ToTag should be empty, sending 500 response");
+				SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+				sipServletResponse.send();
+				return;
+			}
+		}
 		
 		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
 		request.getHeader(TEST_NON_EXISTING_HEADER);

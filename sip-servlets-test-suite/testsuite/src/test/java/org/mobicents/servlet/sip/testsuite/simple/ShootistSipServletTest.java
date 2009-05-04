@@ -17,8 +17,12 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import javax.sip.SipProvider;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -45,6 +49,20 @@ public class ShootistSipServletTest extends SipServletTestCase {
 				projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test"));
 	}
+	
+	public void deployApplicationSetToTag() {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("ToTag");
+		applicationParameter.setValue("callernwPort1241042500479");
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+	}
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -70,6 +88,23 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	public void testShootistSetToTag() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplicationSetToTag();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}

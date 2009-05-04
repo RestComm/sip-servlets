@@ -35,9 +35,10 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
-	private static final int TIMEOUT_CSEQ_INCREASE = 100000;
+	private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000;
+	private static final int TIMEOUT_CSEQ_INCREASE = 100000;
+	
 	
 	TestSipListener sender;
 	TestSipListener registerReciever;
@@ -165,6 +166,18 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());
 		assertEquals(405, sender.getFinalResponseStatus());
+	}
+	
+	public void testShootmeToTag() throws Exception {
+		String fromName = "TestToTag";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
 	}
 
 	@Override

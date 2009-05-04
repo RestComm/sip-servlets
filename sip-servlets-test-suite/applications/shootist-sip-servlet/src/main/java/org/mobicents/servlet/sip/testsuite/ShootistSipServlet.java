@@ -111,6 +111,10 @@ public class ShootistSipServlet
 		} else {
 			toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		}
+		String toTag = ce.getServletContext().getInitParameter("ToTag");
+		if(toTag != null) {
+			toURI.setParameter("tag", toTag);
+		}
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
@@ -118,6 +122,10 @@ public class ShootistSipServlet
 			sipApplicationSession.encodeURI(requestURI);
 		}
 		sipServletRequest.setRequestURI(requestURI);
+		if(sipServletRequest.getTo().getParameter("tag") != null) {
+			logger.error("the ToTag should be empty, not sending the request");
+			return;
+		}
 		try {			
 			sipServletRequest.send();
 		} catch (IOException e) {
