@@ -51,7 +51,7 @@ public class SipServletMappingMetaData extends IdMetaDataImpl
       return pattern;
    }
    @XmlElement(name="pattern")
-   public void setPattern(PatternMetaData patterns)
+   public void setPattern(PatternMetaData pattern)
    {
       this.pattern = pattern;
    }

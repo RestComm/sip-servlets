@@ -22,7 +22,6 @@
 package org.jboss.metadata.sip.spec;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 
 /**
@@ -35,7 +34,6 @@ public class NotMetaData extends ConditionMetaData {
 	/**
 	 * @param condition the condition to set
 	 */
-	@XmlElementWrapper(name = "condition")
 	@XmlElements( {
 			@XmlElement(name = "and", type = AndMetaData.class),
 			@XmlElement(name = "contains", type = ContainsMetaData.class),

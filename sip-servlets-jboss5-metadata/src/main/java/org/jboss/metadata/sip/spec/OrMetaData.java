@@ -24,9 +24,7 @@ package org.jboss.metadata.sip.spec;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -38,7 +36,6 @@ public class OrMetaData extends ConditionMetaData {
 	/**
 	 * @param condition the condition to set
 	 */
-	@XmlElementWrapper(name = "condition")
 	@XmlElements( {
 			@XmlElement(name = "and", type = AndMetaData.class),
 			@XmlElement(name = "contains", type = ContainsMetaData.class),
