@@ -87,6 +87,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		toAddress.setParameter("foo", "fighter");
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getFinalResponseStatus() == 200);
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
