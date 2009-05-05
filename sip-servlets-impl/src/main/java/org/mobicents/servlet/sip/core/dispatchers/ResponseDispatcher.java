@@ -130,6 +130,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 				return ;
 			}
 			String appNameHashed = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME);
+			if(appNameHashed == null) {
+				throw new DispatcherException("the via header " + viaHeader + " for the response is missing the appname parameter previsouly set by the container");
+			}
 			String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
 			boolean inverted = false;
 			if(dialog != null && dialog.isServer()) {
@@ -218,15 +221,15 @@ public class ResponseDispatcher extends MessageDispatcher {
 								forwardResponseStatefully(sipServletResponse);
 							}
 						} catch (ServletException e) {				
-							logger.error("Unexpected servlet exception while processing the response : " + response, e);
+							throw new DispatcherException("Unexpected servlet exception while processing the response : " + response, e);
 							// Sends a 500 Internal server error and stops processing.				
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						} catch (IOException e) {				
-							logger.error("Unexpected io exception while processing the response : " + response, e);
+							throw new DispatcherException("Unexpected io exception while processing the response : " + response, e);
 							// Sends a 500 Internal server error and stops processing.				
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						} catch (Throwable e) {				
-							logger.error("Unexpected exception while processing response : " + response, e);
+							throw new DispatcherException("Unexpected exception while processing response : " + response, e);
 							// Sends a 500 Internal server error and stops processing.				
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						}
