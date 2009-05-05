@@ -1,5 +1,6 @@
 package org.mobicents.servlet.management.client.router;
 
+import org.mobicents.servlet.management.client.UserInterface;
 import org.mobicents.servlet.management.client.dnd.NoInsertAtEndIndexedDropController;
 
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
@@ -63,7 +64,7 @@ public final class RequestColumnsContainer extends AbsolutePanel {
 	private void populateRouterNodes(DARRoute[] routes) {
 		AbsolutePanel boundaryPanel = this;
 		boundaryPanel.add(buildTitles());
-		boundaryPanel.setSize("2100", "1500");
+		boundaryPanel.setSize(UserInterface.WIDTH, UserInterface.HEIGHT);
 		addStyleName(CSS_SSM);
 		routeColumns = new VerticalPanel[COLUMNS.length];
 		PickupDragController columnDragController = new PickupDragController(boundaryPanel, false);

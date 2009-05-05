@@ -13,7 +13,7 @@ import com.gwtext.client.widgets.TabPanel;
 
 public class UserInterface extends VerticalPanel{
 
-	public static final String WIDTH = "1700px";
+	public static final String WIDTH = "2500px";
 	public static final String HEIGHT = "1500px";
 	
 	public UserInterface() {
