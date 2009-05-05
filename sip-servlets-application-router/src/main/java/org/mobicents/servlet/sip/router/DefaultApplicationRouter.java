@@ -168,6 +168,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	//when reusing the information from one header
 	private static final String DAR_SUSCRIBER_PREFIX = "DAR:";
 	private static final int DAR_SUSCRIBER_PREFIX_LENGTH = DAR_SUSCRIBER_PREFIX.length();
+	private static final String METHOD_WILDCARD = "*";
 	//the parser for the properties file
 	private DefaultApplicationRouterParser defaultApplicationRouterParser;
 	//Applications deployed within the container
@@ -224,51 +225,70 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 			Serializable stateInfo) {		
 		// Minimalist application router implementation with no processing logic 
 		// besides the declaration of the application order as specified in JSR 289 - Appendix C
-		if(initialRequest != null) {						
+		SipApplicationRouterInfo sipApplicationRouterInfo = null;
+		if(initialRequest != null) {									
 			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
-				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());
-			if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
-				int previousAppOrder = 0; 
-				if(stateInfo != null) {					
-					previousAppOrder = (Integer) stateInfo;				
+				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());		
+			sipApplicationRouterInfo = getNextApplication(initialRequest, stateInfo,
+						defaultSipApplicationRouterInfoList);			
+			if(sipApplicationRouterInfo == null) {
+				defaultSipApplicationRouterInfoList = 
+					defaultSipApplicationRouterInfos.get(METHOD_WILDCARD);
+				sipApplicationRouterInfo = getNextApplication(initialRequest, stateInfo,
+						defaultSipApplicationRouterInfoList);	
+			}
+			if(sipApplicationRouterInfo != null) {
+				return sipApplicationRouterInfo;
+			}
+		}
+		return new SipApplicationRouterInfo(null,null,null,null,null,null);
+	}
+
+	private SipApplicationRouterInfo getNextApplication(
+			SipServletRequest initialRequest,
+			Serializable stateInfo,
+			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList) {
+		if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
+			int previousAppOrder = 0; 
+			if(stateInfo != null) {					
+				previousAppOrder = (Integer) stateInfo;				
+			}
+			ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
+			while (defaultSipApplicationRouterInfoIt.hasNext() ) {
+				DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = defaultSipApplicationRouterInfoIt.next();
+				boolean isApplicationPresentInContainer = false;
+				synchronized (containerDeployedApplicationNames) {
+					if(containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {
+						isApplicationPresentInContainer = true;
+					}
 				}
-				ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
-				while (defaultSipApplicationRouterInfoIt.hasNext() ) {
-					DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = defaultSipApplicationRouterInfoIt.next();
-					boolean isApplicationPresentInContainer = false;
-					synchronized (containerDeployedApplicationNames) {
-						if(containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {
-							isApplicationPresentInContainer = true;
+				if(log.isDebugEnabled()) {
+					log.debug("Route Modifier : " + defaultSipApplicationRouterInfo.getRouteModifier());
+				}
+				//if application is deployed in the container or if the intention is to route outside even if the application is not deployed
+				if(isApplicationPresentInContainer || !SipRouteModifier.NO_ROUTE.equals(defaultSipApplicationRouterInfo.getRouteModifier())) {
+					//prevents to route to the same application twice in a row
+					if(initialRequest.getSession(false) == null || 
+									!defaultSipApplicationRouterInfo.getApplicationName().equals(
+											initialRequest.getSession(false).getApplicationSession().getApplicationName())) {
+						String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
+						if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
+							String headerName = subscriberIdentity.substring(
+									DAR_SUSCRIBER_PREFIX_LENGTH);
+							subscriberIdentity = initialRequest.getHeader(headerName);
 						}
-					}
-					if(log.isDebugEnabled()) {
-						log.debug("Route Modifier : " + defaultSipApplicationRouterInfo.getRouteModifier());
-					}
-					//if application is deployed in the container or if the intention is to route outside even if the application is not deployed
-					if(isApplicationPresentInContainer || !SipRouteModifier.NO_ROUTE.equals(defaultSipApplicationRouterInfo.getRouteModifier())) {
-						//prevents to route to the same application twice in a row
-						if(initialRequest.getSession(false) == null || 
-										!defaultSipApplicationRouterInfo.getApplicationName().equals(
-												initialRequest.getSession(false).getApplicationSession().getApplicationName())) {
-							String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
-							if(subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
-								String headerName = subscriberIdentity.substring(
-										DAR_SUSCRIBER_PREFIX_LENGTH);
-								subscriberIdentity = initialRequest.getHeader(headerName);
-							}
-							return new SipApplicationRouterInfo(
-									defaultSipApplicationRouterInfo.getApplicationName(),
-									defaultSipApplicationRouterInfo.getRoutingRegion(), 
-									subscriberIdentity,
-									defaultSipApplicationRouterInfo.getRoutes(),
-									defaultSipApplicationRouterInfo.getRouteModifier(),
-									defaultSipApplicationRouterInfo.getOrder());					
-						}
+						return new SipApplicationRouterInfo(
+								defaultSipApplicationRouterInfo.getApplicationName(),
+								defaultSipApplicationRouterInfo.getRoutingRegion(), 
+								subscriberIdentity,
+								defaultSipApplicationRouterInfo.getRoutes(),
+								defaultSipApplicationRouterInfo.getRouteModifier(),
+								defaultSipApplicationRouterInfo.getOrder());					
 					}
 				}
 			}
 		}
-		return new SipApplicationRouterInfo(null,null,null,null,null,null);
+		return null;
 	}
 
 	/**

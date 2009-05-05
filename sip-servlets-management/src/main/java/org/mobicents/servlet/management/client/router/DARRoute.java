@@ -8,8 +8,11 @@ public class DARRoute implements IsSerializable{
 	public String getRequest() {
 		return request;
 	}
-	public void setRequest(String request) {
-		this.request = request;
+	public void setRequest(String request) {		
+		this.request = request;		
+		if(RequestColumnsContainer.WILDCARD.equalsIgnoreCase(this.request)) {
+			this.request = "*";
+		}
 	}
 	public DARRouteNode[] getNodes() {
 		return nodes;

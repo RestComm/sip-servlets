@@ -943,7 +943,7 @@
 						Sip Servlets Presence Client Libraries
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
 						Mobicents Application Router
@@ -967,16 +967,9 @@
 						JSR 309 Sip Servlets Example
 						</a>
 						<br />															
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
-							<li>
-								<img src="red.jpeg" />
-								<a
-									href="http://code.google.com/p/mobicents/issues/detail?id=485">
-									Asterisk Interop/Integration Example
-								</a>								
-							</li>
 							<li>
 								<img src="green.jpeg" />
 								<a
@@ -1003,6 +996,41 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=676">
 									Tags not removed when using SipFactory.createRequest()
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=678">
+									Add config option for splitting headers on multiple lines
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=681">
+									Cannot define more than one servlet mapping for SIP application
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=682">
+									doRequest not called for CANCEL when received INVITE has been CONTINUEd
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=683">
+									Missing appname param in Via header causes NullPointerException while it should be DispatcherException
+								</a>								
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=684">
+									Buddy replication not working
 								</a>								
 							</li>
 						</ul>
@@ -1039,7 +1067,13 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=674">
 						Remove dependency on JAIN SIP internal classes	  
 						</a>	
-						<br />							
+						<br />	
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=485">
+							Asterisk Interop/Integration Example
+						</a>	
+						<br />						
 					</p>		
 				</subsection>
 			</subsection>
