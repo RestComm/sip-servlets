@@ -63,7 +63,7 @@ Configuration
 	The application router is solely responsible for application selection and must not implement application logic. 
 	For example, the application router cannot modify a request or send a response.
 
-	(For more information regarding the Application Router, check the JSR 289 specification Section 15.4.2 Application Router Packaging and Deployment, Section 15.1 Application Selection Process and Appendix C)\
+	For more information regarding the Application Router, check the {{{./mss-dar.html}Application router section}}
 	To configure it, you need to configure the Service Tag in the container server.xml configuration file :
 	
 	<<<<Service name="Sip-Servlets">>>\

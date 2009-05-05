@@ -1,0 +1,86 @@
+Default Application Router
+
+* Role of the Application router 
+
+	The Application Router is called by the container to select a SIP servlet application to service an initial request. 
+	It embodies the logic used to choose which applications to invoke. 
+	An Application Router is required for a container to function, but it is a separate logical entity from the container. 
+	The Application Router is solely responsible for application selection and must not implement application logic. 
+	For example, the Application Router cannot modify a request or send a response.
+
+	The Application Router implements the SipApplicationRouter interface, which defines the API between the container and the Application Router. 
+	There is no direct interaction between the Application Router and applications. 
+	It is also important to note that, besides the information passed by the container, the Application Router is free to make use of any other information or data stores. 
+	How it accesses that information and what information it makes use of is a matter of its implementation and is not defined in the Sip Servlets 1.1 specification.
+	
+	The role of the deployer is defined in the Servlet API. 
+	The deployer in a SIP servlet environment controls application composition by defining and deploying the Application Router implementation. 
+	Giving the deployer control over application composition is desirable because it is the deployer who is most aware of and responsible 
+	for the totality of services provided to his or her subscribers. 
+	Furthermore, this specification intentionally allows the Application Router implementation to consult arbitrary information or data stores. 
+	This is because the deployer maintains subscriber information and this information is often private and valuable.
+			
+* Default Application Router
+
+	Mobicents Sip Servlets provides an implementation of the Default Application Router (DAR) as defined per Sip Servlets 1.1 specification, Appendix C.
+	
+** the DAR Configuration file
+
+	The DAR works off a simple configuration text file which is modeled as a Java properties file:
+	
+	* The properties file MUST be made available to the DAR and the location/content of this file
+	 MUST be accessible from a hierarchical URI which itself is to be supplied as a system property "javax.servlet.sip.ar.dar.configuration".\
+	 In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file 
+	 (See the {{{./configuration.html}Configuration Section}} for more details) or the (See the {{{./sip-servlets-managment.html}sip servlets managment console}}
+	 	 
+	* The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated stringified value for the SipApplicationRouterInfo object.\
+	<<<ALL: (sip-router-info-1)>>>
+	<<<INVITE: (sip-router-info-1), (sip-router-info-2)..>>>
+	<<<SUBSCRIBE: (sip-router-info-3), (sip-router-info-4)..>>>
+	There is a special keyword called ALL here (taht is specific to Mobicents Sip Servlets) allowing a mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an app that listen to all incoming methods.
+	If both the ALL and a specific method are defined in the DAR file, the specific method takes precedence oever the ALL, and ALL is called when there is no applications to server for the specific method anymore.
+	
+	* The properties file is first read by the DAR when the init() is first called on the DAR. The arguments passed in the init() are ignored.
+	
+	* The properties file is refreshed each time applicationDeployed() or applicationUndeployed() is called. 
+	Similar to init(), the argument of these two invocations are ignored, these callbacks act just as a trigger to read the file afresh.
+	
+	The sip-router-info data that goes in the properties file is a stringified version of the SipApplicationRouterInfo object. It consists of the following information :
+
+	* The name of the application as known to the container.
+	
+	* The identity of the subscriber that the DAR returns. It can return any header in the SIP request using the DAR directive DAR:SIP_HEADER e.g "DAR:From" would return the SIP URI in From header. Or alternatively it can return any string.
+	
+	* The routing region, one of the strings "ORIGINATING", "TERMINATING" or "NEUTRAL"
+	
+	* A SIP URI indicating the route as returned by the Application Router, it can be an empty string.
+	
+	* A route modifier which can be any one of the strings "ROUTE", "ROUTE_BACK" or "NO_ROUTE"
+?
+ 	* A string representing stateInfo. As stateInfo is for Application Router's internal use only, what goes in this is up to the individual DAR implementations. As a hint the stateInfo could contain the index into the list of sip-router-info that was returned last.
+
+	Following is an example of the DAR configuration file:
+	
+	<<<INVITE: ("OriginatingCallWaiting", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), ("CallForwarding", "DAR:To", "TERMINATING", "","NO_ROUTE", "1")>>>
+
+	In this example, the DAR is setup to invoke two applications on INVITE request, one each in the originating and the terminating half. 
+	The applications are identified by their names as defined in the application deployment descriptors and used here. 
+	The subscriber identity returned in this case is the URI from the From and To header respectively for the two applications. 
+	The DAR does not return any route to the container and maintains the invocation state in the stateInfo as the index of the last application in the list.
+	
+	
+** The DAR Operation
+
+	The key interaction point between the Container and the Application Router is the method 
+	
+	<<<SipApplicationRouterInfo getNextApplication(SipServletRequest initialRequest, SipApplicationRoutingRegion region, SipApplicationRoutingDirective directive, SipTargetedRequestInfo targetedRequestInfo, Serializable stateInfo);>>>
+	
+	This method is invoked when an initial request is received by the container. 
+	When this method is invoked on DAR it will make use of the stateInfo and the initial request parameters and find out what SIP method is in the request. 
+	Next it will create the object SipApplicationRouterInfo from the sip-router-info information in the properties file, starting from the first in the list. 
+	The stateInfo could contain the index of the last sip-router-info returned so on next invocation of getNextApplication the DAR proceeds to the next sip-router- info in the list. 
+	The order of declaration of sip-router-info becomes the priority order of invocation.
+	As you would notice, this is a minimalist Application Router with no processing logic besides the declaration of the application order. 
+	It is expected that in real world deployments, the Application Router shall play an extremely important role in application orchestration and composition. 
+	It is likely to make use of complex rules and diverse data repositories. 
+	The DAR is intended to be a very simple implementation that is available as part of the reference implementation, and could be used instead of a real world Application Router.	

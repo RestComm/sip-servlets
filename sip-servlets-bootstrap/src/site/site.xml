@@ -20,6 +20,9 @@
 			<item name="License" href="license.html" />
 			<item name="QA" href="qa.html" />
 		</menu>
+		<menu name="Application Router">
+			<item name="Default Application Router" href="mss-dar.html" />
+		</menu>
 		<menu name="Examples">
 			<item name="Examples" href="examples.html" collapse="true">
 				<item name="Call Blocking" href="call_blocking.html" />
