@@ -231,7 +231,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase) {
 		checkReadOnly();
-		final Transaction transaction = getTransaction();		
+		final Transaction transaction = getTransaction();
+		if(RoutingState.CANCELLED.equals(routingState)) {
+			throw new IllegalStateException("Cannot create a response for the invite, a CANCEL has been received and the INVITE was replied with a 487!");
+		}
 		if (transaction == null
 				|| transaction instanceof ClientTransaction) {
 			throw new IllegalStateException(

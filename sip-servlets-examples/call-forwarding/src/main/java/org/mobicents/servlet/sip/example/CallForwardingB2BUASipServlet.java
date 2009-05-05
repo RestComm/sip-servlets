@@ -128,10 +128,17 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 	
 	@Override
 	protected void doCancel(SipServletRequest request) throws ServletException,
-			IOException {
+			IOException {		
 		if(logger.isInfoEnabled()) {
 			logger.info("Got CANCEL: " + request.toString());
 		}
+		SipSession session = request.getSession();	
+		B2buaHelper helper = request.getB2buaHelper();
+		SipSession linkedSession = helper.getLinkedSession(session);
+		SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
+		SipServletRequest  cancelRequest = helper.getLinkedSipServletRequest(originalRequest).createCancel();				
+		logger.info("forkedRequest = " + cancelRequest);			
+		cancelRequest.send();
 	}
 	
 	@Override
