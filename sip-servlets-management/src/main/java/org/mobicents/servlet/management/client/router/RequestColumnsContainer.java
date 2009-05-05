@@ -17,9 +17,7 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 
 public final class RequestColumnsContainer extends AbsolutePanel {
 
-	public static final String WILDCARD = "WILDCARD";
-	
-	private static final String[] COLUMNS = new String[] {WILDCARD, "INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH", "INFO", "UPDATE", "REFER" };
+	private static final String[] COLUMNS = new String[] {"ALL", "INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH", "INFO", "UPDATE", "REFER" };
 
 	private static final String CSS_SSM = "ssm";
 
@@ -104,7 +102,7 @@ public final class RequestColumnsContainer extends AbsolutePanel {
 			columnDragController.makeDraggable(columnCompositePanel, groupDragHandle);
 			
 			for(int q=0; q<routes.length; q++) {
-				if(COLUMNS[col].equals(routes[q].getRequest()) || ("*".equals(routes[q].getRequest()) && WILDCARD.equals(COLUMNS[col]))) {
+				if(COLUMNS[col].equals(routes[q].getRequest())) {
 					for(int w=0; w<routes[q].getNodes().length; w++) {
 						ApplicationRouteNodeEditor widget = new ApplicationRouteNodeEditor(routes[q].getNodes()[w]);
 						verticalPanel.add(widget);
@@ -146,11 +144,7 @@ public final class RequestColumnsContainer extends AbsolutePanel {
 			}
 			if(!empty) {
 				routeText = routeText.substring(0, routeText.length() - 1);
-				if(WILDCARD.equals(COLUMNS[col])) {
-					source += "*:" + routeText + "\n";
-				} else {
-					source += COLUMNS[col] + ":" + routeText + "\n";
-				}
+				source += COLUMNS[col] + ":" + routeText + "\n";
 			}
 		}
 		return source;

@@ -9,10 +9,7 @@ public class DARRoute implements IsSerializable{
 		return request;
 	}
 	public void setRequest(String request) {		
-		this.request = request;		
-		if(RequestColumnsContainer.WILDCARD.equalsIgnoreCase(this.request)) {
-			this.request = "*";
-		}
+		this.request = request;				
 	}
 	public DARRouteNode[] getNodes() {
 		return nodes;

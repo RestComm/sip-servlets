@@ -168,7 +168,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	//when reusing the information from one header
 	private static final String DAR_SUSCRIBER_PREFIX = "DAR:";
 	private static final int DAR_SUSCRIBER_PREFIX_LENGTH = DAR_SUSCRIBER_PREFIX.length();
-	private static final String METHOD_WILDCARD = "*";
+	private static final String METHOD_WILDCARD = "ALL";
 	//the parser for the properties file
 	private DefaultApplicationRouterParser defaultApplicationRouterParser;
 	//Applications deployed within the container
