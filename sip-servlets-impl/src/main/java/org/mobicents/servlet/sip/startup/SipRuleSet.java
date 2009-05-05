@@ -193,7 +193,7 @@ public class SipRuleSet extends RuleSetBase {
 //        digester.addCallParam(prefix + "sip-app/servlet/security-role-ref/description", 2);
         
         //Handles servlet mapping rules
-        digester.addRule(prefix + "sip-app/servlet-selection",
+        digester.addRule(prefix + "sip-app/servlet-selection/servlet-mapping",
                 servletSelection);
         digester.addObjectCreate(prefix + "sip-app/servlet-selection/servlet-mapping",        		
         	"org.mobicents.servlet.sip.startup.loading.SipServletMapping");
@@ -367,7 +367,8 @@ public class SipRuleSet extends RuleSetBase {
         proxyConfig.isProxyConfigSet = false;
         sessionConfig.isSessionConfigSet = false;
         loginConfig.isLoginConfigSet = false;
-        servletSelection.isServletSelectionSet = false;
+        servletSelection.isMainServlet = false;
+        servletSelection.isServletMapping = false;
     }
 }
 
@@ -440,17 +441,24 @@ final class SetProxyConfig extends Rule {
  * within the sip.xml
  */
 final class SetServletSelection extends Rule {
-    protected boolean isServletSelectionSet = false;
+    protected boolean isServletMapping;
+    protected boolean isMainServlet;
     public SetServletSelection() {
     }
 
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
-        if (isServletSelectionSet){
-            throw new IllegalArgumentException(
-            "only one of the <servlet-mapping> or <main-servlet> can be present in the sip.xml");
+        if (name.equals("servlet-mapping")){
+        	isServletMapping = true;
+            
         }
-        isServletSelectionSet = true;
+        if (name.equals("main-servlet")) {
+        	isMainServlet = true;
+        }
+        if(isMainServlet && isServletMapping) {
+        	throw new IllegalArgumentException(
+            	"only one of the <servlet-mapping> or <main-servlet> can be present in the sip.xml");
+        }
     }
 
 }
