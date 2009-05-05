@@ -39,6 +39,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegionType;
 import javax.servlet.sip.ar.SipRouteModifier;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
  * This is a utility class used for parsing the default application router file as
@@ -47,6 +48,7 @@ import org.apache.log4j.Logger;
  */
 public class DefaultApplicationRouterParser {
 	private static final int SIP_APPLICATION_ROUTER_INFO_PARAM_NB = 6;
+	private static final String METHOD_WILDCARD = "*";
 	//the logger
 	private static Logger log = Logger.getLogger(DefaultApplicationRouterParser.class);
 	private Properties properties;
@@ -110,8 +112,14 @@ public class DefaultApplicationRouterParser {
 			String sipApplicationRouterInfosStringified = darEntry.getValue();
 			//parse the corresponding value  
 			List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfoList = 
-				parseSipApplicationRouterInfos(sipApplicationRouterInfosStringified);			
-			sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
+				parseSipApplicationRouterInfos(sipApplicationRouterInfosStringified);
+			if(METHOD_WILDCARD.equals(sipMethod.trim())) {
+				for(String method : SipApplicationDispatcher.METHODS_SUPPORTED) {
+					sipApplicationRoutingInfo.put(method, sipApplicationRouterInfoList);
+				}
+			} else {				
+				sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
+			}
 		}
 		return sipApplicationRoutingInfo;
 	}

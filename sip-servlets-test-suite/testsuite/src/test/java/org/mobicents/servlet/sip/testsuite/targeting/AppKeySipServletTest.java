@@ -43,6 +43,8 @@ public class AppKeySipServletTest extends SipServletTestCase {
 		super(name);
 		startTomcatOnStartup = false;
 		autoDeployOnStartup = false;
+		initTomcatOnStartup = false;
+		addSipConnectorOnStartup = false;
 	}
 
 	@Override
@@ -56,6 +58,11 @@ public class AppKeySipServletTest extends SipServletTestCase {
 	protected String getDarConfigurationFile() {
 		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
 				"org/mobicents/servlet/sip/testsuite/targeting/appkey-sip-servlet-dar.properties";
+	}
+		
+	protected String getWilcardDarConfigurationFile() {
+		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
+				"org/mobicents/servlet/sip/testsuite/targeting/wilcard-sip-servlet-dar.properties";
 	}
 	
 	@Override
@@ -80,6 +87,22 @@ public class AppKeySipServletTest extends SipServletTestCase {
 	 * @throws Exception
 	 */
 	public void testAppKey() throws Exception {
+		tomcat.initTomcat(tomcatBasePath);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		tomcat.startTomcat();
+		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());		
+	}
+	
+	/**
+	 * This test tests the wildcard feature of the AR
+	 * @throws Exception
+	 */
+	public void testWildcard() throws Exception {
+		tomcat.setDarConfigurationFilePath(getWilcardDarConfigurationFile());
+		tomcat.initTomcat(tomcatBasePath);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);

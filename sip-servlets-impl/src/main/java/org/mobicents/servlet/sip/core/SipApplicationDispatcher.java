@@ -43,7 +43,11 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public interface SipApplicationDispatcher extends SipListener {
 
-	// List of sip extensions supported by the container
+	//list of methods supported by the AR
+	public static final String[] METHODS_SUPPORTED = 
+		new String[] {"REGISTER", "INVITE", "ACK", "BYE", "CANCEL", "MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "OPTIONS"};
+	
+	// List of sip extensions supported by the container	
 	public static final String[] EXTENSIONS_SUPPORTED = 
 		new String[] {"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join"};
 	// List of sip rfcs supported by the container

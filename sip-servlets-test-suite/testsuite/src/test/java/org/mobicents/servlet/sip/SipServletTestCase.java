@@ -42,6 +42,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected String listeningPointTransport = ListeningPoint.UDP;
 	protected boolean autoDeployOnStartup = true;
+	protected boolean initTomcatOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
 	protected boolean addSipConnectorOnStartup = true;
 		
@@ -86,18 +87,20 @@ public abstract class SipServletTestCase extends TestCase {
 		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.addHttpConnector(8080);
-		/*
-		 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
-		 * logLevel="DEBUG" port="5070"
-		 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
-		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
-		 */
-		if(addSipConnectorOnStartup) {
-			tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
-		}
+		if(initTomcatOnStartup) {
+			tomcat.initTomcat(tomcatBasePath);
+			tomcat.addHttpConnector(8080);
+			/*
+			 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
+			 * logLevel="DEBUG" port="5070"
+			 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+			 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
+			 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
+			 */
+			if(addSipConnectorOnStartup) {
+				tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+			}
+		}		
 		if(startTomcatOnStartup) {
 			tomcat.startTomcat();
 		}
