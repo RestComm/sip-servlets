@@ -22,6 +22,7 @@
 		</menu>
 		<menu name="Application Router">
 			<item name="Default Application Router" href="mss-dar.html" />
+			<item name="ECharts DFC Application Router" href="mss-dfc.html" />
 		</menu>
 		<menu name="Examples">
 			<item name="Examples" href="examples.html" collapse="true">
