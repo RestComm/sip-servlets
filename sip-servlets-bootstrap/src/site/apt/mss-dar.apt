@@ -33,11 +33,11 @@ Default Application Router
 	 In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file 
 	 (See the {{{./configuration.html}Configuration Section}} for more details) or the (See the {{{./sip-servlets-managment.html}sip servlets managment console}}
 	 	 
-	* The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated stringified value for the SipApplicationRouterInfo object.\
-	<<<ALL: (sip-router-info-1)>>>
+	* The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated stringified value for the SipApplicationRouterInfo object.\	
 	<<<INVITE: (sip-router-info-1), (sip-router-info-2)..>>>
 	<<<SUBSCRIBE: (sip-router-info-3), (sip-router-info-4)..>>>
-	There is a special keyword called ALL here (taht is specific to Mobicents Sip Servlets) allowing a mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an app that listen to all incoming methods.
+	<<<ALL: (sip-router-info-1), (sip-router-info-2)..>>>
+	Note: starting from Mobicents Sip Servlets version 1.0, There is a special keyword called ALL here (taht is specific to Mobicents Sip Servlets) allowing a mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an app that listen to all incoming methods.
 	If both the ALL and a specific method are defined in the DAR file, the specific method takes precedence oever the ALL, and ALL is called when there is no applications to server for the specific method anymore.
 	
 	* The properties file is first read by the DAR when the init() is first called on the DAR. The arguments passed in the init() are ignored.
