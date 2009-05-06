@@ -1,0 +1,19 @@
+ECharts DFC Application Router
+
+* Description
+
+	Instead of using our {{{./mss-dar.html}Default Application Router}}, you can use a more elaborated application router such as the {{{http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1}DFC Application Router from ECharts}}.
+	
+* Installation 
+
+** Tomcat
+
+	Just drop the <<<dfcar.jar>>> from the ECharts distribution package in <<<TOMCAT_HOME/lib>>> directory and remove the Mobicents Default Application Router located in <<<TOMCAT_HOME/lib/sip-servlets-application-router-*.jar>>>
+	
+** JBoss 4
+
+	Just drop the <<<dfcar.jar>>> from the ECharts distribution package in <<<JBOSS_HOME/server/default/deploy/jboss-web.deployer>>> directory and remove the Mobicents Default Application Router located in <<<JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar>>>
+ 
+** JBoss 5
+
+	Just drop the <<<dfcar.jar>>> from the ECharts distribution package in <<<JBOSS_HOME/server/default/deploy/jbossweb.sar/ >>> directory and remove Mobicents Default Application Router located in <<<JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar>>> 
