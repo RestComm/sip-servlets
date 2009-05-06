@@ -227,7 +227,7 @@ public class SipNetworkInterfaceManager {
 	 */
 	public static int checkPortRange(int port, String transport) {
 		if(port < MIN_PORT_NUMBER || port > MAX_PORT_NUMBER) {		
-			if(transport.equalsIgnoreCase(ListeningPoint.TLS)) {
+			if((ListeningPoint.TLS).equalsIgnoreCase(transport)) {
 				return ListeningPoint.PORT_5061;
 			} else {
 				return ListeningPoint.PORT_5060;
