@@ -22,8 +22,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -90,7 +93,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	public ExtendedListeningPoint extendedListeningPoint;
 
 	// sip stack attributes defined by the server.xml
-	private String sipStackPropertiesFile;
+	private String sipStackPropertiesFileLocation;
 	// defining sip stack properties
 	private Properties sipStackProperties;
 	/**
@@ -226,17 +229,33 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	        if(catalinaHome == null) {
 	        	catalinaHome = ".";
 	        }
-	        if(sipStackPropertiesFile != null && !sipStackPropertiesFile.startsWith("file:///")) {
-				sipStackPropertiesFile = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFile;
+	        if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
+				sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
 	 		}	
 	        sipStackProperties = new Properties();
 	        boolean isPropsLoaded = false;
 			try {
 				if (logger.isDebugEnabled()) {
-					logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFile);
+					logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFileLocation);
 				}
-				if(sipStackPropertiesFile != null) {
-					FileInputStream sipStackPropertiesInputStream = new FileInputStream(new File(new URI(sipStackPropertiesFile)));
+				if(sipStackPropertiesFileLocation != null) {
+					//hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html, 
+					// we create a URL since it's permissive enough
+					File sipStackPropertiesFile = null;
+					URL url = null;
+					try {
+						url = new URL(sipStackPropertiesFileLocation);
+					} catch (MalformedURLException e) {
+						logger.fatal("Cannot find the sip stack properties file ! ",e);
+						throw new IllegalArgumentException("The Default Application Router file Location : "+sipStackPropertiesFileLocation+" is not valid ! ",e);
+					}
+					try {
+						sipStackPropertiesFile = new File(new URI(sipStackPropertiesFileLocation));
+					} catch (URISyntaxException e) {
+						//if the uri contains space this will fail, so getting the path will work
+						sipStackPropertiesFile = new File(url.getPath());
+					}		
+					FileInputStream sipStackPropertiesInputStream = new FileInputStream(sipStackPropertiesFile);
 					sipStackProperties.load(sipStackPropertiesInputStream);
 					String debugLog = sipStackProperties.getProperty("gov.nist.javax.sip.DEBUG_LOG");
 					if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
@@ -255,7 +274,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					logger.warn("no sip stack properties file defined ");		
 				}
 			} catch (Exception e) {
-				logger.warn("Could not find or problem when loading the sip stack properties file : " + sipStackPropertiesFile, e);		
+				logger.warn("Could not find or problem when loading the sip stack properties file : " + sipStackPropertiesFileLocation, e);		
 			}
 			
 			if(!isPropsLoaded) {
@@ -549,14 +568,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set
 	 */
 	public void setSipStackPropertiesFile(String sipStackPropertiesFile) {
-		this.sipStackPropertiesFile = sipStackPropertiesFile;
+		this.sipStackPropertiesFileLocation = sipStackPropertiesFile;
 	}
 
 	/**
 	 * @return the sipStackPropertiesFile
 	 */
 	public String getSipStackPropertiesFile() {
-		return sipStackPropertiesFile;
+		return sipStackPropertiesFileLocation;
 	}
     
     // -------------------- JMX related methods --------------------
