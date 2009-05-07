@@ -76,8 +76,7 @@
         </resource-configuration>
     </service>
     
-    <service name="Embedded Converged Sip/Web Application (SAR/WAR)"    
-    			  subCategory="Applications"                  
+    <service name="Embedded Converged Sip/Web Application (SAR/WAR)"        			                   
                   class="org.rhq.plugins.mobicents.servlet.sip.ConvergedWarComponent"
                   discovery="org.rhq.plugins.mobicents.servlet.sip.EmbeddedConvergedWarDiscoveryComponent"
                   description="SIP/Web Application embedded inside of an Enterprise Application"
@@ -233,7 +232,6 @@
     </service>
     
     <service name="Converged SIP/Web Application (SAR/WAR)"
-               subCategory="Applications"
                class="org.rhq.plugins.mobicents.servlet.sip.ConvergedWarComponent"
                discovery="org.rhq.plugins.mobicents.servlet.sip.ConvergedWarDiscoveryComponent"
                description="Converged Sip/Web Application"

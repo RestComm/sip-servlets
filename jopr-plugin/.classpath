@@ -1,21 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-annotations/3.3.0.ga/hibernate-annotations-3.3.0.ga.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-commons-annotations/3.3.0.ga/hibernate-commons-annotations-3.3.0.ga.jar"/>
-	<classpathentry kind="var" path="M2_REPO/mc4j/org-mc4j-ems/1.2.5/org-mc4j-ems-1.2.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-domain/1.1.2.GA/rhq-core-domain-1.1.2.GA.jar" sourcepath="/RHQ_HOME/modules/core/domain/src"/>
-	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-plugin-api/1.1.2.GA/rhq-core-plugin-api-1.1.2.GA.jar" sourcepath="/RHQ_HOME/modules/core/plugin-api/src"/>
-	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-jmx-plugin/1.1.2.GA/rhq-jmx-plugin-1.1.2.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jetbrains/annotations/7.0.2/annotations-7.0.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/on/rhq-jbossas-plugin/2.1.2.GA/rhq-jbossas-plugin-2.1.2.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/on/rhq-tomcat-plugin/2.1.2.GA/rhq-tomcat-plugin-2.1.2.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-native-system/1.1.2.GA/rhq-core-native-system-1.1.2.GA.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/main/java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
+  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jetbrains/annotations/7.0.2/annotations-7.0.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/ant/ant/1.6.5/ant-1.6.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6/antlr-2.7.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/asm/asm/1.5.3/asm-1.5.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/asm/asm-attrs/1.5.3/asm-attrs-1.5.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/bsh/bsh/1.3.0/bsh-1.3.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/cglib/cglib/2.1_3/cglib-2.1_3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/2.1.1/commons-collections-2.1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/1.2.3/ehcache-1.2.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate/3.2.6.ga/hibernate-3.2.6.ga.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-annotations/3.3.0.ga/hibernate-annotations-3.3.0.ga.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-commons-annotations/3.3.0.ga/hibernate-commons-annotations-3.3.0.ga.jar"/>
+  <classpathentry kind="var" path="M2_REPO/i18nlog/i18nlog/1.0.9/i18nlog-1.0.9.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.1.6/jaxb-impl-2.1.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jboss/jbpm/3.1.1/jbpm-3.1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jdom/jdom/1.0/jdom-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/on/jopr-jboss-as-plugin/2.2.0.GA/jopr-jboss-as-plugin-2.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/on/jopr-tomcat-plugin/2.2.0.GA/jopr-tomcat-plugin-2.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.0.1B/jta-1.0.1B.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+  <classpathentry kind="var" path="M2_REPO/mc4j/org-mc4j-ems/1.2.5/org-mc4j-ems-1.2.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-domain/1.2.0.GA/rhq-core-domain-1.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-native-system/1.2.0.GA/rhq-core-native-system-1.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-plugin-api/1.2.0.GA/rhq-core-plugin-api-1.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-util/1.2.0.GA/rhq-core-util-1.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-jmx-plugin/1.2.0.GA/rhq-jmx-plugin-1.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/hyperic/sigar/1.6.0.14/sigar-1.6.0.14.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar"/>
+  <classpathentry kind="lib" path="/home/deruelle/java/jdk1.6.0_10/lib/tools.jar"/>
 </classpath>

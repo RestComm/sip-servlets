@@ -48,8 +48,7 @@ import org.rhq.core.pluginapi.operation.OperationFacet;
 import org.rhq.core.pluginapi.operation.OperationResult;
 import org.rhq.core.pluginapi.util.ResponseTimeConfiguration;
 import org.rhq.core.pluginapi.util.ResponseTimeLogParser;
-import org.rhq.plugins.applications.ApplicationResourceComponent;
-import org.rhq.plugins.jbossas.JBossASServerComponent;
+import org.rhq.plugins.jbossas.ApplicationComponent;
 import org.rhq.plugins.jbossas.util.WarDeploymentInformation;
 import org.rhq.plugins.jmx.ObjectNameQueryUtility;
 
@@ -65,7 +64,7 @@ import org.rhq.plugins.jmx.ObjectNameQueryUtility;
  * @author Heiko W. Rupp
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
-public class ConvergedWarComponent extends ApplicationResourceComponent<JBossASServerComponent> implements OperationFacet {
+public class ConvergedWarComponent extends ApplicationComponent implements OperationFacet {
     private static final String SERVLET_PREFIX = "Servlet.";
     private static final String SIP_SERVLET_PREFIX = "SipServlet.";
     public static final String CONTEXT_ROOT_CONFIG_PROP = "contextRoot";
@@ -132,7 +131,7 @@ public class ConvergedWarComponent extends ApplicationResourceComponent<JBossASS
     @Override
     public void start(ResourceContext resourceContext) {
         super.start(resourceContext);
-        Configuration pluginConfig = this.resourceContext.getPluginConfiguration();
+        Configuration pluginConfig = getResourceContext().getPluginConfiguration();
         this.jbossWebMBean = getJBossWebMBean();
         this.vhost = pluginConfig.getSimple(VHOST_CONFIG_PROP).getStringValue();
         this.contextRoot = pluginConfig.getSimple(CONTEXT_ROOT_CONFIG_PROP).getStringValue();
@@ -386,7 +385,7 @@ public class ConvergedWarComponent extends ApplicationResourceComponent<JBossASS
 
     @Nullable
     private String getJBossWebMBeanName() {
-        Configuration pluginConfig = this.resourceContext.getPluginConfiguration();
+        Configuration pluginConfig = getResourceContext().getPluginConfiguration();
         String jbossWebMBeanName = pluginConfig.getSimpleValue(ConvergedWarComponent.JBOSS_WEB_NAME, null);
         if (jbossWebMBeanName == null) {
             WarDeploymentInformation deploymentInformation = getDeploymentInformation();

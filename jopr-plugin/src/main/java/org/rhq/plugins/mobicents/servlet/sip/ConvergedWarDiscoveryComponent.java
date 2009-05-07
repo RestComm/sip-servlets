@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.rhq.core.pluginapi.inventory.DiscoveredResourceDetails;
 import org.rhq.core.pluginapi.inventory.ResourceDiscoveryContext;
-import org.rhq.plugins.applications.ApplicationDiscoveryComponent;
+import org.rhq.plugins.jbossas.ApplicationDiscoveryComponent;
 import org.rhq.plugins.jbossas.JBossASServerComponent;
 import org.rhq.plugins.jmx.JMXComponent;
 

@@ -2,16 +2,16 @@
 <project name="jopr-plugin.sipservlets.release" default="build-mobicents-jopr-plugin" basedir=".">
 	<property environment="sys"/>
 	<property name="release.path" location="${basedir}/target/" />
-	<property name="base.path" location="${basedir}/target/jopr-download" />
+	<property name="base.path" location="${basedir}/jopr-download" />
 	
-	<property name="embjopr.version" value="1.0.0.GA" />
+	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	<property name="embjopr.mss.war" value="embedded-mss-jopr.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.mss.war}" />
 	<property name="embjopr.home.contents" value="${release.path}/embedded-mss-jopr.war-contents" />
-	<property name="embjopr.war" value="embedded-jopr.war" />
+	<property name="embjopr.war" value="admin-console.war" />
 
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
 		<os family="windows"/>

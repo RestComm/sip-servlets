@@ -32,7 +32,6 @@ import org.rhq.core.domain.configuration.PropertySimple;
 import org.rhq.core.pluginapi.inventory.DiscoveredResourceDetails;
 import org.rhq.core.pluginapi.inventory.ResourceDiscoveryContext;
 import org.rhq.plugins.jbossas.JBossASServerComponent;
-import org.rhq.plugins.jmx.JMXComponent;
 import org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent;
 
 /**
@@ -48,7 +47,7 @@ public class EmbeddedConvergedWarDiscoveryComponent extends MBeanResourceDiscove
 	private static final Log log = LogFactory.getLog(EmbeddedConvergedWarDiscoveryComponent.class);
 	
     @Override
-    public Set<DiscoveredResourceDetails> discoverResources(ResourceDiscoveryContext<JMXComponent> context) {
+    public Set<DiscoveredResourceDetails> discoverResources(ResourceDiscoveryContext context) {
     	//discovering ear kind of app
     	Set<DiscoveredResourceDetails> resources = super.discoverResources(context);
     	

@@ -5,7 +5,7 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>9</version>
+        <version>10</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>jopr-mobicents-sip-servlets-plugin</artifactId>
@@ -46,8 +46,8 @@
 	</repositories>
 	
 	<properties>
-		<jopr-version>2.1.2.GA</jopr-version>
-		<rhq-version>1.1.2.GA</rhq-version>
+		<jopr-version>2.2.0.GA</jopr-version>
+		<rhq-version>1.2.0.GA</rhq-version>
 	</properties>
 	
 	<dependencies>
@@ -75,13 +75,13 @@
 
 		<dependency>
 			<groupId>org.jboss.on</groupId>
-		   	<artifactId>rhq-jbossas-plugin</artifactId>
+		   	<artifactId>jopr-jboss-as-plugin</artifactId>
 		   	<version>${jopr-version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.jboss.on</groupId>
-		   	<artifactId>rhq-tomcat-plugin</artifactId>
+		   	<artifactId>jopr-tomcat-plugin</artifactId>
 		   	<version>${jopr-version}</version>
 		</dependency>
 		

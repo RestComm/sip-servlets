@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>jopr-plugin</name>
-  <comment/>
+  <name>jopr-mobicents-sip-servlets-plugin</name>
+  <comment>A plugin for managing Mobicents Sip Servlets servers</comment>
   <projects/>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
-      <arguments/>
     </buildCommand>
   </buildSpec>
   <natures>
