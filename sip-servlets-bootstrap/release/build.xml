@@ -17,7 +17,7 @@
 	<property name="tomcat.version" value="6.0.14" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
 	
-	<property name="embjopr.version" value="1.0.0.GA" />
+	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
 	<property name="diameter.mux.version" value="1.0.0.BETA4" />
@@ -34,7 +34,7 @@
 	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
 	<property name="jboss-5.home" value="${release.path}/jboss-${jboss-5.version}" />
 	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
-	<property name="embjopr.war" value="embedded-jopr.war" />
+	<property name="embjopr.war" value="admin-console.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
 	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
 	
@@ -177,7 +177,7 @@
 			<param name="management.deploy.folder" value="${jboss.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
-		<!--antcall target="build-mobicents-jopr-plugin" /-->
+		<antcall target="build-mobicents-jopr-plugin" />
 		
 		<condition property="ha.capable">
 			<or>
