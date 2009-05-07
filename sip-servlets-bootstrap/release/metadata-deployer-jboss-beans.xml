@@ -2,7 +2,7 @@
 
 <!--
     MetaData configuration
-    $Id: metadata-deployer-jboss-beans.xml 81687 2008-11-26 23:42:24Z alesj $
+    $Id: metadata-deployer-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org $
 -->
 <deployment xmlns="urn:jboss:bean-deployer:2.0">
 
@@ -75,11 +75,14 @@
     </constructor>
   </bean>
 
+  <bean name="DeploymentProvidedDUFilter" class="org.jboss.deployment.DeploymentProvidedDeploymentUnitFilter" />
+  
   <bean name="GenScanDeployer" class="org.jboss.deployers.vfs.plugins.annotations.FilteredAnnotationEnvironmentDeployer">
     <property name="filter">
       <bean class="org.jboss.deployment.ListDeploymentUnitFilter">
         <property name="filters">
           <list>
+            <inject bean="DeploymentProvidedDUFilter" />
             <inject bean="JBossMetaDataDUFilter"/>
             <inject bean="ScanningMetaDataDUFilter"/>
             <inject bean="JBossCustomDeployDUFilter"/>
@@ -285,11 +288,11 @@
                <value>org.jboss.metadata.web.spec.Web25MetaData</value>
             </entry>
             <!-- SipMetaData -->
-	    	<entry>
+	    <entry>
                <key>sip-app_1_1.xsd</key>
                <value>org.jboss.metadata.sip.spec.Sip11MetaData</value>
             </entry>
-	    	    <entry>
+	    <entry>
                <key>sip-app</key>
                <value>org.jboss.metadata.sip.jboss.JBossSip11MetaData</value>
             </entry>

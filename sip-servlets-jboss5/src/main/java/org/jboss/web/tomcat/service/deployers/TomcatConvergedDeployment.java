@@ -59,6 +59,7 @@ import org.jboss.web.tomcat.security.RunAsListener;
 import org.jboss.web.tomcat.security.SecurityAssociationValve;
 import org.jboss.web.tomcat.security.SecurityContextEstablishmentValve;
 import org.jboss.web.tomcat.service.TomcatConvergedSipInjectionContainer;
+import org.jboss.web.tomcat.service.TomcatInjectionContainer;
 import org.jboss.web.tomcat.service.session.AbstractJBossManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -126,15 +127,13 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		DeploymentUnit depUnit = webApp.getDeploymentUnit();
 		TomcatConvergedSipInjectionContainer injectionContainer = new TomcatConvergedSipInjectionContainer(
 				webApp, depUnit, context,
-				getPersistenceUnitDependencyResolver());
-
-		setInjectionContainer(injectionContainer);
+				getPersistenceUnitDependencyResolver());		
 
 		Loader webLoader = depUnit.getAttachment(
 				Loader.class);
 		if (webLoader == null)
 			webLoader = getWebLoader(depUnit, metaData,
-					loader, warUrl);
+					loader, warUrl, injectionContainer);
 
 		webApp.setName(warUrl.getPath());
 		webApp.setClassLoader(loader);
@@ -262,7 +261,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		// Set listener
 		context.setConfigClass("org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig");
 //		context.setConfigClass("org.jboss.web.tomcat.service.deployers.JBossContextConfig");
-		context.addLifecycleListener(new ConvergedEncListener(hostName, loader, webLoader, webApp));
+		context.addLifecycleListener(new ConvergedEncListener(hostName, loader, webLoader, injectionContainer, webApp));
 
 		// Pass the metadata to the RunAsListener via a thread local
 		RunAsListener.metaDataLocal.set(metaData);
@@ -441,8 +440,8 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 	{
 		protected String hostName;
 		
-		public ConvergedEncListener(String hostName, ClassLoader loader, Loader webLoader, WebApplication webApp) {
-			super(loader, webLoader, webApp);
+		public ConvergedEncListener(String hostName, ClassLoader loader, Loader webLoader,TomcatInjectionContainer tomcatInjectionContainer, WebApplication webApp) {
+			super(loader, webLoader, tomcatInjectionContainer, webApp);
 			this.hostName = hostName;
 		}
 		

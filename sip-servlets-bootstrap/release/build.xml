@@ -10,7 +10,7 @@
 	<property name="mss.release.configurations.jboss5" value="default" />
 	
 	<property name="jboss.version" value="4.2.3.GA" />
-	<property name="jboss-5.version" value="5.0.1.GA" />
+	<property name="jboss-5.version" value="5.1.0.CR1" />
 	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />
 	

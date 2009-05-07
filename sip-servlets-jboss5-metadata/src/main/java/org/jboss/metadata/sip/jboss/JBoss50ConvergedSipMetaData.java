@@ -42,7 +42,7 @@ import org.jboss.xb.annotations.JBossXmlSchema;
       elementFormDefault=XmlNsForm.QUALIFIED)
 @XmlType(name="jboss-webType", namespace=JavaEEMetaDataConstants.JBOSS_NS, propOrder={"classLoading", "securityDomain",
       "jaccAllStoreRole", "contextRoot",
-      "virtualHosts", "useSessionCookies", "replicationConfig", "jndiEnvironmentRefsGroup", "securityRoles", "messageDestinations",
+      "virtualHosts", "useSessionCookies", "replicationConfig", "environmentRefsGroup", "securityRoles", "messageDestinations",
       "webserviceDescriptions", "depends", "servlets", "maxActiveSessions", "passivationConfig"})
 public class JBoss50ConvergedSipMetaData extends JBossConvergedSipMetaData
 {

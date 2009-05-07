@@ -2,7 +2,7 @@
 
 <!--
 Web application deployers
-$Id:$
+$Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org $
 -->
 <deployment xmlns="urn:jboss:bean-deployer:2.0">
 
@@ -14,6 +14,7 @@ $Id:$
              <constructor><parameter class="java.lang.String">.jar</parameter></constructor>
           </bean>
        </property>
+       <property name="includeWebInfInClasspath">true</property>
        <property name="contextInfoOrder">1000</property>
    </bean>
 
@@ -38,10 +39,7 @@ $Id:$
    <!-- Allow for war local class loaders: in testing -->
    <bean name="WarClassLoaderDeployer" class="org.jboss.web.tomcat.service.deployers.WarClassLoaderDeployer">
       <property name="relativeOrder">-1</property>
-      
-      <property name="includeWebInfInClasspath">true</property>
-      <property name="filteredPackages">javax.servlet,org.apache.commons.logging</property>
-      
+      <property name="filteredPackages">javax.servlet,org.apache.commons.logging</property>      
    </bean>
         
    <!-- 

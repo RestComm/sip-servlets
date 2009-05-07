@@ -13,7 +13,7 @@
 	<name>Sip Servlets Loading Specifics for JBoss 5</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
 	<properties>
-		<jboss.version>5.0.1.GA</jboss.version>	
+		<jboss.version>5.1.0.CR1</jboss.version>	
 	</properties>
 	<dependencies>
 		<dependency>

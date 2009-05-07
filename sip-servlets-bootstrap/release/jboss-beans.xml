@@ -27,4 +27,75 @@
 
    </bean>
 
+   <bean name="WebServerMO"
+      class="org.jboss.web.tomcat.service.management.WebServer">
+      <property name="domain">jboss.web</property>
+      <property name="nameProps">
+         <map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String">
+            <entry>
+               <key>service</key>
+               <value>WebServer</value>
+            </entry>
+         </map>
+      </property>
+   </bean>
+
+   <bean name="ConnectorBean-http-${jboss.bind.address}-8080MO"
+      class="org.jboss.web.tomcat.service.management.ConnectorBean">
+      <property name="domain">jboss.web</property>
+      <property name="nameProps">
+         <map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String">
+            <entry>
+               <key>type</key>
+               <value>GlobalRequestProcessor</value>
+            </entry>
+         </map>
+      </property>
+      <property name="port">
+         <value-factory bean="ServiceBindingManager"
+            method="getIntBinding" >
+            <parameter>jboss.web:service=WebServer</parameter>
+         </value-factory>
+      </property>
+      <property name="address">${jboss.bind.address}</property>
+      <property name="server"><inject bean="JMXKernel" property="mbeanServer"/></property>
+   </bean>
+   <bean name="ThreadPool-http-${jboss.bind.address}-8080MO"
+      class="org.jboss.web.tomcat.service.management.ThreadPool">
+      <property name="domain">jboss.web</property>
+      <property name="nameProps">
+         <map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String">
+            <entry>
+               <key>type</key>
+               <value>ThreadPool</value>
+            </entry>
+         </map>
+      </property>
+      <property name="port">
+         <value-factory bean="ServiceBindingManager"
+            method="getIntBinding" >
+            <parameter>jboss.web:service=WebServer</parameter>
+         </value-factory>
+      </property>
+      <property name="address">${jboss.bind.address}</property>
+      <property name="server"><inject bean="JMXKernel" property="mbeanServer"/></property>
+   </bean>
+   <bean name="${jboss.bind.address}-MO"
+      class="org.jboss.web.tomcat.service.management.Host">
+      <property name="domain">jboss.web</property>
+      <property name="nameProps">
+         <map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String">
+            <entry>
+               <key>type</key>
+               <value>Host</value>
+            </entry>
+         <entry>
+            <key>host</key>
+            <value>${jboss.bind.address}</value>
+         </entry>
+         </map>
+      </property>
+   </bean>
+
+   
 </deployment>

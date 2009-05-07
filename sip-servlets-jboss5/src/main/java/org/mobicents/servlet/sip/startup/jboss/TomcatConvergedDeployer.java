@@ -196,10 +196,11 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 		
 		// Add a dependency on the webserver itself
 		List<String> depends = metaData.getDepends();
-		if (depends == null)
+		if (depends == null) {
 			depends = new ArrayList<String>();
-		depends.add(TOMCAT_SERVICE_NAME.getCanonicalName());
-		metaData.setDepends(depends);
+			metaData.setDepends(depends);
+		}
+		depends.add(TOMCAT_SERVICE_NAME.getCanonicalName());		
 
 		convergedDeployment.setServer(getServer());
 		convergedDeployment.init(config);
