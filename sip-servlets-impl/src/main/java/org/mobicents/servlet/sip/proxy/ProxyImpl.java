@@ -582,12 +582,12 @@ public class ProxyImpl implements Proxy, Serializable {
 				originalRequest.createResponse(Response.REQUEST_TIMEOUT).send();
 				return;
 			} catch (IOException e1) {
-				throw new IllegalStateException("Faild to send a timeout response");
+				throw new IllegalStateException("Failed to send a timeout response");
 			}
 		}
 		
 		//Otherwise proceed with proxying the response
-		SipServletResponse proxiedResponse = 
+		SipServletResponseImpl proxiedResponse = 
 			getProxyUtils().createProxiedResponse(response, proxyBranch);
 		
 		if(proxiedResponse == null) {
@@ -595,12 +595,12 @@ public class ProxyImpl implements Proxy, Serializable {
 		}
 
 		try {
-			proxiedResponse.send();
+			proxyBranch.proxyResponseTxStateful(proxiedResponse);
 			proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
 			originalRequest = null;
 			bestBranch = null;
 			bestResponse = null;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("A problem occured while proxying the final response", e);
 		}
 	}
