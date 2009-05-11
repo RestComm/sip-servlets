@@ -229,7 +229,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								for(ProxyBranch pb : branches) {
 									ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
 									if(proxyBranch.isWaitingForPrack()) {
-										proxyBranch.proxyRequestTxStateful(sipServletRequest, true);
+										proxyBranch.proxyDialogStateless(sipServletRequest);
 										proxyBranch.setWaitingForPrack(false);
 									}
 								}

@@ -37,13 +37,11 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
-import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
-import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.GenericUtils;
@@ -83,18 +81,17 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private boolean isAddToPath;
 	private transient List<ProxyBranch> recursedBranches;
 	private boolean waitingForPrack;
-	private ProxyParams initialRequestProxyParams = null;
 	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
 		this.targetURI = uri;
 		this.proxy = proxy;
-		this.isAddToPath = proxy.getAddToPath();
+		isAddToPath = proxy.getAddToPath();
 		this.originalRequest = (SipServletRequestImpl) proxy.getOriginalRequest();
 		this.recordRouteURI = proxy.recordRouteURI;
 		this.pathURI = proxy.pathURI;
 		this.outboundInterface = proxy.getOutboundInterface();
-		if(this.recordRouteURI != null) {
+		if(recordRouteURI != null) {
 			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();			
 		}
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
@@ -260,18 +257,70 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			}
 			recordRoute = recordRouteURI;
 		}
-					
-		this.initialRequestProxyParams = new ProxyParams(this.targetURI,
+						
+		Request cloned = proxy.getProxyUtils().createProxiedRequest(
+				outgoingRequest,
+				this,
+				new ProxyParams(this.targetURI,
 				this.outboundInterface,
 				recordRoute, 
-				this.pathURI);
-		
+				this.pathURI));
 		//tells the application dispatcher to stop routing the original request
 		//since it has been proxied
 		originalRequest.setRoutingState(RoutingState.PROXIED);
 		
-		proxyRequestTxStateful(outgoingRequest, false);					
+		forwardRequest(cloned, false);					
 		started = true;
+	}
+	
+	/**
+	 * Forward the request to the specified destination. The method is used internally.
+	 * @param request
+	 * @param subsequent Set to false if the the method is initial
+	 */
+	private void forwardRequest(Request request, boolean subsequent) {
+
+		if(logger.isDebugEnabled()) {
+			logger.debug("creating cloned Request for proxybranch " + request);
+		}
+		SipServletRequestImpl clonedRequest = new SipServletRequestImpl(
+				request,
+				proxy.getSipFactoryImpl(),
+				null,
+				null, null, false);
+		
+		if(subsequent) {
+			clonedRequest.setRoutingState(RoutingState.SUBSEQUENT);
+		}
+		
+		this.outgoingRequest = clonedRequest;
+		
+		// Initialize the sip session for the new request if initial
+		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
+		if(clonedRequest.getCurrentApplicationName() == null && subsequent) {
+			clonedRequest.setCurrentApplicationName(originalRequest.getSipSession().getSipApplicationSession().getApplicationName());
+		}
+		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
+		try {
+			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSession()).getHandler());
+		} catch (ServletException e) {
+			logger.error("could not set the session handler while forwarding the request", e);
+			throw new RuntimeException(e);
+		}
+		
+		// Use the original dialog in the new session
+		newSession.setSessionCreatingDialog(originalRequest.getSipSession().getSessionCreatingDialog());
+		
+		// And set a reference to the proxy		
+		newSession.setProxy(proxy);		
+				
+		//JSR 289 Section 15.1.6
+		if(!subsequent) {
+			// Subsequent requests can't have a routing directive?
+			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
+		}
+		clonedRequest.getTransactionApplicationData().setProxyBranch(this);			
+		clonedRequest.send();
 	}
 	
 	/**
@@ -301,8 +350,8 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 				return; // this response was addressed to this proxy
 			
 			try {
-				proxyResponseTxStateful((SipServletResponseImpl)proxiedResponse);
-			} catch (Exception e) {
+				proxiedResponse.send();
+			} catch (IOException e) {
 				logger.error("A problem occured while proxying a response", e);
 			}
 			
@@ -342,7 +391,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		}
 		if(response.getStatus() >= 200 && !recursed)
 		{
-			if(response.getRequest().isInitial()) {
+			if(outgoingRequest != null && outgoingRequest.isInitial()) {
 				this.proxy.onFinalResponse(this);
 			} else {
 				this.proxy.sendFinalResponse(response, this);
@@ -370,44 +419,44 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			logger.debug("Proxying subsequent request " + request);
 		}
 		
-		if(request.getMethod().equals("PRACK")) {
-			this.prackOriginalRequest = request;
-		} else {
-			this.originalRequest = request;
-			proxy.setOriginalRequest(request);
-		}
-		
 		// A re-INVITE needs special handling without goind through the dialog-stateful methods
 		if(request.getMethod().equalsIgnoreCase("INVITE")) {
-			proxyRequestTxStateful(request, true);
+			proxyDialogStateless(request);
 			return;
 		}
 		
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
-
-		// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
-		proxy.setSupervised(true);
-
-		// ACK must be forwarded tx-statelessly
-		if(request.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
-			proxyRequestTxStateless(request);
-		}
-		else {				
-			proxyRequestTxStateful(request, true);
-		}
-	}
-
-	private void proxyRequestTxStateless(SipServletRequestImpl request) {
+		proxy.setOriginalRequest(request);
+		this.originalRequest = request;
+		
 		// No proxy params, sine the target is already in the Route headers
 		ProxyParams params = new ProxyParams(null, null, null, null);
 		Request clonedRequest = 
 			proxy.getProxyUtils().createProxiedRequest(request, this, params);
+
+//      There is no need for that, it makes application composition fail (The subsequent request is not dispatched to the next application since the route header is removed)
+//		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
+//		if(routeHeader != null) {
+//			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
+//				clonedRequest.removeFirst(RouteHeader.NAME);	
+//			}
+//		}		
+	
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 				transport, false).getSipProvider();
+		
 		try {
-			sipProvider.sendRequest(clonedRequest);
+			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
+			proxy.setSupervised(true);
+			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
+				sipProvider.sendRequest(clonedRequest);
+			}
+			else {				
+				forwardRequest(clonedRequest, true);
+			}
+			
 		} catch (SipException e) {
 			logger.error("A problem occured while proxying a subsequent request", e);
 		}
@@ -424,20 +473,13 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 * 
 	 * @param request
 	 */
-	public void proxyRequestTxStateful(SipServletRequestImpl request, boolean subsequent) {
+	public void proxyDialogStateless(SipServletRequestImpl request) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Proxying request dialog-statelessly" + request);
-		
-			
-		if(request.getMethod().equals("PRACK")) 
-			this.prackOriginalRequest = request;
-		} else {
-			this.originalRequest = request;
-			proxy.setOriginalRequest(request);
 		}
-		
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
+		this.prackOriginalRequest = request;
 		
 		URI targetURI = this.targetURI;
 		
@@ -448,13 +490,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			targetURI = proxy.getPreviousNode();
 		}
 		
-		ProxyParams params = null;
-		if(request.isInitial()) {
-			params = this.initialRequestProxyParams;
-		} else {
-			params = new ProxyParams(targetURI, null, null, null);
-		}
-		
+		ProxyParams params = new ProxyParams(targetURI, null, null, null);
 		Request clonedRequest = 
 			proxy.getProxyUtils().createProxiedRequest(request, this, params);
 
@@ -485,75 +521,13 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 			ClientTransaction ctx = sipProvider
 				.getNewClientTransaction(clonedRequest);			
 			
-			SipServletRequestImpl clonedSipServletRequest = new SipServletRequestImpl(
-					clonedRequest,
-					proxy.getSipFactoryImpl(),
-					null,
-					ctx, null, false);
-			
-			if(subsequent) {
-				clonedSipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
-			}
-			
-			// Initialize the sip session for the new request if initial
-			clonedSipServletRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
-			if(clonedSipServletRequest.getCurrentApplicationName() == null && subsequent) {
-				clonedSipServletRequest.setCurrentApplicationName(originalRequest.getSipSession().getSipApplicationSession().getApplicationName());
-			}
-			MobicentsSipSession newSession = (MobicentsSipSession) clonedSipServletRequest.getSession(true);
-			try {
-				newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSession()).getHandler());
-			} catch (ServletException e) {
-				logger.error("could not set the session handler while forwarding the request", e);
-				throw new RuntimeException(e);
-			}
-			
-			// And set a reference to the proxy		
-			newSession.setProxy(proxy);		
-					
-			//JSR 289 Section 15.1.6
-			if(!subsequent) {
-				// Subsequent requests can't have a routing directive?
-				clonedSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
-			}
-			
-			
-			clonedSipServletRequest.getTransactionApplicationData().setProxyBranch(this);		
-			TransactionApplicationData appData = (TransactionApplicationData) clonedSipServletRequest.getTransactionApplicationData();
+			TransactionApplicationData appData = (TransactionApplicationData) request.getTransactionApplicationData();
 			appData.setProxyBranch(this);
-			
 			ctx.setApplicationData(appData);
 			
-			this.outgoingRequest = clonedSipServletRequest;
 			ctx.sendRequest();
 		} catch (SipException e) {
 			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", e);
-		}
-	}
-	
-	
-	/**
-	 * Transaction-stateful response forwarding
-	 * 
-	 * @param response
-	 */
-	public void proxyResponseTxStateful(SipServletResponseImpl response) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Proxying response dialog-statelessly" + response);
-		}
-
-		ServerTransaction st = null;
-		try {
-			if(Request.PRACK.equals(response.getMethod())) {
-				st = (ServerTransaction) this.prackOriginalRequest.getTransaction();
-				st.sendResponse(response.getResponse());
-			} 
-			else {
-				st = (ServerTransaction) this.originalRequest.getTransaction();
-				st.sendResponse(response.getResponse());
-			}
-		} catch (Exception e) {
-			logger.error("A problem occured while proxying a response in a dialog-stateless transaction", e);
 		}
 	}
 	
