@@ -38,6 +38,7 @@ Location Service
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/locationservice-dar.properties}dar configuration file}}.\
+ 	To understand what the dar configuration file is used for, check the {{{./mss-dar.html}Application Router Documentation}}.\
  	Drop it in your <<<tomcat_home/conf/dars>>> directory or <<<jboss_home/server/default/conf/dars>>> directory.\
 	To use this dar file for this service, specify in the Service xml tag, 
 	darConfigurationFileLocation attribute of the <<<tomcat_home/conf/server.xml>>> file or <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\

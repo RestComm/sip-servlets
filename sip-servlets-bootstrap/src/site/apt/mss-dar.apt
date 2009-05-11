@@ -79,7 +79,7 @@ Default Application Router
 
 ** Initial Requests and Application Selection Process
 
-	Initial Requests are requests that can essentialy be dialog creating ("INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH", "REFER") 
+	Initial Requests are requests that can essentialy be dialog creating (<<"INVITE", "REGISTER", "SUBSCRIBE", "OPTIONS", "MESSAGE", "NOTIFY", "PUBLISH", "REFER">>) 
 	and not part of an already existing dialog. (There is some other corner cases that you can check in the Sip Servlets 1.1 specification, Appendix B Definition of an Initial Request )
 	
 	Those Initial requests are routed to applications deployed in the container according to the Sip Servlets 1.1 specification, Section 15.4.1 Procedure for Routing an Initial Request.\
@@ -100,6 +100,8 @@ Default Application Router
 	
 	So now the path that the INVITE has taken (ie LocationService, CallBlocking) is called the application path. the Routing of the responses will now occur which brings us to the next section  
 	
+	<Please note that we took the assumption of a request coming to the server, but applications can act as UAC and also generate initial requests on their own.\
+	In such cases, no entry in the dar file is needed for the given application initiating the request to be able to route it to ohter applications in the container or outside.> 
 	
 ** Response Routing
 

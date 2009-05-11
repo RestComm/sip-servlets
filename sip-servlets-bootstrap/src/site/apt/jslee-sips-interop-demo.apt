@@ -54,7 +54,8 @@ JSLEE/Sip servlets Interoperability Demo
 	
 	The DAR file for this example can be found at the root of the project.
 	Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the jboss's server.xml):
-	file:///E:/workspaces/sip-servlets/sip-servlets-examples/jslee-sips-interop/jslee-sips-interop-dar.properties  
+	file:///E:/workspaces/sip-servlets/sip-servlets-examples/jslee-sips-interop/jslee-sips-interop-dar.properties\
+	To understand what the dar configuration file is used for, check the {{{./mss-dar.html}Application Router Documentation}}.  
 
 * How to play with it
 

@@ -52,6 +52,7 @@ Shopping Demo
  	Drop the renamed shopping-demo.ear file into your <<<jboss_home/server/default/deploy>>> directory. 	 
  	
  	Get the corresponding {{{/shopping-demo-dar.properties}dar configuration file}}.\
+ 	To understand what the dar configuration file is used for, check the {{{./mss-dar.html}Application Router Documentation}}.\
  	Drop it in your <<<jboss_home/server/default/conf/dars>>> directory.\
 	To use this dar file for this service, specify in the Service xml tag, 
 	darConfigurationFileLocation attribute of the <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\

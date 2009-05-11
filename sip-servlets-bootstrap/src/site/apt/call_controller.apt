@@ -17,6 +17,7 @@ Call Controller :  a Composed Application
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/call-controller-servlet-dar.properties}dar configuration file}}.\
+ 	To understand what the dar configuration file is used for, check the {{{./mss-dar.html}Application Router Documentation}}.\
  	Drop it in your <<<tomcat_home/conf/dars>>> directory or <<<jboss_home/server/default/conf/dars>>> directory.\
 	To use this dar file for this service, specify in the Service xml tag, 
 	darConfigurationFileLocation attribute of the <<<tomcat_home/conf/server.xml>>> file or <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\
@@ -34,7 +35,8 @@ Call Controller :  a Composed Application
 	The DAR file for this example can be found in the sip servlets impl project under the 
 	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-impl/docs}docs directory}} 
 	Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml):
-	file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-callblocking-forwarding.properties  
+	file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-callblocking-forwarding.properties\
+	To understand what the dar configuration file is used for, check the {{{./mss-dar.html}Application Router Documentation}}.
 
 * How to play with it
 
