@@ -1165,15 +1165,18 @@ public class SipSessionImpl implements MobicentsSipSession {
     public void onReadyToInvalidate() {
     	this.readyToInvalidate = true;
     	
-    	if(this.invalidateWhenReady) {
-    		this.notifySipSessionListeners(SipSessionEventType.READYTOINVALIDATE);
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("invalidateWhenReady flag is set to " + invalidateWhenReady);
     	}
     	
-    	//If the application does not explicitly invalidate the session in the callback or has not defined a listener, 
-    	//the container will invalidate the session. 
-    	if(isValid) {
-    		invalidate();
-    	}
+    	if(isValid && this.invalidateWhenReady) {
+    		this.notifySipSessionListeners(SipSessionEventType.READYTOINVALIDATE);
+    		//If the application does not explicitly invalidate the session in the callback or has not defined a listener, 
+        	//the container will invalidate the session. 
+        	if(isValid) {
+        		invalidate();
+        	}
+    	}    	    	
     }
 
 	/**

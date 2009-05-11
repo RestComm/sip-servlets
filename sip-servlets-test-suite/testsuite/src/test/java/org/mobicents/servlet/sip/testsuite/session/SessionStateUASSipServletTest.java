@@ -50,7 +50,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 	private List<String> send_4xx_sessionStateList;
 	private List<String> send_2xx_sessionStateList;
 	//1 sec
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 20000;
 	
 	TestSipListener sender;
 	

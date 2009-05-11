@@ -686,7 +686,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processDialogTerminated(javax.sip.DialogTerminatedEvent)
 	 */
 	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
-		// TODO FIXME
 		if(logger.isInfoEnabled()) {
 			logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
 		}

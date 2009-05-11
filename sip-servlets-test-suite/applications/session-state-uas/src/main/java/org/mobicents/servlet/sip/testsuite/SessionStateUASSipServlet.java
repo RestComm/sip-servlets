@@ -46,6 +46,8 @@ public class SessionStateUASSipServlet
 	private static final String SEND_1XX_4XX = "send1xx_4xx";
 	private static final String SEND_4XX = "send4xx";
 	private static final String SEND_2XX = "send2xx";
+	//TODO externalize in sip.xml and specify it from test if needed
+	private static final int TIMEOUT = 10000;
 	
 	private SipFactory sipFactory;	
 	
@@ -98,6 +100,8 @@ public class SessionStateUASSipServlet
 				// send message precising the current session state
 				sendMessage(request.getSession().getState().toString());
 			} else if(SEND_1XX_4XX.equals(message)) {
+				request.getSession().setInvalidateWhenReady(false);
+				
 				SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
 				ringingResponse.send();
 				
@@ -107,8 +111,19 @@ public class SessionStateUASSipServlet
 				SipServletResponse forbiddenResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
 				forbiddenResponse.send();
 				
-				// send message precising the current session state
-				sendMessage(request.getSession().getState().toString());
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					logger.error("unexpected exception while putting the thread to sleep", e);
+				}
+				if(request.getSession().isValid()) {
+					logger.info("the session have not been invalidated by the container since the invalidateWhenReady flag is false");
+					// send message precising the current session state
+					sendMessage(request.getSession().getState().toString());
+					request.getSession().invalidate();
+				} else {
+					logger.error("the session should not have been invalidated by the container since the invalidateWhenReady flag is false");
+				}
 			} else if(SEND_2XX.equals(message)) {
 				SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
 				okResponse.send();
