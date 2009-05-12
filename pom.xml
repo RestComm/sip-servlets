@@ -3,7 +3,7 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>10</version>
+        <version>11</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -254,6 +254,17 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
+		<repository>
+            <id>backup.repository.jboss.org</id>
+            <name>JBoss Repository Backup</name>
+            <url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+        </repository>
 		<repository>
 			<id>jboss-snapshots</id>
 			<name>JBoss Snapshot Repository</name>
