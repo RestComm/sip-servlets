@@ -113,7 +113,7 @@ public class ProxyUtils {
 			ViaHeader viaHeader = null;
 			if(proxy.getOutboundInterface() == null) { 
 				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, Utils.generateBranchId());
+						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, Utils.getInstance().generateBranchId());
 			} else { 
 				//If outbound interface is specified use it
 				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
@@ -124,7 +124,7 @@ public class ProxyUtils {
 						proxy.getOutboundInterface().getHost(),
 						proxy.getOutboundInterface().getPort(),
 						outboundTransport,
-						Utils.generateBranchId());
+						Utils.getInstance().generateBranchId());
 			}
 					
 			clonedRequest.addHeader(viaHeader);				

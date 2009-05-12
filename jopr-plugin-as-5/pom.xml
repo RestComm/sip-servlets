@@ -5,7 +5,7 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>10</version>
+        <version>11</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>jopr-mobicents-sip-servlets-as-5-plugin</artifactId>

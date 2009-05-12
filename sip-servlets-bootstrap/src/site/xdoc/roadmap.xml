@@ -973,7 +973,7 @@
 						Move to JBoss AS 5.1.0.CR1
 						</a>
 						<br />																
-						<img src="green.jpeg" />
+						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -1037,6 +1037,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=684">
 									Buddy replication not working
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=689">
+									Incorrect Session Invalidation on setInvalidateWhenReady(false)
 								</a>								
 							</li>
 						</ul>
