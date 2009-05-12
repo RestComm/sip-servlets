@@ -84,7 +84,7 @@ public abstract class ManagedDeploymentDiscoveryComponent implements ResourceDis
                 try
                 {
                     ManagedDeployment managedDeployment = managementView.getDeployment(deploymentName);
-                    if (!accept(managedDeployment))
+                    if (!accept(managedDeployment, resourceDiscoveryContext))
                         continue;
                     String resourceName = managedDeployment.getSimpleName();
                     // @TODO remove this when AS5 actually implements this for sars, and some other DeploymentTypes that haven't implemented getSimpleName()
@@ -123,7 +123,7 @@ public abstract class ManagedDeploymentDiscoveryComponent implements ResourceDis
         return discoveredResources;
     }
 
-    protected abstract boolean accept(ManagedDeployment managedDeployment);
+    protected abstract boolean accept(ManagedDeployment managedDeployment, ResourceDiscoveryContext<ApplicationServerComponent> resourceDiscoveryContext);
 
     private static String getResourceName(String fullPath)
     {

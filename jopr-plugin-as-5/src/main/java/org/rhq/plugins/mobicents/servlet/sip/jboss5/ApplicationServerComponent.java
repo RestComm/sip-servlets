@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -48,6 +49,7 @@ import org.jboss.managed.api.ManagedProperty;
 import org.jboss.profileservice.spi.NoSuchDeploymentException;
 import org.mc4j.ems.connection.ConnectionFactory;
 import org.mc4j.ems.connection.EmsConnection;
+import org.mc4j.ems.connection.bean.EmsBean;
 import org.mc4j.ems.connection.settings.ConnectionSettings;
 import org.mc4j.ems.connection.support.ConnectionProvider;
 import org.mc4j.ems.connection.support.metadata.ConnectionTypeDescriptor;
@@ -85,6 +87,7 @@ import org.rhq.plugins.jbossas5.util.ManagedComponentUtils;
 import org.rhq.plugins.jbossas5.util.ResourceComponentUtils;
 import org.rhq.plugins.jmx.JMXDiscoveryComponent;
 import org.rhq.plugins.jmx.JMXServerComponent;
+import org.rhq.plugins.jmx.ObjectNameQueryUtility;
 import org.rhq.plugins.mobicents.servlet.sip.jboss5.util.DeploymentUtils;
 import org.rhq.plugins.mobicents.servlet.sip.jboss5.util.MainDeployer;
 
@@ -575,5 +578,23 @@ public class ApplicationServerComponent
         return connection;
     }
 
+    public List<EmsBean> getWebApplicationEmsBeans(String applicationName) {    			
+    	
+		String pattern = "jboss.web:host=%host%,path=" + getContextPath(applicationName) + ",type=Manager";		
+	    ObjectNameQueryUtility queryUtil = new ObjectNameQueryUtility(pattern);
+	    return getEmsConnection().queryBeans(queryUtil.getTranslatedQuery());        	    
+    }
+    
+    public List<EmsBean> getConvergedSipApplicationEmsBeans(String applicationName) {    			
+    	
+		String pattern = "jboss.web:host=%host%,path=" + getContextPath(applicationName) + ",type=SipManager";		
+	    ObjectNameQueryUtility queryUtil = new ObjectNameQueryUtility(pattern);
+	    return getEmsConnection().queryBeans(queryUtil.getTranslatedQuery());        	    
+    }
+    
+    public static String getContextPath(String contextRoot) {
+        return ((contextRoot.equals("/"))
+                ? "/" : "/" + contextRoot);
+    }
 }
 

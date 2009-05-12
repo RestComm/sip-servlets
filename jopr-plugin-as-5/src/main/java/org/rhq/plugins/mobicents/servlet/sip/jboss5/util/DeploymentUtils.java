@@ -58,7 +58,7 @@ public abstract class DeploymentUtils {
         String extension = archiveName.substring(lastPeriod + 1);
         // TODO: String compare should be case-insensitive if on Windows.
         return (lastPeriod != -1 && expectedExtension.equals(extension));
-    }
+    }        
 
     public static DeploymentStatus deployArchive(File archiveFile, File deployDirectory, boolean deployExploded)
             throws Exception

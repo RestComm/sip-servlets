@@ -19,13 +19,14 @@
 package org.rhq.plugins.mobicents.servlet.sip.jboss5;
 
 import org.jboss.managed.api.ManagedDeployment;
+import org.rhq.core.pluginapi.inventory.ResourceDiscoveryContext;
 
 /**
  * @author Ian Springer
  */
 public class EmbeddedManagedDeploymentDiscoveryComponent extends ManagedDeploymentDiscoveryComponent
 {
-    protected boolean accept(ManagedDeployment managedDeployment)
+    protected boolean accept(ManagedDeployment managedDeployment, ResourceDiscoveryContext<ApplicationServerComponent> resourceDiscoveryContext)
     {
         return (managedDeployment.getParent() != null);
     }

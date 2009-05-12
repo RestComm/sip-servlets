@@ -1897,7 +1897,7 @@
         <service name="Web Application (WAR)"
                  subCategory="Applications"
                  class="org.rhq.plugins.mobicents.servlet.sip.jboss5.StandaloneManagedDeploymentComponent"
-                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.StandaloneManagedDeploymentDiscoveryComponent"
+                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.WarStandaloneDiscoveryComponent"
                  description="a standalone web application (WAR)"
                  createDeletePolicy="both"
                  creationDataType="content">
@@ -1951,7 +1951,7 @@
         <service name="Embedded Web Application (WAR)"
                  subCategory="Applications"
                  class="org.rhq.plugins.mobicents.servlet.sip.jboss5.EmbeddedManagedDeploymentComponent"
-                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.EmbeddedManagedDeploymentDiscoveryComponent"
+                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.WarEmbeddedDiscoveryComponent"
                  description="an embedded web application (WAR)">
 
             <plugin-configuration>
@@ -1986,7 +1986,7 @@
         <service name="Embedded Converged Sip/Web Application (SAR/WAR)" 
         		 subCategory="Applications"       			                   
                   class="org.rhq.plugins.mobicents.servlet.sip.jboss5.EmbeddedManagedDeploymentComponent"
-                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.EmbeddedManagedDeploymentDiscoveryComponent"
+                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.ConvergedSipEmbeddedDiscoveryComponent"
                   description="SIP/Web Application embedded inside of an Enterprise Application">
 			
             <plugin-configuration>
@@ -2020,7 +2020,7 @@
     <service name="Converged SIP/Web Application (SAR/WAR)"
     			subCategory="Applications"
                class="org.rhq.plugins.mobicents.servlet.sip.jboss5.StandaloneManagedDeploymentComponent"
-                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.StandaloneManagedDeploymentDiscoveryComponent"
+                 discovery="org.rhq.plugins.mobicents.servlet.sip.jboss5.ConvergedSipStandaloneDiscoveryComponent"
                description="Converged Sip/Web Application"
                createDeletePolicy="both"
                creationDataType="content">
