@@ -82,7 +82,7 @@ Mobicents SIP Load Balancer
 
 * Step-By-Step Example
 
-	* Download {{{http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer/1.0.BETA4/sip-balancer-1.0.BETA4-jar-with-dependencies.jar}sip-balancer jar with its dependencies}}
+	* Take the balancer from the sip-balancer directory in the root of your Mobicents Sip Servlets distribuition (JBoss AS distros only)
 	
 	* Get the default {{{http://code.google.com/p/mobicents/source/browse/trunk/tools/sip-balancer/src/test/resources/lb-configuration.properties}load balancer configuration properties files}}
 	
