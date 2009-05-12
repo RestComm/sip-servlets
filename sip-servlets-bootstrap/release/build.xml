@@ -233,7 +233,9 @@
 			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
-		<!--antcall target="build-mobicents-jopr-plugin" /-->
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
+			<arg line="clean install -U -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+		</exec>
 		
 		<!--condition property="ha.capable">
 			<or>
