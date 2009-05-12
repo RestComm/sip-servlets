@@ -25,24 +25,6 @@ public class ConvergedSipStandaloneDiscoveryComponent extends StandaloneManagedD
 	    	return true;
 	    } else {
 	    	return false;
-	    }		
-//    		log.warn(managedDeployment.getName());
-//    		log.warn(managedDeployment.getSimpleName());    		
-//	    	log.warn("Children");
-//	    	for(ManagedDeployment managedDeploymenttemp : managedDeployment.getChildren()){ 
-//	    		log.warn("Child : " + managedDeploymenttemp.getName());
-//	    	}
-//	    	log.warn("Components");
-//	    	for(Entry<String, ManagedComponent> component : managedDeployment.getComponents().entrySet()){ 
-//	    		log.warn("ManagedComponent : key=" + component.getKey() +" ,value=" + component.getValue().getName());
-//	    	}
-//	    	log.warn("ManagedObjectNames");
-//	    	for(String managedObjectName : managedDeployment.getManagedObjectNames()){ 
-//	    		log.warn("ManagedObjectName : " + managedObjectName );
-//	    	}
-//	    	log.warn("Properties");
-//	    	for(Entry<String, ManagedProperty> property : managedDeployment.getProperties().entrySet()){ 
-//	    		log.warn("ManagedProperty : key=" + property.getKey() +" ,value=" + property.getValue().getName());
-//	    	}    	    
-	}
+	    }			   
+	}		
 }

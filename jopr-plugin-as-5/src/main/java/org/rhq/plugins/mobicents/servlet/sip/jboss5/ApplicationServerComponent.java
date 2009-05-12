@@ -593,8 +593,8 @@ public class ApplicationServerComponent
     }
     
     public static String getContextPath(String contextRoot) {
-        return ((contextRoot.equals("/"))
-                ? "/" : "/" + contextRoot);
+        return  contextRoot.equals("/")
+                ? "/" : "/" + contextRoot;
     }
 }
 
