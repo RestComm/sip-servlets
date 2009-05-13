@@ -75,14 +75,14 @@ public class WarEmbeddedComponent extends EmbeddedManagedDeploymentComponent
 //    private EmsBean jbossWebMBean;
 //    private ResponseTimeLogParser logParser;
 //    String vhost;
-    private String contextRoot;
+    private String contextRoot;    
     
     ApplicationServerComponent applicationServerComponent; 
     
     @Override
     public void start(ResourceContext resourceContext) throws Exception {
     	super.start(resourceContext);
-    	applicationServerComponent = (ApplicationServerComponent)resourceContext.getParentResourceComponent();    	    	
+    	applicationServerComponent = (ApplicationServerComponent)resourceContext.getParentResourceComponent();    	
     }
     
     // ------------ MeasurementFacet Implementation ------------
@@ -91,10 +91,15 @@ public class WarEmbeddedComponent extends EmbeddedManagedDeploymentComponent
     	for (MeasurementScheduleRequest request : requests) {
             String metricName = request.getName();
             if (metricName.equals(CUSTOM_PARENT_TRAIT)) {
-                String parentDeploymentName = getManagedDeployment().getParent().getName();
-                // -4 is for the extension .war to be removed
-            	this.contextRoot = parentDeploymentName.substring(0, parentDeploymentName.length() - 5);
+            	this.contextRoot = deploymentName.substring(0, deploymentName.length() - 5);
             	this.contextRoot = contextRoot.substring(contextRoot.lastIndexOf("/") + 1);
+            	List<EmsBean> mBeans = applicationServerComponent.getWebApplicationEmsBeans(contextRoot);
+            	String parentDeploymentName = getManagedDeployment().getParent().getName();
+            	if(mBeans.size() < 1) {	                
+	                // -4 is for the extension .war to be removed
+	            	this.contextRoot = parentDeploymentName.substring(0, parentDeploymentName.length() - 5);
+	            	this.contextRoot = contextRoot.substring(contextRoot.lastIndexOf("/") + 1);
+            	}
                 MeasurementDataTrait trait = new MeasurementDataTrait(request, parentDeploymentName);
                 report.addData(trait);
             }
@@ -152,10 +157,8 @@ public class WarEmbeddedComponent extends EmbeddedManagedDeploymentComponent
 
         EmsConnection jmxConnection = applicationServerComponent.getEmsConnection();
 
-        String servletNameBaseTemplate = SERVLET_NAME_BASE_TEMPLATE;
-        
         //FIXME : replace localhost with the real vhost
-        String servletMBeanNames = servletNameBaseTemplate + ",WebModule=//localhost" 
+        String servletMBeanNames = SERVLET_NAME_BASE_TEMPLATE + ",WebModule=//localhost" 
                 + applicationServerComponent.getContextPath(this.contextRoot);
         ObjectNameQueryUtility queryUtility = new ObjectNameQueryUtility(servletMBeanNames);
         List<EmsBean> mBeans = jmxConnection.queryBeans(queryUtility.getTranslatedQuery());
