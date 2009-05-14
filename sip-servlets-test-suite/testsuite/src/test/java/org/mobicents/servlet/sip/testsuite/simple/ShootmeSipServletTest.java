@@ -168,8 +168,22 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals(405, sender.getFinalResponseStatus());
 	}
 	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=676
 	public void testShootmeToTag() throws Exception {
 		String fromName = "TestToTag";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
+	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=695
+	public void testSubscriberURI() throws Exception {
+		String fromName = "testSubscriberUri";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);

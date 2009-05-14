@@ -42,11 +42,16 @@ import org.apache.log4j.Logger;
 
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
 	
+	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
+	private static final String TEST_SUBSCRIBER_URI = "testSubscriberUri";
+	private static final String TEST_EXTERNAL_ROUTING = "testExternalRouting";
+	private static final String TEST_EXTERNAL_ROUTING_NO_INFO = "testExternalRoutingNoInfo";
 	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
 	private static final String TEST_ALLOW_HEADER = "TestAllowHeader";
 	private static final String TEST_TO_TAG = "TestToTag";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
+	private static final String SUBSCRIBER_URI = "sip:testSubscriberUri@sip-servlets.com";	
 	
 	@Resource
 	SipFactory sipFactory;
@@ -83,13 +88,14 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		logger.info("Got request: "
 				+ request.getMethod());
 		
-		if(request.getFrom().toString().contains("testExternalRoutingNoInfo")) {			
+		String fromString = request.getFrom().toString();
+		if(fromString.contains(TEST_EXTERNAL_ROUTING_NO_INFO)) {			
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable)sipServletResponse);
 			return;
 		}
 		
-		if(request.getFrom().toString().contains("testExternalRouting")) {
+		if(fromString.contains(TEST_EXTERNAL_ROUTING)) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			sipServletResponse.send();
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
@@ -97,16 +103,23 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			return;
 		}
 		
-		if(request.getFrom().toString().contains(TEST_ALLOW_HEADER)) {
+		if(fromString.contains(TEST_ALLOW_HEADER)) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_METHOD_NOT_ALLOWED);
 			sipServletResponse.setHeader("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
 			sipServletResponse.addHeader("Allow", "SUBSCRIBE, NOTIFY");
 			sipServletResponse.addHeader("Allow", "REFER");
 			sipServletResponse.send();
 			return;
+		}
+		
+		logger.info("Subscriber URI received : " + request.getSubscriberURI());
+		if(fromString.contains(TEST_SUBSCRIBER_URI) && !SUBSCRIBER_URI.equalsIgnoreCase(request.getSubscriberURI().toString())) {			
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+			sipServletResponse.send();
+			return;
 		}	
 		
-		if(request.getFrom().toString().contains(TEST_TO_TAG)) {
+		if(fromString.contains(TEST_TO_TAG)) {
 			//checking if the to tag is not
 			Address fromAddress = request.getFrom();
 			Address toAddress   = sipFactory.createAddress(request.getRequestURI(), request.getTo().getDisplayName());
@@ -125,7 +138,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		request.getParameterableHeader("Reply-To");
 		request.getParameterableHeaders("Reply-To");
 		// Test register cseq issue http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
-		if(request.getFrom().toString().contains("testRegisterCSeq")) {
+		if(fromString.contains(TEST_REGISTER_C_SEQ)) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			sipServletResponse.send();
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
