@@ -28,6 +28,7 @@ import javax.sip.SipProvider;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Wrapper;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
@@ -132,7 +133,8 @@ public abstract class MessageDispatcher {
 	protected static SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) throws DispatcherException {
 		String id = null;
 		boolean isAppGeneratedKey = false;
-		Method appKeyMethod = null;
+		Method appKeyMethod = null;			
+		
 		// Session Key Based Targeted Mechanism is oly for Initial Requests 
 		// see JSR 289 Section 15.11.2 Session Key Based Targeting Mechanism 
 		if(sipServletRequestImpl.isInitial() && sipContext != null) {
@@ -144,8 +146,37 @@ public abstract class MessageDispatcher {
 						", using the following annotated method to generate the application key " + appKeyMethod);
 			}
 			sipServletRequestImpl.setReadOnly(true);
-			try {
-				id = (String) appKeyMethod.invoke(null, new Object[] {sipServletRequestImpl});
+			Servlet servlet = null;
+			// Set the Class Loader to the same that loaded the servlet class to avoid http://code.google.com/p/mobicents/issues/detail?id=700
+			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());		
+			
+			Class methodDeclaringClass = appKeyMethod.getDeclaringClass();
+			Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByClassName(methodDeclaringClass.getCanonicalName());			
+			if(sipServletImpl != null) {				
+				try {
+					servlet = sipServletImpl.allocate();
+					// http://code.google.com/p/mobicents/issues/detail?id=700 : 
+					// we get the method from servlet class anew because the original method might have been loaded by a different class loader  
+					Method newMethod = servlet.getClass().getMethod(appKeyMethod.getName(), appKeyMethod.getParameterTypes());
+					appKeyMethod = newMethod;
+												
+					if(logger.isDebugEnabled()) {
+						logger.debug("Invoking the application key method " + appKeyMethod.getName() + 
+								", on the following servlet " + methodDeclaringClass.getCanonicalName());
+					}
+				} catch (ServletException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't allocate the sip servlet to invoke the key annotated method !" ,e);
+				} catch (SecurityException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't allocate the sip servlet to invoke the key annotated method !" ,e);
+				} catch (NoSuchMethodException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't allocate the sip servlet to invoke the key annotated method !" ,e);
+				} finally {
+					java.lang.Thread.currentThread().setContextClassLoader(oldLoader);		
+				}
+			}
+			try {			
+				id = (String) appKeyMethod.invoke(servlet, new Object[] {sipServletRequestImpl});
 				isAppGeneratedKey = true;
 			} catch (IllegalArgumentException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't invoke the app session key annotated method !" ,e);		
@@ -155,6 +186,14 @@ public abstract class MessageDispatcher {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "A Problem occured while invoking the app session key annotated method !" ,e);
 			} finally {
 				sipServletRequestImpl.setReadOnly(false);
+				if(sipServletImpl != null) {
+					try {
+						sipServletImpl.deallocate(servlet);
+					} catch (ServletException e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't deallocate the sip servlet to invoke the key annotated method !" ,e);
+					}
+				}
+				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);		
 			}
 			if(id == null) {
 				isAppGeneratedKey = false;
@@ -198,6 +237,10 @@ public abstract class MessageDispatcher {
 			
 			if(!securityCheck(request)) return;
 
+			if(logger.isDebugEnabled()) {
+				logger.debug("Invoking instance " + servlet);
+			}
+			
 			try {
 				servlet.service(request, null);
 			} finally {			

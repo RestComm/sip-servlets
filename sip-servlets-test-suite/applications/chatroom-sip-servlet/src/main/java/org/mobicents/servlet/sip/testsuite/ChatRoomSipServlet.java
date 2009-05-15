@@ -79,19 +79,24 @@ public class ChatRoomSipServlet
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-
-		logger.info("Got request: "
-				+ request.getMethod());
-		SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
-		ringingResponse.send();
-		Integer numberOfParticipants = (Integer) request.getApplicationSession().getAttribute("numberOfParticipants");
-		if(numberOfParticipants == null) {
-			numberOfParticipants = 0;			
+		logger.info("Static Field value " + staticField);
+		if(staticField) {
+			logger.info("Got request: "
+					+ request.getMethod());
+			SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			ringingResponse.send();
+			Integer numberOfParticipants = (Integer) request.getApplicationSession().getAttribute("numberOfParticipants");
+			if(numberOfParticipants == null) {
+				numberOfParticipants = 0;			
+			}
+			numberOfParticipants++;
+			request.getApplicationSession().setAttribute("numberOfParticipants", numberOfParticipants);
+			SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
+			okResponse.send();
+		} else {
+			SipServletResponse response = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+			response.send();
 		}
-		numberOfParticipants++;
-		request.getApplicationSession().setAttribute("numberOfParticipants", numberOfParticipants);
-		SipServletResponse okResponse = request.createResponse(SipServletResponse.SC_OK);
-		okResponse.send();
 	}
 
 	/**
