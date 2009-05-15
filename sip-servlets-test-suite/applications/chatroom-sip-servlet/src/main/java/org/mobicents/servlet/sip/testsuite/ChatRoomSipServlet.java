@@ -51,6 +51,7 @@ public class ChatRoomSipServlet
 	
 	private SipFactory sipFactory;	
 	
+	private static boolean staticField = false;
 	
 	/** Creates a new instance of ListenersSipServlet */
 	public ChatRoomSipServlet() {
@@ -70,6 +71,7 @@ public class ChatRoomSipServlet
 		} catch (NamingException e) {
 			throw new ServletException("Uh oh -- JNDI problem !", e);
 		}
+		staticField = true;
 	}		
 	
 	/**
@@ -132,9 +134,14 @@ public class ChatRoomSipServlet
 	
 	@SipApplicationKey
 	public static String generateChatroomApplicationKey(SipServletRequest request) {
-		if("modifyRequest".equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
-			request.setExpires(1000);
+		logger.info("Static Field value " + staticField);
+		if(staticField) {
+			if("modifyRequest".equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
+				request.setExpires(1000);
+			}
+			return request.getRequestURI().toString();
+		} else {
+			throw new IllegalStateException("the static field should have been initialized");
 		}
-		return request.getRequestURI().toString();
 	}
 }

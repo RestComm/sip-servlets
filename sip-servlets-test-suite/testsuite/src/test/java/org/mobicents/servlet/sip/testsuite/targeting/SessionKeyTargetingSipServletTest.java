@@ -219,6 +219,31 @@ public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
 	 * @throws ParseException
 	 * @throws InvalidArgumentException
 	 */
+	public void testSipApplicationKeyStaticField() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "staticField";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = sender1Chat1ProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "chatroom";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = sender1Chat1ProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender1Chat1.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(TIMEOUT);
+		sender1Chat1.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender1Chat1.getOkToByeReceived());
+	}
+	
+	/**
+	 * This test check that this is not possible to modify the request in the @SipApplicationKey annotated method
+	 * @throws InterruptedException
+	 * @throws SipException
+	 * @throws ParseException
+	 * @throws InvalidArgumentException
+	 */
 	public void testSipApplicationKeyModifyingSipServletRequest() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "modifyRequest";
 		String fromSipAddress = "sip-servlets.com";
