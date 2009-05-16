@@ -86,7 +86,7 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 		synchronized (sipSessions) {
 			toProcess = new ClusteredSipSession[sipSessions.size()];
 			toProcess = (ClusteredSipSession[]) sipSessions.toArray(toProcess);
-			sessions.clear();
+			sipSessions.clear();
 		}
 
 		JBossCacheSipManager mgr = (JBossCacheSipManager) getManager();
@@ -115,7 +115,7 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 					.size()];
 			toProcess = (ClusteredSipApplicationSession[]) sipApplicationSessions
 					.toArray(toProcess);
-			sessions.clear();
+			sipApplicationSessions.clear();
 		}
 
 		JBossCacheSipManager mgr = (JBossCacheSipManager) getManager();
@@ -150,6 +150,12 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 		stopThread();
 		synchronized (sessions) {
 			sessions.clear();
+		}
+		synchronized (sipSessions) {
+			sipSessions.clear();
+		}
+		synchronized (sipApplicationSessions) {
+			sipApplicationSessions.clear();
 		}
 	}
 

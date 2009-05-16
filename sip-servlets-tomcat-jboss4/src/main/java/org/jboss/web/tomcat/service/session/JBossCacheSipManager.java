@@ -1227,7 +1227,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				ConvergedSessionReplicationContext.sipSessionExpired(
 						clusterSess, realId, snapshotManager_);
 
-				sessions_.remove(realId);
+				sipManagerDelegate.removeSipSession(clusterSess.getKey());
 				stats_.removeStats(realId);
 
 				// Update counters.
@@ -1270,7 +1270,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 						.sipApplicationSessionExpired(clusterSess, realId,
 								snapshotManager_);
 
-				sessions_.remove(realId);
+				sipManagerDelegate.removeSipApplicationSession(clusterSess.getKey());
 				stats_.removeStats(realId);
 
 				// Update counters.
