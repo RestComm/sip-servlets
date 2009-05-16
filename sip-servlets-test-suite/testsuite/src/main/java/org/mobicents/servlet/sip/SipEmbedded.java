@@ -228,7 +228,9 @@ public class SipEmbedded {
 	 */
 	public void stopTomcat() throws Exception {
 		// Stop the embedded server
-		sipService.stop();		
+		if(sipService != null) {
+			sipService.stop();		
+		}
 	}
 
 	/**
