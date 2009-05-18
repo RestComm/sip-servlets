@@ -26,19 +26,11 @@ import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Implementation of a clustered sip application session for the JBossCacheManager.
- * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.SessionBasedClusteredSession JBOSS AS 4.2.2 Tag
+ * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.SessionBasedClusteredSession JBOSS AS 5.1.0.CR1 Tag
  *
  * The replication granularity
  * level is session based; that is, we replicate per whole session object.
- * We use JBossCache for our internal replicated data store.
- * The internal structure in JBossCache is as follows:
- * <pre>
- * /SIPSESSION
- *    /hostname
- *       /sip_app_name    (path + session id is unique)
- *          /sipapplicationsessionid    Map(id, session)         
- *                    (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
- * </pre>
+ *
  * <p/>
  * Note that the isolation level of the cache dictates the
  * concurrency behavior.</p>

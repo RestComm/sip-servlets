@@ -36,6 +36,7 @@ import javax.servlet.sip.SipSession;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Session;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
@@ -47,7 +48,9 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCach
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheManagerFactory;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheManagerFactoryFactory;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.IncomingDistributableSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingAttributeGranularitySessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingSessionGranularitySessionData;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationCapability;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
@@ -66,9 +69,10 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * Implementation of a converged clustered session manager for
  * catalina using JBossCache replication.
  * 
- * Based on JbossCacheManager JBOSS AS 4.2.2 Tag 
- * I was forced to copy over most of the code since some things that needed to be adapted
- * were private 
+ * Based on JbossCacheManager JBOSS AS 5.1.0.CR1 Tag 
+ * 
+ * TODO Some parts have been copied over but the request for change to protected was made http://www.jboss.org/index.html?module=bb&op=viewtopic&p=4231452#4231452 
+ * review this for the GA version
  *
  * @author Ben Wang
  * @author Brian Stansberry
@@ -232,12 +236,53 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    }
    
    @SuppressWarnings("unchecked")
+   private static <T extends OutgoingDistributableSessionData> JBossCacheSipManager<T> uncheckedCastSipManager(JBossCacheSipManager mgr)
+   {
+      return mgr;
+   }
+   
+   @SuppressWarnings("unchecked")
    public DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> getDistributedCacheConvergedSipManager()
    {
       return (DistributedCacheConvergedSipManager) getDistributedCacheManager();
    }
    
-   /**
+   
+   // Satisfy the Manager interface.  Internally we use
+   // createEmptyClusteredSession to avoid a cast
+   public Session createEmptySession()
+   {
+      if (trace_)
+      {
+         log_.trace("Creating an empty ClusteredSession");
+      }
+      
+      return createEmptyConvergedClusteredSession();
+   }
+   
+   private ClusteredSession<? extends OutgoingDistributableSessionData> createEmptyConvergedClusteredSession()
+   {     
+
+      ClusteredSession<? extends OutgoingDistributableSessionData> session = null;
+      switch (getReplicationGranularity())
+      {
+         case ATTRIBUTE:
+            ClusteredSipManager<OutgoingAttributeGranularitySessionData> amgr = uncheckedCastSipManager(this);
+            session = new ConvergedAttributeBasedClusteredSession(amgr);
+            break;
+         case FIELD:
+        	ClusteredSipManager<OutgoingDistributableSessionData> fmgr = uncheckedCastSipManager(this);
+            session = new ConvergedFieldBasedClusteredSession(fmgr);
+            break;
+         default:
+        	 ClusteredSipManager<OutgoingSessionGranularitySessionData> smgr = uncheckedCastSipManager(this);
+            session = new ConvergedSessionBasedClusteredSession(smgr);
+            break;
+      }
+      return session;
+   }
+
+/**
     * {@inheritDoc}
     * <p>
     * Removes the session from this Manager's collection of actively managed

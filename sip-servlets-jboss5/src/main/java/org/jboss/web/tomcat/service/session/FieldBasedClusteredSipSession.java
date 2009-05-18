@@ -17,13 +17,10 @@
 package org.jboss.web.tomcat.service.session;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jboss.aop.Advised;
-import org.jboss.aspects.patterns.observable.Observer;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -36,7 +33,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * Implementation of a clustered sip session for the JBossCacheManager. This
  * class is based on the following Jboss class
  * org.jboss.web.tomcat.service.session.FieldBasedClusteredSession JBOSS AS
- * 4.2.2 Tag
+ * 5.1.0.CR1 Tag
  * 
  * The replication granularity level is field based; that is, we replicate only
  * the dirty field in a POJO that is part of a session attribute. E.g., once a

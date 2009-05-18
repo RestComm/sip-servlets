@@ -24,6 +24,7 @@ package org.jboss.web.tomcat.service.session;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
@@ -71,4 +72,24 @@ public interface ClusteredSipManager<O extends OutgoingDistributableSessionData>
 	boolean storeSipApplicationSession(SipApplicationSession session);
 	
 	SnapshotSipManager getSnapshotSipManager();
+
+	void notifyRemoteSipApplicationSessionInvalidation(String sessId);
+
+	void notifyRemoteSipSessionInvalidation(String sessId);
+
+	void notifySipApplicationSessionLocalAttributeModification(String sessId);
+
+	void notifySipSessionLocalAttributeModification(String sessId);
+
+	boolean sipApplicationSessionChangedInDistributedCache(String realId,
+			String owner, int intValue, long longValue,
+			DistributableSessionMetadata distributableSessionMetadata);
+
+	boolean sipSessionChangedInDistributedCache(String realId, String owner,
+			int intValue, long longValue,
+			DistributableSessionMetadata distributableSessionMetadata);
+
+	void sipApplicationSessionActivated();
+
+	void sipSessionActivated();
 }

@@ -30,7 +30,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  * <p>
  * Implementation of a clustered sip application session for the JBossCacheManager.
- * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.FieldBasedClusteredSession JBOSS AS 4.2.2 Tag
+ * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.FieldBasedClusteredSession JBOSS AS 5.1.0.CR1 Tag
  *
  * The replication granularity
  * level is field based; that is, we replicate only the dirty field in a POJO that is part of

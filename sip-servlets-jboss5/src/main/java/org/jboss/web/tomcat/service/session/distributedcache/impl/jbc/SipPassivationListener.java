@@ -3,7 +3,7 @@ package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 import org.jboss.cache.Fqn;
 import org.jboss.cache.notifications.annotation.NodeActivated;
 import org.jboss.cache.notifications.event.NodeActivatedEvent;
-import org.jboss.web.tomcat.service.session.JBossCacheSipManager;
+import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableSessionManager;
 
 /**
@@ -53,11 +53,11 @@ public class SipPassivationListener extends CacheListenerBase
 			if (SipCacheListener.isFqnSessionRootSized(fqn.size(), isBuddy) 
 		            && SipCacheListener.isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
 				sessId = SipCacheListener.getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-				((JBossCacheSipManager) manager_)
+				((ClusteredSipManager) manager_)
 						.sipApplicationSessionActivated();
 			} else {
 				sessId = SipCacheListener.getSipSessionIdFromFqn(fqn, isBuddy);
-				((JBossCacheSipManager) manager_)
+				((ClusteredSipManager) manager_)
 						.sipSessionActivated();
 			}   
     	  

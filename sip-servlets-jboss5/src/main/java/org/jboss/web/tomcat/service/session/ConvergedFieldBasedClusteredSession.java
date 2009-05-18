@@ -23,23 +23,24 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.security.SecurityUtil;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingAttributeGranularitySessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionDelegate;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 /**
- * Extension of the Jboss AttributeBasedClusteredSession class so that applications
+ * Extension of the Jboss FieldBasedClusteredSession class so that applications
  * are able to cast this session implementation to javax.servlet.sip.ConvergedHttpSession interface.
  * 
- * Based on AttributeBasedClusteredSession JBOSS AS 5.1.0.CR1 Tag
+ * Based on FieldBasedClusteredSession JBOSS AS 5.1.0.CR1 Tag
  * 
- * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
- * 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
  */
-public class ConvergedAttributeBasedClusteredSession extends
-		AttributeBasedClusteredSession implements ConvergedSession {
+public class ConvergedFieldBasedClusteredSession extends
+		FieldBasedClusteredSession implements ConvergedSession {
+
 	/**
      * The facade associated with this session.  NOTE:  This value is not
      * included in the serialized version of this object.
@@ -48,7 +49,11 @@ public class ConvergedAttributeBasedClusteredSession extends
     
 	private ConvergedSessionDelegate convergedSessionDelegate = null;
 	
-	public ConvergedAttributeBasedClusteredSession(ClusteredSipManager<OutgoingAttributeGranularitySessionData> manager) {
+	/**
+	 * @param manager
+	 * @param sipNetworkInterfaceManager 
+	 */
+	public ConvergedFieldBasedClusteredSession(ClusteredSipManager<OutgoingDistributableSessionData> manager) {
 		super(manager);
 		convergedSessionDelegate = new ConvergedSessionDelegate(manager, this);
 	}
@@ -69,7 +74,7 @@ public class ConvergedAttributeBasedClusteredSession extends
         }
         return (facade);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.ConvergedHttpSession#encodeURL(java.lang.String)
@@ -99,7 +104,6 @@ public class ConvergedAttributeBasedClusteredSession extends
 	}
 	
 	public boolean isValid() {
-		// Check if isValidInternal() can be made protected instead
 		return isValid(false);
 	}
 	

@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.manager.util.SessionUtils;
 import org.jboss.cache.Fqn;
 import org.jboss.cache.Node;
 import org.jboss.cache.pojo.impl.InternalConstant;

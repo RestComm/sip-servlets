@@ -16,13 +16,10 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
@@ -33,7 +30,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 /**
  * This class is based on the following Jboss class
  * org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession JBOSS AS
- * 4.2.2 Tag
+ * 5.1.0.CR1 Tag
  * 
  * Implementation of a clustered sip application session where the replication
  * granularity level is attribute based; that is, we replicate only the dirty

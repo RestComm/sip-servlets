@@ -31,7 +31,7 @@ import org.jboss.cache.notifications.event.NodeModifiedEvent;
 import org.jboss.cache.notifications.event.NodeRemovedEvent;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
-import org.jboss.web.tomcat.service.session.JBossCacheSipManager;
+import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableSessionManager;
 
@@ -147,10 +147,10 @@ public class SipCacheListener extends CacheListenerBase
     	  	String sessId = null;
 	      	if(isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
 	      		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-	      		((JBossCacheSipManager)manager_).notifyRemoteSipApplicationSessionInvalidation(sessId);
+	      		((ClusteredSipManager)manager_).notifyRemoteSipApplicationSessionInvalidation(sessId);
 	      	} else {
 	      		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-	      		((JBossCacheSipManager)manager_).notifyRemoteSipSessionInvalidation(sessId);
+	      		((ClusteredSipManager)manager_).notifyRemoteSipSessionInvalidation(sessId);
 	      	}          
       }
       else if (local && !isBuddy
@@ -160,11 +160,11 @@ public class SipCacheListener extends CacheListenerBase
     	  	String sessId = null;
 			if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
 				sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-				((JBossCacheSipManager) manager_)
+				((ClusteredSipManager) manager_)
 						.notifySipApplicationSessionLocalAttributeModification(sessId);
 			} else {
 				sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-				((JBossCacheSipManager) manager_)
+				((ClusteredSipManager) manager_)
 						.notifySipSessionLocalAttributeModification(sessId);
 			}                   
       }
@@ -214,13 +214,13 @@ public class SipCacheListener extends CacheListenerBase
             	boolean updated = false;
             	if(isSipApplicationSession) {
             		// Notify the manager that a session has been updated
-            		updated = ((JBossCacheSipManager) manager_).sipApplicationSessionChangedInDistributedCache(realId, owner, 
+            		updated = ((ClusteredSipManager) manager_).sipApplicationSessionChangedInDistributedCache(realId, owner, 
                                                   version.intValue(), 
                                                   timestamp.longValue(), 
                                                   (DistributableSessionMetadata) data.get(AbstractJBossCacheService.METADATA_KEY));
             	} else {
             		// Notify the manager that a session has been updated
-            		updated = ((JBossCacheSipManager) manager_).sipSessionChangedInDistributedCache(realId, owner, 
+            		updated = ((ClusteredSipManager) manager_).sipSessionChangedInDistributedCache(realId, owner, 
                                                   version.intValue(), 
                                                   timestamp.longValue(), 
                                                   (DistributableSessionMetadata) data.get(AbstractJBossCacheService.METADATA_KEY));
@@ -253,11 +253,11 @@ public class SipCacheListener extends CacheListenerBase
 			String sessId = null;
 			if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
 				sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-				((JBossCacheSipManager) manager_)
+				((ClusteredSipManager) manager_)
 						.notifySipApplicationSessionLocalAttributeModification(sessId);
 			} else {
 				sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-				((JBossCacheSipManager) manager_)
+				((ClusteredSipManager) manager_)
 						.notifySipSessionLocalAttributeModification(sessId);
 			}  
       }

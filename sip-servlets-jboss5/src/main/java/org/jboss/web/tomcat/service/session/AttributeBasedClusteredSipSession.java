@@ -31,21 +31,10 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
  * Implementation of a clustered sip session for the JBossCacheManager.
- * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession JBOSS AS 4.2.2 Tag
+ * This class is based on the following Jboss class org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession JBOSS AS 5.1.0.CR1 Tag
  * 
- * The replication granularity level is attribute based; that is, we replicate only the dirty attributes.
- * We use JBossCache for our internal, deplicated data store.
- * The internal structure is like in JBossCache:
- * <pre>
- * /SIPSESSION
- *    /hostname
- *       /sip_application_name    (path + session id is unique)
- *          /sipappsessionid    Map(id, session)
- *          		  (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
- *          	/sipsessionid   Map(id, session)
- *                    (VERSION_KEY, version)  // Used for version tracking. version is an Integer.
- *             		/ATTRIBUTE    Map(attr_key, value)
- * </pre>
+ * Implementation of a clustered session where the replication granularity
+ * level is attribute based; that is, we replicate only the dirty attributes.
  * <p/>
  * Note that the isolation level of the cache dictates the
  * concurrency behavior. Also note that session and its associated attribtues are stored in different nodes.
