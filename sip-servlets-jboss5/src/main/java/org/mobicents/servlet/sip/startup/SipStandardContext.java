@@ -52,9 +52,13 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
+import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
+import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
@@ -820,17 +824,90 @@ public class SipStandardContext extends StandardContext implements SipContext {
         
     }
 
-	public void enterSipApp(SipServletRequestImpl request,
-			SipServletResponseImpl response, SipManager manager,
-			boolean startCacheActivity, boolean bindSessions) {
-		// TODO Auto-generated method stub
-		
+    public void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions) {		
+		switch (concurrencyControlMode) {
+			case SipSession:
+				MobicentsSipSession sipSession = null;
+				if(request != null) {
+					sipSession = ((MobicentsSipSession)request.getSipSession());
+				} else if (response != null ) {
+					sipSession = ((MobicentsSipSession)response.getSipSession());
+				}
+				if(sipSession != null) {
+					sipSession.getSemaphore().acquireUninterruptibly();
+				}
+				break;
+			case SipApplicationSession:
+				MobicentsSipApplicationSession sipApplicationSession = null;
+				if(request != null) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+				} else if (response != null ) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+				}
+				if(sipApplicationSession != null) {
+					sipApplicationSession.getSemaphore().acquireUninterruptibly();
+				}
+				break;
+			case None:
+				break;
+		}
+		if(getDistributable() && hasDistributableManager) {
+			if(bindSessions) {
+				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, manager, startCacheActivity);
+			} else {
+				ConvergedSessionReplicationContext.enterSipapp(request, response, startCacheActivity);
+			}
+		}
 	}
+	
+	public void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {
+		switch (concurrencyControlMode) {
+			case SipSession:
+				MobicentsSipSession sipSession = null;
+				if(request != null) {
+					sipSession = ((MobicentsSipSession)request.getSipSession());
+				} else if (response != null ) {
+					sipSession = ((MobicentsSipSession)response.getSipSession());
+				}
+				if(sipSession != null && sipSession.getSemaphore() != null) {
+					sipSession.getSemaphore().release();
+				}
+				break;
+			case SipApplicationSession:
+				MobicentsSipApplicationSession sipApplicationSession = null;
+				if(request != null) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+				} else if (response != null ) {
+					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+				}
+				if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
+					sipApplicationSession.getSemaphore().release();
+				}
+				break;
+			case None:
+				break;
+		}
+		if (getDistributable() && hasDistributableManager) {
+			if(logger.isInfoEnabled()) {
+				logger.info("We are now after the servlet invocation, We replicate no matter what");
+			}
+			try {
+				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+						.exitSipapp();
 
-	public void exitSipApp(SipServletRequestImpl request,
-			SipServletResponseImpl response) {
-		// TODO Auto-generated method stub
-		
+				if(logger.isInfoEnabled()) {
+					logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+				}
+				if (ctx.getSoleSnapshotManager() != null) {
+					((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+							ctx.getSoleSipSession());
+					((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+							ctx.getSoleSipApplicationSession());
+				} 
+			} finally {
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
+			}
+		}
 	}
 
 	public boolean notifySipServletsListeners() {
