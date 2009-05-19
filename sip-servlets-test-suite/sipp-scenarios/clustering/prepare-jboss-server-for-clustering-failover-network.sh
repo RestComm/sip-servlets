@@ -1,12 +1,12 @@
 #export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster-network
 
-cp mss-sip-stack.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
-cp jboss-service-all.xml $JBOSS_HOME/server/all/conf/jboss-service.xml
-cp server-jboss-failover-all.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml
-cp jboss-context.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/context.xml
-cp jboss-tomcat-service.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml
-cp webserver-xmbean.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
-cp log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
+cp setup/jboss/mss-sip-stack.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
+cp setup/jboss/jboss-service-all.xml $JBOSS_HOME/server/all/conf/jboss-service.xml
+cp setup/jboss/server-jboss-failover-all.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml
+cp setup/jboss/jboss-context.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/context.xml
+cp setup/jboss/jboss-tomcat-service.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml
+cp setup/jboss/webserver-xmbean.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
+cp setup/jboss/log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
 
 mvn clean install -f ../../../pom.xml -P jboss -Dnode=all
 

@@ -1,5 +1,3 @@
-#export JBOSS_HOME=/home/deruelle/servers/jboss-4.2.2.GA-cluster
-
 #echo "Script name is		[$0]"
 #echo "First Parameter is		[$1]"
 #echo "Second Parameter is		[$2]"
@@ -10,26 +8,26 @@
 
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
-cp setup/jboss/jboss-service-port-1.xml $JBOSS_HOME/server/port-1/conf/jboss-service.xml
-cp setup/jboss/jboss-service-port-2.xml $JBOSS_HOME/server/port-2/conf/jboss-service.xml
-cp setup/jboss/mss-sip-stack.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
-cp setup/jboss/mss-sip-stack.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
-cp setup/jboss/server-jboss-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/server.xml
-cp setup/jboss/server-jboss-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/server.xml
-cp setup/jboss/jboss-context.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/context.xml
-cp setup/jboss/jboss-context.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/context.xml
-cp setup/jboss/jboss-tomcat-service.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/META-INF/jboss-service.xml
-cp setup/jboss/jboss-tomcat-service.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/META-INF/jboss-service.xml
-cp setup/jboss/webserver-xmbean.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
-cp setup/jboss/webserver-xmbean.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
-cp setup/jboss/log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
-cp setup/jboss/log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
+cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
+cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
+cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
+cp setup/jboss-5/server-jboss-5-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
+cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/context.xml
+cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/context.xml
+cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/META-INF/jboss-beans.xml
+cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/META-INF/jboss-beans.xml
+cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/port-1/deployers/META-INF/metadata-deployer-jboss-beans.xml
+cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/port-2/deployers/META-INF/metadata-deployer-jboss-beans.xml
+cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
+cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
+cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
+cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 
-mvn clean install -o -f ../../../pom.xml -P jboss -Dnode=port-1
-mvn clean install -o -f ../../../pom.xml -P jboss -Dnode=port-2
+mvn clean install -o -f ../../../pom.xml -P jboss-5 -Dnode=port-1
+mvn clean install -o -f ../../../pom.xml -P jboss-5 -Dnode=port-2
 
-#mkdir $JBOSS_HOME/server/port-1/conf/dars
-#mkdir $JBOSS_HOME/server/port-2/conf/dars
+mkdir $JBOSS_HOME/server/port-1/conf/dars
+mkdir $JBOSS_HOME/server/port-2/conf/dars
 
 if [ $# -ne 0 ]; then
 	case $1 in	
