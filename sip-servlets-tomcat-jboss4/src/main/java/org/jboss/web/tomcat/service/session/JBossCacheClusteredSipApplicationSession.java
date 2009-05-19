@@ -16,12 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpSession;
-
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
