@@ -37,6 +37,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSi
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.IncomingDistributableSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableSessionManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipApplicationSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipSessionData;
@@ -58,30 +59,29 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 	private SipPassivationListener sipPassivationListener_;
 	
 	AbstractJBossCacheService<OutgoingDistributableSessionData> jBossCacheService;
+	LocalDistributableSessionManager manager;
 	
-	public DistributedCacheConvergedSipManagerDelegate(AbstractJBossCacheService<OutgoingDistributableSessionData> jBossCacheService) {
+	public DistributedCacheConvergedSipManagerDelegate(AbstractJBossCacheService<OutgoingDistributableSessionData> jBossCacheService, LocalDistributableSessionManager localManager) {
 		this.jBossCacheService = jBossCacheService;
+		manager = localManager;
 	}
 	
 	public void start() {
-		Context webapp = (Context) ((ClusteredManager<OutgoingDistributableSessionData>) jBossCacheService
-				.getManager()).getContainer();
+		Context webapp = (Context) ((ClusteredManager<OutgoingDistributableSessionData>) manager).getContainer();
 		if (webapp instanceof SipContext) {
 			SipContext sipApp = (SipContext) webapp;
 			// As per JSR 289, application name should be unique
 			sipApplicationName = sipApp.getApplicationName();
 
 			sipCacheListener_ = new SipCacheListener(
-					jBossCacheService.cacheWrapper_, jBossCacheService
-							.getManager(), jBossCacheService.combinedPath_,
-					Util.getReplicationGranularity(jBossCacheService
-							.getManager()), sipApplicationName);
+					jBossCacheService.cacheWrapper_, manager, jBossCacheService.combinedPath_,
+					Util.getReplicationGranularity(manager), sipApplicationName);
 			jBossCacheService.getCache().addCacheListener(sipCacheListener_);
 
-			if (jBossCacheService.getManager().isPassivationEnabled()) {
+			if (manager.isPassivationEnabled()) {
 				log_.debug("Passivation is enabled");
 				sipPassivationListener_ = new SipPassivationListener(
-						jBossCacheService.getManager(),
+						manager,
 						jBossCacheService.combinedPath_, sipApplicationName);
 				jBossCacheService.getCache().addCacheListener(
 						sipPassivationListener_);

@@ -51,7 +51,7 @@ public class FieldBasedJBossCacheConvergedSipService extends
 			LocalDistributableSessionManager localManager)
 			throws ClusteringNotSupportedException {
 		super(localManager);
-		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this);
+		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this, localManager);
 	}
 	
 	@Override
@@ -66,7 +66,7 @@ public class FieldBasedJBossCacheConvergedSipService extends
 	public FieldBasedJBossCacheConvergedSipService(
 			LocalDistributableSessionManager localManager, PojoCache cache) {
 		super(localManager, cache);
-		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this);
+		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this, localManager);
 	}
 
 	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {

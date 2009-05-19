@@ -56,7 +56,8 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplication
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationCapability;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
-import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClusteredSessionNotificationPolicy;
+import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClusteredSipApplicationSessionNotificationPolicy;
+import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClusteredSipSessionNotificationPolicy;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -168,7 +169,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
             public String run()
             {
                return System.getProperty("jboss.web.clustered.session.notification.policy",
-                     IgnoreUndeployLegacyClusteredSessionNotificationPolicy.class.getName());
+                     IgnoreUndeployLegacyClusteredSipSessionNotificationPolicy.class.getName());
             }
          });
       }
@@ -200,7 +201,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
             public String run()
             {
                return System.getProperty("jboss.web.clustered.session.notification.policy",
-                     IgnoreUndeployLegacyClusteredSessionNotificationPolicy.class.getName());
+                     IgnoreUndeployLegacyClusteredSipApplicationSessionNotificationPolicy.class.getName());
             }
          });
       }

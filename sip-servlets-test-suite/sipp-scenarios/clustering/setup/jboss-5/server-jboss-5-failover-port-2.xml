@@ -7,10 +7,11 @@
    <Listener className="org.apache.catalina.core.JasperListener" />
 
    <Service name="jboss.web"
-        className="org.mobicents.servlet.sip.startup.SipStandardService" 
+	        className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
+  		balancers="127.0.0.1"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
-  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
+  		darConfigurationFileLocation="conf/dars/distributable-dar.properties">
 
       <!-- A HTTP/1.1 Connector on port 8080 -->
       <Connector protocol="HTTP/1.1" port="8080" address="${jboss.bind.address}" 

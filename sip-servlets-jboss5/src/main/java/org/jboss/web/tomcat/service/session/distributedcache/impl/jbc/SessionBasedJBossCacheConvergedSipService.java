@@ -49,14 +49,14 @@ public class SessionBasedJBossCacheConvergedSipService extends
 			LocalDistributableSessionManager localManager)
 			throws ClusteringNotSupportedException {
 		super(localManager);
-		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this);
+		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this, localManager);
 	}
 
 	public SessionBasedJBossCacheConvergedSipService(
 			LocalDistributableSessionManager localManager,
 			Cache<Object, Object> plainCache) {
 		super(localManager, plainCache);
-		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this);
+		delegate = new DistributedCacheConvergedSipManagerDelegate((AbstractJBossCacheService)this, localManager);
 	}
 
 	@Override
