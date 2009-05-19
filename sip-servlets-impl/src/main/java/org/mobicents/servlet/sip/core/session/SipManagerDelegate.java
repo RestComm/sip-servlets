@@ -176,20 +176,25 @@ public abstract class SipManagerDelegate {
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		if(sipApplicationSessionImpl == null && create) {
-			final MobicentsSipApplicationSession newSipApplicationSessionImpl = 
-				getNewMobicentsSipApplicationSession(key, (SipContext) container);
-			sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
-			if (sipApplicationSessionImpl == null) {
-				// put succeeded, use new value
-				if(logger.isDebugEnabled()) {
-					logger.debug("Adding a sip application session with the key : " + key);
-				}
-	            sipApplicationSessionImpl = newSipApplicationSessionImpl;
-	        }						
+			sipApplicationSessionImpl =  createSipApplicationSession(key, create);						
 		}
 		return sipApplicationSessionImpl;
 	}	
 
+	protected MobicentsSipApplicationSession createSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
+		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
+		final MobicentsSipApplicationSession newSipApplicationSessionImpl = 
+			getNewMobicentsSipApplicationSession(key, (SipContext) container);
+		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
+		if (sipApplicationSessionImpl == null) {
+			// put succeeded, use new value
+			if(logger.isDebugEnabled()) {
+				logger.debug("Adding a sip application session with the key : " + key);
+			}
+            sipApplicationSessionImpl = newSipApplicationSessionImpl;
+        }		
+		return sipApplicationSessionImpl;
+	}
 
 	/**
 	 * Retrieve a sip session from its key. If none exists, one can enforce
@@ -209,46 +214,57 @@ public abstract class SipManagerDelegate {
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipSession sipSessionImpl = sipSessions.get(key);
 		if(sipSessionImpl == null && create) {
-			final MobicentsSipSession newSipSessionImpl = getNewMobicentsSipSession(key, sipFactoryImpl, sipApplicationSessionImpl);
-			sipSessionImpl = sipSessions.putIfAbsent(key, newSipSessionImpl);
-			if(sipSessionImpl == null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Adding a sip session with the key : " + key);
-				}
-				// put succeeded, use new value
-	            sipSessionImpl = newSipSessionImpl;
-			}
+			sipSessionImpl =  createSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
 		}
 		// check if this session key has a to tag.
 		if(sipSessionImpl != null) {
-			final String currentKeyToTag = key.getToTag();
-			final SipSessionKey existingKey = sipSessionImpl.getKey();
-			final String toTag = existingKey.getToTag();
-			if(toTag == null && currentKeyToTag != null) {
-				existingKey.setToTag(currentKeyToTag );
-				if(logger.isDebugEnabled()) {
-					logger.debug("Setting the To tag " + currentKeyToTag + 
-							" to the session " + key);
-				}
-			} else if (currentKeyToTag != null && !toTag.equals(currentKeyToTag)) {
-				MobicentsSipSession derivedSipSession = sipSessionImpl.findDerivedSipSession(currentKeyToTag );
-				if(derivedSipSession == null) {
-					// if the to tag is different a sip session is created
-					if(logger.isDebugEnabled()) {
-						logger.debug("Original session " + key + " with To Tag " + toTag + 
-								" creates new derived session with following to Tag " + currentKeyToTag );
-					}
-					derivedSipSession = createDerivedSipSession(sipSessionImpl, key);
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Original session " + key + " with To Tag " + toTag + 
-								" already has a derived session with following to Tag " + currentKeyToTag  + " - reusing it");
-					}
-				}
-				return derivedSipSession;	
-			}
+			return setToTag(key, sipSessionImpl);
 		}
 		return sipSessionImpl;
+	}
+	
+	protected MobicentsSipSession createSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final MobicentsSipApplicationSession sipApplicationSessionImpl) {
+		MobicentsSipSession sipSessionImpl = null;
+		final MobicentsSipSession newSipSessionImpl = getNewMobicentsSipSession(key, sipFactoryImpl, sipApplicationSessionImpl);
+		sipSessionImpl = sipSessions.putIfAbsent(key, newSipSessionImpl);
+		if(sipSessionImpl == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Adding a sip session with the key : " + key);
+			}
+			// put succeeded, use new value
+            sipSessionImpl = newSipSessionImpl;
+		}
+		return sipSessionImpl;
+	}
+	
+	protected MobicentsSipSession setToTag(final SipSessionKey key, final MobicentsSipSession sipSession) {
+		final String currentKeyToTag = key.getToTag();
+		final SipSessionKey existingKey = sipSession.getKey();
+		final String toTag = existingKey.getToTag();
+		if(toTag == null && currentKeyToTag != null) {
+			existingKey.setToTag(currentKeyToTag );
+			if(logger.isDebugEnabled()) {
+				logger.debug("Setting the To tag " + currentKeyToTag + 
+						" to the session " + key);
+			}
+		} else if (currentKeyToTag != null && !toTag.equals(currentKeyToTag)) {
+			MobicentsSipSession derivedSipSession = sipSession.findDerivedSipSession(currentKeyToTag );
+			if(derivedSipSession == null) {
+				// if the to tag is different a sip session is created
+				if(logger.isDebugEnabled()) {
+					logger.debug("Original session " + key + " with To Tag " + toTag + 
+							" creates new derived session with following to Tag " + currentKeyToTag );
+				}
+				derivedSipSession = createDerivedSipSession(sipSession, key);
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Original session " + key + " with To Tag " + toTag + 
+							" already has a derived session with following to Tag " + currentKeyToTag  + " - reusing it");
+				}
+			}
+			return derivedSipSession;	
+		}
+		return sipSession;
 	}
 	
 	public void changeSessionKey(SipSessionKey oldKey, SipSessionKey newKey) {
