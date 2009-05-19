@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingAttributeGranularitySessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -89,7 +90,7 @@ public class AttributeBasedClusteredSipApplicationSession extends
 	// }
 	// -------------------------------------------- Overridden Protected Methods
 	@Override
-	protected OutgoingAttributeGranularitySessionData getOutgoingSessionData() {
+	protected OutgoingAttributeGranularitySessionData getOutgoingSipApplicationSessionData() {
 		Map<String, Object> modAttrs = null;
 		Set<String> removeAttrs = null;
 		if (isSessionAttributeMapDirty()) {
@@ -103,12 +104,12 @@ public class AttributeBasedClusteredSipApplicationSession extends
 
 			clearAttrChangedMaps();
 		}
-		DistributableSessionMetadata metadata = isSessionMetadataDirty() ? getSessionMetadata()
+		DistributableSipApplicationSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipApplicationSessionMetadata)getSessionMetadata()
 				: null;
 		Long timestamp = modAttrs != null || removeAttrs != null
 				|| metadata != null || getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		return new OutgoingData(getRealId(), getVersion(), timestamp, metadata,
+		return new OutgoingData(getRealId(), getVersion(), timestamp, key, metadata,
 				modAttrs, removeAttrs);
 	}
 
@@ -168,16 +169,16 @@ public class AttributeBasedClusteredSipApplicationSession extends
 	// ----------------------------------------------------------------- Classes
 
 	private static class OutgoingData extends
-			OutgoingDistributableSessionDataImpl implements
+			OutgoingDistributableSipApplicationSessionDataImpl implements
 			OutgoingAttributeGranularitySessionData {
 		private final Map<String, Object> modifiedAttributes;
 		private final Set<String> removedAttributes;
 
-		public OutgoingData(String realId, int version, Long timestamp,
-				DistributableSessionMetadata metadata,
+		public OutgoingData(String realId, int version, Long timestamp, SipApplicationSessionKey key,
+				DistributableSipApplicationSessionMetadata metadata,
 				Map<String, Object> modifiedAttributes,
 				Set<String> removedAttributes) {
-			super(realId, version, timestamp, metadata);
+			super(realId, version, timestamp, key, metadata);
 			this.modifiedAttributes = modifiedAttributes;
 			this.removedAttributes = removedAttributes;
 		}

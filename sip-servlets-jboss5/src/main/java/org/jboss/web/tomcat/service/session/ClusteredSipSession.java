@@ -16,10 +16,15 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import gov.nist.javax.sip.SipProviderImpl;
+import gov.nist.javax.sip.SipStackImpl;
+import gov.nist.javax.sip.stack.SIPDialog;
+
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,27 +44,43 @@ import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
+import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.sip.SipStack;
+import javax.sip.address.URI;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
+import org.apache.catalina.Service;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.web.jboss.ReplicationTrigger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.IncomingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
+import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.MobicentsSipSessionFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
+import org.mobicents.servlet.sip.startup.SipService;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -176,7 +197,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	/**
 	 * Our proxy to the distributed cache.
 	 */
-	private transient DistributedCacheManager<O> distributedCacheManager;
+	private transient DistributedCacheConvergedSipManager<O> distributedCacheManager;
 
 	/**
 	 * The maximum time interval, in seconds, between client requests before the
@@ -256,7 +277,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * so we can store it in JBoss Cache w/o concern that a transaction rollback
 	 * will revert the cached ref to an older object.
 	 */
-	private volatile transient DistributableSessionMetadata metadata = new DistributableSessionMetadata();
+	private volatile transient DistributableSipSessionMetadata metadata = new DistributableSipSessionMetadata();
 
 	/**
 	 * The last version that was passed to {@link #setDistributedVersion} or
@@ -326,6 +347,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 */
 	private transient boolean needsPostReplicateActivation;
 
+	protected transient SipApplicationSessionKey sipAppSessionParentKey;
+	
 	// ------------------------------------------------------------ Constructors
 
 	protected ClusteredSipSession(SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession, boolean useJK) {
@@ -800,8 +823,25 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.metadata.setMaxInactiveInterval(maxInactiveInterval);
 		this.metadata.setNew(isNew);
 		this.metadata.setValid(isValid);
-
+		
+		getSipSessionMetadata();
+		
 		return this.metadata;
+	}
+
+	protected void getSipSessionMetadata() {
+		this.metadata.setSipApplicationSessionKey(sipApplicationSession.getKey());
+		this.metadata.setSipSessionKey(key);
+		this.metadata.setB2buaHelper(b2buaHelper);
+		this.metadata.setProxy(proxy);
+		this.metadata.setHandlerServlet(handlerServlet);
+		this.metadata.setInvalidateWhenReady(invalidateWhenReady);
+		this.metadata.setReadyToInvalidate(readyToInvalidate);
+		this.metadata.setRoutingRegion(routingRegion);
+		this.metadata.setSipDialog((SIPDialog)sessionCreatingDialog);
+		if(subscriberURI != null) {
+			this.metadata.setSubscriberURI(subscriberURI.toString());
+		}
 	}
 
 	protected boolean isSessionAttributeMapDirty() {
@@ -820,7 +860,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.lastAccessedTime = this.thisAccessedTime = ts;
 		this.timestamp.set(ts);
 
-		DistributableSessionMetadata md = sessionData.getMetadata();
+		DistributableSipSessionMetadata md = (DistributableSipSessionMetadata)sessionData.getMetadata();
 		// TODO -- get rid of these field and delegate to metadata
 		this.id = md.getId();
 		this.creationTime = md.getCreationTime();
@@ -828,9 +868,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.isNew = md.isNew();
 		this.isValid = md.isValid();
 		this.metadata = md;
-
+		
+		updateSipSession(md);
+		
 		// Get our id without any jvmRoute appended
-		parseRealId(id);
+//		parseRealId(id);
 
 		// We no longer know if we have an activationListener
 		hasActivationListener = null;
@@ -882,6 +924,69 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		clearOutdated();
 	}
 
+	protected void updateSipSession(DistributableSipSessionMetadata md) {
+		//From SipSession
+		key = md.getSipSessionKey();
+		sipAppSessionParentKey = md.getSipApplicationSessionKey();
+		routingRegion = (SipApplicationRoutingRegion) md.getRoutingRegion();
+		handlerServlet = md.getHandlerServlet();
+		if(logger.isDebugEnabled()) {
+			logger.debug("reading handlerServlet "+ handlerServlet);
+		}
+		String subscriberURIStringified = md.getSubscriberURI();
+		if(subscriberURIStringified != null) {
+			try {
+				URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
+				if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
+					subscriberURI = new SipURIImpl((javax.sip.address.SipURI)jsipSubscriberUri);
+				} else if (jsipSubscriberUri instanceof javax.sip.address.TelURL) {
+					subscriberURI = new TelURLImpl((javax.sip.address.TelURL)jsipSubscriberUri);
+				}
+			} catch (ParseException pe) {
+				logger.error("Impossible to parse the subscriber URI " 
+						+ subscriberURIStringified, pe);
+			}
+		}
+		sessionCreatingDialog = (SIPDialog) md.getSipDialog();
+		if(logger.isDebugEnabled()) {
+			logger.debug("deserialized dialog for the sip session "+ sessionCreatingDialog);
+		}
+		invalidateWhenReady = md.isInvalidateWhenReady();
+		readyToInvalidate = md.isReadyToInvalidate();
+		proxy = (ProxyImpl) md.getProxy();
+		b2buaHelper = (B2buaHelperImpl) md.getB2buaHelper();
+		if(proxy != null) {
+			proxy.setSipFactoryImpl(sipFactory);
+		}
+		if(b2buaHelper != null) {
+			b2buaHelper.setSipFactoryImpl(sipFactory);
+			b2buaHelper.setSipManager(manager);
+		}
+		//inject the dialog into the available sip stacks
+		if(logger.isDebugEnabled()) {
+			logger.debug("dialog to inject " + sessionCreatingDialog);
+		}
+		Container context = manager.getContainer();
+		Container container = context.getParent().getParent();
+		if(container instanceof Engine) {
+			Service service = ((Engine)container).getService();
+			if(service instanceof SipService) {
+				Connector[] connectors = service.findConnectors();
+				for (Connector connector : connectors) {
+					SipStack sipStack = (SipStack)
+						connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+					if(sipStack != null && sessionCreatingDialog!= null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null && sipStack.getSipProviders().hasNext()) {
+						((SIPDialog)sessionCreatingDialog).setSipProvider((SipProviderImpl)sipStack.getSipProviders().next());
+						((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
+						if(logger.isDebugEnabled()) {
+							logger.debug("dialog injected " + sessionCreatingDialog);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// ------------------------------------------------------------------ Public
 
 	/**
@@ -898,8 +1003,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 		version.incrementAndGet();
 
-		O outgoingData = getOutgoingSessionData();
-		distributedCacheManager.storeSessionData(outgoingData);
+		O outgoingData = getOutgoingSipSessionData();
+		distributedCacheManager.storeSipSessionData(outgoingData);
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
@@ -907,7 +1012,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		lastReplicated = System.currentTimeMillis();
 	}
 
-	protected abstract O getOutgoingSessionData();
+	protected abstract O getOutgoingSipSessionData();
 
 	/**
 	 * Remove myself from the distributed cache.
@@ -1369,7 +1474,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		return attributes;
 	}
 
-	protected final ClusteredManager<O> getManagerInternal() {
+	protected final ClusteredSipManager<O> getManagerInternal() {
 		return manager;
 	}
 
@@ -1378,7 +1483,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	protected final void setDistributedCacheManager(
-			DistributedCacheManager<O> distributedCacheManager) {
+			DistributedCacheConvergedSipManager<O> distributedCacheManager) {
 		this.distributedCacheManager = distributedCacheManager;
 	}
 
@@ -1455,7 +1560,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	protected void establishDistributedCacheManager() {
 		if (distributedCacheManager == null) {
 			distributedCacheManager = getManagerInternal()
-					.getDistributedCacheManager();
+					.getDistributedCacheConvergedSipManager();
 
 			// still null???
 			if (distributedCacheManager == null) {

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jboss.aop.Advised;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -78,11 +79,11 @@ public class FieldBasedClusteredSipApplicationSession extends ClusteredSipApplic
    // --------------------------------------------- Overridden Protected Methods
 
    @Override
-   protected OutgoingDistributableSessionData getOutgoingSessionData()
+   protected OutgoingDistributableSessionData getOutgoingSipApplicationSessionData()
    {
-      DistributableSessionMetadata metadata = isSessionMetadataDirty() ? getSessionMetadata() : null;
+      DistributableSipApplicationSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipApplicationSessionMetadata)getSessionMetadata() : null;
       Long timestamp = metadata != null || isSessionAttributeMapDirty() || getMustReplicateTimestamp() ? Long.valueOf(getSessionTimestamp()) : null;
-      return new OutgoingDistributableSessionDataImpl(getRealId(), getVersion(), timestamp, metadata);
+      return new OutgoingDistributableSipApplicationSessionDataImpl(getRealId(), getVersion(), timestamp, key, metadata);
    }
 
    /**

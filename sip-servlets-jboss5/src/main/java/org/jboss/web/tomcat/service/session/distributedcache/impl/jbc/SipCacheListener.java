@@ -195,12 +195,11 @@ public class SipCacheListener extends CacheListenerBase
          Integer version = (Integer) data.get(AbstractJBossCacheService.VERSION_KEY);
          if(version != null)
          {
-        	 String realId = null;
+        	 String sipAppSessionId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+        	 String sipSessionId = null;
         	 boolean isSipApplicationSession = true;
- 	      	if(isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
- 	      		realId = getSipApplicationSessionIdFromFqn(fqn, isBuddy); 	      		
- 	      	} else {
- 	      		realId = getSipSessionIdFromFqn(fqn, isBuddy);
+ 	      	if(!isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
+ 	      		sipSessionId = getSipSessionIdFromFqn(fqn, isBuddy);
  	      		isSipApplicationSession = false;
  	      	}              
             String owner = isBuddy ? getBuddyOwner(fqn) : null;
@@ -214,13 +213,13 @@ public class SipCacheListener extends CacheListenerBase
             	boolean updated = false;
             	if(isSipApplicationSession) {
             		// Notify the manager that a session has been updated
-            		updated = ((ClusteredSipManager) manager_).sipApplicationSessionChangedInDistributedCache(realId, owner, 
+            		updated = ((ClusteredSipManager) manager_).sipApplicationSessionChangedInDistributedCache(sipAppSessionId, owner, 
                                                   version.intValue(), 
                                                   timestamp.longValue(), 
                                                   (DistributableSessionMetadata) data.get(AbstractJBossCacheService.METADATA_KEY));
             	} else {
             		// Notify the manager that a session has been updated
-            		updated = ((ClusteredSipManager) manager_).sipSessionChangedInDistributedCache(realId, owner, 
+            		updated = ((ClusteredSipManager) manager_).sipSessionChangedInDistributedCache(sipAppSessionId, sipSessionId, owner, 
                                                   version.intValue(), 
                                                   timestamp.longValue(), 
                                                   (DistributableSessionMetadata) data.get(AbstractJBossCacheService.METADATA_KEY));
@@ -228,7 +227,7 @@ public class SipCacheListener extends CacheListenerBase
                if (!updated && !isBuddy)
                {
                   log_.warn("Possible concurrency problem: Replicated version id " + 
-                            version + " is less than or equal to in-memory version for session " + realId); 
+                            version + " is less than or equal to in-memory version for session app id " + sipAppSessionId + " and session id " + sipSessionId); 
                }
                /*else 
                {

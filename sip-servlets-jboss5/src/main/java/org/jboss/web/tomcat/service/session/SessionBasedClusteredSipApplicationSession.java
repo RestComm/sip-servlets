@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingSessionGranularitySessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -67,15 +68,15 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 	}
 
 	@Override
-	protected OutgoingSessionGranularitySessionData getOutgoingSessionData() {
+	protected OutgoingSessionGranularitySessionData getOutgoingSipApplicationSessionData() {
 		Map<String, Object> attrs = isSessionAttributeMapDirty() ? getSessionAttributeMap()
 				: null;
-		DistributableSessionMetadata metadata = isSessionMetadataDirty() ? getSessionMetadata()
+		DistributableSipApplicationSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipApplicationSessionMetadata)getSessionMetadata()
 				: null;
 		Long timestamp = attrs != null || metadata != null
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		return new OutgoingData(getRealId(), getVersion(), timestamp, metadata,
+		return new OutgoingData(getRealId(), getVersion(), timestamp, key, metadata,
 				attrs);
 	}
 
@@ -105,14 +106,14 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 	// ----------------------------------------------------------------- Classes
 
 	private static class OutgoingData extends
-			OutgoingDistributableSessionDataImpl implements
+			OutgoingDistributableSipApplicationSessionDataImpl implements
 			OutgoingSessionGranularitySessionData {
 		private final Map<String, Object> attributes;
 
-		public OutgoingData(String realId, int version, Long timestamp,
-				DistributableSessionMetadata metadata,
+		public OutgoingData(String realId, int version, Long timestamp, SipApplicationSessionKey key,
+				DistributableSipApplicationSessionMetadata metadata,
 				Map<String, Object> attributes) {
-			super(realId, version, timestamp, metadata);
+			super(realId, version, timestamp, key, metadata);
 			this.attributes = attributes;
 		}
 

@@ -100,7 +100,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	/**
 	 * Id/timestamp of sessions in cache that we haven't loaded
 	 */
-	protected Map<SipSessionKey, OwnedSessionUpdate> unloadedSipSessions_ = new ConcurrentHashMap<SipSessionKey, OwnedSessionUpdate>();
+	protected Map<ClusteredSipSessionKey, OwnedSessionUpdate> unloadedSipSessions_ = new ConcurrentHashMap<ClusteredSipSessionKey, OwnedSessionUpdate>();
 	
 	/**
 	 * Id/timestamp of sessions in cache that we haven't loaded
@@ -703,7 +703,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                     // JBAS-2792 don't assign the result of loadSession to session
 	                     // just update the object from the cache or fall through if
 	                     // the session has been removed from the cache
-	                     loadSipSession(session.getKey(), false, null, null);
+	                     loadSipSession(session.getKey(), false, getSipFactoryImpl(), session.getSipApplicationSession());
 	                  }
 	   
 	                  // Do a normal invalidation check that will expire the
@@ -740,10 +740,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	         // and permanently losing part of its node structure in JBoss Cache.
 	         long maxUnrep = getMaxUnreplicatedInterval() < 0 ? 60 : getMaxUnreplicatedInterval();
 	         
-	         Map<SipSessionKey, OwnedSessionUpdate> unloaded = new HashMap<SipSessionKey, OwnedSessionUpdate>(unloadedSipSessions_);
-	         for (Map.Entry<SipSessionKey, OwnedSessionUpdate> entry : unloaded.entrySet())
+	         Map<ClusteredSipSessionKey, OwnedSessionUpdate> unloaded = new HashMap<ClusteredSipSessionKey, OwnedSessionUpdate>(unloadedSipSessions_);
+	         for (Map.Entry<ClusteredSipSessionKey, OwnedSessionUpdate> entry : unloaded.entrySet())
 	         {
-	        	SipSessionKey key = entry.getKey();
+	        	 ClusteredSipSessionKey key = entry.getKey();
 	            OwnedSessionUpdate osu = entry.getValue();
 	            
 	            long now = System.currentTimeMillis();
@@ -757,7 +757,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  {
 	                     // Passivated session needs to be expired. A call to 
 	                     // findSession will bring it out of passivation
-	                     SipSession session = getSipSession(key, false, null, null);
+	                     SipSession session = getSipSession(key.getSipSessionKey(), false, getSipFactoryImpl(), getSipApplicationSession(key.getSipApplicationSessionKey(), false));
 	                     if (session != null)
 	                     {
 	                        session.isValid(); // will expire
@@ -768,7 +768,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  // If we get here either !osu.passivated, or we don't own
 	                  // the session or the session couldn't be reactivated (invalidated by user). 
 	                  // Either way, do a cleanup
-	                  getDistributedCacheConvergedSipManager().removeSessionLocal(key, osu.owner);
+	                  getDistributedCacheConvergedSipManager().removeSessionLocal(key.getSipApplicationSessionKey(), key.getSipSessionKey(), osu.owner);
 	                  unloadedSipSessions_.remove(key);
 	                  stats_.removeStats(key.toString());
 	                  
@@ -1120,7 +1120,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		               doTx = true;
 		            }
 
-		            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(key, initialLoad);
+		            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
 		            if (data != null)
 		            {
 		               session.update(data);
@@ -1464,12 +1464,12 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 				session
 						.notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
-				getDistributedCacheConvergedSipManager().evictSession(key);
+				getDistributedCacheConvergedSipManager().evictSession(session.getSipApplicationSession().getKey(), key);
 				sipSessionPassivated();
 
 				// Put the session in the unloadedSessions map. This will
 				// expose the session to regular invalidation.
-				Object obj = unloadedSipSessions_.put(key,
+				Object obj = unloadedSipSessions_.put(new ClusteredSipSessionKey(key, session.getSipApplicationSession().getKey()),
 						new OwnedSessionUpdate(null, session
 								.getLastAccessedTimeInternal(), session
 								.getMaxInactiveInterval(), true));
@@ -1541,13 +1541,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * @param realId
 	 *            the session id, minus any jvmRoute
 	 */
-	private void processUnloadedSipSessionPassivation(SipSessionKey key,
+	private void processUnloadedSipSessionPassivation(ClusteredSipSessionKey key,
 			OwnedSessionUpdate osu) {
 		if (trace_) {
 			log_.trace("Passivating session with id: " + key);
 		}
 
-		getDistributedCacheConvergedSipManager().evictSession(key, osu.owner);
+		getDistributedCacheConvergedSipManager().evictSession(key.getSipApplicationSessionKey(), key.getSipSessionKey(), osu.owner);
 		osu.passivated = true;
 		sipSessionPassivated();
 	}
@@ -1589,88 +1589,88 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 	}
 	
-	/**
-	 * Gets the ids of all sessions in the distributed cache and adds them to
-	 * the unloaded sessions map, along with their lastAccessedTime and their
-	 * maxInactiveInterval. Passivates overage or excess sessions.
-	 */
-	private void initializeUnloadedSipSessions() {
-		Map<SipSessionKey, String> sessions = getDistributedCacheConvergedSipManager().getSipSessionKeys();
-		if (sessions != null) {
-			boolean passivate = isPassivationEnabled();
-
-			long passivationMax = passivationMaxIdleTime_ * 1000L;
-			long passivationMin = passivationMinIdleTime_ * 1000L;
-
-			for (Map.Entry<SipSessionKey, String> entry : sessions.entrySet()) {
-				SipSessionKey key = entry.getKey();
-				String owner = entry.getValue();
-
-				long ts = -1;
-				DistributableSessionMetadata md = null;
-				try {
-					IncomingDistributableSessionData sessionData = getDistributedCacheConvergedSipManager()
-							.getSessionData(key, owner, false);
-					ts = sessionData.getTimestamp();
-					md = sessionData.getMetadata();
-				} catch (Exception e) {
-					// most likely a lock conflict if the session is being
-					// updated remotely;
-					// ignore it and use default values for timstamp and
-					// maxInactive
-					log_.debug("Problem reading metadata for session " + key
-							+ " -- " + e.toString());
-				}
-
-				long lastMod = ts == -1 ? System.currentTimeMillis() : ts;
-				int maxLife = md == null ? getMaxInactiveInterval() : md
-						.getMaxInactiveInterval();
-
-				OwnedSessionUpdate osu = new OwnedSessionUpdate(owner, lastMod,
-						maxLife, false);
-				unloadedSipSessions_.put(key, osu);
-				if (passivate) {
-					try {
-						long elapsed = System.currentTimeMillis() - lastMod;
-						// if maxIdle time configured, means that we need to
-						// passivate sessions that have
-						// exceeded the max allowed idle time
-						if (passivationMax >= 0 && elapsed > passivationMax) {
-							if (trace_) {
-								log_.trace("Elapsed time of " + elapsed
-										+ " for session " + key
-										+ " exceeds max of " + passivationMax
-										+ "; passivating");
-							}
-							processUnloadedSipSessionPassivation(key, osu);
-						}
-						// If the session didn't exceed the
-						// passivationMaxIdleTime_, see
-						// if the number of sessions managed by this manager
-						// greater than the max allowed
-						// active sessions, passivate the session if it exceed
-						// passivationMinIdleTime_
-						else if (maxActiveAllowed_ > 0 && passivationMin >= 0
-								&& calcActiveSessions() > maxActiveAllowed_
-								&& elapsed >= passivationMin) {
-							if (trace_) {
-								log_.trace("Elapsed time of " + elapsed
-										+ " for session " + key
-										+ " exceeds min of " + passivationMin
-										+ "; passivating");
-							}
-							processUnloadedSipSessionPassivation(key, osu);
-						}
-					} catch (Exception e) {
-						// most likely a lock conflict if the session is being
-						// updated remotely; ignore it
-						log_.debug("Problem passivating session " + key
-								+ " -- " + e.toString());
-					}
-				}
-			}
-		}
-	}
+//	/**
+//	 * Gets the ids of all sessions in the distributed cache and adds them to
+//	 * the unloaded sessions map, along with their lastAccessedTime and their
+//	 * maxInactiveInterval. Passivates overage or excess sessions.
+//	 */
+//	private void initializeUnloadedSipSessions() {
+//		Map<SipSessionKey, String> sessions = getDistributedCacheConvergedSipManager().getSipSessionKeys();
+//		if (sessions != null) {
+//			boolean passivate = isPassivationEnabled();
+//
+//			long passivationMax = passivationMaxIdleTime_ * 1000L;
+//			long passivationMin = passivationMinIdleTime_ * 1000L;
+//
+//			for (Map.Entry<SipSessionKey, String> entry : sessions.entrySet()) {
+//				SipSessionKey key = entry.getKey();
+//				String owner = entry.getValue();
+//
+//				long ts = -1;
+//				DistributableSessionMetadata md = null;
+//				try {
+//					IncomingDistributableSessionData sessionData = getDistributedCacheConvergedSipManager()
+//							.getSessionData(key, owner, false);
+//					ts = sessionData.getTimestamp();
+//					md = sessionData.getMetadata();
+//				} catch (Exception e) {
+//					// most likely a lock conflict if the session is being
+//					// updated remotely;
+//					// ignore it and use default values for timstamp and
+//					// maxInactive
+//					log_.debug("Problem reading metadata for session " + key
+//							+ " -- " + e.toString());
+//				}
+//
+//				long lastMod = ts == -1 ? System.currentTimeMillis() : ts;
+//				int maxLife = md == null ? getMaxInactiveInterval() : md
+//						.getMaxInactiveInterval();
+//
+//				OwnedSessionUpdate osu = new OwnedSessionUpdate(owner, lastMod,
+//						maxLife, false);
+//				unloadedSipSessions_.put(key, osu);
+//				if (passivate) {
+//					try {
+//						long elapsed = System.currentTimeMillis() - lastMod;
+//						// if maxIdle time configured, means that we need to
+//						// passivate sessions that have
+//						// exceeded the max allowed idle time
+//						if (passivationMax >= 0 && elapsed > passivationMax) {
+//							if (trace_) {
+//								log_.trace("Elapsed time of " + elapsed
+//										+ " for session " + key
+//										+ " exceeds max of " + passivationMax
+//										+ "; passivating");
+//							}
+//							processUnloadedSipSessionPassivation(key, osu);
+//						}
+//						// If the session didn't exceed the
+//						// passivationMaxIdleTime_, see
+//						// if the number of sessions managed by this manager
+//						// greater than the max allowed
+//						// active sessions, passivate the session if it exceed
+//						// passivationMinIdleTime_
+//						else if (maxActiveAllowed_ > 0 && passivationMin >= 0
+//								&& calcActiveSessions() > maxActiveAllowed_
+//								&& elapsed >= passivationMin) {
+//							if (trace_) {
+//								log_.trace("Elapsed time of " + elapsed
+//										+ " for session " + key
+//										+ " exceeds min of " + passivationMin
+//										+ "; passivating");
+//							}
+//							processUnloadedSipSessionPassivation(key, osu);
+//						}
+//					} catch (Exception e) {
+//						// most likely a lock conflict if the session is being
+//						// updated remotely; ignore it
+//						log_.debug("Problem passivating session " + key
+//								+ " -- " + e.toString());
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 * Gets the ids of all sessions in the distributed cache and adds them to
@@ -2334,7 +2334,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * Callback from the distributed cache to notify us that a session has been
 	 * modified remotely.
 	 * 
-	 * @param realId
+	 * @param sipSessionId
 	 *            the session id, without any trailing jvmRoute
 	 * @param dataOwner
 	 *            the owner of the session. Can be <code>null</code> if the
@@ -2347,18 +2347,29 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 *            the session's metadata per the distributed cache
 	 */
 	public boolean sipSessionChangedInDistributedCache(
-			String realId, String dataOwner, int distributedVersion,
+			String sipAppSessionId, String sipSessionId, String dataOwner, int distributedVersion,
 			long timestamp, DistributableSessionMetadata metadata) {
 		boolean updated = true;
-		SipSessionKey key = null;
+		SipApplicationSessionKey sipAppSessionKey = null;
 		try {
-			key = SessionManagerUtil.parseSipSessionKey(realId);
+			sipAppSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(sipAppSessionId);
 		} catch (ParseException e) {
 			// should never happen
 			logger
 					.error(
 							"An unexpected exception happened on parsing the following sip application session key "
-									+ realId, e);
+									+ sipAppSessionId, e);
+			return false;
+		}
+		SipSessionKey key = null;
+		try {
+			key = SessionManagerUtil.parseSipSessionKey(sipSessionId);
+		} catch (ParseException e) {
+			// should never happen
+			logger
+					.error(
+							"An unexpected exception happened on parsing the following sip session key "
+									+ sipSessionId, e);
 			return false;
 		}
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = findLocalSipSession(
@@ -2370,23 +2381,23 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					.setVersionFromDistributedCache(distributedVersion);
 			if (updated && trace_) {
 				log_.trace("session in-memory data is invalidated for id: "
-						+ realId + " new version: " + distributedVersion);
+						+ sipSessionId + " new version: " + distributedVersion);
 			}
 		} else {
 			int maxLife = metadata == null ? getMaxInactiveInterval()
 					: metadata.getMaxInactiveInterval();
 
 			Object existing = unloadedSipSessions_
-					.put(key, new OwnedSessionUpdate(dataOwner, timestamp,
+					.put(new ClusteredSipSessionKey(key, sipAppSessionKey), new OwnedSessionUpdate(dataOwner, timestamp,
 							maxLife, false));
 			if (existing == null) {
 				calcActiveSessions();
 				if (trace_) {
-					log_.trace("New session " + realId
+					log_.trace("New session " + sipSessionId
 							+ " added to unloaded session map");
 				}
 			} else if (trace_) {
-				log_.trace("Updated timestamp for unloaded session " + realId);
+				log_.trace("Updated timestamp for unloaded session " + sipSessionId);
 			}
 		}
 
@@ -2440,7 +2451,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	public void start() throws LifecycleException {
 		super.start();
 		initializeUnloadedSipApplicationSessions();
-		initializeUnloadedSipSessions();
+//		initializeUnloadedSipSessions();
 		initClusteredSipSessionNotificationPolicy();
 		initClusteredSipApplicationSessionNotificationPolicy();
 		initSnapshotSipManager();
@@ -2761,11 +2772,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	
 	private class SipSessionPassivationCheck implements Comparable<SipSessionPassivationCheck>
 	   {
-	      private final SipSessionKey key;
+		  private final ClusteredSipSessionKey key;
 	      private final OwnedSessionUpdate osu;
 	      private final ClusteredSipSession<? extends OutgoingDistributableSessionData> session;
 	      
-	      private SipSessionPassivationCheck(SipSessionKey key, OwnedSessionUpdate osu)
+	      private SipSessionPassivationCheck(ClusteredSipSessionKey key, OwnedSessionUpdate osu)
 	      {
 	         assert osu != null : "osu is null";
 	         assert key != null : "key is null";
@@ -2779,7 +2790,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	      {
 	         assert session != null : "session is null";
 	         
-	         this.key = session.getKey();
+	         this.key = new ClusteredSipSessionKey(session.getKey(), session.getSipApplicationSession().getKey());
 	         this.session = session;
 	         this.osu = null;
 	      }
@@ -2793,7 +2804,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	      {
 	         if (osu == null)
 	         {
-	            JBossCacheSipManager.this.processSipSessionPassivation(key);
+	            JBossCacheSipManager.this.processSipSessionPassivation(key.getSipSessionKey());
 	         }
 	         else
 	         {
@@ -2801,7 +2812,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	         }
 	      }
 	      
-	      private SipSessionKey getKey()
+	      private ClusteredSipSessionKey getKey()
 	      {
 	         return key;
 	      }

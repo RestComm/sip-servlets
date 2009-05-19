@@ -20,6 +20,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,15 +47,19 @@ import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.web.jboss.ReplicationTrigger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.IncomingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -172,7 +177,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	/**
 	 * Our proxy to the distributed cache.
 	 */
-	private transient DistributedCacheManager<O> distributedCacheManager;
+	private transient DistributedCacheConvergedSipManager<O> distributedCacheManager;
 
 	/**
 	 * The maximum time interval, in seconds, between client requests before the
@@ -252,7 +257,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * so we can store it in JBoss Cache w/o concern that a transaction rollback
 	 * will revert the cached ref to an older object.
 	 */
-	private volatile transient DistributableSessionMetadata metadata = new DistributableSessionMetadata();
+	private volatile transient DistributableSipApplicationSessionMetadata metadata = new DistributableSipApplicationSessionMetadata();
 
 	/**
 	 * The last version that was passed to {@link #setDistributedVersion} or
@@ -797,7 +802,19 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.metadata.setNew(isNew);
 		this.metadata.setValid(isValid);
 
+		getSipApplicationSessionMetadata();
+		
 		return this.metadata;
+	}
+
+	private void getSipApplicationSessionMetadata() {
+		this.metadata.setSipApplicationSessionKey(key);
+		for(String sessionId : sipSessions.keySet()) {
+			this.metadata.addSipSessionId(sessionId);
+		}
+		for(String sessionId : httpSessions) {
+			this.metadata.addHttpSessionId(sessionId);
+		}
 	}
 
 	protected boolean isSessionAttributeMapDirty() {
@@ -816,7 +833,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.lastAccessedTime = this.thisAccessedTime = ts;
 		this.timestamp.set(ts);
 
-		DistributableSessionMetadata md = sessionData.getMetadata();
+		DistributableSipApplicationSessionMetadata md = (DistributableSipApplicationSessionMetadata)sessionData.getMetadata();
 		// TODO -- get rid of these field and delegate to metadata
 		this.id = md.getId();
 		this.creationTime = md.getCreationTime();
@@ -824,9 +841,30 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.isNew = md.isNew();
 		this.isValid = md.isValid();
 		this.metadata = md;
+		
+		// From Sip Application Session
+		this.key = md.getSipApplicationSessionKey();
 
+		for (String sipSessionId : md.getSipSessionIds()) {
+			try {
+				SipSessionKey sipSessionKey = SessionManagerUtil.parseSipSessionKey(sipSessionId);
+				sipSessions.put(sipSessionId, sipSessionKey);
+				if(logger.isDebugEnabled()) {
+					logger.debug("reading sip session from the cached sip appsession . sip session key = " + sipSessionKey);
+				}				
+			} catch (ParseException e) {
+				logger.error("Unexpected exception while parsing the sip session key that has been previously passivated " + sipSessionId, e);
+			}								
+		}
+		
+		for (String httpSessionId : md.getHttpSessionIds()) {
+			httpSessions.add(httpSessionId);
+		}
+		
+		//TODO addd underlying sip and http sessions
+		
 		// Get our id without any jvmRoute appended
-		parseRealId(id);
+//		parseRealId(id);
 
 		// We no longer know if we have an activationListener
 		hasActivationListener = null;
@@ -894,8 +932,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		}
 		version.incrementAndGet();
 
-		O outgoingData = getOutgoingSessionData();
-		distributedCacheManager.storeSessionData(outgoingData);
+		O outgoingData = getOutgoingSipApplicationSessionData();
+		distributedCacheManager.storeSipApplicationSessionData(outgoingData);
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
@@ -903,7 +941,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		lastReplicated = System.currentTimeMillis();
 	}
 
-	protected abstract O getOutgoingSessionData();
+	protected abstract O getOutgoingSipApplicationSessionData();
 
 	/**
 	 * Remove myself from the distributed cache.
@@ -1365,7 +1403,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		return attributes;
 	}
 
-	protected final ClusteredManager<O> getManagerInternal() {
+	protected final ClusteredSipManager<O> getManagerInternal() {
 		return manager;
 	}
 
@@ -1374,7 +1412,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}
 
 	protected final void setDistributedCacheManager(
-			DistributedCacheManager<O> distributedCacheManager) {
+			DistributedCacheConvergedSipManager<O> distributedCacheManager) {
 		this.distributedCacheManager = distributedCacheManager;
 	}
 
@@ -1451,7 +1489,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	protected void establishDistributedCacheManager() {
 		if (distributedCacheManager == null) {
 			distributedCacheManager = getManagerInternal()
-					.getDistributedCacheManager();
+					.getDistributedCacheConvergedSipManager();
 
 			// still null???
 			if (distributedCacheManager == null) {

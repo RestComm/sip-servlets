@@ -53,8 +53,40 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * @param dataOwner
 	 *            identifier of node where the session is active
 	 */
-	void removeSessionLocal(SipSessionKey key, String dataOwner);
+	void removeSessionLocal(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key, String dataOwner);
 
+	/**
+	 * Store or update a sip session in the distributed cache.
+	 * 
+	 * @param session
+	 *            the sip session
+	 */
+	void storeSipSessionData(T sipSessionData);
+	
+	/**
+	 * Store or update a sip application session in the distributed cache.
+	 * 
+	 * @param session
+	 *            the sip application session
+	 */
+	void storeSipApplicationSessionData(T sipApplicationSessionData);
+	
+	/**
+	 * Store or update a sip session in the distributed cache.
+	 * 
+	 * @param session
+	 *            the sip session
+	 */
+	void storeSipSessionAttributes(Map<Object, Object> map, T sipSessionData);
+	
+	/**
+	 * Store or update a sip application session in the distributed cache.
+	 * 
+	 * @param session
+	 *            the sip application session
+	 */
+	void storeSipApplicationSessionAttributes(Map<Object, Object> map, T sipApplicationSessionData);
+	
 	/**
 	 * Get the {@link IncomingDistributableSessionData} that encapsulates the
 	 * distributed cache's information about the given sip session.
@@ -67,7 +99,7 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * 
 	 * @return the session data
 	 */
-	IncomingDistributableSessionData getSessionData(SipSessionKey key,
+	IncomingDistributableSessionData getSessionData(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key,
 			boolean initialLoad);
 
 	/**
@@ -87,7 +119,7 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * 
 	 * @return the session data
 	 */
-	IncomingDistributableSessionData getSessionData(SipSessionKey key,
+	IncomingDistributableSessionData getSessionData(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key,
 			String dataOwner, boolean includeAttributes);
 	
 	/**
@@ -132,7 +164,7 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * @param key
 	 *            the session's key
 	 */
-	void evictSession(SipSessionKey key);
+	void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key);
 
 	/**
 	 * Evict a sip application session from the in-memory portion of the
@@ -152,7 +184,7 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * @param dataOwner
 	 *            identifier of node where the session is active
 	 */
-	void evictSession(SipSessionKey key, String dataOwner);
+	void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key, String dataOwner);
 	
 	/**
 	 * Evict a non-locally-active sip application session from the in-memory portion of the

@@ -33,8 +33,13 @@ import org.jboss.cache.Node;
 import org.jboss.cache.pojo.impl.InternalConstant;
 import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredManager;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.IncomingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipApplicationSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipSessionData;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -44,7 +49,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author jean.deruelle@gmail.com
  *
  */
-public class DistributedCacheConvergedSipManagerDelegate {
+public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistributableSessionData> {
 	
 	protected Logger log_ = Logger.getLogger(getClass());
 	public static final String SIPSESSION = "SIPSESSION";
@@ -94,18 +99,18 @@ public class DistributedCacheConvergedSipManagerDelegate {
 		}
 	}
 	
-	public void evictSession(SipSessionKey key) {
-		evictSession(key, null);      
+	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {
+		evictSession(sipAppSessionKey, key, null);      
 	}
 
 	public void evictSession(SipApplicationSessionKey key) {
-		evictSession(key, null);      
+		evictSession(key, (String)null);      
 	}
 
-	public void evictSession(SipSessionKey key, String dataOwner) {
+	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key, String dataOwner) {
 		Fqn<String> fqn = dataOwner == null ? getSipSessionFqn(jBossCacheService.combinedPath_,
-				null, key.toString()) : getBuddyBackupSipSessionFqn(dataOwner, jBossCacheService.combinedPath_,
-				null, key.toString());
+				sipAppSessionKey.toString(), key.toString()) : getBuddyBackupSipSessionFqn(dataOwner, jBossCacheService.combinedPath_,
+				sipAppSessionKey.toString(), key.toString());
 		if (log_.isTraceEnabled()) {
 			log_
 					.trace("evictSession(): evicting session from my distributed store. Fqn: "
@@ -126,13 +131,13 @@ public class DistributedCacheConvergedSipManagerDelegate {
 		jBossCacheService.cacheWrapper_.evictSubtree(fqn);
 	}
 
-	public IncomingDistributableSessionData getSessionData(SipSessionKey key,
+	public IncomingDistributableSessionData getSessionData(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key,
 			boolean initialLoad) {
 		if (key == null) {
 			throw new IllegalArgumentException("Null key");
 		}
 
-		Fqn<String> fqn = getSipSessionFqn(jBossCacheService.combinedPath_, null, key.toString());
+		Fqn<String> fqn = getSipSessionFqn(jBossCacheService.combinedPath_, sipAppSessionKey.toString(), key.toString());
 		Map<Object, Object> sessionData = jBossCacheService.cacheWrapper_.getData(fqn, true);
 
 		if (sessionData == null) {
@@ -152,18 +157,18 @@ public class DistributedCacheConvergedSipManagerDelegate {
 			log_.warn("Problem accessing session data : " + e.getClass() + " "
 					+ e.getLocalizedMessage());
 			// Clean up
-			removeSessionLocal(key);
+			removeSessionLocal(sipAppSessionKey, key);
 			return null;
 		}
 
 		return dsd;
 	}
 
-	public IncomingDistributableSessionData getSessionData(SipSessionKey key,
+	public IncomingDistributableSessionData getSessionData(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key,
 			String dataOwner, boolean includeAttributes) {
 		Fqn<String> fqn = dataOwner == null ? getSipSessionFqn(jBossCacheService.combinedPath_,
-				null, key.toString()) : getBuddyBackupSipSessionFqn(dataOwner, jBossCacheService.combinedPath_,
-						null, key.toString());
+				sipAppSessionKey.toString(), key.toString()) : getBuddyBackupSipSessionFqn(dataOwner, jBossCacheService.combinedPath_,
+						sipAppSessionKey.toString(), key.toString());
 		Map<Object, Object> distributedCacheData = jBossCacheService.cacheWrapper_.getData(fqn,
 				false);
 		return jBossCacheService.getDistributableSessionData(key.toString(), distributedCacheData,
@@ -332,9 +337,9 @@ public class DistributedCacheConvergedSipManagerDelegate {
 		jBossCacheService.removeSessionRegion(key.toString(), fqn);
 	}
 
-	public void removeSessionLocal(SipSessionKey key) {
+	public void removeSessionLocal(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {
 		Fqn<String> fqn = getSipSessionFqn(
-				jBossCacheService.combinedPath_, null, key.toString());
+				jBossCacheService.combinedPath_, sipAppSessionKey.toString(), key.toString());
 		if (log_.isTraceEnabled()) {
 			log_
 					.trace("Remove session from my own distributed store only. Fqn: "
@@ -362,12 +367,12 @@ public class DistributedCacheConvergedSipManagerDelegate {
 		}
 	}
 
-	public void removeSessionLocal(SipSessionKey key, String dataOwner) {
+	public void removeSessionLocal(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key, String dataOwner) {
 		if (dataOwner == null) {
-			removeSessionLocal(key);
+			removeSessionLocal(sipAppSessionKey, key);
 		} else {
 			Fqn<String> fqn = getBuddyBackupSipSessionFqn(dataOwner,
-					jBossCacheService.combinedPath_, null, key.toString());
+					jBossCacheService.combinedPath_, sipAppSessionKey.toString(), key.toString());
 			if (log_.isTraceEnabled()) {
 				log_
 						.trace("Remove session from my own distributed store only. Fqn: "
@@ -405,5 +410,61 @@ public class DistributedCacheConvergedSipManagerDelegate {
 				dataOwner, SIPSESSION, contextHostPath,
 				sipApplicationName, sessionId };
 		return Fqn.fromList(Arrays.asList(objs), true);
+	}
+
+	public void storeSipApplicationSessionData(OutgoingDistributableSipApplicationSessionData sipApplicationSessionData) {
+		String realId = sipApplicationSessionData.getRealId();
+
+		if (log_.isTraceEnabled()) {
+			log_.trace("putSipSession(): putting sip session " + realId);
+		}
+
+		Fqn<String> fqn = getSipApplicationSessionFqn(jBossCacheService.combinedPath_, realId);
+
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		map.put(jBossCacheService.VERSION_KEY, Integer.valueOf(sipApplicationSessionData.getVersion()));
+
+		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipApplicationSessionData.getMetadata();
+		if (dsm != null) {
+			map.put(jBossCacheService.METADATA_KEY, dsm);
+		}
+
+		Long timestamp = sipApplicationSessionData.getTimestamp();
+		if (timestamp != null) {
+			map.put(jBossCacheService.TIMESTAMP_KEY, timestamp);
+		}
+
+		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipApplicationSessionAttributes(map, sipApplicationSessionData);
+
+		jBossCacheService.cacheWrapper_.put(fqn, map);
+	}
+
+	public void storeSipSessionData(
+			OutgoingDistributableSipSessionData sipSessionData) {
+		SipApplicationSessionKey sipApplicationSessionKey = sipSessionData.getSipApplicationSessionKey();
+		SipSessionKey sessionKey = sipSessionData.getSipSessionKey();
+
+		if (log_.isTraceEnabled()) {
+			log_.trace("putSipSession(): putting sip session " + sessionKey.toString());
+		}
+
+		Fqn<String> fqn = getSipSessionFqn(jBossCacheService.combinedPath_, sipApplicationSessionKey.toString(), sessionKey.toString());
+
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		map.put(jBossCacheService.VERSION_KEY, Integer.valueOf(sipSessionData.getVersion()));
+
+		DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)sipSessionData.getMetadata();
+		if (dsm != null) {
+			map.put(jBossCacheService.METADATA_KEY, dsm);
+		}
+
+		Long timestamp = sipSessionData.getTimestamp();
+		if (timestamp != null) {
+			map.put(jBossCacheService.TIMESTAMP_KEY, timestamp);
+		}
+
+		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(map, sipSessionData);
+
+		jBossCacheService.cacheWrapper_.put(fqn, map);
 	} 
 }

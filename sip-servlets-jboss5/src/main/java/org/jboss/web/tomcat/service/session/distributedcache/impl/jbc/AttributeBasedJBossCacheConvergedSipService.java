@@ -21,14 +21,19 @@
  */
 package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.jboss.cache.Cache;
+import org.jboss.cache.Fqn;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.IncomingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableSessionManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingAttributeGranularitySessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipApplicationSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipSessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
@@ -41,7 +46,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 
 	public static final String SIPSESSION = "SIPSESSION";
 	
-	DistributedCacheConvergedSipManagerDelegate delegate;
+	DistributedCacheConvergedSipManagerDelegate<OutgoingAttributeGranularitySessionData> delegate;
 	
 	/**
 	 * @param localManager
@@ -71,30 +76,30 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		delegate.start();
 	}
 
-	public void evictSession(SipSessionKey key) {
-		delegate.evictSession(key);      
+	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {
+		delegate.evictSession(sipAppSessionKey, key);      
 	}
 
 	public void evictSession(SipApplicationSessionKey key) {
 		delegate.evictSession(key);         
 	}
 
-	public void evictSession(SipSessionKey key, String dataOwner) {
-		delegate.evictSession(key, dataOwner);
+	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key, String dataOwner) {
+		delegate.evictSession(sipAppSessionKey, key, dataOwner);
 	}
 
 	public void evictSession(SipApplicationSessionKey key, String dataOwner) {
 		delegate.evictSession(key, dataOwner);
 	}
 
-	public IncomingDistributableSessionData getSessionData(SipSessionKey key,
+	public IncomingDistributableSessionData getSessionData(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key,
 			boolean initialLoad) {
-		return delegate.getSessionData(key, initialLoad);		
+		return delegate.getSessionData(sipAppSessionKey, key, initialLoad);		
 	}
 
-	public IncomingDistributableSessionData getSessionData(SipSessionKey key,
+	public IncomingDistributableSessionData getSessionData(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key,
 			String dataOwner, boolean includeAttributes) {
-		return delegate.getSessionData(key, dataOwner, includeAttributes);
+		return delegate.getSessionData(sipAppSessionKey, key, dataOwner, includeAttributes);
 	}
 
 	public IncomingDistributableSessionData getSessionData(
@@ -120,8 +125,8 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		delegate.removeSessionLocal(key);
 	}
 
-	public void removeSessionLocal(SipSessionKey key) {
-		delegate.removeSessionLocal(key);
+	public void removeSessionLocal(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {
+		delegate.removeSessionLocal(sipAppSessionKey, key);
 	}
 	
 	public void removeSessionLocal(SipApplicationSessionKey key,
@@ -129,8 +134,74 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		delegate.removeSessionLocal(key, dataOwner);
 	}
 
-	public void removeSessionLocal(SipSessionKey key, String dataOwner) {
-		delegate.removeSessionLocal(key, dataOwner);
+	public void removeSessionLocal(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key, String dataOwner) {
+		delegate.removeSessionLocal(sipAppSessionKey, key, dataOwner);
 	}
 
+	public void storeSipApplicationSessionData(
+			OutgoingAttributeGranularitySessionData sipApplicationSessionData) {
+		delegate.storeSipApplicationSessionData((OutgoingDistributableSipApplicationSessionData)sipApplicationSessionData);
+	}
+
+	public void storeSipSessionData(
+			OutgoingAttributeGranularitySessionData sipSessionData) {
+		delegate.storeSipSessionData((OutgoingDistributableSipSessionData)sipSessionData);
+	}
+
+	public void storeSipApplicationSessionAttributes(
+			Map<Object, Object> dataMap,
+			OutgoingAttributeGranularitySessionData sessionData) {
+		Fqn<String> fqn = null;
+		Map<String, Object> map = sessionData.getModifiedSessionAttributes();
+		if (map != null) {
+			// Duplicate the map with marshalled values
+			Map<Object, Object> marshalled = new HashMap<Object, Object>(map
+					.size());
+			for (Map.Entry<String, Object> entry : map.entrySet()) {
+				marshalled.put(entry.getKey(), getMarshalledValue(entry
+						.getValue()));
+			}
+			fqn = delegate.getSipApplicationSessionFqn(combinedPath_, sessionData.getRealId());
+			cacheWrapper_.put(fqn, marshalled);
+		}
+
+		Set<String> removed = sessionData.getRemovedSessionAttributes();
+		if (removed != null) {
+			if (fqn == null) {
+				fqn = delegate.getSipApplicationSessionFqn(combinedPath_, sessionData.getRealId());
+			}
+			for (String key : removed) {
+				cacheWrapper_.remove(fqn, key);
+			}
+		}
+	}
+	
+	public void storeSipSessionAttributes(
+			Map<Object, Object> dataMap,
+			OutgoingAttributeGranularitySessionData sessionData) {
+		Fqn<String> fqn = null;
+		Map<String, Object> map = sessionData.getModifiedSessionAttributes();
+		if (map != null) {
+			// Duplicate the map with marshalled values
+			Map<Object, Object> marshalled = new HashMap<Object, Object>(map
+					.size());
+			for (Map.Entry<String, Object> entry : map.entrySet()) {
+				marshalled.put(entry.getKey(), getMarshalledValue(entry
+						.getValue()));
+			}
+			
+			fqn = delegate.getSipSessionFqn(combinedPath_, ((OutgoingDistributableSipSessionData) sessionData).getSipApplicationSessionKey().toString(),  ((OutgoingDistributableSipSessionData) sessionData).getSipSessionKey().toString());
+			cacheWrapper_.put(fqn, marshalled);
+		}
+
+		Set<String> removed = sessionData.getRemovedSessionAttributes();
+		if (removed != null) {
+			if (fqn == null) {
+				fqn = delegate.getSipSessionFqn(combinedPath_, ((OutgoingDistributableSipSessionData) sessionData).getSipApplicationSessionKey().toString(),  ((OutgoingDistributableSipSessionData) sessionData).getSipSessionKey().toString());
+			}
+			for (String key : removed) {
+				cacheWrapper_.remove(fqn, key);
+			}
+		}
+	}
 }
