@@ -52,8 +52,11 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
+import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.BatchingManager;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
@@ -852,6 +855,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				break;
 		}
 		if(getDistributable() && hasDistributableManager) {
+			startBatchTransaction();
 			if(bindSessions) {
 				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, manager, startCacheActivity);
 			} else {
@@ -859,7 +863,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 	}
-	
+    
 	public void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {
 		switch (concurrencyControlMode) {
 			case SipSession:
@@ -905,11 +909,45 @@ public class SipStandardContext extends StandardContext implements SipContext {
 							ctx.getSoleSipApplicationSession());
 				} 
 			} finally {
-				ConvergedSessionReplicationContext.finishSipCacheActivity();
+				endBatchTransaction();
 			}
 		}
 	}
 
+	private boolean startBatchTransaction() {
+		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipManager) manager)
+				.getDistributedCacheConvergedSipManager();
+		BatchingManager tm = distributedConvergedManager.getBatchingManager();
+		boolean started = false;
+		try {
+			if (tm != null && tm.isBatchInProgress() == false) {
+				tm.startBatch();
+				started = true;
+			}
+		} catch (RuntimeException re) {
+			throw re;
+		} catch (Exception e) {
+			throw new IllegalStateException(
+					"Failed to initiate batch replication transaction", e);
+		}
+
+		return started;
+	}
+	
+	private void endBatchTransaction() {
+		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipManager) manager)
+				.getDistributedCacheConvergedSipManager();
+		BatchingManager tm = distributedConvergedManager.getBatchingManager();
+		try {
+			if (tm != null && tm.isBatchInProgress() == true) {
+				tm.endBatch();
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException(
+					"Failed to stop batch replication transaction", e);
+		}
+	}
+	
 	public boolean notifySipServletsListeners() {
 		boolean ok = true;
 		
