@@ -16,15 +16,18 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -119,9 +122,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected Map<String, Object> sipApplicationSessionAttributeMap;
 
-	protected transient ConcurrentHashMap<String,MobicentsSipSession> sipSessions;
+	protected transient ConcurrentHashMap<String,SipSessionKey> sipSessions;
 	
-	protected transient ConcurrentHashMap<String, HttpSession> httpSessions;
+	protected transient Set<String> httpSessions;
 	
 	protected SipApplicationSessionKey key;	
 	
@@ -163,8 +166,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
-		sipSessions = new ConcurrentHashMap<String,MobicentsSipSession>();
-		httpSessions = new ConcurrentHashMap<String,HttpSession>();
+		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();
+		httpSessions = new CopyOnWriteArraySet<String>();
 		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		if(!ConcurrencyControlMode.None.equals(sipContext.getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);
@@ -234,17 +237,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
-		this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession);
+		this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession.getKey());
 		readyToInvalidate = false;
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
-	public MobicentsSipSession removeSipSession (MobicentsSipSession mobicentsSipSession) {
+	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
 		return this.sipSessions.remove(mobicentsSipSession.getKey().toString());
 	}
 	
 	public void addHttpSession(HttpSession httpSession) {
-		this.httpSessions.putIfAbsent(JvmRouteUtil.removeJvmRoute(httpSession.getId()), httpSession);
+		this.httpSessions.add(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
 		readyToInvalidate = false;
 		// TODO: We assume that there is only one HTTP session in the app session. In this case
 		// we are safe to only assign jvmRoute once here. When we support multiple http sessions
@@ -252,12 +255,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		setJvmRoute(JvmRouteUtil.extractJvmRoute(httpSession.getId()));
 	}
 	
-	public HttpSession removeHttpSession(HttpSession httpSession) {
+	public boolean removeHttpSession(HttpSession httpSession) {
 		return this.httpSessions.remove(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
 	}
 	
-	public HttpSession findHttpSession (HttpSession httpSession) {
-		return this.httpSessions.get(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+	public HttpSession findHttpSession (String sessionId) {
+		String id = JvmRouteUtil.removeJvmRoute(sessionId);
+		if(httpSessions.contains(id)) {
+			try {
+				return (HttpSession)sipContext.getSipManager().findSession(id);
+			} catch (IOException e) {
+				logger.error("An Unexpected exception happened while retrieving the http session " + id, e);				
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -402,12 +413,34 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			throw new NullPointerException("protocol given in argument is null");
 		}
 		if("SIP".equalsIgnoreCase(protocol)) {
-			return sipSessions.values().iterator();
+			return getSipSessions().iterator();
 		} else if("HTTP".equalsIgnoreCase(protocol)) {			
-			return httpSessions.values().iterator();
+			return getHttpSessions().iterator();
 		} else {
 			throw new IllegalArgumentException(protocol + " sessions are not handled by this container");
 		}
+	}
+	
+	protected Set<MobicentsSipSession> getSipSessions() {
+		Set<MobicentsSipSession> retSipSessions = new HashSet<MobicentsSipSession>();
+		for(SipSessionKey sipSessionKey : sipSessions.values()) {
+			MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
+			retSipSessions.add(sipSession);
+		}
+		return retSipSessions;
+	}
+	
+	protected Set<HttpSession> getHttpSessions() {
+		Set<HttpSession> retHttpSessions = new HashSet<HttpSession>();
+		for(String id : httpSessions) {
+			try {
+				HttpSession httpSession = (HttpSession)sipContext.getSipManager().findSession(id);
+				retHttpSessions.add(httpSession);
+			} catch (IOException e) {
+				logger.error("An Unexpected exception happened while retrieving the http session " + id, e);			
+			}			
+		}
+		return retHttpSessions;
 	}
 
 	/*
@@ -422,14 +455,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			logger.debug("Trying to find a session with the id " + id);
 			dumpSipSessions();
 		}
-		return sipSessions.get(id);
+		SipSessionKey sipSessionKey = sipSessions.get(id);
+		return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
 	}
 
 	private void dumpSipSessions() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sessions contained in the following app session " + key);
 			for (String sessionKey : sipSessions.keySet()) {
-				logger.debug("session key " + sessionKey  + ", value = " + sipSessions.get(sessionKey));
+				logger.debug("session key " + sessionKey);
 			}
 		}
 	}
@@ -478,12 +512,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		
 		//doing the invalidation
-		for(MobicentsSipSession session: sipSessions.values()) {
+		for(MobicentsSipSession session: getSipSessions()) {
 			if(session.isValid()) {
 				session.invalidate();
 			}
 		}
-		for(HttpSession session: httpSessions.values()) {
+		for(HttpSession session: getHttpSessions()) {
 			if(session instanceof ConvergedSession) {
 				ConvergedSession convergedSession = (ConvergedSession) session;
 				if(convergedSession.isValid()) {
@@ -884,10 +918,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		switch (protocol) {
 			case SIP :
-				return sipSessions.get(id);
+				return getSipSession(id);
 				
 			case HTTP :
-				return httpSessions.get(JvmRouteUtil.removeJvmRoute(id));
+				return findHttpSession(id);
 		}
 		return null;
 	}
@@ -914,7 +948,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	private void updateReadyToInvalidateState() {
 		if(isValid && !readyToInvalidate) {
-			for(MobicentsSipSession sipSession : this.sipSessions.values()) {
+			for(MobicentsSipSession sipSession : getSipSessions()) {
 				if(sipSession.isValid() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Session not ready to be invalidated : " + sipSession.getKey());
@@ -943,14 +977,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
 			if(readyToInvalidate) {
 				boolean allSipSessionsInvalidated = true;
-				for(MobicentsSipSession sipSession:this.sipSessions.values()) {
+				for(MobicentsSipSession sipSession : getSipSessions()) {
 					if(sipSession.isValid()) {
 						allSipSessionsInvalidated = false;
 						break;
 					}
 				}
 				boolean allHttpSessionsInvalidated = true;
-				for(HttpSession httpSession:this.httpSessions.values()) {
+				for(HttpSession httpSession : getHttpSessions()) {
 					ConvergedSession convergedSession = (ConvergedSession) httpSession;
 					if(convergedSession.isValid()) {
 						allHttpSessionsInvalidated = false;

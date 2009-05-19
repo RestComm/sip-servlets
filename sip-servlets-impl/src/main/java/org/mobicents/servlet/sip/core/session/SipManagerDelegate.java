@@ -335,7 +335,7 @@ public abstract class SipManagerDelegate {
 	 */
 	public MobicentsSipApplicationSession findSipApplicationSession(HttpSession httpSession) {
 		for (MobicentsSipApplicationSession sipApplicationSessionImpl : sipApplicationSessions.values()) {			
-			if(sipApplicationSessionImpl.findHttpSession(httpSession) != null) {
+			if(sipApplicationSessionImpl.findHttpSession(httpSession.getId()) != null) {
 				return sipApplicationSessionImpl;
 			}
 		}

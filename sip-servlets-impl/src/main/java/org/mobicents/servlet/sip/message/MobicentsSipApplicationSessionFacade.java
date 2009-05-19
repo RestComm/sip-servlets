@@ -91,8 +91,8 @@ public class MobicentsSipApplicationSessionFacade implements
 		this.sipApplicationSession.addSipSession(mobicentsSipSession);
 	}
 
-	public HttpSession findHttpSession(HttpSession httpSession) {
-		return this.sipApplicationSession.findHttpSession(httpSession);
+	public HttpSession findHttpSession(String id) {
+		return this.sipApplicationSession.findHttpSession(id);
 	}
 
 	public String getCurrentRequestHandler() {
@@ -131,7 +131,7 @@ public class MobicentsSipApplicationSessionFacade implements
 				.onSipSessionReadyToInvalidate(mobicentsSipSession);
 	}
 
-	public HttpSession removeHttpSession(HttpSession httpSession) {
+	public boolean removeHttpSession(HttpSession httpSession) {
 		return this.sipApplicationSession.removeHttpSession(httpSession);
 	}
 

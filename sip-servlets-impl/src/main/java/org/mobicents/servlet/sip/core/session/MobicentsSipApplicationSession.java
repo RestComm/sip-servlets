@@ -35,9 +35,9 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	
 	void addHttpSession(HttpSession httpSession);
 	
-	HttpSession removeHttpSession(HttpSession httpSession);
+	boolean removeHttpSession(HttpSession httpSession);
 	
-	HttpSession findHttpSession(HttpSession httpSession);
+	HttpSession findHttpSession(String sessionId);
 
 	SipContext getSipContext();
 

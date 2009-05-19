@@ -59,25 +59,12 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 	 */
 	public void initAfterLoad(JBossCacheSipManager manager) {		
 		sipContext = (SipContext) manager.getContainer();
-		//TODO get the sip and http sessions from the cache
-		for (SipSessionKey sipSessionKey : sipSessionsOnPassivation) {
-			MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
-			if(sipSession != null) {
-				sipSessions.put(sipSessionKey.toString(), sipSession);	
-			} else {
-				if(logger.isDebugEnabled()) {
-					logger.warn("Impossible to get the sip session passivated from the cache " + sipSessionKey.toString());
-				}
-			}
+		for (SipSessionKey sipSessionKey : sipSessionsOnPassivation) {			
+			sipSessions.put(sipSessionKey.toString(), sipSessionKey);				
 		}
 		
 		for (String httpSessionKey : httpSessionsOnPassivation) {
-			try {
-				HttpSession httpSession = (HttpSession) sipContext.getSipManager().findSession(httpSessionKey);
-				httpSessions.put(httpSessionKey, httpSession);
-			} catch (IOException e) {
-				logger.error("Unexpected exception while loading an http session that has been previously passivated ", e);
-			}
+			httpSessions.add(httpSessionKey);
 		}
 		
 		establishProxy();

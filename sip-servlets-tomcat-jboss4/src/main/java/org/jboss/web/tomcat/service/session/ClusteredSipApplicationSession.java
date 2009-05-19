@@ -1130,7 +1130,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			}
 			
 			out.writeInt(httpSessions.size());
-			for (HttpSession httpSession : httpSessions.values()) {
+			for (HttpSession httpSession : getHttpSessions()) {
 				out.writeUTF(((ClusteredSession)httpSession).getRealId());
 			}
 			
