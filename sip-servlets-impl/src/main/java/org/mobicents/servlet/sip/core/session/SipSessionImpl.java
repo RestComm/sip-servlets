@@ -242,7 +242,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		this.subscriptions = new HashSet<EventHeader>();
-		if(!ConcurrencyControlMode.None.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
+		if(mobicentsSipApplicationSession.getSipContext() != null && !ConcurrencyControlMode.None.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);		
 		}
 		// the sip context can be null if the AR returned an application that was not deployed

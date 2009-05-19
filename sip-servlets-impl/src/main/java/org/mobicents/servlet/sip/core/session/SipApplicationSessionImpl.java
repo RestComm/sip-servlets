@@ -456,7 +456,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			dumpSipSessions();
 		}
 		SipSessionKey sipSessionKey = sipSessions.get(id);
-		return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
+		if(sipSessionKey != null) {
+			return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
+		} else {
+			return null;
+		}
 	}
 
 	private void dumpSipSessions() {
