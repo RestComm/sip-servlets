@@ -17,6 +17,7 @@
 package org.jboss.web.tomcat.service.session;
 
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -39,13 +40,16 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	private ReplicationGranularity replicationGranularity = ReplicationGranularity.SESSION;
 
 	private boolean useJK;
+	
+	private ClusteredSipManager clusteredSipManager;
 	/**
 	 * @param replicationGranularity 
 	 * 
 	 */
-	public ClusteredSipManagerDelegate(ReplicationGranularity replicationGranularity, boolean useJK) {
+	public ClusteredSipManagerDelegate(ReplicationGranularity replicationGranularity, boolean useJK, ClusteredSipManager clusteredSipManager) {
 		this.replicationGranularity = replicationGranularity;
 		this.useJK = useJK;
+		this.clusteredSipManager = clusteredSipManager;
 	}
 
 	/* (non-Javadoc)
@@ -54,7 +58,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	@Override
 	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
 			SipApplicationSessionKey key, SipContext sipContext) {
-		MobicentsSipApplicationSession session = null;
+		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = null;
 		
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
 			session = new AttributeBasedClusteredSipApplicationSession(key,sipContext, useJK);
@@ -63,6 +67,8 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		} else {
 			session = new SessionBasedClusteredSipApplicationSession(key,sipContext, useJK);
 		}
+		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key);
+		session.setNew(true);
 		return session;
 	}
 
@@ -73,7 +79,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	protected MobicentsSipSession getNewMobicentsSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
-		MobicentsSipSession session = null;
+		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = null;
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
 			session = new AttributeBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, useJK);
 		} else if (replicationGranularity.equals(ReplicationGranularity.FIELD)) {
@@ -81,6 +87,8 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		} else {
 			session = new SessionBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, useJK);
 		}
+		clusteredSipManager.getDistributedCacheConvergedSipManager().sipSessionCreated(mobicentsSipApplicationSession.getKey(), key);
+		session.setNew(true);
 		return session;
 	}
 

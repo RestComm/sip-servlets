@@ -75,6 +75,12 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		super.start();
 		delegate.start();
 	}
+	
+	@Override
+	public void stop() {			
+		delegate.stop();
+		super.stop();
+	}
 
 	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {
 		delegate.evictSession(sipAppSessionKey, key);      
@@ -146,6 +152,16 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 	public void storeSipSessionData(
 			OutgoingAttributeGranularitySessionData sipSessionData) {
 		delegate.storeSipSessionData((OutgoingDistributableSipSessionData)sipSessionData);
+	}
+	
+	public void sipApplicationSessionCreated(SipApplicationSessionKey key) {
+		// no-op by default    
+	}
+
+	public void sipSessionCreated(
+			SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey) {
+		// no-op by default    
 	}
 
 	public void storeSipApplicationSessionAttributes(

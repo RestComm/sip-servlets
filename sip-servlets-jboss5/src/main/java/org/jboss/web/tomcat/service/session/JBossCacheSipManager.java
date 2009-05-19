@@ -155,7 +155,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    @Override
    public void init(String name, JBossWebMetaData webMetaData) throws ClusteringNotSupportedException {
 	   super.init(name, webMetaData);
-	   sipManagerDelegate = new ClusteredSipManagerDelegate(ReplicationGranularity.valueOf(getReplicationGranularityString()),getUseJK());
+	   sipManagerDelegate = new ClusteredSipManagerDelegate(ReplicationGranularity.valueOf(getReplicationGranularityString()),getUseJK(), (ClusteredSipManager)this);
 	   this.sipApplicationSessionNotificationPolicyClass_ = getReplicationConfig().getSessionNotificationPolicy();
 	   this.sipSessionNotificationPolicyClass_ = getReplicationConfig().getSessionNotificationPolicy();
    }
@@ -694,7 +694,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  // JBAS-2403. Check for outdated sessions where we think
 	                  // the local copy has timed out.  If found, refresh the
 	                  // session from the cache in case that might change the timeout
-	                  if (session.isOutdated() && !(session.isValid(false)))
+	                  if (session.isOutdated() && !(session.isValid()))
 	                  {
 	                     // FIXME in AS 5 every time we get a notification from the distributed
 	                     // cache of an update, we get the latest timestamp. So
@@ -902,7 +902,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  // JBAS-2403. Check for outdated sessions where we think
 	                  // the local copy has timed out.  If found, refresh the
 	                  // session from the cache in case that might change the timeout
-	                  if (session.isOutdated() && !(session.isValid(false)))
+	                  if (session.isOutdated() && !(session.isValid()))
 	                  {
 	                     // FIXME in AS 5 every time we get a notification from the distributed
 	                     // cache of an update, we get the latest timestamp. So
@@ -1107,7 +1107,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}		
 		if(newTempSession != null) {
 			synchronized (newTempSession) {
-				ClusteredSipSession sessionInCache = null;
 				boolean doTx = false;
 				BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 				try {
@@ -1126,7 +1125,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		            {
 		               session.update(data);
 		            }
-		            else
+		            else if(mustAdd)
 		            {
 		               // Clunky; we set the session variable to null to indicate
 		               // no data so move on
@@ -1234,7 +1233,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		boolean passivated = false;
 		boolean initialLoad = false;
 		
-		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
+		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
 		if (session == null) {			
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
@@ -1244,7 +1243,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
 			OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
 	        passivated = (osu != null && osu.passivated);
-		}		
+		}
 		synchronized (session) {
 //			ClusteredSipApplicationSession sessionInCache = null;
 			boolean doTx = false;
@@ -1265,7 +1264,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	            {
 	               session.update(data);
 	            }
-	            else
+	            else if(mustAdd)
 	            {
 	               // Clunky; we set the session variable to null to indicate
 	               // no data so move on
@@ -1472,7 +1471,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				// expose the session to regular invalidation.
 				Object obj = unloadedSipSessions_.put(new ClusteredSipSessionKey(key, session.getSipApplicationSession().getKey()),
 						new OwnedSessionUpdate(null, session
-								.getLastAccessedTimeInternal(), session
+								.getLastAccessedTime(), session
 								.getMaxInactiveInterval(), true));
 				if (trace_) {
 					if (obj == null) {
@@ -1517,7 +1516,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				// expose the session to regular invalidation.
 				Object obj = unloadedSipApplicationSessions_.put(key,
 						new OwnedSessionUpdate(null, session
-								.getLastAccessedTimeInternal(), session
+								.getLastAccessedTime(), session
 								.getMaxInactiveInterval(), true));
 				if (trace_) {
 					if (obj == null) {
@@ -2092,8 +2091,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 //				switcher = getContextClassLoaderSwitcher().getSwitchContext();
 //				switcher.setClassLoader(tcl_);
-				session.expire(notify, localCall, localOnly,
-						ClusteredSessionNotificationCause.INVALIDATE);
+//				session.invalidate(notify, localCall, localOnly,
+//						ClusteredSessionNotificationCause.INVALIDATE);
+				session.invalidate();
 			} finally {
 				ConvergedSessionInvalidationTracker.resume();
 
@@ -2167,8 +2167,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 //				switcher = getContextClassLoaderSwitcher().getSwitchContext();
 //				switcher.setClassLoader(tcl_);
-				session.expire(notify, localCall, localOnly,
-						ClusteredSessionNotificationCause.INVALIDATE);
+//				session.expire(notify, localCall, localOnly,
+//						ClusteredSessionNotificationCause.INVALIDATE);
+				session.invalidate();
 			} finally {
 				ConvergedSessionInvalidationTracker.resume();
 
@@ -2798,7 +2799,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	      
 	      private long getLastUpdate()
 	      {
-	         return osu == null ? session.getLastAccessedTimeInternal() : osu.updateTime;
+	         return osu == null ? session.getLastAccessedTime() : osu.updateTime;
 	      }
 	      
 	      private void passivate()
@@ -2859,7 +2860,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	      
 	      private long getLastUpdate()
 	      {
-	         return osu == null ? session.getLastAccessedTimeInternal() : osu.updateTime;
+	         return osu == null ? session.getLastAccessedTime() : osu.updateTime;
 	      }
 	      
 	      private void passivate()

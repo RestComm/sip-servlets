@@ -65,6 +65,12 @@ public class SessionBasedJBossCacheConvergedSipService extends
 		delegate.start();
 	}
 	
+	@Override
+	public void stop() {			
+		delegate.stop();
+		super.stop();
+	}
+	
 	public void evictSession(SipApplicationSessionKey sipAppSessionKey, SipSessionKey key) {
 		delegate.evictSession(sipAppSessionKey, key);      
 	}
@@ -145,5 +151,15 @@ public class SessionBasedJBossCacheConvergedSipService extends
 	public void storeSipSessionAttributes(Map<Object, Object> dataMap,
 			OutgoingSessionGranularitySessionData sessionData) {
 		this.storeSessionAttributes(dataMap, sessionData);
+	}
+
+	public void sipApplicationSessionCreated(SipApplicationSessionKey key) {
+		// no-op by default    
+	}
+
+	public void sipSessionCreated(
+			SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey) {
+		// no-op by default    
 	}
 }

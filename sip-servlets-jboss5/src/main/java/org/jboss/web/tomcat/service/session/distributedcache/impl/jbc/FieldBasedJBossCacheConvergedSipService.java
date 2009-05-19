@@ -59,6 +59,13 @@ public class FieldBasedJBossCacheConvergedSipService extends
 		super.start();
 		delegate.start();
 	}
+	
+	@Override
+	public void stop() {			
+		delegate.stop();
+		super.stop();
+	}
+	
 	/**
 	 * @param localManager
 	 * @param cache
@@ -149,5 +156,15 @@ public class FieldBasedJBossCacheConvergedSipService extends
 	public void storeSipSessionAttributes(Map<Object, Object> dataMap,
 			OutgoingDistributableSessionData sessionData) {
 		this.storeSessionAttributes(dataMap, sessionData);
+	}
+	
+	public void sipApplicationSessionCreated(SipApplicationSessionKey key) {
+		// no-op by default    
+	}
+
+	public void sipSessionCreated(
+			SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey) {
+		// no-op by default    
 	}
 }

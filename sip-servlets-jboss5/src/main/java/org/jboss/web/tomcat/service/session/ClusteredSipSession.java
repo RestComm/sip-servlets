@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,7 +55,6 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
@@ -158,20 +158,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * dynamically the first time it is needed, or after a session reload (since
 	 * it is declared transient).
 	 */
-	private transient Method containerEventMethod = null;
-
-	/**
-	 * The time this session was created, in milliseconds since midnight,
-	 * January 1, 1970 GMT.
-	 */
-	private long creationTime = 0L;
-
-	/**
-	 * We are currently processing a session expiration, so bypass certain
-	 * IllegalStateException tests. NOTE: This value is not included in the
-	 * serialized version of this object.
-	 */
-	private volatile transient boolean expiring = false;
+	private transient Method containerEventMethod = null;		
 
 	/**
 	 * The facade associated with this session. NOTE: This value is not included
@@ -183,11 +170,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * The session identifier of this Session.
 	 */
 	private String id = null;
-
-	/**
-	 * The last accessed time for this Session.
-	 */
-	private volatile long lastAccessedTime = creationTime;
 
 	/**
 	 * The Manager with which this Session is associated.
@@ -210,12 +192,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * Flag indicating whether this session is new or not.
 	 */
 	private boolean isNew = false;
-
-	/**
-	 * Flag indicating whether this session is valid or not.
-	 */
-	private volatile boolean isValid = false;
-
+	
 	/**
 	 * Internal notes associated with this session by Catalina components and
 	 * event listeners. <b>IMPLEMENTATION NOTE:</b> This object is <em>not</em>
@@ -224,23 +201,17 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private final transient Map<String, Object> notes = new Hashtable<String, Object>();
 
 	/**
-	 * The authenticated Principal associated with this session, if any.
-	 * <b>IMPLEMENTATION NOTE:</b> This object is <i>not</i> saved and restored
-	 * across session serializations!
-	 */
-	private transient Principal principal = null;
-
-	/**
 	 * The property change support for this component. NOTE: This value is not
 	 * included in the serialized version of this object.
 	 */
 	 private transient PropertyChangeSupport support =
 		 new PropertyChangeSupport(this);
+	 
+	 /**
+	  * The current accessed time for this session.
+	  */
+	 private volatile long thisAccessedTime = creationTime;
 
-	/**
-	 * The current accessed time for this session.
-	 */
-	private volatile long thisAccessedTime = creationTime;
 
 	/**
 	 * The access count for this session.
@@ -300,11 +271,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private final AtomicInteger version = new AtomicInteger(0);
 
 	/**
-	 * The session's id with any jvmRoute removed.
-	 */
-	private transient String realId;
-
-	/**
 	 * Whether JK is being used, in which case our realId will not match our id
 	 */
 	private transient boolean useJK;
@@ -353,7 +319,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	protected ClusteredSipSession(SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession, boolean useJK) {
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
-		this.invalidationPolicy = this.manager.getReplicationTrigger();
+		id = key.toString();
+	    this.clusterStatus = new ClusteredSessionManagementStatus(this.id, true, null, null);
+		if(mobicentsSipApplicationSession.getSipContext() != null) {
+			setManager((ClusteredSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager());
+			this.invalidationPolicy = this.manager.getReplicationTrigger();
+		}		
 		this.useJK = useJK;
 		this.firstAccess = true;
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
@@ -374,43 +345,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		String oldAuthType = this.authType;
 		this.authType = authType;
 		support.firePropertyChange("authType", oldAuthType, this.authType);
-	}
-
-	public long getCreationTime() {
-		if (!isValidInternal())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.getCreationTime.ise"));
-
-		return (this.creationTime);
-	}
-
-	/**
-	 * Set the creation time for this session. This method is called by the
-	 * Manager when an existing Session instance is reused.
-	 * 
-	 * @param time
-	 *            The new creation time
-	 */
-	public void setCreationTime(long time) {
-		this.creationTime = time;
-		this.lastAccessedTime = time;
-		this.thisAccessedTime = time;
-		sessionMetadataDirty();
-	}
-
-	
-	public long getLastAccessedTime() {
-		if (!isValidInternal()) {
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.getLastAccessedTime.ise"));
-		}
-
-		return (this.lastAccessedTime);
-	}
-
-	public long getLastAccessedTimeInternal() {
-		return (this.lastAccessedTime);
-	}
+	}					
 
 	public SipManager getManager() {
 		return (this.manager);
@@ -444,34 +379,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	public void setMaxInactiveInterval(int interval) {
 		this.maxInactiveInterval = interval;
 		if (isValid && interval == 0) {
-			expire();
+			invalidate();
 		}
 		checkAlwaysReplicateTimestamp();
 		sessionMetadataDirty();
-	}
-
-	public Principal getPrincipal() {
-		return (this.principal);
-	}
-
-	/**
-	 * Set the authenticated Principal that is associated with this Session.
-	 * This provides an <code>Authenticator</code> with a means to cache a
-	 * previously authenticated Principal, and avoid potentially expensive
-	 * <code>Realm.authenticate()</code> calls on every request.
-	 * 
-	 * @param principal
-	 *            The new Principal, or <code>null</code> if none
-	 */
-	public void setPrincipal(Principal principal) {
-		Principal oldPrincipal = this.principal;
-		this.principal = principal;
-		support.firePropertyChange("principal", oldPrincipal, this.principal);
-
-		if ((oldPrincipal != null && !oldPrincipal.equals(principal))
-				|| (oldPrincipal == null && principal != null))
-			sessionMetadataDirty();
-	}
+	}	
 
 	public void access() {
 		this.lastAccessedTime = this.thisAccessedTime;
@@ -507,7 +419,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	public boolean isNew() {
-		if (!isValidInternal())
+		if (!isValid())
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.isNew.ise"));
 
@@ -526,13 +438,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// sessionMetadataDirty();
 	}
 
-	/**
-	 * Overrides the {@link StandardSession#isValid() superclass method} to call @
-	 * #isValid(boolean) isValid(true)} .
-	 */
-	public boolean isValid() {
-		return isValid(true);
-	}
 
 	public void setValid(boolean isValid) {
 		this.isValid = isValid;
@@ -547,35 +452,125 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 *                if this method is called on an invalidated session
 	 */
 	public void invalidate() {
-		if (!isValid())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.invalidate.ise"));
-
-		// Cause this session to expire globally
-		boolean notify = true;
-		boolean localCall = true;
-		boolean localOnly = false;
-		expire(notify, localCall, localOnly,
-				ClusteredSessionNotificationCause.INVALIDATE);
+//		if (!isValid())
+//			throw new IllegalStateException(sm
+//					.getString("clusteredSession.invalidate.ise"));
+//
+//		// Cause this session to expire globally
+//		boolean notify = true;
+//		boolean localCall = true;
+//		boolean localOnly = false;
+//		invalidate(notify, localCall, localOnly,
+//				ClusteredSessionNotificationCause.INVALIDATE);
+		super.invalidate();
 	}
 
-	public void expire() {
-		expire(true);
-	}
-
-	/**
-	 * Expires the session, but in such a way that other cluster nodes are
-	 * unaware of the expiration.
-	 * 
-	 * @param notify
-	 */
-	public void expire(boolean notify) {
-		boolean localCall = true;
-		boolean localOnly = true;
-		expire(notify, localCall, localOnly,
-				ClusteredSessionNotificationCause.TIMEOUT);
-	}
-
+	
+//	/**
+//	 * Expires the session, notifying listeners and possibly the manager.
+//	 * <p>
+//	 * <strong>NOTE:</strong> The manager will only be notified of the
+//	 * expiration if <code>localCall</code> is <code>true</code>; otherwise it
+//	 * is the responsibility of the caller to notify the manager that the
+//	 * session is expired. (In the case of JBossCacheManager, it is the manager
+//	 * itself that makes such a call, so it of course is aware).
+//	 * </p>
+//	 * 
+//	 * @param notify
+//	 *            whether servlet spec listeners should be notified
+//	 * @param localCall
+//	 *            <code>true</code> if this call originated due to local
+//	 *            activity (such as a session invalidation in user code or an
+//	 *            expiration by the local background processing thread);
+//	 *            <code>false</code> if the expiration originated due to some
+//	 *            kind of event notification from the cluster.
+//	 * @param localOnly
+//	 *            <code>true</code> if the expiration should not be announced to
+//	 *            the cluster, <code>false</code> if other cluster nodes should
+//	 *            be made aware of the expiration. Only meaningful if
+//	 *            <code>localCall</code> is <code>true</code>.
+//	 * @param cause
+//	 *            the cause of the expiration
+//	 */
+//	public void invalidate(boolean notify, boolean localCall,
+//			boolean localOnly, ClusteredSessionNotificationCause cause) {
+//		if (log.isTraceEnabled()) {
+//			log.trace("The session has been invalidated with key: " + key
+//					+ " -- is invalidation local? " + localOnly);
+//		}		
+//
+//		synchronized (this) {
+//			// If we had a race to this sync block, another thread may
+//			// have already completed expiration. If so, don't do it again
+//			if (!isValid)
+//				return;
+//
+//			if (manager == null)
+//				return;
+//			
+//			// Notify interested application event listeners
+//			// FIXME - Assumes we call listeners in reverse order
+//			Context context = (Context) manager.getContainer();
+//			Object lifecycleListeners[] = context
+//					.getApplicationLifecycleListeners();
+//			if (notify
+//					&& (lifecycleListeners != null)
+//					&& notificationPolicy
+//							.isSipSessionListenerInvocationAllowed(
+//									this.clusterStatus, cause, localCall)) {
+//				SipSessionEvent event = new SipSessionEvent(getSession());
+//				for (int i = 0; i < lifecycleListeners.length; i++) {
+//					int j = (lifecycleListeners.length - 1) - i;
+//					if (!(lifecycleListeners[j] instanceof SipSessionListener))
+//						continue;
+//					SipSessionListener listener = (SipSessionListener) lifecycleListeners[j];
+//					try {
+//						fireContainerEvent(context, "beforeSessionDestroyed",
+//								listener);
+//						listener.sessionDestroyed(event);
+//						fireContainerEvent(context, "afterSessionDestroyed",
+//								listener);
+//					} catch (Throwable t) {
+//						try {
+//							fireContainerEvent(context,
+//									"afterSessionDestroyed", listener);
+//						} catch (Exception e) {
+//							;
+//						}
+//						manager.getContainer().getLogger().error(
+//								sm.getString("clusteredSession.sessionEvent"),
+//								t);
+//					}
+//				}
+//			}
+//
+//			if (ACTIVITY_CHECK) {
+//				accessCount.set(0);
+//			}
+//
+//			// Notify interested session event listeners.
+////			if (notify) {
+////				fireSessionEvent(Session.SESSION_DESTROYED_EVENT, null);
+////			}
+//
+//			// JBAS-1360 -- Unbind any objects associated with this session
+//			String keys[] = keys();
+//			for (int i = 0; i < keys.length; i++) {
+//				removeAttributeInternal(keys[i], localCall, localOnly, notify,
+//						cause);
+//			}
+//
+//			// Remove this session from our manager's active sessions
+//			// If !localCall, this expire call came from the manager,
+//			// so don't recurse
+//			if (localCall) {
+//				removeFromManager(localOnly);
+//			}
+//				
+//		}
+//
+//	}
+	
 	public Object getNote(String name) {
 		return (notes.get(name));
 	}
@@ -593,6 +588,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		notes.remove(name);
 	}
 
+	
+	
 	
 	// ------------------------------------------------------------ HttpSession
 
@@ -636,7 +633,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 
 		// Validate our current state
-		if (!isValidInternal()) {
+		if (!isValid()) {
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.setAttribute.ise"));
 		}
@@ -694,51 +691,44 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if (notificationPolicy.isSipSessionAttributeListenerInvocationAllowed(
 				this.clusterStatus, ClusteredSessionNotificationCause.MODIFY,
 				name, true)) {
-			Context context = (Context) manager.getContainer();
-			Object lifecycleListeners[] = context
-					.getApplicationEventListeners();
-			if (lifecycleListeners == null)
+			List<SipSessionAttributeListener> listeners = getSipApplicationSession().getSipContext().getListeners().getSipSessionAttributeListeners();
+			if (listeners == null)
 				return;
-			for (int i = 0; i < lifecycleListeners.length; i++) {
-				if (!(lifecycleListeners[i] instanceof SipSessionAttributeListener))
-					continue;
-				SipSessionAttributeListener listener = (SipSessionAttributeListener) lifecycleListeners[i];
+			for (SipSessionAttributeListener listener : listeners) {
 				try {
 					if (unbound != null) {
-						fireContainerEvent(context,
-								"beforeSessionAttributeReplaced", listener);
+//						fireContainerEvent(context,
+//								"beforeSessionAttributeReplaced", listener);
 						if (event == null) {
-							event = new SipSessionBindingEvent(getSession(),
-									name);
+							event = new SipSessionBindingEvent(this, name);
 						}
 						listener.attributeReplaced(event);
-						fireContainerEvent(context,
-								"afterSessionAttributeReplaced", listener);
+//						fireContainerEvent(context,
+//								"afterSessionAttributeReplaced", listener);
 					} else {
-						fireContainerEvent(context,
-								"beforeSessionAttributeAdded", listener);
+//						fireContainerEvent(context, "beforeSessionAttributeAdded",
+//								listener);
 						if (event == null) {
-							event = new SipSessionBindingEvent(getSession(),
-									name);
+							event = new SipSessionBindingEvent(this, name);
 						}
 						listener.attributeAdded(event);
-						fireContainerEvent(context,
-								"afterSessionAttributeAdded", listener);
+//						fireContainerEvent(context, "afterSessionAttributeAdded",
+//								listener);
 					}
 				} catch (Throwable t) {
 					try {
-						if (unbound != null) {
-							fireContainerEvent(context,
-									"afterSessionAttributeReplaced", listener);
-						} else {
-							fireContainerEvent(context,
-									"afterSessionAttributeAdded", listener);
-						}
+//						if (unbound != null) {
+//							fireContainerEvent(context,
+//									"afterSessionAttributeReplaced", listener);
+//						} else {
+//							fireContainerEvent(context,
+//									"afterSessionAttributeAdded", listener);
+//						}
 					} catch (Exception e) {
 						;
 					}
-					manager.getContainer().getLogger().error(
-							sm.getString("clusteredSession.attributeEvent"), t);
+					sipApplicationSession.getSipContext().getLogger().error(
+							sm.getString("standardSession.attributeEvent"), t);
 				}
 			}
 		}
@@ -746,7 +736,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	public void removeAttribute(String name) {
 		// Validate our current state
-		if (!isValidInternal())
+		if (!isValid())
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.removeAttribute.ise"));
 
@@ -759,15 +749,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	public Object getValue(String name) {
 		return (getAttribute(name));
-	}
-
-	public String[] getValueNames() {
-		if (!isValidInternal())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.getValueNames.ise"));
-
-		return (keys());
-	}
+	}	
 
 	public void putValue(String name, Object value) {
 		setAttribute(name, value);
@@ -785,7 +767,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * @see #getUseJK()
 	 */
 	public String getRealId() {
-		return realId;
+		return key.toString();
 	}
 
 	protected int getVersion() {
@@ -889,7 +871,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// a heavy cost.
 		this.lastReplicated = this.creationTime;
 
-		this.clusterStatus = new ClusteredSessionManagementStatus(this.realId,
+		this.clusterStatus = new ClusteredSessionManagementStatus(getRealId(),
 				true, null, null);
 
 		checkAlwaysReplicateTimestamp();
@@ -1062,20 +1044,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	public void setMaxUnreplicatedInterval(long interval) {
 		this.maxUnreplicatedInterval = Math.max(interval, -1);
 		checkAlwaysReplicateTimestamp();
-	}
-
-	/**
-	 * This is called specifically for failover case using mod_jk where the new
-	 * session has this node name in there. As a result, it is safe to just
-	 * replace the id since the backend store is using the "real" id without the
-	 * node name.
-	 * 
-	 * @param id
-	 */
-	public void resetIdWithRouteInfo(String id) {
-		this.id = id;
-		parseRealId(id);
-	}
+	}	
 
 	/**
 	 * Gets whether the session expects to be accessible via mod_jk, mod_proxy,
@@ -1152,157 +1121,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				}
 			}
 		}
-	}
+	}	
 
-	/**
-	 * Returns whether the current session is still valid, but only calls
-	 * {@link #expire(boolean)} for timed-out sessions if
-	 * <code>expireIfInvalid</code> is <code>true</code>.
-	 * 
-	 * @param expireIfInvalid
-	 *            <code>true</code> if sessions that have been timed out should
-	 *            be expired
-	 */
-	public boolean isValid(boolean expireIfInvalid) {
-		if (this.expiring) {
-			return true;
-		}
-
-		if (!this.isValid) {
-			return false;
-		}
-
-		if (ACTIVITY_CHECK && accessCount.get() > 0) {
-			return true;
-		}
-
-		if (maxInactiveInterval >= 0) {
-			long timeNow = System.currentTimeMillis();
-			int timeIdle = (int) ((timeNow - thisAccessedTime) / 1000L);
-			if (timeIdle >= maxInactiveInterval) {
-				if (expireIfInvalid)
-					expire(true);
-				else
-					return false;
-			}
-		}
-
-		return (this.isValid);
-
-	}
-
-	/**
-	 * Expires the session, notifying listeners and possibly the manager.
-	 * <p>
-	 * <strong>NOTE:</strong> The manager will only be notified of the
-	 * expiration if <code>localCall</code> is <code>true</code>; otherwise it
-	 * is the responsibility of the caller to notify the manager that the
-	 * session is expired. (In the case of JBossCacheManager, it is the manager
-	 * itself that makes such a call, so it of course is aware).
-	 * </p>
-	 * 
-	 * @param notify
-	 *            whether servlet spec listeners should be notified
-	 * @param localCall
-	 *            <code>true</code> if this call originated due to local
-	 *            activity (such as a session invalidation in user code or an
-	 *            expiration by the local background processing thread);
-	 *            <code>false</code> if the expiration originated due to some
-	 *            kind of event notification from the cluster.
-	 * @param localOnly
-	 *            <code>true</code> if the expiration should not be announced to
-	 *            the cluster, <code>false</code> if other cluster nodes should
-	 *            be made aware of the expiration. Only meaningful if
-	 *            <code>localCall</code> is <code>true</code>.
-	 * @param cause
-	 *            the cause of the expiration
-	 */
-	public void expire(boolean notify, boolean localCall, boolean localOnly,
-			ClusteredSessionNotificationCause cause) {
-		if (log.isTraceEnabled()) {
-			log.trace("The session has expired with id: " + id
-					+ " -- is expiration local? " + localOnly);
-		}
-
-		// If another thread is already doing this, stop
-		if (expiring)
-			return;
-
-		synchronized (this) {
-			// If we had a race to this sync block, another thread may
-			// have already completed expiration. If so, don't do it again
-			if (!isValid)
-				return;
-
-			if (manager == null)
-				return;
-
-			expiring = true;
-
-			// Notify interested application event listeners
-			// FIXME - Assumes we call listeners in reverse order
-			Context context = (Context) manager.getContainer();
-			Object lifecycleListeners[] = context
-					.getApplicationLifecycleListeners();
-			if (notify
-					&& (lifecycleListeners != null)
-					&& notificationPolicy
-							.isSipSessionListenerInvocationAllowed(
-									this.clusterStatus, cause, localCall)) {
-				SipSessionEvent event = new SipSessionEvent(getSession());
-				for (int i = 0; i < lifecycleListeners.length; i++) {
-					int j = (lifecycleListeners.length - 1) - i;
-					if (!(lifecycleListeners[j] instanceof SipSessionListener))
-						continue;
-					SipSessionListener listener = (SipSessionListener) lifecycleListeners[j];
-					try {
-						fireContainerEvent(context, "beforeSessionDestroyed",
-								listener);
-						listener.sessionDestroyed(event);
-						fireContainerEvent(context, "afterSessionDestroyed",
-								listener);
-					} catch (Throwable t) {
-						try {
-							fireContainerEvent(context,
-									"afterSessionDestroyed", listener);
-						} catch (Exception e) {
-							;
-						}
-						manager.getContainer().getLogger().error(
-								sm.getString("clusteredSession.sessionEvent"),
-								t);
-					}
-				}
-			}
-
-			if (ACTIVITY_CHECK) {
-				accessCount.set(0);
-			}
-
-			// Notify interested session event listeners.
-//			if (notify) {
-//				fireSessionEvent(Session.SESSION_DESTROYED_EVENT, null);
-//			}
-
-			// JBAS-1360 -- Unbind any objects associated with this session
-			String keys[] = keys();
-			for (int i = 0; i < keys.length; i++) {
-				removeAttributeInternal(keys[i], localCall, localOnly, notify,
-						cause);
-			}
-
-			// Remove this session from our manager's active sessions
-			// If !localCall, this expire call came from the manager,
-			// so don't recurse
-			if (localCall) {
-				removeFromManager(localOnly);
-			}
-
-			// We have completed expire of this session
-			setValid(false);
-			expiring = false;
-		}
-
+	private String[] keys() {
+		Set<String> keySet = getAttributesInternal().keySet();
+		return ((String[]) keySet.toArray(new String[keySet.size()]));
 	}
 
 	/**
@@ -1585,20 +1408,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private void checkAlwaysReplicateTimestamp() {
 		this.alwaysReplicateTimestamp = (maxUnreplicatedInterval == 0 || (maxUnreplicatedInterval > 0
 				&& maxInactiveInterval >= 0 && maxUnreplicatedInterval > (maxInactiveInterval * 1000)));
-	}
-
-	private void parseRealId(String sessionId) {
-		String newId = null;
-		if (useJK)
-			newId = Util.getRealId(sessionId);
-		else
-			newId = sessionId;
-
-		// realId is used in a lot of map lookups, so only replace it
-		// if the new id is actually different -- preserve object identity
-		if (!newId.equals(realId))
-			realId = newId;
-	}
+	}	
 
 	/**
 	 * Remove the attribute from the local cache and possibly the distributed
@@ -1643,51 +1453,35 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// Notify interested application event listeners
 		if (notificationPolicy.isSipSessionAttributeListenerInvocationAllowed(
 				this.clusterStatus, cause, name, localCall)) {
-			Context context = (Context) manager.getContainer();
-			Object lifecycleListeners[] = context
-					.getApplicationEventListeners();
-			if (lifecycleListeners == null)
+			// Notify interested application event listeners
+			List<SipSessionAttributeListener> listeners = getSipApplicationSession().getSipContext().getListeners().getSipSessionAttributeListeners();
+			if (listeners == null)
 				return;
-			for (int i = 0; i < lifecycleListeners.length; i++) {
-				if (!(lifecycleListeners[i] instanceof SipSessionAttributeListener))
-					continue;
-				SipSessionAttributeListener listener = (SipSessionAttributeListener) lifecycleListeners[i];
+			for (SipSessionAttributeListener listener : listeners) {
 				try {
-					fireContainerEvent(context,
-							"beforeSessionAttributeRemoved", listener);
+//					fireContainerEvent(context, "beforeSessionAttributeRemoved",
+//							listener);
 					if (event == null) {
-						event = new SipSessionBindingEvent(getSession(), name);
+						event = new SipSessionBindingEvent(this, name);
 					}
 					listener.attributeRemoved(event);
-					fireContainerEvent(context, "afterSessionAttributeRemoved",
-							listener);
+//					fireContainerEvent(context, "afterSessionAttributeRemoved",
+//							listener);
 				} catch (Throwable t) {
-					try {
-						fireContainerEvent(context,
-								"afterSessionAttributeRemoved", listener);
-					} catch (Exception e) {
-						;
-					}
-					manager.getContainer().getLogger().error(
-							sm.getString("clusteredSession.attributeEvent"), t);
+//					try {
+//						fireContainerEvent(context, "afterSessionAttributeRemoved",
+//								listener);
+//					} catch (Exception e) {
+//						;
+//					}
+					sipApplicationSession.getSipContext().getLogger().error(
+							sm.getString("standardSession.attributeEvent"), t);
 				}
 			}
 		}
 	}
 
-	private String[] keys() {
-		Set<String> keySet = getAttributesInternal().keySet();
-		return ((String[]) keySet.toArray(new String[keySet.size()]));
-	}
-
-	/**
-	 * Return the <code>isValid</code> flag for this session without any
-	 * expiration check.
-	 */
-	private boolean isValidInternal() {
-		return (this.isValid || this.expiring);
-	}
-
+	
 	/**
 	 * Fire container events if the Context implementation is the
 	 * <code>org.apache.catalina.core.StandardContext</code>.

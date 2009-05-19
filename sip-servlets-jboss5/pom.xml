@@ -83,14 +83,7 @@
 			<systemPath>${basedir}/lib/jboss-web-deployer-${jboss.version}.jar</systemPath>
 			<optional>true</optional>
 		</dependency>					
-		
-		<dependency>
-			<groupId>jboss.web</groupId>
-			<artifactId>jbossweb</artifactId>
-			<version>2.1.1.GA</version>
-			<scope>provided</scope>
-		</dependency>
-		
+				
 		<dependency>
 			<groupId>org.jboss.jbossas</groupId>
 			<artifactId>jboss-as-tomcat</artifactId>
@@ -110,57 +103,21 @@
 			<artifactId>jboss-as-system-jmx</artifactId>
 			<version>${jboss.version}</version>
 			<scope>provided</scope>
-		</dependency>
-	
-		<dependency>
-			<groupId>jboss.common</groupId>
-			<artifactId>jboss-common</artifactId>
-			<version>1.2.1.GA</version>
-			<scope>provided</scope>
-		</dependency>
-				
-		<dependency>
-			<groupId>org.jboss.aop</groupId>
-			<artifactId>jboss-aop-aspects</artifactId>
-			<version>2.0.0.SP1</version>
-			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		
 		<!-- clustering deps -->
 		<dependency>
 			<groupId>org.jboss.cache</groupId>
 			<artifactId>jbosscache-core</artifactId>
-			<version>3.0.0.GA</version>
+			<version>3.1.0.CR1</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.jboss.cache</groupId>
 			<artifactId>jbosscache-pojo</artifactId>
-			<version>3.0.0.GA</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>jgroups</groupId>
-			<artifactId>jgroups</artifactId>
-			<version>2.6.7.GA</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<version>1.0.1B</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-j2ee-jacc</artifactId>
-			<version>1.0-rc4</version>
-			<scope>provided</scope>
-		</dependency>
+			<version>3.0.0.GA</version>			
+		</dependency>			
 	</dependencies>
 	
 	<repositories>
