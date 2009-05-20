@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>chatroom-bundled</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>chatroom-business</artifactId>
+	<packaging>jar</packaging>
+	<name>ChatRoom Business</name>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>			
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.ChatRoomApplication</app-name>
+	<display-name>ChatRoom Test Sip Servlet</display-name>
+	<description>ChatRoom Test Sip Servlet</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			ChatRoomSipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>ChatRoomSipServlet</servlet-name>
+		<display-name>ChatRoomSipServlet</display-name>
+		<description>ChatRoom Test SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.ChatRoomSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+</sip-app>

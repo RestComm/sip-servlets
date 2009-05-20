@@ -17,9 +17,15 @@
 package org.mobicents.servlet.sip.annotations;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.annotation.SipApplication;
@@ -116,12 +122,44 @@ public class ClassFileScanner {
 	        for(int j = 0; j < files.length; j++) {
 	            if(files[j].isDirectory()) {
 	                _scan(files[j]);
+	            } else if(files[j].getAbsolutePath().endsWith(".jar")) {
+	            	scanJar(files[j].getAbsolutePath());
 	            } else {
 	            	analyzeClass(files[j].getAbsolutePath());
 	            }
 	        }
         }
     }
+	
+	private void scanJar(String path) throws AnnotationVerificationException {
+		if(logger.isDebugEnabled()) {
+    		logger.debug("scanning jar " + path + " for annotations");
+    	}
+		try {
+			URL[] urls = { new URL("jar:file:" + path + "!/") };
+			URLClassLoader urlClassLoader = URLClassLoader.newInstance(urls, this.classLoader);
+
+			JarFile jar =new JarFile(path);
+			Enumeration<JarEntry> jarEntries = jar.entries();
+			while (jarEntries.hasMoreElements()) {
+				JarEntry jarEntry = jarEntries.nextElement();
+				String entryName = jarEntry.getName();
+								
+				if(entryName.endsWith(".class")) {
+					String className =  entryName.substring(0, entryName.indexOf(".class"));
+					className = className.replace('/', '.');
+					className = className.replace('\\', '.');
+					Class<?> clazz = urlClassLoader.loadClass(className);				
+					processAnnotations(clazz);
+				}
+			}
+		} catch (IOException e) {
+			throw new AnnotationVerificationException("couldn't read the following jar file for parsing annotations " + path, e);
+		} catch (ClassNotFoundException e) {
+			throw new AnnotationVerificationException("couldn't read the following jar file for parsing annotations " + path, e);
+		}
+		
+	}
     
     protected void analyzeClass(String path) throws AnnotationVerificationException {
     	if(logger.isDebugEnabled()) {
@@ -138,21 +176,28 @@ public class ClassFileScanner {
     		if(classpath.startsWith(".")) classpath = classpath.substring(1);
     		String className = classpath;
     		try {
-				Class clazz = Class.forName(className, false, this.classLoader);
-				processListenerAnnotation(clazz);
-				processServletAnnotation(clazz);
-				processSipApplicationKeyAnnotation(clazz);
-				processConcurrencyAnnotation(clazz);
-			} catch (Throwable e) {
-				logger.warn("Failed to parse annotations for class " + classpath);
-				if(logger.isDebugEnabled()) {
-					logger.debug("Failed to parse annotations for class " + classpath, e);
-				}
-			}
+    	    	Class clazz = Class.forName(className, false, this.classLoader);
+    	    	processAnnotations(clazz);
+    		} catch (Throwable e) {
+    			logger.warn("Failed to parse annotations for class " + className);
+    			if(logger.isDebugEnabled()) {
+    				logger.debug("Failed to parse annotations for class " + className, e);
+    			}
+    		}
     	}
     }
     
-    protected void processListenerAnnotation(Class<?> clazz) {
+    protected void processAnnotations(Class clazz) throws AnnotationVerificationException {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("analyzing class " + clazz + " for annotations");
+    	}    	
+    	processListenerAnnotation(clazz);
+		processServletAnnotation(clazz);
+		processSipApplicationKeyAnnotation(clazz);
+		processConcurrencyAnnotation(clazz);    	
+	}
+
+	protected void processListenerAnnotation(Class<?> clazz) {
     	if(logger.isDebugEnabled()) {
     		logger.debug("scanning " + clazz.getCanonicalName() + " for listener annotations");
     	}
