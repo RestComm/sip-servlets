@@ -24,7 +24,7 @@ cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
 cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 
 mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=port-1
-#mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=port-2
+mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=port-2
 
 #mkdir $JBOSS_HOME/server/port-1/conf/dars
 #mkdir $JBOSS_HOME/server/port-2/conf/dars
