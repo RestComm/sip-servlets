@@ -922,10 +922,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected void setSipApplicationSession(
 			MobicentsSipApplicationSession sipApplicationSession) {
 		this.sipApplicationSession = sipApplicationSession;
-		if ( sipApplicationSession != null) {
-			if(sipApplicationSession.getSipSession(key.toString()) == null) {
-				sipApplicationSession.addSipSession(this);
-			}
+		if ( sipApplicationSession != null) {			
+			sipApplicationSession.addSipSession(this);			
 		}
 	}
 

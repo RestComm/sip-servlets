@@ -25,8 +25,10 @@ import java.util.Map;
 
 import org.jboss.cache.Fqn;
 import org.jboss.cache.buddyreplication.BuddyManager;
+import org.jboss.cache.notifications.annotation.NodeCreated;
 import org.jboss.cache.notifications.annotation.NodeModified;
 import org.jboss.cache.notifications.annotation.NodeRemoved;
+import org.jboss.cache.notifications.event.NodeCreatedEvent;
 import org.jboss.cache.notifications.event.NodeModifiedEvent;
 import org.jboss.cache.notifications.event.NodeRemovedEvent;
 import org.jboss.logging.Logger;
@@ -124,6 +126,13 @@ public class SipCacheListener extends CacheListenerBase
    
 // --------------- CacheListener methods ------------------------------------
 
+   @NodeCreated
+   public void nodeCreated(NodeCreatedEvent event)
+   {
+	   logger.info("following node created " + event.getFqn().toString());
+   }
+   
+   
    @NodeRemoved
    public void nodeRemoved(NodeRemovedEvent event)
    {      

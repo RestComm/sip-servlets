@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="lib" path="lib/jboss-web-deployer-5.1.0.CR1.jar"/>
-	<classpathentry kind="lib" path="lib/jboss-web-service-5.1.0.CR1.jar"/>
+	<classpathentry kind="lib" path="lib/jboss-web-service-5.1.0.CR1.jar" sourcepath="/home/deruelle/workspaces/JBoss_5_1_0_CR1/tomcat/src/main"/>
 	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6/antlr-2.7.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/apache-avalon/avalon-framework/4.1.5/avalon-framework-4.1.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/apache-httpclient/commons-httpclient/2.0.2/commons-httpclient-2.0.2.jar"/>

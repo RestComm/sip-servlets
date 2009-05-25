@@ -1102,88 +1102,88 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			mustAdd = true;
 			initialLoad = true;
 			newTempSession = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+			session = newTempSession;
 			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
 	        passivated = (osu != null && osu.passivated);
-		}		
-		if(newTempSession != null) {
-			synchronized (newTempSession) {
-				boolean doTx = false;
-				BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
-				try {
-					// We need transaction so any data gravitation replication
-					// is sent in batch.
-					// Don't do anything if there is already transaction context
-					// associated with this thread.
-					if (batchingManager.isBatchInProgress() == false)
-		            {
-		               batchingManager.startBatch();
-		               doTx = true;
-		            }
+		}				
+		synchronized (session) {
+			boolean doTx = false;
+			BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
+			try {
+				// We need transaction so any data gravitation replication
+				// is sent in batch.
+				// Don't do anything if there is already transaction context
+				// associated with this thread.
+				if (batchingManager.isBatchInProgress() == false)
+	            {
+	               batchingManager.startBatch();
+	               doTx = true;
+	            }
 
-		            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
-		            if (data != null)
-		            {
-		               session.update(data);
-		            }
-		            else if(mustAdd)
-		            {
-		               // Clunky; we set the session variable to null to indicate
-		               // no data so move on
-		               session = null;
-		            }
-		            
-		            if (session != null)
-		            {
-		               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
-		                                                                    : ClusteredSessionNotificationCause.FAILOVER;
-		               session.notifyDidActivate(cause);
-		            }
-	
+	            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
+	            if (data != null)
+	            {
+	               session.update(data);
+	            }
+	            else if(mustAdd)
+	            {
+	               // Clunky; we set the session variable to null to indicate
+	               // no data so move on
+	               session = null;
+	            }
+	            
+	            if (session != null)
+	            {
+	               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
+	                                                                    : ClusteredSessionNotificationCause.FAILOVER;
+	               session.notifyDidActivate(cause);
+	            }
+
 //					sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
-				} catch (Exception ex) {
-					try {
-						// if(doTx)
-						// Let's set it no matter what.
-						batchingManager.setBatchRollbackOnly();
-					} catch (Exception exn) {
-						log_.error("Problem rolling back session mgmt transaction",
-								exn);
-					}
-	
-					// We will need to alert Tomcat of this exception.
-					if (ex instanceof RuntimeException)
-						throw (RuntimeException) ex;
-	
-					throw new RuntimeException("Failed to load session " + key.toString(),
-							ex);
-				} finally {
-					if (doTx)
-						batchingManager.endBatch();
+			} catch (Exception ex) {
+				try {
+					// if(doTx)
+					// Let's set it no matter what.
+					batchingManager.setBatchRollbackOnly();
+				} catch (Exception exn) {
+					log_.error("Problem rolling back session mgmt transaction",
+							exn);
 				}
-	
-				if (session != null)
-		         {            
-		            if (mustAdd)
-		            {
-		               add(session, false); // don't replicate
-		               if (!passivated)
-		               {
-		                  session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
-		               }
-		            }
-		            long elapsed = System.currentTimeMillis() - begin;
-		            stats_.updateLoadStats(key.toString(), elapsed);
 
-		            if (trace_)
-		            {
-		               log_.trace("loadSession(): id= " + key + ", session=" + session);
-		            }
-		         }
-		         else if (trace_)
-		         {
-		            log_.trace("loadSession(): session " + key +
-		                       " not found in distributed cache");
-		         }
+				// We will need to alert Tomcat of this exception.
+				if (ex instanceof RuntimeException)
+					throw (RuntimeException) ex;
+
+				throw new RuntimeException("Failed to load session " + key.toString(),
+						ex);
+			} finally {
+				if (doTx)
+					batchingManager.endBatch();
+			}
+
+			if (session != null)
+	         {            
+	            if (mustAdd)
+	            {
+	               add(session, false); // don't replicate
+	               if (!passivated)
+	               {
+	                  session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
+	               }
+	            }
+	            long elapsed = System.currentTimeMillis() - begin;
+	            stats_.updateLoadStats(key.toString(), elapsed);
+
+	            if (trace_)
+	            {
+	               log_.trace("loadSession(): id= " + key + ", session=" + session);
+	            }
+	         }
+	         else if (trace_)
+	         {
+	            log_.trace("loadSession(): session " + key +
+	                       " not found in distributed cache");
+	         }
 //				if (sessionInCache != null) {
 //					// Need to initialize.
 //					sessionInCache.initAfterLoad(this);
@@ -1201,8 +1201,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //					log_.debug("loadSession(): session " + key.toString()
 //							+ " not found in distributed cache");
 //				}
-			}
-		}		
+		}	
 		return session;
 	}
 	
@@ -1929,7 +1928,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			}
 		} else if (session != null && session.isOutdated()) {
 			if (logger.isDebugEnabled())
-				log_.debug("Updating session " + key
+				log_.debug("Updating sip app session " + key
 						+ " from the distributed cache");
 
 			// Need to update it from the cache
@@ -1937,6 +1936,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 
 		if (session != null) {
+			if (logger.isDebugEnabled())
+				logger.debug("Adding sip app session " + key
+						+ " for replication");
 			// Add this session to the set of those potentially needing
 			// replication
 			ConvergedSessionReplicationContext.bindSipApplicationSession(session,
@@ -2007,7 +2009,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //		    }
 		} else if (session != null && session.isOutdated()) {
 			if (logger.isDebugEnabled())
-				logger.debug("Updating session " + key
+				logger.debug("Updating sip session " + key
 						+ " from the distributed cache");
 
 			// Need to update it from the cache
@@ -2015,6 +2017,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 
 		if (session != null) {
+			if (logger.isDebugEnabled())
+				logger.debug("Adding sip session " + key
+						+ " for replication");
 			// Add this session to the set of those potentially needing
 			// replication
 			ConvergedSessionReplicationContext.bindSipSession(session,
