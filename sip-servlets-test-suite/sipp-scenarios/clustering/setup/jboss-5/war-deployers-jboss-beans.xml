@@ -195,13 +195,16 @@ $Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org
            model.
       -->
       <property name="java2ClassLoadingCompliance">false</property>
-      <!-- A flag indicating if the JBoss Loader should be used. This loader
+      <!-- This is NO LONGER supported this way and it will be completely removed for 6.x.
+           See JBAS-6914 for how you can achieve the same in 5.x with new MC JBossCL layer. 
+
+           A flag indicating if the JBoss Loader should be used. This loader
            uses a unified class loader as the class loader rather than the tomcat
            specific class loader.
            The default is false to ensure that wars have isolated class loading
            for duplicate jars and jsp files.
-      -->
       <property name="useJBossWebLoader">false</property>
+      -->
       <!-- The list of package prefixes that should not be loaded without
          delegating to the parent class loader before trying the web app
          class loader. The packages listed here are those tha are used by

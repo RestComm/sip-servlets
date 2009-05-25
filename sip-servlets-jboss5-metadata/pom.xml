@@ -13,7 +13,7 @@
 	<name>Sip Servlets JBoss 5 Metadata</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
 	<properties>
-		<jboss.version>5.1.0.CR1</jboss.version>	
+		<jboss.version>5.1.0.GA</jboss.version>	
 	</properties>
 	<dependencies>
 	

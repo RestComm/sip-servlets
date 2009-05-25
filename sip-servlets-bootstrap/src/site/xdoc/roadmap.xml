@@ -970,9 +970,21 @@
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=687">
-						Move to JBoss AS 5.1.0.CR1
+						Move to JBoss AS 5.1.0.GA
 						</a>
-						<br />																
+						<br />	
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=703">
+						Move from JBoss Rails to the new torquebox
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=704">
+						NIO and lazy parsing in jain sip
+						</a>
+						<br />						
 						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
@@ -1053,11 +1065,24 @@
 									DAR getSubscriberURI() returns an Address not a URI
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=700">
+									@SipApplicationKey method Class Loader issue
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
 				<subsection name="Post 1.0 - No defined date">
 					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=721">
+						Plug JSLEE RAs into MSS
+						</a>
+						<br />	
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=132">
@@ -1090,8 +1115,14 @@
 						<br />	
 						<img src="red.jpeg" />
 						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=702">
+						Integrate with JVoiceXML
+						</a>	
+						<br />
+						<img src="red.jpeg" />
+						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=485">
-							Asterisk Interop/Integration Example
+						Asterisk Interop/Integration Example
 						</a>	
 						<br />						
 					</p>		

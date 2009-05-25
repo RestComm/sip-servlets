@@ -57,7 +57,12 @@
             <parameter>jboss.web:service=WebServer</parameter>
          </value-factory>
       </property>
-      <property name="address">${jboss.bind.address}</property>
+      <property name="address">
+         <value-factory bean="ServiceBindingManager"
+            method="getStringBinding" >
+            <parameter>jboss.web:service=WebServer</parameter>
+         </value-factory>
+      </property>
       <property name="server"><inject bean="JMXKernel" property="mbeanServer"/></property>
    </bean>
    <bean name="ThreadPool-http-${jboss.bind.address}-8080MO"
@@ -73,11 +78,12 @@
       </property>
       <property name="port">
          <value-factory bean="ServiceBindingManager"
-            method="getIntBinding" >
-            <parameter>jboss.web:service=WebServer</parameter>
-         </value-factory>
+            method="getIntBinding" parameter="jboss.web:service=WebServer"/>
       </property>
-      <property name="address">${jboss.bind.address}</property>
+      <property name="address">
+         <value-factory bean="ServiceBindingManager"
+            method="getStringBinding" parameter="jboss.web:service=WebServer"/>
+      </property>
       <property name="server"><inject bean="JMXKernel" property="mbeanServer"/></property>
    </bean>
    <bean name="${jboss.bind.address}-MO"
@@ -91,7 +97,10 @@
             </entry>
          <entry>
             <key>host</key>
-            <value>${jboss.bind.address}</value>
+            <value>
+               <value-factory bean="ServiceBindingManager"
+                  method="getStringBinding" parameter="jboss.web:service=WebServer"/>
+            </value>
          </entry>
          </map>
       </property>
