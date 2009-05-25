@@ -48,7 +48,7 @@
 	<properties>
 		<jopr-version>2.2.0-SNAPSHOT</jopr-version>
 		<rhq-version>1.2.0.GA</rhq-version>
-        <jboss-man.version>2.1.0.CR8</jboss-man.version>        
+        <jboss-man.version>2.1.0.SP1</jboss-man.version>        
 	</properties>
 	
 	<dependencies>
@@ -160,7 +160,7 @@
 		 <dependency>
           <groupId>org.jboss.integration</groupId>
           <artifactId>jboss-profileservice-spi</artifactId>          
-          <version>5.1.0.CR3</version>
+          <version>5.1.0.GA</version>
           <scope>provided</scope>
         </dependency>
 		
@@ -210,6 +210,23 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+ 	        	<groupId>org.apache.maven.plugins</groupId>
+ 	        	<artifactId>maven-dependency-plugin</artifactId>
+ 	        	<executions>		 	          		
+ 	          		<execution>
+ 	            			<id>copy-to-jboss-lib</id>
+ 	            			<phase>package</phase>
+ 	            			<goals>
+								<goal>copy-dependencies</goal>
+ 	            			</goals>
+ 	            			<configuration>
+							<includeArtifactIds>rhq-jmx-plugin</includeArtifactIds>
+			    			<outputDirectory>${JBOSS_HOME}/server/default/deploy/admin-console.war/plugins/</outputDirectory>
+ 	            			</configuration>
+ 	          		</execution>
+ 	        	</executions>
+ 	      	</plugin>
 		</plugins>
 	</build>
 </project>
