@@ -7,7 +7,7 @@
 	
 	<property name="mss.release.version" value="1.0-SNAPSHOT" />
 	<property name="mss.release.configurations" value="all,default" />
-	<property name="mss.release.configurations.jboss5" value="default" />
+	<property name="mss.release.configurations.jboss5" value="all,default" />
 	
 	<property name="jboss.version" value="4.2.3.GA" />
 	<property name="jboss-5.version" value="5.1.0.GA" />
@@ -130,25 +130,25 @@
 		<antcall target="make-final-zip-jboss" />
 	</target>
 	
-	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-rails-deployer">
+	<!--target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-rails-deployer"-->
+	<target name="release-jboss-5" depends="extract-jboss-5">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
 					<property name="jboss-5.home" value="${jboss-5.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant>
-				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
-					<property name="jboss.home" value="${jboss.home}"/>
-					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant-->
-				<!-- Commented out because they don't run on JB5 yet -->
-				<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
-					<property name="jboss.home" value="${jboss.home}"/>
-					<property name="jboss.config" value="@{jboss.config}"/>
-				</ant-->
+				</ant>				
 			</sequential>
 		</for>
-		
+		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
+							<property name="jboss.home" value="${jboss.home}"/>
+							<property name="jboss.config" value="@{jboss.config}"/>
+						</ant-->
+						<!-- Commented out because they don't run on JB5 yet -->
+						<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
+							<property name="jboss.home" value="${jboss.home}"/>
+							<property name="jboss.config" value="@{jboss.config}"/>
+						</ant-->
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5.home}" />
 		<antcall target="build-mobicents-sip-load-balancer">
 			<param name="jboss.home" value="${jboss-5.home}"/>
@@ -156,6 +156,14 @@
 		<antcall target="build-documentation">
 			<param name="jboss.home" value="${jboss-5.home}"/>
 		</antcall>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+				
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>				
+		
 		<antcall target="make-final-zip-jboss-5" />
 	</target>
 	
@@ -204,7 +212,7 @@
 			<arg line="clean install -U -P set-svn-revision,jboss-5-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-annotations.jar" />
+		<!--delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-annotations.jar" />
 		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-impl.jar" />
 		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-spec.jar" />
 		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
@@ -219,15 +227,7 @@
 		</copy>
 		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
 			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
-		</copy>
-		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-svn-revision" />
-		</exec>
-		
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/click2call.war">
-			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
-		</copy>
+		</copy-->				
 				
 		<antcall target="deploy-mgmnt" >
 			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
@@ -237,14 +237,14 @@
 			<arg line="clean install -U -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<!--condition property="ha.capable">
+		<condition property="ha.capable">
 			<or>
 				<equals arg1="${jboss.config}" arg2="all" />
 				<equals arg1="${jboss.config}" arg2="production" />
 			</or>
 		</condition>
 		
-		<antcall target="release-jboss-node-ha" /-->
+		<antcall target="release-jboss-5-node-ha" />
 		
 	</target>
 	
@@ -252,9 +252,10 @@
 		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
 		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
-		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
-		
+		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/war-deployers-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+				
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
@@ -264,6 +265,37 @@
 		</copy>
 		
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+	</target>
+	
+	<target name="release-jboss-5-node-ha" if="ha.capable">
+		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
+		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
+		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
+		
+		<!-- we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum) -->
+		<copy overwrite="true" file="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/jboss-web-service.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-web-service.jar" />
+		<copy overwrite="true" file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar" />
+		<move file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar.bak" />		
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
+			<arg line="clean install -U -P set-svn-revision"/>
+		</exec>
+			
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/simple-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
+		</copy>						
+			
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+									
+		<copy tofile="${jboss-5.home}/server/all/deploy/click2call-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click2call-distributable/target/" includes="click2call-distributable-*.war" />
+		</copy>
+		
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
 	</target>
 	
 	<!-- MSS Management Console -->
