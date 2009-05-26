@@ -903,9 +903,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					logger.info("Snapshot Manager " + ctx.getSoleSnapshotSipManager());
 				}
 				if (ctx.getSoleSnapshotSipManager() != null) {
-					((SnapshotSipManager)ctx.getSoleSnapshotSipManager()).snapshot(
+					ctx.getSoleSnapshotSipManager().snapshot(
 							ctx.getSoleSipSession());
-					((SnapshotSipManager)ctx.getSoleSnapshotSipManager()).snapshot(
+					ctx.getSoleSnapshotSipManager().snapshot(
 							ctx.getSoleSipApplicationSession());
 				} 
 			} finally {

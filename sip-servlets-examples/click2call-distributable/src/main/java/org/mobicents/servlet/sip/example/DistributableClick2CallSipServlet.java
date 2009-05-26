@@ -139,6 +139,9 @@ public class DistributableClick2CallSipServlet
 								"application/sdp");
 					}
 	
+					session.setAttribute("LinkedSession", firstPartyAck.getSession());
+					firstPartyAck.getSession().setAttribute("LinkedSession", session);
+					
 					firstPartyAck.send();
 					secondPartyAck.send();
 				}

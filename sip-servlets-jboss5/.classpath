@@ -63,9 +63,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/cl/jboss-classloading-vfs/2.0.6.GA/jboss-classloading-vfs-2.0.6.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/cl/jboss-classloading/2.0.6.GA/jboss-classloading-2.0.6.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/cluster/jboss-ha-client/1.1.1.GA/jboss-ha-client-1.1.1.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/cluster/jboss-ha-server-api/1.1.1.GA/jboss-ha-server-api-1.1.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/cluster/jboss-ha-server-api/1.1.1.GA/jboss-ha-server-api-1.1.1.GA.jar" sourcepath="/JBOSS-5/ha-server-api-1.1.1.GA/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/cluster/jboss-ha-server-cache-jbc/2.0.0.GA/jboss-ha-server-cache-jbc-2.0.0.GA.jar" sourcepath="/JBOSS-5/ha-server-cache-jbc-2.0.0.GA/src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/cluster/jboss-ha-server-cache-spi/2.0.0.GA/jboss-ha-server-cache-spi-2.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/cluster/jboss-ha-server-cache-spi/2.0.0.GA/jboss-ha-server-cache-spi-2.0.0.GA.jar" sourcepath="/JBOSS-5/ha-server-cache-spi-2.0.0.GA/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/deployers/jboss-deployers-client-spi/2.0.7.GA/jboss-deployers-client-spi-2.0.7.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/deployers/jboss-deployers-client/2.0.7.GA/jboss-deployers-client-2.0.7.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/deployers/jboss-deployers-core-spi/2.0.7.GA/jboss-deployers-core-spi-2.0.7.GA.jar"/>

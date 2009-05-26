@@ -129,12 +129,12 @@ public class ConvergedClusteredSessionValve extends ClusteredSessionValve {
 				}
 				ctx = ConvergedSessionReplicationContext.exitSipapp();
 				if(logger.isInfoEnabled()) {
-					logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+					logger.info("Snapshot Manager " + ctx.getSoleSnapshotSipManager());
 				}
-				if (ctx.getSoleSnapshotManager() != null) {
-					((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+				if (ctx.getSoleSnapshotSipManager() != null) {
+					ctx.getSoleSnapshotSipManager().snapshot(
 							ctx.getSoleSipSession());
-					((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
+					ctx.getSoleSnapshotSipManager().snapshot(
 							ctx.getSoleSipApplicationSession());
 				} 
 			} finally {

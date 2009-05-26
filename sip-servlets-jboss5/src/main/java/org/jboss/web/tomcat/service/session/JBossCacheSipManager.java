@@ -1292,7 +1292,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
             else
             {               
                boolean notify = true;
-               boolean localCall = true;
+               //FIXME set to true when problem with cahce on stop is resolved
+               boolean localCall = false;
                boolean localOnly = true;
                ses.expire(notify, localCall, localOnly, ClusteredSessionNotificationCause.UNDEPLOY);               
             }
@@ -1325,12 +1326,14 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                // Ignore the marker entries for our passivated sessions
                if (!osu.passivated)
                {
-                  getDistributedCacheManager().evictSession(realId, osu.owner);
+            	 //FIXME uncomment when problem with cahce on stop is resolved
+//                  getDistributedCacheManager().evictSession(realId, osu.owner);
                }
             }
             else
             {
-               getDistributedCacheManager().removeSessionLocal(realId);           
+            	//FIXME uncomment when problem with cahce on stop is resolved
+//               getDistributedCacheManager().removeSessionLocal(realId);           
             }
          }
          catch (Exception e)
