@@ -125,6 +125,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * use Pretty Encoding
 	 */
 	private boolean usePrettyEncoding;
+	
+	/*
+	 * These settings staticServerAddress, staticServerPort will override all stun settings and will 
+	 * put the server address in the Via/RR/Contact headers
+	 */
+	private String staticServerAddress;
+	private String staticServerPort;
+	private boolean useStaticAddress;
 
 	/**
 	 * {@inheritDoc}
@@ -343,13 +351,27 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 //				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
 				listeningPoint.setSentBy(globalIpAddress + ":" + port);
 			}
+			if(useStaticAddress) {
+				listeningPoint.setSentBy(staticServerAddress + ":" + port);
+			}
 			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
 			sipStack.start();
 			
 			//creating the extended listening point
 			extendedListeningPoint = new ExtendedListeningPoint(sipProvider, listeningPoint);
-			extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
-			extendedListeningPoint.setGlobalPort(globalPort);
+			
+			if(useStaticAddress) {
+				extendedListeningPoint.setGlobalIpAddress(staticServerAddress);
+				extendedListeningPoint.setGlobalPort(Integer.parseInt(staticServerPort));
+				if(logger.isInfoEnabled()) {
+					logger.info("Using static server address: " + staticServerAddress 
+							+ " and port: " + staticServerPort);
+				}
+			} else {
+				extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
+				extendedListeningPoint.setGlobalPort(globalPort);
+			}
+		
 			//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
 			
 			//made the sip stack and the extended listening Point available to the service implementation
@@ -580,7 +602,31 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
     
     // -------------------- JMX related methods --------------------
 
-    // *
+    public String getStaticServerAddress() {
+		return staticServerAddress;
+	}
+
+	public void setStaticServerAddress(String staticServerAddress) {
+		this.staticServerAddress = staticServerAddress;
+	}
+
+	public String getStaticServerPort() {
+		return staticServerPort;
+	}
+
+	public void setStaticServerPort(String staticServerPort) {
+		this.staticServerPort = staticServerPort;
+	}
+
+	public boolean isUseStaticAddress() {
+		return useStaticAddress;
+	}
+
+	public void setUseStaticAddress(boolean useStaticAddress) {
+		this.useStaticAddress = useStaticAddress;
+	}
+
+	// *
     protected String domain;
     protected ObjectName oname;
     protected MBeanServer mserver;
