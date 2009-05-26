@@ -5,7 +5,7 @@
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-c">
 
-  <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1" />
+  <recv request="INVITE" rrs="true" timeout="10000" />
 
   <send>
     <![CDATA[
@@ -50,16 +50,16 @@
     ]]>
   </send>
   
-  <recv request="ACK" >
+  <recv request="ACK" timeout="10000" >
     <action>
       <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
       <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
     </action>
   </recv>
   
-  <pause milliseconds="13000"/>
+  <pause milliseconds="10000"/>
   
-	<send retrans="500">
+	<send retrans="5000">
 	 <![CDATA[BYE sip:BigGuy@127.0.0.1:5080 SIP/2.0
 Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
 From : [$2]

@@ -354,19 +354,20 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#getLinkedSession(javax.servlet.sip.SipSession)
 	 */
-	public SipSession getLinkedSession(SipSession session) {
+	public SipSession getLinkedSession(final SipSession session) {
 		if ( session == null) { 
 			throw new NullPointerException("the argument is null");
 		}
 		if(!session.isValid()) {
 			throw new IllegalArgumentException("the session is invalid");
 		}
-		SipSessionKey sipSessionKey = this.sessionMap.get(((MobicentsSipSession)session).getKey());
+		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)session;
+		SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
 			return null;
 		}
-		MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, null);
+		MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
 		if(logger.isDebugEnabled()) {
 			if(linkedSession != null) {
 				logger.debug("Linked Session found : " + linkedSession.getKey() + " for this session " + session.getId());
@@ -389,11 +390,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if ( req == null) { 
 			throw new NullPointerException("the argument is null");
 		}
-		SipSessionKey sipSessionKey = sessionMap.get(((MobicentsSipSession)req.getSession()).getKey());
+		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)req.getSession();
+		SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			return null;
 		}
-		MobicentsSipSession linkedSipSession = sipManager.getSipSession(sipSessionKey, false, null, null);
+		MobicentsSipSession linkedSipSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
 		if(linkedSipSession == null) {
 			return null;
 		}

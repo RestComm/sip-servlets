@@ -61,7 +61,7 @@
 
 <pause milliseconds="14000"/>
   
-  <recv request="BYE" timeout="5000" />
+  <recv request="BYE" timeout="20000" />
 
   <send>
     <![CDATA[
