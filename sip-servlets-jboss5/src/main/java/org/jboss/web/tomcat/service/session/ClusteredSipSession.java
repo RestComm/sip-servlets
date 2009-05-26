@@ -929,21 +929,26 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		//inject the dialog into the available sip stacks
 		if(logger.isDebugEnabled()) {
 			logger.debug("dialog to inject " + sessionCreatingDialog);
+			if(sessionCreatingDialog != null) {
+				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialog.getDialogId());
+			}
 		}
-		Container context = manager.getContainer();
-		Container container = context.getParent().getParent();
-		if(container instanceof Engine) {
-			Service service = ((Engine)container).getService();
-			if(service instanceof SipService) {
-				Connector[] connectors = service.findConnectors();
-				for (Connector connector : connectors) {
-					SipStack sipStack = (SipStack)
-						connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-					if(sipStack != null && sessionCreatingDialog!= null && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null && sipStack.getSipProviders().hasNext()) {
-						((SIPDialog)sessionCreatingDialog).setSipProvider((SipProviderImpl)sipStack.getSipProviders().next());
-						((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
-						if(logger.isDebugEnabled()) {
-							logger.debug("dialog injected " + sessionCreatingDialog);
+		if(sessionCreatingDialog != null && sessionCreatingDialog.getDialogId() != null) {
+			Container context = manager.getContainer();
+			Container container = context.getParent().getParent();
+			if(container instanceof Engine) {
+				Service service = ((Engine)container).getService();
+				if(service instanceof SipService) {
+					Connector[] connectors = service.findConnectors();
+					for (Connector connector : connectors) {
+						SipStack sipStack = (SipStack)
+							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+						if(sipStack != null && sipStack.getSipProviders().hasNext() && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
+							((SIPDialog)sessionCreatingDialog).setSipProvider((SipProviderImpl)sipStack.getSipProviders().next());
+							((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
+							if(logger.isDebugEnabled()) {
+								logger.debug("dialog injected " + sessionCreatingDialog);
+							}
 						}
 					}
 				}
