@@ -362,32 +362,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		if (!firstAccess && isNew) {
 			setNew(false);
 		}
-	}
-
-	public void endAccess() {
-		isNew = false;
-
-		if (ACTIVITY_CHECK) {
-			accessCount.decrementAndGet();
-		}
-
-		this.lastAccessedTime = this.thisAccessedTime;
-
-		if (firstAccess) {
-			firstAccess = false;
-			// Tomcat marks the session as non new, but that's not really
-			// accurate per SRV.7.2, as the second request hasn't come in yet
-			// So, we fix that
-			isNew = true;
-		}
-	}
-
-	public boolean isNew() {
-		if (!isValid())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.isNew.ise"));
-
-		return (this.isNew);
+		// everytime a SIP Message is sent, the state has to be replicated
+		sessionMetadataDirty();
 	}
 
 	public void setNew(boolean isNew) {
@@ -774,7 +750,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		// Replicate the session.
 		if (log.isTraceEnabled()) {
 			log
-					.trace("processSessionReplication(): session is dirty. Will increment "
+					.trace("processSipApplicationSessionReplication(): session is dirty. Will increment "
 							+ "version from: "
 							+ getVersion()
 							+ " and replicate.");

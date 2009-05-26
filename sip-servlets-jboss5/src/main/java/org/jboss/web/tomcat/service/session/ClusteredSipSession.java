@@ -398,33 +398,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if (!firstAccess && isNew) {
 			setNew(false);
 		}
-	}
-
-	public void endAccess() {
-		isNew = false;
-
-		if (ACTIVITY_CHECK) {
-			accessCount.decrementAndGet();
-		}
-
-		this.lastAccessedTime = this.thisAccessedTime;
-
-		if (firstAccess) {
-			firstAccess = false;
-			// Tomcat marks the session as non new, but that's not really
-			// accurate per SRV.7.2, as the second request hasn't come in yet
-			// So, we fix that
-			isNew = true;
-		}
-	}
-
-	public boolean isNew() {
-		if (!isValid())
-			throw new IllegalStateException(sm
-					.getString("clusteredSession.isNew.ise"));
-
-		return (this.isNew);
-	}
+		// everytime a SIP Message is sent, the state has to be replicated
+		sessionMetadataDirty();
+	}		
 
 	public void setNew(boolean isNew) {
 		this.isNew = isNew;
@@ -937,8 +913,14 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		readyToInvalidate = md.isReadyToInvalidate();
 		proxy = (ProxyImpl) md.getProxy();
 		b2buaHelper = (B2buaHelperImpl) md.getB2buaHelper();
+		if(logger.isDebugEnabled()) {
+			logger.debug("deserialized proxy for the sip session "+ proxy);
+		}
 		if(proxy != null) {
 			proxy.setSipFactoryImpl(sipFactory);
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("deserialized b2buahelper for the sip session "+ b2buaHelper);
 		}
 		if(b2buaHelper != null) {
 			b2buaHelper.setSipFactoryImpl(sipFactory);
@@ -978,7 +960,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// Replicate the session.
 		if (log.isTraceEnabled()) {
 			log
-					.trace("processSessionReplication(): session is dirty. Will increment "
+					.trace("processSipSessionReplication(): session is dirty. Will increment "
 							+ "version from: "
 							+ getVersion()
 							+ " and replicate.");

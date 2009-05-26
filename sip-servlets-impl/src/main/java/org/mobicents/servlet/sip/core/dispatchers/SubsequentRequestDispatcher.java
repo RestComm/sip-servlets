@@ -215,17 +215,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						}
 								
 						// See if the subsequent request should go directly to the proxy
-						ProxyImpl proxy = sipSession.getProxy();
+						final ProxyImpl proxy = sipSession.getProxy();
 						if(proxy != null) {
-							if(proxy.getFinalBranchForSubsequentRequests() != null) {
-								ProxyBranchImpl proxyBranch = sipSession.getProxy().getFinalBranchForSubsequentRequests();
+							final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
+							if(finalBranch != null) {								
 								proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
 								proxy.setOriginalRequest(sipServletRequest);
 								callServlet(sipServletRequest);
-								proxyBranch.proxySubsequentRequest(sipServletRequest);
+								finalBranch.proxySubsequentRequest(sipServletRequest);
 							} else if(sipServletRequest.getMethod().equals(Request.PRACK)) {
 								callServlet(sipServletRequest);
-								List<ProxyBranch> branches = sipSession.getProxy().getProxyBranches();
+								List<ProxyBranch> branches = proxy.getProxyBranches();
 								for(ProxyBranch pb : branches) {
 									ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
 									if(proxyBranch.isWaitingForPrack()) {
