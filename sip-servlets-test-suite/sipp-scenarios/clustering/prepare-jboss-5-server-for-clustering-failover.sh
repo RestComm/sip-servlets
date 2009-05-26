@@ -8,6 +8,13 @@
 
 #cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 #cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
+# we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum)
+cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/jboss-web-service.jar
+cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/jboss-web-service.jar
+cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
+cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
+mv $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar.bak
+# end of jars dirty copy
 cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
 cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
 cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
