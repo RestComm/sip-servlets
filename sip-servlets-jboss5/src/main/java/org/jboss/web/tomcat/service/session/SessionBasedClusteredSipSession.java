@@ -30,7 +30,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 /**
  * This class is based on the following Jboss class
  * org.jboss.web.tomcat.service.session.SessionBasedClusteredSession JBOSS AS
- * 5.1.0.CR1 Tag
+ * 5.1.0.GA Tag
  * 
  * ClusteredSession where the replication granularity level is session based;
  * that is, we replicate the entire attribute map whenever a request makes any

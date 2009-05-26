@@ -31,7 +31,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 /**
  * This class is based on the following Jboss class
  * org.jboss.web.tomcat.service.session.AttributeBasedClusteredSession JBOSS AS
- * 5.1.0.CR1 Tag
+ * 5.1.0.GA Tag
  * 
  * Implementation of a clustered sip application session where the replication
  * granularity level is attribute based; that is, we replicate only the dirty

@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * Implementation of a clustered sip session for the JBossCacheManager. This
  * class is based on the following Jboss class
  * org.jboss.web.tomcat.service.session.FieldBasedClusteredSession JBOSS AS
- * 5.1.0.CR1 Tag
+ * 5.1.0.GA Tag
  * 
  * The replication granularity level is field based; that is, we replicate only
  * the dirty field in a POJO that is part of a session attribute. E.g., once a

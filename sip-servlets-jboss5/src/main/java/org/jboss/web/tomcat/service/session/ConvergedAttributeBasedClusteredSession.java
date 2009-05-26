@@ -33,7 +33,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
  * Extension of the Jboss AttributeBasedClusteredSession class so that applications
  * are able to cast this session implementation to javax.servlet.sip.ConvergedHttpSession interface.
  * 
- * Based on AttributeBasedClusteredSession JBOSS AS 5.1.0.CR1 Tag
+ * Based on AttributeBasedClusteredSession JBOSS AS 5.1.0.GA Tag
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  * 

@@ -90,6 +90,8 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 	}
 	
 	public void stop() {
+		//FIXME : this is a hack to remove exception on shutdown, when releasing the cache to the manager
+		jBossCacheService.cacheConfigName_ = null;
 		if (sipCacheListener_ != null) {
 			jBossCacheService.getCache().removeCacheListener(sipCacheListener_);
 			if (sipPassivationListener_ != null) {

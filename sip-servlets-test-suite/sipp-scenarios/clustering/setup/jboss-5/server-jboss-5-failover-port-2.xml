@@ -41,7 +41,7 @@
 	     signalingTransport="udp" 
     	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 
-      <Engine name="jboss.web" defaultHost="localhost"  className="org.mobicents.servlet.sip.startup.SipStandardEngine">
+      <Engine name="jboss.web" defaultHost="localhost"  className="org.mobicents.servlet.sip.startup.SipStandardEngine" jvmRoute="node2">
 
          <!-- The JAAS based authentication and authorization realm implementation
          that is compatible with the jboss 3.2.x realm implementation.
