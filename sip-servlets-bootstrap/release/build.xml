@@ -50,7 +50,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-tomcat,release-jboss,release-jboss-5,make-src-zip,clean" />
+	<target name="release" depends="clean,release-jboss-5,release-tomcat,release-jboss,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	
@@ -160,7 +160,7 @@
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
 				
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/click2call.war">
+		<copy tofile="${jboss-5.home}/server/default/deploy/click2call.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
 		</copy>				
 		
@@ -272,7 +272,7 @@
 		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
 		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
-		<copy overwrite="true" file="${base.path}/war-deployers-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
 				
 		<!-- we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum) -->
 		<copy overwrite="true" file="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/jboss-web-service.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-web-service.jar" />
