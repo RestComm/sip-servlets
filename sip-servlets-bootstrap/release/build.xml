@@ -268,8 +268,8 @@
 	
 	<target name="release-jboss-5-node-ha" if="ha.capable">
 		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss5/failover-server-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
-		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss5/failover-server-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />
+		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
 		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
