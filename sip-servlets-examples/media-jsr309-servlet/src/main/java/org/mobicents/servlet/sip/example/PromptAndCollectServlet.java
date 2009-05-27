@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import javax.media.mscontrol.JoinEvent;
-import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
 import javax.media.mscontrol.StatusEvent;
 import javax.media.mscontrol.StatusEventListener;
@@ -24,6 +23,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.media.mscontrol.MediaSessionImpl;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class PromptAndCollectServlet extends PlayerServlet {
 
 	private final static String WELCOME_MSG = "http://"
 			+ System.getProperty("jboss.bind.address", "127.0.0.1")
-			+ ":8080/media-jsr309-servlet/audio/welcome.wav";
+			+ ":8080/media-jsr309-servlet/audio/dtmf_welcome.wav";
 	private final static String DTMF_0 = "http://"
 			+ System.getProperty("jboss.bind.address", "127.0.0.1")
 			+ ":8080/media-jsr309-servlet/audio/dtmf0.wav";
@@ -95,13 +95,16 @@ public class PromptAndCollectServlet extends PlayerServlet {
 	@Override
 	protected void doAck(SipServletRequest req) throws ServletException,
 			IOException {
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Received ACK for INVITE " + req);
+		}
 		SipSession sipSession = req.getSession();
 
-		MediaSession ms = (MediaSession) sipSession
+		MediaSessionImpl ms = (MediaSessionImpl) sipSession
 				.getAttribute("MEDIA_SESSION");
 		try {
-			MediaGroup mg = ms
-					.createContainer(MediaGroupConfig.c_PlayerSignalDetector);
+			MediaGroup mg = ms.createMediaGroup(MediaGroupConfig.c_PlayerSignalDetector);
 			mg.addListener(new MyStatusEventListener());
 
 			NetworkConnection nc = (NetworkConnection) sipSession
@@ -124,6 +127,9 @@ public class PromptAndCollectServlet extends PlayerServlet {
 					&& JoinEvent.ev_Joined.equals(event.getEventType())) {
 				// NC Joined to MG
 
+				if (logger.isDebugEnabled()) {
+					logger.debug("NC joined to MG. Start Player");
+				}
 				try {
 					Player player = mg.getPlayer();
 					player.addListener(new PlayerListener());

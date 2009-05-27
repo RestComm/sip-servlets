@@ -19,17 +19,22 @@ import javax.media.mscontrol.resource.Error;
 import javax.media.mscontrol.resource.MediaEventListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
 
 /**
  * 
  * @author amit bhayani
- *
+ * 
  */
-public class PromptAndRecordServlet extends PlayerServlet {
+public class PromptAndRecordServlet extends PlayerServlet implements
+		TimerListener {
 
 	private static Logger logger = Logger
 			.getLogger(PromptAndRecordServlet.class);
@@ -37,9 +42,12 @@ public class PromptAndRecordServlet extends PlayerServlet {
 	private final static String WELCOME_MSG = "http://"
 			+ System.getProperty("jboss.bind.address", "127.0.0.1")
 			+ ":8080/media-jsr309-servlet/audio/record_welcome.wav";
+
+	private static final int RECORDING_DELAY = 60000;
+
 	private final static String RECORDER = "test.wav";
-	
-	private final String RECORDED_FILE = "file://" + System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
+	private final String RECORDED_FILE = "file://"
+			+ System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -67,6 +75,17 @@ public class PromptAndRecordServlet extends PlayerServlet {
 			// Clean up media session
 			terminate(sipSession, ms);
 		}
+	}
+
+	public void timeout(ServletTimer servletTimer) {
+
+		SipSession sipSession = servletTimer.getApplicationSession()
+				.getSipSession((String) servletTimer.getInfo());
+
+		MediaSession ms = (MediaSession) sipSession
+				.getAttribute("MEDIA_SESSION");
+		
+		
 	}
 
 	private class MyStatusEventListener implements StatusEventListener {
@@ -106,13 +125,27 @@ public class PromptAndRecordServlet extends PlayerServlet {
 			MediaGroup mg = player.getContainer();
 			if (Error.e_OK.equals(event.getError())
 					&& Player.ev_PlayComplete.equals(event.getEventType())) {
+
+				MediaSession mediaSession = event.getSource().getMediaSession();
+
+				SipSession sipSession = (SipSession) mediaSession
+						.getAttribute("SIP_SESSION");
+
+				SipApplicationSession sipAppSession = sipSession
+						.getApplicationSession();
+
 				try {
 					Recorder recoredr = mg.getRecorder();
 					URI prompt = URI.create(RECORDED_FILE);
 					recoredr.record(prompt, null, null);
-					
-					//TODO : Set timer
-					
+
+					// TODO : Set timer
+
+					TimerService timer = (TimerService) getServletContext()
+							.getAttribute(TIMER_SERVICE);
+					timer.createTimer(sipAppSession, RECORDING_DELAY, false,
+							sipSession.getId());
+
 				} catch (MsControlException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

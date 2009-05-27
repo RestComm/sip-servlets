@@ -37,6 +37,7 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.media.mscontrol.MediaSessionImpl;
 
 /**
  * This example shows a simple usage of JSR 309.
@@ -88,7 +89,9 @@ public class PlayerServlet extends SipServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
-		System.out.println("the simple sip servlet has been started");
+		if (logger.isDebugEnabled()) {
+			logger.debug("the simple sip servlet has been started");
+		}
 		super.init(servletConfig);
 
 		Properties property = new Properties();
@@ -130,7 +133,8 @@ public class PlayerServlet extends SipServlet {
 			}
 
 			// Create new media session and store in SipSession
-			MediaSession mediaSession = msControlFactory.createMediaSession();
+			MediaSessionImpl mediaSession = (MediaSessionImpl) msControlFactory
+					.createMediaSession();
 
 			sipSession.setAttribute("MEDIA_SESSION", mediaSession);
 			mediaSession.setAttribute("SIP_SESSION", sipSession);
@@ -140,7 +144,7 @@ public class PlayerServlet extends SipServlet {
 
 			// Create a new NetworkConnection and store in SipSession
 			NetworkConnection conn = mediaSession
-					.createContainer(NetworkConnectionConfig.c_Basic);
+					.createNetworkConnection(NetworkConnectionConfig.c_Basic);
 
 			NetworkConnectionListener ncListener = new NetworkConnectionListener();
 
@@ -194,10 +198,11 @@ public class PlayerServlet extends SipServlet {
 			IOException {
 
 		logger.info("MediaPlaybackServlet: Got BYE request:\n" + request);
-		
-		MediaSession mediaSession = (MediaSession) request.getSession().getAttribute("MEDIA_SESSION");
+
+		MediaSession mediaSession = (MediaSession) request.getSession()
+				.getAttribute("MEDIA_SESSION");
 		mediaSession.release();
-		
+
 		SipServletResponse sipServletResponse = request.createResponse(200);
 		sipServletResponse.send();
 		// releasing the media connection
@@ -229,6 +234,9 @@ public class PlayerServlet extends SipServlet {
 					resp.setContent(sdp, "application/sdp");
 					// Send 200 OK
 					resp.send();
+					if (logger.isDebugEnabled()) {
+						logger.debug("Sent OK Response for INVITE");
+					}
 
 					sipSession.setAttribute("NETWORK_CONNECTION", conn);
 
@@ -243,16 +251,29 @@ public class PlayerServlet extends SipServlet {
 				try {
 					if (NetworkConnection.e_ModifyOffersRejected.equals(event
 							.getError())) {
+
+						if (logger.isDebugEnabled()) {
+							logger
+									.debug("Sending SipServletResponse.SC_NOT_ACCEPTABLE_HERE for INVITE");
+						}
 						// Send 488 error response to INVITE
 						inv.createResponse(
 								SipServletResponse.SC_NOT_ACCEPTABLE_HERE)
 								.send();
 					} else if (NetworkConnection.e_ResourceNotAvailable
 							.equals(event.getError())) {
+						if (logger.isDebugEnabled()) {
+							logger
+									.debug("Sending SipServletResponse.SC_BUSY_HERE for INVITE");
+						}
 						// Send 486 error response to INVITE
 						inv.createResponse(SipServletResponse.SC_BUSY_HERE)
 								.send();
 					} else {
+						if (logger.isDebugEnabled()) {
+							logger
+									.debug("Sending SipServletResponse.SC_SERVER_INTERNAL_ERROR for INVITE");
+						}
 						// Some unknown error. Send 500 error response to INVITE
 						inv.createResponse(
 								SipServletResponse.SC_SERVER_INTERNAL_ERROR)

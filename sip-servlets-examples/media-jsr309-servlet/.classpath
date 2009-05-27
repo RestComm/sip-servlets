@@ -3,8 +3,13 @@
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jain/jain-mgcp-ri/1.0/jain-mgcp-ri-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.96/jain-sip-ri-1.2.96.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/jsr309/mobicents-jsr309-impl/2.0.0.BETA1-SNAPSHOT/mobicents-jsr309-impl-2.0.0.BETA1-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/jain/mobicents-mgcp-impl/2.0.0.RC2-SNAPSHOT/mobicents-mgcp-impl-2.0.0.RC2-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/external/jsr309/mscontrol/0.2/mscontrol-0.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.10-SNAPSHOT/sip-servlets-spec-1.1.10-SNAPSHOT.jar"/>
