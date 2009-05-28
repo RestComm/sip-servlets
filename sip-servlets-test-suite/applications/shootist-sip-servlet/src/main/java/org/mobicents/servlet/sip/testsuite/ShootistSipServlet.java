@@ -111,9 +111,13 @@ public class ShootistSipServlet
 		} else {
 			toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		}
-		String toTag = ce.getServletContext().getInitParameter("ToTag");
+		String toTag = ce.getServletContext().getInitParameter("toTag");
 		if(toTag != null) {
 			toURI.setParameter("tag", toTag);
+		}
+		String toParam = ce.getServletContext().getInitParameter("toParam");
+		if(toParam != null) {
+			toURI.setParameter("toParam", toParam);
 		}
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);

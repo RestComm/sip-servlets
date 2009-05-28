@@ -50,7 +50,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 				"sip-test-context", "sip-test"));
 	}
 	
-	public void deployApplicationSetToTag() {
+	public void deployApplicationSetToParam(String name, String value) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
@@ -58,11 +58,11 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName("ToTag");
-		applicationParameter.setValue("callernwPort1241042500479");
+		applicationParameter.setName(name);
+		applicationParameter.setValue(value);
 		context.addApplicationParameter(applicationParameter);
 		assertTrue(tomcat.deployContext(context));
-	}
+	}		
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -92,6 +92,10 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());		
 	}
 	
+	/**
+	 * non regression test for Issue 676 http://code.google.com/p/mobicents/issues/detail?id=676
+	 *  Tags not removed when using SipFactory.createRequest() 
+	 */
 	public void testShootistSetToTag() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
@@ -104,7 +108,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
-		deployApplicationSetToTag();
+		deployApplicationSetToParam("toTag", "callernwPort1241042500479");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	/**
+	 * non regression test for Issue 732 http://code.google.com/p/mobicents/issues/detail?id=732
+	 * duplicate parameters when using sipFactory.createAddress(uri) with a uri having parameters
+	 */
+	public void testShootistSetToParam() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplicationSetToParam("toParam", "http://yaris.research.att.com:23280/vxml/test.jsp");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}

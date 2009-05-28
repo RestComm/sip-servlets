@@ -68,15 +68,18 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 		if(parameters != null) {
 			this.parameters = parameters;
 		}
-		if(this.address.getURI() instanceof Parameters) {
-			Parameters uri = (Parameters) this.address.getURI();
-			Iterator<String> parameterNames = uri.getParameterNames();
-			while (parameterNames.hasNext()) {
-				String parameterName = (String) parameterNames.next();
-				String value = uri.getParameter(parameterName);
-				this.parameters.put(parameterName.toLowerCase(), value);		
-			}
-		}
+		// this isn't right : we shouldn't copy the uri params as address params
+		// See Issue 732 : http://code.google.com/p/mobicents/issues/detail?id=732
+		// duplicate parameters when using sipFactory.createAddress(uri) with a uri having parameters 
+//		if(this.address.getURI() instanceof Parameters) {
+//			Parameters uri = (Parameters) this.address.getURI();
+//			Iterator<String> parameterNames = uri.getParameterNames();
+//			while (parameterNames.hasNext()) {
+//				String parameterName = (String) parameterNames.next();
+//				String value = uri.getParameter(parameterName);
+//				this.parameters.put(parameterName.toLowerCase(), value);		
+//			}
+//		}
 	}
 
 	/**
