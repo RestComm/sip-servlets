@@ -935,14 +935,8 @@
 				</subsection>
 			</subsection>
 			<subsection name="Planned Versions">																												
-				<subsection name="Version 1.0 - 06/01/2008">
-					<p>							
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=627">
-						Sip Servlets Presence Client Libraries
-						</a>
-						<br />
+				<subsection name="Version 1.0 - 06/07/2008">
+					<p>													
 						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=109">
@@ -955,10 +949,16 @@
 						Jopr plugin for MSS on JBoss 5
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=521">
 						Clustering for MSS on JBoss AS 5
+						</a>
+						<br />
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=731">
+						 Investigate IP Load Balancer setup for MSS HA
 						</a>
 						<br />
 						<img src="orange.jpeg" />
@@ -1077,6 +1077,12 @@
 				</subsection>
 				<subsection name="Post 1.0 - No defined date">
 					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=627">
+						Sip Servlets Presence Client Libraries
+						</a>
+						<br />
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=721">
