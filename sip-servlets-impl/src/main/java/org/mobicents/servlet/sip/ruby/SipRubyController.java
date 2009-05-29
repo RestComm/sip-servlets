@@ -21,6 +21,9 @@
  */
 package org.mobicents.servlet.sip.ruby;
 
+import javax.servlet.ServletContext;
+import javax.servlet.sip.SipServletMessage;
+
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -30,9 +33,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  */
 public interface SipRubyController {
 
-	void routeSipRequestToRubyApp(SipServletRequestImpl request);
-	
-	void routeSipResponseToRubyApp(SipServletResponseImpl response);
+	void routeSipMessageToRubyApp(ServletContext servletContext, SipServletMessage sipServletMessage);	
 	
 	String getName();
 	void setName(String name);

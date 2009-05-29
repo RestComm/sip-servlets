@@ -362,6 +362,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			for(String servletName : sipApplication.getChildrenMap().keySet()) {
 				logger.info("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
 			}
+			if(sipApplication.getSipRubyController() != null) {
+				logger.info("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
+			}
 		}
 	}
 	/**
