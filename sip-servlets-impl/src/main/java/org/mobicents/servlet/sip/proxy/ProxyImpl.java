@@ -540,8 +540,7 @@ public class ProxyImpl implements Proxy, Serializable {
 		
 		for(ProxyBranch pb: this.proxyBranches.values())
 		{
-			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;
-			SipServletResponse response = pb.getResponse();
+			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;			
 			if(!pbi.isStarted())
 			{
 				pbi.start();

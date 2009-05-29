@@ -690,12 +690,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
 	 */
 	public String getParameter(String name) {
+		// JSR 289 Section 5.6.1 Parameters :
+		// For initial requests where a preloaded Route header specified the application to be invoked, the parameters are those of the SIP or SIPS URI in that Route header.
+		// For initial requests where the application is invoked the parameters are those present on the request URI, 
+		// if this is a SIP or a SIPS URI. For other URI schemes, the parameter set is undefined.
+		// For subsequent requests in a dialog, the parameters presented to the application  are those that the application itself 
+		// set on the Record-Route header for the initial request or response (see 10.4 Record-Route Parameters). 
+		// These will typically be the URI parameters of the top Route header field but if the upstream SIP element is a 
+		// "strict router" they may be returned in the request URI (see RFC 3261). 
+		// It is the containers responsibility to recognize whether the upstream element is a strict router and determine the right parameter set accordingly.
 		if(this.getPoppedRoute() != null) {
-			return this.getPoppedRoute().getParameter(name);
+			return this.getPoppedRoute().getURI().getParameter(name);
 		} else {
-			RecordRouteHeader rrh = (RecordRouteHeader) message
-				.getHeader(RecordRouteHeader.NAME);
-			return rrh.getParameter(name);
+			return this.getRequestURI().getParameter(name);
 		}
 	}
 
@@ -704,14 +711,30 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.ServletRequest#getParameterMap()
 	 */
 	public Map<String, String> getParameterMap() {
-		RecordRouteHeader rrh = (RecordRouteHeader) message
-				.getHeader(RecordRouteHeader.NAME);
+		// JSR 289 Section 5.6.1 Parameters :
+		// For initial requests where a preloaded Route header specified the application to be invoked, the parameters are those of the SIP or SIPS URI in that Route header.
+		// For initial requests where the application is invoked the parameters are those present on the request URI, 
+		// if this is a SIP or a SIPS URI. For other URI schemes, the parameter set is undefined.
+		// For subsequent requests in a dialog, the parameters presented to the application  are those that the application itself 
+		// set on the Record-Route header for the initial request or response (see 10.4 Record-Route Parameters). 
+		// These will typically be the URI parameters of the top Route header field but if the upstream SIP element is a 
+		// "strict router" they may be returned in the request URI (see RFC 3261). 
+		// It is the containers responsibility to recognize whether the upstream element is a strict router and determine the right parameter set accordingly.
 		HashMap<String, String> retval = new HashMap<String, String>();
-		Iterator<String> parameterNamesIt = rrh.getParameterNames();
-		while (parameterNamesIt.hasNext()) {
-			String parameterName = (String) parameterNamesIt.next();
-			retval.put(parameterName, rrh.getParameter(parameterName));			
-		}
+		if(this.getPoppedRoute() != null) {
+			Iterator<String> parameterNamesIt =  this.getPoppedRoute().getURI().getParameterNames();
+			while (parameterNamesIt.hasNext()) {
+				String parameterName = parameterNamesIt.next();
+				retval.put(parameterName, this.getPoppedRoute().getURI().getParameter(parameterName));			
+			}
+		} else {
+			Iterator<String> parameterNamesIt =  this.getRequestURI().getParameterNames();
+			while (parameterNamesIt.hasNext()) {
+				String parameterName = parameterNamesIt.next();
+				retval.put(parameterName, this.getRequestURI().getParameter(parameterName));			
+			}
+		}		
+		
 		return retval;
 	}
 	/*
@@ -719,16 +742,31 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.ServletRequest#getParameterNames()
 	 */
 	public Enumeration<String> getParameterNames() {
-		RecordRouteHeader rrh = (RecordRouteHeader) message
-				.getHeader(RecordRouteHeader.NAME);
+		// JSR 289 Section 5.6.1 Parameters :
+		// For initial requests where a preloaded Route header specified the application to be invoked, the parameters are those of the SIP or SIPS URI in that Route header.
+		// For initial requests where the application is invoked the parameters are those present on the request URI, 
+		// if this is a SIP or a SIPS URI. For other URI schemes, the parameter set is undefined.
+		// For subsequent requests in a dialog, the parameters presented to the application  are those that the application itself 
+		// set on the Record-Route header for the initial request or response (see 10.4 Record-Route Parameters). 
+		// These will typically be the URI parameters of the top Route header field but if the upstream SIP element is a 
+		// "strict router" they may be returned in the request URI (see RFC 3261). 
+		// It is the containers responsibility to recognize whether the upstream element is a strict router and determine the right parameter set accordingly.
 		Vector<String> retval = new Vector<String>();
-		Iterator<String> parameterNamesIt = rrh.getParameterNames();
-		while (parameterNamesIt.hasNext()) {
-			String parameterName = (String) parameterNamesIt.next();
-			retval.add(parameterName);
+		if(this.getPoppedRoute() != null) {
+			Iterator<String> parameterNamesIt =  this.getPoppedRoute().getURI().getParameterNames();
+			while (parameterNamesIt.hasNext()) {
+				String parameterName = parameterNamesIt.next();
+				retval.add(parameterName);		
+			}
+		} else {
+			Iterator<String> parameterNamesIt =  this.getRequestURI().getParameterNames();
+			while (parameterNamesIt.hasNext()) {
+				String parameterName = parameterNamesIt.next();
+				retval.add(parameterName);
+			}
 		}		
-		return retval.elements();
-
+		
+		return retval.elements();				
 	}
 
 	/*
@@ -736,9 +774,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * 
 	 * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
 	 */
-	public String[] getParameterValues(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public String[] getParameterValues(String name) {
+		// JSR 289 Section 5.6.1 Parameters :
+		// The getParameterValues method returns an array of String objects containing all the parameter values associated with a parameter name. 
+		// The value returned from the getParameter method must always equal the first value in the array of String objects returned by getParameterValues.
+		// Note:Support for multi-valued parameters is defined mainly for HTTP because HTML forms may contain multi-valued parameters in form submissions.
+		return new String[] {getParameter(name)};
 	}
 
 	public String getRealPath(String arg0) {

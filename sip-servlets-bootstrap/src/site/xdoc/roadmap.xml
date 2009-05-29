@@ -973,7 +973,7 @@
 						Move to JBoss AS 5.1.0.GA
 						</a>
 						<br />	
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=703">
 						Move from JBoss Rails to the new torquebox
@@ -1070,6 +1070,20 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=700">
 									@SipApplicationKey method Class Loader issue
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=732">
+									duplicate parameters when using sipFactory.createAddress(uri) with a uri having parameters
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=733">
+									JSR 289 Section 5.6.1 Parameters incorrectly implemented
 								</a>								
 							</li>
 						</ul>
