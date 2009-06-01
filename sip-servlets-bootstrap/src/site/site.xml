@@ -76,6 +76,7 @@
 			<item name="SIP Load Balancer" href="load-balancer.html" />
 			<item name="Clustering" href="clustering.html" />
 			<item name="Failover" href="failover.html" />
+			<item name="IP Load Balancing" href="mss-ip-balancers.html" />
 		</menu>
 		<menu name="Contribute">			
 			<item name="How to Contribute" href="contributor.html" />

@@ -1,0 +1,62 @@
+<document>
+	<properties>
+		<title>IP load-balancing</title>
+	</properties>
+	<body>
+		<p>
+			<b><i>Throughout this page you can click on the images to see them larger.</i></b>
+		</p>
+		<section name="Introduction">
+		
+			<p>
+				An IP load-balancer is a network appliance that distributes traffic to application server (a.k.a real servers)
+				based on some load-balancing algorithm and the routing decisions are made only based on OSI layer 2, 3 or 4 structures.
+				In other words this type of load balancer only looks at low-level TCP/IP or ethernet things like MAC addresses, IP addresses, ports,
+				protocol type (TCP or UDP or other) and so on. This type of load balancer never reads the payload of the TCP/IP packets and thus
+				never parses SIP or HTTP or any protocol above layer 4. Since this device is not SIP or HTTP aware in any way it is much more performant
+				than mod_jk or our SIP load-balancer.
+			</p>
+			<p>
+			    The IP load-balancing is often used when the other load-balancers' capacity is exceeded and can not scale further without hardware upgrades.
+			</p>
+		</section>	
+		<section name="Technical overview">
+			<p>
+				In the simplest form the IP load-balancer usually "owns" the public-facing IP address (known as VIP) and routes the traffic to real server in it's private network serving as NAT in a way.
+				It is also possible to not change the IP address and just work on the MAC address by assuming that all real server are configured to accept packets for the VIP address.
+				Note that it depends on your load-balancer vendor what features are supported. For now we will just look at the popular Linux-based solution LVS in combination with the health check services. If you want to get started quickly it is recommended to
+				read <a href="http://www.ultramonkey.org/papers/lvs_tutorial/html/">this tutorial</a>. For a deeper looks at the system and especially if you are a RHEL user you should read <a href="http://www.redhat.com/docs/manuals/csgfs/">the official documentation by Red Hat</a>. There are number of other IP balancer solutions including hardware-based and they have similar features in most cases.
+			</p>
+		</section>
+		<section name="Why both with the SIP load balancer if the IP load-balancer is so much better?">
+		<p>
+			The main reason is the request affinity (sticky-ness). Sometimes it makes sense to configure your network to serve the requests
+			from the same call by a single machine. However the relationship between requests in a single call in in the SIP headers (the Call-ID for example).
+			It often goes further, when you want to stick a group of calls to one machine and when you want to have related HTTP and SIP requests to hit the same machine.
+			The point of hitting the same machine for related requests is that if you hit a different machine it will cause data-gravitation, which is the process of pulling
+			call state from the original machine where the call was started to the new machine and then keeping that state replicated. Usually you can select an eager-replication
+			strategy that will replicate the state immediately and you can even end up with no performance penalty at all especially when there is reasonable time between individual
+			related requests. So it depends on your requirements if this is a suitable option or you must use the SIP-aware load-balancer.
+			
+			You have a few choices on how to organize you IP load-balancing depending on your requirements:
+
+			</p>
+						<ul>
+			<li>If you don't need mid-call failover, you can just configure the LVS as a normal load-balancer and it will only route the initial requests. After the dialog is established initially the requests will continue flowing between the SIP client and the application server directly. In case of a NAT you should use STUN-enabled SIP clients.</li>
+				<li>If you need mid-call failover you should configure Mobicents Sip Servlets application servers with static address pointing to the load-balancer address. See <a href="http://code.google.com/p/mobicents/issues/detail?id=720">here</a> on how to do this. This option enabled all initial aAND subsequent requests to pass through the IP load-balancer and the IP-load balancer makes individual routing decisions for each of these requests. </li>
+			</ul><p>Now if you need the mid-call failover, you might need to enable connection affinity for these requests. Usually the SIP connection between a SIP client and a server is done using the same SIP ports (sockets), so what you need in this case is the usual connection persistence with LVS. And it is as simple as adding the <b>-p</b> option to your ipvsadm service.
+			For more information on persistence you can read <a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.persistent_connection.html">here</a></p>
+		</section>	
+
+		<section name="Solutions with Health-checks">
+		<p>
+		Health-checks is usually a separate problem from load-balancing, but with LVS there is an integrated project that helps you to make configuration from a single place. The load-balancer alone will route traffic to all configured nodes without checking if they are still alive. If you want the balancer to check for node health you should install a service on each of the nodes to report its status. You should install a service like <b>Red Hat Cluster Suite</b> or <b>keepalived</b>.
+		With both, you can configure both the load-balancing and the health-checks without doing manually the steps from the previous sections with the 
+		ipvsadm tool.
+		</p>
+		<p>
+		Read more on <a href="http://www.redhat.com/docs/manuals/csgfs/">Red Hat Cluster Suite</a>  and <a href="http://www.keepalived.org/pdf/UserGuide.pdf">keepalived</a>.
+		</p>
+		</section>	
+	</body>
+</document>
