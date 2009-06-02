@@ -1,5 +1,7 @@
 JRuby on Rails Sip Servlets application that can make phone calls
 
+	<<Note this example has been deprecated since the move to torquebox, since pure jruby apps can now handle SIP servlets messages, this has become the preferred way to do it>>
+
 * Service Description
 
 	The application will allow one to file complaints and every time a complaint is filed, 

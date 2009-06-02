@@ -1,0 +1,8 @@
+--- 
+application: 
+  RAILS_ENV: development
+  RAILS_ROOT: /home/deruelle//workspaces/mobicents-sip-servlets/sip-servlets-examples/pure-jruby-telco
+web: 
+  context: /pure-jruby-telco
+sip:  
+  rubycontroller: SipHandler

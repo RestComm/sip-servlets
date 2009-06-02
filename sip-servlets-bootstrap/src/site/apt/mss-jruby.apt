@@ -4,12 +4,16 @@ JRuby on Rails integration or How to make phone calls from a JRuby on Rails appl
 
 	Mobicents Sip Servlets is now featuring JRuby on Rails integration so that you can make phone calls from your favorite JRuby on Rails applications.	
 	 
+	To get more information on how to build pure JRuby-Rails applications leveraging Mobicents Sip Servlets to handle SIP please checkout the {{{http://torquebox.org/documentation/}Torquebox documentation}}
+	 
 	Check this {{{http://jeanderuelle.blogspot.com/2009/04/jruby-voip-app-on-jboss-5-reloaded-look.html}blog post}} to help you create your first pure JRuby on Rails Sip Servlets application and our {{{mss-pure-jruby-telco.html}pure JRuby on Rails Telco example}} showcasing this integration !
+	<<Note : the information over there is outdated since the move from JBoss Rails to Torquebox, so please checkout the Torquebox documentation instead>>
 	
 	Check this {{{http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html}blog post}} to help you create your first converged multi language JRuby on Rails Sip Servlets application and our simple {{{mss-jruby-example.html}JRuby on Rails Sip Servlets example}} showcasing this integration !
+	<<Note : this example has been deprecated since the move to torquebox, since pure jruby apps can now handle SIP servlets messages, this has become the preferred way to do it>>
 	
 	More infor on JRuby on Rails Telco support for JBoss 5 and Mobicents Sip Servlets at {{{http://oddthesis.org/theses/jboss-rails/projects/jboss-rails/pages/telco}oddthesis.org}}.
 
 * Limitations
 
-	There is no limitations known at the moment, you should even be able to cluster a jruby application deployed on Mobicents Sip Servlets on JBoss 5  
+	There is no limitations known at the moment, you should even be able to cluster a JRuby application deployed on Mobicents Sip Servlets on JBoss 5  

@@ -1,16 +1,20 @@
 Pure JRuby on Rails Sip Servlets application that can <make and receive phone calls>
 
+	<<Note : the information over there is outdated since the move from JBoss Rails to Torquebox, so please checkout the Torquebox documentation instead>>
+
 * Service Description
 
 	The application will allow one to file complaints and every time a complaint is filed, 
 	a confirmation call is made to your phone saying that is has been taken into account and has been routed to a sales representative.\
 	Moreover you can call directly the application and the pure jruby application will be able to handle the SIP signalling and setup and teardown the call. 
 	 
+	To get more information on how to build pure JRuby-Rails applications leveraging Mobicents Sip Servlets to handle SIP please checkout the {{{http://torquebox.org/documentation/}Torquebox documentation}}
+	 
 * How to activate it   
 
 ** From the source
 
-	Please check out the location service example located under this 
+	Please check out the JRuby pure VoIP example located under this 
 	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/pure-jruby-telco}location}} 
 	from the svn repository.\
 	Follow the instructions in the README.txt to build and run the example.  

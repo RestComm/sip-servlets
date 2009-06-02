@@ -1,9 +1,0 @@
---- 
-application: 
-  RAILS_ENV: development
-  RAILS_ROOT: /home/deruelle/git/git-projects/pure-jruby-telco
-web: 
-  context: /pure-jruby-telco
-sip:
-  appname: TelcoRubyApplication
-  rubycontroller: SipHandler
