@@ -52,7 +52,7 @@ public class ChatRoomSipServlet
 	private SipFactory sipFactory;	
 	
 	private static boolean staticField = false;
-	private static boolean isAppKeyCalled = false;
+	private static boolean isAppKeyCalled = false;	
 	
 	/** Creates a new instance of ListenersSipServlet */
 	public ChatRoomSipServlet() {

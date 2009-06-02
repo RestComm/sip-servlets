@@ -136,9 +136,6 @@ public class ClassFileScanner {
     		logger.debug("scanning jar " + path + " for annotations");
     	}
 		try {
-			URL[] urls = { new URL("jar:file:" + path + "!/") };
-			URLClassLoader urlClassLoader = URLClassLoader.newInstance(urls, this.classLoader);
-
 			JarFile jar =new JarFile(path);
 			Enumeration<JarEntry> jarEntries = jar.entries();
 			while (jarEntries.hasMoreElements()) {
@@ -149,16 +146,20 @@ public class ClassFileScanner {
 					String className =  entryName.substring(0, entryName.indexOf(".class"));
 					className = className.replace('/', '.');
 					className = className.replace('\\', '.');
-					Class<?> clazz = urlClassLoader.loadClass(className);				
-					processAnnotations(clazz);
+					try {
+		    	    	Class clazz = Class.forName(className, false, this.classLoader);
+		    	    	processAnnotations(clazz);
+		    		} catch (Throwable e) {
+		    			logger.warn("Failed to parse annotations for class " + className);
+		    			if(logger.isDebugEnabled()) {
+		    				logger.debug("Failed to parse annotations for class " + className, e);
+		    			}
+		    		}
 				}
 			}
 		} catch (IOException e) {
 			throw new AnnotationVerificationException("couldn't read the following jar file for parsing annotations " + path, e);
-		} catch (ClassNotFoundException e) {
-			throw new AnnotationVerificationException("couldn't read the following jar file for parsing annotations " + path, e);
-		}
-		
+		} 
 	}
     
     protected void analyzeClass(String path) throws AnnotationVerificationException {
@@ -184,7 +185,7 @@ public class ClassFileScanner {
     				logger.debug("Failed to parse annotations for class " + className, e);
     			}
     		}
-    	}
+    	} 
     }
     
     protected void processAnnotations(Class clazz) throws AnnotationVerificationException {
