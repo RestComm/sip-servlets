@@ -146,13 +146,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			throws ServletException, IOException {
 		if(logger.isInfoEnabled()) {
 			logger.info("Got : " + sipServletResponse.toString());
-		}
-		String cSeqValue = sipServletResponse.getHeader("CSeq");
-		if(cSeqValue.indexOf("BYE") != -1) {
+		}		
+		if(sipServletResponse.getMethod().indexOf("BYE") != -1) {
 			sipServletResponse.getApplicationSession().invalidate();
+			return;
 		} 
 		
-		if(cSeqValue.indexOf("INVITE") != -1) {
+		if(sipServletResponse.getMethod().indexOf("INVITE") != -1) {
 			//	if this is a response to an INVITE we ack it and forward the OK 
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			if(logger.isInfoEnabled()) {
