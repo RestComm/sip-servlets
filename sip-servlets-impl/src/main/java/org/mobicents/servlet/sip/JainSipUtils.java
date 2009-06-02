@@ -413,7 +413,9 @@ public class JainSipUtils {
 			SipNetworkInterfaceManager sipNetworkInterfaceManager,
 			Message message, ExtendedListeningPoint listeningPoint) {
 		boolean usePublicAddress = false;
-		if(listeningPoint.getGlobalIpAddress() != null) {
+		if(listeningPoint.isUseStaticAddress()) {
+			usePublicAddress = true;
+		} else if(listeningPoint.getGlobalIpAddress() != null) {
 			usePublicAddress = sipNetworkInterfaceManager.findUsePublicAddress(message);
 		}
 		return usePublicAddress;

@@ -348,21 +348,27 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
 			if(useStun) {
+				// TODO: (ISSUE-CONFUSION) Check what is the confusion here, why not use the globalport. It ends up putting the local port everywhere
 //				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
 				listeningPoint.setSentBy(globalIpAddress + ":" + port);
 			}
 			if(useStaticAddress) {
-				listeningPoint.setSentBy(staticServerAddress + ":" + port);
+				// TODO: (ISSUE-CONFUSION) Check what is the confusion here as above
+				listeningPoint.setSentBy(staticServerAddress + ":" + globalPort);
 			}
 			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
 			sipStack.start();
 			
 			//creating the extended listening point
 			extendedListeningPoint = new ExtendedListeningPoint(sipProvider, listeningPoint);
+			extendedListeningPoint.setUseStaticAddress(useStaticAddress);
 			
 			if(useStaticAddress) {
 				extendedListeningPoint.setGlobalIpAddress(staticServerAddress);
 				extendedListeningPoint.setGlobalPort(Integer.parseInt(staticServerPort));
+				
+				// TODO: (ISSUE-CONFUSION) This is a bit of a hack related to the same issue
+				extendedListeningPoint.setPort(Integer.parseInt(staticServerPort));
 				if(logger.isInfoEnabled()) {
 					logger.info("Using static server address: " + staticServerAddress 
 							+ " and port: " + staticServerPort);

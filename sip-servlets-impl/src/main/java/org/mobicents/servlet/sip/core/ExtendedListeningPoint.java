@@ -53,6 +53,7 @@ public class ExtendedListeningPoint {
 	private int globalPort;
 	private List<String> ipAddresses;
 	private boolean isAnyLocalAddress;
+	private boolean useStaticAddress;
 	
 //	String host = null;
 	int port = -1;
@@ -231,6 +232,22 @@ public class ExtendedListeningPoint {
 		this.globalPort = globalPort;
 	}
 	
+	/**
+	 * If we are using a statically assigned IP address instead of our local address (for example when IP LB is used)
+	 * @return
+	 */
+	public boolean isUseStaticAddress() {
+		return useStaticAddress;
+	}
+
+	/**
+	 * If we are using a statically assigned IP address instead of our local address (for example when IP LB is used)
+	 * @param useStaticAddress
+	 */
+	public void setUseStaticAddress(boolean useStaticAddress) {
+		this.useStaticAddress = useStaticAddress;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
@@ -283,6 +300,10 @@ public class ExtendedListeningPoint {
 	 */
 	public int getPort() {
 		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 	/**
