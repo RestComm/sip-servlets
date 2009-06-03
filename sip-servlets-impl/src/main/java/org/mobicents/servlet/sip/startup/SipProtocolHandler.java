@@ -70,6 +70,11 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  * 
  */
 public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
+	private static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
+	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
+	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";
+	private static final String IS_SIP_CONNECTOR = "isSipConnector";
+	private static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
 	// the logger
 	private static transient Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
 	// *
@@ -96,6 +101,12 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private String sipStackPropertiesFileLocation;
 	// defining sip stack properties
 	private Properties sipStackProperties;
+	
+	/**
+	 * the sip stack signaling transport
+	 */
+	private String sipPathName;
+	
 	/**
 	 * the sip stack signaling transport
 	 */
@@ -198,8 +209,11 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		if(logger.isInfoEnabled()) {
 			logger.info("Pretty encoding of headers enabled ? " + usePrettyEncoding);
 		}
-		SipFactories.initialize("gov.nist", usePrettyEncoding);
-		setAttribute("isSipConnector",Boolean.TRUE);
+		if(sipPathName == null) {
+			sipPathName = DEFAULT_SIP_PATH_NAME;
+		}
+		SipFactories.initialize(sipPathName, usePrettyEncoding);
+		setAttribute(IS_SIP_CONNECTOR,Boolean.TRUE);
 	}
 
 	public void pause() throws Exception {
@@ -265,18 +279,18 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					}		
 					FileInputStream sipStackPropertiesInputStream = new FileInputStream(sipStackPropertiesFile);
 					sipStackProperties.load(sipStackPropertiesInputStream);
-					String debugLog = sipStackProperties.getProperty("gov.nist.javax.sip.DEBUG_LOG");
+					String debugLog = sipStackProperties.getProperty(DEBUG_LOG_STACK_PROP);
 					if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
-						sipStackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+						sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
 							catalinaHome + "/" + debugLog);
 					}
-					String serverLog = sipStackProperties.getProperty("gov.nist.javax.sip.SERVER_LOG");
+					String serverLog = sipStackProperties.getProperty(SERVER_LOG_STACK_PROP);
 					if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
-						sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+						sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
 							catalinaHome + "/" + serverLog);
 					}
 					// The whole MSS is built upon this assumption, so this property is not overrideable
-					sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
+					sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
 					isPropsLoaded = true;
 				} else {
 					logger.warn("no sip stack properties file defined ");		
@@ -292,12 +306,12 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 						"true");
 				sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 						"32");
-				sipStackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+				sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
 						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-debug.txt");
-				sipStackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+				sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
 						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-messages.xml");
 				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + ipAddress + "-" + port);
-				sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");		
+				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
 				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
@@ -660,5 +674,19 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
     }
 
     public void postDeregister() {
-    }	
+    }
+
+	/**
+	 * @param sipPathName the sipPathName to set
+	 */
+	public void setSipPathName(String sipPathName) {
+		this.sipPathName = sipPathName;
+	}
+
+	/**
+	 * @return the sipPathName
+	 */
+	public String getSipPathName() {
+		return sipPathName;
+	}	
 }
