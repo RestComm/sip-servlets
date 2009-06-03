@@ -16,24 +16,9 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-import java.util.EventObject;
-import java.util.Hashtable;
-
-import javax.sip.DialogTerminatedEvent;
-import javax.sip.IOExceptionEvent;
-import javax.sip.RequestEvent;
-import javax.sip.ResponseEvent;
-import javax.sip.SipListener;
-import javax.sip.SipProvider;
-import javax.sip.TimeoutEvent;
-import javax.sip.TransactionTerminatedEvent;
-
-import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
-public class ParallelProxyWithRecordRouteTest extends SipServletTestCase implements SipListener {
-
-	private static transient Logger logger = Logger.getLogger(ParallelProxyWithRecordRouteTest.class);
+public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 
 	protected Shootist shootist;
 
@@ -41,11 +26,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 	
 	protected Cutme cutme;
 
-	protected Hashtable providerTable = new Hashtable();
-
 	private static final int TIMEOUT = 10000;
-
-	private static final int receiversCount = 1;
 
 	public ParallelProxyWithRecordRouteTest(String name) {
 		super(name);
@@ -57,6 +38,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 	public void setUp() throws Exception {
 		super.setUp();
 		this.shootist = new Shootist(false);
+		shootist.setOutboundProxy(false);
 		this.shootme = new Shootme(5057);
 		this.cutme = new Cutme();
 	}
@@ -65,6 +47,29 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init("useHostName",false);
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+	}
+	
+	/**
+	 * Non regression test for  Issue 747 : Non Record Routing Proxy is adding Record Route on informational response
+	 * http://code.google.com/p/mobicents/issues/detail?id=747
+	 */
+	public void testProxyNonRecordRouting() {
+		this.shootme.init("stackName");
+		this.cutme.init();
+		this.shootist.init("nonRecordRouting",false);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
@@ -103,50 +108,5 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase impleme
 				+ projectHome
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
 				+ "org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
-	}
-
-	public void init() {
-		// setupPhones();
-	}
-
-	private SipListener getSipListener(EventObject sipEvent) {
-		SipProvider source = (SipProvider) sipEvent.getSource();
-		SipListener listener = (SipListener) providerTable.get(source);
-		if (listener == null)
-			throw new RuntimeException("Unexpected null listener");
-		return listener;
-	}
-
-	public void processRequest(RequestEvent requestEvent) {
-		getSipListener(requestEvent).processRequest(requestEvent);
-
-	}
-
-	public void processResponse(ResponseEvent responseEvent) {
-		getSipListener(responseEvent).processResponse(responseEvent);
-
-	}
-
-	public void processTimeout(TimeoutEvent timeoutEvent) {
-		getSipListener(timeoutEvent).processTimeout(timeoutEvent);
-	}
-
-	public void processIOException(IOExceptionEvent exceptionEvent) {
-		fail("unexpected exception");
-
-	}
-
-	public void processTransactionTerminated(
-			TransactionTerminatedEvent transactionTerminatedEvent) {
-		getSipListener(transactionTerminatedEvent)
-				.processTransactionTerminated(transactionTerminatedEvent);
-
-	}
-
-	public void processDialogTerminated(
-			DialogTerminatedEvent dialogTerminatedEvent) {
-		getSipListener(dialogTerminatedEvent).processDialogTerminated(
-				dialogTerminatedEvent);
-
 	}
 }

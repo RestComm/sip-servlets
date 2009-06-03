@@ -52,7 +52,9 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RequireHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.MessageFactory;
@@ -96,6 +98,8 @@ public class Shootist implements SipListener {
 	int count = 0;
 	
 	private boolean forkingProxy = false;
+	
+	private boolean outboundProxy = true;
 	
 	public String requestMethod;
 	
@@ -204,6 +208,12 @@ public class Shootist implements SipListener {
 		System.out.println("Response received : Status Code = "
 				+ response.getStatusCode() + " " + cseq);
 		
+		SipURI fromUri = (SipURI)((FromHeader)response.getHeader(FromHeader.NAME)).getAddress().getURI();
+		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
+		if(response.getStatusCode() > 100 && fromUri.getUser().equals("nonRecordRouting") && recordRouteHeader != null) {
+			logger.error("the proxy is non record routing and we received a record route header in the response !");
+			return;
+		}
 		
 		if (tid == null) {
 			
@@ -217,9 +227,10 @@ public class Shootist implements SipListener {
 			   }
 			}	
 			return;
-		}		
+		}
+		
 		// If the caller is supposed to send the bye
-		if ( !byeTaskRunning) {
+		if ( !byeTaskRunning && dialog != null) {
 			byeTaskRunning = true;
 			new Timer().schedule(new ByeTask(dialog), 4000) ;
 		}
@@ -320,8 +331,10 @@ public class Shootist implements SipListener {
 		// If you want to try TCP transport change the following to
 		String transport = "udp";
 		String peerHostPort = "127.0.0.1:5070";
-		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort + "/"
+		if(outboundProxy) {
+			properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort + "/"
 				+ transport);
+		}
 		// If you want to use UDP then uncomment this.
 		properties.setProperty("javax.sip.STACK_NAME", "shootist");
 
@@ -400,7 +413,7 @@ public class Shootist implements SipListener {
 
 			// Create ViaHeaders
 
-			ArrayList viaHeaders = new ArrayList();
+			ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 			String ipAddress = udpListeningPoint.getIPAddress();
 			ViaHeader viaHeader = headerFactory.createViaHeader(ipAddress,
 					sipProvider.getListeningPoint(transport).getPort(),
@@ -499,6 +512,12 @@ public class Shootist implements SipListener {
 			
 			dialog = inviteTid.getDialog();
 			
+			if(!outboundProxy) {
+				Address address = addressFactory.createAddress(peerHostPort);
+				RouteHeader routeHeader = headerFactory.createRouteHeader(address);
+				request.addHeader(routeHeader);
+			} 
+
 			
 			// Send a subsequent request after 2 secs
 			if(requestMethod.equals(Request.PUBLISH) ||
@@ -563,5 +582,21 @@ public class Shootist implements SipListener {
 		}
 
 		sipStack.stop();
+	}
+
+
+	/**
+	 * @param outboundProxy the outboundProxy to set
+	 */
+	public void setOutboundProxy(boolean outboundProxy) {
+		this.outboundProxy = outboundProxy;
+	}
+
+
+	/**
+	 * @return the outboundProxy
+	 */
+	public boolean isOutboundProxy() {
+		return outboundProxy;
 	}
 }

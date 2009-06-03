@@ -40,22 +40,10 @@ import org.apache.log4j.Logger;
 public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
-	@Override
-	protected void doBranchResponse(SipServletResponse resp)
-			throws ServletException, IOException {
-		logger.info("doBranchResponse callback was called.");
-		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");
-		super.doBranchResponse(resp);
-	}
-
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
 	
-	private static String USE_HOSTNAME= "useHostName";
-	
-	
-	/** Creates a new instance of SimpleProxyServlet */
-	public ProxySipServlet() {
-	}
+	private static String USE_HOSTNAME = "useHostName";
+	private static String NON_RECORD_ROUTING = "nonRecordRouting";
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -112,11 +100,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		
 		if(obi == null) throw new NullPointerException("No loopback interface found.");
 		
-		
+		boolean recordRoute = true;
+		if(NON_RECORD_ROUTING.equals(fromURI.getUser())) {		
+			recordRoute = false;
+			logger.info("not record routing");
+		}
 		//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
-		proxy.setRecordRoute(true);
+		proxy.setRecordRoute(recordRoute);
 		proxy.setSupervised(true);
-		proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
+		if(recordRoute) {
+			proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
+		}
 		proxy.setParallel(true);
 		proxy.setProxyTimeout(4);
 		proxy.proxyTo(uris);
@@ -151,7 +145,15 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		}
 		super.doResponse(response);
 	}
-
+	
+	@Override
+	protected void doBranchResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		logger.info("doBranchResponse callback was called.");
+		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");
+		super.doBranchResponse(resp);
+	}	
+	
 	// SipErrorListener methods
 
 	/**

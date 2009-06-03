@@ -61,6 +61,7 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * Implementation of the sip servlet response interface
@@ -411,9 +412,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			final int statusCode = response.getStatusCode();
 			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
 			final SipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
+			final ProxyImpl proxy = session.getProxy();
 			//if this is a final response
 			if(statusCode >= Response.TRYING && 
-					statusCode <= Response.SESSION_NOT_ACCEPTABLE && (session.getProxy() ==null || (session.getProxy()!=null && session.getProxy().getFinalBranchForSubsequentRequests() == null))) {
+					statusCode <= Response.SESSION_NOT_ACCEPTABLE && (proxy == null || 
+				(proxy != null && proxy.getFinalBranchForSubsequentRequests() == null &&
+						// we check if the proxy branch is record routing http://code.google.com/p/mobicents/issues/detail?id=747				
+						proxyBranch != null && proxyBranch.getRecordRoute()))) {
 				//Issue 112 fix by folsson: use the viaheader transport				
 				final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
