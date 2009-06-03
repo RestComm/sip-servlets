@@ -28,7 +28,6 @@ import javax.sip.SipProvider;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Wrapper;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
@@ -67,7 +66,7 @@ public abstract class MessageDispatcher {
 	/* 
 	 * This parameter is to know if a servlet application sent a final response
 	 */
-	public static final String FINAL_RESPONSE = "final_response";
+//	public static final String FINAL_RESPONSE = "final_response";
 	/* 
 	 * This parameter is to know if a servlet application has generated its own application key
 	 */

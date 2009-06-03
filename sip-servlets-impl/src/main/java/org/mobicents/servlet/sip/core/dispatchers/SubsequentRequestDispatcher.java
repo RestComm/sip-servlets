@@ -25,7 +25,6 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
 import javax.sip.Dialog;
-import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.header.Parameters;
@@ -79,12 +78,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Routing of Subsequent Request " + sipServletRequest);
 		}	
-		
-		final ServerTransaction transaction = (ServerTransaction) sipServletRequest.getTransaction();
+				
 		final Request request = (Request) sipServletRequest.getMessage();
 		final Dialog dialog = sipServletRequest.getDialog();				
-				
-		if(sipServletRequest.getPoppedRouteHeader() ==null){
+		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader(); 		
+		if(poppedRouteHeader ==null){
 			if(Request.ACK.equals(request.getMethod())) {
 				//Means that this is an ACK to a container generated error response, so we can drop it
 				if(logger.isDebugEnabled()) {
@@ -95,10 +93,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "The popped route shouldn't be null for not proxied requests.");
 			}
 		}
-		Parameters poppedAddress = (Parameters)sipServletRequest.getPoppedRouteHeader().getAddress().getURI();
+		final Parameters poppedAddress = (Parameters)poppedRouteHeader.getAddress().getURI();
 		//Extract information from the Route Header		
-		String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);	
-		final String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
+		final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);	
+//		final String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
 		String applicationId = poppedAddress.getParameter(APP_ID);
 		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
 		boolean isAppGenerated = false;
@@ -110,7 +108,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
 					"in this popped routed header " + poppedAddress);
 		}
-		String applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+		final String applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
 		boolean inverted = false;
 		if(dialog != null && !dialog.isServer()) {
 			inverted = true;

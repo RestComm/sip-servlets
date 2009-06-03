@@ -425,7 +425,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						response
 						);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
-				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");
+//				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");
 				if(sipAppSessionKey.isAppGeneratedKey()) {
 					sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
 				} else {
