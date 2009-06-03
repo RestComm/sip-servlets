@@ -418,7 +418,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE && (proxy == null || 
 				(proxy != null && proxy.getFinalBranchForSubsequentRequests() == null &&
 						// we check if the proxy branch is record routing http://code.google.com/p/mobicents/issues/detail?id=747				
-						proxyBranch != null && proxyBranch.getRecordRoute()))) {
+						proxyBranch != null && proxyBranch.getRecordRoute()))) {				
 				//Issue 112 fix by folsson: use the viaheader transport				
 				final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -437,6 +437,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				RecordRouteHeader recordRouteHeader = 
 					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
 				response.addFirst(recordRouteHeader);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Record Route added to the response "+ recordRouteHeader);
+				}
 			}
 			final ServerTransaction transaction = (ServerTransaction) getTransaction();
 			 
