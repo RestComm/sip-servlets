@@ -414,7 +414,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			final SipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
 			final ProxyImpl proxy = session.getProxy();
 			//if this is a final response
-			if(statusCode >= Response.TRYING && 
+			if(statusCode > Response.TRYING && 
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE && (proxy == null || 
 				(proxy != null && proxy.getFinalBranchForSubsequentRequests() == null &&
 						// we check if the proxy branch is record routing http://code.google.com/p/mobicents/issues/detail?id=747				
