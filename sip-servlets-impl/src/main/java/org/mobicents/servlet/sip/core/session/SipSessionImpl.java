@@ -660,7 +660,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// because it will try to get the B2BUAHelper after the session has been invalidated	
 //		sipApplicationSession = null;
 		manager = null;
-		b2buaHelper= null;		
+		if(b2buaHelper != null) {
+			b2buaHelper.unlinkSipSessions(this);
+			b2buaHelper= null;	
+		}
 		derivedSipSessions = null;
 		handlerServlet = null;
 		localParty = null;

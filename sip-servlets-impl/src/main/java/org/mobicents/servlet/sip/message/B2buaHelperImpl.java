@@ -103,8 +103,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		b2buaSystemHeaders.add(PathHeader.NAME);
 	}
 	
-	//FIXME @jean.deruelle session map is never cleaned up => could lead to memory leak
-	//shall we have a thread scanning for invalid sessions and removing them accordingly ?
+	//Map to handle linked sessions
 	private Map<SipSessionKey, SipSessionKey> sessionMap = null;	
 
 	//Map to handle responses to original request and cancel on original request
