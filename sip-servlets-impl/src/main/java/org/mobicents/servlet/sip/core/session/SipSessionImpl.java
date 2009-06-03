@@ -661,7 +661,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 //		sipApplicationSession = null;
 		manager = null;
 		if(b2buaHelper != null) {
-			b2buaHelper.unlinkSipSessions(this);
+			b2buaHelper.unlinkSipSessionsInternal(this, false);
 			b2buaHelper= null;	
 		}
 		derivedSipSessions = null;

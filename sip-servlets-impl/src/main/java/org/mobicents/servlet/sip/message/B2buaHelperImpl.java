@@ -484,15 +484,25 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @see javax.servlet.sip.B2buaHelper#unlinkSipSessions(javax.servlet.sip.SipSession)
 	 */
 	public void unlinkSipSessions(SipSession session) {		
+		unlinkSipSessionsInternal(session, true);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#unlinkSipSessions(javax.servlet.sip.SipSession)
+	 */
+	public void unlinkSipSessionsInternal(SipSession session, boolean checkSession) {		
 		if ( session == null) { 
 			throw new NullPointerException("the argument is null");
 		}
 		MobicentsSipSession key = (MobicentsSipSession) session;
-		if(!session.isValid() || 
-				State.TERMINATED.equals(key.getState()) ||
-				sessionMap.get(key.getKey()) == null) {
-			throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
-		}		
+		if(checkSession) {
+			if(!session.isValid() || 
+					State.TERMINATED.equals(key.getState()) ||
+					sessionMap.get(key.getKey()) == null) {
+				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
+			}		
+		}
 		SipSessionKey value  = this.sessionMap.get(key.getKey());
 		if (value != null) {
 			this.sessionMap.remove(value);
