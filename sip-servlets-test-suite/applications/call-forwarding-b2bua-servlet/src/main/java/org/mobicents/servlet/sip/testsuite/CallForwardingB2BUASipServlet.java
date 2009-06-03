@@ -86,12 +86,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-
+		
 		logger.info("Got INVITE: " + request.toString());
 		logger.info(request.getFrom().getURI().toString());
 		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
 			helper = request.getB2buaHelper();						
+			
+			helper.createResponseToOriginalRequest(request.getSession(), SipServletResponse.SC_TRYING, "").send();
 			
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 					SIP_FACTORY);

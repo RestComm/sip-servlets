@@ -61,6 +61,7 @@ import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SIPETagHeader;
@@ -221,6 +222,8 @@ public class TestSipListener implements SipListener {
 	private boolean sendReinvite;
 	
 	private boolean reinviteSent;
+	
+	private boolean abortProcessing;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -263,6 +266,11 @@ public class TestSipListener implements SipListener {
 	}
 
 	public void processRequest(RequestEvent requestReceivedEvent) {
+		if(abortProcessing) {
+			logger.error("Processing aborted");
+			return ;
+		}
+		
 		Request request = requestReceivedEvent.getRequest();
 		ServerTransaction serverTransactionId = requestReceivedEvent
 				.getServerTransaction();
@@ -1031,8 +1039,16 @@ public class TestSipListener implements SipListener {
 		}
 	}
 	public void processResponse(ResponseEvent responseReceivedEvent) {
-		logger.info("Got a response");
+		if(abortProcessing) {
+			logger.error("Processing aborted");
+			return ;
+		}
 		Response response = (Response) responseReceivedEvent.getResponse();
+		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
+		if(response.getStatusCode() == Response.TRYING && recordRouteHeader != null) {
+			abortProcessing = true;
+			throw new IllegalArgumentException("we received a record route header in the TRYING response !");			
+		}
 		if(response.getStatusCode() >= 400 && response.getStatusCode() < 510) {
 			this.serverErrorReceived = true;
 		}
