@@ -217,7 +217,12 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			if(mainServlet != null && mainServlet.length() > 0) {
 				convergedContext.setMainServlet(mainServlet);
 				servletSelectionSet = true;
-			} else if(servletSelectionMetaData.getSipServletMappings() != null && servletSelectionMetaData.getSipServletMappings().size() > 0) {
+			} 
+			
+			if(servletSelectionMetaData.getSipServletMappings() != null && servletSelectionMetaData.getSipServletMappings().size() > 0) {
+				if(servletSelectionSet) {
+					throw new SipDeploymentException("the main servlet and servlet mapping cannot be present at the same time in sip.xml or as annotations !");	
+				}
 				Iterator<SipServletMappingMetaData> sipServletMapping = servletSelectionMetaData.getSipServletMappings().iterator();
 				while (sipServletMapping.hasNext()) {
 					SipServletMappingMetaData sipServletMappingMetaData = (SipServletMappingMetaData) sipServletMapping
@@ -230,7 +235,9 @@ public class SipJBossContextConfig extends JBossContextConfig {
 					convergedContext.addSipServletMapping(sipMapping);					
 				}
 				servletSelectionSet = true;
-			} else if(servletSelectionMetaData.getSipRubyController() != null) {
+			} 
+			
+			if(servletSelectionMetaData.getSipRubyController() != null) {
 				convergedContext.setSipRubyController(servletSelectionMetaData.getSipRubyController());
 				servletSelectionSet = true;
 			}

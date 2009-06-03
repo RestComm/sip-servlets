@@ -170,11 +170,20 @@ public class SipJBossContextConfig extends JBossContextConfig
 		String mainServlet = ((SipContext) context).getMainServlet();
 		if(mainServlet != null && mainServlet.length() > 0) {
 			servletSelectionSet = true;
-		} else if(((SipContext) context).findSipServletMappings() != null && ((SipContext) context).findSipServletMappings().size() > 0) {
-			servletSelectionSet = true;
-		} else if(((SipContext) context).getSipRubyController() != null) {
+		} 
+		
+		if(((SipContext) context).findSipServletMappings() != null && ((SipContext) context).findSipServletMappings().size() > 0) {
+			if(servletSelectionSet) {
+				ok = false;
+				context.setConfigured(false);
+				throw new SipDeploymentException("the main servlet and servlet mapping cannot be present at the same time in sip.xml or as annotations !");	
+			}
 			servletSelectionSet = true;
 		}
+		
+		if(((SipContext) context).getSipRubyController() != null) {
+			servletSelectionSet = true;
+		}				
 		
 		if(((SipContext) context).getChildrenMap().keySet().size() > 1 && !servletSelectionSet) {
 			ok = false;
