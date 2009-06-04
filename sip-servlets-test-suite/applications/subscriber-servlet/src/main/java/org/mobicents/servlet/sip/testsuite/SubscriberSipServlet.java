@@ -142,14 +142,14 @@ public class SubscriberSipServlet
 	protected void doNotify(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got notify : "
-				+ request.getMethod());	
-		if(getServletContext().getInitParameter("no200OKToNotify") == null && "pending".equalsIgnoreCase(request.getHeader("Subscription-State"))) {
-			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-			sipServletResponse.send();
-		} else {
-			logger.info("no sending 200 to Initial Notify as specified by the test configuration");			
-		}
-		if("Active".equalsIgnoreCase(request.getHeader("Subscription-State"))) {
+				+ request.getMethod());			
+		String state = request.getHeader("Subscription-State");
+		logger.info("state " + state);
+		logger.info("session id " + request.getSession().getId());
+		logger.info("sameContainerUserName attribute in session " + request.getSession().getAttribute(TEST_SAME_CONTAINER_USER_NAME));
+		logger.info("byeReceived attribute in session " + request.getSession().getAttribute("byeReceived"));
+						
+		if("Active".equalsIgnoreCase(state)) {
 			SipServletRequest subscriberRequest = request.getSession().createRequest("SUBSCRIBE");
 			SipURI requestURI = ((SipFactory)getServletContext().getAttribute(SIP_FACTORY)).createSipURI("LittleGuy", "127.0.0.1:5080");
 			subscriberRequest.setRequestURI(requestURI);
@@ -161,7 +161,7 @@ public class SubscriberSipServlet
 				logger.error(e);
 			}	
 		}
-		if("terminated".equalsIgnoreCase(request.getHeader("Subscription-State")) && request.getSession().getAttribute(TEST_SAME_CONTAINER_USER_NAME) != null) {
+		if(state != null && state.indexOf("Terminated") != -1 && request.getSession().getAttribute(TEST_SAME_CONTAINER_USER_NAME) != null) {
 			if(request.getSession().getAttribute("byeReceived") == null) {
 				request.getSession().createRequest("BYE").send();
 				SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
@@ -174,6 +174,12 @@ public class SubscriberSipServlet
 				sipServletRequest.setRequestURI(requestURI);		
 				sipServletRequest.send();		
 			}
+		}
+		if(getServletContext().getInitParameter("no200OKToNotify") == null) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+		} else {
+			logger.info("no sending 200 to Initial Notify as specified by the test configuration");			
 		}
 	}
 	
@@ -193,7 +199,8 @@ public class SubscriberSipServlet
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
 			SipURI requestURI = sipFactory.createSipURI(TEST_SAME_CONTAINER_USER_NAME, ce.getServletContext().getInitParameter("requestURI"));			
 			sipServletRequest.setRequestURI(requestURI);
-			sipServletRequest.getSession().setAttribute(TEST_SAME_CONTAINER_USER_NAME, Boolean.TRUE);			
+			sipServletRequest.getSession().setAttribute(TEST_SAME_CONTAINER_USER_NAME, Boolean.TRUE);
+			logger.info("session id " + sipServletRequest.getSession().getId());
 			try {			
 				sipServletRequest.send();
 			} catch (IOException e) {
