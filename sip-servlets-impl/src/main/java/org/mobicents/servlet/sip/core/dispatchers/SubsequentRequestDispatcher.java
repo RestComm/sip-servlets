@@ -86,7 +86,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader();
 		String applicationName = null; 
 		String applicationId = null;
-		if(poppedRouteHeader != null){
+		if(poppedRouteHeader != null && ((Parameters)poppedRouteHeader.getAddress().getURI()).getParameter(RR_PARAM_APPLICATION_NAME) != null){
 			final Parameters poppedAddress = (Parameters)poppedRouteHeader.getAddress().getURI();
 			//Extract information from the Route Header		
 			final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
