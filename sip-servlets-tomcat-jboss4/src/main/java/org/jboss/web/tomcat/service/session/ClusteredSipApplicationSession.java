@@ -1006,10 +1006,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		}
 		synchronized (this) {
 			// From SipApplicationSessionImpl
-			String id = in.readUTF();
-			String applicationName = in.readUTF();
-			boolean isAppGeneratedKey = in.readBoolean();
-			key = new SipApplicationSessionKey(id, applicationName, isAppGeneratedKey);
+			key = (SipApplicationSessionKey )in.readObject();
 			if(logger.isDebugEnabled()) {
 				logger.debug("reading sip app session from the cache. key = " + key);
 			}
@@ -1111,9 +1108,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	public void writeExternal(ObjectOutput out) throws IOException {
 		synchronized (this) {
 			// From SipApplicationSessionImpl
-			out.writeUTF(key.getId());
-			out.writeUTF(key.getApplicationName());
-			out.writeBoolean(key.isAppGeneratedKey());
+			out.writeObject(key);
 			
 			out.writeLong(creationTime);
 			out.writeLong(lastAccessedTime);

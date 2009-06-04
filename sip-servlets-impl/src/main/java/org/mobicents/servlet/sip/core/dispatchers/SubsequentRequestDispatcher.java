@@ -30,11 +30,13 @@ import javax.sip.SipProvider;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
+import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -53,8 +55,9 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * This class is responsible for routing and dispatching subsequent request to applications according to JSR 289 Section 
  * 15.6 Responses, Subsequent Requests and Application Path 
  * 
- * It uses route header parameters that were previously set by the container on 
- * record route headers to know which app has to be called 
+ * It uses route header parameters for proxy apps or to tag parameter for UAS/B2BUA apps 
+ * that were previously set by the container on 
+ * record route headers or to tag to know which app has to be called 
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
@@ -68,7 +71,6 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		super(sipApplicationDispatcher);
 	}
 	
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -80,35 +82,38 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}	
 				
 		final Request request = (Request) sipServletRequest.getMessage();
-		final Dialog dialog = sipServletRequest.getDialog();				
-		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader(); 		
-		if(poppedRouteHeader ==null){
-			if(Request.ACK.equals(request.getMethod())) {
+		final Dialog dialog = sipServletRequest.getDialog();		
+		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader();
+		String applicationName = null; 
+		String applicationId = null;
+		if(poppedRouteHeader != null){
+			final Parameters poppedAddress = (Parameters)poppedRouteHeader.getAddress().getURI();
+			//Extract information from the Route Header		
+			final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
+			if(applicationNameHashed == null || applicationNameHashed.length() < 1) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
+						"in this popped routed header " + poppedAddress);
+			}
+			applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+			applicationId = poppedAddress.getParameter(APP_ID);
+			if(applicationId != null) {
+				applicationId = RFC2396UrlDecoder.decode(applicationId);
+			}
+		} else {
+			ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
+			String arText = toHeader.getTag();
+			ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(sipApplicationDispatcher, arText);
+			applicationName = ar.getApplicationName();
+			applicationId = ar.getAppGeneratedApplicationSessionId();
+			if(Request.ACK.equals(request.getMethod()) && applicationId == null && applicationName == null) {
 				//Means that this is an ACK to a container generated error response, so we can drop it
 				if(logger.isDebugEnabled()) {
-					logger.debug("The popped route is null for an ACK, this is an ACK to a container generated error response, so it is dropped");
+					logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
 				}
 				return ;
-			} else {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "The popped route shouldn't be null for not proxied requests.");
-			}
-		}
-		final Parameters poppedAddress = (Parameters)poppedRouteHeader.getAddress().getURI();
-		//Extract information from the Route Header		
-		final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);	
-//		final String finalResponse = poppedAddress.getParameter(FINAL_RESPONSE);
-		String applicationId = poppedAddress.getParameter(APP_ID);
-		String generatedApplicationKey = poppedAddress.getParameter(GENERATED_APP_KEY);
-		boolean isAppGenerated = false;
-		if(generatedApplicationKey != null) {
-			applicationId = RFC2396UrlDecoder.decode(generatedApplicationKey);
-			isAppGenerated = true;
-		}
-		if(applicationNameHashed == null || applicationNameHashed.length() < 1) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
-					"in this popped routed header " + poppedAddress);
-		}
-		final String applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+			} 
+		}		
+		
 		boolean inverted = false;
 		if(dialog != null && !dialog.isServer()) {
 			inverted = true;
@@ -116,21 +121,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationName);
 		if(sipContext == null) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
-					"in this popped routed header " + poppedAddress);
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+					"in this popped routed header " + poppedRouteHeader);
 		}
 		final SipManager sipManager = (SipManager)sipContext.getManager();		
-		SipApplicationSessionKey sipApplicationSessionKey = null;
-		if(applicationId != null && applicationId.length() > 0) {
-			sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-					applicationName, 
-					applicationId,
-					isAppGenerated);
-		} else {
-			sipApplicationSessionKey = makeAppSessionKey(
-				sipContext, sipServletRequest, applicationName);
-		}		
-		
+		SipApplicationSessionKey sipApplicationSessionKey = null;		
+		sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+				applicationName, 
+				applicationId);
+	
 		MobicentsSipSession tmpSipSession = null;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
@@ -185,6 +184,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 
 			public void dispatch() throws DispatcherException {
 				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
+				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+				sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 				try {
 					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					// JSR 289 Section 6.2.1 :
@@ -195,22 +196,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					try {
 						// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
 						// a new subscription and a new dialog (unless they have already been
-						// created by a matching response, as described above).
-						SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-							sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);		
+						// created by a matching response, as described above).								
 						if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
 										(subscriptionStateHeader != null && 
 												SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
 												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
 							sipSession.addSubscription(sipServletRequest);
-						}
-						// A subscription is destroyed when a notifier sends a NOTIFY request
-						// with a "Subscription-State" of "terminated".			
-						if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
-										(subscriptionStateHeader != null && 
-												SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
-							sipSession.removeSubscription(sipServletRequest);
-						}
+						}						
 								
 						// See if the subsequent request should go directly to the proxy
 						final ProxyImpl proxy = sipSession.getProxy();
@@ -236,7 +228,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						// If it's not for a proxy then it's just an AR, so go to the next application
 						else {							
 							callServlet(sipServletRequest);				
-						}
+						}						
 					} catch (ServletException e) {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
 					} catch (SipException e) {
@@ -245,6 +237,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
 					} 	 
 				} finally {
+					// A subscription is destroyed when a notifier sends a NOTIFY request
+					// with a "Subscription-State" of "terminated".			
+					if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+									(subscriptionStateHeader != null && 
+											SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
+						sipSession.removeSubscription(sipServletRequest);
+					}
 					sipContext.exitSipApp(sipServletRequest, null);
 				}
 				//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	

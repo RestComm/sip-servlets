@@ -74,12 +74,15 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
@@ -254,18 +257,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final ToHeader toHeader = (ToHeader) response
 					.getHeader(ToHeader.NAME);
 				// If we already have a to tag, dont create new
-				if (toHeader.getTag() == null) {
-					String localTag = null;					
-					if(dialog != null) {
-						localTag = dialog.getLocalTag();
-						// if a dialog has already been created
-						// reuse local tag
-						if(localTag != null && localTag.length() > 0) {
-							toHeader.setTag(localTag);
-						} else {
-							toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
-						}
-					} else {
+				if (toHeader.getTag() == null) {					
+					// if a dialog has already been created
+					// reuse local tag
+					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0) {																	
+						toHeader.setTag(dialog.getLocalTag());						
+					} else if(session != null && session.getSipApplicationSession() != null) {						
+						final SipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
+						ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
+								sipFactoryImpl.getSipApplicationDispatcher());
+						stack.setApplicationName(session.getKey().getApplicationName());						
+						stack.setAppGeneratedApplicationSessionId(RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
+						toHeader.setTag(stack.toString());
+					} else {							
+						//if the sessions are null, it means it is a cancel response
 						toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
 					}
 				}

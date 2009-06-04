@@ -130,8 +130,7 @@ public abstract class MessageDispatcher {
 	}
 	
 	protected static SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) throws DispatcherException {
-		String id = null;
-		boolean isAppGeneratedKey = false;
+		String appGeneratedKey = null;
 		Method appKeyMethod = null;			
 		
 		// Session Key Based Targeted Mechanism is oly for Initial Requests 
@@ -175,8 +174,7 @@ public abstract class MessageDispatcher {
 				}
 			}
 			try {			
-				id = (String) appKeyMethod.invoke(servlet, new Object[] {sipServletRequestImpl});
-				isAppGeneratedKey = true;
+				appGeneratedKey = (String) appKeyMethod.invoke(servlet, new Object[] {sipServletRequestImpl});
 			} catch (IllegalArgumentException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Couldn't invoke the app session key annotated method !" ,e);		
 			} catch (IllegalAccessException e) {
@@ -194,8 +192,7 @@ public abstract class MessageDispatcher {
 				}
 				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);		
 			}
-			if(id == null) {
-				isAppGeneratedKey = false;
+			if(appGeneratedKey == null) {
 				//JSR 289 Section 18.2.5 @SipApplicationKey Annotation , The container should treat a "null" return 
 				//or an invalid session id as a failure to obtain a key from the application. 
 				//It is recommended that the container create a new SipApplicationSession for the incoming request in such a case.
@@ -203,13 +200,13 @@ public abstract class MessageDispatcher {
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("For request target to application " + sipContext.getApplicationName() + 
-						", following annotated method " + appKeyMethod + " generated the application key : " + id);
+						", following annotated method " + appKeyMethod + " generated the application key : " + appGeneratedKey);
 			}
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
-				id,
-				isAppGeneratedKey);
+				null);
+		sipApplicationSessionKey.setAppGeneratedKey(appGeneratedKey);
 		return sipApplicationSessionKey;
 	}
 	

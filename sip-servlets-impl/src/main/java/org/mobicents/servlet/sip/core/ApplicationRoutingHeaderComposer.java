@@ -104,8 +104,8 @@ public class ApplicationRoutingHeaderComposer {
 		if(appGeneratedApplicationSessionId != null && appGeneratedApplicationSessionId.length() > 0) {
 			text = text + TOKEN_SEPARATOR + appGeneratedApplicationSessionId; 
 		}
-		if(logger.isInfoEnabled()) {
-			logger.info("tag will be equal to " + text);
+		if(logger.isDebugEnabled()) {
+			logger.debug("tag will be equal to " + text);
 		}
 		return text;
 	}

@@ -42,6 +42,10 @@ public abstract class SipManagerDelegate {
 	
 	protected ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
 		new ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession>();
+
+	protected ConcurrentHashMap<String, MobicentsSipApplicationSession> sipApplicationSessionsByAppGeneratedKey = 
+		new ConcurrentHashMap<String, MobicentsSipApplicationSession>();
+	
 	//if it's never cleaned up a memory leak will occur
 	//Shall we have a thread scanning for invalid sessions and removing them accordingly ?
 	//=> after a chat with ranga the better way to go for now is removing on processDialogTerminated
@@ -162,7 +166,13 @@ public abstract class SipManagerDelegate {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip application session with the key : " + key);
 		}
-		return sipApplicationSessions.remove(key);
+		MobicentsSipApplicationSession sipApplicationSession  = sipApplicationSessions.remove(key);
+		final String appGeneratedKey = sipApplicationSession.getKey().getAppGeneratedKey();
+		if(appGeneratedKey != null) {
+			sipApplicationSessionsByAppGeneratedKey.remove(appGeneratedKey);
+		}
+		
+		return sipApplicationSession;
 	}
 	
 	/**
@@ -172,9 +182,16 @@ public abstract class SipManagerDelegate {
 	 * @param create if set to true, if no session has been found one will be created
 	 * @return the sip application session matching the key
 	 */
-	public MobicentsSipApplicationSession getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
-		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
-		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.get(key);
+	public MobicentsSipApplicationSession getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {		
+		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
+		//first we check if the app session can be found by its app generated key
+		final String appGeneratedKey = key.getAppGeneratedKey();
+		if(appGeneratedKey != null) {
+			sipApplicationSessionImpl = sipApplicationSessionsByAppGeneratedKey.get(appGeneratedKey);
+		}
+		if(sipApplicationSessionImpl == null) {
+			sipApplicationSessionImpl = sipApplicationSessions.get(key);
+		}
 		if(sipApplicationSessionImpl == null && create) {
 			sipApplicationSessionImpl =  createSipApplicationSession(key, create);						
 		}
@@ -182,16 +199,21 @@ public abstract class SipManagerDelegate {
 	}	
 
 	protected MobicentsSipApplicationSession createSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
+		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
 		final MobicentsSipApplicationSession newSipApplicationSessionImpl = 
 			getNewMobicentsSipApplicationSession(key, (SipContext) container);
-		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
+		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);		
 		if (sipApplicationSessionImpl == null) {
 			// put succeeded, use new value
 			if(logger.isDebugEnabled()) {
 				logger.debug("Adding a sip application session with the key : " + key);
 			}
             sipApplicationSessionImpl = newSipApplicationSessionImpl;
+            final String appGeneratedKey = key.getAppGeneratedKey(); 
+    		if(appGeneratedKey != null) {    		
+            	sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, sipApplicationSessionImpl);
+            }
         }		
 		return sipApplicationSessionImpl;
 	}
@@ -379,7 +401,7 @@ public abstract class SipManagerDelegate {
 			logger.debug("sip application sessions present in the session manager");
 		
 			for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessions.keySet()) {
-				logger.debug(sipApplicationSessionKey.toString());
+				logger.debug(sipApplicationSessionKey.toString() + "/hashed_app_name=" + sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipApplicationSessionKey.getApplicationName()));
 			}
 		}
 	}

@@ -91,7 +91,7 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		if(applicationSessionKey == null) {
 			throw new NullPointerException("the given key is null !");
 		}
-		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(applicationSessionKey, sipContext.getApplicationName(), true);
+		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(applicationSessionKey, sipContext.getApplicationName());
 		
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(sipApplicationSessionKey, create);
 		if(sipApplicationSession == null) {

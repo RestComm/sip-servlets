@@ -157,8 +157,7 @@ public class ConvergedSessionDelegate {
 //			
 			SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					((SipContext)sipManager.getContainer()).getApplicationName(), 
-					null,
-					false);
+					null);
 			
 			sipApplicationSession = 
 				sipManager.getSipApplicationSession(sipApplicationSessionKey, true);

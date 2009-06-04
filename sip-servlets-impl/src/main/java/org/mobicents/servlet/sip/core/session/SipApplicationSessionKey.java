@@ -29,23 +29,22 @@ import java.io.Serializable;
  */
 public class SipApplicationSessionKey implements Serializable {
 	String uuid;
+	String appGeneratedKey;
 	String applicationName;
-	boolean isAppGeneratedKey;
 	private String toString;
 	
 	/**
 	 * @param id
 	 * @param applicationName
 	 */
-	public SipApplicationSessionKey(String id, String applicationName, boolean isAppGeneratedKey) {
+	public SipApplicationSessionKey(String id, String applicationName) {
 		super();
 		if(id == null) {
 			this.uuid = "" + System.nanoTime();
 		} else {
 			this.uuid = id;
-		}
+		}		
 		this.applicationName = applicationName;
-		this.isAppGeneratedKey = isAppGeneratedKey;
 		StringBuffer value = new StringBuffer();
 		value = value.append("(");
 		value = value.append(uuid);
@@ -67,11 +66,15 @@ public class SipApplicationSessionKey implements Serializable {
 		return applicationName;
 	}
 	/**
-	 * @return the isAppGeneratedKey
+	 * @return the applicationName
 	 */
-	public boolean isAppGeneratedKey() {
-		return isAppGeneratedKey;
+	public String getAppGeneratedKey() {
+		return appGeneratedKey;
 	}
+	public void setAppGeneratedKey(String appGeneratedKey) {
+		this.appGeneratedKey = appGeneratedKey;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -80,8 +83,8 @@ public class SipApplicationSessionKey implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((applicationName == null) ? 0 : applicationName.hashCode());
-		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+				+ ((applicationName == null) ? 0 : applicationName.hashCode());		
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());	
 		return result;
 	}
 	/* (non-Javadoc)
@@ -100,7 +103,7 @@ public class SipApplicationSessionKey implements Serializable {
 			if (other.applicationName != null)
 				return false;
 		} else if (!applicationName.equals(other.applicationName))
-			return false;
+			return false;		
 		if (uuid == null) {
 			if (other.uuid != null)
 				return false;

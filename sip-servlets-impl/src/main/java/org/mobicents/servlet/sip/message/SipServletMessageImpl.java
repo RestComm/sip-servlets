@@ -473,8 +473,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			SipApplicationSessionKey key = SessionManagerUtil.getSipApplicationSessionKey(
 					currentApplicationName, 
-					null,
-					false);
+					null);
 			if(this.session == null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Tryin to create a new sip application session with key = " + key);

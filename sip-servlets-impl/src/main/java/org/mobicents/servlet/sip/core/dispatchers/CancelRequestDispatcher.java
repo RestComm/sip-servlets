@@ -138,6 +138,10 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
 		}				
 		final Transaction inviteTransaction = ((ServerTransactionExt) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
+		if(inviteTransaction == null) {
+			logger.error("couldn't find the original invite transaction for this cancel " + request);
+			return;
+		}
 		final TransactionApplicationData inviteAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
 		final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
 			inviteAppData.getSipServletMessage();

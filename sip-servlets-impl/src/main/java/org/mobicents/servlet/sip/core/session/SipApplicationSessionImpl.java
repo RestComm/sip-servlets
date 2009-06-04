@@ -425,7 +425,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		Set<MobicentsSipSession> retSipSessions = new HashSet<MobicentsSipSession>();
 		for(SipSessionKey sipSessionKey : sipSessions.values()) {
 			MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
-			retSipSessions.add(sipSession);
+			if(sipSession != null) {
+				retSipSessions.add(sipSession);
+			}
 		}
 		return retSipSessions;
 	}
@@ -435,7 +437,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		for(String id : httpSessions) {
 			try {
 				HttpSession httpSession = (HttpSession)sipContext.getSipManager().findSession(id);
-				retHttpSessions.add(httpSession);
+				if(httpSession != null) {
+					retHttpSessions.add(httpSession);
+				}
 			} catch (IOException e) {
 				logger.error("An Unexpected exception happened while retrieving the http session " + id, e);			
 			}			

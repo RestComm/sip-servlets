@@ -413,24 +413,19 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
 			final SipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
 			final ProxyImpl proxy = session.getProxy();
-			//if this is a final response
-			if(statusCode > Response.TRYING && 
-					statusCode <= Response.SESSION_NOT_ACCEPTABLE && (proxy == null || 
-				(proxy != null && proxy.getFinalBranchForSubsequentRequests() == null &&
-						// we check if the proxy branch is record routing http://code.google.com/p/mobicents/issues/detail?id=747				
-						proxyBranch != null && proxyBranch.getRecordRoute()))) {				
+			// if this is a proxy response and the branch is record routing http://code.google.com/p/mobicents/issues/detail?id=747
+			// we add a record route
+			if(proxy != null && proxy.getFinalBranchForSubsequentRequests() == null &&
+						proxyBranch != null && proxyBranch.getRecordRoute() && 
+						statusCode > Response.TRYING && 
+						statusCode <= Response.SESSION_NOT_ACCEPTABLE) {	
 				//Issue 112 fix by folsson: use the viaheader transport				
 				final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
 						response
 						);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
-//				sipURI.setParameter(MessageDispatcher.FINAL_RESPONSE, "true");
-				if(sipAppSessionKey.isAppGeneratedKey()) {
-					sipURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
-				} else {
-					sipURI.setParameter(MessageDispatcher.APP_ID, sipAppSessionKey.getId());
-				}
+				sipURI.setParameter(MessageDispatcher.APP_ID, RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
 				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);

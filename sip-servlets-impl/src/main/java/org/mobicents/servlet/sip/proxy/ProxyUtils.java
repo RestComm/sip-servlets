@@ -152,11 +152,7 @@ public class ProxyUtils {
 						proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName()));
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_PROXY_APP,
 						"true");				
-				if(sipAppKey.isAppGeneratedKey()) {
-					rrURI.setParameter(MessageDispatcher.GENERATED_APP_KEY, RFC2396UrlDecoder.encode(sipAppKey.getId()));
-				} else {
-					rrURI.setParameter(MessageDispatcher.APP_ID, sipAppKey.getId());
-				}
+				rrURI.setParameter(MessageDispatcher.APP_ID, RFC2396UrlDecoder.encode(sipAppKey.getId()));
 				rrURI.setLrParam();
 				
 				Address rraddress = SipFactories.addressFactory

@@ -189,8 +189,7 @@ public class SipFactoryImpl implements Serializable {
 		//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
-				null,
-				false);		
+				null);		
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
 				sipApplicationSessionKey, true);
 			
