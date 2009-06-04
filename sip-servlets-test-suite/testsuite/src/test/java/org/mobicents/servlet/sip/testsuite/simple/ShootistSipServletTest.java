@@ -78,7 +78,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	public void testShootist() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			
@@ -99,7 +99,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	public void testShootistSetToTag() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			
@@ -120,7 +120,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	public void testShootistSetToParam() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			
@@ -137,7 +137,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	public void testShootistCallerSendsBye() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
 		SipProvider senderProvider = receiver.createProvider();			

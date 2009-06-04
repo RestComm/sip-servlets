@@ -71,7 +71,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 			super.setUp();						
 			
 			senderProtocolObjects =new ProtocolObjects(
-					"reinvite", "gov.nist", TRANSPORT, AUTODIALOG);
+					"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
 						
 			sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 			SipProvider senderProvider = sender.createProvider();			

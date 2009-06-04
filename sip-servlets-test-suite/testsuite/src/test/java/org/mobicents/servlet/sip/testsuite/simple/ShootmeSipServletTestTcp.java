@@ -66,7 +66,7 @@ public class ShootmeSipServletTestTcp extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", listeningPointTransport, AUTODIALOG);
+				"sender", "gov.nist", listeningPointTransport, AUTODIALOG, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			

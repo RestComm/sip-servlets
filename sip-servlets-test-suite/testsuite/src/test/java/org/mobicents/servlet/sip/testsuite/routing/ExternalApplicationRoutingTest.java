@@ -68,7 +68,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
@@ -79,7 +79,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 		
 		
 		recieverProtocolObjects =new ProtocolObjects(
-				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG);
+				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		
 		receiver = new TestSipListener(5058, 5070, recieverProtocolObjects, false);
 		SipProvider registerRecieverProvider = receiver.createProvider();			

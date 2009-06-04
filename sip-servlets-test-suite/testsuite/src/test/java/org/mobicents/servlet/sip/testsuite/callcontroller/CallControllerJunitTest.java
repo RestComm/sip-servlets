@@ -82,9 +82,9 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects(TO_NAME,
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 			
 	}
 	
@@ -92,9 +92,11 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		deployCallBlocking();
 		deployCallForwarding();
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -125,9 +127,11 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		deployCallBlocking();
 		deployCallForwarding();
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -156,9 +160,11 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		deployCallBlocking();
 		deployCallForwarding();
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);

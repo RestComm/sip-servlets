@@ -48,7 +48,7 @@ public class SipAppSessionTerminationTest extends SipServletTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		receiverProtocolObjects =new ProtocolObjects(
-				"receiver", "gov.nist", TRANSPORT, AUTODIALOG);
+				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, true);
 		SipProvider receiverProvider = receiver.createProvider();			

@@ -68,16 +68,18 @@ public class ReplacesSipServletTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG);			
+				"gov.nist", TRANSPORT, AUTODIALOG, null);			
 	}
 	
 	public void testSipServletSendsReplaces() throws Exception {		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -105,9 +107,11 @@ public class ReplacesSipServletTest extends SipServletTestCase {
 	
 	public void testSipServletReceivesReplaces() throws Exception {		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);

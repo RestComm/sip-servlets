@@ -70,7 +70,7 @@ public class SessionHandlerSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender1Chat1", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender1Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);

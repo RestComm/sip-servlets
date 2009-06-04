@@ -36,13 +36,15 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  *
  */
 public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
-	
+		
+
 	private static transient Logger logger = Logger.getLogger(SessionKeyTargetingSipServletTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 10000;
-	private static final int TIMEOUT_TIMER = 6000;	
+	private static final int TIMEOUT_TIMER = 6000;
+	private static final int CONTAINER_PORT = 5070;
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender1Chat1;
@@ -59,6 +61,9 @@ public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
 	
 	public SessionKeyTargetingSipServletTest(String name) {
 		super(name);
+//		startTomcatOnStartup = false;
+//		autoDeployOnStartup = false;
+//		initTomcatOnStartup = false;
 	}
 
 	@Override
@@ -79,30 +84,30 @@ public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		sender1Chat1ProtocolObjects =new ProtocolObjects(
-				"sender1Chat1", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender1Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		sender2Chat1ProtocolObjects =new ProtocolObjects(
-				"sender2Chat1", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender2Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		sender3Chat1ProtocolObjects =new ProtocolObjects(
-				"sender3Chat1", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender3Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		sender1Chat2ProtocolObjects =new ProtocolObjects(
-				"sender1Chat2", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender1Chat2", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
-		sender1Chat1 = new TestSipListener(5080, 5070, sender1Chat1ProtocolObjects, false);
+		sender1Chat1 = new TestSipListener(5071, CONTAINER_PORT, sender1Chat1ProtocolObjects, false);
 		SipProvider senderProvider = sender1Chat1.createProvider();			
 		senderProvider.addSipListener(sender1Chat1);
 		sender1Chat1ProtocolObjects.start();			
 		
-		sender2Chat1 = new TestSipListener(5081, 5070, sender2Chat1ProtocolObjects, false);
+		sender2Chat1 = new TestSipListener(5072, CONTAINER_PORT, sender2Chat1ProtocolObjects, false);
 		SipProvider sender2Provider = sender2Chat1.createProvider();			
 		sender2Provider.addSipListener(sender2Chat1);
 		sender2Chat1ProtocolObjects.start();
 		
-		sender3Chat1 = new TestSipListener(5082, 5070, sender3Chat1ProtocolObjects, false);
+		sender3Chat1 = new TestSipListener(5073, CONTAINER_PORT, sender3Chat1ProtocolObjects, false);
 		SipProvider sender3Provider = sender3Chat1.createProvider();			
 		sender3Provider.addSipListener(sender3Chat1);
 		sender3Chat1ProtocolObjects.start();
 		
-		sender1Chat2 = new TestSipListener(5083, 5070, sender1Chat2ProtocolObjects, false);
+		sender1Chat2 = new TestSipListener(5074, CONTAINER_PORT, sender1Chat2ProtocolObjects, false);
 		SipProvider sender4Provider = sender1Chat2.createProvider();			
 		sender4Provider.addSipListener(sender1Chat2);
 		sender1Chat2ProtocolObjects.start();
@@ -149,7 +154,7 @@ public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
 		assertTrue(sender2Chat1.isAckSent());
 		fromName = "sender3Chat1";
 		fromAddress = sender3Chat1ProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
+				fromName, fromSipAddress);		
 		sender3Chat1.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender3Chat1.isAckSent());

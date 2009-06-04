@@ -46,6 +46,7 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
+import javax.sip.address.TelURL;
 import javax.sip.address.URI;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
@@ -224,6 +225,8 @@ public class TestSipListener implements SipListener {
 	private boolean reinviteSent;
 	
 	private boolean abortProcessing;
+	
+	private boolean recordRoutingProxyTesting;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -277,8 +280,9 @@ public class TestSipListener implements SipListener {
 
 		logger.info("\n\nRequest " + request.getMethod()
 				+ " received at " + protocolObjects.sipStack.getStackName()
-				+ " with server transaction id " + serverTransactionId);
-
+				+ " with server transaction id " + serverTransactionId
+				+ " dialog " + requestReceivedEvent.getDialog());
+		
 		if (request.getMethod().equals(Request.INVITE)) {
 			processInvite(requestReceivedEvent, serverTransactionId);
 		}
@@ -980,7 +984,10 @@ public class TestSipListener implements SipListener {
 			logger.info("shootist:  got a " + request);
 			logger.info("shootist:  got an ACK. ServerTxId = " + serverTransactionId);
 			ackReceived = true;
-			ackCount ++;
+			//we don't count retransmissions
+			if(serverTransactionId != null) {
+				ackCount ++;
+			}
 			if(sendBye) {											
 				Thread.sleep(1000);
 				Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
@@ -1045,9 +1052,9 @@ public class TestSipListener implements SipListener {
 		}
 		Response response = (Response) responseReceivedEvent.getResponse();
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
-		if(response.getStatusCode() == Response.TRYING && recordRouteHeader != null) {
+		if(!recordRoutingProxyTesting && recordRouteHeader != null) {
 			abortProcessing = true;
-			throw new IllegalArgumentException("we received a record route header in the TRYING response !");			
+			throw new IllegalArgumentException("we received a record route header in a  response !");			
 		}
 		if(response.getStatusCode() >= 400 && response.getStatusCode() < 510) {
 			this.serverErrorReceived = true;
@@ -1230,6 +1237,11 @@ public class TestSipListener implements SipListener {
 	}
 
 	public Request processResponseAuthorization(Response response, URI uriReq) {
+		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
+		if(!recordRoutingProxyTesting && recordRouteHeader != null) {
+			abortProcessing = true;
+			throw new IllegalArgumentException("we received a record route header in a  response !");			
+		}
 		Request requestauth = null;
 		this.authenticationErrorReceived = true;
 		try {
@@ -1453,7 +1465,7 @@ public class TestSipListener implements SipListener {
 			((SipURI)this.requestURI).setPort(peerPort);
 			((SipURI)this.requestURI).setTransportParam(listeningPoint.getTransport());
 		}
-		if(useToURIasRequestUri) {
+		if(useToURIasRequestUri || toURI instanceof TelURL) {
 			this.requestURI = toURI;
 		}
 		
@@ -2148,6 +2160,20 @@ public class TestSipListener implements SipListener {
 
 	public Request getInviteRequest() {
 		return inviteRequest;
+	}
+
+	/**
+	 * @param recordRoutingProxyTesting the recordRoutingProxyTesting to set
+	 */
+	public void setRecordRoutingProxyTesting(boolean recordRoutingProxyTesting) {
+		this.recordRoutingProxyTesting = recordRoutingProxyTesting;
+	}
+
+	/**
+	 * @return the recordRoutingProxyTesting
+	 */
+	public boolean isRecordRoutingProxyTesting() {
+		return recordRoutingProxyTesting;
 	}
 
 }

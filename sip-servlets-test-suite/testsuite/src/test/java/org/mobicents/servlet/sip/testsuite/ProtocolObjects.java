@@ -52,7 +52,7 @@ public class ProtocolObjects {
 	private boolean isStarted;
 
 	public ProtocolObjects(String stackname, String pathname, String transport,
-			boolean autoDialog) {
+			boolean autoDialog, String outboundProxy) {
 
 		this.transport = transport;
 		SipFactory sipFactory = SipFactory.getInstance();
@@ -61,6 +61,10 @@ public class ProtocolObjects {
 		Properties properties = new Properties();
 		properties.setProperty("javax.sip.STACK_NAME", stackname);
 
+		if(outboundProxy != null) {
+			properties.setProperty("javax.sip.OUTBOUND_PROXY", outboundProxy + "/"
+				+ transport);
+		}
 		// The following properties are specific to nist-sip
 		// and are not necessarily part of any other jain-sip
 		// implementation.

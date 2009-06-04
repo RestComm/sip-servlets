@@ -67,9 +67,9 @@ public class CallForwardingJunitTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver", "gov.nist",
-				TRANSPORT, AUTODIALOG);
+				TRANSPORT, AUTODIALOG, null);
 
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();

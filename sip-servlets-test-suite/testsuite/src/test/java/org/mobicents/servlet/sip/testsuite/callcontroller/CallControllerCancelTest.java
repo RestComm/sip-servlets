@@ -74,9 +74,9 @@ public class CallControllerCancelTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects("forward-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 			
 	}
 

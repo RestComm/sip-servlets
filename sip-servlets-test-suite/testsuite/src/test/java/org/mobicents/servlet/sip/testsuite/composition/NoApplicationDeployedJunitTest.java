@@ -54,9 +54,9 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG);
+				"gov.nist", TRANSPORT, AUTODIALOG, null);
 	}
 	
 	@Override

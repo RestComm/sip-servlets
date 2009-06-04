@@ -79,7 +79,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			

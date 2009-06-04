@@ -82,7 +82,7 @@ public class PublishSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		watcherProtocolObjects =new ProtocolObjects(
-				"watcher", "gov.nist", TRANSPORT, AUTODIALOG);
+				"watcher", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		watcher = new TestSipListener(5080, 5070, watcherProtocolObjects, true);
 		SipProvider senderProvider = watcher.createProvider();			
@@ -92,7 +92,7 @@ public class PublishSipServletTest extends SipServletTestCase {
 		watcherProtocolObjects.start();
 		
 		puaProtocolObjects =new ProtocolObjects(
-				"pua", "gov.nist", TRANSPORT, AUTODIALOG);
+				"pua", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		pua = new TestSipListener(5090, 5070, puaProtocolObjects, true);
 		SipProvider puaProvider = pua.createProvider();			

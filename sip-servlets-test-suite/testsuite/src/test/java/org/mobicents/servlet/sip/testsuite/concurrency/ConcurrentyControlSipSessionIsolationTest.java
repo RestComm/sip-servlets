@@ -78,7 +78,7 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			

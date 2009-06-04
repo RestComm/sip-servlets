@@ -44,13 +44,15 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG);
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG);
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
