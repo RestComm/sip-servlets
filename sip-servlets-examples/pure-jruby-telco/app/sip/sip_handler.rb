@@ -1,6 +1,8 @@
 # Note that the class extend a JBoss provided sip controller called JBoss::Sip::SipBaseHandler
 # that mimic the Java Sip Servlet class the ruby way
-class SipHandler < JBoss::Sip::SipBaseHandler
+require 'torquebox/sip/base'
+
+class SipHandler < TorqueBox::Sip::Base
   # Handle INVITE request to setup a call by answering 200 OK
   def do_invite(request) 	
     request.create_response(200).send
