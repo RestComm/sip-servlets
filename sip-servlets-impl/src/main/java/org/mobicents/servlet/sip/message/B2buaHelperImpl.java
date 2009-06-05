@@ -135,18 +135,13 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		
 		try {
 			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-			final Request newRequest = (Request) origRequestImpl.message.clone();
+			Request newRequest = (Request) origRequestImpl.message.clone();
 			((SIPMessage)newRequest).setApplicationData(null);
 			//content should be copied too, so commented out
 //		 	newRequest.removeContent();				
 			//removing the via header from original request
 			newRequest.removeHeader(ViaHeader.NAME);	
-			
-			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
-			
-			newFromHeader.removeParameter("tag");
-			((ToHeader) newRequest.getHeader(ToHeader.NAME))
-					.removeParameter("tag");
+						
 			// Remove the route header ( will point to us ).
 			// commented as per issue 649
 //			newRequest.removeHeader(RouteHeader.NAME);
@@ -168,11 +163,15 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			newRequest.setHeader(callIdHeader);
 			
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
-					newRequest);			
+					newRequest);	
+			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
+			newFromHeader.removeParameter("tag");
+			((ToHeader) newRequest.getHeader(ToHeader.NAME))
+					.removeParameter("tag");
+			
 			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			final MobicentsSipApplicationSession appSession = originalSession
-					.getSipApplicationSession();	
-						
+					.getSipApplicationSession();			
 			final FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
 			
 			final SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) appSession.getSipContext().getSipApplicationDispatcher();

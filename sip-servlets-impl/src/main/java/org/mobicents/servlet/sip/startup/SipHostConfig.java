@@ -108,9 +108,9 @@ public class SipHostConfig extends HostConfig {
 	
 	@Override
 	protected void deployWAR(String contextPath, File dir, String file) {
-		if(logger.isDebugEnabled()) {
-    		logger.debug("Context class used to deploy the WAR : " + contextClass);
-    		logger.debug("Context config class used to deploy the WAR : " + configClass);
+		if(logger.isTraceEnabled()) {
+    		logger.trace("Context class used to deploy the WAR : " + contextClass);
+    		logger.trace("Context config class used to deploy the WAR : " + configClass);
     	}
 		super.deployWAR(contextPath, dir, file);
 	}

@@ -54,7 +54,6 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
-import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.BatchingManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -285,6 +284,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				if(logger.isInfoEnabled()) {
 					logger.info("this context contains a manager that allows applications to work in a distributed environment");
 				}
+			}
+			if(logger.isInfoEnabled()) {
+				logger.info("sip application session timeout for this context is " + sipApplicationSessionTimeout + " minutes");
 			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context started");
