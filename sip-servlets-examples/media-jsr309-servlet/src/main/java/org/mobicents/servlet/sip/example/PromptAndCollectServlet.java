@@ -104,7 +104,8 @@ public class PromptAndCollectServlet extends PlayerServlet {
 		MediaSessionImpl ms = (MediaSessionImpl) sipSession
 				.getAttribute("MEDIA_SESSION");
 		try {
-			MediaGroup mg = ms.createMediaGroup(MediaGroupConfig.c_PlayerSignalDetector);
+			MediaGroup mg = ms
+					.createMediaGroup(MediaGroupConfig.c_PlayerSignalDetector);
 			mg.addListener(new MyStatusEventListener());
 
 			NetworkConnection nc = (NetworkConnection) sipSession
@@ -143,6 +144,12 @@ public class PromptAndCollectServlet extends PlayerServlet {
 					e.printStackTrace();
 				}
 
+			}
+			if (event.getError().equals(Error.e_OK)
+					&& JoinEvent.ev_Unjoined.equals(event.getEventType())) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Un-Joined MG and NC");
+				}
 			} else {
 				logger.error("Joining of MG and NC failed");
 			}
@@ -153,21 +160,24 @@ public class PromptAndCollectServlet extends PlayerServlet {
 	private class PlayerListener implements MediaEventListener<PlayerEvent> {
 
 		public void onEvent(PlayerEvent event) {
-
+			logger.info("PlayerListener Received event " + event);
 			Player player = event.getSource();
 			MediaGroup mg = player.getContainer();
-			if (Error.e_OK.equals(event.getError())
-					&& Player.ev_PlayComplete.equals(event.getEventType())) {
-				try {
-					SignalDetector sg = mg.getSignalDetector();
-					sg.addListener(new SignalDetectorListener());
-					sg.receiveSignals(1, null, null, null);
-				} catch (MsControlException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			if (!isBye) {
+				if (Error.e_OK.equals(event.getError())
+						&& Player.ev_PlayComplete.equals(event.getEventType())) {
+					logger.info("Received PlayComplete event");
+					try {
+						SignalDetector sg = mg.getSignalDetector();
+						sg.addListener(new SignalDetectorListener());
+						sg.receiveSignals(1, null, null, null);
+					} catch (MsControlException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					logger.error("Player didn't complete successfully ");
 				}
-			} else {
-				logger.error("Player didn't complete successfully ");
 			}
 
 		}
@@ -178,14 +188,19 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			MediaEventListener<SignalDetectorEvent> {
 
 		public void onEvent(SignalDetectorEvent event) {
-			MediaGroup mg = (MediaGroup) event.getSource().getContainer();
-			if (Error.e_OK.equals(event.getError())
-					&& SignalDetector.ev_ReceiveSignals.equals(event
-							.getEventType())) {
-				String seq = event.getSignalString();
+			try {
+				MediaGroup mg = (MediaGroup) event.getSource().getContainer();
 
-				URI prompt = null;
-				try {
+				SignalDetector sg = mg.getSignalDetector();
+				sg.removeListener(this);
+
+				if (Error.e_OK.equals(event.getError())
+						&& SignalDetector.ev_SignalDetected.equals(event
+								.getEventType())) {
+					String seq = event.getSignalString();
+
+					URI prompt = null;
+
 					Player player = mg.getPlayer();
 
 					if (seq.equals("0")) {
@@ -227,12 +242,11 @@ public class PromptAndCollectServlet extends PlayerServlet {
 
 					player.play(prompt, null, null);
 
-				} catch (MsControlException e) {
-					e.printStackTrace();
+				} else {
+					logger.error("DTMF detection failed ");
 				}
-
-			} else {
-				logger.error("DTMF detection failed ");
+			} catch (MsControlException e) {
+				e.printStackTrace();
 			}
 
 		}

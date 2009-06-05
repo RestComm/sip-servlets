@@ -83,6 +83,8 @@ public class PlayerServlet extends SipServlet {
 
 	public static final String PEER_ADDRESS = "127.0.0.1";
 	protected static final int MGW_PORT = 2427;
+	
+	protected boolean isBye = false;
 
 	public PlayerServlet() {
 	}
@@ -120,6 +122,9 @@ public class PlayerServlet extends SipServlet {
 
 		logger.info("MediaPlaybackServlet: Got request:\n"
 				+ request.getMethod());
+		
+		isBye = false;
+		
 		SipServletResponse sipServletResponse = request
 				.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
@@ -198,7 +203,7 @@ public class PlayerServlet extends SipServlet {
 			IOException {
 
 		logger.info("MediaPlaybackServlet: Got BYE request:\n" + request);
-
+		isBye = true;
 		MediaSession mediaSession = (MediaSession) request.getSession()
 				.getAttribute("MEDIA_SESSION");
 		mediaSession.release();
