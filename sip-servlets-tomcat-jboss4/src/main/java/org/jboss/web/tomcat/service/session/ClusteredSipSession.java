@@ -1108,8 +1108,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			checkAlwaysReplicateMetadata();
 
 			if(logger.isDebugEnabled()) {
-				logger.debug("sip session has just been read from the cache ");
-				logger.debug("sip session executor service " + executorService);
+				logger.debug("sip session has just been read from the cache ");				
 			}
 			// TODO uncomment when work on JBAS-1900 is completed
 			// // Session notes -- for FORM auth apps, allow replicated session

@@ -71,7 +71,6 @@ import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
-import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -988,7 +987,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			//container and not a "real" call to the AR to select an application - needed by TCK AR test cases
 			stateInfo = serializeStateInfo(sipServletRequest.getSipSession().getStateInfo()); 
 		}
-		Request request = (Request) sipServletRequest.getMessage();
+		final Request request = (Request) sipServletRequest.getMessage();
 		
 		sipServletRequest.setReadOnly(true);
 		SipApplicationRouterInfo applicationRouterInfo = sipApplicationRouter.getNextApplication(
@@ -999,17 +998,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			stateInfo);
 		sipServletRequest.setReadOnly(false);
 		// 15.4.1 Procedure : point 2
-		SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
-		String[] routes = applicationRouterInfo.getRoutes();		
+		final SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
+		final String[] routes = applicationRouterInfo.getRoutes();		
 		try {
 			// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
 			// it is up to container to decide whether it is external or internal.
 			if(SipRouteModifier.ROUTE.equals(sipRouteModifier)) {						
-				Address routeAddress = null; 
-				RouteHeader applicationRouterInfoRouteHeader = null;
-				
-				routeAddress = SipFactories.addressFactory.createAddress(routes[0]);
-				applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);									
+				final Address routeAddress = SipFactories.addressFactory.createAddress(routes[0]);
+				final RouteHeader applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);									
 				if(isRouteExternal(applicationRouterInfoRouteHeader)) {				
 					// push all of the routes on the Route header stack of the request and 
 					// send the request externally
@@ -1020,7 +1016,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 			} else if (SipRouteModifier.ROUTE_BACK.equals(sipRouteModifier)) {
 				// Push container Route, pick up the first outbound interface
-				SipURI sipURI = getOutboundInterfaces().get(0);
+				final SipURI sipURI = getOutboundInterfaces().get(0);
 				sipURI.setParameter("modifier", "route_back");
 				Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
 				request.addHeader(routeHeader);

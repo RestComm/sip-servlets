@@ -36,10 +36,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -131,8 +128,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient Principal userPrincipal;
 	
-	protected transient ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 90, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<Runnable>());
+//	protected transient ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 90, TimeUnit.SECONDS,
+//			new LinkedBlockingQueue<Runnable>());
 	
 	/**
 	 * Creation time.
@@ -225,7 +222,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	// If a subscription's destruction leaves no other application state associated with the dialog, the dialog terminates
 	protected transient Set<EventHeader> subscriptions = null;
 	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
-	protected transient Transaction originalTransaction = null;
+	protected transient String originalMethod = null;
 	protected transient boolean okToByeSentOrReceived = false;
 	protected transient Semaphore semaphore;
 	
@@ -586,9 +583,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return this.state;
 	}
 
-	public ThreadPoolExecutor getExecutorService() {
-		return executorService;
-	}
+//	public ThreadPoolExecutor getExecutorService() {
+//		return executorService;
+//	}
 	/**
 	 * {@inheritDoc}
 	 */
@@ -652,10 +649,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		ongoingTransactions.clear();
 		subscriptions.clear();
-		executorService.shutdown();
+//		executorService.shutdown();
 		parentSession = null;
 		userPrincipal = null;		
-		executorService = null;
+//		executorService = null;
 		// If the sip app session is nullified com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest102 will fail
 		// because it will try to get the B2BUAHelper after the session has been invalidated	
 //		sipApplicationSession = null;
@@ -668,7 +665,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		handlerServlet = null;
 		localParty = null;
 		ongoingTransactions = null;
-		originalTransaction = null;
+		originalMethod = null;
 		outboundInterface = null;
 		sipSessionAttributeMap = null;
 //		key = null;
@@ -939,8 +936,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {
 		this.sessionCreatingTransaction = sessionCreatingTransaction;
-		if(originalTransaction == null) {
-			this.originalTransaction = sessionCreatingTransaction;
+		if(originalMethod == null) {
+			this.originalMethod = sessionCreatingTransaction.getRequest().getMethod();
 		}
 		if(sessionCreatingTransaction != null) {
 			addOngoingTransaction(sessionCreatingTransaction);
@@ -1426,10 +1423,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 			subscriptions.add(eventHeader);	
 		}		
 		if(logger.isDebugEnabled()) {
-			logger.debug("Request from Original Transaction is " + originalTransaction.getRequest());
+			logger.debug("Request from Original Transaction is " + originalMethod);
 			logger.debug("Dialog is " + sessionCreatingDialog);
 		}
-		if(subscriptions.size() < 2 && originalTransaction != null && Request.INVITE.equals(originalTransaction.getRequest().getMethod())) {
+		if(subscriptions.size() < 2 && Request.INVITE.equals(originalMethod)) {
 			sessionCreatingDialog.terminateOnBye(false);
 		}
 	}
@@ -1451,7 +1448,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(!hasOngoingSubscriptions) {		
 			if(subscriptions.size() < 1) {
-				if((originalTransaction != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalTransaction.getRequest().getMethod()) ) {
+				if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
 					readyToInvalidate = true;
 					setState(State.TERMINATED);
 				}

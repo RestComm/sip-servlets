@@ -97,9 +97,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		if(applicationId == null) {
 			final ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 			final String arText = toHeader.getTag();
-			final ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(sipApplicationDispatcher, arText);
-			applicationName = ar.getApplicationName();
-			applicationId = ar.getAppGeneratedApplicationSessionId();
+			final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);
+			applicationName = tuple[0];
+			applicationId = tuple[1];
 			if(Request.ACK.equals(request.getMethod()) && applicationId == null && applicationName == null) {
 				//Means that this is an ACK to a container generated error response, so we can drop it
 				if(logger.isDebugEnabled()) {

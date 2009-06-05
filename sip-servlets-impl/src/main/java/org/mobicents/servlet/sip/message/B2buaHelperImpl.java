@@ -61,7 +61,6 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.RoutingState;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -172,14 +171,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			final MobicentsSipApplicationSession appSession = originalSession
 					.getSipApplicationSession();			
-			final FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
 			
-			final SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) appSession.getSipContext().getSipApplicationDispatcher();
-			final ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
-					dispatcher, oldFromHeader.getTag());
-			stack.setApplicationName(originalSession.getKey().getApplicationName());
-			stack.setAppGeneratedApplicationSessionId(appSession.getKey().getId());
-			newFromHeader.setTag(stack.toString());
+			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), appSession.getKey().getId()));
 			
 			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
@@ -547,14 +540,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			final MobicentsSipApplicationSession originalAppSession = originalSession
 					.getSipApplicationSession();				
 						
-			final FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
-			
-			final SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) originalAppSession.getSipContext().getSipApplicationDispatcher();
-			final ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
-					dispatcher, oldFromHeader.getTag());
-			stack.setApplicationName(originalSession.getKey().getApplicationName());
-			stack.setAppGeneratedApplicationSessionId(originalAppSession.getKey().getId());
-			newFromHeader.setTag(stack.toString());
+			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
 			
 			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			

@@ -516,14 +516,8 @@ public class SipFactoryImpl implements Serializable {
 			if(contactHeader != null) {
 				requestToWrap.addHeader(contactHeader);
 			}
-			
-			SipApplicationDispatcher dispatcher = 
-				mobicentsSipApplicationSession.getSipContext().getSipApplicationDispatcher();
-			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
-					dispatcher);			
-			stack.setApplicationName(sipAppSession.getApplicationName());
-			stack.setAppGeneratedApplicationSessionId(sipApplicationSessionKey.getId());
-			fromHeader.setTag(stack.toString());
+						
+			fromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipApplicationDispatcher, sipAppSession.getApplicationName(), sipApplicationSessionKey.getId()));
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
 					mobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
