@@ -353,8 +353,8 @@ public class DiameterShClient implements DiameterProvider, DiameterListener
 
       // { Vendor-Specific-Application-Id }
       AvpSet vsaiAvp = avps.addGroupedAvp( Avp.VENDOR_SPECIFIC_APPLICATION_ID, true, false );
-      vsaiAvp.addAvp( Avp.VENDOR_ID, SH_VENDOR_ID, true, false );
-      vsaiAvp.addAvp( Avp.AUTH_APPLICATION_ID, SH_APPLICATION_ID, true, false );
+      vsaiAvp.addAvp( Avp.VENDOR_ID, SH_VENDOR_ID, true, false, true );
+      vsaiAvp.addAvp( Avp.AUTH_APPLICATION_ID, SH_APPLICATION_ID, true, false, true );
 
       // { Auth-Session-State }
       // 0 == Idle,1 == Pending, 2 == Open, 3 == Disconnected
