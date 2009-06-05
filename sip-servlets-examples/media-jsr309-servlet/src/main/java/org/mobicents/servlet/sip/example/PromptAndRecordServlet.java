@@ -27,6 +27,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.media.mscontrol.MediaSessionImpl;
 
 /**
  * 
@@ -43,7 +44,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			+ System.getProperty("jboss.bind.address", "127.0.0.1")
 			+ ":8080/media-jsr309-servlet/audio/record_welcome.wav";
 
-	private static final int RECORDING_DELAY = 60000;
+	private static final int RECORDING_DELAY = 30000;
 
 	private final static String RECORDER = "test.wav";
 	private final String RECORDED_FILE = "file://"
@@ -59,11 +60,11 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			IOException {
 		SipSession sipSession = req.getSession();
 
-		MediaSession ms = (MediaSession) sipSession
+		MediaSessionImpl ms = (MediaSessionImpl) sipSession
 				.getAttribute("MEDIA_SESSION");
 		try {
 			MediaGroup mg = ms
-					.createContainer(MediaGroupConfig.c_PlayerRecorderSignalDetector);
+					.createMediaGroup(MediaGroupConfig.c_PlayerRecorderSignalDetector);
 			mg.addListener(new MyStatusEventListener());
 
 			NetworkConnection nc = (NetworkConnection) sipSession
@@ -82,10 +83,9 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 		SipSession sipSession = servletTimer.getApplicationSession()
 				.getSipSession((String) servletTimer.getInfo());
 
-		MediaSession ms = (MediaSession) sipSession
-				.getAttribute("MEDIA_SESSION");
-		
-		
+		System.out.println("Timer fired");
+		// sipSession.setAttribute("MEDIA_GROUP", mg);
+
 	}
 
 	private class MyStatusEventListener implements StatusEventListener {
@@ -110,6 +110,11 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 					e.printStackTrace();
 				}
 
+			} else if (event.getError().equals(Error.e_OK)
+					&& JoinEvent.ev_Unjoined.equals(event.getEventType())) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Un-Joined MG and NC");
+				}
 			} else {
 				logger.error("Joining of MG and NC failed");
 			}
@@ -123,39 +128,43 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 			Player player = event.getSource();
 			MediaGroup mg = player.getContainer();
-			if (Error.e_OK.equals(event.getError())
-					&& Player.ev_PlayComplete.equals(event.getEventType())) {
+			if (!isBye) {
+				if (Error.e_OK.equals(event.getError())
+						&& Player.ev_PlayComplete.equals(event.getEventType())) {
 
-				MediaSession mediaSession = event.getSource().getMediaSession();
+					MediaSession mediaSession = event.getSource()
+							.getMediaSession();
 
-				SipSession sipSession = (SipSession) mediaSession
-						.getAttribute("SIP_SESSION");
+					SipSession sipSession = (SipSession) mediaSession
+							.getAttribute("SIP_SESSION");
 
-				SipApplicationSession sipAppSession = sipSession
-						.getApplicationSession();
+					sipSession.setAttribute("MEDIA_GROUP", mg);
 
-				try {
-					Recorder recoredr = mg.getRecorder();
-					URI prompt = URI.create(RECORDED_FILE);
-					recoredr.record(prompt, null, null);
+					SipApplicationSession sipAppSession = sipSession
+							.getApplicationSession();
 
-					// TODO : Set timer
+					try {
+						Recorder recoredr = mg.getRecorder();
+						URI prompt = URI.create(RECORDER);
+						recoredr.record(prompt, null, null);
 
-					TimerService timer = (TimerService) getServletContext()
-							.getAttribute(TIMER_SERVICE);
-					timer.createTimer(sipAppSession, RECORDING_DELAY, false,
-							sipSession.getId());
+						// TODO : Set timer
 
-				} catch (MsControlException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+						TimerService timer = (TimerService) getServletContext()
+								.getAttribute(TIMER_SERVICE);
+						timer.createTimer(sipAppSession, RECORDING_DELAY,
+								false, sipSession.getId());
+
+					} catch (MsControlException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					logger.error("Player didn't complete successfully ");
 				}
-			} else {
-				logger.error("Player didn't complete successfully ");
 			}
 
 		}
 
 	}
-
 }

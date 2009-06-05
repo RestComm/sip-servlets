@@ -144,8 +144,7 @@ public class PromptAndCollectServlet extends PlayerServlet {
 					e.printStackTrace();
 				}
 
-			}
-			if (event.getError().equals(Error.e_OK)
+			} else if (event.getError().equals(Error.e_OK)
 					&& JoinEvent.ev_Unjoined.equals(event.getEventType())) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Un-Joined MG and NC");
