@@ -936,7 +936,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {
 		this.sessionCreatingTransaction = sessionCreatingTransaction;
-		if(originalMethod == null) {
+		if(originalMethod == null && sessionCreatingTransaction != null) {
 			this.originalMethod = sessionCreatingTransaction.getRequest().getMethod();
 		}
 		if(sessionCreatingTransaction != null) {
