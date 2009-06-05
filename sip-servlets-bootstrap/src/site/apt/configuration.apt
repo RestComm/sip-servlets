@@ -54,6 +54,8 @@ Configuration
 		
 		** gov.nist.javax.sip.REENTRANT_LISTENER=true  
 	
+	* Optionnaly there is a <<<sipPathName>>> attribute allowing one to change the underlying JAIN SIP Stack implementation. If not specified it defaults to "gov.nist", which is the RI for JAIN SIP.
+	Please note that switching the JAIN SIP Stack will not work because we rely on internal classes of the RI, but Mobicents proposed some additions to the JAIN SIP APIs so that the next rev of the spec allows it.
 	
 * Application Router and Service Configuration
 

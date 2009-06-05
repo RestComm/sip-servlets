@@ -961,7 +961,7 @@
 						 Investigate IP Load Balancer setup for MSS HA
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=663">
 						JSR 309 Sip Servlets Example
@@ -985,7 +985,7 @@
 						NIO and lazy parsing in jain sip
 						</a>
 						<br />						
-						<img src="green.jpeg" />
+						<img src="orange.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -1084,6 +1084,20 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=733">
 									JSR 289 Section 5.6.1 Parameters incorrectly implemented
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=747">
+									Non Record Routing Proxy is adding Record Route on informational response
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=748">
+									B2BUA/UAS apps should not have Record Route in their responses
 								</a>								
 							</li>
 						</ul>
