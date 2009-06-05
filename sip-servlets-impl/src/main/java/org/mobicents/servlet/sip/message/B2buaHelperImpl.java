@@ -134,16 +134,17 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		
 		try {
-			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-			Request newRequest = (Request) origRequestImpl.message.clone();
+			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+			final Request newRequest = (Request) origRequestImpl.message.clone();
 			((SIPMessage)newRequest).setApplicationData(null);
 			//content should be copied too, so commented out
 //		 	newRequest.removeContent();				
 			//removing the via header from original request
 			newRequest.removeHeader(ViaHeader.NAME);	
 			
-			((FromHeader) newRequest.getHeader(FromHeader.NAME))
-					.removeParameter("tag");
+			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
+			
+			newFromHeader.removeParameter("tag");
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
 					.removeParameter("tag");
 			// Remove the route header ( will point to us ).
@@ -162,31 +163,30 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			}
 	
 			//Creating new call id
-			ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
-			CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+			final ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
+			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			
-			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					newRequest);			
-			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-			MobicentsSipApplicationSession appSession = originalSession
+			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			final MobicentsSipApplicationSession appSession = originalSession
 					.getSipApplicationSession();	
+						
+			final FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
 			
-			FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
-			FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
-			
-			SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) appSession.getSipContext().getSipApplicationDispatcher();
-			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
+			final SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) appSession.getSipContext().getSipApplicationDispatcher();
+			final ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher, oldFromHeader.getTag());
 			stack.setApplicationName(originalSession.getKey().getApplicationName());
 			stack.setAppGeneratedApplicationSessionId(appSession.getKey().getId());
 			newFromHeader.setTag(stack.toString());
 			
-			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
+			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 		
-			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,					
 					session, 
@@ -233,11 +233,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		
 		try {
-			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-			MobicentsSipSession sessionImpl = (MobicentsSipSession) session;
+			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			final MobicentsSipSession sessionImpl = (MobicentsSipSession) session;
 
-			SipServletRequestImpl newSubsequentServletRequest = (SipServletRequestImpl) session.createRequest(origRequest.getMethod());
+			final SipServletRequestImpl newSubsequentServletRequest = (SipServletRequestImpl) session.createRequest(origRequest.getMethod());
 			
 			
 			//For non-REGISTER requests, the Contact header field is not copied 
@@ -252,7 +252,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			//They will be added later after the sip servlet request has been created
-			List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					(Request) newSubsequentServletRequest.getMessage());
 						
 			//If Contact header is present in the headerMap 
@@ -295,7 +295,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @return
 	 * @throws ParseException
 	 */
-	private static List<String> retrieveContactHeaders(
+	private final static List<String> retrieveContactHeaders(
 			Map<String, List<String>> headerMap, Request newRequest)
 			throws ParseException {
 		List<String> contactHeaderList = new ArrayList<String>();
@@ -306,7 +306,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						throw new IllegalArgumentException(headerName + " in the provided map is a system header");
 					}
 					for (String value : headerMap.get(headerName)) {							
-						Header header = SipFactories.headerFactory.createHeader(
+						final Header header = SipFactories.headerFactory.createHeader(
 								headerName, value);					
 						if(! singletonHeadersNames.contains(header.getName())) {
 							newRequest.addHeader(header);
@@ -336,13 +336,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new IllegalArgumentException("session is invalid !");
 		}
 		
-		MobicentsSipSession sipSession = (MobicentsSipSession) session;
-
+		final MobicentsSipSession sipSession = (MobicentsSipSession) session;
+		final Transaction trans = sipSession.getSessionCreatingTransaction();				
+		final TransactionApplicationData appData = (TransactionApplicationData) trans.getApplicationData();
 		
-		Transaction trans = sipSession.getSessionCreatingTransaction();				
-		TransactionApplicationData appData = (TransactionApplicationData) trans.getApplicationData();
-		
-		SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) appData.getSipServletMessage();
+		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) appData.getSipServletMessage();
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
 			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
 		}
@@ -361,12 +359,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new IllegalArgumentException("the session is invalid");
 		}
 		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)session;
-		SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
+		final SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
 			return null;
 		}
-		MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
+		final MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
 		if(logger.isDebugEnabled()) {
 			if(linkedSession != null) {
 				logger.debug("Linked Session found : " + linkedSession.getKey() + " for this session " + session.getId());
@@ -390,15 +388,15 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)req.getSession();
-		SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
+		final SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			return null;
 		}
-		MobicentsSipSession linkedSipSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
+		final MobicentsSipSession linkedSipSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
 		if(linkedSipSession == null) {
 			return null;
 		}
-		SipServletRequest linkedSipServletRequest = originalRequestMap.get(linkedSipSession.getKey());
+		final SipServletRequest linkedSipServletRequest = originalRequestMap.get(linkedSipSession.getKey());
 		return linkedSipServletRequest;
 	}
 	
@@ -411,15 +409,15 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if(!session.isValid()) {
 			throw new IllegalArgumentException("the session is invalid!");
 		}
-		MobicentsSipSession sipSessionImpl = (MobicentsSipSession) session;
-		List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
+		final MobicentsSipSession sipSessionImpl = (MobicentsSipSession) session;
+		final List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
 		if (mode.equals(UAMode.UAC)) {
-			Set<Transaction> ongoingTransactions = sipSessionImpl.getOngoingTransactions();
+			final Set<Transaction> ongoingTransactions = sipSessionImpl.getOngoingTransactions();
 			if(ongoingTransactions != null) {
 				for ( Transaction transaction: ongoingTransactions) {
 					if ( transaction instanceof ClientTransaction) {
-						TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-						SipServletMessage sipServletMessage = tad.getSipServletMessage();
+						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+						final SipServletMessage sipServletMessage = tad.getSipServletMessage();
 						//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
 						//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
 						//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
@@ -438,8 +436,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		} else {
 			for ( Transaction transaction: sipSessionImpl.getOngoingTransactions()) {
 				if ( transaction instanceof ServerTransaction) {
-					TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-					SipServletMessage sipServletMessage = tad.getSipServletMessage();
+					final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+					final SipServletMessage sipServletMessage = tad.getSipServletMessage();
 					//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
 					//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
 					//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
@@ -495,7 +493,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if ( session == null) { 
 			throw new NullPointerException("the argument is null");
 		}
-		MobicentsSipSession key = (MobicentsSipSession) session;
+		final MobicentsSipSession key = (MobicentsSipSession) session;
 		if(checkSession) {
 			if(!session.isValid() || 
 					State.TERMINATED.equals(key.getState()) ||
@@ -503,7 +501,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 			}		
 		}
-		SipSessionKey value  = this.sessionMap.get(key.getKey());
+		final SipSessionKey value  = this.sessionMap.get(key.getKey());
 		if (value != null) {
 			this.sessionMap.remove(value);
 		}
@@ -516,15 +514,16 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest) {
 		try {
-			SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-			Request newRequest = (Request) origRequestImpl.message.clone();
+			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+			final Request newRequest = (Request) origRequestImpl.message.clone();
 			((SIPMessage)newRequest).setApplicationData(null);
 			//removing the via header from original request
 			newRequest.removeHeader(ViaHeader.NAME);	
 			
+			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME); 
+			
 			//assign a new from tag
-			((FromHeader) newRequest.getHeader(FromHeader.NAME))
-					.removeParameter("tag");
+			newFromHeader.removeParameter("tag");
 			//remove the to tag
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
 					.removeParameter("tag");
@@ -541,29 +540,28 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				newRequest.removeHeader(ContactHeader.NAME);
 			}
 			//Creating new call id
-			ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
-			CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+			final ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
+			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			
-			MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-			MobicentsSipApplicationSession originalAppSession = originalSession
+			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			final MobicentsSipApplicationSession originalAppSession = originalSession
 					.getSipApplicationSession();				
+						
+			final FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
 			
-			FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
-			FromHeader oldFromHeader = (FromHeader) origRequestImpl.getMessage().getHeader(FromHeader.NAME);
-			
-			SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) originalAppSession.getSipContext().getSipApplicationDispatcher();
-			ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
+			final SipApplicationDispatcher dispatcher = (SipApplicationDispatcher) originalAppSession.getSipContext().getSipApplicationDispatcher();
+			final ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 					dispatcher, oldFromHeader.getTag());
 			stack.setApplicationName(originalSession.getKey().getApplicationName());
 			stack.setAppGeneratedApplicationSessionId(originalAppSession.getKey().getId());
 			newFromHeader.setTag(stack.toString());
 			
-			SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
-			MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			
+			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			
 			session.setHandler(originalSession.getHandler());
 			
-			SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,					
 					session, 
@@ -595,9 +593,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * {@inheritDoc}
 	 */
 	public SipServletRequest createCancel(SipSession session) {
-		SipServletRequest sipServletRequest = originalRequestMap.get(((MobicentsSipSession)session).getKey());
+		final SipServletRequest sipServletRequest = originalRequestMap.get(((MobicentsSipSession)session).getKey());
 		
-		SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl)sipServletRequest.createCancel();
+		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl)sipServletRequest.createCancel();
 		((MobicentsSipSession)sipServletRequestImpl.getSession()).setB2buaHelper(this);
 		return sipServletRequestImpl;
 	}

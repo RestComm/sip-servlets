@@ -264,10 +264,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						toHeader.setTag(dialog.getLocalTag());						
 					} else if(session != null && session.getSipApplicationSession() != null) {						
 						final SipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
-						ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
+						final ApplicationRoutingHeaderComposer stack = new ApplicationRoutingHeaderComposer(
 								sipFactoryImpl.getSipApplicationDispatcher());
 						stack.setApplicationName(session.getKey().getApplicationName());						
-						stack.setAppGeneratedApplicationSessionId(RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
+						stack.setAppGeneratedApplicationSessionId(sipAppSessionKey.getId());
 						toHeader.setTag(stack.toString());
 					} else {							
 						//if the sessions are null, it means it is a cancel response

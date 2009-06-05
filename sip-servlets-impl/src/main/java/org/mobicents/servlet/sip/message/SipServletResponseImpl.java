@@ -55,7 +55,6 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -425,7 +424,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						response
 						);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
-				sipURI.setParameter(MessageDispatcher.APP_ID, RFC2396UrlDecoder.encode(sipAppSessionKey.getId()));
+				sipURI.setParameter(MessageDispatcher.APP_ID, sipAppSessionKey.getId());
 				sipURI.setLrParam();				
 				javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);

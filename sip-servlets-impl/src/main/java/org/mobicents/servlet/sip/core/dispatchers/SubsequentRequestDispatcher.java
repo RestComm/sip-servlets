@@ -35,7 +35,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -85,24 +84,20 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final Dialog dialog = sipServletRequest.getDialog();		
 		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader();
 		String applicationName = null; 
-		String applicationId = null;
-		if(poppedRouteHeader != null && ((Parameters)poppedRouteHeader.getAddress().getURI()).getParameter(RR_PARAM_APPLICATION_NAME) != null){
+		String applicationId = null;		
+		if(poppedRouteHeader != null){
 			final Parameters poppedAddress = (Parameters)poppedRouteHeader.getAddress().getURI();
 			//Extract information from the Route Header		
 			final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
-			if(applicationNameHashed == null || applicationNameHashed.length() < 1) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " +
-						"in this popped routed header " + poppedAddress);
+			if(applicationNameHashed != null && applicationNameHashed.length() > 0) {				
+				applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+				applicationId = poppedAddress.getParameter(APP_ID);
 			}
-			applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
-			applicationId = poppedAddress.getParameter(APP_ID);
-			if(applicationId != null) {
-				applicationId = RFC2396UrlDecoder.decode(applicationId);
-			}
-		} else {
-			ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
-			String arText = toHeader.getTag();
-			ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(sipApplicationDispatcher, arText);
+		} 
+		if(applicationId == null) {
+			final ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
+			final String arText = toHeader.getTag();
+			final ApplicationRoutingHeaderComposer ar = new ApplicationRoutingHeaderComposer(sipApplicationDispatcher, arText);
 			applicationName = ar.getApplicationName();
 			applicationId = ar.getAppGeneratedApplicationSessionId();
 			if(Request.ACK.equals(request.getMethod()) && applicationId == null && applicationName == null) {
@@ -125,18 +120,19 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					"in this popped routed header " + poppedRouteHeader);
 		}
 		final SipManager sipManager = (SipManager)sipContext.getManager();		
-		SipApplicationSessionKey sipApplicationSessionKey = null;		
-		sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
 				applicationId);
 	
 		MobicentsSipSession tmpSipSession = null;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 		if(sipApplicationSession == null) {
-			sipManager.dumpSipApplicationSessions();
+			if(logger.isDebugEnabled()) {
+				sipManager.dumpSipApplicationSessions();
+			}
 			//trying the join or replaces matching sip app sessions
-			SipApplicationSessionKey joinSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, JoinHeader.NAME);
-			SipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
+			final SipApplicationSessionKey joinSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, JoinHeader.NAME);
+			final SipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
 			if(joinSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(joinSipApplicationSessionKey, false);
 				sipApplicationSessionKey = joinSipApplicationSessionKey;
@@ -184,8 +180,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 
 			public void dispatch() throws DispatcherException {
 				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
-				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-				sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
+				
+				final String requestMethod = sipServletRequest.getMethod();
+				final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+					sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 				try {
 					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					// JSR 289 Section 6.2.1 :
@@ -197,7 +195,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
 						// a new subscription and a new dialog (unless they have already been
 						// created by a matching response, as described above).								
-						if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+						if(Request.NOTIFY.equals(requestMethod) && 
 										(subscriptionStateHeader != null && 
 												SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
 												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
@@ -209,11 +207,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						if(proxy != null) {
 							final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
 							if(finalBranch != null) {								
-								proxy.setAckReceived(sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK));
+								proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
 								proxy.setOriginalRequest(sipServletRequest);
 								callServlet(sipServletRequest);
 								finalBranch.proxySubsequentRequest(sipServletRequest);
-							} else if(sipServletRequest.getMethod().equals(Request.PRACK)) {
+							} else if(requestMethod.equals(Request.PRACK)) {
 								callServlet(sipServletRequest);
 								List<ProxyBranch> branches = proxy.getProxyBranches();
 								for(ProxyBranch pb : branches) {
@@ -239,7 +237,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				} finally {
 					// A subscription is destroyed when a notifier sends a NOTIFY request
 					// with a "Subscription-State" of "terminated".			
-					if(Request.NOTIFY.equals(sipServletRequest.getMethod()) && 
+					if(Request.NOTIFY.equals(requestMethod) && 
 									(subscriptionStateHeader != null && 
 											SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
 						sipSession.removeSubscription(sipServletRequest);

@@ -102,7 +102,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 					tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 				}
-				ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
+				final ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
 				if(proxyBranch == null) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
@@ -114,26 +114,26 @@ public class ResponseDispatcher extends MessageDispatcher {
 			final SipServletRequestImpl originalRequest = tmpOriginalRequest;
 			sipServletResponse.setOriginalRequest(originalRequest);
 			
-			String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
+			final String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
 			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
 				forwardResponseStatefully(sipServletResponse);
 				return ;
 			}
-			String noAppReturned = viaHeader.getParameter(NO_APP_RETURNED);
+			final String noAppReturned = viaHeader.getParameter(NO_APP_RETURNED);
 			if(noAppReturned != null && noAppReturned.length() > 0) {
 				forwardResponseStatefully(sipServletResponse);
 				return ;
 			}
-			String modifier = viaHeader.getParameter(MODIFIER);
+			final String modifier = viaHeader.getParameter(MODIFIER);
 			if(modifier != null && modifier.length() > 0) {
 				forwardResponseStatefully(sipServletResponse);
 				return ;
 			}
-			String appNameHashed = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME);
+			final String appNameHashed = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME);
 			if(appNameHashed == null) {
 				throw new DispatcherException("the via header " + viaHeader + " for the response is missing the appname parameter previsouly set by the container");
 			}
-			String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
+			final String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
 			boolean inverted = false;
 			if(dialog != null && dialog.isServer()) {
 				inverted = true;
@@ -195,7 +195,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 							// We can not use session.getProxyBranch() because all branches belong to the same session
 							// and the session.proxyBranch is overwritten each time there is activity on the branch.
 							ProxyBranchImpl proxyBranch = null;
-							if(finalApplicationData != null) proxyBranch = finalApplicationData.getProxyBranch();
+							if(finalApplicationData != null) {
+								proxyBranch = finalApplicationData.getProxyBranch();
+							}
 							if(proxyBranch != null) {
 								sipServletResponse.setProxyBranch(proxyBranch);								
 								// Update Session state
@@ -253,19 +255,19 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * the topmost via header is stripped from the response and the response is forwarded statefully
 	 * @param sipServletResponse
 	 */
-	private final static void forwardResponseStatefully(SipServletResponseImpl sipServletResponse) {
+	private final static void forwardResponseStatefully(final SipServletResponseImpl sipServletResponse) {
 		final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
 		final Dialog dialog = sipServletResponse.getDialog();
-		Response response = sipServletResponse.getResponse();
+		final Response response = sipServletResponse.getResponse();
 				
-		ListIterator<ViaHeader> viaHeadersLeft = response.getHeaders(ViaHeader.NAME);
+		final ListIterator<ViaHeader> viaHeadersLeft = response.getHeaders(ViaHeader.NAME);
 		// we cannot remove the via header on the original response (and we don't to proactively clone the response for perf reasons)
 		// otherwise it will make subsequent request creation fails (because JSIP dialog check the topmostviaHeader of the response)
 		if(viaHeadersLeft.hasNext()) {
 			viaHeadersLeft.next();
 		}
 		if(viaHeadersLeft.hasNext()) {
-			Response newResponse = (Response) response.clone();
+			final Response newResponse = (Response) response.clone();
 			((SIPMessage)newResponse).setApplicationData(null);
 			newResponse.removeFirst(ViaHeader.NAME);
 			//forward it statefully
@@ -287,7 +289,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					logger.debug("dialog application data " + applicationData);
 				}
 			}								
-			ServerTransaction serverTransaction = (ServerTransaction)
+			final ServerTransaction serverTransaction = (ServerTransaction)
 				applicationData.getTransaction();
 			try {					
 				serverTransaction.sendResponse(newResponse);
@@ -314,15 +316,16 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * @param nextViaHeader
 	 */
 	public void checkInitialRemoteInformation(SipServletMessageImpl sipServletMessage, ViaHeader nextViaHeader) {		
-		SIPTransaction transaction = (SIPTransaction)sipServletMessage.getTransaction();
-		String initialRemoteAddr = transaction.getPeerAddress();
-		int initialRemotePort = transaction.getPeerPort();
-		String initialRemoteTransport = transaction.getTransport();
+		final SIPTransaction transaction = (SIPTransaction)sipServletMessage.getTransaction();
+		final String initialRemoteAddr = transaction.getPeerAddress();
+		final int initialRemotePort = transaction.getPeerPort();
+		final String initialRemoteTransport = transaction.getTransport();
+		final TransactionApplicationData transactionApplicationData = sipServletMessage.getTransactionApplicationData();
 		// if the message comes from an external source we add the initial remote info from the transaction
 		if(sipApplicationDispatcher.isExternal(initialRemoteAddr, initialRemotePort, initialRemoteTransport)) {
-			sipServletMessage.getTransactionApplicationData().setInitialRemoteHostAddress(initialRemoteAddr);
-			sipServletMessage.getTransactionApplicationData().setInitialRemotePort(initialRemotePort);
-			sipServletMessage.getTransactionApplicationData().setInitialRemoteTransport(initialRemoteTransport);
+			transactionApplicationData.setInitialRemoteHostAddress(initialRemoteAddr);
+			transactionApplicationData.setInitialRemotePort(initialRemotePort);
+			transactionApplicationData.setInitialRemoteTransport(initialRemoteTransport);
 			// there is no other way to pass the information to the next applications in chain  
 			// (to avoid maintaining in memory information that would be to be clustered as well...)
 			// than adding it as a custom information, we add it as headers only if 
@@ -334,14 +337,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 		} else {
 			// if the message comes from an internal source we add the initial remote info from the previously added headers
-			sipServletMessage.getTransactionApplicationData().setInitialRemoteHostAddress(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME));
+			transactionApplicationData.setInitialRemoteHostAddress(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME));
 			String remotePort = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME);
 			int intRemotePort = -1;
 			if(remotePort != null) {
 				intRemotePort = Integer.parseInt(remotePort);
 			}
-			sipServletMessage.getTransactionApplicationData().setInitialRemotePort(intRemotePort);
-			sipServletMessage.getTransactionApplicationData().setInitialRemoteTransport(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));
+			transactionApplicationData.setInitialRemotePort(intRemotePort);
+			transactionApplicationData.setInitialRemoteTransport(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));
 			if(nextViaHeader == null || sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
 				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, true); 
 				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, true);

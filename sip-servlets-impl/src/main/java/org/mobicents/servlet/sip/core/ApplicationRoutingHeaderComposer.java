@@ -7,8 +7,9 @@ import org.apache.log4j.Logger;
 /**
  * This class manipulates strings representing the AR stack for cases when the container
  * behaves as UAC. When the container acts as UAC the AR must be stored in the from-tag
+ * of the outgoing request.When the container acts as UAS/B2BUA the AR must be stored in the to-tag
  * of the outgoing request. The string looks like this:
- * uniqueValue_appname1 and an optional part _appGeneratedApplicationSessionId
+ * uniqueValue_appname1_appGeneratedApplicationSessionId
  * 
  * @author vralev
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -18,7 +19,7 @@ public class ApplicationRoutingHeaderComposer {
 	private static transient Logger logger = Logger.getLogger(ApplicationRoutingHeaderComposer.class
 			.getCanonicalName());
 	
-	private static Random random = new Random();
+	private static final Random random = new Random();
 	private static final String TOKEN_SEPARATOR = "_";
 	
 	private static String reduceRandomValue(String str, int maxChars) {
@@ -54,7 +55,7 @@ public class ApplicationRoutingHeaderComposer {
 			return;
 		}
 		
-		String[] tokens = text.split(TOKEN_SEPARATOR);
+		final String[] tokens = text.split(TOKEN_SEPARATOR);
 		
 		// If there is no AR in the string, generate a uniqueValue for the tag
 		// and it will be stored for later.
@@ -65,7 +66,7 @@ public class ApplicationRoutingHeaderComposer {
 		
 		// Otherwise extract the uniqueValue from the tag string, it's the first token.
 		uniqueValue = tokens[0];
-		String hashedAppName = tokens[1];
+		final String hashedAppName = tokens[1];
 		String appName = sipApplicationDispatcher.getApplicationNameFromHash(hashedAppName);
 		if(appName == null) 
 			throw new NullPointerException("The hash doesn't correspond to any app name: " + hashedAppName);
