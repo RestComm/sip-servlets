@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -45,16 +46,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 
 	private static Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);	
 	Map<String, String[]> forwardingUris = null;
-	
-	/** Creates a new instance of CallForwardingB2BUASipServlet */
-	public CallForwardingB2BUASipServlet() {
-	}
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the call forwarding B2BUA sip servlet has been started");
 		super.init(servletConfig);
-		forwardingUris = new HashMap<String, String[]>();
+		forwardingUris = new ConcurrentHashMap<String, String[]>();
 		forwardingUris.put("sip:receiver@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver@127.0.0.1", 

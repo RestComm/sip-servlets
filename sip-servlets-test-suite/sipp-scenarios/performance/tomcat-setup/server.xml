@@ -49,7 +49,7 @@
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None" 
   		congestionControlCheckingInterval="-1" 
-  		darConfigurationFileLocation="conf/dars/simple-dar.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
   		<!--darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"-->

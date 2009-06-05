@@ -15,7 +15,7 @@
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
   		congestionControlCheckingInterval="-1" 
-  		darConfigurationFileLocation="conf/dars/simple-dar.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :

@@ -6,4 +6,4 @@ cp jboss-setup/webserver-xmbean.xml $JBOSS_HOME/server/default/deploy/jboss-web.
 cp jboss-setup/log4j.xml $JBOSS_HOME/server/default/conf/jboss-log4j.xml
 mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet/pom.xml
 cp ../../../sip-servlets-examples/simple-sip-servlet/target/simple-sip-servlet-*.war $JBOSS_HOME/server/default/deploy
-cp ../../../sip-servlets-examples/simple-sip-servlet/simple-dar.properties $JBOSS_HOME/server/default/conf/dars/simple-dar.properties
+cp ../../../sip-servlets-examples/simple-sip-servlet/simple-dar.properties $JBOSS_HOME/server/default/conf/dars/mobicents-dar.properties

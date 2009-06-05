@@ -57,7 +57,7 @@
     </action>
   </recv>  
   
-  <recv request="BYE" timeout="20000" />
+  <recv request="BYE" timeout="60000" />
 
   <send>
     <![CDATA[

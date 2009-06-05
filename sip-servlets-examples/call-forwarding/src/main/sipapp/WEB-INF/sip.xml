@@ -11,6 +11,10 @@
 		</main-servlet>
 	</servlet-selection>
 	
+	<session-config>
+        	<session-timeout>4</session-timeout>
+    </session-config>
+	
 	<servlet>
 		<servlet-name>CallForwardingB2BUASipServlet</servlet-name>
 		<display-name>CallForwardingB2BUASipServlet</display-name>
