@@ -34,16 +34,21 @@
 				<item name="Speed Dial/Location Service" href="speeddial_locationservice.html" />
 				<item name="Click to Call" href="click2call.html" />
 				<item name="Chat Server" href="chatserver.html" />
+				<item name="Facebook Click To Call Plugin" href="facebook-c2c.html" />				
+			</item>
+			<item name="JBoss 4.x only Examples" href="mss-jb4-examples.html" collapse="true">
 				<item name="Media Demo" href="media-demo.html" />
+				<item name="Conference Demo" href="conference-demo.html" />				
 				<item name="Shopping Demo" href="shopping-demo.html" />
 				<item name="JSLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html" />
-				<item name="Facebook Click To Call Plugin" href="facebook-c2c.html" />
-				<item name="Conference Demo" href="conference-demo.html" />
 				<item name="Media PBX" href="mss-ipbx.html" />
 				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
-				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
+				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>				
+			</item>
+			<item name="JBoss 5.x only Examples" href="mss-jb5-examples.html" collapse="true">
 				<item name="JRuby/Rails Sip Servlets Example" href="mss-jruby-example.html"/>
 				<item name="Pure JRuby/Rails Telco Example" href="mss-pure-jruby-telco.html"/>
+				<item name="Media JSR309 Demo" href="mss-jsr309-demo.html" />				
 			</item>
 		</menu>
 		<menu name="Advanced Features">

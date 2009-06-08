@@ -1,45 +1,30 @@
 Examples
 
-	Here is our list of examples that also helps us testing out our implementation :
+	Here is our list of examples that also helps us testing out our implementation, those examples will work on all versions of Mobicents Sip Servlets (Tomcat, JBoss 4.x and JBoss 5.x) :
 	
-	* {{{call_blocking.html}Call Blocking}} : UAS application 
+		* {{{call_blocking.html}Call Blocking}} : UAS application 
 	
-	* {{{call_forwarding.html}Call Forwarding}} : B2BUA application
+		* {{{call_forwarding.html}Call Forwarding}} : B2BUA application
 	 
-	* The two previous examples can be composed and become a new application known as {{{call_controller.html}Call Controller}}
+		* The two previous examples can be composed and become a new application known as {{{call_controller.html}Call Controller}}
 	
-	* {{{speed_dial.html}Speed Dial}} : proxy application
+		* {{{speed_dial.html}Speed Dial}} : proxy application
 	
-	* {{{location_service.html}Location Service}} : proxy application
+		* {{{location_service.html}Location Service}} : proxy application
 	
-	* The two previous examples can be composed and become a new application showing what can be achieved
-	with two {{{speeddial_locationservice.html}chained proxy applications}}
+		* The two previous examples can be composed and become a new application showing what can be achieved
+		with two {{{speeddial_locationservice.html}chained proxy applications}}
 	
-	* {{{click2call.html}Click to Call}} : Converged application
+		* {{{click2call.html}Click to Call}} : Converged application
 	
-	* {{{chatserver.html}Chat Server}} : support for sip extension MESSAGE
+		* {{{chatserver.html}Chat Server}} : support for sip extension MESSAGE
 	
-	* {{{media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
-	
-	* {{{shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   
-	
-	* {{{jslee-sips-interop-demo.html}JSLEE/Sip servlets Interoperability Demo}} : a Converged JEE/Sip-Servlets/JSLEE Application showing how Sip Servlets and JSLEE can play along together to leverage standards everywhere
+		* {{{facebook-c2c.html}Facebook Click To Call}} : a Facebook plugin application that makes calls between real phones through a PSTN gateway
 
-	* {{{facebook-c2c.html}Facebook Click To Call}} : a Facebook plugin application that makes calls between real phones through a PSTN gateway
 	
-	* {{{diameter_event_charging.html}Diameter Example}} : a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)
+	{{{mss-jb4-examples.html}Examples for Mobicents Sip Servlets on JBoss 4.x only}} showcasing Media, Diameter, JSLEE interoperability are also available
 	
-	* {{{mss-diameter_sh.html}Diameter Sh OpenIMS Integration Example}} : a Diameter Sh service showing integration between Mobicents Sip Servlets acting as a SIP Application Server in {{{http://www.openimscore.org/}OpenIMS Core}}, using the Diameter Sh interface to receive profile updates and SIP.
-
-	* {{{conference-demo.html}Conference Demo}} : a conference media server demo application built on GWT with server-push updates.
-	
-	* {{{mss-ipbx.html}Media IPBX}} : a JBoss Seam-based PBX
-	
-	* {{{mss-jruby-example.html}JRuby on Rails Sip Servlets Example}} : a JRuby on Rails multi language application that can make phone calls
-	
-	* {{{mss-pure-jruby-telco.html}Pure JRuby on Rails Telco Example}} : a pure JRuby on Rails application that can make and receive phone calls
-	
-	
+	{{{mss-jb5-examples.html}Examples for Mobicents Sip Servlets on JBoss 5.x only}} showcasing Media (JSR 309 based) and JRuby integration are also available
 
 	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)

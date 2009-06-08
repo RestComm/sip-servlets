@@ -985,7 +985,7 @@
 						NIO and lazy parsing in jain sip
 						</a>
 						<br />						
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
 							<li>
@@ -1066,7 +1066,7 @@
 								</a>								
 							</li>
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=712">
 									Classes located in jar within WEB-INF/lib are not scanned for annotations

@@ -1,0 +1,25 @@
+JBoss 4.x only Examples
+
+	Here is our list of examples showcasing Media, Diameter, JSLEE interoperability that will work only on Mobicents Sip Servlets for JBoss 4.x version :
+		
+		* {{{media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
+	
+		* {{{shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   
+		
+		* {{{jslee-sips-interop-demo.html}JSLEE/Sip servlets Interoperability Demo}} : a Converged JEE/Sip-Servlets/JSLEE Application showing how Sip Servlets and JSLEE can play along together to leverage standards everywhere
+		
+		* {{{diameter_event_charging.html}Diameter Example}} : a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)
+		
+		* {{{mss-diameter_sh.html}Diameter Sh OpenIMS Integration Example}} : a Diameter Sh service showing integration between Mobicents Sip Servlets acting as a SIP Application Server in {{{http://www.openimscore.org/}OpenIMS Core}}, using the Diameter Sh interface to receive profile updates and SIP.
+	
+		* {{{conference-demo.html}Conference Demo}} : a conference media server demo application built on GWT with server-push updates.
+		
+		* {{{mss-ipbx.html}Media IPBX}} : a JBoss Seam-based PBX	
+		
+	You can play with most of our examples in 2 differents ways. 
+	From the binary or right from the source like a true hacker :-)
+	
+	For testing against the examples you'll need to use some SIP softphones.
+	We tested most of the examples with WengoPhone, 3CX VoIP Client, SJ Phone 1.65, Ekiga, linphone and XLite.
+	Most of the examples uses the 5090 port for one of the SIP softphone 
+	to be contacted so please make sure, it is configured that way.

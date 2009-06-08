@@ -2,10 +2,10 @@
 
 <sip-app>
 	<app-name>
-		org.mobicents.servlet.sip.example.MediaJSR309Servlet
+		org.mobicents.servlet.sip.example.MediaJSR309Application
 	</app-name>
-	<display-name>MediaJSR309Servlet</display-name>
-	<description>MediaJSR309Servlet</description>
+	<display-name>MediaJSR309Application</display-name>
+	<description>MediaJSR309Application</description>
 
 	<servlet-selection>
 		<servlet-mapping>

@@ -1,0 +1,17 @@
+JBoss 5.x only Examples
+
+	Here is our list of examples showcasing Media (JSR 309 based) and JRuby integration that will work only on Mobicents Sip Servlets for JBoss 5.x version :
+		
+		* {{{mss-jruby-example.html}JRuby on Rails Sip Servlets Example}} : a JRuby on Rails multi language application that can make phone calls
+		
+		* {{{mss-pure-jruby-telco.html}Pure JRuby on Rails Telco Example}} : a pure JRuby on Rails application that can make and receive phone calls
+		
+		* {{{mss-jsr309-demo.html}Media JSR-309 Demo}} : a sip servlet application showing how to use media capabilities defined in JSR 309 (Announcements, Recording, DTMF detection).
+
+	You can play with most of our examples in 2 differents ways. 
+	From the binary or right from the source like a true hacker :-)
+	
+	For testing against the examples you'll need to use some SIP softphones.
+	We tested most of the examples with WengoPhone, 3CX VoIP Client, SJ Phone 1.65, Ekiga, linphone and XLite.
+	Most of the examples uses the 5090 port for one of the SIP softphone 
+	to be contacted so please make sure, it is configured that way.
