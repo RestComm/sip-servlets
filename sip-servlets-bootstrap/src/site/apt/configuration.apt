@@ -21,7 +21,8 @@ Configuration
 	
 	Here is a description of the sip Connector tag's attributes :
 		
-	* <<<port>>> : the port number on which the container will be able to receive SIP messages.
+	* <<<port>>> : the port number on which the container will be able to receive SIP messages. You can setup the container to
+	listen on all available IP Addresses by setting the ip address to 0.0.0.0
 		
 	* <<<ipAddress>>> : The ip address on which the container will be able to receive SIP messages.
 		
