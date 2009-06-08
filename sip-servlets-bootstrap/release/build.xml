@@ -140,10 +140,15 @@
 				</ant>				
 			</sequential>
 		</for>
-		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
-							<property name="jboss.home" value="${jboss.home}"/>
-							<property name="jboss.config" value="@{jboss.config}"/>
-						</ant-->
+		<!-- include MMS 2.X in default dir only -->
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<!-- include JSR309 media example -->
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
 						<!-- Commented out because they don't run on JB5 yet -->
 						<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
 							<property name="jboss.home" value="${jboss.home}"/>
@@ -156,6 +161,7 @@
 		<antcall target="build-documentation">
 			<param name="jboss.home" value="${jboss-5.home}"/>
 		</antcall>
+		<!-- include Click to Call example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
@@ -346,10 +352,7 @@
 		<echo>Building Mobicents Media Server 2.x</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
-		</exec>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core/server-sar">
-			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
-		</exec>
+		</exec>		
 	</target>
 	
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
