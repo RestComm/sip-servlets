@@ -26,8 +26,8 @@
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
-	<property name="jboss-5.jboss.rails.deployer.url" value="http://repo.oddthesis.org/maven2/SNAPSHOTS/org/jboss/rails/jboss-rails/1.0.0.Beta7-SNAPSHOT/jboss-rails-1.0.0.Beta7-20090408.124930-1-deployer.jar"/>
-	<property name="jboss-5.jboss.rails.deployer.zip.path" value="${base.path}/jboss-rails-deployer.zip"/>
+	<property name="jboss-5.torquebox.deployer.url" value="http://repository.torquebox.org/maven2/snapshots/org/torquebox/torquebox-core/1.0.0.Beta13-SNAPSHOT/torquebox-core-1.0.0.Beta13-20090609.135000-1-deployer.jar"/>
+	<property name="jboss-5.torquebox.deployer.zip.path" value="${base.path}/torquebox-deployer.zip"/>
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.mux.version}.zip" />
 	
@@ -131,7 +131,7 @@
 	</target>
 	
 	<!--target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-rails-deployer"-->
-	<target name="release-jboss-5" depends="extract-jboss-5">
+	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
@@ -218,22 +218,22 @@
 			<arg line="clean install -U -P set-svn-revision,jboss-5-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<!--delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-annotations.jar" />
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-impl.jar" />
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-spec.jar" />
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-annotations.jar">
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar">
 			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-annotations-*.jar" />
 		</copy>
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-impl.jar">
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar">
 			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-impl-*.jar" />
 		</copy>
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-spec.jar">
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar">
 			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-spec-*.jar" />
 		</copy>
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/jboss-rails.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
 			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
-		</copy-->				
+		</copy>				
 				
 		<antcall target="deploy-mgmnt" >
 			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
@@ -551,10 +551,10 @@
 		<get dest="${jboss-5.distro.zip.path}" src="${jboss-5.download.url}"/>
 	</target>
 	
-	<available file="${jboss-5.jboss.rails.deployer.zip.path}" property="got.jboss-5-rails-deployer" />
-	<target name="get-jboss-5-rails-deployer" unless="got.jboss-5-rails-deployer">
-		<echo>Downloading JBoss AS 5 Rails Deployer</echo>
-		<get dest="${jboss-5.jboss.rails.deployer.zip.path}" src="${jboss-5.jboss.rails.deployer.url}"/>
+	<available file="${jboss-5.torquebox.deployer.zip.path}" property="got.jboss-5-torquebox-deployer" />
+	<target name="get-jboss-5-torquebox-deployer" unless="got.jboss-5-torquebox-deployer">
+		<echo>Downloading JBoss AS 5 Torquebox Deployer</echo>
+		<get dest="${jboss-5.jboss.torquebox.deployer.zip.path}" src="${jboss-5.torquebox.deployer.url}"/>
 	</target>
 	
 	<target name="extract-jboss" depends="get-jboss">
@@ -581,8 +581,8 @@
 		</delete>
 	</target>
 	
-	<target name="extract-jboss-5-rails-deployer" depends="get-jboss-5-rails-deployer">			
-		<unzip src="${jboss-5.jboss.rails.deployer.zip.path}" dest="${jboss-5.home}/server/default/deployers/jboss-rails.deployer" />					
+	<target name="extract-jboss-5-torquebox-deployer" depends="get-jboss-5-torquebox-deployer">			
+		<unzip src="${jboss-5.torquebox.deployer.zip.path}" dest="${jboss-5.home}/server/default/deployers/torquebox.deployer" />					
 	</target>
 	
 	<available file="${tomcat.distro.zip.path}" property="got.tomcat" />
