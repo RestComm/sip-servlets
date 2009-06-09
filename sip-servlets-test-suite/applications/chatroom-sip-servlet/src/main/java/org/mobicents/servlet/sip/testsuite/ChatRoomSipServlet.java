@@ -140,6 +140,9 @@ public class ChatRoomSipServlet
 	@SipApplicationKey
 	public static String generateChatroomApplicationKey(SipServletRequest request) {
 		logger.info("Static Field value " + staticField);
+		if(request.getSubscriberURI() == null) {
+			throw new IllegalStateException("the subscriber URI should not be null");
+		}
 		if(staticField) {
 			if("modifyRequest".equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
 				request.setExpires(1000);

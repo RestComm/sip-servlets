@@ -308,6 +308,24 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		} else if (replacesHeader != null) {
 			headerName = ReplacesHeader.NAME;	
 		}
+		// subscriber URI should be set before calling makeAppSessionKey method, see Issue 750
+		// http://code.google.com/p/mobicents/issues/detail?id=750
+		try {
+			URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());
+			javax.servlet.sip.URI jainSipSubscriberUri = null; 
+			if(subscriberUri instanceof javax.sip.address.SipURI) {
+				jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
+			} else if (subscriberUri instanceof javax.sip.address.TelURL) {
+				jainSipSubscriberUri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
+			} else {
+				jainSipSubscriberUri = new GenericURIImpl(subscriberUri);
+			}
+			sipServletRequest.setSubscriberURI(jainSipSubscriberUri);
+		} catch (ParseException pe) {
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 
+					+ applicationRouterInfo.getSubscriberURI() +
+					", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
+		} 		
 		
 		MobicentsSipApplicationSession sipApplicationSession = null;
 		if(joinReplacesSipSession != null && applicationRouterInfo.getNextApplicationName().equals(joinReplacesSipSession.getKey().getApplicationName())) {
@@ -357,26 +375,8 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
 					sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
 					sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
-					try {
-						URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());				
-						if(subscriberUri instanceof javax.sip.address.SipURI) {
-							javax.servlet.sip.URI uri = new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
-							sipServletRequest.setSubscriberURI(uri);
-							sipSessionImpl.setSipSubscriberURI(uri);
-						} else if (subscriberUri instanceof javax.sip.address.TelURL) {
-							javax.servlet.sip.URI uri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
-							sipServletRequest.setSubscriberURI(uri);
-							sipSessionImpl.setSipSubscriberURI(uri);
-						} else {
-							javax.servlet.sip.URI uri = new GenericURIImpl(subscriberUri);
-							sipServletRequest.setSubscriberURI(uri);
-							sipSessionImpl.setSipSubscriberURI(uri);
-						}
-					} catch (ParseException pe) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 
-								+ applicationRouterInfo.getSubscriberURI() +
-								", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
-					} 									
+					sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI());
+					
 					String sipSessionHandlerName = sipSessionImpl.getHandler();						
 					if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 						String mainServlet = appSession.getCurrentRequestHandler();
