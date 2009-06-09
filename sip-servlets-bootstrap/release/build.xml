@@ -141,14 +141,14 @@
 			</sequential>
 		</for>
 		<!-- include MMS 2.X in default dir only -->
-		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
 			<property name="jboss.home" value="${jboss.home}"/>
 			<property name="jboss.config" value="default"/>
-		</ant-->
+		</ant>
 		<!-- include JSR309 media example -->
-		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
 			<arg line="clean install -U -P set-svn-revision" />
-		</exec-->
+		</exec>
 						<!-- Commented out because they don't run on JB5 yet -->
 						<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
 							<property name="jboss.home" value="${jboss.home}"/>
