@@ -28,13 +28,13 @@
 				read <a href="http://www.ultramonkey.org/papers/lvs_tutorial/html/">this tutorial</a>. For a deeper looks at the system and especially if you are a RHEL user you should read <a href="http://www.redhat.com/docs/manuals/csgfs/">the official documentation by Red Hat</a>. There are number of other IP balancer solutions including hardware-based and they have similar features in most cases.
 			</p>
 		</section>
-		<section name="Why both with the SIP load balancer if the IP load-balancer is so much better?">
+		<section name="Why bother with the SIP load balancer if the IP load-balancer is so much better?">
 		<p>
 			The main reason is the request affinity (sticky-ness). Sometimes it makes sense to configure your network to serve the requests
-			from the same call by a single machine. However the relationship between requests in a single call in in the SIP headers (the Call-ID for example).
+			from the same call by a single machine. However the relationship between requests in a single call is in the SIP headers (the Call-ID for example).
 			It often goes further, when you want to stick a group of calls to one machine and when you want to have related HTTP and SIP requests to hit the same machine.
 			The point of hitting the same machine for related requests is that if you hit a different machine it will cause data-gravitation, which is the process of pulling
-			call state from the original machine where the call was started to the new machine and then keeping that state replicated. Usually you can select an eager-replication
+			call state from the original machine where the call was started to the new machine and then keeping that state replicated. Data-gravitation is associated with some performance penalty and a cache-miss. Usually you can select an eager-replication
 			strategy that will replicate the state immediately and you can even end up with no performance penalty at all especially when there is reasonable time between individual
 			related requests. So it depends on your requirements if this is a suitable option or you must use the SIP-aware load-balancer.
 			
@@ -52,10 +52,20 @@
 		<p>
 		Health-checks is usually a separate problem from load-balancing, but with LVS there is an integrated project that helps you to make configuration from a single place. The load-balancer alone will route traffic to all configured nodes without checking if they are still alive. If you want the balancer to check for node health you should install a service on each of the nodes to report its status. You should install a service like <b>Red Hat Cluster Suite</b> or <b>keepalived</b>.
 		With both, you can configure both the load-balancing and the health-checks without doing manually the steps from the previous sections with the 
-		ipvsadm tool.
+		ipvsadm tool. Generally, with these tools you are able to specify what kind of request to use for health-check. For Sip Servlets it makes sense to do an HTTP request, because if HTTP is working it is likely that SIP would be working too.
 		</p>
 		<p>
 		Read more on <a href="http://www.redhat.com/docs/manuals/csgfs/">Red Hat Cluster Suite</a>  and <a href="http://www.keepalived.org/pdf/UserGuide.pdf">keepalived</a>.
+		</p>
+		</section>	
+		
+				<section name="Configuring Mobicents Sip Servlets">
+		<p>
+		For the most part, what you need from Mobicents is to keep the replication going on, but turn off the SIP load-balancing. Since, out SIP load-balancer is bidirectional, we put the SIP IP load-balancer address when sending out SIP requests so they can be distributed reliable to healthy nodes. In the case of IP load-balancing however, this is not needed and we want to bypass the SIP load balancer.
+		This is easily done if you use the <i>all</i> configuration (by <i>run -c all</i>), which is a fully enabled cluster node, but you still must disable the SIP load balancing.
+		To do this simply go to <i>JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml</i> and edit the <i>jboss.web</i> engine tag.
+		You should remove the balancers attribute from the Service tag of <i>jboss.web</i> service. This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer.
+		Note that if you don't initiate requests from the server, this configuration doesn't matter, but in all other cases make sure it's done AND make sure the staticServerAddress is set in order all requests to arrive at the IP load balancer without by-passing it.
 		</p>
 		</section>	
 	</body>
