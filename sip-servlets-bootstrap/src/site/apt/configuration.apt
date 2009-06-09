@@ -29,6 +29,9 @@ Configuration
 	* <<<protocol>>> : This  attribute specifies that this is a Sip Connector and not an http one. There is no need to change this property.
 	
 	* <<<signalingTransport>>> : the transport on which the container will be able to receive SIP messages
+	
+	* <<<usePrettyEncoding>>> : (true by default) Allows Via, Route, and RecordRouteheader field information to be split into multiple lines, rather than each header field being separating with a comma. 
+	The attribute defaults to "true" to able to better interoperate with other SIP Servers such as Asterisk PBX.
 		
 	* <<<useStun>>> : Set to true to enable STUN for this connector and make sure <<<ipAddress>>> is different from 127.0.0.1. (Default to false, you can also check the {{{./stun.html}STUN section}} for more information)
 			
