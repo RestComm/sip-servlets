@@ -353,6 +353,10 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
 		</exec>		
+		<echo>Building Mobicents Media Server 2.x JSR 309 API</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/jsr-309">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
+		</exec>
 	</target>
 	
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
