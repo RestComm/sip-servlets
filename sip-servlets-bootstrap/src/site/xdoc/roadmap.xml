@@ -1075,6 +1075,13 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=720">
+									Allow configurable address for headers instered by Sip Servlets
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=732">
 									duplicate parameters when using sipFactory.createAddress(uri) with a uri having parameters
 								</a>								
@@ -1098,6 +1105,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=748">
 									B2BUA/UAS apps should not have Record Route in their responses
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=750">
+									SipServletRequest.getSubscriberURI returns null in @SipApplicationKey method
 								</a>								
 							</li>
 						</ul>
