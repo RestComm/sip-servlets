@@ -12,6 +12,16 @@
 		</static-preset>
 		<static-preset
            id="mobicents.sip.servlet.jsf12.preset">
+	    <label>Converged SIP/Web Project with JBoss (recommended)</label>
+	    <facet id="jst.java" version="5.0"/>
+	    <facet id="jst.web" version="2.5"/>
+	    <facet id="mobicents.sip.servlet.core" version="1.0" />
+     	<description>
+        	Creates a web project with Sip Servlets capabilities and other SIP-related tooling.
+     	</description>
+     </static-preset>
+     		<static-preset
+           id="mobicents.sip.servlet.jsf11.preset">
 	    <label>Converged SIP/Web Project with JSF 1.2</label>
 	    <facet id="jst.java" version="5.0"/>
 	    <facet id="jst.web" version="2.5"/>
@@ -19,17 +29,6 @@
 	    <facet id="mobicents.sip.servlet.core" version="1.0" />
      	<description>
         	Creates a web project with JSF 1.2, Sip Servlets capabilities and other SIP-related tooling.
-     	</description>
-     </static-preset>
-     		<static-preset
-           id="mobicents.sip.servlet.jsf11.preset">
-	    <label>Converged SIP/Web Project with JSF 1.1</label>
-	    <facet id="jst.java" version="5.0"/>
-	    <facet id="jst.web" version="2.5"/>
-	    <facet id="jst.jsf" version="1.1"/>
-	    <facet id="mobicents.sip.servlet.core" version="1.0" />
-     	<description>
-        	Creates a web project with JSF 1.1, Sip Servlets capabilities and other SIP-related tooling.
      	</description>
      </static-preset>
 	</extension>

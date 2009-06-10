@@ -40,12 +40,27 @@ public class ApplicationRouterEditorPart extends
 							httpPort = port.getPort();
 						}
 					}
-					browser.setUrl(host + ":" + Integer.toString(httpPort)
+					browser.setUrl("http://" + host + ":" + Integer.toString(httpPort)
 							+ "/sip-servlets-management");
 					parent.redraw();
 					browser.redraw();
 					browser.update();
 					parent.update();
+					
+					// The following hack is need to redraw correctly the browser.
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					new Thread(){
+						public void run() {
+							parent.setSize(parent.getSize().x-1,parent.getSize().y);
+							parent.getShell().redraw();
+					}
+					}.run();
+					
 				}
 
 			});
