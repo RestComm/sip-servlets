@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Sip Servlets Eclipse Plugin Core
 Bundle-SymbolicName: sip_servlets_eclipse_plugin_core;singleton:=true
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Bundle-Activator: org.mobicents.sip.servlet.tooling.SipServletCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

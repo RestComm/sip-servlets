@@ -2,7 +2,7 @@
 <feature
       id="sip_servlets_eclipse_core_plugin"
       label="Sip Servlets Core Plugin"
-      version="1.0.1">
+      version="1.0.2">
 
    <description url="http://www.mobicents.org">
       Core plugin includes a project creation WST Synamic Web Project
@@ -39,7 +39,7 @@ Facet for SIP and Converged applications.
          id="sip_servlets_eclipse_plugin_core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.2"
          unpack="false"/>
 
 </feature>
