@@ -149,11 +149,14 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
-						<!-- Commented out because they don't run on JB5 yet -->
-						<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
-							<property name="jboss.home" value="${jboss.home}"/>
-							<property name="jboss.config" value="@{jboss.config}"/>
-						</ant-->
+		<copy tofile="${jboss-5.home}/server/default/deploy/media-jsr309-demo.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet-*.war" />
+		</copy>
+		<!-- Commented out because Diameter don't run on JB5 yet -->
+		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="@{jboss.config}"/>
+		</ant-->
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5.home}" />
 		<antcall target="build-mobicents-sip-load-balancer">
 			<param name="jboss.home" value="${jboss-5.home}"/>
