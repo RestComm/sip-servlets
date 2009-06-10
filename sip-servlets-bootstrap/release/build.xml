@@ -554,7 +554,7 @@
 	<available file="${jboss-5.torquebox.deployer.zip.path}" property="got.jboss-5-torquebox-deployer" />
 	<target name="get-jboss-5-torquebox-deployer" unless="got.jboss-5-torquebox-deployer">
 		<echo>Downloading JBoss AS 5 Torquebox Deployer</echo>
-		<get dest="${jboss-5.jboss.torquebox.deployer.zip.path}" src="${jboss-5.torquebox.deployer.url}"/>
+		<get dest="${jboss-5.torquebox.deployer.zip.path}" src="${jboss-5.torquebox.deployer.url}"/>
 	</target>
 	
 	<target name="extract-jboss" depends="get-jboss">
