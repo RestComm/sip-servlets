@@ -150,7 +150,7 @@
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
 		<copy tofile="${jboss-5.home}/server/default/deploy/media-jsr309-demo.war">
-			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet-*.war" />
+			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
 		</copy>
 		<!-- Commented out because Diameter don't run on JB5 yet -->
 		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
