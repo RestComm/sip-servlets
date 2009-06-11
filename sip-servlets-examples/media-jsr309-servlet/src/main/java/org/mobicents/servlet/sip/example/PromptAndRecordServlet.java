@@ -1,5 +1,6 @@
 package org.mobicents.servlet.sip.example;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -47,8 +48,8 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 	private static final int RECORDING_DELAY = 30000;
 
 	private final static String RECORDER = "test.wav";
-	private final String RECORDED_FILE = "file://"
-			+ System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
+	private final String RECORDED_FILE = "file://" +
+			 System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -77,15 +78,42 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			terminate(sipSession, ms);
 		}
 	}
+	
+	@Override
+	protected void doBye(SipServletRequest request) throws ServletException,
+			IOException {
+		MediaGroup mediaGroup = (MediaGroup)request.getSession().getAttribute("MEDIA_GROUP");
+		if(mediaGroup != null) {
+			logger.info("Bye received, stopping the recording");
+			try {
+				mediaGroup.getRecorder().stop();
+			} catch (MsControlException e) {
+				logger.info("recording couldn't be stopped", e);
+			}
+		}
+		super.doBye(request);
+	}
 
 	public void timeout(ServletTimer servletTimer) {
 
+		String sessionId = (String) servletTimer.getInfo();
+		logger.info("Timer fired on sip session " + sessionId);
 		SipSession sipSession = servletTimer.getApplicationSession()
-				.getSipSession((String) servletTimer.getInfo());
+				.getSipSession(sessionId);
 
-		System.out.println("Timer fired");
-		// sipSession.setAttribute("MEDIA_GROUP", mg);
-
+		if(sipSession != null) {
+			MediaGroup mediaGroup = (MediaGroup)sipSession.getAttribute("MEDIA_GROUP");
+			if(mediaGroup != null) {
+				logger.info("Timer fired, stopping the recording");
+				try {
+					mediaGroup.getRecorder().stop();
+				} catch (MsControlException e) {
+					logger.info("recording couldn't be stopped", e);
+				}
+			}
+		} else {
+			logger.info("the session has not been found, it may have been already invalidated");
+		}
 	}
 
 	private class MyStatusEventListener implements StatusEventListener {
@@ -145,10 +173,13 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 					try {
 						Recorder recoredr = mg.getRecorder();
-						URI prompt = URI.create(RECORDER);
+						logger.info("recording the user at " + RECORDED_FILE);
+						URI prompt = URI.create(RECORDED_FILE);
+						File file = new File(prompt);
+						if(!file.exists()) {
+							file.createNewFile();
+						}
 						recoredr.record(prompt, null, null);
-
-						// TODO : Set timer
 
 						TimerService timer = (TimerService) getServletContext()
 								.getAttribute(TIMER_SERVICE);
@@ -156,8 +187,9 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 								false, sipSession.getId());
 
 					} catch (MsControlException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error("An unexpected error happened ", e);
+					} catch (IOException e) {
+						logger.error("could not create the file " + RECORDED_FILE, e);
 					}
 				} else {
 					logger.error("Player didn't complete successfully ");
