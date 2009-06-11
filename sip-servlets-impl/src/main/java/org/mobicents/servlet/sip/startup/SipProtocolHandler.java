@@ -135,7 +135,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/*
 	 * use Pretty Encoding
 	 */
-	private boolean usePrettyEncoding;
+	private boolean usePrettyEncoding = true;
 	
 	/*
 	 * These settings staticServerAddress, staticServerPort will override all stun settings and will 
