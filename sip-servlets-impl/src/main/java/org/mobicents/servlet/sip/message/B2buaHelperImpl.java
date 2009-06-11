@@ -178,6 +178,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 		
+			
 			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
 					newRequest,
 					sipFactoryImpl,					

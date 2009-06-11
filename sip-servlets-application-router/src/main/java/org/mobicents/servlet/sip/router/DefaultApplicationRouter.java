@@ -253,7 +253,10 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
 			int previousAppOrder = 0; 
 			if(stateInfo != null) {					
-				previousAppOrder = (Integer) stateInfo;				
+				previousAppOrder = (Integer) stateInfo;
+				if(log.isDebugEnabled()) {
+					log.debug("The previous app order was : " + previousAppOrder);
+				}
 			}
 			ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
 			while (defaultSipApplicationRouterInfoIt.hasNext() ) {
@@ -262,6 +265,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 				synchronized (containerDeployedApplicationNames) {
 					if(containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {
 						isApplicationPresentInContainer = true;
+						if(log.isDebugEnabled()) {
+							log.debug(defaultSipApplicationRouterInfo.getApplicationName() + " is present in the container.");
+						}
 					}
 				}
 				if(log.isDebugEnabled()) {

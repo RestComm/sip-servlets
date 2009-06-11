@@ -20,10 +20,4 @@
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-
-	<listener>
-		<listener-class>
-			org.mobicents.servlet.sip.testsuite.B2BUASipServlet
-		</listener-class>
-	</listener>
 </sip-app>

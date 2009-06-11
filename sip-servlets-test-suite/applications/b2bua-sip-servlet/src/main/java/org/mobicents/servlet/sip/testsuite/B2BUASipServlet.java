@@ -22,11 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -36,8 +33,7 @@ import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
 
-public class B2BUASipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class B2BUASipServlet extends SipServlet {
 
 	B2buaHelper helper = null;
 	
@@ -64,6 +60,7 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 		if (logger.isDebugEnabled()) {
 			logger.debug("forkedRequest = " + forkedRequest);
 		}
+		forkedRequest.getSession().setAttribute("originalRequest", request);
 		forkedRequest.send();
 
 	}
@@ -113,15 +110,18 @@ public class B2BUASipServlet extends SipServlet implements SipErrorListener,
 		newRequest.send();
 
 	}
-
-	public void noAckReceived(SipErrorEvent ee) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void noPrackReceived(SipErrorEvent ee) {
-		// TODO Auto-generated method stub
-
+	
+	@Override
+	protected void doCancel(SipServletRequest request) throws ServletException,
+			IOException {		
+		logger.info("Got CANCEL: " + request.toString());
+		SipSession session = request.getSession();
+		B2buaHelper b2buaHelper = request.getB2buaHelper();
+		SipSession linkedSession = b2buaHelper.getLinkedSession(session);
+		SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
+		SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
+		logger.info("forkedRequest = " + cancelRequest);			
+		cancelRequest.send();
 	}
 
 }
