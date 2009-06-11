@@ -20,6 +20,7 @@ import javax.media.mscontrol.resource.MediaEventListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
@@ -111,14 +112,89 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			NetworkConnection nc = (NetworkConnection) sipSession
 					.getAttribute("NETWORK_CONNECTION");
 			mg.joinInitiate(Direction.DUPLEX, nc, this);
-
+			sipSession.setAttribute("MediaGroup", mg);
 		} catch (MsControlException e) {
 			logger.error(e);
 			// Clean up media session
 			terminate(sipSession, ms);
 		}
 	}
+	
+	@Override
+	protected void doInfo(SipServletRequest request) throws ServletException,
+			IOException {
+		int responseCode = SipServletResponse.SC_OK;		
+		//Getting the message content
+		String messageContent = new String( (byte[]) request.getContent());
+		logger.info("got INFO request with following content " + messageContent);
+		int signalIndex = messageContent.indexOf("Signal=");
+		
+		//Playing file only if the DTMF session has been started
+		if(messageContent != null && messageContent.length() > 0 && signalIndex != -1) {
+			String signal = messageContent.substring("Signal=".length()).trim();			
+			signal = signal.substring(0,1);
+			logger.info("Signal received " + signal );													
+			MediaGroup mediaGroup = (MediaGroup) request.getSession().getAttribute("MediaGroup");		
+			try {
+				playDTMF(mediaGroup.getPlayer(), signal);
+			} catch (MsControlException e) {
+				logger.error("Problem playing the stream corresponding to the following DTMF " + signal, e);
+				responseCode = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+			}
+		}	
+		//sending response
+		SipServletResponse response = request.createResponse(responseCode);
+		response.send();
+	}	
 
+	/**
+	 * @param mg
+	 * @param dtmf
+	 * @throws MsControlException
+	 */
+	private void playDTMF(Player player, String dtmf)
+			throws MsControlException {
+		URI prompt = null;
+
+		if (dtmf.equals("0")) {
+			prompt = URI.create(DTMF_0);
+		} else if (dtmf.equals("1")) {
+			prompt = URI.create(DTMF_1);
+		} else if (dtmf.equals("2")) {
+			prompt = URI.create(DTMF_2);
+		} else if (dtmf.equals("3")) {
+			prompt = URI.create(DTMF_3);
+		} else if (dtmf.equals("4")) {
+			prompt = URI.create(DTMF_4);
+		} else if (dtmf.equals("5")) {
+			prompt = URI.create(DTMF_5);
+		} else if (dtmf.equals("6")) {
+			prompt = URI.create(DTMF_6);
+		} else if (dtmf.equals("7")) {
+			prompt = URI.create(DTMF_7);
+		} else if (dtmf.equals("8")) {
+			prompt = URI.create(DTMF_8);
+		} else if (dtmf.equals("9")) {
+			prompt = URI.create(DTMF_9);
+		} else if (dtmf.equals("#")) {
+			prompt = URI.create(POUND);
+		} else if (dtmf.equals("*")) {
+			prompt = URI.create(STAR);
+		} else if (dtmf.equals("A")) {
+			prompt = URI.create(A);
+		} else if (dtmf.equals("B")) {
+			prompt = URI.create(B);
+		} else if (dtmf.equals("C")) {
+			prompt = URI.create(C);
+		} else if (dtmf.equals("D")) {
+			prompt = URI.create(D);
+		} else {
+			throw new MsControlException("This DigitMap is not recognized " + dtmf);
+		}
+
+		player.play(prompt, null, null);
+	}
+	
 	private class MyStatusEventListener implements StatusEventListener {
 
 		public void onEvent(StatusEvent event) {
@@ -198,48 +274,7 @@ public class PromptAndCollectServlet extends PlayerServlet {
 								.getEventType())) {
 					String seq = event.getSignalString();
 
-					URI prompt = null;
-
-					Player player = mg.getPlayer();
-
-					if (seq.equals("0")) {
-						prompt = URI.create(DTMF_0);
-					} else if (seq.equals("1")) {
-						prompt = URI.create(DTMF_1);
-					} else if (seq.equals("2")) {
-						prompt = URI.create(DTMF_2);
-					} else if (seq.equals("3")) {
-						prompt = URI.create(DTMF_3);
-					} else if (seq.equals("4")) {
-						prompt = URI.create(DTMF_4);
-					} else if (seq.equals("5")) {
-						prompt = URI.create(DTMF_5);
-					} else if (seq.equals("6")) {
-						prompt = URI.create(DTMF_6);
-					} else if (seq.equals("7")) {
-						prompt = URI.create(DTMF_7);
-					} else if (seq.equals("8")) {
-						prompt = URI.create(DTMF_8);
-					} else if (seq.equals("9")) {
-						prompt = URI.create(DTMF_9);
-					} else if (seq.equals("#")) {
-						prompt = URI.create(POUND);
-					} else if (seq.equals("*")) {
-						prompt = URI.create(STAR);
-					} else if (seq.equals("A")) {
-						prompt = URI.create(A);
-					} else if (seq.equals("B")) {
-						prompt = URI.create(B);
-					} else if (seq.equals("C")) {
-						prompt = URI.create(C);
-					} else if (seq.equals("D")) {
-						prompt = URI.create(D);
-					} else {
-						logger.error("This DigitMap is not recognized " + seq);
-						return;
-					}
-
-					player.play(prompt, null, null);
+					playDTMF(mg.getPlayer(), seq);
 
 				} else {
 					logger.error("DTMF detection failed ");
@@ -249,7 +284,6 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			}
 
 		}
-
 	}
 
 }
