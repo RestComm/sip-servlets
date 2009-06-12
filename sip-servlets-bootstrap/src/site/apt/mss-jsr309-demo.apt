@@ -27,20 +27,20 @@ Media Example
 
 	<Part I> 
 	
-	[[1]] Dial 1010 from you SIP Phone
+		[[1]] Dial 1010 from you SIP Phone
 	
-	[[2]] You will hear an announcement (show casing the announcement capability)
+		[[2]] You will hear an announcement (show casing the announcement capability)
 	
-	[[3]] Dial a DTMF from your SIP Phone, the DTMF is recognized by the media-jsr309-servlet example and MS is instructed to play corresponding Announcement (show casing the DTMF detection capability of MS)
+		[[3]] Dial a DTMF from your SIP Phone, the DTMF is recognized by the media-jsr309-servlet example and MS is instructed to play corresponding Announcement (show casing the DTMF detection capability of MS)
 	
 	
 	<Part II> 
 	
-	[[1]] Dial 1011 from your SIP Phone
+		[[1]] Dial 1011 from your SIP Phone
 	
-	[[2]] You will hear an announcement to start recording
+		[[2]] You will hear an announcement to start recording
 	
-	[[3]] Once announcement is over, speak on your mic and your voice gets recorded to Mobicents Media Server Home directory (showcasing recording capability). After few seconds you can disconnect and manually go to Mobicents Media Server home directory and play test.wav using your favorite player.
+		[[3]] Once announcement is over, speak on your mic and your voice gets recorded to Mobicents Media Server Home directory (showcasing recording capability). After few seconds you can disconnect and manually go to Mobicents Media Server home directory and play test.wav using your favorite player.
 	 
 	 
 * How to activate it

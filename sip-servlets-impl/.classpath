@@ -16,7 +16,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.14/servlet-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA4/sip-balancer-1.0.BETA4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA5/sip-balancer-1.0.BETA5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>	
