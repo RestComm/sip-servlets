@@ -1,6 +1,5 @@
 package org.mobicents.servlet.sip.example;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -48,8 +47,8 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 	private static final int RECORDING_DELAY = 30000;
 
 	private final static String RECORDER = "test.wav";
-	private final String RECORDED_FILE = "file://" +
-			 System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
+//	private final String RECORDED_FILE = "file://" +
+//			 System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -173,12 +172,9 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 					try {
 						Recorder recoredr = mg.getRecorder();
-						logger.info("recording the user at " + RECORDED_FILE);
-						URI prompt = URI.create(RECORDED_FILE);
-						File file = new File(prompt);
-						if(!file.exists()) {
-							file.createNewFile();
-						}
+						logger.info("recording the user at " + RECORDER);
+						URI prompt = URI.create(RECORDER);
+						
 						recoredr.record(prompt, null, null);
 
 						TimerService timer = (TimerService) getServletContext()
@@ -188,9 +184,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 					} catch (MsControlException e) {
 						logger.error("An unexpected error happened ", e);
-					} catch (IOException e) {
-						logger.error("could not create the file " + RECORDED_FILE, e);
-					}
+					} 
 				} else {
 					logger.error("Player didn't complete successfully ");
 				}
