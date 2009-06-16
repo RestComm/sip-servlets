@@ -36,6 +36,11 @@
     </context-param>
     
     <context-param>
+      <param-name>call.center.contact</param-name>
+      <param-value>sip:call-center@127.0.0.1:5090</param-value>
+    </context-param>
+    
+    <context-param>
       <param-name>caller.domain</param-name>
       <param-value>sip.callwithus.com</param-value>
     </context-param>    

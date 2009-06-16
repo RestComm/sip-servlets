@@ -7,7 +7,6 @@
 package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.Remove;
@@ -18,7 +17,6 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.jboss.mobicents.seam.model.Customer;
@@ -44,46 +42,36 @@ public class HelpAction implements Help, Serializable {
     //jboss 4
     @Resource(mappedName="java:/sip/shopping-demo/SipFactory") SipFactory sipFactory;
 
-	
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public void call() {
 		log.info("the phone number to call is " + phoneNumber);
-		if(phoneNumber != null) {
-			fireEvent(phoneNumber);
-		}
-	}
-
-	
-	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-	private void fireEvent(String customerPhone) {		
-			
-		customerPhone = "sip:" + customerPhone + "@" + (String)Contexts.getApplicationContext().get("caller.domain");;
+		String customerPhone = "sip:" + phoneNumber + "@" + (String)Contexts.getApplicationContext().get("caller.domain");;
 		try {
-			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();			
-			String callerAddress = (String)Contexts.getApplicationContext().get("caller.sip");
-			String callerDomain = (String)Contexts.getApplicationContext().get("caller.domain");
-			SipURI fromURI = sipFactory.createSipURI(callerAddress, callerDomain);
-			Address fromAddress = sipFactory.createAddress(fromURI);
-			Address toAddress = sipFactory.createAddress(customerPhone);
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			
+//			String callerAddress = (String)Contexts.getApplicationContext().get("caller.sip");
+//			String callerDomain = (String)Contexts.getApplicationContext().get("caller.domain");
+//			SipURI fromURI = sipFactory.createSipURI(callerAddress, callerDomain);
+//			Address fromAddress = sipFactory.createAddress(fromURI);
+			
+			String toAddr = (String)Contexts.getApplicationContext().get("call.center.contact");
+			Address toAddress = sipFactory.createAddress(toAddr);
+			Address fromAddress = sipFactory.createAddress(customerPhone);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
-			// getting the contact address for the registered customer sip address
-			String userContact= ((Map<String, String>)Contexts.getApplicationContext().get("registeredUsersMap")).get(customerPhone);
-			if(userContact != null && userContact.length() > 0) {
-				// for customers using the registrar
-				URI requestURI = sipFactory.createURI(userContact);
-				sipServletRequest.setRequestURI(requestURI);
-			} else {
-				// for customers not using the registrar and registered directly their contact location
-				URI requestURI = sipFactory.createURI(customerPhone);
-				sipServletRequest.setRequestURI(requestURI);
-			}
+			URI requestURI = sipFactory.createURI(toAddr);
+			sipServletRequest.setRequestURI(requestURI);
 			
+        	sipServletRequest.getSession().setAttribute("SecondPartyAddress", fromAddress);
+        	sipServletRequest.getSession().setAttribute("HelpCall", Boolean.TRUE);
+        	sipServletRequest.send();
+        	
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for checkout confirmation", uoe);
 		} catch (Exception e) {
 			log.error("An unexpected exception occurred while trying to create the request for checkout confirmation", e);
-		}				
-	}	
+		}			
+	}
 	
 	@Remove
 	public void destroy() {

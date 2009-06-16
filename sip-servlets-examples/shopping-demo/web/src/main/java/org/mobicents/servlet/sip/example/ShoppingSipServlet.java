@@ -3,7 +3,6 @@
  */
 package org.mobicents.servlet.sip.example;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -32,25 +31,15 @@ import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
-import org.jboss.mobicents.seam.listeners.MediaResourceListener;
 import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.jboss.mobicents.seam.util.TTSUtils;
 import org.mobicents.mscontrol.MsConnection;
 import org.mobicents.mscontrol.MsConnectionState;
-import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
-import org.mobicents.mscontrol.events.MsEventAction;
-import org.mobicents.mscontrol.events.MsEventFactory;
-import org.mobicents.mscontrol.events.MsRequestedEvent;
-import org.mobicents.mscontrol.events.MsRequestedSignal;
-import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
-import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
-import org.mobicents.mscontrol.events.pkg.DTMF;
-import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 
 /**
  * Sip Servlet handling responses to call initiated due to actions made on the web shopping demo
@@ -92,7 +81,10 @@ public class ShoppingSipServlet
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
 		int status = sipServletResponse.getStatus();
-		if (status == SipServletResponse.SC_SESSION_PROGRESS && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+		Boolean isHelpCall = (Boolean) sipServletResponse.getSession().getAttribute("HelpCall");
+		if (status == SipServletResponse.SC_SESSION_PROGRESS && 
+				"INVITE".equalsIgnoreCase(sipServletResponse.getMethod()) && 
+				(isHelpCall == null || Boolean.FALSE.equals(isHelpCall))) {
 			//creates the connection
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
@@ -104,33 +96,95 @@ public class ShoppingSipServlet
 			connection.modify("$", sdp);			
 		}
 	}
+
+	protected void doHelpCallSuccessResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		logger.info("Got OK");
+		SipSession session = resp.getSession();
+
+		Boolean inviteSent = (Boolean) session.getAttribute("InviteSent");
+		if (inviteSent != null && inviteSent.booleanValue()) {
+			return;
+		}
+		Address secondPartyAddress = (Address) resp.getSession()
+				.getAttribute("SecondPartyAddress");
+		if (secondPartyAddress != null) {
+
+			SipServletRequest invite = sipFactory.createRequest(resp
+					.getApplicationSession(), "INVITE", session
+					.getRemoteParty(), secondPartyAddress);
+
+			logger.info("Found second party -- sending INVITE to "
+					+ secondPartyAddress);
+
+			String contentType = resp.getContentType();
+			if (contentType.trim().equals("application/sdp")) {
+				invite.setContent(resp.getContent(), "application/sdp");
+			}
+
+			session.setAttribute("LinkedSession", invite.getSession());
+			invite.getSession().setAttribute("LinkedSession", session);
+
+			SipServletRequest ack = resp.createAck();
+			invite.getSession().setAttribute("FirstPartyAck", ack);
+			invite.getSession().setAttribute("FirstPartyContent", resp.getContent());
+			invite.getSession().setAttribute("HelpCall", Boolean.TRUE);
+			
+			invite.send();
+
+			session.setAttribute("InviteSent", Boolean.TRUE);
+		} else {
+			logger.info("Got OK from second party -- sending ACK");
+
+			SipServletRequest secondPartyAck = resp.createAck();
+			SipServletRequest firstPartyAck = (SipServletRequest) resp
+					.getSession().getAttribute("FirstPartyAck");
+
+//					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
+				firstPartyAck.setContent(resp.getContent(),
+						"application/sdp");
+				secondPartyAck.setContent(resp.getSession().getAttribute("FirstPartyContent"),
+						"application/sdp");
+//					}
+
+			firstPartyAck.send();
+			secondPartyAck.send();
+		}
+	}
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
+		
 		int status = sipServletResponse.getStatus();
 		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
-			//send ack
-			SipServletRequest ackRequest = sipServletResponse.createAck();			
-			ackRequest.send();
-			//creates the connection
-			Object sdpObj = sipServletResponse.getContent();
-			byte[] sdpBytes = (byte[]) sdpObj;
-			String sdp = new String(sdpBytes);		
-			String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
-			sipServletResponse.getSession().setAttribute("audioFilePath", pathToAudioDirectory);
-			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
-			if(!connection.getState().equals(MsConnectionState.OPEN)) {
-				logger.info("Creating the end to end media connection");
-				sipServletResponse.getSession().setAttribute("playAnnouncement", Boolean.TRUE);
-				connection.modify("$", sdp);
-				
+			Boolean isHelpCall = (Boolean) sipServletResponse.getSession().getAttribute("HelpCall");
+			if(isHelpCall != null && Boolean.TRUE.equals(isHelpCall)) {
+				//Handle the help call use case
+				doHelpCallSuccessResponse(sipServletResponse);
 			} else {
-				logger.info("Not Creating the end to end media connection, connection already opened");
-				MediaConnectionListener.playAnnouncement(connection, (MsLink)sipServletResponse.getSession().getAttribute("link"), sipServletResponse.getSession(), pathToAudioDirectory);
-			}			
+				//send ack
+				SipServletRequest ackRequest = sipServletResponse.createAck();			
+				ackRequest.send();
+				//creates the connection
+				Object sdpObj = sipServletResponse.getContent();
+				byte[] sdpBytes = (byte[]) sdpObj;
+				String sdp = new String(sdpBytes);		
+				String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
+				sipServletResponse.getSession().setAttribute("audioFilePath", pathToAudioDirectory);
+				MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
+				if(!connection.getState().equals(MsConnectionState.OPEN)) {
+					logger.info("Creating the end to end media connection");
+					sipServletResponse.getSession().setAttribute("playAnnouncement", Boolean.TRUE);
+					connection.modify("$", sdp);
+					
+				} else {
+					logger.info("Not Creating the end to end media connection, connection already opened");
+					MediaConnectionListener.playAnnouncement(connection, (MsLink)sipServletResponse.getSession().getAttribute("link"), sipServletResponse.getSession(), pathToAudioDirectory);
+				}			
+			}
 		}
 	}
 	
@@ -158,7 +212,6 @@ public class ShoppingSipServlet
 						response.getRequest().getMethod());
 				
 				challengeRequest.addAuthHeader(response, authInfo);
-				logger.info("Sending the challenge request " + challengeRequest);
 				
 				MsConnection connection =  (MsConnection) 
 					sipSession.getAttribute("connection");
@@ -166,13 +219,13 @@ public class ShoppingSipServlet
 					String sdp = connection.getLocalDescriptor();
 					try {
 						challengeRequest.setContentLength(sdp.length());
-						challengeRequest.setContent(sdp.getBytes(), "application/sdp");
-						logger.info("sending challenge request " + challengeRequest);
-						challengeRequest.send();
+						challengeRequest.setContent(sdp.getBytes(), "application/sdp");						
 					} catch (IOException e) {
 						logger.error("An unexpected exception occured while sending the request", e);
 					}
 				}
+				logger.info("sending challenge request " + challengeRequest);
+				challengeRequest.send();
 			}
 		} else {					
 			super.doErrorResponse(response);
@@ -226,6 +279,14 @@ public class ShoppingSipServlet
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
+		
+		SipSession linkedSession = (SipSession) request.getSession()
+				.getAttribute("LinkedSession");
+		if (linkedSession != null) {
+			SipServletRequest bye = linkedSession.createRequest("BYE");
+			logger.info("Sending bye to " + linkedSession.getRemoteParty());
+			bye.send();
+		}
 		
 		if(connection != null) {
 			connection.release();
