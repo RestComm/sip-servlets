@@ -41,7 +41,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.mobicents.jsr309</groupId>
+			<groupId>org.mobicents.jsr-309</groupId>
 			<artifactId>mobicents-jsr309-impl</artifactId>
 			<version>2.0.0.BETA1</version>
 			<!-- scope>runtime</scope -->
