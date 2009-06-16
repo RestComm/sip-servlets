@@ -3,6 +3,7 @@
  */
 package org.mobicents.servlet.sip.example;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -31,14 +32,25 @@ import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
+import org.jboss.mobicents.seam.listeners.MediaResourceListener;
 import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.jboss.mobicents.seam.util.TTSUtils;
 import org.mobicents.mscontrol.MsConnection;
+import org.mobicents.mscontrol.MsConnectionState;
+import org.mobicents.mscontrol.MsEndpoint;
 import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsPeer;
 import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
+import org.mobicents.mscontrol.events.MsEventAction;
+import org.mobicents.mscontrol.events.MsEventFactory;
+import org.mobicents.mscontrol.events.MsRequestedEvent;
+import org.mobicents.mscontrol.events.MsRequestedSignal;
+import org.mobicents.mscontrol.events.ann.MsPlayRequestedSignal;
+import org.mobicents.mscontrol.events.dtmf.MsDtmfRequestedEvent;
+import org.mobicents.mscontrol.events.pkg.DTMF;
+import org.mobicents.mscontrol.events.pkg.MsAnnouncement;
 
 /**
  * Sip Servlet handling responses to call initiated due to actions made on the web shopping demo
@@ -73,6 +85,26 @@ public class ShoppingSipServlet
 		}	
 	}		
 	
+
+	@Override
+	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		logger.info("Got : " + sipServletResponse.getStatus() + " "
+				+ sipServletResponse.getMethod());
+		int status = sipServletResponse.getStatus();
+		if (status == SipServletResponse.SC_SESSION_PROGRESS && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+			//creates the connection
+			Object sdpObj = sipServletResponse.getContent();
+			byte[] sdpBytes = (byte[]) sdpObj;
+			String sdp = new String(sdpBytes);
+			logger.info("Creating the end to end media connection");
+			sipServletResponse.getSession().setAttribute("playAnnouncement", Boolean.FALSE);
+			sipServletResponse.getSession().setAttribute("audioFilePath", (String)getServletContext().getAttribute("audioFilePath"));
+			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
+			connection.modify("$", sdp);			
+		}
+	}
+	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
@@ -86,10 +118,19 @@ public class ShoppingSipServlet
 			//creates the connection
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
-			String sdp = new String(sdpBytes);
-			sipServletResponse.getSession().setAttribute("audioFilePath", (String)getServletContext().getAttribute("audioFilePath"));
+			String sdp = new String(sdpBytes);		
+			String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
+			sipServletResponse.getSession().setAttribute("audioFilePath", pathToAudioDirectory);
 			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
-			connection.modify("$", sdp);			
+			if(!connection.getState().equals(MsConnectionState.OPEN)) {
+				logger.info("Creating the end to end media connection");
+				sipServletResponse.getSession().setAttribute("playAnnouncement", Boolean.TRUE);
+				connection.modify("$", sdp);
+				
+			} else {
+				logger.info("Not Creating the end to end media connection, connection already opened");
+				MediaConnectionListener.playAnnouncement(connection, (MsLink)sipServletResponse.getSession().getAttribute("link"), sipServletResponse.getSession(), pathToAudioDirectory);
+			}			
 		}
 	}
 	
@@ -121,14 +162,16 @@ public class ShoppingSipServlet
 				
 				MsConnection connection =  (MsConnection) 
 					sipSession.getAttribute("connection");
-				String sdp = connection.getLocalDescriptor();
-				try {
-					challengeRequest.setContentLength(sdp.length());
-					challengeRequest.setContent(sdp.getBytes(), "application/sdp");
-					logger.info("sending challenge request " + challengeRequest);
-					challengeRequest.send();
-				} catch (IOException e) {
-					logger.error("An unexpected exception occured while sending the request", e);
+				if(connection != null) {
+					String sdp = connection.getLocalDescriptor();
+					try {
+						challengeRequest.setContentLength(sdp.length());
+						challengeRequest.setContent(sdp.getBytes(), "application/sdp");
+						logger.info("sending challenge request " + challengeRequest);
+						challengeRequest.send();
+					} catch (IOException e) {
+						logger.error("An unexpected exception occured while sending the request", e);
+					}
 				}
 			}
 		} else {					
@@ -184,8 +227,16 @@ public class ShoppingSipServlet
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
 		
-		connection.release();
-		link.release();
+		if(connection != null) {
+			connection.release();
+		} else {
+			logger.info("connection not created");
+		}
+		if(link != null) {
+			link.release();	
+		} else {
+			logger.info("link not created");
+		}
 	}
 	
 	@Override	

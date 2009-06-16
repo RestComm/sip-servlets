@@ -37,7 +37,7 @@
     
     <context-param>
       <param-name>caller.domain</param-name>
-      <param-value>callwithus.com</param-value>
+      <param-value>sip.callwithus.com</param-value>
     </context-param>    
     
     <context-param>

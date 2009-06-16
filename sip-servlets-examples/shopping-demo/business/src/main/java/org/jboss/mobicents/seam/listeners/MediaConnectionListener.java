@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
 import org.mobicents.mscontrol.MsConnection;
@@ -14,7 +15,6 @@ import org.mobicents.mscontrol.MsLink;
 import org.mobicents.mscontrol.MsLinkEvent;
 import org.mobicents.mscontrol.MsLinkListener;
 import org.mobicents.mscontrol.MsLinkMode;
-import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
 import org.mobicents.mscontrol.events.MsEventAction;
 import org.mobicents.mscontrol.events.MsEventFactory;
@@ -57,6 +57,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 	
 	public void connectionCreated(MsConnectionEvent event) {		
 		logger.info("connection created " + event);
+//		handleMedia(event);
 //		logger.info("connection hal opened " + event);
 //		MsConnection connection = event.getConnection();
 //		String sdp = connection.getLocalDescriptor();
@@ -74,8 +75,8 @@ public class MediaConnectionListener implements MsConnectionListener {
 		logger.info("connection initialized " + arg0);
 	}
 
-	public void connectionDisconnected(MsConnectionEvent arg0) {
-		logger.info("connection disconnected " + arg0);
+	public void connectionDisconnected(MsConnectionEvent event) {
+		logger.info("connection disconnected " + event);
 	}
 
 	public void connectionFailed(MsConnectionEvent arg0) {
@@ -83,7 +84,7 @@ public class MediaConnectionListener implements MsConnectionListener {
 	}
 
 	public void connectionHalfOpen(MsConnectionEvent event) {
-		logger.info("connection hal opened " + event);
+		logger.info("connection half opened " + event);
 		MsConnection connection = event.getConnection();
 		String sdp = connection.getLocalDescriptor();
 		try {
@@ -98,6 +99,26 @@ public class MediaConnectionListener implements MsConnectionListener {
 
 	public void connectionOpen(MsConnectionEvent event) {
 		logger.info("connection opened " + event);
+		handleMedia(event);
+
+	}
+
+	public void connectionModeRecvOnly(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void connectionModeSendOnly(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void connectionModeSendRecv(MsConnectionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	protected void handleMedia(MsConnectionEvent event) {
 		logger.info("Remote Media Connection created. Endpoints connected " + event.getEventID());
 		
 		final MsConnection connection = event.getConnection();
@@ -113,59 +134,12 @@ public class MediaConnectionListener implements MsConnectionListener {
 			public void linkConnected(MsLinkEvent evt) {
 				logger.info("link connected " + link.getEndpoints()[0].getLocalName() +
 						" " + link.getEndpoints()[1].getLocalName());
-				MsProvider provider = session.getProvider();
-				MsEventFactory eventFactory = provider.getEventFactory();
+//				MsProvider provider = session.getProvider();
+//				MsEventFactory eventFactory = provider.getEventFactory();
 				inviteRequest.getSession().setAttribute("link", link);
-				
-				MsEndpoint endpoint = link.getEndpoints()[0];
-				
-				String pathToAudioDirectory = (String) inviteRequest.getSession().getAttribute("audioFilePath");
-				
-				// Let us request for Announcement Complete event or Failure
-				// in case if it happens
-				MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
-				onCompleted.setEventAction(MsEventAction.NOTIFY);
-
-				MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
-				onFailed.setEventAction(MsEventAction.NOTIFY);
-				
-				MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
-		        
-				DTMFListener dtmfListener = new DTMFListener(eventFactory, link, inviteRequest.getSession(), pathToAudioDirectory);
-				link.addNotificationListener(dtmfListener);
-				MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
-			
-				MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
-		        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
-				
-				if(inviteRequest.getSession().getAttribute("orderApproval") != null) {
-					java.io.File speech = new File("speech.wav");
-					if(inviteRequest.getSession().getAttribute("adminApproval") != null) {
-						speech = new File("adminspeech.wav");	
-					}			
-					logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
-			        play.setURL("file://"+ speech.getAbsolutePath());
-
-			        endpoint.execute(requestedSignals, requestedEvents, link);
-			        
-					logger.info("Waiting for DTMF at the same time..");
-				} else if (inviteRequest.getSession().getAttribute("deliveryDate") != null) {			
-					String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
-					logger.info("Playing Delivery Date Announcement : " + announcementFile);
-					play.setURL(announcementFile);
-					endpoint.execute(requestedSignals, requestedEvents, link);
-					
-					logger.info("Waiting for DTMF at the same time..");
-				} else if (inviteRequest.getSession().getAttribute("shipping") != null) {			
-					java.io.File speech = new File("shipping.wav");
-					logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
-					MediaResourceListener mediaResourceListener = new MediaResourceListener(inviteRequest.getSession(), link, connection);
-					link.addNotificationListener(mediaResourceListener);
-					play.setURL("file://"+ speech.getAbsolutePath());
-					endpoint.execute(requestedSignals, requestedEvents, link);
-					
-					logger.info("shipping announcement played. tearing down the call");
-				}		
+				if((Boolean.TRUE).equals(inviteRequest.getSession().getAttribute("playAnnouncement"))) {
+					playAnnouncement(connection, link, inviteRequest.getSession(), (String)inviteRequest.getSession().getAttribute("audioFilePath"));
+				}
 			}
 
 			public void linkDisconnected(MsLinkEvent evt) {
@@ -189,24 +163,59 @@ public class MediaConnectionListener implements MsConnectionListener {
 		logger.info(log);
 		
 		link.join(IVR_JNDI_NAME, endpoint.getLocalName());
-		
-		
-
 	}
 
-	public void connectionModeRecvOnly(MsConnectionEvent arg0) {
-		// TODO Auto-generated method stub
+	
+	public static void playAnnouncement(MsConnection connection, MsLink link, SipSession sipSession, String pathToAudioDirectory) {
+		//playing the file
+		MsEventFactory eventFactory = (MsEventFactory) connection.getSession().getProvider().getEventFactory();
 		
-	}
-
-	public void connectionModeSendOnly(MsConnectionEvent arg0) {
-		// TODO Auto-generated method stub
+		MsEndpoint endpoint = link.getEndpoints()[0];			
 		
-	}
+		// Let us request for Announcement Complete event or Failure
+		// in case if it happens
+		MsRequestedEvent onCompleted = eventFactory.createRequestedEvent(MsAnnouncement.COMPLETED);
+		onCompleted.setEventAction(MsEventAction.NOTIFY);
 
-	public void connectionModeSendRecv(MsConnectionEvent arg0) {
-		// TODO Auto-generated method stub
+		MsRequestedEvent onFailed = eventFactory.createRequestedEvent(MsAnnouncement.FAILED);
+		onFailed.setEventAction(MsEventAction.NOTIFY);
 		
-	}
+		MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
+        
+		DTMFListener dtmfListener = new DTMFListener(eventFactory, link, sipSession, pathToAudioDirectory);
+		link.addNotificationListener(dtmfListener);
+		MsDtmfRequestedEvent dtmf = (MsDtmfRequestedEvent) eventFactory.createRequestedEvent(DTMF.TONE);
+	
+		MsRequestedSignal[] requestedSignals = new MsRequestedSignal[] { play };
+        MsRequestedEvent[] requestedEvents = new MsRequestedEvent[] { onCompleted, onFailed, dtmf };
+		
+		if(sipSession.getAttribute("orderApproval") != null) {
+			java.io.File speech = new File("speech.wav");
+			if(sipSession.getAttribute("adminApproval") != null) {
+				speech = new File("adminspeech.wav");	
+			}			
+			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
+	        play.setURL("file://"+ speech.getAbsolutePath());
 
+	        endpoint.execute(requestedSignals, requestedEvents, link);
+	        
+			logger.info("Waiting for DTMF at the same time..");
+		} else if (sipSession.getAttribute("deliveryDate") != null) {			
+			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
+			logger.info("Playing Delivery Date Announcement : " + announcementFile);
+			play.setURL(announcementFile);
+			endpoint.execute(requestedSignals, requestedEvents, link);
+			
+			logger.info("Waiting for DTMF at the same time..");
+		} else if (sipSession.getAttribute("shipping") != null) {			
+			java.io.File speech = new File("shipping.wav");
+			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
+			MediaResourceListener mediaResourceListener = new MediaResourceListener(sipSession, link, connection);
+			link.addNotificationListener(mediaResourceListener);
+			play.setURL("file://"+ speech.getAbsolutePath());
+			endpoint.execute(requestedSignals, requestedEvents, link);
+			
+			logger.info("shipping announcement played. tearing down the call");
+		}		
+	}
 }
