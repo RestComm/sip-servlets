@@ -47,7 +47,7 @@
                                     <goal>checkout</goal>
                                 </goals>
                                 <configuration>
-                                    <checkoutDirectory>${checkout.basedir}/media/2.x/</checkoutDirectory>
+                                    <checkoutDirectory>${checkout.basedir}/media/2.x/core</checkoutDirectory>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
                                     <connectionUrl>${media.core.2.x.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
