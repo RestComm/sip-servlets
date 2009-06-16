@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>org.mobicents.jsr309</groupId>
 			<artifactId>mobicents-jsr309-impl</artifactId>
-			<version>2.0.0.BETA1-SNAPSHOT</version>
+			<version>2.0.0.BETA1</version>
 			<!-- scope>runtime</scope -->
 		</dependency>
 		<!-- j2ee dependencies -->
