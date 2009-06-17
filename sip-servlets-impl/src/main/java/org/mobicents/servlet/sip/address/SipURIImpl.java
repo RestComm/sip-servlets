@@ -378,9 +378,10 @@ public class SipURIImpl extends URIImpl implements SipURI, Serializable {
 				return;
 			}
 		}
+		String escapedValue = RFC2396UrlDecoder.encode(value);
 		super.setParameter(name, value);
 		try {
-			((Parameters)getSipURI()).setParameter(name, value);
+			((Parameters)getSipURI()).setParameter(name, escapedValue);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Problem setting parameter",e);
 		}

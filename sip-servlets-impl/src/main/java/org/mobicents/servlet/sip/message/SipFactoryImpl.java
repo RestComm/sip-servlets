@@ -418,7 +418,7 @@ public class SipFactoryImpl implements Serializable {
 			from.removeParameter(TAG_PARAM);
 			
 			fromAddress = SipFactories.addressFactory
-					.createAddress(from.getURI().toString());
+					.createAddress(((URIImpl)from.getURI()).getURI());
 			fromAddress.setDisplayName(from.getDisplayName());		
 			
 			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddress, null);			
@@ -437,7 +437,7 @@ public class SipFactoryImpl implements Serializable {
 			to.removeParameter(TAG_PARAM);
 			
 			toAddress = SipFactories.addressFactory
-				.createAddress(to.getURI().toString());
+				.createAddress(((URIImpl)to.getURI()).getURI());
 			
 			toAddress.setDisplayName(to.getDisplayName());
 

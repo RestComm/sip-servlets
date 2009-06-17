@@ -16,10 +16,13 @@
  */
 package org.mobicents.servlet.sip.testsuite.simple;
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
+import javax.sip.header.ToHeader;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -132,6 +135,32 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		deployApplicationSetToParam("toParam", "http://yaris.research.att.com:23280/vxml/test.jsp");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
+	}
+	
+	/**
+	 * non regression test for Issue 755 http://code.google.com/p/mobicents/issues/detail?id=755
+	 * SipURI parameters not escaped
+	 */
+	public void testShootistSetEscapedParam() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		String toParamValue = "http://yaris.research.att.com:23280/vxml/test.jsp?toto=tata";
+		deployApplicationSetToParam("toParam", toParamValue);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+		ToHeader toHeader = (ToHeader) receiver.getInviteRequest().getHeader(ToHeader.NAME);
+		String toParam = ((SipURI)toHeader.getAddress().getURI()).getParameter("toParam");
+		logger.info(toParam);
+		assertEquals(toParamValue , RFC2396UrlDecoder.decode(toParam));
 	}
 	
 	public void testShootistCallerSendsBye() throws Exception {
