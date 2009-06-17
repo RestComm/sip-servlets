@@ -73,6 +73,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/client/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/" />
 									</tasks>
 								</configuration>
@@ -98,7 +99,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-									<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/client/" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/client/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" />
 									</tasks>
@@ -153,7 +154,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-									<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/client" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/client/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/" />
 									</tasks>
 								</configuration>
@@ -179,6 +180,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/client/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" />
 									</tasks>
