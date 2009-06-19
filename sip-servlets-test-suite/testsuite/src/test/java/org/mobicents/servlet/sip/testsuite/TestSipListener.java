@@ -227,6 +227,8 @@ public class TestSipListener implements SipListener {
 	private boolean abortProcessing;
 	
 	private boolean recordRoutingProxyTesting;
+	
+	public boolean b2buamessagereceived;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -701,17 +703,22 @@ public class TestSipListener implements SipListener {
 		request.getHeader(ContentTypeHeader.NAME);
 		boolean sendInvitewithJoin = false;
 		boolean sendInvitewithReplaces = false;
-		if(TEXT_CONTENT_TYPE.equals(contentTypeHeader.getContentType())) {
-			this.lastMessageContent = new String(request.getRawContent());
-			allMessagesContent.add(new String(lastMessageContent));
-			if(lastMessageContent.indexOf("Join : ") != -1) {
-				this.lastMessageContent = lastMessageContent.substring("Join : ".length());
-				sendInvitewithJoin = true;
+		if(contentTypeHeader != null) {
+			if(TEXT_CONTENT_TYPE.equals(contentTypeHeader.getContentType())) {
+				this.lastMessageContent = new String(request.getRawContent());
+				allMessagesContent.add(new String(lastMessageContent));
+				if(lastMessageContent.indexOf("Join : ") != -1) {
+					this.lastMessageContent = lastMessageContent.substring("Join : ".length());
+					sendInvitewithJoin = true;
+				}
+				if(lastMessageContent.indexOf("Replaces : ") != -1) {
+					this.lastMessageContent = lastMessageContent.substring("Replaces : ".length());
+					sendInvitewithReplaces = true;
+				}
 			}
-			if(lastMessageContent.indexOf("Replaces : ") != -1) {
-				this.lastMessageContent = lastMessageContent.substring("Replaces : ".length());
-				sendInvitewithReplaces = true;
-			}
+		} else {
+			if(request.getHeader("From").toString().contains("b2bua@sip-servlets"))
+					b2buamessagereceived = true;
 		}
 		try {
 			Response okResponse = protocolObjects.messageFactory.createResponse(
@@ -1408,18 +1415,33 @@ public class TestSipListener implements SipListener {
 		sendBye(this.dialog);
 	}
 	
+	public boolean sendByeInNewThread = false;
+	
 	/**
 	 * @throws SipException
 	 * @throws TransactionUnavailableException
 	 * @throws TransactionDoesNotExistException
 	 */
-	public void sendBye(Dialog dialog) throws SipException,
+	public void sendBye(final Dialog dialog) throws SipException,
 			TransactionUnavailableException, TransactionDoesNotExistException {
-		Request byeRequest = dialog.createRequest(Request.BYE);
-		ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
-		logger.info("Sending BYE " + byeRequest);
-		dialog.sendRequest(ct);
-		byeSent = true;
+		Thread th = new Thread(){
+			public void run() {
+				try {
+					if(sendByeInNewThread) Thread.sleep(600);
+					Request byeRequest = dialog.createRequest(Request.BYE);
+					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+					logger.info("Sending BYE " + byeRequest);
+					dialog.sendRequest(ct);
+					byeSent = true;	
+				} catch(Exception e)  {e.printStackTrace();}
+			}
+		};
+		if(sendByeInNewThread) {
+			th.start();
+		} else {
+			th.run();
+		}
+
 	}
 
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {

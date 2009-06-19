@@ -79,7 +79,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doAck(SipServletRequest request) throws ServletException,
 			IOException {		
 		logger.info("Got : " + request.toString());
-//		SipSession session = request.getSession();		
+		SipSession session = request.getSession();
+		if(request.getTo().toString().contains("b2bua@sip-servlet")) {
+			session.createRequest("MESSAGE").send();
+		}
 //		SipSession linkedSession = helper.getLinkedSession(session);
 //		SipServletRequest forkedRequest = linkedSession.createRequest("ACK");
 //		forkedRequest.setContentLength(request.getContentLength());

@@ -83,6 +83,7 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 	public void testSpeedDialLocationServiceCallerSendBye() throws Exception {		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.sendByeInNewThread = true;
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
@@ -107,6 +108,7 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.b2buamessagereceived);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
