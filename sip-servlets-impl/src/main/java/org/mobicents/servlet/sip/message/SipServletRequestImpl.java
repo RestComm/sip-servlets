@@ -939,6 +939,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				super.session.setSessionCreatingTransaction(ctx);
 				
 				Dialog dialog = ctx.getDialog();
+				
+				if(super.session.getProxy() != null) dialog = null;
+				
 				if (dialog == null && this.createDialog) {					
 					dialog = sipProvider.getNewDialog(ctx);
 					super.session.setSessionCreatingDialog(dialog);
@@ -1037,7 +1040,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			//updating the last accessed times 
 			session.access();
 			session.getSipApplicationSession().access();
-			final Dialog dialog = getDialog();
+			Dialog dialog = getDialog();
+			if(session.getProxy() != null) dialog = null;
 			// If dialog does not exist or has no state.
 			if (dialog == null || dialog.getState() == null
 					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(method))) {
