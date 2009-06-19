@@ -39,6 +39,7 @@ import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 /**
@@ -110,20 +111,33 @@ public class ProxyUtils {
 			} 
 			//Add via header
 			ViaHeader viaHeader = null;
-			if(proxy.getOutboundInterface() == null) { 
+			if(proxy.getOutboundInterface() == null) {
+				String branchId = null;
+				
+				if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
+					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+					logger.debug("reusing original branch id " + branchId);
+				}
 				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, Utils.getInstance().generateBranchId());
+						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId);
 			} else { 
 				//If outbound interface is specified use it
 				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
 				if(outboundTransport == null) {
 					outboundTransport = ListeningPoint.UDP;
 				}
+				String branchId = null;
+				
+				if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
+					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+					logger.debug("reusing original branch id " + branchId);
+				}
+				
 				viaHeader = SipFactories.headerFactory.createViaHeader(
 						proxy.getOutboundInterface().getHost(),
 						proxy.getOutboundInterface().getPort(),
 						outboundTransport,
-						Utils.getInstance().generateBranchId());
+						branchId);
 			}
 					
 			clonedRequest.addHeader(viaHeader);				
