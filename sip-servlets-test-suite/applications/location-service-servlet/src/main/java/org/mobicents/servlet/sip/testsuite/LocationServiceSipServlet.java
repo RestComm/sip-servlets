@@ -72,7 +72,11 @@ public class LocationServiceSipServlet extends SipServlet {
 		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
 		uriList  = new ArrayList<URI>();
 		uriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:5090"));
-		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);		
+		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
+		uriList  = new ArrayList<URI>();
+		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:5070"));
+		registeredUsers.put("sip:proxy-b2bua@127.0.0.1:5070", uriList);
+		
 	}
 
 	@Override
@@ -120,7 +124,10 @@ public class LocationServiceSipServlet extends SipServlet {
 			proxy.setProxyTimeout(3);
 			proxy.setRecordRoute(true);
 			proxy.setParallel(true);
-			proxy.setSupervised(true);
+			proxy.setSupervised(true);			
+			for (URI uri : contactAddresses) {
+				logger.info("proxying to " + uri);
+			}
 			proxy.proxyTo(contactAddresses);		
 		} else {
 			logger.info(request.getRequestURI().toString() + " is not currently registered");
