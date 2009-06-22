@@ -106,6 +106,22 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	public void testShootmeParameterable() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"additionalParameterableHeader","nonParameterableHeader"}, new String[] {"none","none"});		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+	
 	public void testShootmeRegister() throws Exception {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";

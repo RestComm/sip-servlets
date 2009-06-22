@@ -88,6 +88,21 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		logger.info("Got request: "
 				+ request.getMethod());
 		
+		if(request.getParameterableHeader("additionalParameterableHeader") != null) {
+			request.getParameterableHeader("additionalParameterableHeader").setParameter("dsfds", "value");
+			boolean error = false;
+			try {
+				request.getParameterableHeader("nonParameterableHeader").setParameter("dsfds", "value");
+			} catch (ServletParseException e) {
+				error = true;
+			}
+			if(error) {
+				// Success only if nonParameterable headers thow excpetion when treated as parametereable
+				request.createResponse(200).send();
+			}
+			return;
+		}
+		
 		request.createResponse(SipServletResponse.SC_TRYING).send();
 		
 		String fromString = request.getFrom().toString();
