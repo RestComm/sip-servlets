@@ -28,6 +28,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
@@ -63,6 +64,7 @@ public class SipStandardService extends StandardService implements SipService {
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
+	protected String additionalParameterableHeaders;
 	//the sip application router class name defined in the server.xml
 //	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
@@ -350,6 +352,23 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public long getCongestionControlCheckingInterval() {
 		return congestionControlCheckingInterval;
+	}
+
+
+	public String getAdditionalParameterableHeaders() {
+		return additionalParameterableHeaders;
+	}
+
+
+	public void setAdditionalParameterableHeaders(
+			String additionalParameterableHeaders) {
+		this.additionalParameterableHeaders = additionalParameterableHeaders;
+		String[] headers = additionalParameterableHeaders.split(",");
+		for(String header : headers) {
+			if(header != null && header.length()>0) {
+				JainSipUtils.parameterableHeadersNames.add(header);
+			}
+		}
 	}
 
 }
