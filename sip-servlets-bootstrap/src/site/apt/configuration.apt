@@ -75,6 +75,7 @@ Configuration
 	<<<<Service name="Sip-Servlets">>>\
   	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>\
   	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>\
+  	<<<additionalParameterableHeaders="header1,Header2">>>\
   	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/call-blocking-demo/call-blocking-servlet-dar.properties">>>>
   	
   	Here is a description of the sip Service tag's attributes :
@@ -84,6 +85,8 @@ Configuration
   	* <<<sipApplicationDispatcherClassName>>> : This attribute specifies the class name of the <<<org.mobicents.servlet.sip.core.SipApplicationDispatcher>>> implementation to use. The routing algorithm and application selection process is done in that class.
   	
   	* <<<darConfigurationFileLocation>>> : The default application router file location. Used by our default application router to know the application selection logic. Check JSR 289 Spec Appendix C.
+  	
+  	* <<<additionalParameterableHeaders>>> : A comma-separated list of header names that are treated as Parameterable by the container. For these headers setting and getting parameters is allowed, others will result in ServletParseExcpetion. There are a number of standard headers that are already Parameterable, you generally don't have to include them here.
   	
   	
 * Logging
