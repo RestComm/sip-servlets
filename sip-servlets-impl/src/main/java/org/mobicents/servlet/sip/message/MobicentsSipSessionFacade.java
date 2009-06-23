@@ -410,4 +410,18 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 			SipApplicationRouterInfo routerInfo) {
 		sipSession.setNextSipApplicationRouterInfo(routerInfo);
 	}
+
+	public void setAckReceived(boolean ackReceived) {
+	}
+
+	public boolean isAckReceived() {
+		return false;
+	}
+
+	public void setCseq(long cseq) {
+	}
+
+	public long getCseq() {
+		return 0;
+	}
 }

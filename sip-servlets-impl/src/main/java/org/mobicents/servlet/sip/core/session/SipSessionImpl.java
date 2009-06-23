@@ -129,6 +129,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected transient Principal userPrincipal;
 	
+	protected boolean ackReceived;
+	
+	protected long cseq = -1;
+	
 //	protected transient ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 90, TimeUnit.SECONDS,
 //			new LinkedBlockingQueue<Runnable>());
 	
@@ -1513,5 +1517,17 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public void setNextSipApplicationRouterInfo(
 			SipApplicationRouterInfo routerInfo) {
 		this.nextSipApplicationRouterInfo = routerInfo;
+	}
+	public boolean isAckReceived() {
+		return ackReceived;
+	}
+	public void setAckReceived(boolean ackReceived) {
+		this.ackReceived = ackReceived;
+	}
+	public long getCseq() {
+		return cseq;
+	}
+	public void setCseq(long cseq) {
+		this.cseq = cseq;
 	}
 }

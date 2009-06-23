@@ -159,4 +159,12 @@ public interface MobicentsSipSession extends SipSession {
 
 	void setNextSipApplicationRouterInfo(SipApplicationRouterInfo routerInfo);
 	SipApplicationRouterInfo getNextSipApplicationRouterInfo();
+
+	public boolean isAckReceived();
+
+	public void setAckReceived(boolean ackReceived);
+
+	public long getCseq();
+
+	public void setCseq(long cseq);
 }

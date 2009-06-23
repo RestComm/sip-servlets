@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.header.CSeq;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
@@ -24,9 +25,11 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.SipServletResponse;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
@@ -175,6 +178,35 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		final MobicentsSipSession sipSession = tmpSipSession;
 		sipServletRequest.setSipSession(sipSession);
+		
+		
+		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
+		if(request.getMethod().equalsIgnoreCase("ACK")) {
+			if(sipSession.isAckReceived()) {
+				// Filter out ACK retransmissions as per changes in 
+				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
+				return;
+			}
+			sipSession.setAckReceived(true);
+		}
+		
+		CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
+		long localCseq = sipSession.getCseq();
+		long remoteCseq = cseq.getSeqNumber();
+		
+		if(localCseq>remoteCseq) {
+			logger.error("CSeq out of order for the following request");
+			SipServletResponse response = sipServletRequest.createResponse(500, "CSeq out of order");
+			try {
+				response.send();
+			} catch (IOException e) {
+				logger.error("Can not send error response", e);
+			}
+		}
+		
+		sipSession.setCseq(remoteCseq);
+		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
+		
 		
 		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 

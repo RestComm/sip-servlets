@@ -317,6 +317,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 			}
 			
 			//checking the external ip address if stun enabled			
