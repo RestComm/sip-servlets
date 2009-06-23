@@ -51,6 +51,7 @@ import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -150,6 +151,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * AR state info
 	 */
 	protected Serializable stateInfo;
+	
+	/**
+	 * AR router info for the next app in chain
+	 */
+	protected SipApplicationRouterInfo nextSipApplicationRouterInfo;
 	
 	/**
 	 * Current state of the session, one of INTITIAL, EARLY, ESTABLISHED and TERMINATED.
@@ -1500,5 +1506,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	@Override
 	public String toString() {
 		return getKey().toString();
+	}
+	public SipApplicationRouterInfo getNextSipApplicationRouterInfo() {
+		return nextSipApplicationRouterInfo;
+	}
+	public void setNextSipApplicationRouterInfo(
+			SipApplicationRouterInfo routerInfo) {
+		this.nextSipApplicationRouterInfo = routerInfo;
 	}
 }

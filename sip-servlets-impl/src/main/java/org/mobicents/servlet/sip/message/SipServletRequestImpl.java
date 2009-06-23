@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -893,7 +894,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					//add a route header to direct the request back to the container 
 					//to check if there is any other apps interested in it
-					addInfoForRoutingBackToContainer(session.getSipApplicationSession().getKey().getId(), session.getKey().getApplicationName());
+					addInfoForRoutingBackToContainer(routerInfo, session.getSipApplicationSession().getKey().getId(), session.getKey().getApplicationName());
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("routing outside the container " +
@@ -1072,7 +1073,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @throws SipException 
 	 * @throws NullPointerException 
 	 */
-	public void addInfoForRoutingBackToContainer(String applicationSessionId, String applicationName) throws ParseException, SipException {		
+	public void addInfoForRoutingBackToContainer(SipApplicationRouterInfo routerInfo, String applicationSessionId, String applicationName) throws ParseException, SipException {		
 		final Request request = (Request) super.message;
 		final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -1088,7 +1089,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipFactories.addressFactory.createAddress(sipURI);
 		final RouteHeader routeHeader = 
 			SipFactories.headerFactory.createRouteHeader(routeAddress);
-		request.addFirst(routeHeader);						
+		request.addFirst(routeHeader);		
+		// adding the application router info to avoid calling the AppRouter twice
+		// See Issue 791 : http://code.google.com/p/mobicents/issues/detail?id=791
+		session.setNextSipApplicationRouterInfo(routerInfo);
 	}
 
 	/**

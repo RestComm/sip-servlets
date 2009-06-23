@@ -22,6 +22,7 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.SipException;
@@ -399,5 +400,14 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 	@Override
 	public String toString() {
 		return sipSession.toString();
+	}
+
+	public SipApplicationRouterInfo getNextSipApplicationRouterInfo() {
+		return sipSession.getNextSipApplicationRouterInfo();
+	}
+
+	public void setNextSipApplicationRouterInfo(
+			SipApplicationRouterInfo routerInfo) {
+		sipSession.setNextSipApplicationRouterInfo(routerInfo);
 	}
 }

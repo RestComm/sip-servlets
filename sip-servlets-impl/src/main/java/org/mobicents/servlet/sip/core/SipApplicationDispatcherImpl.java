@@ -981,11 +981,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		SipApplicationRoutingRegion routingRegion = null;
 		Serializable stateInfo = null;
 		if(sipServletRequest.getSipSession() != null) {
-			//we serialize and deserailize in memory to get the same state info object but with a new reference
 			routingRegion = sipServletRequest.getSipSession().getRegionInternal();
-			// so that the AR will not change the stateinfo, since this check is just to see if we have to route back to the 
-			//container and not a "real" call to the AR to select an application - needed by TCK AR test cases
-			stateInfo = serializeStateInfo(sipServletRequest.getSipSession().getStateInfo()); 
+			stateInfo = sipServletRequest.getSipSession().getStateInfo();
 		}
 		final Request request = (Request) sipServletRequest.getMessage();
 		

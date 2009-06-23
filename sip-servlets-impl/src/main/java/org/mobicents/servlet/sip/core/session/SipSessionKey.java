@@ -40,6 +40,8 @@ public class SipSessionKey implements Serializable {
 	String toTag;
 	String callId; 
 	String applicationName;
+	// Issue 790 : 1 SipSession should not be used in 2 different app session (http://code.google.com/p/mobicents/issues/detail?id=790)
+	// so we add the app session id in the key as well
 	String applicationSessionId;
 	private String toString;
 	/**

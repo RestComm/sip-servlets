@@ -23,7 +23,12 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
-
+/**
+ * Non regression test for Issue 790 :  
+ * 1 SipSession should not be used in 2 different app session (http://code.google.com/p/mobicents/issues/detail?id=790)
+ * @author jean.deruelle@gmail.com
+ *
+ */
 public class SameSipSessionB2BUACompositionJunitTest extends SipServletTestCase {
 	
 	private static final String TO_NAME = "receiver";

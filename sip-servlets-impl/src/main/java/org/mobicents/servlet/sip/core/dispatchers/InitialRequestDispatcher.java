@@ -109,7 +109,8 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		}
 		MobicentsSipSession sipSessionImpl = sipServletRequest.getSipSession();
 		//set directive from popped route header if it is present			
-		Serializable stateInfo = null;
+		Serializable stateInfo = null;		
+		SipApplicationRouterInfo applicationRouterInfo = null;
 		//If request is received from an external SIP entity, directive is set to NEW. 
 		SipApplicationRoutingDirective sipApplicationRoutingDirective = SipApplicationRoutingDirective.NEW;
 		if(poppedRoute != null) {
@@ -137,9 +138,12 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				//If request is received from an application, and directive is CONTINUE or REVERSE, 
 				//stateInfo is set to that of the original request that this request is associated with. 
 				stateInfo = sipSessionImpl.getStateInfo();
+				applicationRouterInfo = sipSessionImpl.getNextSipApplicationRouterInfo();
+				sipSessionImpl.setNextSipApplicationRouterInfo(null);
 				sipServletRequest.setSipSession(sipSessionImpl);
 				if(logger.isDebugEnabled()) {
 					logger.debug("state info before the request has been routed back to container : " + stateInfo);
+					logger.debug("router info before the request has been routed back to container : " + applicationRouterInfo);
 				}
 			}
 		} else if(sipSessionImpl != null) {
@@ -252,14 +256,18 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		
 		//the application router shouldn't modify the request
 		sipServletRequest.setReadOnly(true);
-		
-		final SipApplicationRouterInfo applicationRouterInfo = 
-			sipApplicationRouter.getNextApplication(
-					sipServletRequest, 
-					routingRegion, 
-					sipApplicationRoutingDirective,
-					targetedRequestInfo,
-					stateInfo);
+		// if the router info is null, it means that the request comes from the external
+		if(applicationRouterInfo == null) {
+			applicationRouterInfo =  
+				sipApplicationRouter.getNextApplication(
+						sipServletRequest, 
+						routingRegion, 
+						sipApplicationRoutingDirective,
+						targetedRequestInfo,
+						stateInfo);
+		} else if (logger.isDebugEnabled()){
+			logger.debug("application name selected by the AR before re routing this request back to the conatiner " + applicationRouterInfo.getNextApplicationName());
+		}
 		
 		sipServletRequest.setReadOnly(false);
 		

@@ -22,12 +22,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.SipException;
@@ -156,4 +156,7 @@ public interface MobicentsSipSession extends SipSession {
 	void removeSubscription(SipServletMessageImpl sipServletMessage);
 	
 	MobicentsSipSessionFacade getSession();
+
+	void setNextSipApplicationRouterInfo(SipApplicationRouterInfo routerInfo);
+	SipApplicationRouterInfo getNextSipApplicationRouterInfo();
 }
