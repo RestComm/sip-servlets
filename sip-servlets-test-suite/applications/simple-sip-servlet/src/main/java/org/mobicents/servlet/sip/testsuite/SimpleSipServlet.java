@@ -190,6 +190,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		if(req.getFrom().getURI() instanceof SipURI) {
 			if(TEST_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
 				SipServletRequest reInvite = req.getSession(false).createRequest("INVITE");
+				
+				if(reInvite.getHeader("Contact").contains("0.0.0.0")) {
+					logger.error("Reinvite doesn't add correct address. We must not see 0.0.0.0 here");
+					return;
+				}
 				if(req.getSession(false) == reInvite.getSession(false)) {
 					reInvite.send();
 				} else {

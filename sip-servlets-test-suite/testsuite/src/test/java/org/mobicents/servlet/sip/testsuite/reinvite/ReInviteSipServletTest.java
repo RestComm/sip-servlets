@@ -68,6 +68,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	@Override
 	protected void setUp() {
 		try {
+			super.sipIpAddress="0.0.0.0";
 			super.setUp();						
 			
 			senderProtocolObjects =new ProtocolObjects(
