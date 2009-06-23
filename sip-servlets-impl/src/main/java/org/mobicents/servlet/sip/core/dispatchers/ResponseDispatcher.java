@@ -129,6 +129,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 				forwardResponseStatefully(sipServletResponse);
 				return ;
 			}
+			final String appId = viaHeader.getParameter(APP_ID);
+			if(appId == null) {
+				throw new DispatcherException("the via header " + viaHeader + " for the response is missing the appid parameter previsouly set by the container");
+			}
 			final String appNameHashed = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME);
 			if(appNameHashed == null) {
 				throw new DispatcherException("the via header " + viaHeader + " for the response is missing the appname parameter previsouly set by the container");
@@ -140,7 +144,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 			final SipContext sipContext = sipApplicationDispatcher.findSipApplication(appName);
 			final SipManager sipManager = (SipManager)sipContext.getManager();
-			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, inverted);
+			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appId, appName, response, inverted);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Trying to find session with following session key " + sessionKey);
 			}			
@@ -149,7 +153,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
 			//needed in the case of RE-INVITE by example
 			if(tmpSession == null) {
-				sessionKey = SessionManagerUtil.getSipSessionKey(appName, response, !inverted);
+				sessionKey = SessionManagerUtil.getSipSessionKey(appId, appName, response, !inverted);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Trying to find session with following session key " + sessionKey);
 				}

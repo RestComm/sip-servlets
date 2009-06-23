@@ -84,12 +84,16 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				//an app was found or an app was returned by the AR but not found
 				String handlerName = session.getHandler();
 				if(handlerName != null) { 
+					viaHeader.setParameter(APP_ID,
+							sipServletRequest.getSipSession().getSipApplicationSession().getKey().getId());
 					viaHeader.setParameter(RR_PARAM_APPLICATION_NAME,
 							sipApplicationDispatcher.getHashFromApplicationName(sipServletRequest.getSipSession().getKey().getApplicationName()));
 				} else {				
 					// if the handler name is null it means that the app returned by the AR was not deployed
 					// and couldn't be called, 
 					// we specify it so that on response handling this app can be skipped
+					viaHeader.setParameter(APP_ID,
+							sipServletRequest.getSipSession().getSipApplicationSession().getKey().getId());
 					viaHeader.setParameter(APP_NOT_DEPLOYED,
 							sipServletRequest.getSipSession().getKey().getApplicationName());					
 				}			

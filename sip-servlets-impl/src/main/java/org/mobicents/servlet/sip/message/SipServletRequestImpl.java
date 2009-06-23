@@ -893,7 +893,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					//add a route header to direct the request back to the container 
 					//to check if there is any other apps interested in it
-					addInfoForRoutingBackToContainer(session.getKey().getApplicationName());
+					addInfoForRoutingBackToContainer(session.getSipApplicationSession().getKey().getId(), session.getKey().getApplicationName());
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("routing outside the container " +
@@ -1036,7 +1036,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			final ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
-			
+			viaHeader.setParameter(MessageDispatcher.APP_ID,
+					session.getSipApplicationSession().getKey().getId());
 			//updating the last accessed times 
 			session.access();
 			session.getSipApplicationSession().access();
@@ -1071,7 +1072,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @throws SipException 
 	 * @throws NullPointerException 
 	 */
-	public void addInfoForRoutingBackToContainer(String applicationName) throws ParseException, SipException {		
+	public void addInfoForRoutingBackToContainer(String applicationSessionId, String applicationName) throws ParseException, SipException {		
 		final Request request = (Request) super.message;
 		final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -1081,6 +1082,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				routingDirective.toString());
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APPLICATION_NAME, 
 				applicationName);
+		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APP_ID, 
+				applicationSessionId);
 		final javax.sip.address.Address routeAddress = 
 			SipFactories.addressFactory.createAddress(sipURI);
 		final RouteHeader routeHeader = 

@@ -146,7 +146,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 		}
 		
-		SipSessionKey key = SessionManagerUtil.getSipSessionKey(applicationName, request, inverted);
+		SipSessionKey key = SessionManagerUtil.getSipSessionKey(sipApplicationSession.getKey().getId(), applicationName, request, inverted);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Trying to find the corresponding sip session with key " + key + " to this subsequent request " + request +
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
@@ -159,7 +159,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				logger.debug("Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
 						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ". Trying inverted.");
 			}
-			key = SessionManagerUtil.getSipSessionKey(applicationName, request, !inverted);
+			key = SessionManagerUtil.getSipSessionKey(sipApplicationSession.getKey().getId(), applicationName, request, !inverted);
 			tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		}
 		

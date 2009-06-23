@@ -477,12 +477,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			if(this.session == null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Tryin to create a new sip application session with key = " + key);
-				}
-				SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(currentApplicationName, message, false);
+				}				
 				SipContext sipContext = 
 					sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(currentApplicationName);				
 				MobicentsSipApplicationSession applicationSession = 
 					((SipManager)sipContext.getManager()).getSipApplicationSession(key, create);
+				SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(key.getId(), currentApplicationName, message, false);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Tryin to create a new sip session with key = " + sessionKey);
 				}
@@ -874,7 +874,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public SipSession getSession(boolean create) {
 		if (this.session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getApplicationSession(create);
-			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(currentApplicationName, message, false);
+			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
 			this.session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);
 			this.session.setSessionCreatingTransaction(transaction);

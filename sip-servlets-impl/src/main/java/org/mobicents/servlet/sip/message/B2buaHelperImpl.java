@@ -174,7 +174,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			
 			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), appSession.getKey().getId()));
 			
-			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
+			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 		
@@ -543,7 +543,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						
 			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
 			
-			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalSession.getKey().getApplicationName(), newRequest, false);
+			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			
 			session.setHandler(originalSession.getHandler());
 			

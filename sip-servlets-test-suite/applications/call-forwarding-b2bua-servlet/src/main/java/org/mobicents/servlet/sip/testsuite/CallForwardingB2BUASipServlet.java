@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
 
+	private static final String ACT_AS_UAS = "actAsUas";
 	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);
 	B2buaHelper helper = null;
 	Map<String, String[]> forwardingUris = null;
@@ -73,6 +74,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:forward-composition@127.0.0.1:5070", "sip:forward-composition@127.0.0.1:5070"});
 		forwardingUris.put("sip:sender@sip-servlets.com", 
 				new String[]{"sip:fromB2BUA@sip-servlets.com", "sip:fromB2BUA@127.0.0.1:5090"});
+		forwardingUris.put("sip:samesipsession@sip-servlets.com", 
+				new String[]{"sip:forward-samesipsession@127.0.0.1:5070", "sip:forward-samesipsession@127.0.0.1:5070"});
+		forwardingUris.put("sip:cancel-samesipsession@sip-servlets.com", 
+				new String[]{"sip:cancel-forward-samesipsession@127.0.0.1:5070", "sip:cancel-forward-samesipsession@127.0.0.1:5070"});
+		forwardingUris.put("sip:error-samesipsession@sip-servlets.com", 
+				new String[]{"sip:error-forward-samesipsession@127.0.0.1:5070", "sip:error-forward-samesipsession@127.0.0.1:5070"});
 	}
 	
 	@Override
@@ -99,6 +106,23 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info("Got INVITE: " + request.toString());
 		logger.info(request.getFrom().getURI().toString());
 		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
+		if(((SipURI)request.getTo().getURI()).getUser().contains("forward-samesipsession")) {
+			request.getSession().setAttribute(ACT_AS_UAS, Boolean.TRUE);
+			if(request.getSession().getAttribute("originalRequest") == null) {
+				if(((SipURI)request.getTo().getURI()).getUser().contains("cancel")) {
+					request.createResponse(SipServletResponse.SC_RINGING).send();
+				} else if(((SipURI)request.getTo().getURI()).getUser().contains("error")) {
+					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "expected error").send();
+				} else {
+					request.createResponse(SipServletResponse.SC_OK).send();
+				}
+			} else {
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "same sip session").send();
+			}
+			return ;
+		}
+		
+		
 		if(forwardingUri != null && forwardingUri.length > 0) {
 			helper = request.getB2buaHelper();						
 			
@@ -133,25 +157,29 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		//we send the OK directly to the first call leg
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
-		//we forward the BYE
-		SipSession session = request.getSession();		
-		SipSession linkedSession = helper.getLinkedSession(session);		
-		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
-		logger.info("forkedRequest = " + forkedRequest);			
-		forkedRequest.send();
+		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
+			//we forward the BYE
+			SipSession session = request.getSession();		
+			SipSession linkedSession = helper.getLinkedSession(session);		
+			SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
+			logger.info("forkedRequest = " + forkedRequest);			
+			forkedRequest.send();
+		}
 	}	
 	
 	@Override
 	protected void doCancel(SipServletRequest request) throws ServletException,
-			IOException {		
-		logger.info("Got CANCEL: " + request.toString());
-		SipSession session = request.getSession();
-		B2buaHelper b2buaHelper = request.getB2buaHelper();
-		SipSession linkedSession = b2buaHelper.getLinkedSession(session);
-		SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
-		SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
-		logger.info("forkedRequest = " + cancelRequest);			
-		cancelRequest.send();
+			IOException {
+		if(!((SipURI)request.getTo().getURI()).getUser().equals("cancel-forward-samesipsession")) {
+			logger.info("Got CANCEL: " + request.toString());
+			SipSession session = request.getSession();
+			B2buaHelper b2buaHelper = request.getB2buaHelper();
+			SipSession linkedSession = b2buaHelper.getLinkedSession(session);
+			SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
+			SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
+			logger.info("forkedRequest = " + cancelRequest);			
+			cancelRequest.send();
+		}
 	}
 	
 	@Override

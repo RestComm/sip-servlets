@@ -40,6 +40,7 @@ public class SipSessionKey implements Serializable {
 	String toTag;
 	String callId; 
 	String applicationName;
+	String applicationSessionId;
 	private String toString;
 	/**
 	 * @param fromAddress
@@ -47,10 +48,11 @@ public class SipSessionKey implements Serializable {
 	 * @param toAddress
 	 * @param toTag
 	 * @param callId
+	 * @param applicationSessionId
 	 * @param applicationName
 	 */
 	public SipSessionKey(String fromAddress, String fromTag, String toAddress,
-			String toTag, String callId, String applicationName) {
+			String toTag, String callId, String applicationSessionId, String applicationName) {
 		super();
 		this.fromAddress = fromAddress;
 		this.fromTag = fromTag;
@@ -58,6 +60,8 @@ public class SipSessionKey implements Serializable {
 		this.toTag = toTag;
 		this.callId = callId;
 		this.applicationName = applicationName;
+		this.applicationSessionId = applicationSessionId;
+		
 		StringBuffer value = new StringBuffer();
 		value = value.append("(");
 		value = value.append(fromAddress);
@@ -67,6 +71,8 @@ public class SipSessionKey implements Serializable {
 		value = value.append(toAddress);
 		value = value.append(",");
 		value = value.append(callId);
+		value = value.append(",");
+		value = value.append(applicationSessionId);
 		value = value.append(",");
 		value = value.append(applicationName);
 		value = value.append(")");
@@ -103,6 +109,12 @@ public class SipSessionKey implements Serializable {
 		return callId;
 	}
 	/**
+	 * @return the applicationSessionId
+	 */
+	public String getApplicationSessionId() {
+		return applicationSessionId;
+	}
+	/**
 	 * @return the applicationName
 	 */
 	public String getApplicationName() {
@@ -117,6 +129,8 @@ public class SipSessionKey implements Serializable {
 		int result = 1;
 		result = prime * result
 				+ ((applicationName == null) ? 0 : applicationName.hashCode());
+		result = prime * result
+				+ ((applicationSessionId == null) ? 0 : applicationSessionId.hashCode());
 		result = prime * result + ((callId == null) ? 0 : callId.hashCode());
 		result = prime * result
 				+ ((fromAddress == null) ? 0 : fromAddress.hashCode());
@@ -141,6 +155,11 @@ public class SipSessionKey implements Serializable {
 			if (other.applicationName != null)
 				return false;
 		} else if (!applicationName.equals(other.applicationName))
+			return false;
+		if (applicationSessionId == null) {
+			if (other.applicationSessionId != null)
+				return false;
+		} else if (!applicationSessionId.equals(other.applicationSessionId))
 			return false;
 		if (callId == null) {
 			if (other.callId != null)
@@ -174,6 +193,6 @@ public class SipSessionKey implements Serializable {
 	 */
 	public void setToTag(String toTag) {
 		this.toTag = toTag;
-	}
+	}	
 	
 }

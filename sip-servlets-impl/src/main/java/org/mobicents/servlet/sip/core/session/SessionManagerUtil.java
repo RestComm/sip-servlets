@@ -54,7 +54,7 @@ public class SessionManagerUtil {
 	 * @return the computed key 
 	 * @throws NullPointerException if application name is null
 	 */
-	public static SipSessionKey getSipSessionKey(final String applicationName, final Message message, boolean inverted) {		
+	public static SipSessionKey getSipSessionKey(final String applicationSessionId, final String applicationName, final Message message, boolean inverted) {		
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
@@ -72,6 +72,7 @@ public class SessionManagerUtil {
 					fromUri,
 					fromTag,
 					((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
+					applicationSessionId,
 					applicationName);
 		} else {
 			return new SipSessionKey(
@@ -80,6 +81,7 @@ public class SessionManagerUtil {
 				toUri,
 				toTag,
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
+				applicationSessionId,
 				applicationName);
 		}
 	}
@@ -157,8 +159,9 @@ public class SessionManagerUtil {
 		String fromTag = stringTokenizer.nextToken();
 		String toAddress = stringTokenizer.nextToken();
 		String callId = stringTokenizer.nextToken();
+		String applicationSessionId = stringTokenizer.nextToken();
 		String applicationName = stringTokenizer.nextToken();
 		
-		return new SipSessionKey(fromAddress, fromTag, toAddress, null, callId, applicationName);			
+		return new SipSessionKey(fromAddress, fromTag, toAddress, null, callId, applicationSessionId, applicationName);			
 	}
 }

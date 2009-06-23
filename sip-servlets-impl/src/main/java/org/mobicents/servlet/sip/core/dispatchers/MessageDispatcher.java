@@ -54,6 +54,8 @@ public abstract class MessageDispatcher {
 	public static final String ROUTE_PARAM_DIRECTIVE = "directive";
 	
 	public static final String ROUTE_PARAM_PREV_APPLICATION_NAME = "previousappname";
+	
+	public static final String ROUTE_PARAM_PREV_APP_ID = "previousappid";
 	/* 
 	 * This parameter is to know which app handled the request 
 	 */
@@ -220,7 +222,7 @@ public abstract class MessageDispatcher {
 			if(logger.isInfoEnabled()) {
 				logger.info("Dispatching request " + request.toString() + 
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
-					"/" + session.getHandler());
+					"/" + session.getHandler() + " on following sip session " + session.getId());
 			}
 			Servlet servlet = sipServletImpl.allocate();
 			// JBoss-specific CL issue:
@@ -278,7 +280,7 @@ public abstract class MessageDispatcher {
 			if(logger.isInfoEnabled()) {
 				logger.info("Dispatching response " + response.toString() + 
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
-					"/" + session.getHandler());
+					"/" + session.getHandler() + " on following sip session " + session.getId());
 			}
 			try {				
 				servlet.service(null, response);

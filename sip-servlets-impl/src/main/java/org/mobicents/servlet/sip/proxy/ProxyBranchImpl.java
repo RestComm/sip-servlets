@@ -498,6 +498,8 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		try {
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(request.getSipSession().getKey().getApplicationName()));
+			viaHeader.setParameter(MessageDispatcher.APP_ID,
+					request.getSipSession().getSipApplicationSession().getKey().getId());
 		} catch (ParseException pe) {
 			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", pe);
 		}

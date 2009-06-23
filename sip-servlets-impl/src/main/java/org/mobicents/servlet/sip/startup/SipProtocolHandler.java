@@ -71,6 +71,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  */
 public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
+	private static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
 	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";
 	private static final String IS_SIP_CONNECTOR = "isSipConnector";
@@ -289,8 +290,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 						sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
 							catalinaHome + "/" + serverLog);
 					}
-					// The whole MSS is built upon this assumption, so this property is not overrideable
+					// The whole MSS is built upon those assumptions, so those properties are not overrideable
 					sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
+					sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 					isPropsLoaded = true;
 				} else {
 					logger.warn("no sip stack properties file defined ");		

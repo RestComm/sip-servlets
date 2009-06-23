@@ -126,11 +126,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				sipApplicationRoutingDirective = SipApplicationRoutingDirective.valueOf(
 						SipApplicationRoutingDirective.class, directive);
 				String previousAppName = poppedAddress.getParameter(ROUTE_PARAM_PREV_APPLICATION_NAME);
+				String previousAppId = poppedAddress.getParameter(ROUTE_PARAM_PREV_APP_ID);
 				if(logger.isDebugEnabled()) {
 					logger.debug("application name before the request has been routed back to container : " + previousAppName);
+					logger.debug("application session id before the request has been routed back to container : " + previousAppId);
 				}
 				SipContext sipContext = sipApplicationDispatcher.findSipApplication(previousAppName);				
-				SipSessionKey sipSessionKey = SessionManagerUtil.getSipSessionKey(previousAppName, request, false);
+				SipSessionKey sipSessionKey = SessionManagerUtil.getSipSessionKey(previousAppId, previousAppName, request, false);
 				sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
 				//If request is received from an application, and directive is CONTINUE or REVERSE, 
 				//stateInfo is set to that of the original request that this request is associated with. 
@@ -352,7 +354,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//sip application session association
 		final MobicentsSipApplicationSession appSession = sipApplicationSession;
 		//sip session association
-		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(applicationRouterInfo.getNextApplicationName(), request, false);
+		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), applicationRouterInfo.getNextApplicationName(), request, false);
 		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
 		sipServletRequest.setSipSession(sipSessionImpl);
 

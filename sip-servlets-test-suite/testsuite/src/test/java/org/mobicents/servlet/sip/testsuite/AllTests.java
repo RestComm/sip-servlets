@@ -35,6 +35,7 @@ import org.mobicents.servlet.sip.testsuite.callcontroller.CallForwardingSipUnitT
 import org.mobicents.servlet.sip.testsuite.click2call.Click2CallBasicTest;
 import org.mobicents.servlet.sip.testsuite.composition.B2BUACompositionJunitTest;
 import org.mobicents.servlet.sip.testsuite.composition.NoApplicationDeployedJunitTest;
+import org.mobicents.servlet.sip.testsuite.composition.SameSipSessionB2BUACompositionJunitTest;
 import org.mobicents.servlet.sip.testsuite.composition.SpeedDialLocationServiceJunitTest;
 import org.mobicents.servlet.sip.testsuite.concurrency.ConcurrentyControlSipSessionIsolationTest;
 import org.mobicents.servlet.sip.testsuite.concurrency.CongestionControlTest;
@@ -105,6 +106,7 @@ public class AllTests {
 		suite.addTestSuite(CallControllerJunitTest.class);
 		suite.addTestSuite(CallControllerCancelTest.class);
 		suite.addTestSuite(B2BUACompositionJunitTest.class);
+		suite.addTestSuite(SameSipSessionB2BUACompositionJunitTest.class);
 		suite.addTestSuite(ProxyRecordRouteReInviteTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteTest.class);
 		suite.addTestSuite(ParallelProxyTelURLWithRecordRouteTest.class);

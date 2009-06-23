@@ -520,7 +520,7 @@ public class SipFactoryImpl implements Serializable {
 			fromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipApplicationDispatcher, sipAppSession.getApplicationName(), sipApplicationSessionKey.getId()));
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
-					mobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
+					mobicentsSipApplicationSession.getKey().getId(), mobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
 			MobicentsSipSession session = ((SipManager)mobicentsSipApplicationSession.getSipContext().getManager()).
 				getSipSession(key, true, this, mobicentsSipApplicationSession);
 			session.setHandler(handler);
