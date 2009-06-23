@@ -1026,8 +1026,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				toTag = null;
 			}
 			String callId = in.readUTF();
+			String applicationSessionId = in.readUTF();
 			String applicationName = in.readUTF();
-			key = new SipSessionKey(fromAddress,fromTag,toAddress, toTag, callId, applicationName);
+			key = new SipSessionKey(fromAddress,fromTag,toAddress, toTag, callId, applicationSessionId, applicationName);
 			if(logger.isDebugEnabled()) {
 				logger.debug("reading sip session from the cache. sip session key = " + key);
 			}
@@ -1155,6 +1156,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				out.writeUTF("");
 			}
 			out.writeUTF(key.getCallId());
+			out.writeUTF(key.getApplicationSessionId());
 			out.writeUTF(key.getApplicationName());
 			
 			out.writeUTF(sipApplicationSession.getKey().toString());
