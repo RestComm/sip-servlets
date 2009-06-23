@@ -57,6 +57,7 @@ import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.InvalidArgumentException;
+import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
@@ -64,6 +65,7 @@ import javax.sip.TransactionState;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Parameters;
@@ -90,6 +92,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
 /**
  * 
@@ -318,7 +321,32 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(this.sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
 			try {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
-				
+
+				if(methodRequest.getHeader(ContactHeader.NAME) != null) {
+					// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
+					// so that the subsequent requests can be failed over
+					try {
+						ContactHeader contactHeader = null;
+						if(sipFactory.isUseLoadBalancer()) {
+							BalancerDescription loadBalancerToUse = sipFactory.getLoadBalancerToUse();
+							javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI("", loadBalancerToUse.getAddress().getHostAddress());
+							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+							sipURI.setPort(loadBalancerToUse.getSipPort());	
+
+							// TODO: Is this enough or we must specify the transport somewhere?
+							sipURI.setTransportParam(ListeningPoint.UDP);
+							
+							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
+							contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
+						} else {
+							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "");
+						}
+						methodRequest.setHeader(contactHeader);
+					} catch (Exception e) {
+						logger.error("Can not create contact header for subsequent request", e);
+					}
+				}
+
 				//Issue 112 fix by folsson
 				methodRequest.removeHeader(ViaHeader.NAME);
 				
