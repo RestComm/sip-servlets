@@ -183,7 +183,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 		if(request.getMethod().equalsIgnoreCase("ACK")) {
 			if(sipSession.isAckReceived()) {
-				// Filter out ACK retransmissions as per changes in 
+				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
 				return;
 			}
