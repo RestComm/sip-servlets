@@ -902,12 +902,19 @@ public class TestSipListener implements SipListener {
 				st.sendResponse(response);
 				return;
 			}
+			
+			ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
+			if(contactHeader != null && "0.0.0.0".equals(((SipURI)contactHeader.getAddress().getURI()).getHost())) {
+				abortProcessing = true;
+				throw new IllegalArgumentException("we received a contact header with 0.0.0.0 in an INVITE !");
+			}
+			
 			if(!waitForCancel) {
 				Address address = protocolObjects.addressFactory
 				.createAddress("Shootme <sip:127.0.0.1:" + myPort
 						+";transport="+protocolObjects.transport
 						+ ">");
-				ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
+				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 				Response finalResponse = protocolObjects.messageFactory
 						.createResponse(finalResponseToSend, request);
 				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
@@ -1063,6 +1070,12 @@ public class TestSipListener implements SipListener {
 			abortProcessing = true;
 			throw new IllegalArgumentException("we received a record route header in a  response !");			
 		}
+		ContactHeader contactHeader = (ContactHeader)response.getHeader(ContactHeader.NAME);
+		if(contactHeader != null && "0.0.0.0".equals(((SipURI)contactHeader.getAddress().getURI()).getHost())) {
+			abortProcessing = true;
+			throw new IllegalArgumentException("we received a contact header with 0.0.0.0 in a response !");
+		}
+		
 		if(response.getStatusCode() >= 400 && response.getStatusCode() < 510) {
 			this.serverErrorReceived = true;
 		}
