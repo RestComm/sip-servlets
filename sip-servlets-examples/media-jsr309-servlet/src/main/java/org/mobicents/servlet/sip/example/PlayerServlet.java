@@ -79,10 +79,10 @@ public class PlayerServlet extends SipServlet {
 	 * In this case MGW and CA are on same local host
 	 */
 	public static final String LOCAL_ADDRESS = System.getProperty("jboss.bind.address", "127.0.0.1");
-	protected static final int CA_PORT = 2727;
+	protected static final String CA_PORT = "2727";
 
 	public static final String PEER_ADDRESS = System.getProperty("jboss.bind.address", "127.0.0.1");
-	protected static final int MGW_PORT = 2427;
+	protected static final String MGW_PORT = "2427";
 	
 	protected boolean isBye = false;
 
@@ -97,12 +97,12 @@ public class PlayerServlet extends SipServlet {
 		super.init(servletConfig);
 
 		Properties property = new Properties();
-		property.put(MGCP_STACK_NAME, "SipServlets");
-		property.put(MGCP_PEER_IP, PEER_ADDRESS);
-		property.put(MGCP_PEER_PORT, MGW_PORT);
+		property.setProperty(MGCP_STACK_NAME, "SipServlets");
+		property.setProperty(MGCP_PEER_IP, PEER_ADDRESS);
+		property.setProperty(MGCP_PEER_PORT, MGW_PORT);
 
-		property.put(MGCP_STACK_IP, LOCAL_ADDRESS);
-		property.put(MGCP_STACK_PORT, CA_PORT);
+		property.setProperty(MGCP_STACK_IP, LOCAL_ADDRESS);
+		property.setProperty(MGCP_STACK_PORT, CA_PORT);
 
 		try {
 			// create the Media Session Factory
