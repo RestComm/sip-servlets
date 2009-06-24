@@ -188,5 +188,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
         req.getProxy(true).proxyTo(req.getRequestURI());
     }
 	
+    @Override
+    protected void doCancel(SipServletRequest req) throws ServletException,
+    		IOException {
+    	logger.error("CANCEL seen at proxy " + req);
+    }
 
 }

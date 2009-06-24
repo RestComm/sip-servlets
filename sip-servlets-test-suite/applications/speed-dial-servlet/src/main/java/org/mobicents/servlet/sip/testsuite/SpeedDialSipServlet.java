@@ -163,6 +163,12 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 			}
 		}
 	}
+	
+	@Override
+	protected void doCancel(SipServletRequest req) throws ServletException,
+			IOException {
+		logger.error("CANCEL seen at proxy " + req);
+	}
 
 	// SipErrorListener methods
 	/**

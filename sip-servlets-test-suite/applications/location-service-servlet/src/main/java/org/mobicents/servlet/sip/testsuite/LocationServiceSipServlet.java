@@ -198,4 +198,10 @@ public class LocationServiceSipServlet extends SipServlet {
 		SipServletResponse resp = req.createResponse(response);
 		resp.send();
 	}
+	
+	@Override
+	protected void doCancel(SipServletRequest req) throws ServletException,
+			IOException {
+		logger.error("CANCEL seen at proxy " + req);
+	}
 }

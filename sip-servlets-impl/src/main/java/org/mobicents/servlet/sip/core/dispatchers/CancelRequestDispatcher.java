@@ -184,6 +184,15 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 						// otherwise, all branches are cancelled, and response processing continues as usual
 						proxy.cancel();
 					}
+					// Fix for Issue 796 : SIP servlet (simple proxy) does not receive "Cancel" requests. (http://code.google.com/p/mobicents/issues/detail?id=796)
+					// JSR 289 Section 10.2.6 Receiving CANCEL : In either case, the application is subsequently invoked with the CANCEL request
+					try{
+						callServlet(sipServletRequest);
+					} catch (ServletException e) {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
+					} catch (IOException e) {				
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
+					} 
 				} else if(RoutingState.FINAL_RESPONSE_SENT.equals(inviteRequest.getRoutingState())) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("the final response has already been sent, nothing to do here");
