@@ -85,4 +85,11 @@ public class MultiHomeUASTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
 	}
+	
+	@Override
+	protected void tearDown() throws Exception {	
+		senderProtocolObjects.destroy();
+		logger.info("Test completed");
+		super.tearDown();
+	}
 }

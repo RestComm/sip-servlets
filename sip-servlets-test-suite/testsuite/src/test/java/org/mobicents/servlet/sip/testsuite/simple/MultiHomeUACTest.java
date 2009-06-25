@@ -94,5 +94,12 @@ public class MultiHomeUACTest extends SipServletTestCase {
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
-	}		
+	}	
+	
+	@Override
+	protected void tearDown() throws Exception {	
+		receiverProtocolObjects.destroy();
+		logger.info("Test completed");
+		super.tearDown();
+	}
 }

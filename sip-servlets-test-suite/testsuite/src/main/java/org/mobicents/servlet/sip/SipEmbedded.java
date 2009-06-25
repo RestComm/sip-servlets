@@ -144,8 +144,8 @@ public class SipEmbedded {
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		sipService.setCongestionControlCheckingInterval(30000);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
-		sipService.setBypassRequestExecutor(true);
-		sipService.setBypassResponseExecutor(true);
+//		sipService.setBypassRequestExecutor(true);
+//		sipService.setBypassResponseExecutor(true);
 		// Create an engine		
 		SipStandardEngine engine = new SipStandardEngine();
 		engine.setName(serverName);
