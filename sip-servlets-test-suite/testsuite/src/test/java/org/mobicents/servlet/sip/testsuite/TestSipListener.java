@@ -928,10 +928,10 @@ public class TestSipListener implements SipListener {
 				return ;
 			}
 			
-			if(((SipUri)request.getRequestURI()).getUser().equalsIgnoreCase("join")) {
+			if(("join").equalsIgnoreCase(((SipUri)request.getRequestURI()).getUser())) {
 				sendJoinMessage = true;
 			}
-			if(((SipUri)request.getRequestURI()).getUser().equalsIgnoreCase("replaces")) {
+			if(("replaces").equalsIgnoreCase(((SipUri)request.getRequestURI()).getUser())) {
 				sendReplacesMessage = true;
 			}
 		} catch (Exception ex) {
