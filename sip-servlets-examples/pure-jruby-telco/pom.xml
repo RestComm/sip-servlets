@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip.example
+		</groupId>
+		<artifactId>sip-servlets-examples-parent
+		</artifactId>
+		<version>1.4-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<groupId>org.mobicents.servlet.sip.example
+	</groupId>
+	<artifactId>pure-jruby-telco</artifactId>
+	<packaging>jar</packaging>
+	<version>1.1-SNAPSHOT</version>
+	<name>JRuby Sip Servlet Demo Application</name>
+	<url>http://www.mobicents.org/mss-pure-jruby-telco.html
+	</url>
+
+	<dependencies>
+		<!-- media dependencies -->
+		<dependency>
+			<groupId>org.mobicents.external.jsr309
+			</groupId>
+			<artifactId>mscontrol</artifactId>
+			<version>0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mobicents.jsr-309</groupId>
+			<artifactId>mobicents-jsr309-impl</artifactId>
+			<version>2.0.0.BETA1</version>
+			<!-- scope>runtime</scope -->
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin
+				</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/lib/java</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
