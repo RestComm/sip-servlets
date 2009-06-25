@@ -37,6 +37,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -280,7 +281,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	
 			}
 		};
-		getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);
+		// if the flag is set we bypass the executor 
+		if(sipApplicationDispatcher.isBypassRequestExecutor()) {
+			dispatchTask.dispatchAndHandleExceptions();
+		} else {
+			getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);
+		}
 	}	
 
 }

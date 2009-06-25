@@ -56,6 +56,7 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -428,7 +429,12 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			}
 			
 		};
-		getConcurrencyModelExecutorService(sipContext, sipServletRequest).execute(dispatchTask);
+		// if the flag is set we bypass the executor 
+		if(sipApplicationDispatcher.isBypassRequestExecutor()) {
+			dispatchTask.dispatchAndHandleExceptions();
+		} else {
+			getConcurrencyModelExecutorService(sipContext, sipServletRequest).execute(dispatchTask);
+		}
 
 	}
 

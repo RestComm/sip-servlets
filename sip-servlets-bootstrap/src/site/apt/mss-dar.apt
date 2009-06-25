@@ -32,7 +32,7 @@ Default Application Router
 		* The properties file MUST be made available to the DAR and the location/content of this file
 	 	MUST be accessible from a hierarchical URI which itself is to be supplied as a system property "javax.servlet.sip.ar.dar.configuration".\
 	 	In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file 
-	 	(See the {{{./configuration.html}Configuration Section}} for more details) or the (See the {{{./sip-servlets-managment.html}sip servlets managment console}}
+	 	(See the {{{./configuration.html}Configuration Section}} for more details) or the (See the {{{./sip-servlets-managment.htm}sip servlets managment console}}
 	 
 		* The properties file is first read by the container when it loads up.
 	

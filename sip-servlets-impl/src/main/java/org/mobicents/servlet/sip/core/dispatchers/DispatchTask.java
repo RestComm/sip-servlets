@@ -47,6 +47,10 @@ public abstract class DispatchTask implements Runnable {
 	abstract public void dispatch() throws DispatcherException;
 
 	public void run() {
+		dispatchAndHandleExceptions();
+	}
+
+	public void dispatchAndHandleExceptions () {
 		try {
 			dispatch();
 		} catch (Throwable t) {
@@ -59,9 +63,7 @@ public abstract class DispatchTask implements Runnable {
 					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 				}
 			}
-
-		}
-
+		}		
 	}
-
+	
 }

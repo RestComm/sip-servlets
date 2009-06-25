@@ -1003,6 +1003,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 				if(sipSession != null) {
 					sipSession.getSemaphore().acquireUninterruptibly();
+					if(logger.isDebugEnabled()) {
+						logger.debug("response " + response + " acquired the semaphore for sip session " + sipSession);
+					}
 				}
 				break;
 			case SipApplicationSession:
@@ -1014,6 +1017,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 				if(sipApplicationSession != null) {
 					sipApplicationSession.getSemaphore().acquireUninterruptibly();
+					if(logger.isDebugEnabled()) {
+						logger.debug("response " + response + " acquired the semaphore for sip application session " + sipApplicationSession);
+					}
 				}
 				break;
 			case None:
@@ -1039,6 +1045,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 				if(sipSession != null && sipSession.getSemaphore() != null) {
 					sipSession.getSemaphore().release();
+					if(logger.isDebugEnabled()) {
+						logger.debug("response " + response + " released the semaphore for sip session " + sipSession);
+					}
 				}
 				break;
 			case SipApplicationSession:
@@ -1050,6 +1059,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 				if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
 					sipApplicationSession.getSemaphore().release();
+					if(logger.isDebugEnabled()) {
+						logger.debug("response " + response + " released the semaphore for sip application session " + sipApplicationSession);
+					}
 				}
 				break;
 			case None:
@@ -1084,6 +1096,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
 		this.concurrencyControlMode = mode;
+		if(logger.isInfoEnabled()) {
+			logger.info("Concurrency Control set to " + concurrencyControlMode.toString() + " for application " + applicationName);
+		}
 	}
  
 	public SipRubyController getSipRubyController() {

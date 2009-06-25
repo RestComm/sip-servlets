@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.core;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.sip.SipURI;
@@ -180,4 +179,10 @@ public interface SipApplicationDispatcher extends SipListener {
 	
 	public int getNumberOfMessagesInQueue();
 	public double getPercentageOfMemoryUsed();
+	
+	public void setBypassRequestExecutor(boolean bypassRequestExecutor);
+	public boolean isBypassRequestExecutor();
+
+	public void setBypassResponseExecutor(boolean bypassResponseExecutor);
+	public boolean isBypassResponseExecutor();
 }

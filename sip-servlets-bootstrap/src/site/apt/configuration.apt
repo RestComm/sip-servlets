@@ -76,6 +76,8 @@ Configuration
   	<<<className="org.mobicents.servlet.sip.startup.SipStandardService">>>\
   	<<<sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">>>\
   	<<<additionalParameterableHeaders="header1,Header2">>>\
+  	<<<bypassResponseExecutor="false">>>\
+  	<<<bypassRequestExecutor="false">>>\
   	<<<darConfigurationFileLocation="file:///home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/call-blocking-demo/call-blocking-servlet-dar.properties">>>>
   	
   	Here is a description of the sip Service tag's attributes :
@@ -87,6 +89,11 @@ Configuration
   	* <<<darConfigurationFileLocation>>> : The default application router file location. Used by our default application router to know the application selection logic. Check JSR 289 Spec Appendix C.
   	
   	* <<<additionalParameterableHeaders>>> : A comma-separated list of header names that are treated as Parameterable by the container. For these headers setting and getting parameters is allowed, others will result in ServletParseExcpetion. There are a number of standard headers that are already Parameterable, you generally don't have to include them here.
+  	
+  	* <<<bypassResponseExecutor/bypassRequestExecutor>>> : Since Mobicents Sip Servlets uses a ThreadPoolExecutor backed by a LinkedBlockingQueue to dispatch the requests/responses.\
+  	There could be a race condition where two different threads can handle two responses(180 Ringing/200 OK) at the same time, one taking over the other.(200 OK dispatched to the app before the ringing)
+  	So those flags (false by default) allow not to use the Executors thus using jain sip serializing per transaction to ensure such race conditions don't occur. 
+  	Note that one could use the {{{./concurrency.html}concurrency control mechanisms}} to avoid that as well   
   	
   	
 * Logging

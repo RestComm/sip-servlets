@@ -161,7 +161,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	private AtomicLong responsesProcessed = new AtomicLong(0);
 	
-	private boolean rejectRequests = false;
+	private boolean rejectSipMessages = false;
+	
+	private boolean bypassResponseExecutor = false;
+	private boolean bypassRequestExecutor = false;
 	
 	private boolean memoryToHigh = false;	
 	
@@ -258,6 +261,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
             } catch (Exception e) {
                 logger.error("Impossible to register the Sip Application dispatcher in domain" + domain, e);
             }
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("bypassRequestExecutor ? " + bypassRequestExecutor);
+			logger.info("bypassResponseExecutor ? " + bypassResponseExecutor);
 		}
 	}
 	/**
@@ -436,15 +443,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	private void analyzeQueueCongestionState() {
 		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
-		if(rejectRequests) {
+		if(rejectSipMessages) {
 			if(numberOfMessagesInQueue<queueSize) {
 				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the queue Size : " + queueSize + " => stopping to reject requests");
-				rejectRequests = false;
+				rejectSipMessages = false;
 			}
 		} else {
 			if(numberOfMessagesInQueue>queueSize) {
 				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize + " => starting to reject requests");
-				rejectRequests = true;
+				rejectSipMessages = true;
 			}
 		}
 	}
@@ -476,7 +483,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
 	public void processRequest(RequestEvent requestEvent) {
-		if((rejectRequests || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
+		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
 			logger.error("dropping request, memory is too high or too many messages present in queues");
 			return;
 		}	
@@ -566,7 +573,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			
 			try {
-				if(rejectRequests || memoryToHigh) {
+				if(rejectSipMessages || memoryToHigh) {
 					if(!Request.ACK.equals(request.getMethod()) && !Request.PRACK.equals(request.getMethod())) {
 						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 					}
@@ -603,7 +610,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
-		if((rejectRequests || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
+		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
 			logger.error("dropping response, memory is too high or too many messages present in queues");
 			return;
 		}
@@ -1183,6 +1190,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode) {
 		this.concurrencyControlMode = concurrencyControlMode;
+		if(logger.isInfoEnabled()) {
+			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode.toString());
+		}
 	}
 
 	public int getQueueSize() {
@@ -1286,5 +1296,33 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public double getPercentageOfMemoryUsed() {
 		return percentageOfMemoryUsed;
+	}
+
+	/**
+	 * @param bypassRequestExecutor the bypassRequestExecutor to set
+	 */
+	public void setBypassRequestExecutor(boolean bypassRequestExecutor) {
+		this.bypassRequestExecutor = bypassRequestExecutor;
+	}
+
+	/**
+	 * @return the bypassRequestExecutor
+	 */
+	public boolean isBypassRequestExecutor() {
+		return bypassRequestExecutor;
+	}
+
+	/**
+	 * @param bypassResponseExecutor the bypassResponseExecutor to set
+	 */
+	public void setBypassResponseExecutor(boolean bypassResponseExecutor) {
+		this.bypassResponseExecutor = bypassResponseExecutor;
+	}
+
+	/**
+	 * @return the bypassResponseExecutor
+	 */
+	public boolean isBypassResponseExecutor() {
+		return bypassResponseExecutor;
 	}
 }

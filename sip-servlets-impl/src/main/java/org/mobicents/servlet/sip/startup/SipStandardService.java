@@ -65,6 +65,8 @@ public class SipStandardService extends StandardService implements SipService {
 	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
 	protected String additionalParameterableHeaders;
+	protected boolean bypassResponseExecutor;
+	protected boolean bypassRequestExecutor;
 	//the sip application router class name defined in the server.xml
 //	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
@@ -135,7 +137,8 @@ public class SipStandardService extends StandardService implements SipService {
 		sipApplicationDispatcher.setCongestionControlPolicyByName(getCongestionControlPolicy());
 		sipApplicationDispatcher.setQueueSize(getSipMessageQueueSize());
 		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));
-
+		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
+		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);
 		sipApplicationDispatcher.init();
 	}
 	
@@ -369,6 +372,38 @@ public class SipStandardService extends StandardService implements SipService {
 				JainSipUtils.parameterableHeadersNames.add(header);
 			}
 		}
+	}
+
+
+	/**
+	 * @return the bypassResponseExecutor
+	 */
+	public boolean isBypassResponseExecutor() {
+		return bypassResponseExecutor;
+	}
+
+
+	/**
+	 * @param bypassResponseExecutor the bypassResponseExecutor to set
+	 */
+	public void setBypassResponseExecutor(boolean bypassResponseExecutor) {
+		this.bypassResponseExecutor = bypassResponseExecutor;
+	}
+
+
+	/**
+	 * @return the bypassRequestExecutor
+	 */
+	public boolean isBypassRequestExecutor() {
+		return bypassRequestExecutor;
+	}
+
+
+	/**
+	 * @param bypassRequestExecutor the bypassRequestExecutor to set
+	 */
+	public void setBypassRequestExecutor(boolean bypassRequestExecutor) {
+		this.bypassRequestExecutor = bypassRequestExecutor;
 	}
 
 }
