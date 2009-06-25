@@ -135,7 +135,9 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
     	//cleaning 
 //    	balancerNames.clear();
     	register.clear();
-    	this.hearBeatTaskToRun.cancel();
+    	if(hearBeatTaskToRun != null) {
+    		this.hearBeatTaskToRun.cancel();
+    	}
 		this.hearBeatTaskToRun = null;
 		started = false;
     	super.stop();    	
