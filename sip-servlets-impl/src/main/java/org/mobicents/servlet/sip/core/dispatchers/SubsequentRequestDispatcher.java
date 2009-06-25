@@ -189,7 +189,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipSession.setAckReceived(true);
 		}
 		
-		//CSeq validation should only be done for proxies
+		//CSeq validation should only be done for non proxy applications
 		if(sipSession.getProxy() == null) {
 			CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
 			long localCseq = sipSession.getCseq();
