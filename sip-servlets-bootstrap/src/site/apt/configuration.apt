@@ -92,8 +92,7 @@ Configuration
   	
   	* <<<bypassResponseExecutor/bypassRequestExecutor>>> : Since Mobicents Sip Servlets uses a ThreadPoolExecutor backed by a LinkedBlockingQueue to dispatch the requests/responses.\
   	There could be a race condition where two different threads can handle two responses(180 Ringing/200 OK) at the same time, one taking over the other.(200 OK dispatched to the app before the ringing)
-  	So those flags (false by default) allow not to use the Executors thus using jain sip serializing per transaction to ensure such race conditions don't occur. 
-  	Note that one could use the {{{./concurrency.html}concurrency control mechanisms}} to avoid that as well   
+  	So those flags (false by default) allow not to use the Executors thus using jain sip serializing per transaction to ensure such race conditions don't occur.   	   
   	
   	
 * Logging
