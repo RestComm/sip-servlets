@@ -415,15 +415,21 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 * 
 	 * @param request
 	 */
-	public void proxySubsequentRequest(SipServletRequestImpl request) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Proxying subsequent request " + request);
-		}
+	public void proxySubsequentRequest(SipServletRequestImpl request) {		
 		
 		// A re-INVITE needs special handling without goind through the dialog-stateful methods
 		if(request.getMethod().equalsIgnoreCase("INVITE")) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Proxying reinvite request " + request);
+			}
+			// reset the ack received flag for reINVITE
+			request.getSipSession().setAckReceived(false);
 			proxyDialogStateless(request);
 			return;
+		}
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Proxying subsequent request " + request);
 		}
 		
 		// Update the last proxied request

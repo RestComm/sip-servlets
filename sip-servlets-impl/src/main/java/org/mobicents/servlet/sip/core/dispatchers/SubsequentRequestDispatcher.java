@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
-import gov.nist.javax.sip.header.CSeq;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
@@ -190,21 +189,23 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			sipSession.setAckReceived(true);
 		}
 		
-		CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
-		long localCseq = sipSession.getCseq();
-		long remoteCseq = cseq.getSeqNumber();
-		
-		if(localCseq>remoteCseq) {
-			logger.error("CSeq out of order for the following request");
-			SipServletResponse response = sipServletRequest.createResponse(500, "CSeq out of order");
-			try {
-				response.send();
-			} catch (IOException e) {
-				logger.error("Can not send error response", e);
+		//CSeq validation should only be done for proxies
+		if(sipSession.getProxy() == null) {
+			CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
+			long localCseq = sipSession.getCseq();
+			long remoteCseq = cseq.getSeqNumber();
+			
+			if(localCseq>remoteCseq) {
+				logger.error("CSeq out of order for the following request");
+				SipServletResponse response = sipServletRequest.createResponse(500, "CSeq out of order");
+				try {
+					response.send();
+				} catch (IOException e) {
+					logger.error("Can not send error response", e);
+				}
 			}
-		}
-		
-		sipSession.setCseq(remoteCseq);
+			sipSession.setCseq(remoteCseq);
+		}				
 		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
 		
 		
