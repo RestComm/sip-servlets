@@ -978,13 +978,7 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=703">
 						Move from JBoss Rails to the new TorqueBox
 						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=704">
-						NIO and lazy parsing in jain sip
-						</a>
-						<br />						
+						<br />										
 						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes
 						<ul>
@@ -1114,11 +1108,59 @@
 									SipServletRequest.getSubscriberURI returns null in @SipApplicationKey method
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=755">
+									SipURI parameters not escaped
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=766">
+									Loosen JSIP dialog usage in Proxy-B2BUA application routing case
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=787">
+									Allow configurable Parameterable headers
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=790">
+									1 SipSession should not be used in 2 different app session
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=791">
+									MSS is calling the AR 2 times when routing an INVITE back to the container
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=796">
+									SIP servlet (simple proxy) does not receive "Cancel" requests.
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
 				<subsection name="Post 1.0 - No defined date">
 					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=704">
+						NIO and lazy parsing in jain sip
+						</a>
+						<br />	
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=627">
