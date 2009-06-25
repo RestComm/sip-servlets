@@ -78,8 +78,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public BasicFailoverTest(String name) {
 		super(name);
-		autoDeployOnStartup = false;
-		startTomcatOnStartup = false;
+		createTomcatOnStartup = false;
 	}
 
 	@Override
@@ -192,24 +191,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFile(), tomcatBasePath, 5070);
 		deployApplication(tomcat);		
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFile());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFile(), getTomcatBackupHomePath(), 5071);
 		deployApplication(secondTomcatServer);		
 		//first test
 		Thread.sleep(TIMEOUT);
@@ -237,7 +222,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());
 		sender.setOkToByeReceived(false);
 		secondTomcatServer.stopTomcat();
-	}
+	}	
 	
 	public void testBasicFailoverUAC() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
@@ -250,24 +235,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFileShootist());
-		tomcat.startTomcat();			
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFileShootist(), tomcatBasePath, 5070);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileShootist());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileShootist(), getTomcatBackupHomePath(), 5071);
 		//first test
 		Thread.sleep(TIMEOUT);
 		deployShootistApplication(tomcat, false);
@@ -293,24 +263,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFileShootist());
-		tomcat.startTomcat();			
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFileShootist(), tomcatBasePath, 5070);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileShootist());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileShootist(), getTomcatBackupHomePath(), 5071);		
 		//first test
 		Thread.sleep(TIMEOUT);
 		deployShootistApplication(tomcat, false);
@@ -336,24 +291,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFileShootist());
-		tomcat.startTomcat();			
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFileShootist(), tomcatBasePath, 5070);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileShootist());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileShootist(), getTomcatBackupHomePath(), 5071);
 		//first test
 		Thread.sleep(TIMEOUT);
 		deployShootistApplication(tomcat, true);
@@ -379,24 +319,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFile());
-		tomcat.startTomcat();			
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFile(), tomcatBasePath, 5070);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFile());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFile(), getTomcatBackupHomePath(), 5071);
 		//first test
 		Thread.sleep(TIMEOUT);
 		deployApplication(tomcat);
@@ -431,24 +356,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.startTomcat();
-		deployApplication(tomcat);		
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFile(), tomcatBasePath, 5070);
+		deployApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFile());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFile(), getTomcatBackupHomePath(), 5071);
 		deployApplication(secondTomcatServer);		
 		//first test
 		Thread.sleep(TIMEOUT);
@@ -501,27 +412,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getLocationServiceDarConfigurationFile(), tomcatBasePath, 5070);
 		deployLocationServiceApplication(tomcat);
 		deploySpeedDialApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getLocationServiceDarConfigurationFile(), getTomcatBackupHomePath(), 5071);
 		deployLocationServiceApplication(secondTomcatServer);
 		deploySpeedDialApplication(secondTomcatServer);
 		//first test
@@ -574,27 +469,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getLocationServiceDarConfigurationFile(), tomcatBasePath, 5070);
 		deployLocationServiceApplication(tomcat);
 		deploySpeedDialApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getLocationServiceDarConfigurationFile(), getTomcatBackupHomePath(), 5071);
 		deployLocationServiceApplication(secondTomcatServer);
 		deploySpeedDialApplication(secondTomcatServer);
 		//first test
@@ -648,27 +527,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getLocationServiceDarConfigurationFile(), tomcatBasePath, 5070);
 		deployLocationServiceApplication(tomcat);
 		deploySpeedDialApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getLocationServiceDarConfigurationFile());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getLocationServiceDarConfigurationFile(), getTomcatBackupHomePath(), 5071);
 		deployLocationServiceApplication(secondTomcatServer);
 		deploySpeedDialApplication(secondTomcatServer);
 		//first test
@@ -723,26 +586,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFileCallForwarding(), tomcatBasePath, 5070);
 		deployCallForwardingApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileCallForwarding(), getTomcatBackupHomePath(), 5071);
 		deployCallForwardingApplication(secondTomcatServer);
 		//first test
 		Thread.sleep(TIMEOUT);
@@ -794,26 +641,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFileCallForwarding(), tomcatBasePath, 5070);
 		deployCallForwardingApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileCallForwarding(), getTomcatBackupHomePath(), 5071);
 		deployCallForwardingApplication(secondTomcatServer);
 		//first test
 		Thread.sleep(TIMEOUT);
@@ -865,26 +696,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 		//start the sip balancer
 		startSipBalancer();				
 		//starts the first server
-		((SipStandardBalancerNodeService)tomcat.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		tomcat.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
-		tomcat.initTomcat(tomcatBasePath);
-		tomcat.startTomcat();
+		tomcat = setupAndStartTomcat(serverName, getDarConfigurationFileCallForwarding(), tomcatBasePath, 5070);
 		deployCallForwardingApplication(tomcat);
 		//starts the second server
-		secondTomcatServer = new SipEmbedded(SECOND_SERVER_NAME, SIP_SERVICE_CLASS_NAME);
-		secondTomcatServer.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + secondTomcatServer.getLoggingFilePath());
-		secondTomcatServer.setDarConfigurationFilePath(getDarConfigurationFileCallForwarding());
-		getTomcatBackupHomePath();
-		secondTomcatServer.initTomcat(getTomcatBackupHomePath());						
-		secondTomcatServer.addSipConnector(SECOND_SERVER_NAME, sipIpAddress, 5071, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)secondTomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
-		secondTomcatServer.startTomcat();
+		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileCallForwarding(), getTomcatBackupHomePath(), 5071);
 		deployCallForwardingApplication(secondTomcatServer);
 		//first test
 		Thread.sleep(TIMEOUT);
@@ -947,6 +762,27 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isErrorResponseReceived());
 	}
 
+	/**
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private SipEmbedded setupAndStartTomcat(String serverName, String darConfigurationFile, String specificTomcatBasePath, int sipConnectorPort) throws IOException, Exception {
+		SipEmbedded tomcatServer = new SipEmbedded(serverName, SIP_SERVICE_CLASS_NAME);
+		tomcatServer.setLoggingFilePath(  
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + tomcatServer.getLoggingFilePath());
+		tomcatServer.setDarConfigurationFilePath(darConfigurationFile);		
+		tomcatServer.initTomcat(specificTomcatBasePath);						
+		tomcatServer.addSipConnector(serverName, sipIpAddress, sipConnectorPort, ListeningPoint.UDP);
+		((SipStandardBalancerNodeService)tomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		tomcatServer.startTomcat();
+		return tomcatServer;
+	}
+	
 	private String getTomcatBackupHomePath() throws IOException {
 		//Reading properties
 		Properties properties = new Properties();
@@ -1020,6 +856,12 @@ public class BasicFailoverTest extends SipServletTestCase {
 		}		
 		if(receiverProtocolObjects != null) {
 			receiverProtocolObjects.destroy();
+		}
+		if(tomcat != null) {
+			tomcat.stopTomcat();
+		}
+		if(secondTomcatServer != null) {
+			secondTomcatServer.stopTomcat();
 		}
 //		super.tearDown();
 	}

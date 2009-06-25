@@ -27,6 +27,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -143,6 +144,8 @@ public class SipEmbedded {
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		sipService.setCongestionControlCheckingInterval(30000);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
+		sipService.setBypassRequestExecutor(true);
+		sipService.setBypassResponseExecutor(true);
 		// Create an engine		
 		SipStandardEngine engine = new SipStandardEngine();
 		engine.setName(serverName);
@@ -227,10 +230,14 @@ public class SipEmbedded {
 	/**
 	 * This method Stops the Tomcat server.
 	 */
-	public void stopTomcat() throws Exception {
+	public void stopTomcat() {
 		// Stop the embedded server
 		if(sipService != null) {
-			sipService.stop();		
+			try {
+				sipService.stop();
+			} catch (LifecycleException e) {
+				e.printStackTrace();
+			}		
 		}
 	}
 
