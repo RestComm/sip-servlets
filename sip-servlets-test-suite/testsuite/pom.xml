@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
 			<artifactId>sip-balancer</artifactId>
-			<version>1.0.BETA5</version>
+			<version>1.0.BETA6</version>
 		</dependency>
 	</dependencies>
 	<build>
