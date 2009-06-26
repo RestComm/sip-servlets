@@ -132,11 +132,6 @@ public class PlayerServlet extends SipServlet {
 		SipSession sipSession = request.getSession();
 
 		try {
-			String user = request.getFrom().getDisplayName();
-			if (user == null && request.getFrom().getURI() instanceof SipURI) {
-				user = ((SipURI) request.getFrom().getURI()).getUser();
-			}
-
 			// Create new media session and store in SipSession
 			MediaSessionImpl mediaSession = (MediaSessionImpl) msControlFactory
 					.createMediaSession();
@@ -163,24 +158,6 @@ public class PlayerServlet extends SipServlet {
 					.send();
 		}
 
-	}
-
-	private static String getBasename(String path) {
-		int index = path.lastIndexOf(".");
-		if (index == -1) {
-			return path;
-		} else {
-			return path.substring(0, index);
-		}
-	}
-
-	private static String getExtension(String path) {
-		int index = path.lastIndexOf(".");
-		if (index == -1) {
-			return null;
-		} else {
-			return path.substring(index + 1);
-		}
 	}
 
 	protected void terminate(SipSession sipSession, MediaSession mediaSession) {
