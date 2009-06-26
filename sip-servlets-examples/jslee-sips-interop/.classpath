@@ -25,8 +25,8 @@
 	<classpathentry kind="var" path="M2_REPO/javax/slee/jain-slee/1.0/jain-slee-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee_1.4_spec/1.1/geronimo-j2ee_1.4_spec-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/resources/tts-ratype/1.2.2.GA/tts-ratype-1.2.2.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.1.GA/mobicents-media-server-constants-1.0.1.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.1.GA/mobicents-media-server-msc-api-1.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.2.GA/mobicents-media-server-constants-1.0.2.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.2.GA/mobicents-media-server-msc-api-1.0.2.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/controllers/msc-ratype/1.0.1.GA/msc-ratype-1.0.1.GA.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

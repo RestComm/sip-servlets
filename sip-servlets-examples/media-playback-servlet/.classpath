@@ -8,7 +8,7 @@
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.9-SNAPSHOT/sip-servlets-spec-1.1.9-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.1.GA/mobicents-media-server-constants-1.0.1.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.1.GA/mobicents-media-server-msc-api-1.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.2.GA/mobicents-media-server-constants-1.0.2.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.2.GA/mobicents-media-server-msc-api-1.0.2.GA.jar"/>
 	<classpathentry kind="output" path="src/main/sipapp/WEB-INF/classes"/>
 </classpath>
