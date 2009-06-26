@@ -1150,6 +1150,13 @@
 									SIP servlet (simple proxy) does not receive "Cancel" requests.
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=797">
+									Race Condition on 180/200 in MSS	
+								</a>								
+							</li>							
 						</ul>
 					</p>
 				</subsection>
