@@ -1,8 +1,5 @@
+require 'java'
 require 'singleton'
-
-import java.lang.System
-import java.util.Properties
-import javax.media.mscontrol.spi.DriverManager
 
 module MediaHelper
 
@@ -21,10 +18,10 @@ module MediaHelper
 	# Property key for the port where MGW MGCP Stack is bound
 	MGCP_PEER_PORT = "mgcp.stack.peer.port"
 
-	LOCAL_ADDRESS = System.getProperty("jboss.bind.address", "127.0.0.1")
+	LOCAL_ADDRESS = java.lang.System.get_property("jboss.bind.address", "127.0.0.1")
 	CA_PORT = "2727"
 
-	PEER_ADDRESS = System.getProperty("jboss.bind.address", "127.0.0.1")
+	PEER_ADDRESS = java.lang.System.get_property("jboss.bind.address", "127.0.0.1")
 	MGW_PORT = "2427"
 
 	STACK_NAME = "SipServlets"
@@ -35,7 +32,7 @@ module MediaHelper
 		attr_accessor :msControlFactory
 	
 		def initialize			
-			@properties = Properties.new
+			@properties = java.util.Properties.new
 			@properties.set_property(MGCP_STACK_NAME, STACK_NAME)
 			@properties.set_property(MGCP_PEER_IP, PEER_ADDRESS)
 			@properties.set_property(MGCP_PEER_PORT, MGW_PORT)
@@ -43,7 +40,7 @@ module MediaHelper
 			@properties.set_property(MGCP_STACK_IP, LOCAL_ADDRESS)
 			@properties.set_property(MGCP_STACK_PORT, CA_PORT)
 			
-      drivers = DriverManager.get_drivers
+      drivers = javax.media.mscontrol.spi.DriverManager.get_drivers
       puts @properties
       if drivers.has_next
         @msControlFactory = drivers.next.get_factory(@properties)        

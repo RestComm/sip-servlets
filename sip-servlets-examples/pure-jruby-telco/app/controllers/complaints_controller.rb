@@ -1,9 +1,6 @@
+require 'java' 
 require 'media_helper'
 require 'network_connection_listener'
-
-import javax.media.mscontrol.networkconnection.NetworkConnectionConfig
-import javax.media.mscontrol.networkconnection.NetworkConnection
-import javax.media.mscontrol.MsControlException
 
 class ComplaintsController < ApplicationController
   # GET /complaints
@@ -58,27 +55,27 @@ class ComplaintsController < ApplicationController
 	
 	#MediaHelper
 	mgcp_stack = MediaHelper::MgcpStack.instance
-  media_session = mgcp_stack.create_media_session
-  if media_session == nil
-    puts "Impossible to get create the media session to initialize the RTP connection"    
-  else
-    puts media_session
-    
-    sip_session = sip_request.get_session
-    sip_session.set_attribute("MEDIA_SESSION", media_session)
-    media_session.set_attribute("SIP_SESSION", sip_session)
-    sip_session.set_attribute("INVITE", request)
-    
-    # Create a new NetworkConnection to handle RTP and attaching a new listener to it to know when it is created to update
-    # the sip request SDP and send it
-    connection = media_session.create_network_connection(NetworkConnectionConfig.c_Basic)
-    network_connection_listener = NetworkConnectionListener.new
-    connection.add_listener(network_connection_listener)
-    # asking to modify the connection with the received sdp : the listener will get 
-    # the event notifying it that the connection is ready or not with the corresponding SDP
-    # that will be used to send the 200 response
-    connection.modify(NetworkConnection.UNKNOWN_YET, nil)
-  end
+	  media_session = mgcp_stack.create_media_session
+	  if media_session == nil
+	    puts "Impossible to get create the media session to initialize the RTP connection"    
+	  else
+	    puts media_session
+	    
+	    sip_session = sip_request.get_session
+	    sip_session.set_attribute("MEDIA_SESSION", media_session)
+	    media_session.set_attribute("SIP_SESSION", sip_session)
+	    sip_session.set_attribute("INVITE", request)
+	    
+	    # Create a new NetworkConnection to handle RTP and attaching a new listener to it to know when it is created to update
+	    # the sip request SDP and send it
+	    connection = media_session.create_network_connection(javax.media.mscontrol.networkconnection.NetworkConnectionConfig.c_Basic)
+	    network_connection_listener = NetworkConnectionListener.new
+	    connection.add_listener(network_connection_listener)
+	    # asking to modify the connection with the received sdp : the listener will get 
+	    # the event notifying it that the connection is ready or not with the corresponding SDP
+	    # that will be used to send the 200 response
+	    connection.modify(javax.media.mscontrol.networkconnection.NetworkConnection.UNKNOWN_YET, nil)
+	  end
   
 	# actually sending the request out to the sip phone
 	#@sip_request.send();
