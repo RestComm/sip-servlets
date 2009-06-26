@@ -36,7 +36,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-spi/2.0.5.GA/jboss-logging-spi-2.0.5.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/test/jboss-test/1.1.0.GA/jboss-test-1.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.100/jain-sip-ri-1.2.100.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.108/jain-sip-ri-1.2.108.jar"/>
 	<classpathentry kind="var" path="M2_REPO/qdox/qdox/1.6/qdox-1.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/trove/trove/2.1.1/trove-2.1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

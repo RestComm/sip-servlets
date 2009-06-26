@@ -49,7 +49,7 @@
 		<gwt-user.version>1.4.61</gwt-user.version>
 		<commons-fileupload.version>1.1</commons-fileupload.version>
 		<jain-sip-api.version>1.2</jain-sip-api.version>
-		<jain-sip-ri.version>1.2.108-SNAPSHOT</jain-sip-ri.version>
+		<jain-sip-ri.version>1.2.108</jain-sip-ri.version>
 		<jain-mgcp.version>1.0</jain-mgcp.version>			
 		<javax.activation.version>1.1</javax.activation.version>
 		<jcc.version>1.1</jcc.version>				
