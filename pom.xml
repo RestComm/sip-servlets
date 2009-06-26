@@ -3,7 +3,7 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>12-SNAPSHOT</version>
+        <version>12</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
