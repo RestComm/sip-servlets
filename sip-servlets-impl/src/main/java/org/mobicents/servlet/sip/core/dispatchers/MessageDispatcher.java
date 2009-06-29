@@ -251,6 +251,9 @@ public abstract class MessageDispatcher {
 					" to following App/ruby controller => " + request.getSipSession().getKey().getApplicationName()+ 
 					"/" + sipContext.getSipRubyController().getName());
 			}
+			ClassLoader cl = sipContext.getLoader().getClassLoader();
+			Thread.currentThread().setContextClassLoader(cl);
+			
 			sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), request);
 		}				
 	}
@@ -271,6 +274,9 @@ public abstract class MessageDispatcher {
 						" to following App/ruby controller => " + response.getSipSession().getKey().getApplicationName()+ 
 						"/" + sipContext.getSipRubyController().getName());
 				}
+				ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				
 				sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), response);
 			} else {
 				logger.warn(sessionHandler + " is unavailable, dropping response " + response);
