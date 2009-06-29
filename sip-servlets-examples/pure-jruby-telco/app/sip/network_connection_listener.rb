@@ -2,13 +2,13 @@ require 'java'
 
 class NetworkConnectionListener
 	include javax.media.mscontrol.resource.MediaEventListener
+	include java.io.Serializable
 	
   def initialize    
   end
   
 	def onEvent(event)
-		puts "onEvent called" 
-		puts event
+		puts "NetworkConnectionListener event received " + event.to_string  
 		
 		conn = event.get_source;
 		media_session = conn.get_media_session
@@ -54,7 +54,7 @@ class NetworkConnectionListener
 	          media_session.release
 	        end	
 	      end
-	    elsif javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.networkconnection.NetworkConnection.ev_LocalSessionDescriptionModified.equals(event.get_event_type)
+	    elsif sip_session.get_attribute("INVITE") != nil && javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.networkconnection.NetworkConnection.ev_Modify.equals(event.get_event_type)
 	        invite = sip_session.get_attribute("INVITE")
 	        sip_session.remove_attribute("INVITE")
 	        sdp = conn.get_local_session_description
@@ -62,6 +62,18 @@ class NetworkConnectionListener
 	        invite.send
 	          
 	        sip_session.set_attribute("NETWORK_CONNECTION", conn)
+	    else 
+	    	begin
+      			media_group = media_session.create_media_group(javax.media.mscontrol.mediagroup.MediaGroupConfig.c_PlayerSignalDetector)
+		      	media_group.add_listener(MediaStatusListener.new)		
+		      	media_group.join_initiate(javax.media.mscontrol.Joinable::Direction::DUPLEX, conn, self)
+		      	
+		      	sip_session = media_session.get_attribute("SIP_SESSION")
+		      	sip_session.set_attribute("MediaGroup", media_group)
+		    rescue javax.media.mscontrol.MsControlException => e
+		      puts e.message
+		      terminate(sipSession, ms);
+    		end
 	    end  	
 	end	
 end 

@@ -1,5 +1,5 @@
 require 'java'
-require 'player_listener'
+load 'player_listener.rb'
 
 class MediaStatusListener
   include javax.media.mscontrol.StatusEventListener

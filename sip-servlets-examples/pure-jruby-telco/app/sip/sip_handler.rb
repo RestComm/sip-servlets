@@ -3,8 +3,8 @@
 require 'java'
 require 'torquebox/sip/base'
 require 'media_helper'
-require 'network_connection_listener'
-require 'media_status_listener'
+load 'network_connection_listener.rb'
+load 'media_status_listener.rb'
 
 class SipHandler < TorqueBox::Sip::Base
   # Handle INVITE request to setup a call by answering 200 OK
