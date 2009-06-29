@@ -1,6 +1,7 @@
 require 'java'
 load 'player_listener.rb'
 
+# listener on Media Session creation when the phone and the application can start to exchange media
 class MediaStatusListener
   include javax.media.mscontrol.StatusEventListener
 
@@ -14,23 +15,23 @@ class MediaStatusListener
 
       media_group = event.get_source
       if (event.get_error.equals(javax.media.mscontrol.resource.Error.e_OK) && javax.media.mscontrol.JoinEvent.ev_Joined.equals(event.get_event_type)) 
-        # NC Joined to MG
-        puts "NC joined to MG. Start Player"
+        puts "both parties connected. Start Player"
        begin
+       	  
           player = media_group.get_player
-          player.add_listener(PlayerListener.new)
-
+          player.add_listener(PlayerListener.new)          
           prompt = java.net.URI.create(WELCOME_MSG)
-
+          
+          # we play the welcome message and listen for DTMF
           player.play(prompt, nil, nil)
 
         rescue MsControlException => e
           e.backtrace;
         end
       elsif (event.get_error.equals(javax.media.mscontrol.resource.Error.e_OK) && javax.media.mscontrol.JoinEvent.ev_Unjoined.equals(event.get_event_type)) 
-        puts "Un-Joined MG and NC"
+        puts "both parties disconnected"
       else 
-        puts "Joining of MG and NC failed"
+        puts "Joining of both parties failed"
       end
    end
 end

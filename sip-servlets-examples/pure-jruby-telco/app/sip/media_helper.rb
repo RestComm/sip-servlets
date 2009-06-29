@@ -26,6 +26,7 @@ module MediaHelper
 
 	STACK_NAME = "SipServlets"
 
+    # this class is a singleton so that only one MGCP stack is used for the whole application
 	class MgcpStack
 		include Singleton
 		
@@ -40,20 +41,20 @@ module MediaHelper
 			@properties.set_property(MGCP_STACK_IP, LOCAL_ADDRESS)
 			@properties.set_property(MGCP_STACK_PORT, CA_PORT)
 			
-      drivers = javax.media.mscontrol.spi.DriverManager.get_drivers
-      puts @properties
-      if drivers.has_next
-        @msControlFactory = drivers.next.get_factory(@properties)        
-      end
+	      	drivers = javax.media.mscontrol.spi.DriverManager.get_drivers
+	      	puts @properties
+	      	if drivers.has_next
+	        	@msControlFactory = drivers.next.get_factory(@properties)        
+	      	end
 		end
     
 		def create_media_session
 			# Create new media session
-      if @msControlFactory != nil
-		    @msControlFactory.create_media_session
-		  else
-        return nil
-      end
+      		if @msControlFactory != nil
+		    	@msControlFactory.create_media_session
+		  	else
+        		return nil
+      		end
 		end
 	end
 end

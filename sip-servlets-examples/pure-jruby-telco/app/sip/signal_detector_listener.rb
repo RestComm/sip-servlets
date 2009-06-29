@@ -31,6 +31,7 @@ class SignalDetectorListener
         signal_detector.remove_listener(self)
 
         if (javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.mediagroup.signals.SignalDetector.ev_SignalDetected.equals(event.get_event_type))
+          # get the DTMF and play the corresponding file
           dtmf = event.get_signal_string
           play_dtmf(media_group.get_player, dtmf)
         else

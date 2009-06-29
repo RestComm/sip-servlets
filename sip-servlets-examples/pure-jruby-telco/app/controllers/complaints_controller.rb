@@ -64,6 +64,7 @@ class ComplaintsController < ApplicationController
     	sip_session = sip_request.get_session
     	sip_session.set_attribute("MEDIA_SESSION", media_session)
     	media_session.set_attribute("SIP_SESSION", sip_session)
+    	# we store the INVITE to be ablet to send it later when we will get the SDP from the Media Server
     	sip_session.set_attribute("INVITE", sip_request)
     
     	# Create a new NetworkConnection to handle RTP and attaching a new listener to it to know when it is created to update
@@ -77,7 +78,7 @@ class ComplaintsController < ApplicationController
     	connection.modify(javax.media.mscontrol.networkconnection.NetworkConnection.CHOOSE, nil)
   	end
   
-	# actually sending the request out to the sip phone
+	# the sending the request out to the sip phone will happen in the NetworkConnectionListener when the SDP will be received from the Media Server
 	#@sip_request.send();
 
     respond_to do |format|

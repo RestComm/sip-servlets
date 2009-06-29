@@ -47,6 +47,7 @@ class SipHandler < TorqueBox::Sip::Base
 
     media_session = sip_session.get_attribute("MEDIA_SESSION")
     begin
+      # connecting both parties so that the media session is setup and media starts flowing from one to another
       media_group = media_session.create_media_group(javax.media.mscontrol.mediagroup.MediaGroupConfig.c_PlayerSignalDetector)
       media_group.add_listener(MediaStatusListener.new)
 
@@ -77,6 +78,7 @@ class SipHandler < TorqueBox::Sip::Base
   # Handle a successful response to an application initiated INVITE to set up a call (when a new complaint is filed throught the web part) by send an acknowledgment
   def do_success_response(response)
     response.create_ack.send
+    # notify the Media Server of the SDP from the other party so that the media session can be setup and media starts
     sdp = response.get_content    
     connection = response.get_session.getAttribute("NETWORK_CONNECTION")
     connection.modify(javax.media.mscontrol.networkconnection.NetworkConnection.CHOOSE, sdp)
