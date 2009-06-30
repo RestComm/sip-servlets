@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<section id="saimse-SIP_and_IMS_Extensions">
+    <title>SIP and IMS Extensions</title>
+    <para>SIP Extensions in the SIP Servlets Server are based on Internet Engineering Task Force (IETF) Request for Comments (RFC) protocol recommendatons.  <xref linkend="tab-sse-Supported_SIP_Extensions"/> lists the supported RFCs for the SIP Servlets Server.</para>
+    <table id="tab-sse-Supported_SIP_Extensions" frame='all'>
+      <title>Supported SIP Extensions</title>
+        <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+        <colspec colname='c1'/>
+        <colspec colname='c2'/>
+        <colspec colname='c3'/>
+      <thead>
+        <row>
+          <entry align="center">Extension</entry>
+          <entry align="center">RFC Number</entry>
+          <entry align="center">Description</entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>DNS</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3263.txt">RFC 3263</ulink></entry><entry>SIP: Locating SIP Servers</entry>
+        </row>
+        <row>
+         <entry>INFO</entry><entry><ulink url="http://www.ietf.org/rfc/rfc2976.txt">RFC 2976</ulink></entry><entry>The SIP INFO Method</entry>
+        </row>
+        <row>
+          <entry>IPv6</entry><entry><ulink url="http://www.ietf.org/rfc/rfc2460.txt">RFC 2460</ulink></entry><entry>Internet Protocol, Version 6 (IPv6) Specification</entry>
+        </row>
+        <row>
+          <entry>JOIN</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3911.txt">RFC 3911</ulink></entry><entry>The SIP "Join" Header</entry>
+        </row>
+        <row>
+          <entry>MESSAGE</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3428.txt">RFC 3428</ulink></entry><entry>SIP Extension for Instant Messaging</entry>
+        </row>
+        <row>
+          <entry>PATH</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3327.txt">RFC 3327</ulink></entry><entry>SIP Extension Header Field for Registering Non-adjacent Contacts</entry>
+        </row>
+        <row>
+          <entry>PRACK</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3262.txt">RFC 3262</ulink></entry><entry>Reliability of Provisional Responses in the SIP</entry>
+        </row>
+        <row>
+          <entry>PUBLISH</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3903.txt">RFC 3903</ulink></entry><entry>SIP Extension for Event State Publication</entry>
+        </row>
+        <row>
+          <entry>REASON</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3326.txt">RFC 3515</ulink></entry><entry>The Reason Header Field for the Session Initiation Protocol (SIP)</entry>
+        </row>
+        <row>
+          <entry>REFER</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3515.txt">RFC 3515</ulink></entry><entry>The SIP Refer Method</entry>
+        </row>
+        <row>
+          <entry>REPLACES</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3891.txt">RFC 3891</ulink></entry><entry>The SIP "Replaces" Header</entry>
+        </row>
+        <row>
+          <entry>STUN</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3489.txt">RFC 3489</ulink></entry><entry>STUN - Simple Traversal of User Datagram Protocol (UDP) through Network Address Translators (NATs)</entry>
+        </row>
+        <row>
+          <entry>SUBSCRIBE/NOTIFY</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3265.txt">RFC 3265</ulink></entry><entry>SIP-specific Event Notification</entry>
+        </row>
+      </tbody>
+    </tgroup>
+    </table>
+    <para>IMS Private Header (P-Header) Extensions are provided according to the recommendations of the <ulink url="http://www.3gpp.org/">3rd Generation Partnering Project (3GPP)</ulink>, and the IETF.  P-Header extensions are primarily used to store information about the networks a call traverses, including (but not limited to) security or call charging details.</para>
+    <para><xref linkend="tab-sse-IMS_P-Header_Extensions"/> describes the list of supported P-Headers, including links to the relevant ITEF memorandum where available.</para>
+        <table id="tab-sse-IMS_P-Header_Extensions" frame='all'>
+        <title>IMS P-Header Extensions</title>
+        <tgroup cols='2' align='left' colsep='1' rowsep='1'>
+        <colspec colname='c1'/>
+        <colspec colname='c2'/>
+      <thead>
+        <row>
+          <entry align="center">Extension</entry>
+          <entry align="center">Description</entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>AuthorizationHeaderIMS</entry><entry>Defines a new auth-param for the Authorization header used in REGISTER requests.</entry>
+        </row>
+        <row>
+         <entry>PAccessNetworkInfoHeader</entry><entry>Contains information regarding the access network the User Agent (UA) uses to connect to the SIP Proxy.  The information contained in this header may be sensitive, such as the cell ID, so it is important to secure all SIP application that interface with this header. </entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3324.txt">PAssertedIdentityHeader</ulink></entry><entry>Contains an identity resulting from an authentication process, derived from a SIP network intermediary.  The identity may be based on SIP Digest authentication.</entry>
+        </row>
+         <row>
+          <entry>PAssertedServiceHeader</entry><entry>Contains information used by "trust domains", according to Spec(T) specifications detailed in <ulink url="http://www.ietf.org/rfc/rfc3324.txt">RFC 3324</ulink>.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3455.txt">PAssociatedURIHeader</ulink></entry><entry>Contains a list of URIs that are allocated to the user.  The header is defined in the 200 OK response to a REGISTER request.  It allows the User Agent Client (UAC) to determine the URIs the service provider has associated to the user's address-of-record URI.</entry>
+        </row>
+         <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3327.txt">PathHeader</ulink></entry><entry>SIP Extension header, with syntax similar to the RecordRoute header.  Used in conjunction with SIP REGISTER requests and 200 class messages in response to REGISTER responses.</entry>
+        </row>
+        <row>
+          <entry>PCalledPartyIDHeader</entry><entry>Typically inserted en-route into an INVITE request by the proxy, the header is populated with the Request_URI received by the proxy in the request.  The header allows the User Agent Server (UAS) to identify which address-of-record the invitation was sent to, and can be used to render distinctive audio-visual alert notes based on the URI.</entry>
+        </row>
+        <row>
+          <entry>PChargingFunctionAddressesHeader</entry><entry>Contains a list of one or more of the Charging Collection Function (CCF) and the Event Charging Function (ECF) addresses.  The CCF and ECF addresses may be passed during the establishment of a dialog, or in a standalone transaction.</entry>
+        </row>
+        <row>
+          <entry>PChargingVectorHeader</entry><entry>Contains a unique charging identifier and correlation information, which is used by network operators to correctly charge for routing events through their networks.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3313.txt">PMediaAuthorizationHeader</ulink></entry><entry>Contains one or more session-specific media authorization tokens, which are used for QoS of the media streams.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3325.txt">PPreferredIdentityHeader</ulink></entry><entry>Contains a SIP URI and an optional display-name.  For example, "James May" &lt;sip:james@domain.com&gt;.  This header is used by trusted proxy servers to identify the user to other trusted proxies, and can be used to select the correct SIP URI in the case of multiple user identities.  </entry>
+        </row>
+        <row>
+          <entry>PPreferredServiceHeader</entry><entry>Used by the PAssertedService Header to determine the preferred user service.  Multiple PPreferreedService headers may be present in a single request.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc5002.txt">PProfileKeyHeader</ulink></entry><entry>Contains a key used by a proxy to query the user database for a given profile.  The key may contain wildcards that are used as part of the query into the database.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3323.txt">PrivacyHeader</ulink></entry><entry>Contains values that determine whether particular header information is deemed as private by the UA for requests and responses.  </entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc5502.txt">PServedUserHeader</ulink></entry><entry>Contains an identity of the user that represents the served user.  The header is added to the initial requests for a dialog or standalone request, which are then routed between nodes in a trusted domain.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc4457.txt">PUserDatabaseHeader</ulink></entry><entry>Contains the address of the HSS handling the user that generated the request.  The header field is added to request routed from an Interrogating Call Session Control Function (I-CSCF) to a Serving Call Session Control Function (S-CSCF)</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3455.txt">PVisitedNetworkIDHeader</ulink></entry><entry>Contains the identifier of a visited network.  The identifier is a text string or token than it known by both the registrar or the home proxy at the home network, and the proxies in the visited network.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3329.txt">SecurityClientHeader, SecurityServerHeader, SecurityVerifyHeader</ulink></entry><entry>Contains information used to negotiate the security mechanisms between a UAC, and other SIP entities including UAS, proxy and registrar.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://www.ietf.org/rfc/rfc3608.txt">ServiceRouteHeader</ulink></entry><entry>Contains a route vector that will direct requests through a specified sequence of proxies.  The header may be included by a registrar in response to a REGISTER request.</entry>
+        </row>
+        <row>
+          <entry><ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/header/ims/WWWAuthenticateHeaderIms.html">WWWAuthenticateHeaderIms</ulink></entry><entry>Extends the WWWAuthenticateResponse header functionality by defining an additional authorization parameter (auth-param).</entry>
+        </row>
+      </tbody>
+    </tgroup>
+    </table>
+  </section>

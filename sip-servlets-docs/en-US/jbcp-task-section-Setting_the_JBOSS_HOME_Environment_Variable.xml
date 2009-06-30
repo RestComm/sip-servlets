@@ -1,0 +1,113 @@
+<?xml version='1.0'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+<section>
+	<title>Setting the JBOSS_HOME Environment Variable</title>
+	<para>
+		The <application>JBoss Communications Platform</application> (<application>JBCP</application>) is built on top of the <application>JBoss Enterprise Application Platform</application> (<application>JBoss EAP</application>). You do not need to set the <envar>JBOSS_HOME</envar> environment variable to run any of the <application>JBoss Communications Platform</application> servers <emphasis>unless</emphasis> <envar>JBOSS_HOME</envar> is <emphasis>already</emphasis> set.
+	</para>
+	<para>
+		The best way to know for sure whether <envar>JBOSS_HOME</envar> was set previously or not is to perform a simple check which may save you time and frustration.
+	</para>
+	<formalpara>
+		<title>Checking to See If JBOSS_HOME is Set on Linux</title>
+		<para>
+			At the command line, <command>echo</command>
+			<userinput>$JBOSS_HOME</userinput> to see if it is currently defined in your environment:
+		</para>
+	</formalpara>
+	<!--  ~]$ echo $JBOSS_HOME  -->
+	<screen>~]$ echo $JBOSS_HOME</screen>
+	<para>
+		Silence on the command line (a completely blank line) means that it is not set, in which case you can proceed with running the <application>JBoss Communications Platform</application>.
+	</para>
+	<formalpara>
+		<title>Checking to See if JBOSS_HOME is Set on Windows</title>
+		<para>
+			For information on determining whether environment variables are set in recent versions of Windows, refer to <ulink
+				url="http://support.microsoft.com/kb/931715"></ulink>.
+		</para>
+	</formalpara>
+	<para>
+		If <envar>JBOSS_HOME</envar> is already set on your system, then you have three options:
+	</para>
+	<orderedlist>
+		<listitem>
+			<para>
+				<command>unset</command> it, which only takes effect for the current session and is therefore not advised;
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				find where <envar>JBOSS_HOME</envar> is defined, such as in your local <filename>~/.bashrc</filename> startup script in Linux, or, possibly, system-wide in <filename>/etc/bashrc</filename>, and remove it or comment it out;
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				or point it to the correct location, in which case you should refer to the following instructions on how to set <envar>JBOSS_HOME</envar>.
+			</para>
+		</listitem>
+	</orderedlist>
+	<formalpara>
+		<title>Setting the JBOSS_HOME Environment Variable on Linux</title>
+		<para>
+			The <envar>JBOSS_HOME</envar> environment variable must point to the directory which contains all of the files for the <application>JBoss Communications Platform</application> that you installed. As another hint, this topmost directory contains a <filename>bin</filename> subdirectory.
+		</para>
+	</formalpara>
+	<para>
+		Setting <envar>JBOSS_HOME</envar> in your personal <filename>~/.bashrc</filename> startup script carries the advantage of retaining effect over reboots. Each time you log in, the environment variable is sure to be set for you, as a user. On Linux, it is possible to set <envar>JBOSS_HOME</envar> as a system-wide environment variable, by defining it in <filename>/etc/bashrc</filename>, but this method is neither recommended nor detailed in these instructions.
+	</para>
+	<procedure>
+		<title>To Set JBOSS_HOME on Linux...</title>
+		<step>
+			<para>
+				Open the <filename>~/.bashrc</filename> startup script, which is a hidden file in your home directory, in a text editor, and insert the following line on its own line while substituting for the actual install location on your system:
+			</para>
+			<!--  export JBOSS_HOME="/home/<replaceable>&lt;username&gt;</replaceable>/<replaceable>&lt;path&gt;</replaceable>/<replaceable>&lt;to&gt;</replaceable>/<replaceable>&lt;install_directory&gt;</replaceable>"  -->
+			<screen>export JBOSS_HOME="/home/<replaceable>&lt;username&gt;</replaceable>/<replaceable>&lt;path&gt;</replaceable>/<replaceable>&lt;to&gt;</replaceable>/<replaceable>&lt;install_directory&gt;</replaceable>"</screen>
+		</step>
+		<step>
+			<para>
+				Save and close the <filename>.bashrc</filename> startup script.
+			</para>
+		</step>
+		<step>
+			<para>
+				You should <command>source</command> the <filename>.bashrc</filename> script to force your change to take effect, so that <envar>JBOSS_HOME</envar> becomes set for the current session<footnote>
+				<para>
+					Note that any other terminals which were opened prior to your having altered <filename>.bashrc</filename> will need to <command>source</command>
+						<filename>~/.bashrc</filename> as well should they require access to <envar>JBOSS_HOME</envar>.
+				</para>
+				</footnote>.
+			</para>
+			<!--  ~]$ source ~/.bashrc  -->
+			<screen>~]$ source ~/.bashrc</screen>
+		</step>
+		<step>
+			<para>
+				Finally, ensure that <envar>JBOSS_HOME</envar> is set in the current session, and actually points to the correct location:
+			</para>
+			<note>
+				<para>
+					The command line usage below is based upon a binary installation of the <application>JBoss Communications Platform</application>. In this sample output, <envar>JBOSS_HOME</envar> has been set correctly to the <replaceable>topmost_directory</replaceable> of the <application>JBCP</application> installation. Note that if you are installing one of the standalone <application>JBCP</application> servers (with <application>JBoss AS</application> bundled!), then <envar>JBOSS_HOME</envar> would point to the <replaceable>topmost_directory</replaceable> of your server installation.
+				</para>
+			</note>
+			<!--  ~]$ echo $JBOSS_HOME
+/home/silas/&MOB_JBOSS_HOME_LIN;  -->
+			<screen>~]$ echo $JBOSS_HOME
+/home/silas/&JBCP_JBOSS_HOME_LIN;</screen>
+		</step>
+	</procedure>
+
+	<formalpara>
+		<title>Setting the JBOSS_HOME Environment Variable on Windows</title>
+		<para>
+			The <envar>JBOSS_HOME</envar> environment variable must point to the directory which contains all of the files for the <phrase>JBoss Communications Platform</phrase> that you installed. As another hint, this topmost directory contains a <filename>bin</filename> subdirectory.
+		</para>
+	</formalpara>
+	<para>
+		For information on how to set environment variables in recent versions of Windows, refer to <ulink
+			url="http://support.microsoft.com/kb/931715"></ulink>.
+	</para>
+
+</section>

@@ -1,0 +1,130 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]><!-- chapter id nickname: bsssc -->
+<section
+	id="bsssc-binary-SIP_Servlets_Server-Configuring">
+	<title>Configuring</title>
+	<para>&nbsp;</para>
+	<section	id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
+		<title>Configuring SIP Connectors</title>
+		<para>SIP Connectors are added in the same way as HTTP Connectors: by adding a <literal>&lt;Connector&gt;</literal> element under the <literal>&lt;Service&gt;</literal> element in the container's <filename>server.xml</filename> configuration file.</para>
+		<para>For example, to add a SIP Connector on the IP address <literal>127.0.0.1</literal>, on port <literal>5080</literal>, using the UDP transport protocol, you should insert the following XML element:</para>
+		<example>
+			<title>Adding a SIP Connector to server.xml</title>
+			<programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+  <Connector	port="5080" 
+ipAddress="127.0.0.1"
+	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	signalingTransport="udp"
+	usePrettyEncoding="false"
+	useStun="false"
+	stunServerAddress="stun01.sipphone.com"
+	stunServerPort="3478"
+	sipStackPropertiesFile="conf/mss-sip-stack.properties"/>]]></programlisting>
+    </example>
+		<variablelist>
+		<title>SIP &lt;connector&gt; Attributes</title>
+			<varlistentry>
+				<term>port</term>
+				<listitem><para>The port number on which the container will be able to receive SIP messages.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>ipAddress</term>
+				<listitem><para>The IP address at which the container will be able to receive SIP messages.  The container can be configured to listen to all available IP addresses by setting <parameter>ipAddress</parameter> to <userinput>0.0.0.0 &lt;sipPathName&gt;</userinput>.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>protocol</term>
+				<listitem><para>Specifies the connector is a SIP Connector and not an HTTP Connector.  There is no need to change this property.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>signalingTransport</term>
+				<listitem><para>Specifies the transport on which the container will be able to receive SIP messages.  For example, <quote>udp</quote>.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>usePrettyEncoding</term>
+				<listitem><para>Allows Via, Route, and RecordRouteheader field information to be split into multiple lines, rather than each header field being separating with a comma.  The attribute defaults to <quote>true</quote>.  Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>useStun</term>
+				<listitem><para>Enables Session Traversal Utilities for NAT (STUN) support for this Connector.  The attribute defaults to <quote>false</quote>.  If set to <quote>true</quote>, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>.  Refer to <xref linkend="mssstun-MSS_STUN" /> for more information about STUN.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>stunServerAddress</term>
+				<listitem><para>Specifies the STUN server address used to discover the public IP address of the SIP Connector.  This attribute is only required if the <literal>useStun</literal> attribute is set to <quote>true</quote>. Refer to <xref linkend="mssstun-MSS_STUN" /> for more information about STUN and public STUN servers.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>stunServerPort</term>
+				<listitem><para>Specifies the STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute. You should rarely need to change this attribute; also, it is only needed if the <literal>useStun</literal> attribute is set to <quote>true</quote>. Refer to <xref linkend="mssstun-MSS_STUN" /> for more information about STUN.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>sipStackPropertiesFile</term>
+				<listitem><para>Specifies the location of the file containing key-value pairs corresponding to the SIP stack configuration properties.  This attribute is used to further tune the JAIN SIP Stack.  If this property is omitted, the following default values are assumed:</para>
+					<itemizedlist>
+						<listitem><para>gov.nist.javax.sip.LOG_MESSAGE_CONTENT=true</para></listitem>
+            <listitem><para>gov.nist.javax.sip.TRACE_LEVEL=32</para></listitem>
+						<listitem><para>gov.nist.javax.sip.DEBUG_LOG=logs/mss-jsip-debuglog.txt</para></listitem>
+						<listitem><para>gov.nist.javax.sip.SERVER_LOG=logs/mss-jsip-messages.xml</para></listitem>
+						<listitem><para>javax.sip.STACK_NAME=Mobicents-SIP-Servlets</para></listitem>
+						<listitem><para>javax.sip.AUTOMATIC_DIALOG_SUPPORT=off</para></listitem>
+						<listitem><para>gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY=true</para></listitem>
+						<listitem><para>gov.nist.javax.sip.THREAD_POOL_SIZE=64</para></listitem>
+						<listitem><para>gov.nist.javax.sip.REENTRANT_LISTENER=true</para></listitem>
+					</itemizedlist>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<note><para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface SipStack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para></note>
+	</section>
+	<section
+		id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
+		<title>Application Routing and Service Configuration</title>
+		<para>The application router is called by the container&#x2014;whether JBoss or Tomcat&#x2014;to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container. The application router is solely responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
+		<para>For more information about the application router, refer to the following sections of the JSR 289 specification: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
+			</para>
+		<para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container's <filename>server.xml</filename> configuration file:</para>
+		<example
+			id="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml">
+			<title>Configuring the Service Element in the Container's server.xml</title>
+			<programlisting linenumbering="unnumbered"	role="XML"><![CDATA[
+  <Service name="Sip-Servlets"
+	className="org.mobicents.servlet.sip.startup.SipStandardService"
+	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+	darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
+	sip-servlets-examples/reinvite-demo/reinvite-dar.properties">]]>
+	</programlisting>
+		</example>
+		<para>Provided here is a description of the SIP Service element's attributes:</para>
+		<variablelist>
+			<varlistentry>
+				<term>className</term>
+				<listitem>
+					<para>This attribute specifies that the servlet container is a <emphasis>converged</emphasis> (i.e. SIP + HTTP) servlet container. This attribute can also be used to handle load-balancing and failover.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>sipApplicationDispatcherClassName</term>
+				<listitem>
+					<para>This attribute specifies the class name of the <literal>org.mobicents.servlet.sip.core.SipApplicationDispatcher</literal> implementation to use. The routing algorithm and application selection process is performed in that class.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>darConfigurationFileLocation</term>
+				<listitem>
+					<para>The default application router file location. This is used by the default application router to determine the application selection logic. Refer to Appendix C of the JSR 289 specification for more details.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	<section	id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">
+		<title>SIP Servlets Server Logging</title>
+		<para>There are two separate levels of logging:</para>
+		<itemizedlist>
+			<listitem>
+				<para>Logging at the container level, which can be configured using the <filename>log4j.xml</filename> configuration file, which is usually located in the container's <filename>lib</filename> directory.</para>
+			</listitem>
+			<listitem>
+				<para>Logging of the NIST SIP stack, which is configured in the <literal>Connector</literal> element of the container's <filename>server.xml</filename> configuration file.</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+</section>

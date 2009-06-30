@@ -1,0 +1,26 @@
+<!-- NOTES ON CHANGING ENTITY FILES
+Important: take care when changing entities for directories
+* Linux path separators must be: "/"
+* Windows path separators must be: "\"
+* Entities which represent directories MUST HAVE a final path separator:
+	my/path/  <- (final separator)
+If this final separator is missing, then the documentation will be wrong. -->
+
+<!-- Common entities: same across all books except for BOOKID -->
+<!ENTITY PRODUCT "JBoss Communications Platform">
+<!ENTITY BOOKID "SIP_Servlets_Server_User_Guide">
+<!ENTITY YEAR "2009">
+<!ENTITY HOLDER "Red Hat Inc">
+
+<!-- Shared: Configuring the JBOSS_HOME Environment Variable -->
+<!ENTITY MOB_JBOSS_HOME_LIN "mobicents-all-1.2.1.GA-jboss-4.2.3.GA/jboss/">
+<!ENTITY JBCP_JBOSS_HOME_LIN "jboss-eap-4.3/jboss-as/">
+
+<!-- SIP Servlet Server Installation Guide -->
+<!ENTITY SSS_MSS4J_VERSION "1.0.0">
+<!ENTITY SSS_MSS4J_SIZE "135 MB">
+<!ENTITY SSS_MSS4J_ZIP "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip">
+
+<!ENTITY SSS_MSS4T_VERSION "0.5">
+<!ENTITY SSS_MSS4T_SIZE "20 MB">
+<!ENTITY SSS_MSS4T_ZIP "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip">

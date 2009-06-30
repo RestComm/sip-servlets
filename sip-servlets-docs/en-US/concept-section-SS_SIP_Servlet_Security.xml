@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<section id="sss-SIP_Servlet_Security">
+    <title>SIP Servlets Application Security</title>
+    <para>The information present in SIP requests often contains sensitive user information.  To protect user information, SIP Security can be enabled on the server, and within the SIP application to mitigate the risk of unauthorised access to the information.</para>
+    <para>Application security varies depending on the server type used.  The following procedures describe how to configure the JBoss Application Server, and the Tomcat server.</para>
+    <procedure>
+      <title>Enable SIP Application Security in JBoss Application Server</title>
+      <step>
+        <title>Add Security Policy to Server</title>
+        <orderedlist>
+          <listitem>
+            <para>Open a terminal and navigate to the conf directory:</para>
+            <programlisting>home]$ cd server/default/conf/</programlisting>
+          </listitem>
+          <listitem>
+            <para>Open <literal>login-config.xml</literal> (using your preferred editor) and append the security policy to the file:</para>
+<programlisting role="XML"><![CDATA[
+<application-policy name="sip-servlets">
+<authentication>
+  <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule" 
+    flag = "required">
+  <module-option name="usersProperties">props/sip-servlets-
+    users.properties</module-option>
+  <module-option name="rolesProperties">props/sip-servlets-
+    roles.properties</module-option>
+  <module-option name="hashAlgorithm">MD5</module-option>
+  <module-option name="hashEncoding">rfc2617</module-option>
+  <module-option name="hashUserPassword">false</module-option>
+  <module-option name="hashStorePassword">true</module-option>
+  <module-option name="passwordIsA1Hash">true</module-option>
+  <module-option name="storeDigestCallback">
+    org.jboss.security.auth.spi.RFC2617Digest</module-option>
+  </login-module>
+</authentication>
+</application-policy>]]>
+  </programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <title>Update SIP Server user properties file</title>
+        <orderedlist>
+          <listitem>
+            <para>Open a terminal and navigate to the /props directory:</para>
+            <programlisting>home]$ cd server/default/props/</programlisting>
+          </listitem>
+          <listitem>
+          <para>Open <literal>sip-servlets-users.properties</literal> and append the user lines to the file:</para>
+  <programlisting> <![CDATA[
+  # A sample users.properties file, this line creates user "admin" with 
+  # password "admin" for "sip-servlets-realm"
+  admin=<A1_cryptographic_string>]]>
+  </programlisting>
+          </listitem>
+          <listitem>
+           <para>To create &lt;A1_cryptographic_string&gt;, execute the following command in a terminal:</para>
+            <programlisting>home]$ java -cp ../server/default/lib/jbosssx.jar</programlisting>
+          </listitem>
+          <listitem><para>Copy the A1 hash, and paste it into the admin parameter in the previous step.</para></listitem>
+          <listitem><para>Save and close <literal>sip-servlets-users.properties</literal>.</para></listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <title>Update SIP Server roles file</title>
+        <orderedlist>
+          <listitem>
+            <para>Open a terminal and navigate to the /props directory:</para>
+            <programlisting>home]$ cd server/default/props/</programlisting>
+          </listitem>
+          <listitem>
+          <para>Open <literal>sip-servlets-roles.properties</literal> (using your preferred editor) and append the following information to the file:</para>
+            <programlisting> 
+# A sample roles.properties file for use with some roles
+# Each line in this file assigns roles to the users defined in 
+# sip-servlets-users.properties
+admin=caller,role1,role2,..
+            </programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <title>Add the security domain to the SIP application</title>
+        <orderedlist>
+          <listitem>
+            <para>Open the <literal>jboss-web.xml</literal> file for the SIP application to which security is required.</para>
+          </listitem>
+          <listitem>
+          <para>Add &lt;security-domain&gt; to the &lt;jboss-web&gt; element:</para>
+<programlisting role="XML">
+<![CDATA[<jboss-web >
+<!--Uncomment the security-domain to enable security. You will need to edit the htmladaptor-->
+<!--login configuration to setup the login modules used to authentication users.-->
+  <security-domain>java:/jaas/sip-servlets</security-domain>
+</jboss-web >]]>
+            </programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <title>Add security constraints to the SIP application</title>
+        <orderedlist>
+          <listitem>
+            <para>Open the <literal>sip.xml</literal> file for the SIP application.</para>
+          </listitem>
+          <listitem>
+          <para>Add &lt;security-domain&gt; to the &lt;jboss-web&gt; element:</para>
+  <programlisting role="XML"><![CDATA[
+<security-constraint>
+  <display-name>REGISTER Method Security Constraint</display-name>
+  <resource-collection>
+    <resource-name>SimpleSipServlet</resource-name>
+    <description>Require authenticated REGISTER requests</description>
+    <servlet-name>SimpleSipServlet</servlet-name>
+    <sip-method>REGISTER</sip-method>
+  </resource-collection>
+  <auth-constraint>
+    <role-name>caller</role-name>
+  </auth-constraint>
+</security-constraint>
+<login-config>
+  <auth-method>DIGEST</auth-method>
+  <realm-name>sip-servlets-realm</realm-name>
+</login-config>]]>
+</programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+    </procedure>
+    <procedure>
+      <title>Enable SIP Application Security in Tomcat Server</title>
+      <step>
+        <title>Activate the Memory Realm in Catalina:</title>
+        <orderedlist>
+          <listitem>
+            <para>Open a terminal and navigate to the /conf directory:</para>
+            <programlisting>home]$ cd server/default/&lt;tomcat_home&gt;/conf/</programlisting>
+          </listitem>
+          <listitem>
+            <para>Open <literal>server.xml</literal> and uncomment the following line:</para>
+            <programlisting role="XML"><![CDATA[<!--<Realm className="org.apache.catalina.realm.MemoryRealm"/>-->]]></programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <title>Update SIP Server user properties file</title>
+        <orderedlist>
+          <listitem>
+            <para>In the /conf directory, open <literal>tomcat-users.xml</literal> (using your preferred editor) and append the following &lt;user&gt; sub-element:</para>
+            <programlisting role="XML"><![CDATA[<user name="user" password="password" roles="caller"/>]]></programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <title>Add security constraints to the SIP application</title>
+        <orderedlist>
+          <listitem>
+            <para>Open the <literal>sip.xml</literal> file for the SIP application to which security is required.</para>
+          </listitem>
+          <listitem>
+          <para>Add &lt;security-domain&gt; to the &lt;jboss-web&gt; element:</para>
+<programlisting role="XML"><![CDATA[
+<security-constraint>
+  <display-name>REGISTER Method Security Constraint</display-name>
+  <resource-collection>
+    <resource-name>SimpleSipServlet</resource-name>
+    <description>Require authenticated REGISTER requests</description>
+    <servlet-name>SimpleSipServlet</servlet-name>
+    <sip-method>REGISTER</sip-method>
+  </resource-collection>
+  <auth-constraint>
+    <role-name>caller</role-name>
+  </auth-constraint>
+</security-constraint>
+<login-config>
+  <auth-method>DIGEST</auth-method>
+  <realm-name>sip-servlets-realm</realm-name>
+</login-config>]]>
+            </programlisting>
+          </listitem>
+        </orderedlist>
+      </step>
+    </procedure>
+  </section>

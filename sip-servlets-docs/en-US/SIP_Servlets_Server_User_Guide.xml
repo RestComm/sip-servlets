@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<book>
+	<xi:include href="Book_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Preface.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="concept-chapter-ittsss-Introduction_to_the_SIP_Servlets_Server.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="task-chapter-SIP_Servlets_Server-Installing_Configuring_and_Running.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="concept-chapter-Services_for_SIP_Servlets.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="concept-chapter-SS_Examples.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<!--<index />-->
+</book>
+

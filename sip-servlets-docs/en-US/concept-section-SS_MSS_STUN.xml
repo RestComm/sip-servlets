@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<section id="mssstun-MSS_STUN">
+    <title>MSS STUN</title>
+    <para>The Session Traversal Utilities for NAT (STUN) prococol is used in Network Address Translation (NAT) traversal for real-time voice, video, messaging, and related interactive IP application communications.  This light-weight, client-server protocol allows applications passing through a NAT to obtain the public IP address for the UDP connections the application uses to connect to remote hosts.  </para>
+    <para>STUN support is provided at the SIP connector level, using the <ulink url="https://stun4j.dev.java.net/">STUN for Java</ulink>  project.  The STUN for Java project provides a Java implementation of the STUN Protocol (RFC3489), which allows each SIP connector to select whether it should use STUN to discover a public IP address, and use this address in the SIP messages sent through the connector.</para>
+    <para>To make a SIP connector STUN-enabled, three attributes must be appended to the &lt;connector&gt; tag in the server.xml file.  The properties are:
+      <itemizedlist>
+        <listitem>
+         <para>useStun="true"</para>
+         <para>Enables STUN support for this connector.  Ensure that the <literal>ipAddress</literal> attribute is not set to <literal>127.0.0.1</literal></para>
+        </listitem>
+        <listitem>
+          <para>stunServerAddress="&lt;public_STUN_Server&gt;"</para>
+          <para>STUN server address used to discover the public IP address of this SIP Connector.  See the table below for a suggested list of public STUN servers.</para>
+        </listitem>
+        <listitem>
+          <para>stunServerPort="3478"</para>
+          <para>STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute.  Both TCP and UDP protocols communicate with STUN servers using this port only.</para>
+        </listitem>
+      </itemizedlist>
+    </para>
+    <note><para>A list of available SIP connector attributes and their descriptions is located in the <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/> section of this user guide.</para></note>
+    <para>A number of public STUN servers are available, and can be specified in the stunServerAddress.  Depending on the router firmware used, the MAPPED_ADDRESS in STUN reply packets may be changed to the router's WAN port as they pass through particular router brands.  To alleviate this problem, certain public STUN servers provide XOR_MAPPED_ADDRESS support.  A selection of the public STUN servers include:</para>
+    <informaltable>
+      <tgroup align="left" cols="3" colsep="1" rowsep="1">
+       <colspec colwidth="1*"/>
+       <colspec colwidth="5*"/>
+       <tbody>
+         <row>
+           <entry>Server Address</entry><entry>XOR Support</entry><entry>DNS SRV Record</entry>
+          </row>
+          <row>
+            <entry>stun.ekiga.net</entry><entry>Yes</entry><entry>Yes</entry>
+          </row>
+         <row>
+           <entry>stun.fwdnet.net</entry><entry>No</entry><entry>Yes</entry>
+          </row>
+         <row>
+           <entry>stun.ideasip.com</entry><entry>No</entry><entry>Yes</entry>
+          </row> 
+          <row>
+           <entry>stun01.sipphone.com</entry><entry>Yes</entry><entry>No</entry>
+          </row>
+          <row>
+           <entry>stun.softjoys.com</entry><entry>No</entry><entry>No</entry>
+          </row>
+         <row>
+           <entry>stun.voipbuster.com</entry><entry>No</entry><entry>No</entry>
+          </row>
+         <row>
+           <entry>stun.voxgratia.org</entry><entry>No</entry><entry>No</entry>
+          </row>
+         <row>
+           <entry>stun.xten.com</entry><entry>Yes</entry><entry>Yes</entry>
+          </row>
+         <row>
+           <entry>stunserver.org</entry><entry>Yes</entry><entry>Yes</entry>
+          </row>
+        </tbody>
+      </tgroup>
+</informaltable>
+  </section>

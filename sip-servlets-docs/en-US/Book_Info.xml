@@ -1,0 +1,51 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE bookinfo PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]><!-- chapter id nickname: sssug -->
+<bookinfo id="sssug-SIP_Servlets_Server_User_Guide">
+	<title>SIP Servlets Server User Guide</title>
+	<subtitle>The Guide to the SIP Servlets v1.1-Certified Server</subtitle>
+  <productname>Mobicents Platform</productname>
+	<productnumber>1.2.1</productnumber>
+	<edition>2.0</edition>
+	<pubsnumber>1</pubsnumber>
+	<abstract>
+		<para><application condition="mob">The Mobicents Platform</application> is the first and only open source <acronym>VoIP</acronym> platform certified for <acronym>JAIN SLEE</acronym> 1.0 and <acronym>SIP</acronym> Servlets 1.1 compliance.  <application condition="mob">Mobicents</application><application condition="jbcp">JBCP</application> serves as a high-performance core for Service Delivery Platforms (<acronym>SDP</acronym>s) and <acronym>IP</acronym> Multimedia Subsystems (<acronym>IMS</acronym>s) by leveraging <acronym>J2EE</acronym> to enable the convergence of data and video in Next-Generation Intelligent Network (<acronym>NGIN</acronym>) applications.</para>
+		<para>The <application condition="mob">Mobicents Platform</application><application condition="jbcp">JBCP Platform</application> enables the composition of predefined Service Building Blocks (<acronym>SBB</acronym>s) such as Call-Control, Billing, User-Provisioning, Administration and Presence-Sensing.  Out-of-the-box monitoring and management of <application condition="mob">Mobicents</application><application condition="jbcp">JBCP</application> components is achieved through <acronym>JMX</acronym> Consoles. <acronym>JSLEE</acronym> allows popular protocol stacks such as <acronym>SIP</acronym> to be plugged in as Resource Adapters (<acronym>RA</acronym>s), and Service Building Blocks—which share many similarities with <acronym>EJB</acronym>s—allow the easy accommodation and integration of enterprise applications with end points such as the Web, Customer Relationship Management (<acronym>CRM</acronym>) systems and Service-Oriented Architectures (<acronym>SOA</acronym>s). The <application condition="mob">Mobicents Platform</application><application condition="jbcp">JBCP Platform</application> is the natural choice for telecommunication Operations Support Systems (OSSs) and Network Management Systems (NMSs).</para>
+		<para>In addition to the telecommunication industry, the <application condition="mob">Mobicents Platform</application><application condition="jbcp">JBCP Platform</application> is suitable for a variety of problem domains demanding an Event-Driven Architecture (<acronym>EDA</acronym>) for high-volume, low-latency signaling, such as financial trading, online gaming, (<acronym>RFID</acronym>) sensor network integration, and distributed control.</para>
+	</abstract>
+	<corpauthor>
+		<inlinemediaobject>
+			<imageobject>
+				<imagedata
+					format="SVG"
+					fileref="Common_Content/images/title_logo.svg" />
+			</imageobject>
+			<textobject>
+				<phrase>Logo</phrase>
+			</textobject>
+		</inlinemediaobject>
+	</corpauthor>
+	<copyright>
+		<year>&YEAR;</year>
+		<holder>&HOLDER;</holder>
+	</copyright>
+	<!--ORIGINAL:
+	<xi:include
+		href="Common_Content/Legal_Notice.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude" />-->
+	<!--FOR JDOCBOOK:-->
+	<!--<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Common_Content/Legal_Notice.xml">
+		<xi:fallback
+			xmlns:xi="http://www.w3.org/2001/XInclude">
+			<xi:include
+				href="fallback_content/Legal_Notice.xml"
+				xmlns:xi="http://www.w3.org/2001/XInclude"></xi:include>
+		</xi:fallback>
+	</xi:include>-->
+	<xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</bookinfo>
+
+
+

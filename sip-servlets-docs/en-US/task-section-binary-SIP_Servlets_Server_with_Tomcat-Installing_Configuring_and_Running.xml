@@ -1,0 +1,307 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]><!-- chapter id nickname: bssswticar -->
+<section
+	id="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running">
+	<title>SIP Servlet-Enabled Tomcat Servlet Container: Installing, Configuring and Running</title>
+	<para>You can also run Mobicents SIP Servlets on top of the Apache Tomcat Servlet Container. This section provides information on the requirements and prerequisites for running MSS for Tomcat, as well as instructions on how to download, install, configure, run, use, stop, test and uninstall it.</para>
+	<para>Keep in mind that not all capabilities provided by running Mobicents SIP Servlets Server on top of the JBoss Application Server are available with MSS for Tomcat. In particular, MSS for Tomcat lacks support for both clustering and failover; MSS for Tomcat nodes can utilize the SIP load balancer, however.</para>
+	<para>If you are interested in clustering and failover support, or would rather run the Mobicents SIP Servlets Server on top of the JBoss Application Server, go to <xref
+			linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>.</para>
+	<formalpara>
+		<title>Differences Between the Standard Tomcat Installation and One Customized for the SIP Servlets Server</title>
+		<para>Provided here is a list of differences between a standard Tomcat Servlet Container installation and the SIP Servlets Server for Tomcat installation. The differences include:</para>
+	</formalpara>
+	<itemizedlist>
+		<listitem>
+			<para>The <filename>server.xml</filename> configuration file has been modified to provide extended classes to the standard Tomcat container classes, in order to allow SIP applications to be loaded and the SIP stack started.</para>
+		</listitem>
+		<listitem>
+			<para>A <filename>dars</filename> directory containing the default applications' router properties files for using the SIP Servlet Click-to-Call application (which comes bundled with the release) has been added to the <filename>conf</filename> directory.</para>
+		</listitem>
+		<listitem>
+			<para>Additional JAR files which can be found in the <filename>lib</filename> directory have been added to enable SIP Servlet functionality.</para>
+		</listitem>
+	</itemizedlist>
+	<bridgehead
+		id="bssswticar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="mob-task-section-Java_Development_Kit-Installing_Configuring_and_Running.xml"></xi:include>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-PreInstall_Requirements_and_Prerequisites">
+		<title>Pre-Install Requirements and Prerequisites</title>
+		<variablelist
+			id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Hardware_Requirements">
+			<title>Hardware Requirements</title>
+			<varlistentry>
+				<term>Sufficient Disk Space</term>
+				<listitem>
+					<para>You must have sufficient disk space in order to install the MSS for Tomcat binary release. Once unzipped, version &SSS_MSS4T_VERSION; of the MSS for Tomcat binary release requires <emphasis>at least</emphasis> &SSS_MSS4T_SIZE; of free disk space. Keep in mind that disk space requirements may change from release to release.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Anything Java Itself Will Run On</term>
+				<listitem>
+					<para>MSS for Tomcat is 100% Java. It will run on the same hardware that the Tomcat Servlet Container runs on.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<variablelist
+			id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Software_Prerequisites">
+			<title>Software Prerequisites</title>
+			<varlistentry>
+				<term>JDK 5 or Higher</term>
+				<listitem>
+					<para>A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is required in order to run MSS for Tomcat.</para>
+					<!--<para>For instructions on how to install the JDK, refer to <xref linkend="bssswticar-Installing_the_Java_Development_Kit"/>.</para>-->
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Downloading">
+		<title>Downloading</title>
+		<para>You can download the latest version of MSS for Tomcat from <ulink
+				url="http://www.mobicents.org/mss-downloads.html"/>. The top row of the table holds the latest version. Note that each release of the Mobicents SIP Servlets Server is comprised of two separate binary distribution files: one which is MSS for JBoss, and the other which is MSS for Tomcat. Download Mobicents SIP Servlets Server for Tomcat and continue with the following instructions.</para>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Installing">
+		<title>Installing</title>
+		<para>Once the requirements and prerequisites have been met and you have downloaded the binary distribution zip file, you are ready to install MSS for Tomcat. Follow the instructions below for your platform, whether Linux or Windows.</para>
+		<note
+			id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Use_Version_Numbers_Relevant_to_Your_Installation">
+			<title>Use Version Numbers Relevant to Your Installation!</title>
+			<para>For clarity, the command line instructions presented in this chapter use specific version numbers and directory names. Remember to replace them with version numbers and file names relevant to those you are actually working with.</para>
+		</note>
+		<procedure>
+			<title>Installing the MSS for Tomcat Binary Distribution on Linux</title>
+			<step>
+				<para>For this example, we'll assume you're currently in your home directory, which is where you downloaded the zip file to. First, create a subdirectory to hold the unzipped MSS for Tomcat files. It is good practice to include the version number in this directory name; if you do so, remember to correctly match it with the version of the MSS for Tomcat distribution you downloaded.</para>
+				<screen>~]$ cd downloads</screen>
+			</step>
+			<step>
+				<para>In <filename>downloads</filename>, create a subdirectory to hold the unzipped MSS for Tomcat files. It is good practice to include the version number in this directory name; if you do so, remember to correctly match it with the version of the MSS for Tomcat binary distribution you downloaded.</para>
+				<screen>~]$ mkdir &quot;mss-tomcat-&lt;version&gt;&quot;</screen>
+			</step>
+			<step>
+				<para>Move the downloaded zip file into the directory you have just created:</para>
+				<screen>~]$ mv &quot;&SSS_MSS4T_ZIP;" "mss-tomcat-&lt;version&gt;&quot;</screen>
+			</step>
+			<step>
+				<para>Move into that directory:</para>
+				<screen>~]$ cd &quot;mss-tomcat-&lt;version&gt;&quot;</screen>
+			</step>
+			<step>
+				<para>Finally, use Java's <command>jar <option>-xvf</option>
+							</command> command to extract the contents of the zip file into the current directory, thus completing the install:</para>
+				<screen>mss-tomcat-&lt;version&gt;]$ jar -xvf &quot;&SSS_MSS4T_ZIP;&quot;</screen>
+				<stepalternatives>
+					<step>
+						<para>Alternatively, if Linux's <command>unzip</command> utility is present on your system or is installable, you can use it in lieu of Java's <command>jar <option>-xvf</option>
+									</command> command:</para>
+						<screen>mss-tomcat-&lt;version&gt;]$ unzip &quot;&SSS_MSS4T_ZIP;&quot;</screen>
+						<note>
+							<para>You can also use <command>unzip</command>'s <option>-d</option>
+								<filename>
+								<replaceable>&lt;unzip_to_location&gt;</replaceable>
+							</filename> option to extract the zip file's contents to a location other than the current directory.</para>
+						</note>
+					</step>
+				</stepalternatives>
+			</step>
+			<step>
+				<para>To free disk space, you may want to delete the zip file once you've extracted its contents:</para>
+				<screen>mss-tomcat-&lt;version&gt;]$ rm &quot;&SSS_MSS4T_ZIP;&quot;</screen>
+			</step>
+		</procedure>
+		<procedure>
+			<title>Installing the MSS for Tomcat Binary Distribution on Windows</title>
+			<step>
+				<para>For this example, we'll assume that you downloaded the binary distribution zip file to the <filename>My Downloads</filename> folder. First, using Windows Explorer, create a subfolder in <filename>My Downloads</filename> to extract the zip file's contents into. When you name this folder, it is good practice to include the version number; if you do so, remember to correctly match it with the version of the MSS for Tomcat binary distribution you downloaded. In these instructions, we will refer to this folder as <filename>mss-tomcat-<replaceable>&lt;version&gt;</replaceable></filename>.</para>
+			</step>
+			<step>
+				<para>Double-click the downloaded zip file, selecting as the destination folder the one you just created to hold the zip file's contents.</para>
+				<stepalternatives>
+					<step>
+						<para>Alternatively, it is also possible to use Java's <command>jar <option>-xvf</option>
+									</command> command to extract the binary distribution files from the zip archive. To use this method instead, first move the downloaded zip file from <filename>My Downloads</filename> to the folder that you just created to hold the SIP Servlets Server files.</para>
+					</step>
+					<step>
+						<para>Then, open the Windows Command Prompt and navigate to the folder holding the archive using the <command>cd</command> command.</para>
+						<note
+							id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Opening_the_Command_Prompt_from_Windows_Explorer">
+							<title>Opening the Command Prompt from Windows Explorer</title>
+							<para>If you are using Windows Vista&#xAE;, you can open the Command Prompt directly from Explorer. Hold down the <keycap>Shift</keycap> key and right-click on either a folder, the desktop, or inside a folder. This will cause an <guimenuitem>Open Command Window Here</guimenuitem> context menu item to appear, which can be used to open the Command Prompt with the current working directory set to either the folder you opened, or opened it from.</para>
+						</note>
+					</step>
+					<step>
+						<para>Finally, use the <command>jar <option>-xvf</option>
+									</command> command to extract the archive contents into the current folder.</para>
+						<screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-tomcat-&lt;version&gt;&gt;jar -xvf &quot;&SSS_MSS4T_ZIP;&quot;</screen>
+					</step>
+				</stepalternatives>
+			</step>
+			<step>
+				<para>At this point, you may want to move the folder holding the MSS for Tomcat binary files (in this example, the folder named <filename>mss-tomcat-<replaceable>&lt;version&gt;</replaceable></filename>) to another location. This step is not strictly necessary, but it is probably a good idea to move the installation folder from <filename>My Downloads</filename> to a user-defined location for storing runnable programs. Any location will suffice, however.</para>
+			</step>
+			<step>
+				<para>You may want to delete the zip file after extracting its contents in order to free disk space:</para>
+				<screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-tomcat-&lt;version&gt;&gt;delete &quot;&SSS_MSS4T_ZIP;&quot;</screen>
+			</step>
+		</procedure>
+	</section>
+	<section
+		id="section-SIP_Servlets_Server_with_Tomcat-Setting_the_CATALINA_HOME_Environment_Variable">
+		<title>Setting the CATALINA_HOME Environment Variable</title>
+		<para>Before running the Mobicents server you are installing, you should consider if you need to set the <envar>CATALINA_HOME</envar> environment variable. Setting it (or re-setting it) will always work. Whether or not you <emphasis>need</emphasis> to set <envar>CATALINA_HOME</envar> depends on the following factors:</para>
+		<itemizedlist>
+			<listitem>
+				<para>If you are installing a binary Mobicents server and <envar>CATALINA_HOME</envar> is not set on your system, then you <emphasis>do not need</emphasis> to set it, but doing so will do no harm.</para>
+			</listitem>
+			<listitem>
+				<para>If you are installing a binary Mobicents server and <envar>CATALINA_HOME</envar> is (already) set on your system, then you need to make sure it points to the location of the new Mobicents server.</para>
+			</listitem>
+			<listitem>
+				<para>If you are installing a Mobicents server from source which uses the Tomcat servlet container, then you <emphasis>must</emphasis> set <envar>CATALINA_HOME</envar>.</para>
+			</listitem>
+		</itemizedlist>
+		<para>The following instructions detail how to set <envar>CATALINA_HOME</envar> on both Linux and Windows.</para>
+		<procedure
+			id="bssswticar-Setting_the_CATALINA_HOME_Environment_Variable_on_Linux">
+			<title>Setting the <envar>CATALINA_HOME</envar> Environment Variable on Linux</title>
+			<step>
+				<para>The <envar>CATALINA_HOME</envar> environment variable must point to the location of your Tomcat installation. Any Mobicents server which runs on top of the Tomcat servlet container has a topmost directory, i.e. the directory in which you unzipped the zip file to install the server, and underneath that directory, a <filename>bin</filename> directory. <envar>CATALINA_HOME</envar> must be set to the topmost directory of your Mobicents server installation.</para>
+				<para>Setting this variable in your personal <filename>~/.bashrc</filename> file has the advantage that it will always be set (for you, as a user) each time you log in or reboot the system. To do so, open <filename>~/.bashrc</filename> in a text editor (or create the file if it doesn't already exist) and insert the following line anywhere in the file, taking care to substitute <filename>&lt;mobicents_server&gt;</filename> for the topmost directory of the Mobicents server you installed:</para>
+				<screen>export CATALINA_HOME=&quot;/home/&lt;username&gt;/&lt;path&gt;/&lt;to&gt;/&lt;mobicents_server&gt;&quot;</screen>
+				<para>Save and close <filename>.bashrc</filename>.</para>
+			</step>
+			<step>
+				<para>You can&#8212;and should&#8212;<command>source</command> your <filename>.bashrc</filename> file to make your change take effect (so that <envar>CATALINA_HOME</envar> is set) for the current session:</para>
+				<screen>~]$ source ~/.bashrc</screen>
+			</step>
+			<step>
+				<para>Finally, make sure that <envar>CATALINA_HOME</envar> has been set correctly (that it leads to the right directory), and has taken effect in the current session.</para>
+				<para>The following command will show the path to the directory pointed to by <envar>CATALINA_HOME</envar>:</para>
+				<screen>~]$ echo $CATALINA_HOME</screen>
+				<para>To be absolutely sure, change your directory to the one pointed to by <envar>CATALINA_HOME</envar>:</para>
+				<screen>~]$ cd $CATALINA_HOME &amp;&amp; pwd</screen>
+			</step>
+		</procedure>
+		<procedure
+			id="bssswticar-Setting_the_CATALINA_HOME_Environment_Variable_on_Windows">
+			<title>Setting the <envar>CATALINA_HOME</envar> Environment Variable on Windows</title>
+			<step>
+				<para>The <envar>CATALINA_HOME</envar> environment variable must point to the location of your Tomcat installation. Any Mobicents server which runs on top of the Tomcat servlet container has a topmost directory, i.e. the directory in which you unzipped the zip file to install the server, and underneath that directory, a <filename>bin</filename> directory. <envar>CATALINA_HOME</envar> must be set to the topmost directory of your Mobicents server installation.</para>
+				<para>If you are planning on running the Tomcat container as the Administrator, then you should, of course, set the <envar>CATALINA_HOME</envar> environment variable <emphasis>as the administrator</emphasis>, and if you planning to run Tomcat as a normal user, then set <envar>CATALINA_HOME</envar> as a user environment variable.</para>
+				<para>For information on how to set environment variables in Windows, refer to <ulink
+						url="http://support.microsoft.com/kb/931715"/>.</para>
+			</step>
+		</procedure>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Configuring">
+		<title>Configuring</title>
+		<para>Configuring MSS for Tomcat consists in setting the <envar>CATALINA_HOME</envar> environment variable and then, optionally, customizing your MSS for Tomcat container by adding SIP Connectors, configuring the application router, and configuring logging. See <xref
+				linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/> to learn what and how to configure MSS for Tomcat.</para>
+		<para>Alternatively, you can simply run your MSS for Tomcat container now and return to this section to configure it later.</para>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running">
+		<title>Running</title>
+		<para>Once installed, you can run the Tomcat Servlet Container by executing the one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only). However, we suggest always starting Tomcat using the terminal or Command Prompt because you are then able to read&#x2014;and act upon&#x2014;any startup messages, and possibly debug any problems that may arise. In the Linux terminal or Command Prompt, you will be able to tell that the container started successfully if the last line of output is similar to the following:</para>
+		<programlisting><![CDATA[Using CATALINA_BASE:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2
+Using CATALINA_HOME:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2
+Using CATALINA_TMPDIR: /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2/temp
+Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></programlisting>
+		<para>Detailed instructions are given below, arranged by platform.</para>
+		<procedure>
+			<title>Running MSS for Tomcat on Linux</title>
+			<step>
+				<para>Change your working directory to the SIP Servlets-customized Tomcat's topmost directory (the one in which you extracted the zip file's contents to):</para>
+				<screen>~]$ cd &quot;mss-tomcat-&lt;version&gt;&quot;</screen>
+			</step>
+			<step
+				performance="optional">
+				<para>(Optional) Ensure that the <filename>bin/startup.sh</filename> start script is executable:</para>
+				<screen>mss-tomcat-&lt;version&gt;]$ chmod +x bin/startup.sh</screen>
+			</step>
+			<step>
+				<para>Finally, execute the <filename>startup.sh</filename> Bourne shell script:</para>
+				<screen>mss-tomcat-&lt;version&gt;]$ ./bin/startup.sh</screen>
+			</step>
+		</procedure>
+		<procedure>
+			<title>Running MSS for Tomcat on Windows</title>
+			<step>
+				<para>There are several different ways to start the Tomcat Servlet Container on Windows. All of the following methods accomplish the same task.</para>
+				<para>Using Windows Explorer, change your folder to the one in which you unzipped the downloaded zip file, and then to the <filename>bin</filename> subfolder.</para>
+			</step>
+			<step>
+				<para>Although not the preferred way (see below), it is possible to start the Tomcat Servlet Container by double-clicking on the <filename>startup.bat</filename> executable batch file.</para>
+				<stepalternatives>
+					<step>
+						<para>As mentioned above, the best way to start the Tomcat Servlet Container is by using the Command Prompt. Doing it this way will allow you to view all of the server startup details, which will enable you to easily determine whether any problems were encountered during the startup process. You can open the Command Prompt directly from the <filename>&lt;topmost_directory&gt;&bsol;bin</filename> folder in Windows Explorer,<!--(see <xref
+								linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Opening_the_Command_Prompt_from_Windows_Explorer"/> for details)--> or you can open the Command Prompt via the <guilabel>Start</guilabel> menu and navigate to the correct folder:</para>
+						<screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&gt; cd &quot;mss-tomcat-&lt;version&gt;&quot;</screen>
+					</step>
+					<step>
+						<para>Start the Tomcat Servlet Container by running the executable <filename>startup.bat</filename> batch file:</para>
+						<screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-tomcat-&lt;version&gt;&gt;bin&bsol;startup.bat</screen>
+					</step>
+				</stepalternatives>
+			</step>
+		</procedure>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping">
+		<title>Stopping</title>
+		<para>Detailed instructions for stopping the Tomcat Servlet Container are given below, arranged by platform. Note that if you properly stop the server, you will see the following three lines as the last output in the Linux terminal or Command Prompt (both running and stopping the Tomcat Servlet Container produces the same output):</para>
+		<screen><![CDATA[Using CATALINA_BASE:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2
+Using CATALINA_HOME:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2
+Using CATALINA_TMPDIR: /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2/temp
+Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
+		<procedure>
+			<title>Stopping MSS for Tomcat on Linux by Executing <filename>shutdown.sh</filename>
+			</title>
+			<step>
+				<para>You can shut down the Tomcat Servlet Container by executing the <filename>shutdown.sh</filename> Bourne shell script in the <filename>&lt;topmost_directory&gt;/bin</filename> directory. To do so, first change your working directory to the binary distribution's topmost directory (the one to which you extracted the downloaded zip file's contents):</para>
+				<screen>downloads]$ cd &quot;mss-tomcat-&lt;version&gt;&quot;</screen>
+			</step>
+			<step
+				performance="optional">
+				<para>(Optional) Ensure that the bin/shutdown.sh start script is executable:</para>
+				<screen>mss-tomcat-&lt;version&gt;]$ chmod +x bin/shutdown.sh</screen>
+			</step>
+			<step>
+				<para>Finally, run the <filename>shutdown.sh</filename> executable Bourne shell script</para>
+				<screen>mss-tomcat-&lt;version&gt;]$ ./bin/shutdown.sh</screen>
+			</step>
+		</procedure>
+		<procedure>
+			<title>Stopping MSS for Tomcat on Windows</title>
+			<step>
+				<para>Stopping the Tomcat Servlet Container on Windows consists in executing the <filename>shutdown.bat</filename> executable batch script in the <filename>bin</filename> subfolder of the SIP Servlets-customized Tomcat binary distribution:</para>
+				<screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-tomcat-&lt;version&gt;&gt;bin&bsol;shutdown.bat</screen>
+			</step>
+		</procedure>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server-Using">
+		<title>Using</title>
+		<para>After starting the server successfully, you can access the default web applications included with MSS for Tomcat by opening the following URL in your browser: <ulink
+				url="http://localhost:8080/"/>.</para>
+		<para>You can also access the SIP Servlets Management Console by opening <ulink
+				url="http://localhost:8080/sip-servlets-management/"/> in your browser.</para>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Testing">
+		<title>Testing</title>
+		<para>&nbsp;</para>
+	</section>
+	<section
+		id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Uninstalling">
+		<title>Uninstalling</title>
+		<para>To uninstall MSS for Tomcat, simply delete the directory you decompressed the binary distribution archive into.</para>
+	</section>
+</section>

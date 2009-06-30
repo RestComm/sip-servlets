@@ -1,0 +1,176 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE authorgroup PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+<authorgroup>
+  <author>
+		<firstname>Jared</firstname>
+		<surname>Morgan</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv>Engineering Content Services</orgdiv>
+		</affiliation>
+		<email>jmorgan@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Douglas</firstname>
+		<surname>Silas</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv>Engineering Content Services</orgdiv>
+		</affiliation>
+		<email
+			condition="mobicents">dhensley@redhat.com</email>
+		<email
+			condition="jbcp">dhensley@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Ivelin</firstname>
+		<surname>Ivanov</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">ivelin.atanasoff.ivanov@gmail.com</email>
+		<email
+			condition="jbcp">iivanov@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Vladimir</firstname>
+		<surname>Ralev</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">vladimir.ralev@gmail.com</email>
+		<email
+			condition="jbcp">vralev@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Eduardo</firstname>
+		<surname>Martins</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">emmartins@gmail.com</email>
+		<email
+			condition="jbcp">emartins@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Jean</firstname>
+		<surname>Deruelle</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">jean.deruelle@gmail.com</email>
+		<email
+			condition="jbcp">jderuell@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Oleg</firstname>
+		<surname>Kulikov</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">oleg.kulikoff@gmail.com</email>
+		<email
+			condition="jbcp">okulikov@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Amit</firstname>
+		<surname>Bhayani</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">amit.bhayani@gmail.com</email>
+		<email
+			condition="jbcp">abhayani@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Luis</firstname>
+		<surname>Barreiro</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">lbbbarreiro@gmail.com</email>
+		<email
+			condition="jbcp">lbarreiro@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Alexandre</firstname>
+		<surname>Mendonça</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">brainslog@gmail.com</email>
+		<email
+			condition="jbcp">amendonc@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Bartosz</firstname>
+		<surname>Baranowski</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">baranowb@gmail.com</email>
+		<email
+			condition="jbcp">bbaranow@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Pavel</firstname>
+		<surname>Šlégr</surname>
+		<affiliation>
+			<orgname>Red Hat, </orgname>
+			<orgdiv
+				condition="mob">Mobicents</orgdiv>
+			<orgdiv
+				condition="jbcp">JBoss Communications Platform</orgdiv>
+		</affiliation>
+		<email
+			condition="mob">pavel.slegr@gmail.com</email>
+		<email
+			condition="jbcp">pslegr@redhat.com</email>
+	</author>
+</authorgroup>

@@ -1,0 +1,50 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]><!-- chapter id nickname: wwtssmc -->
+<section
+	id="wwtssmc-Working_with_the_SIP_Servlets_Management_Console">
+	<title>Working with the SIP Servlets Management Console</title>
+	<para>Once installed, the MSS for JBoss or MSS for Tomcat instance can be accessed and configured using the SIP Servlets Management Console.  The management console is available at <ulink url="http://localhost:8080/sip-servlets-management/"/>.</para>
+	<mediaobject
+		id="wwtssmc-mss-MSSSManagementConsole-ss-ManagementConsole">
+		<imageobject>
+			<imagedata
+				width="440"
+				align="center"
+				fileref="images/mss-MSSSManagementConsole-ss-ManagementConsole.png"
+				format="PNG"/>
+		</imageobject>
+		<caption>
+			<para>The SIP Servlets Management Console</para>
+		</caption>
+	</mediaobject>
+	<para>Information on how to use the SIP Servlets Management Console is available from the <guilabel>Help</guilabel> link on the top main menu bar.  Clicking <guilabel>Help</guilabel> displays a <guilabel>Default Application Router Help</guilabel> pop-up which can be repositioned and resized by dragging.</para>
+	<mediaobject
+		id="wwtssmc-mss-MSSSManagementConsole-ss-Help">
+		<imageobject>
+			<imagedata
+				width="440"
+				align="center"
+				fileref="images/mss-MSSSManagementConsole-ss-Help.png"
+				format="PNG"/>
+		</imageobject>
+		<caption>
+			<para>SIP Servlets Management Console: Default Application Router Help</para>
+		</caption>
+	</mediaobject>
+	<para>Recent versions of the SIP Servlets Management Console feature a <guilabel>Server Settings</guilabel> tab, in which concurrency and congestion control settings can be tuned.</para>
+	<mediaobject
+		id="wwtssmc-mss-MSSSManagementConsole-ss-ServerSettings-2">
+		<imageobject>
+			<imagedata
+				width="440"
+				align="center"
+				fileref="images/mss-MSSSManagementConsole-ss-ServerSettings.png"
+				format="PNG"/>
+		</imageobject>
+		<caption>
+			<para>Tunable SIP Servlets Server Settings</para>
+		</caption>
+	</mediaobject>
+	<para>For more information on concurrency and congestion control tuning, refer to <xref linkend="sscacc-Configuring_the_Concurrency_and_Congestion_Control_Settings"/>.</para>
+</section>
