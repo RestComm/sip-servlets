@@ -4,12 +4,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-bootstrap</artifactId>
+		<version>1.0-SNAPSHOT</version>
+    	</parent>
+
 	<groupId>org.jboss.jbossas</groupId>
 	<artifactId>Mobicents_User_Guides-${translation}</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jdocbook</packaging>
 	<!--<name>Platform User Guide (${translation})</name>-->
-	<name>${env.DOCNAME}(${translation})</name>
+	<name>SIP_Servlets_Server_User_Guide(${translation})</name>
 	<build>
 		<plugins>
 			<plugin>
@@ -33,11 +39,11 @@
 				<configuration>
 				    <!--minmemory>1024m</minmemory>
 			    <maxmemory>1024m</maxmemory -->
-					<sourceDocumentName>all-${env.DOCNAME}.xml</sourceDocumentName>
+					<sourceDocumentName>all-SIP_Servlets_Server_User_Guide.xml</sourceDocumentName>
 					<!--<sourceDocumentName>${env.DOCNAME}</sourceDocumentName>-->
-					<sourceDirectory>en-US</sourceDirectory>
+					<sourceDirectory>${basedir}/en-US</sourceDirectory>
 					<imageResource>
-						<directory>en-US</directory>
+						<directory>${basedir}/en-US</directory>
 						<includes>
 							<include>images/*</include>
 						</includes>
@@ -188,7 +194,7 @@
 							version 1.0.0 and version 1.1.0 -->
 							<!--<stylesheetResource>classpath:/xslt/org/jboss/main-pdf.xsl</stylesheetResource>-->
 									<stylesheetResource>classpath:/xslt/org/jboss/pdf.xsl</stylesheetResource>
-									<finalName>${env.DOCNAME}.pdf</finalName>
+									<finalName>SIP_Servlets_Server_User_Guide.pdf</finalName>
 								</format>
 								<format>
 									<formatName>html</formatName>
@@ -308,7 +314,7 @@
 							version 1.0.0 and version 1.1.0 -->
 							<!--<stylesheetResource>classpath:/xslt/org/jboss/main-pdf.xsl</stylesheetResource>-->
 									<stylesheetResource>classpath:/xslt/org/jboss/pdf.xsl</stylesheetResource>
-									<finalName>${env.DOCNAME}.pdf</finalName>
+									<finalName>SIP_Servlets_Server_User_Guide.pdf</finalName>
 								</format>
 							</formats>
 						</configuration>
