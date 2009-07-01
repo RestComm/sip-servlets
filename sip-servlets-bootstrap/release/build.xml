@@ -261,8 +261,8 @@
 		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
 		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
-		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
+		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
 						
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
