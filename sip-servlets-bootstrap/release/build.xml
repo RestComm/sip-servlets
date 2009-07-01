@@ -29,7 +29,7 @@
 	<property name="jboss-5.torquebox.deployer.url" value="http://repository.torquebox.org/maven2/snapshots/org/torquebox/torquebox-core/1.0.0.Beta13-SNAPSHOT/torquebox-core-1.0.0.Beta13-20090609.135000-1-deployer.jar"/>
 	<property name="jboss-5.torquebox.deployer.zip.path" value="${base.path}/torquebox-deployer.zip"/>
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
-	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.mux.version}.zip" />
+	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.version}.zip" />
 	
 	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
 	<property name="jboss-5.home" value="${release.path}/jboss-${jboss-5.version}" />
