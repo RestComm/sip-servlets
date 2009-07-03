@@ -38,14 +38,14 @@
   <recv response="200" rrs="true">
     <action>
 		<!-- TODO: Better regEx -->>
-		<ereg regexp="([[:graph:]])(.*:(.*@)?.*(:[[:digit:]]*)?)([[:graph:]])" search_in="hdr" header="Contact:" check_it="true" assign_to="1" />
+		<ereg regexp="\&lt;([a-zA-Z0-9@.=;]+)[^&gt;]+" search_in="hdr" header="Contact:" assign_to="1"/>
 	</action>
   </recv>
 
   <send>
     <![CDATA[
     
-      ACK sip:[service]@127.0.0.1:5080 SIP/2.0
+      ACK [$1] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
@@ -63,7 +63,7 @@
   
 <send retrans="500">
  <![CDATA[
-      BYE sip:[service]@127.0.0.1:5080 SIP/2.0
+      BYE [$1] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
