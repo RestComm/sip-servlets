@@ -201,7 +201,7 @@
 						<configuration>
 							<tasks>
 								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/default/deploy/admin-console.war/plugins" />
-								<move verbose="true" failonerror="false" file="${JBOSS_HOME}/server/default/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.2.0.EmbJopr_1_2_0-2.jar" tofile="${JBOSS_HOME}/server/default/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.2.0.EmbJopr_1_2_0-2.jar.bak" />
+								<move verbose="true" failonerror="false" file="${JBOSS_HOME}/server/default/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar" tofile="${JBOSS_HOME}/server/default/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar.bak" />
 							</tasks>
 						</configuration>
 						<goals>
