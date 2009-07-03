@@ -47,7 +47,7 @@ What is different from JBoss standard version
 	** in server/default/deploy/jboss-web.deployer/ directory, there should be a sip-servlets-spec-*.jar
 	** in server/default/deploy/jboss-web.deployer/ directory, there should be a sip-balancer-*.jar
 	** in server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-api-1.2.jar
-	** in server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-ri-1.2.86.jar
+	** in server/default/deploy/jboss-web.deployer/ directory, there should be a jain-sip-ri-1.2*.jar
 	** in server/default/deploy/jboss-web.deployer/ directory, there should be a concurrent-1.3.4.jar
 	** in server/default/deploy/jboss-web.deployer/ directory, there should be a log4j-1.2.14.jar
 	** in server/default/deploy/jboss-web.deployer/ directory, there should be a stun4j-1.0-MOBICENTS.jar
