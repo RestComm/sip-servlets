@@ -62,8 +62,8 @@
   <send>
     <![CDATA[
     
-      BYE sip:barreiro@127.0.0.1:5055 SIP/2.0      
-      [last_Via:]
+      BYE sip:barreiro@127.0.0.1:5055 SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]      
       From: [$2]
       To: [$1]
       [last_Call-ID:]
