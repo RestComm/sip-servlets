@@ -38,7 +38,7 @@
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>1.0.2.GA</mms.version>
+		<mms.version>1.0.3.GA</mms.version>
                 <war.plugin.version>2.1-beta-1</war.plugin.version>
 	</properties>
 
