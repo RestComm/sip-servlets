@@ -181,17 +181,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-		if(request.getMethod().equalsIgnoreCase("ACK")) {
-			if(sipSession.isAckReceived()) {
-				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
-				return;
-			}
-			sipSession.setAckReceived(true);
-		}
-		
+
 		//CSeq validation should only be done for non proxy applications
 		if(sipSession.getProxy() == null) {
+			if(request.getMethod().equalsIgnoreCase("ACK")) {
+				if(sipSession.isAckReceived()) {
+					// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
+					logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
+					return;
+				}
+				sipSession.setAckReceived(true);
+			}
 			CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
 			long localCseq = sipSession.getCseq();
 			long remoteCseq = cseq.getSeqNumber();

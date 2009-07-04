@@ -580,8 +580,8 @@ public class ProxyImpl implements Proxy, Serializable {
 			try {
 				originalRequest.createResponse(Response.REQUEST_TIMEOUT).send();
 				return;
-			} catch (IOException e1) {
-				throw new IllegalStateException("Faild to send a timeout response");
+			} catch (IOException e) {
+				throw new IllegalStateException("Failed to send a timeout response", e);
 			}
 		}
 		
