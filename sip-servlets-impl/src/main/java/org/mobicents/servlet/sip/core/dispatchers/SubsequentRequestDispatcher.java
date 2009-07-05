@@ -182,22 +182,19 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 		
-		final boolean isRetranmission = sipSession.isAckReceived();
 		boolean isAck = request.getMethod().equalsIgnoreCase("ACK");
+		final boolean isAckRetranmission = sipSession.isAckReceived() && isAck;
 		
 		if(isAck) {
 			sipSession.setAckReceived(true);
 		}
-		
+
 		//CSeq validation should only be done for non proxy applications
 		if(sipSession.getProxy() == null) {
-			if(isAck) {
-				if(isRetranmission) {
-					// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-					logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
-					return;
-				}
-				
+			if(isAckRetranmission) {
+				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
+				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
+				return;
 			}
 			CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
 			long localCseq = sipSession.getCseq();
@@ -251,7 +248,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							if(finalBranch != null) {								
 								proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
 								proxy.setOriginalRequest(sipServletRequest);
-								if(!isRetranmission) { // We shouldn't call the app again if it's just retrans
+								if(!isAckRetranmission) { // We shouldn't call the app again if it's just retrans
 									callServlet(sipServletRequest);
 								}
 								finalBranch.proxySubsequentRequest(sipServletRequest);
