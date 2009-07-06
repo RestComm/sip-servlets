@@ -150,7 +150,7 @@ public class ClassFileScanner {
 		    	    	Class clazz = Class.forName(className, false, this.classLoader);
 		    	    	processAnnotations(clazz);
 		    		} catch (Throwable e) {
-		    			logger.warn("Failed to parse annotations for class " + className);
+		    			logger.debug("Failed to parse annotations for class " + className);
 		    			if(logger.isDebugEnabled()) {
 		    				logger.debug("Failed to parse annotations for class " + className, e);
 		    			}
@@ -180,7 +180,7 @@ public class ClassFileScanner {
     	    	Class clazz = Class.forName(className, false, this.classLoader);
     	    	processAnnotations(clazz);
     		} catch (Throwable e) {
-    			logger.warn("Failed to parse annotations for class " + className);
+    			logger.debug("Failed to parse annotations for class " + className);
     			if(logger.isDebugEnabled()) {
     				logger.debug("Failed to parse annotations for class " + className, e);
     			}
