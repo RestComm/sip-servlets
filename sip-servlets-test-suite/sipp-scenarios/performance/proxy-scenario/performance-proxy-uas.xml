@@ -23,7 +23,7 @@
     ]]>
   </send>
 
-  <pause milliseconds="1000"/>
+  <pause milliseconds="300"/>
 
   <send retrans="500">
     <![CDATA[
@@ -57,9 +57,9 @@
     </action>
   </recv>
     
-  <pause milliseconds="2000" /> 
+  <pause milliseconds="300" /> 
   
-  <send>
+  <send retrans="500">
     <![CDATA[
     
       BYE sip:barreiro@127.0.0.1:5055 SIP/2.0
