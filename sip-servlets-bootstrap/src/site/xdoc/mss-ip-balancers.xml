@@ -25,7 +25,7 @@
 				In the simplest form the IP load-balancer usually "owns" the public-facing IP address (known as VIP) and routes the traffic to real server in it's private network serving as NAT in a way.
 				It is also possible to not change the IP address and just work on the MAC address by assuming that all real server are configured to accept packets for the VIP address.
 				Note that it depends on your load-balancer vendor what features are supported. For now we will just look at the popular Linux-based solution LVS in combination with the health check services. If you want to get started quickly it is recommended to
-				read <a href="http://www.ultramonkey.org/papers/lvs_tutorial/html/">this tutorial</a>. For a deeper looks at the system and especially if you are a RHEL user you should read <a href="http://www.redhat.com/docs/manuals/csgfs/">the official documentation by Red Hat</a>. There are number of other IP balancer solutions including hardware-based and they have similar features in most cases.
+				read <a href="http://www.ultramonkey.org/papers/lvs_tutorial/html/">this tutorial</a> or follow the instructions in <a href="http://code.google.com/p/mobicents/issues/detail?id=731">this issue</a> (these instructions deal only with ipvsadm without health checks). For a deeper looks at the system and especially if you are a RHEL user you should read <a href="http://www.redhat.com/docs/manuals/csgfs/">the official documentation by Red Hat</a>. There are number of other IP balancer solutions including hardware-based and they have similar features in most cases.
 			</p>
 		</section>
 		<section name="Why bother with the SIP load balancer if the IP load-balancer is so much better?">
@@ -43,7 +43,7 @@
 			</p>
 						<ul>
 			<li>If you don't need mid-call failover, you can just configure the LVS as a normal load-balancer and it will only route the initial requests. After the dialog is established initially the requests will continue flowing between the SIP client and the application server directly. In case of a NAT you should use STUN-enabled SIP clients.</li>
-				<li>If you need mid-call failover you should configure Mobicents Sip Servlets application servers with static address pointing to the load-balancer address. See <a href="http://code.google.com/p/mobicents/issues/detail?id=720">here</a> on how to do this. This option enabled all initial aAND subsequent requests to pass through the IP load-balancer and the IP-load balancer makes individual routing decisions for each of these requests. </li>
+				<li>If you need mid-call failover you should configure Mobicents Sip Servlets application servers with static address pointing to the load-balancer address. See <a href="http://code.google.com/p/mobicents/issues/detail?id=720">here</a> on how to do this. This option forces all initial and subsequent requests to pass through the IP load-balancer and the IP-load balancer makes individual routing decisions for each requests. </li>
 			</ul><p>Now if you need the mid-call failover, you might need to enable connection affinity for these requests. Usually the SIP connection between a SIP client and a server is done using the same SIP ports (sockets), so what you need in this case is the usual connection persistence with LVS. And it is as simple as adding the <b>-p</b> option to your ipvsadm service.
 			For more information on persistence you can read <a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.persistent_connection.html">here</a></p>
 		</section>	

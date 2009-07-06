@@ -17,7 +17,10 @@ Configuration
 	<<<useStun="false">>>\
 	<<<stunServerAddress="stun01.sipphone.com">>>\
 	<<<stunServerPort="3478">>>\
-    <<<sipStackPropertiesFile="conf/mss-sip-stack.properties"/>>>>
+    <<<sipStackPropertiesFile="conf/mss-sip-stack.properties"/>>>\
+    <<<staticServerAddress="122.122.122.122"/>>>\
+    <<<staticServerPort="44"/>>>\
+    <<<useStaticAddress="true"/>>>>
 	
 	Here is a description of the sip Connector tag's attributes :
 		
@@ -60,6 +63,12 @@ Configuration
 	
 	* Optionnaly there is a <<<sipPathName>>> attribute allowing one to change the underlying JAIN SIP Stack implementation. If not specified it defaults to "gov.nist", which is the RI for JAIN SIP.
 	Please note that switching the JAIN SIP Stack will not work because we rely on internal classes of the RI, but Mobicents proposed some additions to the JAIN SIP APIs so that the next rev of the spec allows it.
+	
+	* <<<staticServerAddress>>> : this attribute specifies what address to put in Contact/Via headers of requests created by the server. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
+	
+	* <<<staticServerPort>>> : the port of the load-balancer specified in <<<staticServerAddress>>>. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
+	
+	* <<<useStaticAddress>>> : Specifies whether the settings in <<<staticServerAddress>>> and <<<staticServerPort>>> should are active. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
 	
 * Application Router and Service Configuration
 
