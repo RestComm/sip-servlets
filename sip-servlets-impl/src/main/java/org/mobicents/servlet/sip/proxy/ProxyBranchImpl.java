@@ -449,16 +449,15 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 //			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
 //				clonedRequest.removeFirst(RouteHeader.NAME);	
 //			}
-//		}		
-	
-		String transport = JainSipUtils.findTransport(clonedRequest);
-		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
-				transport, false).getSipProvider();
+//		}					
 		
 		try {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
+				String transport = JainSipUtils.findTransport(clonedRequest);
+				SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();
 				sipProvider.sendRequest(clonedRequest);
 			}
 			else {				

@@ -276,7 +276,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * the topmost via header is stripped from the response and the response is forwarded statefully
 	 * @param sipServletResponse
 	 */
-	private final static void forwardResponseStatefully(final SipServletResponseImpl sipServletResponse) {
+	private final void forwardResponseStatefully(final SipServletResponseImpl sipServletResponse) {
 		final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
 		final Dialog dialog = sipServletResponse.getDialog();
 		final Response response = sipServletResponse.getResponse();
@@ -309,16 +309,29 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(logger.isDebugEnabled()) {
 					logger.debug("dialog application data " + applicationData);
 				}
-			}								
-			final ServerTransaction serverTransaction = (ServerTransaction)
-				applicationData.getTransaction();
-			try {					
-				serverTransaction.sendResponse(newResponse);
-			} catch (SipException e) {
-				logger.error("cannot forward the response statefully" , e);
-			} catch (InvalidArgumentException e) {
-				logger.error("cannot forward the response statefully" , e);
-			}				
+			}		
+			if(applicationData != null) {
+				// non retransmission case
+				final ServerTransaction serverTransaction = (ServerTransaction)
+					applicationData.getTransaction();
+				try {					
+					serverTransaction.sendResponse(newResponse);
+				} catch (SipException e) {
+					logger.error("cannot forward the response statefully" , e);
+				} catch (InvalidArgumentException e) {
+					logger.error("cannot forward the response statefully" , e);
+				}				
+			} else {
+				// retransmission case
+				try {	
+					String transport = JainSipUtils.findTransport(newResponse);
+					SipProvider sipProvider = sipApplicationDispatcher.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+							transport, false).getSipProvider();
+					sipProvider.sendResponse(newResponse);
+				} catch (SipException e) {
+					logger.error("cannot forward the response statelessly" , e);
+				} 
+			}
 		} else {
 			//B2BUA case we don't have to do anything here
 			//no more via header B2BUA is the end point
