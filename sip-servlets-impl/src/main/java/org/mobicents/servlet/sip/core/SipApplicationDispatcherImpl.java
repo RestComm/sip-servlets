@@ -634,13 +634,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						"since this a 100");
 			}
 			return;
-		}
-		if(responseEvent.getClientTransaction() == null && responseEvent.getDialog() == null) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("the following response is dropped since there is no client transaction nor dialog for it : " + response);	
-			}
-			return;
-		}
+		}		
 		responsesProcessed.incrementAndGet();
 		final ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
 		final Dialog dialog = responseEvent.getDialog();

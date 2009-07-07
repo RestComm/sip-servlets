@@ -203,7 +203,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 							ProxyBranchImpl proxyBranch = null;
 							if(finalApplicationData != null) {
 								proxyBranch = finalApplicationData.getProxyBranch();
-							}
+							} else if(session.getProxy() != null) {
+								// the final Application data is null meaning that the CTX was null, so it's a retransmission
+								proxyBranch = session.getProxy().getFinalBranchForSubsequentRequests();								
+							} 
 							if(proxyBranch != null) {
 								sipServletResponse.setProxyBranch(proxyBranch);								
 								// Update Session state
@@ -222,6 +225,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 								//we don't forward the response here since this has been done by the proxy
 							}
 							else {
+								// in non proxy case we drop the retransmissions
+								if(sipServletResponse.getTransaction() == null && sipServletResponse.getDialog() == null) {
+									if(logger.isDebugEnabled()) {
+										logger.debug("the following response is dropped since there is no client transaction nor dialog for it : " + response);	
+									}
+									return;
+								}
 								// Update Session state
 								session.updateStateOnResponse(sipServletResponse, true);
 

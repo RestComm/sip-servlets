@@ -34,6 +34,8 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.SipException;
+import javax.sip.SipProvider;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
@@ -453,8 +455,8 @@ public class ProxyImpl implements Proxy, Serializable {
 		//Get the final response
 		SipServletResponseImpl response = (SipServletResponseImpl) branch.getResponse();
 		
-		// Cancel all others if 2xx or 6xx 10.2.4
-		if(!isNoCancel) {
+		// Cancel all others if 2xx or 6xx 10.2.4 and it's not a retransmission
+		if(!isNoCancel && response.getTransaction() != null) {
 			if( (response.getStatus() >= 200 && response.getStatus() < 300) 
 					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
 				if(this.getParallel()) {
@@ -586,21 +588,35 @@ public class ProxyImpl implements Proxy, Serializable {
 		}
 		
 		//Otherwise proceed with proxying the response
-		SipServletResponse proxiedResponse = 
+		SipServletResponseImpl proxiedResponse = 
 			getProxyUtils().createProxiedResponse(response, proxyBranch);
 		
 		if(proxiedResponse == null) {
 			return; // this response was addressed to this proxy
 		}
 
-		try {
-			proxiedResponse.send();
-			proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
-			originalRequest = null;
-			bestBranch = null;
-			bestResponse = null;
-		} catch (IOException e) {
-			logger.error("A problem occured while proxying the final response", e);
+		if(proxiedResponse.getTransaction() != null) {
+			// non retransmission case
+			try {
+				proxiedResponse.send();
+					
+				proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
+				originalRequest = null;
+				bestBranch = null;
+				bestResponse = null;
+			} catch (Exception e) {
+				logger.error("A problem occured while proxying the final response", e);
+			}
+		} else {
+			// retransmission case, RFC3261 specifies that the retrans should be proxied statelessly
+			String transport = JainSipUtils.findTransport(proxiedResponse.getMessage());
+			SipProvider sipProvider = getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+					transport, false).getSipProvider();
+			try {
+				sipProvider.sendResponse((Response)proxiedResponse.getMessage());
+			} catch (SipException e) {
+				logger.error("A problem occured while proxying the final response retransmission", e);
+			}
 		}
 	}
 	

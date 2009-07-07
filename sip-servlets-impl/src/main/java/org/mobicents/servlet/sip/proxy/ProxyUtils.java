@@ -213,8 +213,8 @@ public class ProxyUtils {
 		Response clonedResponse = (Response)  response.clone();
 		((SIPMessage)clonedResponse).setApplicationData(null);
 
-		// 1. Update timer C for provisional responses
-		if(sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE)) {
+		// 1. Update timer C for provisional non retransmission responses
+		if(sipServetResponse.getTransaction() != null && sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE)) {
 			if(Response.TRYING < response.getStatusCode() && response.getStatusCode() < Response.OK) {
 				proxyBranch.updateTimer();
 			} else if(response.getStatusCode() >= Response.OK) {
@@ -239,11 +239,22 @@ public class ProxyUtils {
 				(SipServletRequestImpl) proxyBranch.getPrackOriginalRequest();
 		}
 		
-		SipServletResponseImpl newServletResponseImpl = new SipServletResponseImpl(clonedResponse,
-				sipFactoryImpl,
-				originalRequest.getTransaction(),
-				originalRequest.getSipSession(),
-				sipServetResponse.getDialog());
+		SipServletResponseImpl newServletResponseImpl = null;
+		if(sipServetResponse.getTransaction() != null) {
+			// non retransmission case
+			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
+					sipFactoryImpl,
+					originalRequest.getTransaction(),
+					originalRequest.getSipSession(),
+					sipServetResponse.getDialog());
+		} else {
+			// retransmission case
+			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
+					sipFactoryImpl,
+					null,
+					sipServetResponse.getSipSession(),
+					sipServetResponse.getDialog());
+		}
 		newServletResponseImpl.setOriginalRequest(originalRequest);
 		newServletResponseImpl.setProxiedResponse(true);
 		return newServletResponseImpl;
