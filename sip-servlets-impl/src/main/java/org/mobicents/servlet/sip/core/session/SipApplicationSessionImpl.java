@@ -547,12 +547,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		
 		isValid = false;	
 		//cancelling the timers
-		for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
-			ServletTimer timerEntry = servletTimerEntry.getValue();
-			if(timerEntry != null) {
-				timerEntry.cancel();				
-			}
-		}		
+		if(servletTimers != null) {
+			for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
+				ServletTimer timerEntry = servletTimerEntry.getValue();
+				if(timerEntry != null) {
+					timerEntry.cancel();				
+				}
+			}		
+		}
 		if(!expired && expirationTimerTask != null) {
 			cancelExpirationTimer();
 		}
@@ -580,12 +582,19 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		sipContext.getSipSessionsUtil().removeCorrespondingSipApplicationSession(key);
 		expirationTimerTask = null;
 		expirationTimerFuture = null;
-		httpSessions.clear();
+		if(httpSessions != null) {
+			httpSessions.clear();
+		}
 //		key = null;
-		servletTimers.clear();
-		sipApplicationSessionAttributeMap.clear();
-		sipSessions.clear();
-		httpSessions.clear();
+		if(servletTimers != null) {
+			servletTimers.clear();
+		}
+		if(sipApplicationSessionAttributeMap != null) {
+			sipApplicationSessionAttributeMap.clear();
+		}
+		if(sipSessions != null) {
+			sipSessions.clear();
+		}		
 //		executorService.shutdown();
 //		executorService = null;		
 		httpSessions = null;
