@@ -75,12 +75,13 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private boolean started;
 	private boolean timedOut;
 	private int proxyBranchTimeout;
-	private transient Timer proxyBranchTimer;
 	private transient ProxyBranchTimerTask proxyTimeoutTask;
 	private boolean canceled;
 	private boolean isAddToPath;
 	private transient List<ProxyBranch> recursedBranches;
 	private boolean waitingForPrack;
+	
+	private static transient Timer timer = new Timer();
 	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
@@ -559,17 +560,15 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 *
 	 */
 	void updateTimer() {
-		if(proxyBranchTimer != null) {
-			proxyBranchTimer.cancel();
-			proxyBranchTimer.purge();
+		if(proxyTimeoutTask != null) {
+			proxyTimeoutTask.cancel();
 		}
-		proxyBranchTimer = new Timer();
 		proxyTimeoutTask = new ProxyBranchTimerTask(this);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
 		}
 		if(proxyBranchTimeout != 0)
-			proxyBranchTimer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
+			timer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
 	}
 	
 	/**
@@ -577,11 +576,10 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 */
 	public void cancelTimer()
 	{
-		if(proxyBranchTimer != null)
+		if(proxyTimeoutTask != null)
 		{
-			proxyBranchTimer.cancel();
-			proxyBranchTimer.purge();
-			proxyBranchTimer = null;
+			proxyTimeoutTask.cancel();
+			proxyTimeoutTask = null;
 		}
 	}
 
