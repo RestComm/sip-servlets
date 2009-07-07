@@ -248,9 +248,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							if(finalBranch != null) {								
 								proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
 								proxy.setOriginalRequest(sipServletRequest);
-								if(!isAckRetranmission) { // We shouldn't call the app again if it's just retrans
+								// if(!isAckRetranmission) { // We should pass the ack retrans (implied by 10.2.4.1 Handling 2xx Responses to INVITE)
 									callServlet(sipServletRequest);
-								}
+
 								finalBranch.proxySubsequentRequest(sipServletRequest);
 							} else if(requestMethod.equals(Request.PRACK)) {
 								callServlet(sipServletRequest);
