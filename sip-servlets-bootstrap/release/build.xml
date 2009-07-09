@@ -390,11 +390,11 @@
 	<target name="build-mobicents-diameter" depends="get-mobicents-diameter">
 		<unzip overwrite="true" dest="${diameter.extracted}" src="${diameter.distro.zip.path}">
 			<patternset>
-				<include name="core/mux/mobicents-diameter-${diameter.version}.sar/**/*" />
+				<include name="core/mux/mobicents-diameter-mux-${diameter.version}.sar/**/*" />
 			</patternset>
 		</unzip>
 		<copy verbose="true" todir="${jboss.home}/server/${jboss.config}/deploy/">
-			<fileset dir="${diameter.extracted}/core/${diameter.version}" />
+			<fileset dir="${diameter.extracted}/core/mux" />
 		</copy>
 	</target>
 	
