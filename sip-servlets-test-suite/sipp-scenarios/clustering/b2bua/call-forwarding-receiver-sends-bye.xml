@@ -57,20 +57,20 @@
     </action>
   </recv>
   
-  <pause milliseconds="10000"/>
+  <pause milliseconds="20000"/>
   
 	<send retrans="5000">
 	 <![CDATA[BYE sip:BigGuy@127.0.0.1:5080 SIP/2.0
-Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-From : [$2]
-To : [$1]
-Call-ID: [call_id]
-CSeq: 2 BYE
-Contact: sip:LittleGuy@[local_ip]:[local_port]
-[routes]
-Max-Forwards: 70
-Subject: Clustering Test
-Content-Length: 0]]>
+		Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+		From : [$2]
+		To : [$1]
+		Call-ID: [call_id]
+		CSeq: 2 BYE
+		Contact: sip:LittleGuy@[local_ip]:[local_port]
+		[routes]
+		Max-Forwards: 70
+		Subject: Clustering Test
+		Content-Length: 0]]>
 	</send>
 	<recv response="200" crlf="true">
 	</recv>
