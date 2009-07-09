@@ -138,7 +138,8 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		SipSession linkedSession = byeHelper.getLinkedSession(session);		
 		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
 		logger.info("forkedRequest = " + forkedRequest);			
-		forkedRequest.send();		
+		forkedRequest.send();	
+		helper = byeHelper;
 	}	
 	
 	@Override
