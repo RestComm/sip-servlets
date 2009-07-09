@@ -20,7 +20,7 @@
 	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
-	<property name="diameter.version" value="1.0.0.GA" />
+	<property name="diameter.version" value="1.0.1.GA" />
 	<property name="diameter.mux.download.url" value="http://downloads.sourceforge.net/mobicents/mobicents-diameter-${diameter.version}.zip" />
 	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.version}.zip" />
 	<property name="diameter.mux.extracted" value="${release.path}/mobicents-diameter-mux-${diameter.version}-extracted" />

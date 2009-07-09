@@ -16,13 +16,13 @@
     <dependency>
       <groupId>org.mobicents.servers.diameter</groupId>
       <artifactId>jdiameter-api</artifactId>
-      <version>1.5.0.1-build186</version>
+      <version>1.5.0.1-build187</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mobicents.servers.diameter</groupId>
       <artifactId>mobicents-diameter-mux-jar</artifactId>
-      <version>1.0.0.BETA4</version>
+      <version>1.0.1.GA</version>
       <scope>provided</scope>
     </dependency>    
     <dependency>
