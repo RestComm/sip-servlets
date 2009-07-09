@@ -111,10 +111,8 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			IOException {
 		logger.info("Got BYE: " + request.toString());
 		//we forward the BYE
-		if(helper == null) {
-			helper = request.getB2buaHelper();
-		}
-		SipSession linkedSipSession = helper.getLinkedSession(request.getSession());
+		B2buaHelper byeHelper = request.getB2buaHelper();
+		SipSession linkedSipSession = byeHelper.getLinkedSession(request.getSession());
 		String linkedSipSessionInviteAttribute  = (String) linkedSipSession.getAttribute("INVITE");
 		String sipSessionInviteAttribute  = (String) request.getSession().getAttribute("INVITE");
 		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");		
@@ -137,7 +135,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		sipServletResponse.send();
 		
 		SipSession session = request.getSession();		
-		SipSession linkedSession = helper.getLinkedSession(session);		
+		SipSession linkedSession = byeHelper.getLinkedSession(session);		
 		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
 		logger.info("forkedRequest = " + forkedRequest);			
 		forkedRequest.send();		
