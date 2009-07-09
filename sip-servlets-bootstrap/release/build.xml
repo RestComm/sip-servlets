@@ -21,9 +21,9 @@
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
 	<property name="diameter.version" value="1.0.1.GA" />
-	<property name="diameter.mux.download.url" value="http://downloads.sourceforge.net/mobicents/mobicents-diameter-${diameter.version}.zip" />
-	<property name="diameter.mux.distro.zip.path" value="${base.path}/mobicents-diameter-mux-${diameter.version}.zip" />
-	<property name="diameter.mux.extracted" value="${release.path}/mobicents-diameter-mux-${diameter.version}-extracted" />
+	<property name="diameter.download.url" value="http://downloads.sourceforge.net/mobicents/mobicents-diameter-${diameter.version}.zip" />
+	<property name="diameter.distro.zip.path" value="${base.path}/mobicents-diameter-${diameter.version}.zip" />
+	<property name="diameter.extracted" value="${release.path}/mobicents-diameter-${diameter.version}-extracted" />
 	
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
@@ -99,7 +99,7 @@
 			<property name="jboss.home" value="${jboss.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
-		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter">
 			<property name="jboss.home" value="${jboss.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
@@ -154,7 +154,7 @@
 			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
 		</copy>
 		<!-- Commented out because Diameter don't run on JB5 yet -->
-		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-mux">
+		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter">
 			<property name="jboss.home" value="${jboss.home}"/>
 			<property name="jboss.config" value="@{jboss.config}"/>
 		</ant-->
@@ -387,21 +387,21 @@
 	
 	<!-- Download dependencies from SourceForge -->
 	
-	<target name="build-mobicents-diameter-mux" depends="get-mobicents-diameter-mux">
-		<unzip overwrite="true" dest="${diameter.mux.extracted}" src="${diameter.mux.distro.zip.path}">
+	<target name="build-mobicents-diameter" depends="get-mobicents-diameter">
+		<unzip overwrite="true" dest="${diameter.extracted}" src="${diameter.distro.zip.path}">
 			<patternset>
-				<include name="core/mux-${diameter.version}/mobicents-diameter-mux-${diameter.version}.sar/**/*" />
+				<include name="core/mux/mobicents-diameter-${diameter.version}.sar/**/*" />
 			</patternset>
 		</unzip>
 		<copy verbose="true" todir="${jboss.home}/server/${jboss.config}/deploy/">
-			<fileset dir="${diameter.mux.extracted}/core/mux-${diameter.version}" />
+			<fileset dir="${diameter.extracted}/core/${diameter.version}" />
 		</copy>
 	</target>
 	
-	<available file="${diameter.mux.distro.zip.path}" property="got.mobicents-diameter-mux" />
-	<target name="get-mobicents-diameter-mux" unless="got.mobicents-diameter-mux">
-		<echo>Downloading Mobicents Diameter Mux</echo>
-			<get dest="${diameter.mux.distro.zip.path}" src="${diameter.mux.download.url}" />
+	<available file="${diameter.distro.zip.path}" property="got.mobicents-diameter" />
+	<target name="get-mobicents-diameter" unless="got.mobicents-diameter">
+		<echo>Downloading Mobicents Diameter</echo>
+			<get dest="${diameter.distro.zip.path}" src="${diameter.download.url}" />
 	</target>
 	
 	<!-- Fetch and build documentation -->
