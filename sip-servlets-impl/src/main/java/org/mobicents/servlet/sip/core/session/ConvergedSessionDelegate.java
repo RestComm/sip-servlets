@@ -21,6 +21,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -33,7 +34,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class ConvergedSessionDelegate {
-
+	private static transient Logger logger = Logger.getLogger(ConvergedSessionDelegate.class);
 	// We are storing the app session id in the http sessions (since they are replicated) under this key
 	private static final String APPLICATION_SESSION_ID_ATTRIBUTE_NAME = "org.mobicents.servlet.sip.SipApplicationSessionId";
 	
@@ -139,7 +140,14 @@ public class ConvergedSessionDelegate {
 			key = (SipApplicationSessionKey) httpSession.getAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME); 
 		}
 		if(key != null) {
-			return sipManager.getSipApplicationSession(key, false);
+			MobicentsSipApplicationSession sipAppSession = sipManager.getSipApplicationSession(key, false);
+			if (sipAppSession != null) {
+				return sipAppSession;
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug(key + " found in http session " + httpSession.getId() + " but not present in the manager. already invalidated ? creating new sip application session");
+				}
+			}
 		}
 		
 		//Otherwise proceed as normally

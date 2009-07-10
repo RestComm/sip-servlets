@@ -968,13 +968,29 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			for(MobicentsSipSession sipSession : getSipSessions()) {
 				if(sipSession.isValid() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
-						logger.debug("Session not ready to be invalidated : " + sipSession.getKey());
+						logger.debug("Sip Session not ready to be invalidated : " + sipSession.getKey());
 					}
 					return;
 				}
 			}
+			// Fix for Issue 813 : SipApplicationSession invalidates too soon when HttpSession are present
+			// (http://code.google.com/p/mobicents/issues/detail?id=813)
+			for(HttpSession httpSession: getHttpSessions()) {				
+				if(httpSession instanceof ConvergedSession) {
+					ConvergedSession convergedSession = (ConvergedSession) httpSession;
+					if(convergedSession.isValid()) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("Http Session not ready to be invalidated : " + convergedSession.getId());
+						}
+						return;
+					}
+				} 
+			}
 			
 			if(this.servletTimers.size() <= 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("All sip sessions and http session are ready to be invalidated, no timers alive, can invalidate this application session " + key);
+				}
 				this.readyToInvalidate = true;
 			} else {
 				if(logger.isDebugEnabled()) {
