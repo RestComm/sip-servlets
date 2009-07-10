@@ -1157,6 +1157,13 @@
 									Race Condition on 180/200 in MSS	
 								</a>								
 							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=805">
+									Proxy not seeing retransmissions	
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
