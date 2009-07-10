@@ -1,0 +1,50 @@
+﻿<?xml version='1.0'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+<section id="tsear-echarts-Application-Router">
+	<title>eCharts Application Router</title>
+	<para>&nbsp;</para>
+	<section>
+		<title>Role of the Application Router</title>
+		<para>The Application Router is called by the container to select a SIP servlet application to service an initial request. It embodies the logic used to choose which applications to invoke.</para>
+		<para>An Application Router is required for a container to function, but it is a separate logical entity from the container.  The Application Router is solely responsible for application selection and must not implement application logic. For example, the Application Router cannot modify a request or send a response.</para>
+                <para>There is no direct interaction between the Application Router and applications, only between the Sip Servlets Container and the Application Router</para>
+		<para>So that the Application Router can make knowledgeable decisions, the Sip Servlets container is responsible for passing a number of information related to the initial request. Besides the information passed by the container, the Application Router is free to make use of any other information or data stores.  How it accesses that information and what information it makes use of is a matter of its implementation and is not defined in the Sip Servlets 1.1 specification.</para>
+		<para>The role of the deployer is defined in the Servlet API :
+		The deployer in a SIP servlet environment controls application composition by defining and deploying the Application Router implementation.  Giving the deployer control over application composition is desirable because it is the deployer who is most aware of and responsible for the totality of services provided to his or her subscribers. Furthermore, this specification intentionally allows the Application Router implementation to consult arbitrary information or data stores.  This is because the deployer maintains subscriber information and this information is often private and valuable.</para>		
+	</section>
+	<section>
+		<title>Default Application Router</title>
+		<para>Mobicents Sip Servlets provides an implementation of the Default Application Router (DAR) as defined per Sip Servlets 1.1 specification, Appendix C.</para>		
+		<section>
+			<title>the DAR Configuration file</title>
+			<para>The Default Application Router (DAR) works off a simple configuration text file which is modeled as a Java properties file</para>
+			<itemizedlist>
+				<listitem>
+					<para>The properties file MUST be made available to the DAR and the location/content of this file MUST be accessible from a hierarchical URI which itself is to be supplied as a system property "javax.servlet.sip.ar.dar.configuration".
+In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file (See the Configuration Section for more details) or the (See the sip servlets managment console</para>
+				</listitem>
+				<listitem>
+					<para>The properties file is first read by the container when it loads up.</para>
+				</listitem>
+				<listitem>
+					<para>The properties file is refreshed each time an application is deployed/undeployed.</para>
+				</listitem>
+				<listitem>
+					<para>The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated stringified value for the SipApplicationRouterInfo object.
+INVITE: (sip-router-info-1), (sip-router-info-2)..
+SUBSCRIBE: (sip-router-info-3), (sip-router-info-4)..
+ALL: (sip-router-info-5), (sip-router-info-6)..</para>
+				</listitem>
+			</itemizedlist>
+			<note><para>In addition to what is defined in the Sip Servlet 1.1 Specification, Mobicents Sip Servlets defines a new keyword called ALL allowing a mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an application that listen to all incoming methods. If both the ALL and a specific method are defined in the DAR file, the specific method takes precedence oever the ALL, and ALL is called when there is no applications to serve for the specific method anymore.</para></note>
+		</section>
+	</section>
+	<section>
+		<title>Limitations</title>
+		<para>It is not possible to filter out the requests based on some headers to target specific applications, like if From Header user domain part is equals to sip-servlets.org call Application 1 and if not called Application 2.</para>
+		<para>As you would notice, this is a minimalist Application Router with no processing logic besides the declaration of the application order.  It is expected that in real world deployments, the Application Router shall play an extremely important role in application orchestration and composition.  It is likely to make use of complex rules and diverse data repositories.</para>
+		<para>The DAR is intended to be a very simple implementation that is available as part of the reference implementation, and could be used instead of a real world Application Router.</para>
+		<para>So far we didn't had requests for a more elaborated Application Router but if you need one you can either open an issue see the feedback page or look at the DFC Application Router from ECharts .</para>		
+	</section>
+</section>
