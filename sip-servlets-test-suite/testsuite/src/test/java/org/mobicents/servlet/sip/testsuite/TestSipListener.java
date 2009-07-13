@@ -229,6 +229,8 @@ public class TestSipListener implements SipListener {
 	private boolean recordRoutingProxyTesting;
 	
 	public boolean b2buamessagereceived;
+	
+	private boolean sendSubsequentRequestsThroughSipProvider;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1113,7 +1115,11 @@ public class TestSipListener implements SipListener {
 						ackRequest.setRequestURI(requestURI);	
 					}
 					logger.info("Sending ACK");
-					tid.getDialog().sendAck(ackRequest);
+					if(!sendSubsequentRequestsThroughSipProvider) {
+						tid.getDialog().sendAck(ackRequest);
+					} else {
+						sipProvider.sendRequest(ackRequest);
+					}
 					ackSent = true;
 					Thread.sleep(1000);
 					// If the caller is supposed to send the bye
@@ -1444,7 +1450,11 @@ public class TestSipListener implements SipListener {
 					Request byeRequest = dialog.createRequest(Request.BYE);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 					logger.info("Sending BYE " + byeRequest);
-					dialog.sendRequest(ct);
+					if(!sendSubsequentRequestsThroughSipProvider) {
+						dialog.sendRequest(ct);
+					} else {
+						sipProvider.sendRequest(byeRequest);
+					}
 					byeSent = true;	
 				} catch(Exception e)  {e.printStackTrace();}
 			}
@@ -2209,6 +2219,21 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isRecordRoutingProxyTesting() {
 		return recordRoutingProxyTesting;
+	}
+
+	/**
+	 * @param sendSubsequentRequestsThroughSipProvider the sendSubsequentRequestsThroughSipProvider to set
+	 */
+	public void setSendSubsequentRequestsThroughSipProvider(
+			boolean sendSubsequentRequestsThroughSipProvider) {
+		this.sendSubsequentRequestsThroughSipProvider = sendSubsequentRequestsThroughSipProvider;
+	}
+
+	/**
+	 * @return the sendSubsequentRequestsThroughSipProvider
+	 */
+	public boolean isSendSubsequentRequestsThroughSipProvider() {
+		return sendSubsequentRequestsThroughSipProvider;
 	}
 
 }

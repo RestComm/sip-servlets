@@ -37,6 +37,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -103,12 +104,39 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);
 			applicationName = tuple[0];
 			applicationId = tuple[1];
-			if(Request.ACK.equals(request.getMethod()) && applicationId == null && applicationName == null) {
-				//Means that this is an ACK to a container generated error response, so we can drop it
-				if(logger.isDebugEnabled()) {
-					logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
+			if(applicationId == null && applicationName == null) {
+				javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+				
+				String host = sipRequestUri.getHost();
+				int port = sipRequestUri.getPort();
+				String transport = JainSipUtils.findTransport(request);
+				boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+				//Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
+				// Container should proxy statelessly subsequent requests not targeted at itself
+				if(isAnotherDomain) {					
+					// Some UA are misbehaving and don't follow the non record proxy so they sent subsequent requests to the container (due to oubound proxy set probably) instead of directly to the UA
+					// so we proxy statelessly those requests
+					if(logger.isDebugEnabled()) {
+						logger.debug("No application found to handle this request " + request + " with the following popped route header " + poppedRouteHeader + " so forwarding statelessly to the outside since it is not targeted at the container");
+					}
+					try {
+						sipProvider.sendRequest(request);
+					} catch (SipException e) {
+						throw new DispatcherException("cannot proxy statelessly outside of the container the following request " + request, e);
+					}
+					return;
+				} else {
+					if(Request.ACK.equals(request.getMethod())) {
+						//Means that this is an ACK to a container generated error response, so we can drop it
+						if(logger.isDebugEnabled()) {
+							logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
+						}				
+						return ;
+					} else {
+						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+								"in this popped routed header " + poppedRouteHeader);
+					}
 				}
-				return ;
 			} 
 		}		
 		

@@ -30,7 +30,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  */
 public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 
-	private static transient Logger logger = Logger.getLogger(SpeedDialLocationServiceJunitTest.class);
+	private static transient Logger logger = Logger.getLogger(NoApplicationDeployedJunitTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;

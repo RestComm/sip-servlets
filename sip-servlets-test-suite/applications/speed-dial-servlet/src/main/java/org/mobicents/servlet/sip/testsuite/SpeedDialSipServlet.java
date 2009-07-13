@@ -53,6 +53,8 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 	
 	private static final String TEST_USER_REMOTE = "remote";
 	
+	private static boolean isRecordRoute = true;
+	
 	Map<String, String> dialNumberToSipUriMapping = null;
 
 	/** Creates a new instance of SpeedDialSipServlet */
@@ -70,6 +72,12 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		dialNumberToSipUriMapping.put("5", "sip:jeand@sip-servlets.com");
 		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
+		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090");
+		String initParam = servletConfig.getServletContext().getInitParameter("record_route");
+		if(initParam != null && initParam.equals("false")) {
+			isRecordRoute = false;
+		}
+		logger.info("Speed dial sip servlet is record routing ?" + isRecordRoute);
 	}
 
 	@Override
@@ -118,7 +126,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
 			Proxy proxy = request.getProxy();
 			proxy.setProxyTimeout(120);
-			proxy.setRecordRoute(true);
+			proxy.setRecordRoute(isRecordRoute);
 			proxy.setParallel(false);
 			proxy.setSupervised(true);
 			logger.info("proxying to " + mappedUri);

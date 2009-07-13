@@ -55,6 +55,7 @@ import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteUse
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyBranchTimeoutTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyPrackTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyRecordRouteReInviteTest;
+import org.mobicents.servlet.sip.testsuite.proxy.SpeedDialJunitTest;
 import org.mobicents.servlet.sip.testsuite.publish.PublishSipServletTest;
 import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
 import org.mobicents.servlet.sip.testsuite.reinvite.ReInviteSipServletTest;
@@ -109,6 +110,7 @@ public class AllTests {
 		suite.addTestSuite(CallControllerCancelTest.class);
 		suite.addTestSuite(B2BUACompositionJunitTest.class);
 		suite.addTestSuite(ProxyB2BUACompositionTest.class);
+		suite.addTestSuite(SpeedDialJunitTest.class);
 		suite.addTestSuite(LocationServiceB2BUACompositionTest.class);
 		suite.addTestSuite(SameSipSessionB2BUACompositionJunitTest.class);
 		suite.addTestSuite(ProxyRecordRouteReInviteTest.class);
