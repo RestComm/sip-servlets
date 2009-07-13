@@ -167,11 +167,12 @@ public abstract class SipManagerDelegate {
 			logger.debug("Removing a sip application session with the key : " + key);
 		}
 		MobicentsSipApplicationSession sipApplicationSession  = sipApplicationSessions.remove(key);
-		final String appGeneratedKey = sipApplicationSession.getKey().getAppGeneratedKey();
-		if(appGeneratedKey != null) {
-			sipApplicationSessionsByAppGeneratedKey.remove(appGeneratedKey);
+		if(sipApplicationSession != null) {
+			final String appGeneratedKey = sipApplicationSession.getKey().getAppGeneratedKey();
+			if(appGeneratedKey != null) {
+				sipApplicationSessionsByAppGeneratedKey.remove(appGeneratedKey);
+			}
 		}
-		
 		return sipApplicationSession;
 	}
 	
