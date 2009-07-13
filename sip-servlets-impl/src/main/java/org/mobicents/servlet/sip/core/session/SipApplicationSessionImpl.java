@@ -243,7 +243,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
-		return this.sipSessions.remove(mobicentsSipSession.getKey().toString());
+		if(sipSessions != null) {
+			return this.sipSessions.remove(mobicentsSipSession.getKey().toString());
+		} 
+		return null;
 	}
 	
 	public void addHttpSession(HttpSession httpSession) {
@@ -256,7 +259,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public boolean removeHttpSession(HttpSession httpSession) {
-		return this.httpSessions.remove(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+		if(httpSessions != null) {
+			return this.httpSessions.remove(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+		}
+		return false;
 	}
 	
 	public HttpSession findHttpSession (String sessionId) {

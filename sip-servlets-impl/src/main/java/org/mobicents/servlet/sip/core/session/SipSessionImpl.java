@@ -651,17 +651,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 				
 		// No need for checks after JSR 289 PFD spec
 		//checkInvalidation();
-		for (String key : sipSessionAttributeMap.keySet()) {
-			removeAttribute(key);
+		if(sipSessionAttributeMap != null) {
+			for (String key : sipSessionAttributeMap.keySet()) {
+				removeAttribute(key);
+			}
 		}
 		notifySipSessionListeners(SipSessionEventType.DELETION);
 		
 		isValid = false;	
 		
-		for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
-			derivedMobicentsSipSession.invalidate();
+		if(derivedSipSessions != null) {
+			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
+				derivedMobicentsSipSession.invalidate();
+			}		
+			derivedSipSessions.clear();
 		}
-		derivedSipSessions.clear();		
 		
 		/*
          * Compute how long this session has been alive, and update
@@ -685,8 +689,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		getSipApplicationSession().getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
-		ongoingTransactions.clear();
-		subscriptions.clear();
+		if(ongoingTransactions != null) {
+			ongoingTransactions.clear();
+		}
+		if(subscriptions != null) {
+			subscriptions.clear();
+		}
 //		executorService.shutdown();
 		parentSession = null;
 		userPrincipal = null;		
