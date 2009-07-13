@@ -423,10 +423,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected Set<MobicentsSipSession> getSipSessions() {
 		Set<MobicentsSipSession> retSipSessions = new HashSet<MobicentsSipSession>();
-		for(SipSessionKey sipSessionKey : sipSessions.values()) {
-			MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
-			if(sipSession != null) {
-				retSipSessions.add(sipSession);
+		if(sipSessions != null) {
+			for(SipSessionKey sipSessionKey : sipSessions.values()) {
+				MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
+				if(sipSession != null) {
+					retSipSessions.add(sipSession);
+				}
 			}
 		}
 		return retSipSessions;
@@ -434,15 +436,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected Set<HttpSession> getHttpSessions() {
 		Set<HttpSession> retHttpSessions = new HashSet<HttpSession>();
-		for(String id : httpSessions) {
-			try {
-				HttpSession httpSession = (HttpSession)sipContext.getSipManager().findSession(id);
-				if(httpSession != null) {
-					retHttpSessions.add(httpSession);
-				}
-			} catch (IOException e) {
-				logger.error("An Unexpected exception happened while retrieving the http session " + id, e);			
-			}			
+		if(httpSessions != null) {
+			for(String id : httpSessions) {
+				try {
+					HttpSession httpSession = (HttpSession)sipContext.getSipManager().findSession(id);
+					if(httpSession != null) {
+						retHttpSessions.add(httpSession);
+					}
+				} catch (IOException e) {
+					logger.error("An Unexpected exception happened while retrieving the http session " + id, e);			
+				}			
+			}
 		}
 		return retHttpSessions;
 	}
