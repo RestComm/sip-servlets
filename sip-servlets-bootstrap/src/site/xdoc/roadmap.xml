@@ -1164,6 +1164,20 @@
 									Proxy not seeing retransmissions	
 								</a>								
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=813">
+									SipApplicationSession invalidates too soon when HttpSession are present
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=823">
+									Container not proxying statelessly subsequent requests not targeted at itself
+								</a>								
+							</li>
 						</ul>
 					</p>
 				</subsection>
