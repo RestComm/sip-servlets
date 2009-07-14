@@ -194,8 +194,8 @@ public class MediaConnectionListener implements MsConnectionListener {
 			if(sipSession.getAttribute("adminApproval") != null) {
 				speech = new File("adminspeech.wav");	
 			}			
-			logger.info("Playing confirmation announcement : " + "file://" + speech.getAbsolutePath());
-	        play.setURL("file://"+ speech.getAbsolutePath());
+			logger.info("Playing confirmation announcement : " + "file:///" + speech.getAbsolutePath());
+	        play.setURL("file:///"+ speech.getAbsolutePath().replace('\\', '/'));
 
 	        endpoint.execute(requestedSignals, requestedEvents, link);
 	        
@@ -203,16 +203,16 @@ public class MediaConnectionListener implements MsConnectionListener {
 		} else if (sipSession.getAttribute("deliveryDate") != null) {			
 			String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
 			logger.info("Playing Delivery Date Announcement : " + announcementFile);
-			play.setURL(announcementFile);
+			play.setURL(announcementFile.replace('\\', '/'));
 			endpoint.execute(requestedSignals, requestedEvents, link);
 			
 			logger.info("Waiting for DTMF at the same time..");
 		} else if (sipSession.getAttribute("shipping") != null) {			
 			java.io.File speech = new File("shipping.wav");
-			logger.info("Playing shipping announcement : " + "file://" + speech.getAbsolutePath());
+			logger.info("Playing shipping announcement : " + "file:///" + speech.getAbsolutePath().replace('\\', '/'));
 			MediaResourceListener mediaResourceListener = new MediaResourceListener(sipSession, link, connection);
 			link.addNotificationListener(mediaResourceListener);
-			play.setURL("file://"+ speech.getAbsolutePath());
+			play.setURL("file:///"+ speech.getAbsolutePath().replace('\\', '/'));
 			endpoint.execute(requestedSignals, requestedEvents, link);
 			
 			logger.info("shipping announcement played. tearing down the call");
