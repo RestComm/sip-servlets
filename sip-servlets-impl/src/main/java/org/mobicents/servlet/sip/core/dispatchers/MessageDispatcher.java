@@ -213,18 +213,18 @@ public abstract class MessageDispatcher {
 	}
 	
 	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
-		MobicentsSipSession session = request.getSipSession();		
-		String sessionHandler = session.getHandler();
-		MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
-		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
+		final MobicentsSipSession session = request.getSipSession();		
+		final String sessionHandler = session.getHandler();
+		final MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
+		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
+		final Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		if(sipServletImpl != null) {
 			if(logger.isInfoEnabled()) {
 				logger.info("Dispatching request " + request.toString() + 
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
 					"/" + session.getHandler() + " on following sip session " + session.getId());
 			}
-			Servlet servlet = sipServletImpl.allocate();
+			final Servlet servlet = sipServletImpl.allocate();
 			// JBoss-specific CL issue:
 			// This is needed because usually the classloader here is some UnifiedClassLoader3,
 			// which has no idea where the servlet ENC is. We will use the classloader of the
@@ -259,12 +259,12 @@ public abstract class MessageDispatcher {
 	}
 	
 	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
-		MobicentsSipSession session = response.getSipSession();
+		final MobicentsSipSession session = response.getSipSession();
 		
-		String sessionHandler = session.getHandler();
-		MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
-		SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
+		final String sessionHandler = session.getHandler();
+		final MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
+		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
+		final Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		
 		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
 			if(sipContext.getSipRubyController() != null) {
@@ -282,7 +282,7 @@ public abstract class MessageDispatcher {
 				logger.warn(sessionHandler + " is unavailable, dropping response " + response);
 			}
 		} else {
-			Servlet servlet = sipServletImpl.allocate();
+			final Servlet servlet = sipServletImpl.allocate();
 			if(logger.isInfoEnabled()) {
 				logger.info("Dispatching response " + response.toString() + 
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
