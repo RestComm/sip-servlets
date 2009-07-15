@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
@@ -1044,6 +1045,9 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			}
 			
 			int nbOfHttpSessions = in.readInt();
+			if(nbOfHttpSessions > 0) {
+				httpSessions = new CopyOnWriteArraySet<String>();
+			}
 			for (int i = 0; i < nbOfHttpSessions; i++) {
 				httpSessionsOnPassivation.add(in.readUTF());
 			}
@@ -1123,10 +1127,13 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			for (String sipSessionKey : sipSessions.keySet()) {
 				out.writeUTF(sipSessionKey);
 			}
-			
-			out.writeInt(httpSessions.size());
-			for (HttpSession httpSession : getHttpSessions()) {
-				out.writeUTF(((ClusteredSession)httpSession).getRealId());
+			if(httpSessions != null) {
+				out.writeInt(httpSessions.size());
+				for (HttpSession httpSession : getHttpSessions()) {
+					out.writeUTF(((ClusteredSession)httpSession).getRealId());
+				}
+			} else {
+				out.writeInt(0);
 			}
 			
 			// From ClusteredSession

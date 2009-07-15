@@ -695,8 +695,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		getSipApplicationSession().getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
-		ongoingTransactions.clear();
-		subscriptions.clear();
+		if(ongoingTransactions != null) {
+			ongoingTransactions.clear();
+		}
+		if(subscriptions != null) {
+			subscriptions.clear();
+		}
 //		executorService.shutdown();
 		parentSession = null;
 		userPrincipal = null;		
@@ -1152,9 +1156,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(cSeqHeader.getMethod())) || response.getStatus() == 487) {
 			boolean hasOngoingSubscriptions = false;
-			synchronized (subscriptions) {
-				if(subscriptions.size() > 0) {
-					hasOngoingSubscriptions = true;
+			if(subscriptions != null) {
+				synchronized (subscriptions) {
+					if(subscriptions.size() > 0) {
+						hasOngoingSubscriptions = true;
+					}
 				}
 			}
 			if(!hasOngoingSubscriptions) {
@@ -1503,19 +1509,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 			logger.info("removing subscription " + eventHeader + " to sip session " + getId());
 		}
 		boolean hasOngoingSubscriptions = false;
-		synchronized (subscriptions) {
-			subscriptions.remove(eventHeader);
-			if(subscriptions.size() > 0) {
-				hasOngoingSubscriptions = true;
-			}
-		}
-		if(!hasOngoingSubscriptions) {		
-			if(subscriptions.size() < 1) {
-				if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
-					readyToInvalidate = true;
-					setState(State.TERMINATED);
+		if(subscriptions != null) {
+			synchronized (subscriptions) {
+				subscriptions.remove(eventHeader);
+				if(subscriptions.size() > 0) {
+					hasOngoingSubscriptions = true;
 				}
-			}			
+			}
+			if(!hasOngoingSubscriptions) {		
+				if(subscriptions.size() < 1) {
+					if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
+						readyToInvalidate = true;
+						setState(State.TERMINATED);
+					}
+				}			
+			}
 		}
 		if(readyToInvalidate) {
 			if(logger.isInfoEnabled()) {

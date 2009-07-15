@@ -21,6 +21,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -174,8 +175,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();
-		httpSessions = new CopyOnWriteArraySet<String>();
-		servletTimers = new ConcurrentHashMap<String, ServletTimer>();
 		if(!ConcurrencyControlMode.None.equals(sipContext.getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);
 		}
@@ -257,6 +256,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addHttpSession(HttpSession httpSession) {
+		if(httpSessions == null) {
+			httpSessions = new CopyOnWriteArraySet<String>();
+		}
 		this.httpSessions.add(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
 		readyToInvalidate = false;
 		// TODO: We assume that there is only one HTTP session in the app session. In this case
@@ -274,11 +276,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	public HttpSession findHttpSession (String sessionId) {
 		String id = JvmRouteUtil.removeJvmRoute(sessionId);
-		if(httpSessions.contains(id)) {
-			try {
-				return (HttpSession)sipContext.getSipManager().findSession(id);
-			} catch (IOException e) {
-				logger.error("An Unexpected exception happened while retrieving the http session " + id, e);				
+		if(httpSessions != null) {
+			if(httpSessions.contains(id)) {
+				try {
+					return (HttpSession)sipContext.getSipManager().findSession(id);
+				} catch (IOException e) {
+					logger.error("An Unexpected exception happened while retrieving the http session " + id, e);				
+				}
 			}
 		}
 		return null;
@@ -501,7 +505,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return servletTimers.values();
+		if(servletTimers != null) {
+			return servletTimers.values();
+		}
+		return new HashMap<String, ServletTimer>().values();
 	}
 
 	/**
@@ -509,6 +516,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @param servletTimer the servlet timer to add
 	 */
 	public void addServletTimer(ServletTimer servletTimer){
+		if(servletTimers == null) {
+			servletTimers = new ConcurrentHashMap<String, ServletTimer>();
+		}
 		servletTimers.putIfAbsent(servletTimer.getId(), servletTimer);
 	}
 	/**
@@ -516,7 +526,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @param servletTimer the servlet timer to remove
 	 */
 	public void removeServletTimer(ServletTimer servletTimer){
-		servletTimers.remove(servletTimer.getId());
+		if(servletTimers != null) {
+			servletTimers.remove(servletTimer.getId());
+		}
 		updateReadyToInvalidateState();
 	}
 	
@@ -882,7 +894,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return servletTimers.get(id);
+		if(servletTimers != null) {
+			return servletTimers.get(id);
+		} 
+		return null;
 	}
 	
 	/**
@@ -1007,7 +1022,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				} 
 			}
 			
-			if(this.servletTimers.size() <= 0) {
+			if(servletTimers == null || this.servletTimers.size() <= 0) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("All sip sessions and http session are ready to be invalidated, no timers alive, can invalidate this application session " + key);
 				}

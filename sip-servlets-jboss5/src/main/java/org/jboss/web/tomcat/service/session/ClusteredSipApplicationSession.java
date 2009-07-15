@@ -637,8 +637,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		for(String sessionId : sipSessions.keySet()) {
 			this.metadata.addSipSessionId(sessionId);
 		}
-		for(String sessionId : httpSessions) {
-			this.metadata.addHttpSessionId(sessionId);
+		if(httpSessions != null) {
+			for(String sessionId : httpSessions) {
+				this.metadata.addHttpSessionId(sessionId);
+			}
 		}
 	}
 
