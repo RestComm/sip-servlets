@@ -464,8 +464,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
 		if (this.session != null
-				&& this.session.getApplicationSession() != null) {
-			return this.session.getApplicationSession();
+				&& this.session.getSipApplicationSession() != null) {
+			return this.session.getSipApplicationSession();
 		} else if (create) {						
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			SipApplicationSessionKey key = SessionManagerUtil.getSipApplicationSessionKey(
@@ -488,7 +488,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				this.session.setSessionCreatingTransaction(transaction);				
 			} 
 //			this.session.setSipApplicationSession(applicationSession);
-			return this.session.getApplicationSession();			
+			return this.session.getSipApplicationSession();			
 		}		
 		return null;
 	}
