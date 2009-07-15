@@ -27,6 +27,7 @@ import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.text.ParseException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -210,7 +211,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 	protected transient Set<Transaction> ongoingTransactions;
 	
-	protected transient ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
+	volatile protected transient ConcurrentHashMap<String, MobicentsSipSession> derivedSipSessions;
 
 	/*
 	 * The almighty provider
@@ -233,7 +234,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	//Subscriptions used for RFC 3265 compliance to be able to determine when the session can be invalidated
 	//  A subscription is destroyed when a notifier sends a NOTIFY request with a "Subscription-State" of "terminated".
 	// If a subscription's destruction leaves no other application state associated with the dialog, the dialog terminates
-	protected transient Set<EventHeader> subscriptions = null;
+	volatile protected transient Set<EventHeader> subscriptions = null;
 	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
 	protected transient String originalMethod = null;
 	protected transient boolean okToByeSentOrReceived = false;
@@ -247,10 +248,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.sipFactory = sipFactoryImpl;
 		this.creationTime = this.lastAccessedTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
-		this.isValid = true;
-		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
+		this.isValid = true;		
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
-		this.subscriptions = new HashSet<EventHeader>();
 		if(mobicentsSipApplicationSession.getSipContext() != null && !ConcurrencyControlMode.None.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);		
 		}
@@ -1409,14 +1408,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public MobicentsSipSession findDerivedSipSession(String toTag) {
-		return derivedSipSessions.get(toTag);
+		if(derivedSipSessions != null) {
+			return derivedSipSessions.get(toTag);
+		}
+		return null;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	public Iterator<MobicentsSipSession> getDerivedSipSessions() {
-		return derivedSipSessions.values().iterator();
+		if(derivedSipSessions != null) {
+			return derivedSipSessions.values().iterator();
+		}
+		return new HashMap<String, MobicentsSipSession>().values().iterator();
 	}
 	
 	/**
@@ -1437,6 +1442,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void addDerivedSipSessions(MobicentsSipSession derivedSession) {
+		if(derivedSipSessions == null) {
+			this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
+		}
 		derivedSipSessions.putIfAbsent(derivedSession.getKey().getToTag(), derivedSession);
 	}
 	/**
@@ -1470,6 +1478,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(logger.isInfoEnabled()) {
 			logger.info("adding subscription " + eventHeader + " to sip session " + getId());
+		}
+		if(subscriptions == null) {
+			this.subscriptions = new HashSet<EventHeader>();
 		}
 		synchronized (subscriptions) {
 			subscriptions.add(eventHeader);	
