@@ -421,8 +421,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				//Issue 112 fix by folsson: use the viaheader transport				
 				final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), 
-						response
-						);
+						response);
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
 				sipURI.setParameter(MessageDispatcher.APP_ID, sipAppSessionKey.getId());
 				sipURI.setLrParam();				
@@ -456,12 +455,11 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			//if a response is sent for an initial request, it means that the application
 			//acted as an endpoint so a dialog must be created but only for dialog creating method
-			final CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 			if(!Request.CANCEL.equals(originalRequest.getMethod())					
 					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
 							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
 					&& getTransaction().getDialog() == null 
-					&& JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod())) {					
+					&& JainSipUtils.dialogCreatingMethods.contains(method)) {					
 				final String transport = JainSipUtils.findTransport(transaction.getRequest());
 				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();

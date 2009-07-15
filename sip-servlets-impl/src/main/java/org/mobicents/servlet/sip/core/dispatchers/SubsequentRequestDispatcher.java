@@ -38,7 +38,6 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -107,10 +106,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			if(applicationId == null && applicationName == null) {
 				javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
 				
-				String host = sipRequestUri.getHost();
-				int port = sipRequestUri.getPort();
-				String transport = JainSipUtils.findTransport(request);
-				boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+				final String host = sipRequestUri.getHost();
+				final int port = sipRequestUri.getPort();
+				final String transport = JainSipUtils.findTransport(request);
+				final boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
 				//Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
 				// Container should proxy statelessly subsequent requests not targeted at itself
 				if(isAnotherDomain) {					
@@ -210,7 +209,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 		
-		boolean isAck = request.getMethod().equalsIgnoreCase("ACK");
+		final boolean isAck = request.getMethod().equalsIgnoreCase("ACK");
 		final boolean isAckRetranmission = sipSession.isAckReceived() && isAck;
 		
 		if(isAck) {
@@ -224,13 +223,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
 				return;
 			}
-			CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
-			long localCseq = sipSession.getCseq();
-			long remoteCseq = cseq.getSeqNumber();
+			final CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
+			final long localCseq = sipSession.getCseq();
+			final long remoteCseq = cseq.getSeqNumber();
 			
 			if(localCseq>remoteCseq) {
 				logger.error("CSeq out of order for the following request");
-				SipServletResponse response = sipServletRequest.createResponse(500, "CSeq out of order");
+				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
 				try {
 					response.send();
 				} catch (IOException e) {
@@ -243,14 +242,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
 		
 		
-		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
+		final DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
 			public void dispatch() throws DispatcherException {
 				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
 				
 				final String requestMethod = sipServletRequest.getMethod();
-				final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-					sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 				try {
 					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
 					// JSR 289 Section 6.2.1 :
@@ -262,11 +259,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
 						// a new subscription and a new dialog (unless they have already been
 						// created by a matching response, as described above).								
-						if(Request.NOTIFY.equals(requestMethod) && 
-										(subscriptionStateHeader != null && 
+						if(Request.NOTIFY.equals(requestMethod)) {
+							final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+								sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
+						 						
+							if (subscriptionStateHeader != null && 
 												SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
-							sipSession.addSubscription(sipServletRequest);
+												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState())) {					
+								sipSession.addSubscription(sipServletRequest);
+							}
 						}						
 								
 						// See if the subsequent request should go directly to the proxy
@@ -306,10 +307,14 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				} finally {
 					// A subscription is destroyed when a notifier sends a NOTIFY request
 					// with a "Subscription-State" of "terminated".			
-					if(Request.NOTIFY.equals(requestMethod) && 
-									(subscriptionStateHeader != null && 
-											SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
-						sipSession.removeSubscription(sipServletRequest);
+					if(Request.NOTIFY.equals(requestMethod)) {
+						final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+							sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
+					
+						if (subscriptionStateHeader != null && 
+											SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
+							sipSession.removeSubscription(sipServletRequest);
+						}
 					}
 					sipContext.exitSipApp(sipServletRequest, null);
 				}

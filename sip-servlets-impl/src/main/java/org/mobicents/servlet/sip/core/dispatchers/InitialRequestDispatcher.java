@@ -383,7 +383,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			sipContext.getSipSessionsUtil().addCorrespondingSipSession(sipSessionImpl, joinReplacesSipSession, headerName);		
 		}
 		
-		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
+		final DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
 
 			public void dispatch() throws DispatcherException {
 				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);

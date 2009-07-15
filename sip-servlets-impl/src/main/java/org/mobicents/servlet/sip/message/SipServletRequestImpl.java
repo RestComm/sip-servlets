@@ -79,9 +79,10 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
@@ -249,7 +250,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			final Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);
 			final Dialog dialog = transaction.getDialog();
-			final String method = request.getMethod();
 			if(reasonPhrase!=null) {
 				response.setReasonPhrase(reasonPhrase);
 			}
@@ -839,12 +839,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void send() {
 		checkReadOnly();
 		try {
-			final Request request = (Request) super.message;
-			final String method = request.getMethod();
+			final Request request = (Request) super.message;			
 			final String transport = JainSipUtils.findTransport(request);
 			final ProxyImpl proxy = session.getProxy();
+			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			//Issue 112 fix by folsson
-		    if(!method.equalsIgnoreCase(Request.CANCEL)) {
+		    if(!method.equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
 		    	boolean addViaHeader = false;
 		    	if(proxy == null) {
 		    		addViaHeader = true;
@@ -859,18 +860,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    		if(logger.isDebugEnabled()) {
 				    	logger.debug("Adding via Header");
 				    }
-		    		if(message.getHeader(ViaHeader.NAME) == null) {
-			    		final ViaHeader viaHeader = JainSipUtils.createViaHeader(
-			    				sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
-			    		message.addHeader(viaHeader);
-			    	}
-		    	}		    			    	
+		    		
+		    		viaHeader = JainSipUtils.createViaHeader(
+		    				sipNetworkInterfaceManager, request, null);
+		    		message.addHeader(viaHeader);
+			    }
 		    }
 		    
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
-			if(Request.ACK.equals(request.getMethod())) {
+			if(Request.ACK.equals(method)) {
 				super.session.getSessionCreatingDialog().sendAck(request);
 				return;
 			}
@@ -916,19 +916,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			if (super.getTransaction() == null) {				
 
-				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();
 				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null) {
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
+					final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
 					String fromName = null;
-					if(fromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
-						fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();
+					if(fromUri instanceof javax.sip.address.SipURI) {
+						fromName = ((javax.sip.address.SipURI)fromUri).getUser();
 					}
 					// Create the contact name address.
 					contactHeader = 
-						JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), request, fromName);										
+						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName);										
 					request.addHeader(contactHeader);
 				}
 				
@@ -954,15 +955,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 				//Keeping the transactions mapping in application data for CANCEL handling
 				if(linkedRequest != null) {
+					final Transaction linkedTransaction = linkedRequest.getTransaction();
+					final Dialog linkedDialog = linkedRequest.getDialog();
 					//keeping the client transaction in the server transaction's application data
-					((TransactionApplicationData)linkedRequest.getTransaction().getApplicationData()).setTransaction(ctx);
-					if(linkedRequest.getDialog() != null && linkedRequest.getDialog().getApplicationData() != null) {
-						((TransactionApplicationData)linkedRequest.getDialog().getApplicationData()).setTransaction(ctx);
+					((TransactionApplicationData)linkedTransaction.getApplicationData()).setTransaction(ctx);
+					if(linkedDialog != null && linkedDialog.getApplicationData() != null) {
+						((TransactionApplicationData)linkedDialog.getApplicationData()).setTransaction(ctx);
 					}
 					//keeping the server transaction in the client transaction's application data
-					this.transactionApplicationData.setTransaction(linkedRequest.getTransaction());
+					this.transactionApplicationData.setTransaction(linkedTransaction);
 					if(dialog!= null && dialog.getApplicationData() != null) {
-						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
+						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedTransaction);
 					}
 				}
 				// Make the dialog point here so that when the dialog event
@@ -980,7 +983,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				super.setTransaction(ctx);
 
 			} else if (Request.PRACK.equals(request.getMethod())) {
-				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);
 				//Keeping the transactions mapping in application data for CANCEL handling
@@ -1015,34 +1018,34 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}			
 			session.addOngoingTransaction(getTransaction());
 			// Update Session state
-			super.session.updateStateOnSubsequentRequest(this, false);
-			// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
-			// a new subscription and a new dialog (unless they have already been
-			// created by a matching response, as described above).
-			final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-				getMessage().getHeader(SubscriptionStateHeader.NAME);		
-			if(Request.NOTIFY.equals(getMethod()) && 
-							(subscriptionStateHeader != null && 
-									SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-									SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
-				super.session.addSubscription(this);
-			}
-			// A subscription is destroyed when a notifier sends a NOTIFY request
-			// with a "Subscription-State" of "terminated".
-			if(Request.NOTIFY.equals(getMethod()) && 
-							(subscriptionStateHeader != null && 
-									SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState()))) {
-				session.removeSubscription(this);
-			}
+			super.session.updateStateOnSubsequentRequest(this, false);			
+			if(Request.NOTIFY.equals(getMethod())) {
+				final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+					getMessage().getHeader(SubscriptionStateHeader.NAME);		
 			
-			final ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
+				// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
+				// a new subscription and a new dialog (unless they have already been
+				// created by a matching response, as described above).
+				if (subscriptionStateHeader != null && 
+									SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+									SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState())) {					
+					session.addSubscription(this);
+				}
+				// A subscription is destroyed when a notifier sends a NOTIFY request
+				// with a "Subscription-State" of "terminated".
+				if (subscriptionStateHeader != null && 
+									SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
+					session.removeSubscription(this);
+				}
+			}		
+			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();		
 			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
 					sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
 			viaHeader.setParameter(MessageDispatcher.APP_ID,
-					session.getSipApplicationSession().getKey().getId());
+					sipApplicationSession.getKey().getId());
 			//updating the last accessed times 
 			session.access();
-			session.getSipApplicationSession().access();
+			sipApplicationSession.access();
 			Dialog dialog = getDialog();
 			if(session.getProxy() != null) dialog = null;
 			// If dialog does not exist or has no state.

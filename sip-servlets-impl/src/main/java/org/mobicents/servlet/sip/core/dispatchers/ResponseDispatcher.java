@@ -179,7 +179,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 
 			final MobicentsSipSession session = tmpSession;
 			final TransactionApplicationData finalApplicationData = applicationData;
-			DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
+			final DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
 
 				public void dispatch() throws DispatcherException {
 					sipContext.enterSipApp(null, sipServletResponse, sipManager, true, true);
@@ -275,10 +275,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * @param sipServletResponse
 	 */
 	private final void forwardResponseStatefully(final SipServletResponseImpl sipServletResponse) {
-		final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
-		final Dialog dialog = sipServletResponse.getDialog();
 		final Response response = sipServletResponse.getResponse();
-				
 		final ListIterator<ViaHeader> viaHeadersLeft = response.getHeaders(ViaHeader.NAME);
 		// we cannot remove the via header on the original response (and we don't to proactively clone the response for perf reasons)
 		// otherwise it will make subsequent request creation fails (because JSIP dialog check the topmostviaHeader of the response)
@@ -286,6 +283,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 			viaHeadersLeft.next();
 		}
 		if(viaHeadersLeft.hasNext()) {
+			final ClientTransaction clientTransaction = (ClientTransaction) sipServletResponse.getTransaction();
+			final Dialog dialog = sipServletResponse.getDialog();
 			final Response newResponse = (Response) response.clone();
 			((SIPMessage)newResponse).setApplicationData(null);
 			newResponse.removeFirst(ViaHeader.NAME);
