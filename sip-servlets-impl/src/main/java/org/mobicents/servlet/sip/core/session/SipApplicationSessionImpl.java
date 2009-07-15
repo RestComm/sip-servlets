@@ -164,8 +164,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected long sipApplicationSessionTimeout = -1;
 	
-	// Does it really need to be synchronized?
-	private synchronized Map<String,Object> getMap() {
+	// Does it need to be synchronized?
+	private Map<String,Object> getAttributeMap() {
 		if(sipApplicationSessionAttributeMap == null) {
 			sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		}
@@ -324,7 +324,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return this.getMap().get(name);
+		return this.getAttributeMap().get(name);
 	}
 
 	/*
@@ -335,7 +335,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return this.getMap().keySet().iterator();
+		return this.getAttributeMap().keySet().iterator();
 	}
 
 	/*
@@ -558,7 +558,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 		if(this.sipApplicationSessionAttributeMap != null)
-		for (String key : getMap().keySet()) {
+		for (String key : getAttributeMap().keySet()) {
 			removeAttribute(key);
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
@@ -680,7 +680,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 		SipApplicationSessionBindingEvent event = null;
 		
-        Object value = this.getMap().remove(name);
+        Object value = this.getAttributeMap().remove(name);
 
         // Call the valueUnbound() method if necessary
         if (value != null && value instanceof SipApplicationSessionBindingListener) {
@@ -731,7 +731,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         // Call the valueBound() method if necessary
         if (attribute instanceof SipApplicationSessionBindingListener) {
             // Don't call any notification if replacing with the same value
-            Object oldValue = getMap().get(key);
+            Object oldValue = getAttributeMap().get(key);
             if (attribute != oldValue) {
             	event = new SipApplicationSessionBindingEvent(this, key);
                 try {
@@ -742,7 +742,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             }
         }
 		
-		Object previousValue = this.getMap().put(key, attribute);
+		Object previousValue = this.getAttributeMap().put(key, attribute);
 		
 		if (previousValue != null && previousValue != attribute &&
 	            previousValue instanceof SipApplicationSessionBindingListener) {
@@ -893,9 +893,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         // Notify ActivationListeners
     	SipApplicationSessionEvent event = null;
     	if(this.sipApplicationSessionAttributeMap != null) {
-        Set<String> keySet = getMap().keySet();
+        Set<String> keySet = getAttributeMap().keySet();
         for (String key : keySet) {
-        	Object attribute = getMap().get(key);
+        	Object attribute = getAttributeMap().get(key);
             if (attribute instanceof SipApplicationSessionActivationListener) {
                 if (event == null)
                     event = new SipApplicationSessionEvent(this);

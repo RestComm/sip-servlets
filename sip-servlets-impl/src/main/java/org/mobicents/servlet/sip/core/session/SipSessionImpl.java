@@ -455,8 +455,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 	}
 	
-	// Does it really need to be synchronized?
-	private synchronized Map<String, Object> getMap() {
+	// Does it need to be synchronized?
+	private Map<String, Object> getAttributeMap() {
 		if(this.sipSessionAttributeMap == null) {
 			this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		}
@@ -471,7 +471,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return getMap().get(name);
+		return getAttributeMap().get(name);
 	}
 
 	/*
@@ -482,7 +482,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		Vector<String> names = new Vector<String>(getMap().keySet());
+		Vector<String> names = new Vector<String>(getAttributeMap().keySet());
 		return names.elements();
 	}
 
@@ -805,14 +805,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 			return;
 		
 		SipSessionBindingEvent event = null;
-		Object value = getMap().get(name);
+		Object value = getAttributeMap().get(name);
 		// Call the valueUnbound() method if necessary
         if (value != null && value instanceof SipSessionBindingListener) {
         	event = new SipSessionBindingEvent(this, name);
             ((SipSessionBindingListener) value).valueUnbound(event);
         }
 		
-		this.getMap().remove(name);
+		this.getAttributeMap().remove(name);
 		
 		// Notifying Listeners of attribute removal	
 		SipListenersHolder sipListenersHolder = this.getSipApplicationSession().getSipContext().getListeners();		
@@ -855,7 +855,7 @@ public class SipSessionImpl implements MobicentsSipSession {
         // Call the valueBound() method if necessary
         if (attribute instanceof SipSessionBindingListener) {        	
             // Don't call any notification if replacing with the same value
-            Object oldValue = getMap().get(key);
+            Object oldValue = getAttributeMap().get(key);
             if (attribute != oldValue) {
             	event = new SipSessionBindingEvent(this, key);
                 try {
@@ -866,7 +866,7 @@ public class SipSessionImpl implements MobicentsSipSession {
             }
         }
 		
-		Object previousValue = this.getMap().put(key, attribute);
+		Object previousValue = this.getAttributeMap().put(key, attribute);
 		
 		if (previousValue != null && previousValue != attribute &&
 	            previousValue instanceof SipSessionBindingListener) {
@@ -1275,9 +1275,9 @@ public class SipSessionImpl implements MobicentsSipSession {
         // Notify ActivationListeners
     	SipSessionEvent event = null;
     	if(this.sipSessionAttributeMap != null) {
-        Set<String> keySet = getMap().keySet();
+        Set<String> keySet = getAttributeMap().keySet();
         for (String key : keySet) {
-        	Object attribute = getMap().get(key);
+        	Object attribute = getAttributeMap().get(key);
             if (attribute instanceof SipSessionActivationListener) {
                 if (event == null)
                     event = new SipSessionEvent(this);
@@ -1300,9 +1300,9 @@ public class SipSessionImpl implements MobicentsSipSession {
         // Notify ActivationListeners
     	SipSessionEvent event = null;
     	if(this.sipSessionAttributeMap != null) {
-        Set<String> keySet = getMap().keySet();
+        Set<String> keySet = getAttributeMap().keySet();
         for (String key : keySet) {
-        	Object attribute = getMap().get(key);
+        	Object attribute = getAttributeMap().get(key);
             if (attribute instanceof SipSessionActivationListener) {
                 if (event == null)
                     event = new SipSessionEvent(this);
@@ -1443,7 +1443,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public Map<String, Object> getSipSessionAttributeMap() {
-		return getMap();
+		return getAttributeMap();
 	}
 	/**
 	 * @param localParty the localParty to set
