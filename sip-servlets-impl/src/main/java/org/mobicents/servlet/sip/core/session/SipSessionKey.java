@@ -64,21 +64,7 @@ public class SipSessionKey implements Serializable {
 		this.applicationName = applicationName;
 		this.applicationSessionId = applicationSessionId;
 		
-		StringBuffer value = new StringBuffer();
-		value = value.append("(");
-		value = value.append(fromAddress);
-		value = value.append(",");
-		value = value.append(fromTag);
-		value = value.append(",");
-		value = value.append(toAddress);
-		value = value.append(",");
-		value = value.append(callId);
-		value = value.append(",");
-		value = value.append(applicationSessionId);
-		value = value.append(",");
-		value = value.append(applicationName);
-		value = value.append(")");
-		toString = value.toString();
+		toString = "(" + fromAddress + "," + fromTag + "," + toAddress + "," +	callId + "," + applicationSessionId +"," + applicationName + ")";
 	}
 	/**
 	 * @return the fromAddress
