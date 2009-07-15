@@ -16,12 +16,12 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
-import gov.nist.javax.sip.Utils;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
 import java.util.Iterator;
+import java.util.Random;
 
 import javax.sip.ListeningPoint;
 import javax.sip.address.Address;
@@ -51,7 +51,7 @@ public class ProxyUtils {
 	private static transient Logger logger = Logger.getLogger(ProxyUtils.class);
 	private SipFactoryImpl sipFactoryImpl;
 	private ProxyImpl proxy;
-	
+	private static transient Random random = new Random(System.currentTimeMillis());
 	public ProxyUtils(SipFactoryImpl sipFactoryImpl, ProxyImpl proxy) {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxy = proxy;
@@ -141,6 +141,16 @@ public class ProxyUtils {
 							branchId);
 				}
 				proxyBranch.viaHeader = viaHeader;
+			} else {
+				String branchId = null;
+				viaHeader = (ViaHeader) viaHeader.clone();
+				if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
+					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+					logger.debug("reusing original branch id " + branchId);
+				} else {
+					branchId = "z9hG4bK" + Long.toHexString(System.nanoTime()^32543621) + Integer.toString(random.nextInt());
+				}
+				viaHeader.setBranch(branchId);
 			}
 
 			clonedRequest.addHeader(viaHeader);				
