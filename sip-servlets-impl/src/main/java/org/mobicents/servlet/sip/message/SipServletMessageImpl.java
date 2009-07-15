@@ -70,6 +70,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -104,11 +105,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected String defaultEncoding = "UTF8";
 
 	protected HeaderForm headerForm = HeaderForm.DEFAULT;
-
-	protected InetAddress localAddr = null;
-
-	protected int localPort = -1;
-
+	
 	// IP address of the next upstream/downstream hop from which this message
 	// was received. Applications can determine the actual IP address of the UA
 	// that originated the message from the message Via header fields.
@@ -689,25 +686,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			return result.listIterator();
 		}
 		return result.listIterator();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletMessage#getLocalAddr()
-	 */
-	public String getLocalAddr() {
-		if (this.localAddr == null)
-			return null;
-		else
-			return this.localAddr.getHostAddress();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletMessage#getLocalPort()
-	 */
-	public int getLocalPort() {
-		return this.localPort;
 	}
 
 	/*
@@ -1424,15 +1402,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		this.transaction = transaction;
 	}
 
-	// TRANSPORT LEVEL, TO BE SET WHEN THIS IS RECEIVED	
-	public void setLocalAddr(InetAddress localAddr) {
-		this.localAddr = localAddr;
-	}
-
-	public void setLocalPort(int localPort) {
-		this.localPort = localPort;
-	}
-
 	public void setTransport(String transport) {
 		this.transport = transport;
 	}
@@ -1522,4 +1491,35 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public void setCurrentApplicationName(String currentApplicationName) {
 		this.currentApplicationName = currentApplicationName;
 	}	
+	
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getLocalAddr()
+	 */
+	public String getLocalAddr() {
+		final SIPTransaction sipTransaction = (SIPTransaction)getTransaction();
+		if(sipTransaction != null) {
+			return sipTransaction.getHostPort().getHost().getIpAddress();
+		} else {
+			final String transport = JainSipUtils.findTransport(message);
+			final ExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
+			return listeningPoint.getHost(true);
+		}		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletMessage#getLocalPort()
+	 */
+	public int getLocalPort() {
+		final SIPTransaction sipTransaction = (SIPTransaction)getTransaction();
+		if(sipTransaction != null) {
+			return sipTransaction.getPort();
+		} else {
+			final String transport = JainSipUtils.findTransport(message);
+			final ExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
+			return listeningPoint.getPort();
+		}
+	}
 }

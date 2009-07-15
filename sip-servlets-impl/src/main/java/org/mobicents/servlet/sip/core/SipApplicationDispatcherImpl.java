@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.stack.SIPTransaction;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -188,6 +190,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	//used for the congestion control mechanism
 	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
 	
+	// fatcory for dispatching SIP messages
+	private MessageDispatcherFactory messageDispatcherFactory;
+	
 	/**
 	 * 
 	 */
@@ -202,7 +207,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		congestionControlThreadPool.prestartAllCoreThreads();
+		congestionControlThreadPool.prestartAllCoreThreads();		
 	}
 	
 	/**
@@ -266,6 +271,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.info("bypassRequestExecutor ? " + bypassRequestExecutor);
 			logger.info("bypassResponseExecutor ? " + bypassResponseExecutor);
 		}
+		messageDispatcherFactory = new MessageDispatcherFactory(this);
 	}
 	/**
 	 * {@inheritDoc}
@@ -527,28 +533,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						dialog,
 						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));
 			requestsProcessed.incrementAndGet();	
-			if(transaction != null) {
-				final TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
-				if(transactionApplicationData != null && transactionApplicationData.getInitialRemoteHostAddress() == null) {
-					final ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);					
-					transactionApplicationData.setInitialRemoteHostAddress(viaHeader.getHost());
-					transactionApplicationData.setInitialRemotePort(viaHeader.getPort());
-					transactionApplicationData.setInitialRemoteTransport(viaHeader.getTransport());
-				}
-			}
-			final String transport = JainSipUtils.findTransport(request);
-			final ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
-			sipServletRequest.setLocalAddr(InetAddress.getByName(listeningPoint.getIPAddress()));
-			sipServletRequest.setLocalPort(listeningPoint.getPort());
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
 			final RouteHeader routeHeader = (RouteHeader) request
 					.getHeader(RouteHeader.NAME);
 			
-			javax.sip.address.SipURI requestURI = null;
-			if(request.getRequestURI() instanceof javax.sip.address.SipURI) {
-				requestURI = (javax.sip.address.SipURI)request.getRequestURI();
-			}						
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
 			if(!isRouteExternal(routeHeader)) {
@@ -578,7 +567,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 					}
 				}
-				MessageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
+				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 					dispatchMessage(sipProvider, sipServletRequest);
 			} catch (DispatcherException e) {
 				logger.error("Unexpected exception while processing request " + request,e);
@@ -645,14 +634,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				clientTransaction, 
 				null, 
 				dialog);
-		final SipProvider sipProvider = (SipProvider)responseEvent.getSource();
-		try {
-			final String transport = JainSipUtils.findTransport(response);
-			final ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);			
-			sipServletResponse.setLocalAddr(InetAddress.getByName(listeningPoint.getIPAddress()));
-			sipServletResponse.setLocalPort(listeningPoint.getPort());
-		
-			MessageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
+		try {		
+			messageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
 				dispatchMessage(null, sipServletResponse);
 		} catch (Throwable e) {
 			logger.error("An unexpected exception happened while routing the response " +  sipServletResponse, e);

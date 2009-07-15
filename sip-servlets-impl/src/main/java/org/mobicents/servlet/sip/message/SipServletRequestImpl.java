@@ -17,7 +17,7 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.ims.PathHeader;
-import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -79,6 +79,7 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -1495,5 +1496,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void setParameterableHeader(String name, Parameterable param) {
 		checkReadOnly();
 		super.setParameterableHeader(name, param);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getInitialRemoteAddr() {
+		return ((SIPTransaction)getTransaction()).getPeerAddress();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getInitialRemotePort() {
+		return ((SIPTransaction)getTransaction()).getPeerPort();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getInitialTransport() {		
+		return ((SIPTransaction)getTransaction()).getTransport();
 	}
 }

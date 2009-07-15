@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.core.dispatchers;
 
 import javax.sip.message.Request;
 
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -31,19 +32,32 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  */
 public class MessageDispatcherFactory {
 
-	public static RequestDispatcher getRequestDispatcher(SipServletRequestImpl sipServletRequest, SipApplicationDispatcherImpl sipApplicationDispatcher) {
+	InitialRequestDispatcher initialRequestDispatcher;
+	SubsequentRequestDispatcher subsequentRequestDispatcher;
+	CancelRequestDispatcher cancelRequestDispatcher;
+	ResponseDispatcher responseDispatcher;
+	
+	public MessageDispatcherFactory(SipApplicationDispatcher sipApplicationDispatcher) {
+		// pre initializing the dispatcher to avoid creating them every time we process a message
+		initialRequestDispatcher = new InitialRequestDispatcher(sipApplicationDispatcher);
+		subsequentRequestDispatcher = new SubsequentRequestDispatcher(sipApplicationDispatcher);
+		cancelRequestDispatcher = new CancelRequestDispatcher(sipApplicationDispatcher);
+		responseDispatcher = new ResponseDispatcher(sipApplicationDispatcher);
+	}
+	
+	public final RequestDispatcher getRequestDispatcher(SipServletRequestImpl sipServletRequest, SipApplicationDispatcherImpl sipApplicationDispatcher) {
 		if(sipServletRequest.isInitial()) {
-			return new InitialRequestDispatcher(sipApplicationDispatcher);										
+			return initialRequestDispatcher;										
 		} else {			
 			if(sipServletRequest.getMethod().equals(Request.CANCEL)) {
-				return new CancelRequestDispatcher(sipApplicationDispatcher);
+				return cancelRequestDispatcher;
 			} else {
-				return new SubsequentRequestDispatcher(sipApplicationDispatcher);
+				return subsequentRequestDispatcher;
 			}
 		}
 	}
 	
-	public static ResponseDispatcher getResponseDispatcher(SipServletResponseImpl sipServletResponse, SipApplicationDispatcherImpl sipApplicationDispatcher) {
-		return new ResponseDispatcher(sipApplicationDispatcher);
+	public final ResponseDispatcher getResponseDispatcher(SipServletResponseImpl sipServletResponse, SipApplicationDispatcherImpl sipApplicationDispatcher) {
+		return responseDispatcher;
 	}
 }
