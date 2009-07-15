@@ -1083,21 +1083,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @param receive true if the response has been received, false if it is to be sent.
 	 */
 	public void updateStateOnResponse(SipServletResponseImpl response, boolean receive) {
-		CSeqHeader cSeqHeader = (CSeqHeader)response.getMessage().getHeader(CSeqHeader.NAME);
+		final String method = response.getMethod();
 		// JSR 289 Section 6.2.1 Point 2 of rules governing the state of SipSession
 		// In general, whenever a non-dialog creating request is sent or received, 
 		// the SipSession state remains unchanged. Similarly, a response received 
 		// for a non-dialog creating request also leaves the SipSession state unchanged. 
 		// The exception to the general rule is that it does not apply to requests (e.g. BYE, CANCEL) 
 		// that are dialog terminating according to the appropriate RFC rules relating to the kind of dialog.		
-		if(!JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod()) &&
-				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
+		if(!JainSipUtils.dialogCreatingMethods.contains(method) &&
+				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
 			return;
 		}
 		// Mapping to the sip session state machine (proxy is covered here too)
 		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
 				response.getStatus() >= 200 && response.getStatus() < 300 && 
-				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
+				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
 			this.setState(State.CONFIRMED);
 			if(this.proxy != null && this.proxy.getFinalBranchForSubsequentRequests() != null && !this.proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
 				readyToInvalidate = true;
@@ -1115,8 +1115,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}		
 		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
 				response.getStatus() >= 300 && response.getStatus() < 700 &&
-				JainSipUtils.dialogCreatingMethods.contains(cSeqHeader.getMethod()) && 
-				!JainSipUtils.dialogTerminatingMethods.contains(cSeqHeader.getMethod())) {
+				JainSipUtils.dialogCreatingMethods.contains(method) && 
+				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
 			// If the servlet acts as a UAC and sends a dialog creating request, 
 			// then the SipSession state tracks directly the SIP dialog state except 
 			// that non-2XX final responses received in the EARLY or INITIAL states 
@@ -1154,22 +1154,22 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 			}						
 		}
-		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(cSeqHeader.getMethod())) || response.getStatus() == 487) {
-			boolean hasOngoingSubscriptions = false;
+		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method)) || response.getStatus() == 487) {			
 			if(subscriptions != null) {
+				boolean hasOngoingSubscriptions = false;
 				synchronized (subscriptions) {
 					if(subscriptions.size() > 0) {
 						hasOngoingSubscriptions = true;
 					}
 				}
-			}
-			if(!hasOngoingSubscriptions) {
-				setState(State.TERMINATED);
-				readyToInvalidate =true;
-				if(sessionCreatingDialog != null) {
-					sessionCreatingDialog.delete();
+				if(!hasOngoingSubscriptions) {
+					setState(State.TERMINATED);
+					readyToInvalidate =true;
+					if(sessionCreatingDialog != null) {
+						sessionCreatingDialog.delete();
+					}
 				}
-			}
+			}			
 			okToByeSentOrReceived = true;
 			
 			if(logger.isDebugEnabled()) {
@@ -1190,12 +1190,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 
 		//state updated to TERMINATED for CANCEL only if no final response had been received on the inviteTransaction
 		if(((Request.CANCEL.equalsIgnoreCase(request.getMethod())))) {
-			Transaction inviteTransaction = null;
-			if(request.getTransaction() instanceof ServerTransactionExt) {
-				inviteTransaction = ((ServerTransactionExt) request.getTransaction()).getCanceledInviteTransaction();
-			} else {
-				return ;
+			if(!(request.getTransaction() instanceof ServerTransactionExt)) {
+				return;
 			}
+			final Transaction inviteTransaction = ((ServerTransactionExt) request.getTransaction()).getCanceledInviteTransaction();
 			TransactionApplicationData inviteAppData = (TransactionApplicationData) 
 				inviteTransaction.getApplicationData();			
 			SipServletRequestImpl inviteRequest = (SipServletRequestImpl)inviteAppData.getSipServletMessage();
