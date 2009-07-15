@@ -80,6 +80,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private boolean isAddToPath;
 	private transient List<ProxyBranch> recursedBranches;
 	private boolean waitingForPrack;
+	public transient ViaHeader viaHeader;
 	
 	private static transient Timer timer = new Timer();
 	

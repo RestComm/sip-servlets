@@ -110,36 +110,39 @@ public class ProxyUtils {
 				clonedRequest.removeHeader(ViaHeader.NAME);				
 			} 
 			//Add via header
-			ViaHeader viaHeader = null;
-			if(proxy.getOutboundInterface() == null) {
-				String branchId = null;
-				
-				if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
-					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
-					logger.debug("reusing original branch id " + branchId);
+			ViaHeader viaHeader = proxyBranch.viaHeader;
+			if(viaHeader == null) {
+				if(proxy.getOutboundInterface() == null) {
+					String branchId = null;
+
+					if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
+						branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+						logger.debug("reusing original branch id " + branchId);
+					}
+					viaHeader = JainSipUtils.createViaHeader(
+							sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId);
+				} else { 
+					//If outbound interface is specified use it
+					String outboundTransport = proxy.getOutboundInterface().getTransportParam();
+					if(outboundTransport == null) {
+						outboundTransport = ListeningPoint.UDP;
+					}
+					String branchId = null;
+
+					if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
+						branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+						logger.debug("reusing original branch id " + branchId);
+					}
+
+					viaHeader = SipFactories.headerFactory.createViaHeader(
+							proxy.getOutboundInterface().getHost(),
+							proxy.getOutboundInterface().getPort(),
+							outboundTransport,
+							branchId);
 				}
-				viaHeader = JainSipUtils.createViaHeader(
-						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId);
-			} else { 
-				//If outbound interface is specified use it
-				String outboundTransport = proxy.getOutboundInterface().getTransportParam();
-				if(outboundTransport == null) {
-					outboundTransport = ListeningPoint.UDP;
-				}
-				String branchId = null;
-				
-				if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
-					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
-					logger.debug("reusing original branch id " + branchId);
-				}
-				
-				viaHeader = SipFactories.headerFactory.createViaHeader(
-						proxy.getOutboundInterface().getHost(),
-						proxy.getOutboundInterface().getPort(),
-						outboundTransport,
-						branchId);
+				proxyBranch.viaHeader = viaHeader;
 			}
-					
+
 			clonedRequest.addHeader(viaHeader);				
 			
 			

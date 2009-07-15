@@ -126,7 +126,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected B2buaHelperImpl b2buaHelper;
 
-	protected Map<String, Object> sipSessionAttributeMap;
+	volatile protected Map<String, Object> sipSessionAttributeMap;
 	
 	protected SipSessionKey key;
 	
@@ -248,7 +248,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.creationTime = this.lastAccessedTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
 		this.isValid = true;
-		this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		this.derivedSipSessions = new ConcurrentHashMap<String, MobicentsSipSession>();
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		this.subscriptions = new HashSet<EventHeader>();
@@ -455,6 +454,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 			return sipApplicationSession.getSession();
 		}
 	}
+	
+	// Does it really need to be synchronized?
+	private synchronized Map<String, Object> getMap() {
+		if(this.sipSessionAttributeMap == null) {
+			this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
+		}
+		return this.sipSessionAttributeMap;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -464,7 +471,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return sipSessionAttributeMap.get(name);
+		return getMap().get(name);
 	}
 
 	/*
@@ -475,7 +482,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		Vector<String> names = new Vector<String>(sipSessionAttributeMap.keySet());
+		Vector<String> names = new Vector<String>(getMap().keySet());
 		return names.elements();
 	}
 
@@ -665,7 +672,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				derivedMobicentsSipSession.invalidate();
 			}		
 			derivedSipSessions.clear();
-		}
+		}	
 		
 		/*
          * Compute how long this session has been alive, and update
@@ -689,12 +696,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
 		getSipApplicationSession().getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
-		if(ongoingTransactions != null) {
-			ongoingTransactions.clear();
-		}
-		if(subscriptions != null) {
-			subscriptions.clear();
-		}
+		ongoingTransactions.clear();
+		subscriptions.clear();
 //		executorService.shutdown();
 		parentSession = null;
 		userPrincipal = null;		
@@ -802,14 +805,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 			return;
 		
 		SipSessionBindingEvent event = null;
-		Object value = sipSessionAttributeMap.get(name);
+		Object value = getMap().get(name);
 		// Call the valueUnbound() method if necessary
         if (value != null && value instanceof SipSessionBindingListener) {
         	event = new SipSessionBindingEvent(this, name);
             ((SipSessionBindingListener) value).valueUnbound(event);
         }
 		
-		this.sipSessionAttributeMap.remove(name);
+		this.getMap().remove(name);
 		
 		// Notifying Listeners of attribute removal	
 		SipListenersHolder sipListenersHolder = this.getSipApplicationSession().getSipContext().getListeners();		
@@ -852,7 +855,7 @@ public class SipSessionImpl implements MobicentsSipSession {
         // Call the valueBound() method if necessary
         if (attribute instanceof SipSessionBindingListener) {        	
             // Don't call any notification if replacing with the same value
-            Object oldValue = sipSessionAttributeMap.get(key);
+            Object oldValue = getMap().get(key);
             if (attribute != oldValue) {
             	event = new SipSessionBindingEvent(this, key);
                 try {
@@ -863,7 +866,7 @@ public class SipSessionImpl implements MobicentsSipSession {
             }
         }
 		
-		Object previousValue = this.sipSessionAttributeMap.put(key, attribute);
+		Object previousValue = this.getMap().put(key, attribute);
 		
 		if (previousValue != null && previousValue != attribute &&
 	            previousValue instanceof SipSessionBindingListener) {
@@ -1271,9 +1274,10 @@ public class SipSessionImpl implements MobicentsSipSession {
     public void passivate() {
         // Notify ActivationListeners
     	SipSessionEvent event = null;
-        Set<String> keySet = sipSessionAttributeMap.keySet();
+    	if(this.sipSessionAttributeMap != null) {
+        Set<String> keySet = getMap().keySet();
         for (String key : keySet) {
-        	Object attribute = sipSessionAttributeMap.get(key);
+        	Object attribute = getMap().get(key);
             if (attribute instanceof SipSessionActivationListener) {
                 if (event == null)
                     event = new SipSessionEvent(this);
@@ -1285,6 +1289,7 @@ public class SipSessionImpl implements MobicentsSipSession {
                 }
             }
 		}
+    	}
     }
     
     /**
@@ -1294,9 +1299,10 @@ public class SipSessionImpl implements MobicentsSipSession {
     public void activate() {        
         // Notify ActivationListeners
     	SipSessionEvent event = null;
-        Set<String> keySet = sipSessionAttributeMap.keySet();
+    	if(this.sipSessionAttributeMap != null) {
+        Set<String> keySet = getMap().keySet();
         for (String key : keySet) {
-        	Object attribute = sipSessionAttributeMap.get(key);
+        	Object attribute = getMap().get(key);
             if (attribute instanceof SipSessionActivationListener) {
                 if (event == null)
                     event = new SipSessionEvent(this);
@@ -1307,7 +1313,7 @@ public class SipSessionImpl implements MobicentsSipSession {
                     logger.error("SipSessionActivationListener threw exception", t);
                 }
             }
-		}
+		}}
     }
     
 	public Principal getUserPrincipal() {
@@ -1437,7 +1443,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public Map<String, Object> getSipSessionAttributeMap() {
-		return sipSessionAttributeMap;
+		return getMap();
 	}
 	/**
 	 * @param localParty the localParty to set
