@@ -56,7 +56,6 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
-import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -267,7 +266,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						targetedRequestInfo,
 						stateInfo);
 		} else if (logger.isDebugEnabled()){
-			logger.debug("application name selected by the AR before re routing this request back to the conatiner " + applicationRouterInfo.getNextApplicationName());
+			logger.debug("application name selected by the AR before re routing this request back to the container " + applicationRouterInfo.getNextApplicationName());
 		}
 		
 		sipServletRequest.setReadOnly(false);
@@ -294,12 +293,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
 	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl, MobicentsSipSession joinReplacesSipSession) throws DispatcherException {
+		final String nextApplicationName = applicationRouterInfo.getNextApplicationName();
 		if(logger.isInfoEnabled()) {
-			logger.info("Dispatching the request event to " + applicationRouterInfo.getNextApplicationName());
+			logger.info("Dispatching the request event to " + nextApplicationName);
 		}
 		final Request request = (Request) sipServletRequest.getMessage();
-		sipServletRequest.setCurrentApplicationName(applicationRouterInfo.getNextApplicationName());
-		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationRouterInfo.getNextApplicationName());
+		sipServletRequest.setCurrentApplicationName(nextApplicationName);
+		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(nextApplicationName);
 		// follow the procedures of Chapter 16 to select a servlet from the application.									
 		//no matching deployed apps
 		if(sipContext == null) {
@@ -311,14 +311,6 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		}			
 		final SipManager sipManager = (SipManager)sipContext.getManager();
 		
-		final JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
-		final ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
-		String headerName = null;
-		if(joinHeader != null) {
-			headerName = JoinHeader.NAME;
-		} else if (replacesHeader != null) {
-			headerName = ReplacesHeader.NAME;	
-		}
 		// subscriber URI should be set before calling makeAppSessionKey method, see Issue 750
 		// http://code.google.com/p/mobicents/issues/detail?id=750
 		try {
@@ -339,23 +331,31 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		} 		
 		
 		MobicentsSipApplicationSession sipApplicationSession = null;
-		if(joinReplacesSipSession != null && applicationRouterInfo.getNextApplicationName().equals(joinReplacesSipSession.getKey().getApplicationName())) {
+		if(joinReplacesSipSession != null && nextApplicationName.equals(joinReplacesSipSession.getKey().getApplicationName())) {
 			// 15.11.4.5. If the Application Router returns an application name that matches the application name found in step 15.11.4.2, 
 			// then the container must create a SipSession object and associate it with the SipApplicationSession identified in step 2. 
+			final JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
+			final ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
+			String headerName = null;
+			if(joinHeader != null) {
+				headerName = JoinHeader.NAME;
+			} else if (replacesHeader != null) {
+				headerName = ReplacesHeader.NAME;	
+			}
 			
 			sipApplicationSession = joinReplacesSipSession.getSipApplicationSession();
 			if(logger.isDebugEnabled()) {
 				logger.debug("Reusing the application session from the Join/Replaces " + sipApplicationSession.getId());
 			}
 			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
-					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
+					sipContext, sipServletRequest, nextApplicationName);
 			sipContext.getSipSessionsUtil().addCorrespondingSipApplicationSession(sipApplicationSessionKey, sipApplicationSession.getKey(), headerName);
 		} else {
 			// 15.11.4.6. If the Application Router returns an application name that does not match the application name found in step 15.11.4.2,
 			// then the container invokes the application using its normal procedure, creating a new SipSession and SipApplicationSession.
 
 			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
-					sipContext, sipServletRequest, applicationRouterInfo.getNextApplicationName());
+					sipContext, sipServletRequest, nextApplicationName);
 			sipApplicationSession = sipManager.getSipApplicationSession(
 					sipApplicationSessionKey, true);
 		}	
@@ -363,11 +363,19 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//sip application session association
 		final MobicentsSipApplicationSession appSession = sipApplicationSession;
 		//sip session association
-		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), applicationRouterInfo.getNextApplicationName(), request, false);
+		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), nextApplicationName, request, false);
 		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
 		sipServletRequest.setSipSession(sipSessionImpl);
 
-		if(joinReplacesSipSession != null && applicationRouterInfo.getNextApplicationName().equals(joinReplacesSipSession.getKey().getApplicationName())) {
+		if(joinReplacesSipSession != null && nextApplicationName.equals(joinReplacesSipSession.getKey().getApplicationName())) {
+			final JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
+			final ReplacesHeader replacesHeader = (ReplacesHeader)request.getHeader(ReplacesHeader.NAME);
+			String headerName = null;
+			if(joinHeader != null) {
+				headerName = JoinHeader.NAME;
+			} else if (replacesHeader != null) {
+				headerName = ReplacesHeader.NAME;	
+			}
 			// 15.11.4.5. If the Application Router returns an application name that matches the application name found in step 15.11.4.2, 
 			// then the container must create a SipSession object and associate it with the SipApplicationSession identified in step 2. 
 			// The association of this newly created SipSession with the one found in step 15.11.4.2 is made available to the application 
@@ -498,13 +506,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @return true if the request has been routed outside, false otherwise
 	 * @throws DispatcherException a proble occured while checking the information returned by the AR
 	 */
-	private boolean checkRouteModifier(SipApplicationRouterInfo applicationRouterInfo, SipServletRequestImpl sipServletRequest) throws DispatcherException {
-		final Request request = (Request) sipServletRequest.getMessage();
+	private final boolean checkRouteModifier(SipApplicationRouterInfo applicationRouterInfo, SipServletRequestImpl sipServletRequest) throws DispatcherException {		
 		final SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
 		if(logger.isDebugEnabled()) {
 			logger.debug("the AR returned the following sip route modifier" + sipRouteModifier);
 		}
 		if(sipRouteModifier != null) {
+			final Request request = (Request) sipServletRequest.getMessage();
 			final String[] routes = applicationRouterInfo.getRoutes();
 			switch(sipRouteModifier) {
 				// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,

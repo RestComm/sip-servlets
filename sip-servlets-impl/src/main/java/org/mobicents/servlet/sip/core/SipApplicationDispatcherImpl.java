@@ -16,15 +16,12 @@
  */
 package org.mobicents.servlet.sip.core;
 
-import gov.nist.javax.sip.stack.SIPTransaction;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -450,12 +447,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private void analyzeQueueCongestionState() {
 		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
 		if(rejectSipMessages) {
-			if(numberOfMessagesInQueue<queueSize) {
+			if(numberOfMessagesInQueue  <queueSize) {
 				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the queue Size : " + queueSize + " => stopping to reject requests");
 				rejectSipMessages = false;
 			}
 		} else {
-			if(numberOfMessagesInQueue>queueSize) {
+			if(numberOfMessagesInQueue > queueSize) {
 				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize + " => starting to reject requests");
 				rejectSipMessages = true;
 			}
@@ -497,14 +494,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
 		final Dialog dialog = requestEvent.getDialog();
 		final Request request = requestEvent.getRequest();
+		final String requestMethod = request.getMethod();
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Got a request event "  + request.toString());
 			}			
-			if (!Request.ACK.equals(request.getMethod()) && requestTransaction == null ) {
+			if (!Request.ACK.equals(requestMethod) && requestTransaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
-				    if(request.getHeader(MaxForwardsHeader.NAME)==null){
+				    if(request.getHeader(MaxForwardsHeader.NAME) == null){
 					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
 					}
 				    requestTransaction = sipProvider.getNewServerTransaction(request);					
@@ -531,7 +529,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						null,
 						transaction,
 						dialog,
-						JainSipUtils.dialogCreatingMethods.contains(request.getMethod()));
+						JainSipUtils.dialogCreatingMethods.contains(requestMethod));
 			requestsProcessed.incrementAndGet();	
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
@@ -563,7 +561,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			
 			try {
 				if(rejectSipMessages || memoryToHigh) {
-					if(!Request.ACK.equals(request.getMethod()) && !Request.PRACK.equals(request.getMethod())) {
+					if(!Request.ACK.equals(requestMethod) && !Request.PRACK.equals(requestMethod)) {
 						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 					}
 				}
@@ -572,14 +570,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} catch (DispatcherException e) {
 				logger.error("Unexpected exception while processing request " + request,e);
 				// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
-				if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
+				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
 					MessageDispatcher.sendErrorResponse(e.getErrorCode(), (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 				}
 				return;
 			} catch (Throwable e) {
 				logger.error("Unexpected exception while processing request " + request,e);
 				// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
-				if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
+				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
 					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 				}
 				return;
