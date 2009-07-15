@@ -658,7 +658,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
 			tryToInvalidateSession(sipSessionImpl);
 		} else {
-			logger.debug("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
+			logger.warn("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
 		}
 	}
 
@@ -786,9 +786,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
 			if(sipSessionImpl == null) {
-				if(logger.isInfoEnabled()) {
-					logger.info("no sip session were returned for this transaction " + transaction);
-				}
+//				if(logger.isInfoEnabled()) {
+					logger.warn("no sip session were returned for this transaction " + transaction + " and message " + sipServletMessageImpl);
+//				}
 			} else {
 				if(sipSessionImpl.getKey() != null) {
 					if(logger.isInfoEnabled()) {

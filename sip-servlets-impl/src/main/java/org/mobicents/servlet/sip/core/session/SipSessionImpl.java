@@ -1049,12 +1049,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
 		
-		if(ongoingTransactions != null && !ongoingTransactions.contains(transaction)) { 
-			this.ongoingTransactions.add(transaction);
-			if(logger.isDebugEnabled()) {
-				logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
+		if(!readyToInvalidate && ongoingTransactions != null) { 
+			boolean added = this.ongoingTransactions.add(transaction);
+			if(added) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
+				}
+				readyToInvalidate = false;
 			}
-			readyToInvalidate = false;
 		}
 	}
 	
@@ -1154,22 +1156,24 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 			}						
 		}
-		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method)) || response.getStatus() == 487) {			
-			if(subscriptions != null) {
-				boolean hasOngoingSubscriptions = false;
+		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method)) || response.getStatus() == 487) {
+			boolean hasOngoingSubscriptions = false;
+			if(subscriptions != null) {				
 				synchronized (subscriptions) {
 					if(subscriptions.size() > 0) {
 						hasOngoingSubscriptions = true;
 					}
-				}
+				}				
 				if(!hasOngoingSubscriptions) {
-					setState(State.TERMINATED);
-					readyToInvalidate =true;
 					if(sessionCreatingDialog != null) {
 						sessionCreatingDialog.delete();
 					}
 				}
-			}			
+			}	
+			if(!hasOngoingSubscriptions) {
+				setState(State.TERMINATED);
+				readyToInvalidate =true;				
+			}
 			okToByeSentOrReceived = true;
 			
 			if(logger.isDebugEnabled()) {
