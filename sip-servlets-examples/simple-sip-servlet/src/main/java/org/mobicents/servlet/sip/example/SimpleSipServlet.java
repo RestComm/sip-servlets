@@ -47,6 +47,8 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 	//60 sec
 	private static final int DEFAULT_BYE_DELAY = 60000;
 	
+	private int byeDelay = DEFAULT_BYE_DELAY;
+	
 	/** Creates a new instance of SimpleProxyServlet */
 	public SimpleSipServlet() {
 	}
@@ -55,6 +57,12 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the simple sip servlet has been started");
 		super.init(servletConfig);
+		String byeDelayStr = getServletContext().getInitParameter("bye.delay");		
+		try{
+			byeDelay = Integer.parseInt(byeDelayStr);
+		} catch (NumberFormatException e) {
+			logger.error("Impossible to parse the bye delay : " + byeDelayStr, e);
+		}
 	}
 
 	/**
@@ -72,14 +80,7 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 		if(CALLEE_SEND_BYE.equalsIgnoreCase(((SipURI)request.getTo().getURI()).getUser())) {
-			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
-			String byeDelayStr = getServletContext().getInitParameter("bye.delay");
-			int byeDelay = DEFAULT_BYE_DELAY;
-			try{
-				Integer.parseInt(byeDelayStr);
-			} catch (NumberFormatException e) {
-				logger.error("Impossible to parse the bye delay : " + byeDelayStr, e);
-			}
+			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);			
 			timer.createTimer(request.getApplicationSession(), byeDelay, false, request.getSession().getId());
 		}
 	}
