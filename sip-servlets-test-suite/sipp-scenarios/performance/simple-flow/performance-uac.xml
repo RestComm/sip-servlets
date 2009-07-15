@@ -79,11 +79,9 @@
 
     ]]>
   </send>
-
-<pause milliseconds="58000"/>
   
- <recv request="BYE"/>
-<send retrans="2000">
+ <recv request="BYE" timeout="80000"/>
+<send>
 
 <![CDATA[
       SIP/2.0 200 OK
@@ -98,5 +96,10 @@
  ]]>
 
 </send>
+
+<pause milliseconds="90000"/>
+<!-- Keep the call open for a while in case the 200 is lost to be     -->
+<!-- able to retransmit it if we receive the BYE again.               -->
+
 
 </scenario>
