@@ -166,7 +166,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	protected long sipApplicationSessionTimeout = -1;
 	
 	// Does it need to be synchronized?
-	private Map<String,Object> getAttributeMap() {
+	protected Map<String,Object> getAttributeMap() {
 		if(sipApplicationSessionAttributeMap == null) {
 			sipApplicationSessionAttributeMap = new ConcurrentHashMap<String,Object>() ;
 		}
@@ -569,9 +569,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				}
 			}
 		}
-		if(this.sipApplicationSessionAttributeMap != null)
-		for (String key : getAttributeMap().keySet()) {
-			removeAttribute(key);
+		if(this.sipApplicationSessionAttributeMap != null) {
+			for (String key : getAttributeMap().keySet()) {
+				removeAttribute(key);
+			}
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		
@@ -908,20 +909,21 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         // Notify ActivationListeners
     	SipApplicationSessionEvent event = null;
     	if(this.sipApplicationSessionAttributeMap != null) {
-        Set<String> keySet = getAttributeMap().keySet();
-        for (String key : keySet) {
-        	Object attribute = getAttributeMap().get(key);
-            if (attribute instanceof SipApplicationSessionActivationListener) {
-                if (event == null)
-                    event = new SipApplicationSessionEvent(this);
-                try {
-                    ((SipApplicationSessionActivationListener)attribute)
-                        .sessionWillPassivate(event);
-                } catch (Throwable t) {
-                    logger.error("SipApplicationSessionActivationListener threw exception", t);
-                }
-            }
-		}}
+	        Set<String> keySet = getAttributeMap().keySet();
+	        for (String key : keySet) {
+	        	Object attribute = getAttributeMap().get(key);
+	            if (attribute instanceof SipApplicationSessionActivationListener) {
+	                if (event == null)
+	                    event = new SipApplicationSessionEvent(this);
+	                try {
+	                    ((SipApplicationSessionActivationListener)attribute)
+	                        .sessionWillPassivate(event);
+	                } catch (Throwable t) {
+	                    logger.error("SipApplicationSessionActivationListener threw exception", t);
+	                }
+	            }
+			}
+	    }
     }
     
     /**
@@ -932,20 +934,21 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         // Notify ActivationListeners
     	SipApplicationSessionEvent event = null;
     	if(sipApplicationSessionAttributeMap != null) {
-        Set<String> keySet = sipApplicationSessionAttributeMap.keySet();
-        for (String key : keySet) {
-        	Object attribute = sipApplicationSessionAttributeMap.get(key);
-            if (attribute instanceof SipApplicationSessionActivationListener) {
-                if (event == null)
-                    event = new SipApplicationSessionEvent(this);
-                try {
-                    ((SipApplicationSessionActivationListener)attribute)
-                        .sessionDidActivate(event);
-                } catch (Throwable t) {
-                    logger.error("SipApplicationSessionActivationListener threw exception", t);
-                }
-            }
-		}}
+	        Set<String> keySet = sipApplicationSessionAttributeMap.keySet();
+	        for (String key : keySet) {
+	        	Object attribute = sipApplicationSessionAttributeMap.get(key);
+	            if (attribute instanceof SipApplicationSessionActivationListener) {
+	                if (event == null)
+	                    event = new SipApplicationSessionEvent(this);
+	                try {
+	                    ((SipApplicationSessionActivationListener)attribute)
+	                        .sessionDidActivate(event);
+	                } catch (Throwable t) {
+	                    logger.error("SipApplicationSessionActivationListener threw exception", t);
+	                }
+	            }
+			}
+	    }
     }
 
 	public boolean getInvalidateWhenReady() {

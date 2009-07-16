@@ -222,7 +222,7 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
       
       // Restore any excluded attributes
       if (excluded != null)
-    	  sipSessionAttributeMap.putAll(excluded);
+    	  getAttributeMap().putAll(excluded);
    }
  
    protected Object getJBossInternalAttribute(String name)

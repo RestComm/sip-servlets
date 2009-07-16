@@ -104,7 +104,7 @@ public class SessionBasedClusteredSipSession extends
 	}
 
 	protected Object getJBossInternalAttribute(String name) {
-		Object result = sipSessionAttributeMap.get(name);
+		Object result = getAttributeMap().get(name);
 
 		// Do dirty check even if result is null, as w/ SET_AND_GET null
 		// still makes us dirty (ensures timely replication w/o using ACCESS)
@@ -120,16 +120,16 @@ public class SessionBasedClusteredSipSession extends
 			boolean localCall, boolean localOnly) {
 		if (localCall)
 			sessionAttributesDirty();
-		return sipSessionAttributeMap.remove(name);
+		return getAttributeMap().remove(name);
 	}
 
 	protected Map getJBossInternalAttributes() {
-		return sipSessionAttributeMap;
+		return getAttributeMap();
 	}
 
 	protected Object setJBossInternalAttribute(String name, Object value) {
 		sessionAttributesDirty();
-		return sipSessionAttributeMap.put(name, value);
+		return getAttributeMap().put(name, value);
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class SessionBasedClusteredSipSession extends
 			super.writeExternal(out);
 
 			// Don't replicate any excluded attributes
-			Map excluded = removeExcludedAttributes(sipSessionAttributeMap);
+			Map excluded = removeExcludedAttributes(getAttributeMap());
 
 			out.writeObject(sipSessionAttributeMap);
 

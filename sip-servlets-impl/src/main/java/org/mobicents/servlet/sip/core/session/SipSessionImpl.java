@@ -455,7 +455,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	// Does it need to be synchronized?
-	private Map<String, Object> getAttributeMap() {
+	protected Map<String, Object> getAttributeMap() {
 		if(this.sipSessionAttributeMap == null) {
 			this.sipSessionAttributeMap = new ConcurrentHashMap<String, Object>();
 		}
@@ -1282,20 +1282,20 @@ public class SipSessionImpl implements MobicentsSipSession {
         // Notify ActivationListeners
     	SipSessionEvent event = null;
     	if(this.sipSessionAttributeMap != null) {
-        Set<String> keySet = getAttributeMap().keySet();
-        for (String key : keySet) {
-        	Object attribute = getAttributeMap().get(key);
-            if (attribute instanceof SipSessionActivationListener) {
-                if (event == null)
-                    event = new SipSessionEvent(this);
-                try {
-                    ((SipSessionActivationListener)attribute)
-                        .sessionWillPassivate(event);
-                } catch (Throwable t) {
-                    logger.error("SipSessionActivationListener threw exception", t);
-                }
-            }
-		}
+	        Set<String> keySet = getAttributeMap().keySet();
+	        for (String key : keySet) {
+	        	Object attribute = getAttributeMap().get(key);
+	            if (attribute instanceof SipSessionActivationListener) {
+	                if (event == null)
+	                    event = new SipSessionEvent(this);
+	                try {
+	                    ((SipSessionActivationListener)attribute)
+	                        .sessionWillPassivate(event);
+	                } catch (Throwable t) {
+	                    logger.error("SipSessionActivationListener threw exception", t);
+	                }
+	            }
+			}
     	}
     }
     
@@ -1306,21 +1306,22 @@ public class SipSessionImpl implements MobicentsSipSession {
     public void activate() {        
         // Notify ActivationListeners
     	SipSessionEvent event = null;
-    	if(this.sipSessionAttributeMap != null) {
-        Set<String> keySet = getAttributeMap().keySet();
-        for (String key : keySet) {
-        	Object attribute = getAttributeMap().get(key);
-            if (attribute instanceof SipSessionActivationListener) {
-                if (event == null)
-                    event = new SipSessionEvent(this);
-                try {
-                    ((SipSessionActivationListener)attribute)
-                        .sessionDidActivate(event);
-                } catch (Throwable t) {
-                    logger.error("SipSessionActivationListener threw exception", t);
-                }
-            }
-		}}
+    	if(sipSessionAttributeMap != null) {
+	        Set<String> keySet = getAttributeMap().keySet();
+	        for (String key : keySet) {
+	        	Object attribute = getAttributeMap().get(key);
+	            if (attribute instanceof SipSessionActivationListener) {
+	                if (event == null)
+	                    event = new SipSessionEvent(this);
+	                try {
+	                    ((SipSessionActivationListener)attribute)
+	                        .sessionDidActivate(event);
+	                } catch (Throwable t) {
+	                    logger.error("SipSessionActivationListener threw exception", t);
+	                }
+	            }
+			}
+	    }
     }
     
 	public Principal getUserPrincipal() {
