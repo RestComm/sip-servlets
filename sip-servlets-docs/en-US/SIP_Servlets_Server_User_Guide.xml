@@ -1,15 +1,19 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- This document was created with Syntext Serna Free. --><!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <book>
-	<xi:include href="Book_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="Preface.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-chapter-ittsss-Introduction_to_the_SIP_Servlets_Server.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="task-chapter-SIP_Servlets_Server-Installing_Configuring_and_Running.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="task-chapter-Application_Router.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-chapter-Services_for_SIP_Servlets.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-chapter-SS_Examples.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<!--<index />-->
-</book>
-
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Book_Info.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Preface.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-ittsss-Introduction_to_the_SIP_Servlets_Server.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="task-chapter-SIP_Servlets_Server-Installing_Configuring_and_Running.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="task-chapter-Application_Router.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Services_for_SIP_Servlets.xml"/>
+  <chapter>
+    <title>Clustering and High Availability</title>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_for_JBoss-Clustering_Support.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_for_JBoss-Failover_Support.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Load_Balancer.xml"/>
+  </chapter>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-SS_Examples.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Revision_History.xml"/>
+<!--<index />--></book>

@@ -1,17 +1,14 @@
-﻿<?xml version='1.0' encoding="UTF-8"?>
+﻿<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-]><!-- chapter id nickname: afotsss -->
-<chapter id="afotsss-Advanced_Features_of_the_SIP_Servlets_Server">
-	<title>Advanced Features of the SIP Servlets Server</title>
-	<para>The advanced features of <application condition="mob">Mobicents</application><application condition="jbcp">JBCP</application> SIP Servlets include Concurrency and Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclusively for MSS for JBoss, clustering and failover support.</para>
-	<xi:include href="concept-section-SS_Concurrency_and_Congestion_Control.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Load_Balancer.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_SIP_Servlet_Security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_SIP_Extensions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Seam_Telco_Framework.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_STUN_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Diameter_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Media_IPBX.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_for_JBoss-Clustering_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_for_JBoss-Failover_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+]>
+<!-- chapter id nickname: afotsss --><chapter id="afotsss-Advanced_Features_of_the_SIP_Servlets_Server">
+  <title>Advanced Features of the SIP Servlets Server</title>
+  <para>The advanced features of <application condition="mob">Mobicents</application><application condition="jbcp">JBCP</application> SIP Servlets include Concurrency and Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclusively for MSS for JBoss, clustering and failover support.</para>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Concurrency_and_Congestion_Control.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Servlet_Security.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Extensions.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Seam_Telco_Framework.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_STUN_Support.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Diameter_Support.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Media_IPBX.xml"/>
 </chapter>

@@ -1,75 +1,59 @@
-<?xml version='1.0'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-]><!-- chapter id nickname: ssfjcs -->
-<section
-	id="ssfjcs-SS_for_JBoss-Clustering_Support">
-	<title>MSS for JBoss: Clustering Support</title>
-	<para>Mobicents supports the clustering of SIP Servlets-enabled JBoss Application Servers for performance, reliability and failover purposes. Note that only MSS for JBoss Servers can be used as cluster nodes; MSS for Tomcat Containers are not supported.</para>
-	<para>As the SIP Servlets Server employs JBoss Application Server as its servlet container and takes advantage of its capabilities, including clustering and failover, familiarity with the basics of JBoss Clustering is helpful. Refer to this chapter in the Clustering Guide for background or if you wish to dig further: <ulink
-			url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/index.html">JBoss Application Server Clustering Guide</ulink>.</para>
-	<!-- SIP Servlets Server Cluster -->
-	<section
-		id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing_Configuring_and_Running">
-		<title>SIP Servlets Server Cluster: Installing, Configuring and Running</title>
-		<para>&nbsp;</para>
-		<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-PreInstall_Requirements_and_Prerequisites">
-			<title>Pre-Install Requirements and Prerequisites</title>
-			<para>&nbsp;</para>
-			<variablelist
-				id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Software_Prerequisites">
-				<title>Software Prerequisites</title>
-				<varlistentry>
-					<term>A SIP Servlets-enabled JBoss Application Server</term>
-					<listitem>
-						<para>Before proceeding, you should follow the instructions for installing, configuring, running and testing MSS for JBoss from the binary distribution:</para>
-						<itemizedlist>
-							<listitem>
-								<para>
-									<xref
-										linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>
-								</para>
-							</listitem>
-						</itemizedlist>
-						<para>The easiest way to set up a cluster of SIP Servlets-enabled JBoss Application Servers is to install, configure and test the binary distribution on one machine, and then simply copy the entire installation (directory) to the other machines in the cluster. This is the approach taken in this chapter.</para>
-						<para>First, install your SIP Servlets Server with JBoss by following these instructions: <xref
-								linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>. Then proceed to <xref
-								linkend="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring"/> below.</para>
-					</listitem>
-				</varlistentry>
-			</variablelist>
-		</section>
-	<!-- <section
-		id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Downloading">
-		<title>Downloading</title>
-		<para>&nbsp;</para>
-	</section> -->
-		<!--<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing">
-			<title>Installing</title>
-			<para>&nbsp;</para>
-		</section>-->
-		<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
-			<title>Configuring</title>
-			<para>Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering. SIP and HTTP session state clustering are pre-configured and ready-to-go straight out of the binary distribution. However, to enable session replication in your node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor.</para>
-			<important
-				id="ssfjcs-You_Must_Use_the_all_Server_Configuration_Profile">
-				<title>You Must Use the <quote>all</quote> Server Configuration Profile</title>
-				<para>You will notice that the following instructions modify one or more properties in the configuration files for the <quote>all</quote> Server Configuration Profile. This is evident in the path names given below. When we start each MSS for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.</para>
-			</important>
-			<para>To do so, open the <filename>web.xml</filename> configuration file, which lives in the <filename>&lt;topmost_directory&gt;/server/all/deploy/jboss-web.deployer/conf/</filename> directory, and add the empty element <literal>&lt;distributable/&gt;</literal> as a child of the document root element, <literal>web-app</literal>:</para>
-			<example
-				id="ssfjcs-Enabling_Node_Session_Replication_in_the_web.xml_Deployer">
-				<title>Enabling Node Session Replication in the web.xml Deployer</title>
-				<programlisting
-					linenumbering="unnumbered"
-					role="XML"><![CDATA[<?xml version="1.0" encoding="utf-8"?><?xml version="1.0" encoding="ISO-8859-1"?>
+]>
+<!-- chapter id nickname: ssfjcs --><section id="ssfjcs-SS_for_JBoss-Clustering_Support">
+  <title>MSS for JBoss: Clustering Support</title>
+  <para>Mobicents supports the clustering of SIP Servlets-enabled JBoss Application Servers for performance, reliability and failover purposes. Note that only MSS for JBoss Servers can be used as cluster nodes; MSS for Tomcat Containers are not supported.</para>
+  <para>As the SIP Servlets Server employs JBoss Application Server as its servlet container and takes advantage of its capabilities, including clustering and failover, familiarity with the basics of JBoss Clustering is helpful. Refer to this chapter in the Clustering Guide for background or if you wish to dig further: <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/index.html">JBoss Application Server Clustering Guide</ulink>.</para>
+<!-- SIP Servlets Server Cluster -->  <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing_Configuring_and_Running">
+    <title>SIP Servlets Server Cluster: Installing, Configuring and Running</title>
+    <para>&nbsp;</para>
+    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-PreInstall_Requirements_and_Prerequisites">
+      <title>Pre-Install Requirements and Prerequisites</title>
+      <para>&nbsp;</para>
+      <variablelist id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Software_Prerequisites">
+        <title>Software Prerequisites</title>
+        <varlistentry>
+          <term>A SIP Servlets-enabled JBoss Application Server</term>
+          <listitem>
+            <para>Before proceeding, you should follow the instructions for installing, configuring, running and testing MSS for JBoss from the binary distribution:</para>
+            <itemizedlist>
+              <listitem>
+                <para>
+         <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>
+        </para>
+              </listitem>
+            </itemizedlist>
+            <para>The easiest way to set up a cluster of SIP Servlets-enabled JBoss Application Servers is to install, configure and test the binary distribution on one machine, and then simply copy the entire installation (directory) to the other machines in the cluster. This is the approach taken in this chapter.</para>
+            <para>First, install your SIP Servlets Server with JBoss by following these instructions: <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>. Then proceed to <xref linkend="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring"/> below.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </section>
+<!-- <section
+  id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Downloading">
+  <title>Downloading</title>
+  <para>&nbsp;</para>
+ </section> --><!--<section
+   id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing">
+   <title>Installing</title>
+   <para>&nbsp;</para>
+  </section>-->    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
+      <title>Configuring</title>
+      <para>Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering. SIP and HTTP session state clustering are pre-configured and ready-to-go straight out of the binary distribution. However, to enable session replication in your node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per appication or globally for all applications.</para>
+      <important id="ssfjcs-You_Must_Use_the_all_Server_Configuration_Profile">
+        <title>You Must Use the <quote>all</quote> Server Configuration Profile</title>
+        <para>You will notice that the following instructions modify one or more properties in the configuration files for the <quote>all</quote> Server Configuration Profile. This is evident in the path names given below. When we start each MSS for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.</para>
+      </important>
+      <para>To do so, open the <filename>web.xml</filename> configuration file, which lives in the <filename>&lt;topmost_directory&gt;/server/all/deploy/jboss-web.deployer/conf/</filename> directory, and add the empty element <literal>&lt;distributable/&gt;</literal> as a child of the document root element, <literal>web-app</literal>:</para>
+      <example id="ssfjcs-Enabling_Node_Session_Replication_in_the_web.xml_Deployer">
+        <title>Enabling Node Session Replication in the default web.xml descriptor</title>
+        <programlisting linenumbering="unnumbered" role="XML"><![CDATA[<?xml version="1.0" encoding="utf-8"?><?xml version="1.0" encoding="ISO-8859-1"?>
 <web-app
-	xmlns="http://java.sun.com/xml/ns/j2ee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-	version="2.4">
+ xmlns="http://java.sun.com/xml/ns/j2ee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+ version="2.4">
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
   <!-- loaded into this instance of Tomcat.  As each application is         -->
@@ -83,74 +67,75 @@
   <!-- JBossInjectionProvider provides resource injection for managed beans. -->
   <!-- See JSF 1.2 spec section 5.4 for details.                             -->
   <distributable/>
-	<context-param>
-		<param-name>com.sun.faces.injectionProvider</param-name>
-		<param-value>org.jboss.web.jsf.integration.injection.JBossInjectionProvider</param-value>
-	</context-param>]]></programlisting>
-			</example>
-			<para>This one configuration change is sufficient for enabling clustering capabilities in MSS for JBoss servers. For further information on session replication and clustering with JBoss, refer to <ulink
-					url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/clustering-http-app.html">Enabling session replication in your application</ulink> in the <ulink
-					url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Getting_Started_Guide/beta422/html/index.html">JBoss Application Server Getting Started Guide</ulink>.</para>
-		</section>
-		<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Running">
-			<title>Running</title>
-			<para>Clustering with MSS for JBoss nodes requires running all of the nodes using the <quote>all</quote> Server Configuration Profile, which is specified when you invoke <command>run.sh</command> or <command>run.bat</command>.</para>
-			<formalpara>
-				<title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Linux</title>
-				<para>To run the server on Linux using the <quote>all</quote> Configuration Profile, start the server with the following command:</para>
-			</formalpara>
-			<screen>mss-jboss-&lt;version&gt;]$ ./bin/run.sh -c all</screen>
-			<formalpara>
-				<title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Windows</title>
-				<para>To run the server on Windows using the <quote>all</quote> Configuration Profile, open the Command Prompt, change your folder to the topmost folder of your MSS for JBoss installation, and issue the following command:</para>
-			</formalpara>
-			<screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;run.bat -c all</screen>
-		</section>
-		<!--<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Using">
-			<title>Using</title>
-			<para>&nbsp;</para>
-		</section>-->
-		<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Stopping">
-			<title>Stopping</title>
-			<para>Individual nodes in the cluster should be stopped one-by-one, followed by the SIP load balancer. Refer to:</para>
-			<itemizedlist>
-				<listitem>
-					<para>Stopping the SIP load balancer: <xref
-							linkend="sslb-binary-SIP_Load_Balancer-Stopping"/>
-					</para>
-				</listitem>
-				<listitem>
-					<para>Stopping MSS for JBoss: <xref
-							linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>
-					</para>
-				</listitem>
-				<listitem>
-					<para>Stopping MSS for Tomcat: <xref
-							linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>
-					</para>
-				</listitem>
-			</itemizedlist>
-		</section>
-		<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Testing">
-			<title>Testing</title>
-			<para>To test your MSS for JBoss cluster setup for mid-call failover, refer to:</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						<xref
-							linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>
-					</para>
-				</listitem>
-			</itemizedlist>
-		</section>
-		<section
-			id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Uninstalling">
-			<title>Uninstalling</title>
-			<para>Uninstalling a SIP Servlets Cluster would entail deleting the Mobicents SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly unsetting the <envar>JBOSS_HOME</envar> environment variable.</para>
-		</section>
-	</section>
+ <context-param>
+  <param-name>com.sun.faces.injectionProvider</param-name>
+  <param-value>org.jboss.web.jsf.integration.injection.JBossInjectionProvider</param-value>
+ </context-param>]]></programlisting>
+      </example>
+      <para>This one configuration change is sufficient for enabling clustering capabilities in MSS for JBoss servers for all applications. For further information on session replication and clustering with JBoss, refer to <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/clustering-http-app.html">Enabling session replication in your application</ulink> in the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Getting_Started_Guide/beta422/html/index.html">JBoss Application Server Getting Started Guide</ulink>.</para>
+    </section>
+    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Running">
+      <title>Running</title>
+      <para>Clustering with MSS for JBoss nodes requires running all of the nodes using the <quote>all</quote> Server Configuration Profile, which is specified when you invoke <command>run.sh</command> or <command>run.bat</command>.</para>
+      <formalpara>
+        <title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Linux</title>
+        <para>To run the server on Linux using the <quote>all</quote> Configuration Profile, start the server with the following command:</para>
+      </formalpara>
+      <screen>mss-jboss-&lt;version&gt;]$ ./bin/run.sh -c all</screen>
+      <formalpara>
+        <title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Windows</title>
+        <para>To run the server on Windows using the <quote>all</quote> Configuration Profile, open the Command Prompt, change your folder to the topmost folder of your MSS for JBoss installation, and issue the following command:</para>
+      </formalpara>
+      <screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;run.bat -c all</screen>
+      <formalpara>
+        <title>Distriuting requests between nodes</title>
+        <para>Together with the application server nodes, it is advised to run a SIP load-balancer or an IP load-balancer which will distribute the traffic evenly between the nodes. A load-balancer is a single entry-point to all nodes. All calls should e made through the load-balancer if you need High Availability. You can read more on how to use the SIP load-balancer in <xref linkend="sslb-SIP_Servlets_Load_Balancer-Implementation"/>.</para>
+        <para>By default the servers are configured with one SIP load-balancer at IP address &quot;127.0.0.1&quot;. This is specified in the <literal>balancers</literal> attriute in the <filename>server.xml</filename> configuration file as follows:</para>
+      </formalpara>
+      <programlisting>&lt;Service name=&quot;jboss.web&quot; 
+      className=&quot;org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService&quot;
+  balancers=&quot;127.0.0.1&quot;  
+  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
+concurrencyControlMode=&quot;None&quot; 
+  darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;&gt;
+</programlisting>
+    </section>
+<!--<section
+   id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Using">
+   <title>Using</title>
+   <para>&nbsp;</para>
+  </section>-->    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Stopping">
+      <title>Stopping</title>
+      <para>Individual nodes in the cluster should be stopped one-by-one, followed by the SIP load balancer. Refer to:</para>
+      <itemizedlist>
+        <listitem>
+          <para>Stopping the SIP load balancer: <xref linkend="sslb-binary-SIP_Load_Balancer-Stopping"/>
+     </para>
+        </listitem>
+        <listitem>
+          <para>Stopping MSS for JBoss: <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>
+     </para>
+        </listitem>
+        <listitem>
+          <para>Stopping MSS for Tomcat: <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>
+     </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Testing">
+      <title>Testing</title>
+      <para>To test your MSS your JBoss cluster setup for mid-call failover, refer to:</para>
+      <itemizedlist>
+        <listitem>
+          <para>
+      <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>
+     </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Uninstalling">
+      <title>Uninstalling</title>
+      <para>Uninstalling a SIP Servlets Cluster would entail deleting the Mobicents SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly unsetting the <envar>JBOSS_HOME</envar> environment variable.</para>
+    </section>
+  </section>
 </section>
