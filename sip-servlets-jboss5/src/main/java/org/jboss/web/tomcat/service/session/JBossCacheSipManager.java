@@ -2269,61 +2269,62 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
 	        passivated = (osu != null && osu.passivated);
 		}				
-		synchronized (session) {
-			boolean doTx = false;
-			BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
-			try {
-				// We need transaction so any data gravitation replication
-				// is sent in batch.
-				// Don't do anything if there is already transaction context
-				// associated with this thread.
-				if (batchingManager.isBatchInProgress() == false)
-	            {
-	               batchingManager.startBatch();
-	               doTx = true;
-	            }
-
-	            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
-	            if (data != null)
-	            {
-	               session.update(data);
-	            }
-	            else if(mustAdd)
-	            {
-	               // Clunky; we set the session variable to null to indicate
-	               // no data so move on
-	               session = null;
-	            }
-	            
-	            if (session != null)
-	            {
-	               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
-	                                                                    : ClusteredSessionNotificationCause.FAILOVER;
-	               session.notifyDidActivate(cause);
-	            }
-
-//					sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
-			} catch (Exception ex) {
+		if(session != null) {
+			synchronized (session) {
+				boolean doTx = false;
+				BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 				try {
-					// if(doTx)
-					// Let's set it no matter what.
-					batchingManager.setBatchRollbackOnly();
-				} catch (Exception exn) {
-					log_.error("Problem rolling back session mgmt transaction",
-							exn);
+					// We need transaction so any data gravitation replication
+					// is sent in batch.
+					// Don't do anything if there is already transaction context
+					// associated with this thread.
+					if (batchingManager.isBatchInProgress() == false)
+		            {
+		               batchingManager.startBatch();
+		               doTx = true;
+		            }
+	
+		            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
+		            if (data != null)
+		            {
+		               session.update(data);
+		            }
+		            else if(mustAdd)
+		            {
+		               // Clunky; we set the session variable to null to indicate
+		               // no data so move on
+		               session = null;
+		            }
+		            
+		            if (session != null)
+		            {
+		               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
+		                                                                    : ClusteredSessionNotificationCause.FAILOVER;
+		               session.notifyDidActivate(cause);
+		            }
+	
+	//					sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
+				} catch (Exception ex) {
+					try {
+						// if(doTx)
+						// Let's set it no matter what.
+						batchingManager.setBatchRollbackOnly();
+					} catch (Exception exn) {
+						log_.error("Problem rolling back session mgmt transaction",
+								exn);
+					}
+	
+					// We will need to alert Tomcat of this exception.
+					if (ex instanceof RuntimeException)
+						throw (RuntimeException) ex;
+	
+					throw new RuntimeException("Failed to load session " + key.toString(),
+							ex);
+				} finally {
+					if (doTx)
+						batchingManager.endBatch();
 				}
-
-				// We will need to alert Tomcat of this exception.
-				if (ex instanceof RuntimeException)
-					throw (RuntimeException) ex;
-
-				throw new RuntimeException("Failed to load session " + key.toString(),
-						ex);
-			} finally {
-				if (doTx)
-					batchingManager.endBatch();
 			}
-
 			if (session != null)
 	         {            
 	            if (mustAdd)
