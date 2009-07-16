@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -682,13 +683,13 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			} catch (ParseException e) {
 				logger.error("Unexpected exception while parsing the sip session key that has been previously passivated " + sipSessionId, e);
 			}								
+		}		
+		if(md.getHttpSessionIds().size() > 0  && httpSessions == null) {
+			httpSessions = new CopyOnWriteArraySet<String>();
 		}
-		
 		for (String httpSessionId : md.getHttpSessionIds()) {
 			httpSessions.add(httpSessionId);
 		}
-		
-		//TODO addd underlying sip and http sessions
 		
 		// Get our id without any jvmRoute appended
 //		parseRealId(id);
