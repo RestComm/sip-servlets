@@ -2,7 +2,7 @@ require 'java'
 
 # Listener getting the connection creation events
 class NetworkConnectionListener
-	include javax.media.mscontrol.resource.MediaEventListener
+	include javax.media.mscontrol.MediaEventListener
 	include java.io.Serializable
 	
   	def initialize    
@@ -10,9 +10,11 @@ class NetworkConnectionListener
   
 	def onEvent(event)
 		puts "NetworkConnectionListener event received " + event.to_string  
+		puts "NetworkConnectionListener event type " + event.get_event_type.to_string
 		
 		# get the media connection
-		conn = event.get_source;
+		sdp_manager = event.get_source
+        conn = sdp_manager.get_container
 		# get the corresponding media session
 		media_session = conn.get_media_session
 		# get the corresponding sip session
@@ -23,11 +25,11 @@ class NetworkConnectionListener
 		  invite = sip_session.get_attribute("UNANSWERED_INVITE")
 		  sip_session.remove_attribute("UNANSWERED_INVITE")
             	  
-	      if javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.networkconnection.NetworkConnection.ev_Modify.equals(event.get_event_type)
+	      if event.is_successful
 	      	# connection was successfully created, we create the response, set the answer SDP on it and send it out 
 	        response = invite.create_response(javax.servlet.sip.SipServletResponse.SC_OK)
 	        begin
-	          sdp = conn.get_local_session_description
+	          sdp = event.get_media_server_sdp
 	  
 	          response.set_content(sdp, "application/sdp")
 	          response.send
@@ -41,10 +43,10 @@ class NetworkConnectionListener
 	        end
 	      else
 	        begin
-	          if (javax.media.mscontrol.networkconnection.NetworkConnection.e_ModifyOffersRejected.equals(event.get_error)) 
+	          if (javax.media.mscontrol.networkconnection.SdpPortManagerEvent.SDP_NOT_ACCEPTABLE.equals(event.get_error)) 
 	            # if the INVITE SDP was rejected, Send 488 error response to INVITE
 	            invite.create_response(javax.servlet.sip.SipServletResponse.SC_NOT_ACCEPTABLE_HERE).send
-	          elsif (javax.media.mscontrol.networkconnection.NetworkConnection.e_ResourceNotAvailable.equals(event.get_error)) 
+	          elsif (javax.media.mscontrol.networkconnection.SdpPortManagerEvent.RESOURCE_UNAVAILABLE.equals(event.get_error)) 
 	            # if no resource is available, Send 486 error response to INVITE
 	            invite.create_response(javax.servlet.sip.SipServletResponse.SC_BUSY_HERE).send
 	          else 
@@ -61,12 +63,12 @@ class NetworkConnectionListener
 	          media_session.release
 	        end	
 	      end
-	    elsif sip_session.get_attribute("INVITE") != nil && javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.networkconnection.NetworkConnection.ev_Modify.equals(event.get_event_type)
+	    elsif sip_session.get_attribute("INVITE") != nil && event.is_successful && javax.media.mscontrol.networkconnection.SdpPortManagerEvent.OFFER_GENERATED == event.get_event_type
 	        # handling the case where the app sent an INVITE to a Phone to setup a call
 	        # SDP is attached to the INVITE and the INVITE is sent out
 	        invite = sip_session.get_attribute("INVITE")
 	        sip_session.remove_attribute("INVITE")
-	        sdp = conn.get_local_session_description
+	        sdp = event.get_media_server_sdp
 	        invite.set_content(sdp, "application/sdp")
 	        invite.send
 	          
@@ -75,9 +77,9 @@ class NetworkConnectionListener
 	    	# handling the case where where the app received a 200 OK to a previously sent INVITE to a Phone to setup a call
 	    	begin
 	    		# we create the media session and initiate it
-      			media_group = media_session.create_media_group(javax.media.mscontrol.mediagroup.MediaGroupConfig.c_PlayerSignalDetector)
-		      	media_group.add_listener(MediaStatusListener.new)		
-		      	media_group.join_initiate(javax.media.mscontrol.Joinable::Direction::DUPLEX, conn, self)
+      			media_group = media_session.create_media_group(javax.media.mscontrol.mediagroup.MediaGroup.PLAYER_SIGNALDETECTOR)
+		      	media_group.add_listener(JoinStatusListener.new)		
+		      	media_group.join_initiate(javax.media.mscontrol.join.Joinable::Direction::DUPLEX, conn, self)
 		      	
 		      	sip_session.set_attribute("MediaGroup", media_group)
 		    rescue javax.media.mscontrol.MsControlException => e

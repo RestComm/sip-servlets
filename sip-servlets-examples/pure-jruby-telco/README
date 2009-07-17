@@ -12,7 +12,7 @@ JRuby 1.2.0+
 	 
 Build the application :
 
-1. modify the ruby-teclo-app-rails.yml located in this directory to map the RAILS_ROOT variable to where this application is located on your filesystem
+1. modify the pure-jruby-teclo-rails.yml located in this directory to map the RAILS_ROOT variable to where this application is located on your filesystem
 
 Now let's freeze the rails version and the associated gems dependencies we are using into our application so that if rails or a dependency is upgraded in the system, our application will always use the version we freezed and not the newly upgraded version of rails from the system. Note: this is highly recommended for production env and really is a best practice (google freeze rails for more information)
 Note that freezing is mandatory if you wish to deploy your application to JBoss 5 with the jboss-rails plugin.
@@ -41,6 +41,8 @@ F = Frozen
 R = Framework (loaded before rails starts)
 
 Let's add torquebox-support to the application so that it can be deployed and run on JBoss 5 and even start JBoss 5 from the commandline, grab the following zip http://repo.oddthesis.org/maven2/SNAPSHOTS/org/jboss/rails/jboss-rails/1.0.0.Beta7-SNAPSHOT/jboss-rails-1.0.0.Beta7-20090408.124930-1-support.zip and extract it to the vendor/plugins directory of our application.
+
+do a mvn clean install in this directory, to bundle the media jars
 
 Run the application
 

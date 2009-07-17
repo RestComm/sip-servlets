@@ -2,7 +2,7 @@ require 'java'
 require 'signal_detector_listener'
 
 class PlayerListener
-  include javax.media.mscontrol.resource.MediaEventListener
+  include javax.media.mscontrol.MediaEventListener
 
   def initialize
   end
@@ -13,7 +13,7 @@ class PlayerListener
       
       player = event.get_source
       media_group = player.get_container
-      if (javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.mediagroup.Player.ev_PlayComplete.equals(event.get_event_type))
+      if (event.is_successful && javax.media.mscontrol.mediagroup.PlayerEvent.PLAY_COMPLETED == event.get_event_type)
         # welcome message has ended, starting to listen for DTMF
         puts "Received PlayComplete event"
         begin

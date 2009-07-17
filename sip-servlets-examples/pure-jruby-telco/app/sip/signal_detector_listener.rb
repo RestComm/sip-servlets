@@ -1,7 +1,7 @@
 require 'java'
 
 class SignalDetectorListener
-  include javax.media.mscontrol.resource.MediaEventListener
+  include javax.media.mscontrol.MediaEventListener
 
 	DTMF_0 = "http://"	+ java.lang.System.get_property("jboss.bind.address", "127.0.0.1")	+ ":8080/pure-jruby-telco/audio/dtmf0.wav"
 	DTMF_1 = "http://"	+ java.lang.System.get_property("jboss.bind.address", "127.0.0.1")	+ ":8080/pure-jruby-telco/audio/dtmf1.wav"
@@ -30,7 +30,7 @@ class SignalDetectorListener
         signal_detector = media_group.get_signal_detector
         signal_detector.remove_listener(self)
 
-        if (javax.media.mscontrol.resource.Error.e_OK.equals(event.get_error) && javax.media.mscontrol.mediagroup.signals.SignalDetector.ev_SignalDetected.equals(event.get_event_type))
+        if (event.is_successful && javax.media.mscontrol.mediagroup.signals.SignalDetectorEvent.SIGNAL_DETECTED == event.get_event_type) 
           # get the DTMF and play the corresponding file
           dtmf = event.get_signal_string
           play_dtmf(media_group.get_player, dtmf)

@@ -4,7 +4,7 @@ require 'java'
 require 'torquebox/sip/base'
 require 'media_helper'
 load 'network_connection_listener.rb'
-load 'media_status_listener.rb'
+load 'join_status_listener.rb'
 
 class SipHandler < TorqueBox::Sip::Base
   # Handle INVITE request to setup a call by answering 200 OK
@@ -27,13 +27,14 @@ class SipHandler < TorqueBox::Sip::Base
   		sip_session.set_attribute("UNANSWERED_INVITE", request)
   	
   		# Create a new NetworkConnection and attaching a new listener to it to know when the connection will have been created
-  		connection = media_session.create_network_connection(javax.media.mscontrol.networkconnection.NetworkConnectionConfig.c_Basic)
+  		connection = media_session.create_network_connection(javax.media.mscontrol.networkconnection.NetworkConnection.BASIC)
+  		sdp_manager = connection.get_sdp_port_manager
   		network_connection_listener = NetworkConnectionListener.new
-  		connection.add_listener(network_connection_listener)
+  		sdp_manager.add_listener(network_connection_listener)
   		# asking to modify the connection with the received sdp : the listener will get 
   		# the event notifying it that the connection is ready or not with the corresponding SDP
   		# that will be used to send the 200 response
-  		connection.modify(javax.media.mscontrol.networkconnection.NetworkConnection.CHOOSE, request.get_raw_content)
+  		sdp_manager.process_sdp_offer(request.get_raw_content);
   	rescue Exception => e
   		puts e.backtrace
   		puts e.message
@@ -48,11 +49,11 @@ class SipHandler < TorqueBox::Sip::Base
     media_session = sip_session.get_attribute("MEDIA_SESSION")
     begin
       # connecting both parties so that the media session is setup and media starts flowing from one to another
-      media_group = media_session.create_media_group(javax.media.mscontrol.mediagroup.MediaGroupConfig.c_PlayerSignalDetector)
-      media_group.add_listener(MediaStatusListener.new)
+      media_group = media_session.create_media_group(javax.media.mscontrol.mediagroup.MediaGroup.PLAYER_SIGNALDETECTOR)
+      media_group.add_listener(JoinStatusListener.new)
 
       connection = sip_session.get_attribute("NETWORK_CONNECTION")
-      media_group.join_initiate(javax.media.mscontrol.Joinable::Direction::DUPLEX, connection, self)
+      media_group.join_initiate(javax.media.mscontrol.join.Joinable::Direction::DUPLEX, connection, self)
       sip_session.set_attribute("MediaGroup", media_group)
     rescue javax.media.mscontrol.MsControlException => e
       puts e.message
@@ -81,7 +82,8 @@ class SipHandler < TorqueBox::Sip::Base
     # notify the Media Server of the SDP from the other party so that the media session can be setup and media starts
     sdp = response.get_content    
     connection = response.get_session.getAttribute("NETWORK_CONNECTION")
-    connection.modify(javax.media.mscontrol.networkconnection.NetworkConnection.CHOOSE, sdp)
+    sdp_manager = connection.get_sdp_port_manager
+    sdp_manager.process_sdp_offer(sdp);
   end
   
   def terminate(sip_session, media_session)

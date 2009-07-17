@@ -69,13 +69,14 @@ class ComplaintsController < ApplicationController
     
     	# Create a new NetworkConnection to handle RTP and attaching a new listener to it to know when it is created to update
     	# the sip request SDP and send it
-    	connection = media_session.create_network_connection(javax.media.mscontrol.networkconnection.NetworkConnectionConfig.c_Basic)
+    	connection = media_session.create_network_connection(javax.media.mscontrol.networkconnection.NetworkConnection.BASIC)
+    	sdp_port_manager = connection.get_sdp_port_manager
     	network_connection_listener = NetworkConnectionListener.new
-    	connection.add_listener(network_connection_listener)
+    	sdp_port_manager.add_listener(network_connection_listener)
     	# asking to modify the connection with the received sdp : the listener will get 
     	# the event notifying it that the connection is ready or not with the corresponding SDP
     	# that will be used to send the 200 response
-    	connection.modify(javax.media.mscontrol.networkconnection.NetworkConnection.CHOOSE, nil)
+    	sdp_port_manager.generate_sdp_offer
   	end
   
 	# the sending the request out to the sip phone will happen in the NetworkConnectionListener when the SDP will be received from the Media Server
