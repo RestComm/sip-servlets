@@ -19,14 +19,13 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.media.mscontrol.MediaEventListener;
 import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
 import javax.media.mscontrol.MsControlFactory;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
-import javax.media.mscontrol.networkconnection.NetworkConnectionConfig;
-import javax.media.mscontrol.networkconnection.NetworkConnectionEvent;
-import javax.media.mscontrol.resource.Error;
-import javax.media.mscontrol.resource.MediaEventListener;
+import javax.media.mscontrol.networkconnection.SdpPortManager;
+import javax.media.mscontrol.networkconnection.SdpPortManagerEvent;
 import javax.media.mscontrol.spi.DriverManager;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -34,10 +33,8 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.media.mscontrol.MediaSessionImpl;
 
 /**
  * This example shows a simple usage of JSR 309.
@@ -78,12 +75,14 @@ public class PlayerServlet extends SipServlet {
 	/**
 	 * In this case MGW and CA are on same local host
 	 */
-	public static final String LOCAL_ADDRESS = System.getProperty("jboss.bind.address", "127.0.0.1");
+	public static final String LOCAL_ADDRESS = System.getProperty(
+			"jboss.bind.address", "127.0.0.1");
 	protected static final String CA_PORT = "2727";
 
-	public static final String PEER_ADDRESS = System.getProperty("jboss.bind.address", "127.0.0.1");
+	public static final String PEER_ADDRESS = System.getProperty(
+			"jboss.bind.address", "127.0.0.1");
 	protected static final String MGW_PORT = "2427";
-	
+
 	protected boolean isBye = false;
 
 	public PlayerServlet() {
@@ -122,9 +121,9 @@ public class PlayerServlet extends SipServlet {
 
 		logger.info("MediaPlaybackServlet: Got request:\n"
 				+ request.getMethod());
-		
+
 		isBye = false;
-		
+
 		SipServletResponse sipServletResponse = request
 				.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
@@ -133,7 +132,7 @@ public class PlayerServlet extends SipServlet {
 
 		try {
 			// Create new media session and store in SipSession
-			MediaSessionImpl mediaSession = (MediaSessionImpl) msControlFactory
+			MediaSession mediaSession = (MediaSession) msControlFactory
 					.createMediaSession();
 
 			sipSession.setAttribute("MEDIA_SESSION", mediaSession);
@@ -144,13 +143,17 @@ public class PlayerServlet extends SipServlet {
 
 			// Create a new NetworkConnection and store in SipSession
 			NetworkConnection conn = mediaSession
-					.createNetworkConnection(NetworkConnectionConfig.c_Basic);
+					.createNetworkConnection(NetworkConnection.BASIC);
+
+			SdpPortManager sdpManag = conn.getSdpPortManager();
 
 			NetworkConnectionListener ncListener = new NetworkConnectionListener();
 
-			conn.addListener(ncListener);
+			sdpManag.addListener(ncListener);
 
-			conn.modify(NetworkConnection.CHOOSE, request.getRawContent());
+			byte[] sdpOffer = request.getRawContent();
+
+			sdpManag.processSdpOffer(sdpOffer);
 
 		} catch (MsControlException e) {
 			logger.error(e);
@@ -192,11 +195,12 @@ public class PlayerServlet extends SipServlet {
 	}
 
 	private class NetworkConnectionListener implements
-			MediaEventListener<NetworkConnectionEvent> {
+			MediaEventListener<SdpPortManagerEvent> {
 
-		public void onEvent(NetworkConnectionEvent event) {
+		public void onEvent(SdpPortManagerEvent event) {
 
-			NetworkConnection conn = event.getSource();
+			SdpPortManager sdpmana = event.getSource();
+			NetworkConnection conn = sdpmana.getContainer();
 			MediaSession mediaSession = event.getSource().getMediaSession();
 
 			SipSession sipSession = (SipSession) mediaSession
@@ -206,12 +210,11 @@ public class PlayerServlet extends SipServlet {
 					.getAttribute("UNANSWERED_INVITE");
 			sipSession.removeAttribute("UNANSWERED_INVITE");
 
-			if (Error.e_OK.equals(event.getError())
-					&& NetworkConnection.ev_Modify.equals(event.getEventType())) {
+			if (event.isSuccessful()) {
 				SipServletResponse resp = inv
 						.createResponse(SipServletResponse.SC_OK);
 				try {
-					byte[] sdp = conn.getLocalSessionDescription();
+					byte[] sdp = event.getMediaServerSdp();
 
 					resp.setContent(sdp, "application/sdp");
 					// Send 200 OK
@@ -231,7 +234,7 @@ public class PlayerServlet extends SipServlet {
 				}
 			} else {
 				try {
-					if (NetworkConnection.e_ModifyOffersRejected.equals(event
+					if (SdpPortManagerEvent.SDP_NOT_ACCEPTABLE.equals(event
 							.getError())) {
 
 						if (logger.isDebugEnabled()) {
@@ -242,7 +245,7 @@ public class PlayerServlet extends SipServlet {
 						inv.createResponse(
 								SipServletResponse.SC_NOT_ACCEPTABLE_HERE)
 								.send();
-					} else if (NetworkConnection.e_ResourceNotAvailable
+					} else if (SdpPortManagerEvent.RESOURCE_UNAVAILABLE
 							.equals(event.getError())) {
 						if (logger.isDebugEnabled()) {
 							logger

@@ -3,20 +3,17 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.media.mscontrol.JoinEvent;
+import javax.media.mscontrol.MediaEventListener;
 import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
-import javax.media.mscontrol.StatusEvent;
-import javax.media.mscontrol.StatusEventListener;
-import javax.media.mscontrol.Joinable.Direction;
+import javax.media.mscontrol.join.JoinEvent;
+import javax.media.mscontrol.join.JoinEventListener;
+import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.mediagroup.MediaGroup;
-import javax.media.mscontrol.mediagroup.MediaGroupConfig;
 import javax.media.mscontrol.mediagroup.Player;
 import javax.media.mscontrol.mediagroup.PlayerEvent;
 import javax.media.mscontrol.mediagroup.Recorder;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
-import javax.media.mscontrol.resource.Error;
-import javax.media.mscontrol.resource.MediaEventListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
@@ -27,7 +24,6 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.media.mscontrol.MediaSessionImpl;
 
 /**
  * 
@@ -47,8 +43,9 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 	private static final int RECORDING_DELAY = 30000;
 
 	private final static String RECORDER = "test.wav";
-//	private final String RECORDED_FILE = "file://" +
-//			 System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
+
+	// private final String RECORDED_FILE = "file://" +
+	// System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -60,12 +57,12 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			IOException {
 		SipSession sipSession = req.getSession();
 
-		MediaSessionImpl ms = (MediaSessionImpl) sipSession
+		MediaSession ms = (MediaSession) sipSession
 				.getAttribute("MEDIA_SESSION");
 		try {
 			MediaGroup mg = ms
-					.createMediaGroup(MediaGroupConfig.c_PlayerRecorderSignalDetector);
-			mg.addListener(new MyStatusEventListener());
+					.createMediaGroup(MediaGroup.PLAYER_RECORDER_SIGNALDETECTOR);
+			mg.addListener(new MyJoinEventListener());
 
 			NetworkConnection nc = (NetworkConnection) sipSession
 					.getAttribute("NETWORK_CONNECTION");
@@ -77,12 +74,13 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			terminate(sipSession, ms);
 		}
 	}
-	
+
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-		MediaGroup mediaGroup = (MediaGroup)request.getSession().getAttribute("MEDIA_GROUP");
-		if(mediaGroup != null) {
+		MediaGroup mediaGroup = (MediaGroup) request.getSession().getAttribute(
+				"MEDIA_GROUP");
+		if (mediaGroup != null) {
 			logger.info("Bye received, stopping the recording");
 			try {
 				mediaGroup.getRecorder().stop();
@@ -100,9 +98,10 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 		SipSession sipSession = servletTimer.getApplicationSession()
 				.getSipSession(sessionId);
 
-		if(sipSession != null) {
-			MediaGroup mediaGroup = (MediaGroup)sipSession.getAttribute("MEDIA_GROUP");
-			if(mediaGroup != null) {
+		if (sipSession != null) {
+			MediaGroup mediaGroup = (MediaGroup) sipSession
+					.getAttribute("MEDIA_GROUP");
+			if (mediaGroup != null) {
 				logger.info("Timer fired, stopping the recording");
 				try {
 					mediaGroup.getRecorder().stop();
@@ -111,37 +110,38 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 				}
 			}
 		} else {
-			logger.info("the session has not been found, it may have been already invalidated");
+			logger
+					.info("the session has not been found, it may have been already invalidated");
 		}
 	}
 
-	private class MyStatusEventListener implements StatusEventListener {
+	private class MyJoinEventListener implements JoinEventListener {
 
-		public void onEvent(StatusEvent event) {
+		public void onEvent(javax.media.mscontrol.join.JoinEvent event) {
 
-			MediaGroup mg = (MediaGroup) event.getSource();
-			if (event.getError().equals(Error.e_OK)
-					&& JoinEvent.ev_Joined.equals(event.getEventType())) {
-				// NC Joined to MG
+			MediaGroup mg = (MediaGroup) event.getThisJoinable();
+			if (event.isSuccessful()) {
 
-				try {
-					Player player = mg.getPlayer();
-					player.addListener(new PlayerListener());
+				if (JoinEvent.JOINED == event.getEventType()) {
+					// NC Joined to MG
 
-					URI prompt = URI.create(WELCOME_MSG);
+					try {
+						Player player = mg.getPlayer();
+						player.addListener(new PlayerListener());
 
-					player.play(prompt, null, null);
+						URI prompt = URI.create(WELCOME_MSG);
 
-				} catch (MsControlException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+						player.play(prompt, null, null);
+
+					} catch (MsControlException e) {
+						logger.error(e);
+					}
+				} else if (JoinEvent.UNJOINED == event.getEventType()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Un-Joined MG and NC");
+					}
 				}
 
-			} else if (event.getError().equals(Error.e_OK)
-					&& JoinEvent.ev_Unjoined.equals(event.getEventType())) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Un-Joined MG and NC");
-				}
 			} else {
 				logger.error("Joining of MG and NC failed");
 			}
@@ -156,8 +156,8 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			Player player = event.getSource();
 			MediaGroup mg = player.getContainer();
 			if (!isBye) {
-				if (Error.e_OK.equals(event.getError())
-						&& Player.ev_PlayComplete.equals(event.getEventType())) {
+				if (event.isSuccessful()
+						&& (PlayerEvent.PLAY_COMPLETED == event.getEventType())) {
 
 					MediaSession mediaSession = event.getSource()
 							.getMediaSession();
@@ -174,7 +174,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 						Recorder recoredr = mg.getRecorder();
 						logger.info("recording the user at " + RECORDER);
 						URI prompt = URI.create(RECORDER);
-						
+
 						recoredr.record(prompt, null, null);
 
 						TimerService timer = (TimerService) getServletContext()
@@ -184,7 +184,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 					} catch (MsControlException e) {
 						logger.error("An unexpected error happened ", e);
-					} 
+					}
 				} else {
 					logger.error("Player didn't complete successfully ");
 				}

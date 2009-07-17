@@ -3,20 +3,18 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.media.mscontrol.JoinEvent;
+import javax.media.mscontrol.MediaEventListener;
+import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
-import javax.media.mscontrol.StatusEvent;
-import javax.media.mscontrol.StatusEventListener;
-import javax.media.mscontrol.Joinable.Direction;
+import javax.media.mscontrol.join.JoinEvent;
+import javax.media.mscontrol.join.JoinEventListener;
+import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.mediagroup.MediaGroup;
-import javax.media.mscontrol.mediagroup.MediaGroupConfig;
 import javax.media.mscontrol.mediagroup.Player;
 import javax.media.mscontrol.mediagroup.PlayerEvent;
 import javax.media.mscontrol.mediagroup.signals.SignalDetector;
 import javax.media.mscontrol.mediagroup.signals.SignalDetectorEvent;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
-import javax.media.mscontrol.resource.Error;
-import javax.media.mscontrol.resource.MediaEventListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
@@ -24,7 +22,6 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.media.mscontrol.MediaSessionImpl;
 
 /**
  * 
@@ -102,12 +99,12 @@ public class PromptAndCollectServlet extends PlayerServlet {
 		}
 		SipSession sipSession = req.getSession();
 
-		MediaSessionImpl ms = (MediaSessionImpl) sipSession
+		MediaSession ms = (MediaSession) sipSession
 				.getAttribute("MEDIA_SESSION");
 		try {
 			MediaGroup mg = ms
-					.createMediaGroup(MediaGroupConfig.c_PlayerSignalDetector);
-			mg.addListener(new MyStatusEventListener());
+					.createMediaGroup(MediaGroup.PLAYER_SIGNALDETECTOR);
+			mg.addListener(new MyJoinEventListener());
 
 			NetworkConnection nc = (NetworkConnection) sipSession
 					.getAttribute("NETWORK_CONNECTION");
@@ -119,41 +116,46 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			terminate(sipSession, ms);
 		}
 	}
-	
+
 	@Override
 	protected void doInfo(SipServletRequest request) throws ServletException,
 			IOException {
-		int responseCode = SipServletResponse.SC_OK;		
-		//Getting the message content
-		String messageContent = new String( (byte[]) request.getContent());
-		logger.info("got INFO request with following content " + messageContent);
+		int responseCode = SipServletResponse.SC_OK;
+		// Getting the message content
+		String messageContent = new String((byte[]) request.getContent());
+		logger
+				.info("got INFO request with following content "
+						+ messageContent);
 		int signalIndex = messageContent.indexOf("Signal=");
-		
-		//Playing file only if the DTMF session has been started
-		if(messageContent != null && messageContent.length() > 0 && signalIndex != -1) {
-			String signal = messageContent.substring("Signal=".length()).trim();			
-			signal = signal.substring(0,1);
-			logger.info("Signal received " + signal );													
-			MediaGroup mediaGroup = (MediaGroup) request.getSession().getAttribute("MediaGroup");		
+
+		// Playing file only if the DTMF session has been started
+		if (messageContent != null && messageContent.length() > 0
+				&& signalIndex != -1) {
+			String signal = messageContent.substring("Signal=".length()).trim();
+			signal = signal.substring(0, 1);
+			logger.info("Signal received " + signal);
+			MediaGroup mediaGroup = (MediaGroup) request.getSession()
+					.getAttribute("MediaGroup");
 			try {
 				playDTMF(mediaGroup.getPlayer(), signal);
 			} catch (MsControlException e) {
-				logger.error("Problem playing the stream corresponding to the following DTMF " + signal, e);
+				logger.error(
+						"Problem playing the stream corresponding to the following DTMF "
+								+ signal, e);
 				responseCode = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
 			}
-		}	
-		//sending response
+		}
+		// sending response
 		SipServletResponse response = request.createResponse(responseCode);
 		response.send();
-	}	
+	}
 
 	/**
 	 * @param mg
 	 * @param dtmf
 	 * @throws MsControlException
 	 */
-	private void playDTMF(Player player, String dtmf)
-			throws MsControlException {
+	private void playDTMF(Player player, String dtmf) throws MsControlException {
 		URI prompt = null;
 
 		if (dtmf.equals("0")) {
@@ -189,42 +191,42 @@ public class PromptAndCollectServlet extends PlayerServlet {
 		} else if (dtmf.equals("D")) {
 			prompt = URI.create(D);
 		} else {
-			throw new MsControlException("This DigitMap is not recognized " + dtmf);
+			throw new MsControlException("This DigitMap is not recognized "
+					+ dtmf);
 		}
 
 		player.play(prompt, null, null);
 	}
-	
-	private class MyStatusEventListener implements StatusEventListener {
 
-		public void onEvent(StatusEvent event) {
+	private class MyJoinEventListener implements JoinEventListener {
 
-			MediaGroup mg = (MediaGroup) event.getSource();
-			if (event.getError().equals(Error.e_OK)
-					&& JoinEvent.ev_Joined.equals(event.getEventType())) {
-				// NC Joined to MG
+		public void onEvent(JoinEvent event) {
 
-				if (logger.isDebugEnabled()) {
-					logger.debug("NC joined to MG. Start Player");
+			MediaGroup mg = (MediaGroup) event.getThisJoinable();
+			if (event.isSuccessful()) {
+				if (JoinEvent.JOINED == event.getEventType()) {
+					// NC Joined to MG
+
+					if (logger.isDebugEnabled()) {
+						logger.debug("NC joined to MG. Start Player");
+					}
+					try {
+						Player player = mg.getPlayer();
+						player.addListener(new PlayerListener());
+
+						URI prompt = URI.create(WELCOME_MSG);
+
+						player.play(prompt, null, null);
+
+					} catch (MsControlException e) {
+						logger.error(e);
+					}
+				} else if (JoinEvent.UNJOINED == event.getEventType()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Un-Joined MG and NC");
+					}
 				}
-				try {
-					Player player = mg.getPlayer();
-					player.addListener(new PlayerListener());
 
-					URI prompt = URI.create(WELCOME_MSG);
-
-					player.play(prompt, null, null);
-
-				} catch (MsControlException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			} else if (event.getError().equals(Error.e_OK)
-					&& JoinEvent.ev_Unjoined.equals(event.getEventType())) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Un-Joined MG and NC");
-				}
 			} else {
 				logger.error("Joining of MG and NC failed");
 			}
@@ -239,16 +241,15 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			Player player = event.getSource();
 			MediaGroup mg = player.getContainer();
 			if (!isBye) {
-				if (Error.e_OK.equals(event.getError())
-						&& Player.ev_PlayComplete.equals(event.getEventType())) {
+				if (event.isSuccessful()
+						&& (PlayerEvent.PLAY_COMPLETED == event.getEventType())) {
 					logger.info("Received PlayComplete event");
 					try {
 						SignalDetector sg = mg.getSignalDetector();
 						sg.addListener(new SignalDetectorListener());
 						sg.receiveSignals(1, null, null, null);
 					} catch (MsControlException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error(e);
 					}
 				} else {
 					logger.error("Player didn't complete successfully ");
@@ -269,8 +270,8 @@ public class PromptAndCollectServlet extends PlayerServlet {
 				SignalDetector sg = mg.getSignalDetector();
 				sg.removeListener(this);
 
-				if (Error.e_OK.equals(event.getError())
-						&& SignalDetector.ev_SignalDetected.equals(event
+				if (event.isSuccessful()
+						&& (SignalDetectorEvent.SIGNAL_DETECTED == event
 								.getEventType())) {
 					String seq = event.getSignalString();
 
