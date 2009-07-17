@@ -87,7 +87,7 @@
     <title>Congestion Control</title>
 
     <para>Mobicents Sip Servlets currently defines two different congestion
-    control mechanisms : </para>
+    control mechanisms :</para>
   </formalpara>
 
   <itemizedlist>
@@ -109,7 +109,7 @@
       start rejecting any new SIP requests with either SIP error code 503
       until the server catches up or drop any incoming messages depending of
       the congestion control policy chosen until the percentage of memory used
-      by the container goes back below the threshold. </para>
+      by the container goes back below the threshold.</para>
     </listitem>
   </itemizedlist>
 
@@ -121,7 +121,7 @@
   Servlets to gather information about the current server congestion and the
   interval can be adjusted in the configuration. This background task can be
   stopped and congestion control deactivated by setting the interval to 0 or a
-  negative value. </para>
+  negative value.</para>
 
   <para>Also the congestion control policy, what to do with an incoming
   message when the server is overloaded, is configurable and the possible
@@ -134,7 +134,7 @@
 
     <listitem>
       <para>ErrorResponse - send a 503 - Service Unavailable response to any
-      incoming request (Default). </para>
+      incoming request (Default).</para>
     </listitem>
   </itemizedlist>
 
@@ -205,13 +205,14 @@
             <para>The default value of the
             <literal>sipMessageQueueSize</literal> attribute is
             <replaceable>1500</replaceable>, of the congestion control
-            checking interval is 30000 millisecs (3O seconds), of the default
-            memory threshold is 90% and the congestion control policy is
-            ErrorResponse. Those are the default values which are used even if
-            the attribute is not present in <filename>server.xml</filename>.
-            You will need to play around with this setting for the optimal
-            value, which depends on the hardware running your SIP Servlets
-            Server.</para>
+            checking interval is <emphasis>30000 millisecs (3O
+            seconds)</emphasis>, of the default memory threshold is
+            <emphasis>90%</emphasis> and the congestion control policy is
+            <emphasis>ErrorResponse</emphasis>. Those are the default values
+            which are used even if the attribute is not present in
+            <filename>server.xml</filename>. You will need to play around with
+            this setting for the optimal value, which depends on the hardware
+            running your SIP Servlets Server.</para>
 
             <para>Possible values for the
             <literal>concurrencyControlMode</literal> attribute include:
@@ -258,13 +259,14 @@
             <para>The default value of the
             <literal>sipMessageQueueSize</literal> attribute is
             <replaceable>1500</replaceable>, of the congestion control
-            checking interval is 30000 millisecs (3O seconds), of the default
-            memory threshold is 90% and the congestion control policy is
-            ErrorResponse. Those are the default values which are used even if
-            the attribute is not present in <filename>server.xml</filename>.
-            You will need to play around with this setting for the optimal
-            value, which depends on the hardware running your SIP Servlets
-            Server.</para>
+            checking interval is <emphasis>30000 millisecs (3O
+            seconds)</emphasis>, of the default memory threshold is
+            <emphasis>90%</emphasis> and the congestion control policy is
+            <emphasis>ErrorResponse</emphasis>. Those are the default values
+            which are used even if the attribute is not present in
+            <filename>server.xml</filename>. You will need to play around with
+            this setting for the optimal value, which depends on the hardware
+            running your SIP Servlets Server.</para>
 
             <para>Possible values for the
             <literal>concurrencyControlMode</literal> attribute include:
