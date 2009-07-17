@@ -4807,12 +4807,42 @@ useStaticAddress="true"/&gt;
 	<formalpara>
 		<title>Congestion Control</title>
 		<para>
-			Congestion control currently refers to tuning the size of the SIP message queue, though further tunable settings are planned.
+			Mobicents Sip Servlets currently defines two different congestion control mechanisms :
 		</para>
 	</formalpara>
+	<itemizedlist>
+		<listitem>
+			<para>
+				All SIP messages which cannot be processed immediately are put into a queue, and therein wait for either a free thread or for the lock on their session to be released. The exact size of this SIP message queue is a tunable parameter, and it currently defaults to <constant>1500</constant>. If the SIP Message queue becomes full, the container immediately begins rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen until the queue is once again diminished.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				If the percentage of memory currently used by the container goes over a configurable threshold (90% per default), the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen until the percentage of memory used by the container goes back below the threshold.
+			</para>
+		</listitem>
+	</itemizedlist>
 	<para>
-		All SIP messages which cannot be processed immediately are put into a queue, and therein wait for either a free thread or for the lock on their session to be released. The exact size of this SIP message queue is a tunable parameter, and it currently defaults to <constant>1500</constant>. If the SIP message queue becomes full, the container immediately begins rejecting any new SIP requests with a <literal>503 (Service Unavailable)</literal> response until the queue is once again diminished. Note that in this situation, only new SIP requests are rejected; SIP responses which arrive in the milieu of a full queue are appropriately stored and are processed eventually.
+		Note that either situation, only new SIP requests are rejected; SIP responses which arrive in the milieu of a full queue are appropriately stored and are processed eventually.
 	</para>
+	<para>
+		A background task is running at regular intervals within Mobicents Sip Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration. This background task can be stopped and congestion control deactivated by setting the interval to 0 or a negative value.
+	</para>
+	<para>
+		Also the congestion control policy, what to do with an incoming message when the server is overloaded, is configurable and the possible values are :
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				DropMessage - drop any incoming message
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				ErrorResponse - send a 503 - Service Unavailable response to any incoming request (Default).
+			</para>
+		</listitem>
+	</itemizedlist>
 	<formalpara id="sscacc-Configuring_the_Concurrency_and_Congestion_Control_Settings">
 		<title>Configuring the Concurrency and Congestion Control Settings</title>
 		<para>
@@ -4856,7 +4886,7 @@ useStaticAddress="true"/&gt;
 							Find the <literal>Service</literal> element and add a <literal>concurrencyControlMode</literal> and/or a <literal>sipMessageQueueSize</literal> attribute to it.
 						</para>
 						<para>
-							The default value of the <literal>sipMessageQueueSize</literal> attribute is <replaceable>1500</replaceable>. That is the default value which is used even if the attribute is not present in <filename>server.xml</filename>. You will need to play around with this setting for the optimal value, which depends on the hardware running your SIP Servlets Server.
+							The default value of the <literal>sipMessageQueueSize</literal> attribute is <replaceable>1500</replaceable>, of the congestion control checking interval is 30000 millisecs (3O seconds), of the default memory threshold is 90% and the congestion control policy is ErrorResponse. Those are the default values which are used even if the attribute is not present in <filename>server.xml</filename>. You will need to play around with this setting for the optimal value, which depends on the hardware running your SIP Servlets Server.
 						</para>
 						<para>
 							Possible values for the <literal>concurrencyControlMode</literal> attribute include: <replaceable>None</replaceable>, <replaceable>SipSession</replaceable> or <replaceable>SipApplicationSession</replaceable>. <replaceable>SipSession</replaceable> is the value of this attribute when it is not present—and overridden—in <filename>server.xml</filename>.
@@ -4870,7 +4900,10 @@ useStaticAddress="true"/&gt;
 	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
 	darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
 	concurrencyControlMode="SipApplicationSession"
-	SipApplicationSession="1600"&gt;
+	sipMessageQueueSize="1600"
+	congestionControlCheckingInterval="2000"
+	congestionControlPolicy="DropMessage"
+	memoryThreshold="80"&gt;
 </programlisting>
 						</example>
 					</step>
@@ -4888,7 +4921,7 @@ useStaticAddress="true"/&gt;
 							Find the <literal>Service</literal> element and add a <literal>concurrencyControlMode</literal> and/or a <literal>sipMessageQueueSize</literal> attribute to it.
 						</para>
 						<para>
-							The default value of the <literal>sipMessageQueueSize</literal> attribute is <replaceable>1500</replaceable>. That is the default value which is used even if the attribute is not present in <filename>server.xml</filename>. You will need to play around with this setting for the optimal value, which depends on the hardware running your SIP Servlets Server.
+							The default value of the <literal>sipMessageQueueSize</literal> attribute is <replaceable>1500</replaceable>, of the congestion control checking interval is 30000 millisecs (3O seconds), of the default memory threshold is 90% and the congestion control policy is ErrorResponse. Those are the default values which are used even if the attribute is not present in <filename>server.xml</filename>. You will need to play around with this setting for the optimal value, which depends on the hardware running your SIP Servlets Server.
 						</para>
 						<para>
 							Possible values for the <literal>concurrencyControlMode</literal> attribute include: <replaceable>None</replaceable>, <replaceable>SipSession</replaceable> or <replaceable>SipApplicationSession</replaceable>. <replaceable>SipSession</replaceable> is the value of this attribute if when it is not present and overridden in <filename>server.xml</filename>.
@@ -4902,7 +4935,10 @@ useStaticAddress="true"/&gt;
 	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
 	darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
 	concurrencyControlMode="SipApplicationSession"
-	SipApplicationSession="1600"&gt;
+	sipMessageQueueSize="1600"
+	congestionControlCheckingInterval="2000"
+	congestionControlPolicy="DropMessage"
+	memoryThreshold="80"&gt;
 </programlisting>
 						</example>
 					</step>
