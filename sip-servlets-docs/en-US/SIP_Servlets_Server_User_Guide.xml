@@ -7,6 +7,7 @@
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="task-chapter-SIP_Servlets_Server-Installing_Configuring_and_Running.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="task-chapter-Application_Router.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Services_for_SIP_Servlets.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-SS_Examples.xml"/>
   <chapter>
     <title>Clustering and High Availability</title>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_for_JBoss-Clustering_Support.xml"/>
@@ -15,6 +16,6 @@
   </chapter>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Enterprise-Monitoring-Operations-Management.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.xml"/>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-SS_Examples.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Best_Practices.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Revision_History.xml"/>
 <!--<index />--></book>
