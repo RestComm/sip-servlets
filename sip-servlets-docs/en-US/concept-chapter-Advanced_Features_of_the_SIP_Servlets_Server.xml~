@@ -13,6 +13,5 @@ Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclus
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Diameter_Support.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Extensions.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JRuby_Teclo_Integration.xml"/>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JSLEE_Interop.xml"/>
 
 </chapter>

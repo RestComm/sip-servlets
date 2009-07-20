@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<section id="mipbx-Media_IPBX">
+  <title>Media Support</title>
+
+  <para>Mobicents Sip Servlets by implementing the Sip Servlets 1.1
+  specification is providing natively support for applications to setup calls
+  through SIP Support.</para>
+
+  <para>But since most Telco services have the need for managing and
+  controlling media, by example to play announcements, mixing calls, recognize
+  DTMF, ... Mobicents Sip Servlets allows applications to control media in 2
+  ways.</para>
+
+  <section>
+    <title>JSR 309 : Media Server Control API </title>
+
+    <para>This Specification is a protocol agnostic API for Media Server
+    Control. It provides a portable interface to create media rich
+    applications with IVR, Conferencing, Speech Recognition, and similar
+    features. </para>
+
+    <para>Mobicents Media Server provides an implementation of the JSR 309
+    specification (currently in public review) using the MGCP protocol to
+    allow controlling any Media Server (located in the same Virtual Machine or
+    on a remote server) supporting MGCP.</para>
+
+    <para>It is better demonstrated in the JSR 309 example application
+    provided with Mobicents Sip Servlets</para>
+  </section>
+
+  <section>
+    <title>Mobicents Media Server Control API (MSC API)</title>
+
+    <para>Since JSR 309 is not final yet, the Mobicents Media Server provides
+    it's own client API so that any applications within Mobicents Sip Servlets
+    can interact with the Mobicents Media Server. One limitation with this API
+    is that you can only control the Media Server if it's located in the same
+    JVM as the Mobicents Sip Servlets container.</para>
+
+    <para>The documentation of the API is provided <ulink
+    url="http://hudson.jboss.org/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/media/index.html#captms-MMS_Control_API">in
+    the Mobicents Media Server user guide</ulink></para>
+
+    <para>The following examples demonstrate its usage :</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Media Example : a Sip Servlet application showing how to use
+        media capabilities (Media playback, Text to Speech with FreeTTS and
+        DTMF detection). </para>
+      </listitem>
+
+      <listitem>
+        <para>Shopping Example : a Converged JEE Application showing SEAM
+        integration, JEE, Media integration with TTS and DTMF support. </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+</section>
