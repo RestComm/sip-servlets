@@ -1,258 +1,326 @@
-﻿<?xml version='1.0'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-]><!-- chapter id nickname: bssswjicar -->
-<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running">
-	<title>SIP Servlet-Enabled JBoss Application Server: Installing, Configuring and Running</title>
-	<para>The <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container. This section details how to install the SIP Servlets Server on top of the JBoss Application Server. For installation instructions for the Tomcat Servlet Container, refer to <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running"/>
-	</para>
-	<note><para>It is recommended that the SIP Servlets Server is run on the JBoss platform.  Some functionality, including the ability to execute some SIP Extension examples, is not available in the Tomcat version.</para></note>
-	<formalpara>
-		<title>Differences Between a Standard JBoss Installation and the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> SIP Servlets Version</title>
-		<para>Provided here is a list of differences between a standard JBoss Application Server installation one customized for SIP Servlets. The differences include:</para>
-	</formalpara>
-	<itemizedlist>
-		<listitem>
-			<para>The <filename>server/default/deploy</filename> directory contains both HTTP and SIP Servlet applications (WAR and SAR2 files).</para>
-		</listitem>
-		<listitem>
-			<para>The <filename>server/default/deploy/jboss-web.deployer</filename> and <filename>server/default/deploy/jbossweb.sar</filename> units have been modified to provide extended classes to the standard JBoss container classes, in order to allow SIP applications to be loaded and the SIP stack to be started.</para>
-		</listitem>
-		<listitem>
-			<para>The <filename>server/default/deploy/jboss-web.deployer</filename> and <filename>server/default/deploy/jbossweb.sar</filename> <filename>context.xml</filename> files have been modified to allow the extended manager to manage SIP sessions and SIP application sessions in addition to HTTP sessions.</para>
-		</listitem>
-		<listitem>
-			<para>The <filename>server/default/deploy/jbossweb.sar/</filename> <filename>server.xml</filename> file has been modified to provide extended classes to common JBoss Web containers.  The classes allow SIP applications to be loaded, and the SIP stack to be started.</para>
-		</listitem>
-		<listitem>
-			<para>The <filename>server/default/deploy/jbossweb.sar/</filename> <filename>jboss-beans.xml</filename> file has been modified to allow the JBoss container to process SIP messages.</para>
-		</listitem>
-		<listitem>
-			<para>The <filename>server/default/deployers/</filename> <filename>metadata-deployer-jboss-beans.xml</filename> file has been modified to allow JBoss to parse sip.xml deployment descriptors and SIP metadata annotations.</para>
-		</listitem>
-		<listitem>
-			<para>The <filename>server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml</filename> file and the <filename>server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml</filename> file have been modified so that it is now possible for JBoss containers to correctly deploy SIP servlets and converged applications.</para>
-		</listitem>
-		<listitem>
-			<para>A <filename>dars</filename> directory containing all of the Default Application Router (DAR) properties files for using the various SIP Servlets applications (which come bundled with the release) has been added to the <filename>server/default/conf</filename> directory.</para>
-		</listitem>
-		<listitem>
-			<para>Additional JAR files have been added to enable SIP Servlet functionality; these are located in the <filename>server/default/deploy/jboss-web.deployer/</filename> and <filename>server/default/deploy/jbossweb.sar/</filename> directories.</para>
-		</listitem>
+]>
+<!-- chapter id nickname: bssswjicar --><section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running">
+  <title>SIP Servlet-Enabled JBoss Application Server: Installing, Configuring and Running</title>
+  <para>The <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container. This section details how to install the SIP Servlets Server on top of the JBoss Application Server. For installation instructions for the Tomcat Servlet Container, refer to <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running"/>
+ </para>
+  <note>
+    <para>It is recommended that the SIP Servlets Server is run on the JBoss platform.  Some functionality, including the ability to execute some SIP Extension examples, is not available in the Tomcat version.</para>
+  </note>
+  <formalpara>
+    <title>Differences Between a Standard JBoss Installation and the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> SIP Servlets Version</title>
+    <para>Provided here is a list of differences between a standard JBoss Application Server installation one customized for SIP Servlets. The differences include:</para>
+  </formalpara>
+  <itemizedlist>
+    <listitem>
+      <para>The <filename>server/default/deploy</filename> directory contains both HTTP and SIP Servlet applications (WAR and SAR2 files).</para>
+    </listitem>
+    <listitem>
+      <para>The <filename>server/default/deploy/jboss-web.deployer</filename> and <filename>server/default/deploy/jbossweb.sar</filename> units have been modified to provide extended classes to the standard JBoss container classes, in order to allow SIP applications to be loaded and the SIP stack to be started.</para>
+    </listitem>
+    <listitem>
+      <para>The <filename>server/default/deploy/jboss-web.deployer</filename> and <filename>server/default/deploy/jbossweb.sar</filename> <filename>context.xml</filename> files have been modified to allow the extended manager to manage SIP sessions and SIP application sessions in addition to HTTP sessions.</para>
+    </listitem>
+    <listitem>
+      <para>The <filename>server/default/deploy/jbossweb.sar/</filename> <filename>server.xml</filename> file has been modified to provide extended classes to common JBoss Web containers.  The classes allow SIP applications to be loaded, and the SIP stack to be started.</para>
+    </listitem>
+    <listitem>
+      <para>The <filename>server/default/deploy/jbossweb.sar/</filename> <filename>jboss-beans.xml</filename> file has been modified to allow the JBoss container to process SIP messages.</para>
+    </listitem>
+    <listitem>
+      <para>The <filename>server/default/deployers/</filename> <filename>metadata-deployer-jboss-beans.xml</filename> file has been modified to allow JBoss to parse sip.xml deployment descriptors and SIP metadata annotations.</para>
+    </listitem>
+    <listitem>
+      <para>The <filename>server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml</filename> file and the <filename>server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml</filename> file have been modified so that it is now possible for JBoss containers to correctly deploy SIP servlets and converged applications.</para>
+    </listitem>
+    <listitem>
+      <para>A <filename>dars</filename> directory containing all of the Default Application Router (DAR) properties files for using the various SIP Servlets applications (which come bundled with the release) has been added to the <filename>server/default/conf</filename> directory.</para>
+    </listitem>
+    <listitem>
+      <para>Additional JAR files have been added to enable SIP Servlet functionality; these are located in the <filename>server/default/deploy/jboss-web.deployer/</filename> and <filename>server/default/deploy/jbossweb.sar/</filename> directories.</para>
+    </listitem>
   </itemizedlist>
-	<!--<bridgehead	id="bssswjicar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>-->
-	
-	<xi:include href="mob-task-section-Java_Development_Kit-Installing_Configuring_and_Running.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-
-	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-PreInstall_Requirements_and_Prerequisites">
-		<title>Pre-Install Requirements and Prerequisites</title>
-		<para>&nbsp;</para>
-		<variablelist id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem><para>Once unzipped, version &SSS_MSS4J_VERSION; of the MSS for JBoss binary release requires a minimum of &SSS_MSS4J_SIZE; free disk space.</para></listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>Anything Java Itself Will Run On</term>
-				<listitem>
-					<para>MSS for JBoss is 100% Java and will run on the same hardware that the JBoss Application Server runs on.</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-		<variablelist id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Software_Prerequisites">
-			<title>Software Prerequisites</title>
-			<varlistentry>
-				<term>JDK 5 or Higher</term>
-				<listitem>
-					<para>&nbsp;</para>
-					<!--<para>A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is currently required in order to run MSS for JBoss binary distribution. For instructions on how to install the JDK, refer to <xref
-							linkend="bssswjicar-Installing_the_Java_Development_Kit"/>.</para>-->
-				</listitem>
-			</varlistentry>
-		</variablelist>
-	</section>
-	<section	id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Downloading">
-		<title>Downloading</title>
-		<para>The latest version of MSS for JBoss is available from <ulink	url="http://www.mobicents.org/mss-downloads.html"/>.  The top row of the table contains the latest version.</para>
-		<para>Each version of the SIP Servlets Server is comprised of two separate binary distribution files: one which is MSS for JBoss, and the other which is MSS for Tomcat.  Download SIP Servlets Server for JBoss and continue with the following instructions.</para>
-	</section>
-	<section
-		id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing">
-		<title>Installing</title>
-		<para>Once the requirements and prerequisites have been met and you have downloaded the binary distribution zip file, you are ready to install the MSS for JBoss binary distribution.  Follow the instructions below for the selected platform, whether Linux or Windows.</para>
-		<note id="bssswjicar--binary-SIP_Servlets_Server_with_JBoss-Use_Version_Numbers_Relevant_to_Your_Installation">
-			<title>Version Numbers</title>
-			<para>For clarity, the command line instructions presented in this chapter use specific version numbers and directory names.  Ensure this information is substituted with the binary distribution's version numbers and file names.</para>
-		</note>
-		<procedure>
-			<title>Installing the MSS for JBoss Binary Distribution on Linux</title>
-			<para>It is assumed that the downloaded archive is saved in the home directory, and that a terminal window is open displaying the home directory</para>
-			<step>
-				<para>Create a subdirectory to extract the MSS for JBoss files into.  For ease of identification, it is recommended that the version number of the binary is included in this directory name.</para>
-				<screen>~]$ mkdir &quot;mss-jboss-&lt;version&gt;&quot;</screen>
-			</step>
-			<step>
-				<para>Move the downloaded zip file into the directory.</para>
-				<screen>~]$ mv &quot;&SSS_MSS4J_ZIP;&quot; &quot;mss-jboss-&lt;version&gt;&quot;</screen>
-			</step>
-			<step>
-				<para>Move into the directory.</para>
-				<screen>~]$ cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
-			</step>
-			<step>
-				<para>Extract the files into the current directory by executing one of the following commands.</para>
-				<itemizedlist>
-          <listitem><para>Java: <screen>mss-jboss-&lt;version&gt;]$ jar -xvf &quot;&SSS_MSS4J_ZIP;&quot;</screen></para></listitem>
-				  <listitem><para>Linux: <screen>mss-jboss-&lt;version&gt;]$ unzip &quot;&SSS_MSS4J_ZIP;&quot;</screen></para></listitem>
+<!--<bridgehead id="bssswjicar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>-->  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="mob-task-section-Java_Development_Kit-Installing_Configuring_and_Running.xml"/>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-PreInstall_Requirements_and_Prerequisites">
+    <title>Pre-Install Requirements and Prerequisites</title>
+    <para>&nbsp;</para>
+    <variablelist id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Hardware_Requirements">
+      <title>Hardware Requirements</title>
+      <varlistentry>
+        <term>Sufficient Disk Space</term>
+        <listitem>
+          <para>Once unzipped, version &SSS_MSS4J_VERSION; of the MSS for JBoss binary release requires a minimum of &SSS_MSS4J_SIZE; free disk space.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Anything Java Itself Will Run On</term>
+        <listitem>
+          <para>MSS for JBoss is 100% Java and will run on the same hardware that the JBoss Application Server runs on.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <variablelist id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Software_Prerequisites">
+      <title>Software Prerequisites</title>
+      <varlistentry>
+        <term>JDK 5 or Higher</term>
+        <listitem>
+          <para>&nbsp;</para>
+<!--<para>A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is currently required in order to run MSS for JBoss binary distribution. For instructions on how to install the JDK, refer to <xref
+       linkend="bssswjicar-Installing_the_Java_Development_Kit"/>.</para>-->        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Downloading">
+    <title>Downloading</title>
+    <para>The latest version of MSS for JBoss is available from <ulink url="http://www.mobicents.org/mss-downloads.html"/>.  The top row of the table contains the latest version.</para>
+    <para>Each version of the SIP Servlets Server is comprised of two separate binary distribution files: one which is MSS for JBoss, and the other which is MSS for Tomcat.  Download SIP Servlets Server for JBoss and continue with the following instructions.</para>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing">
+    <title>Installing</title>
+    <para>Once the requirements and prerequisites have been met and you have downloaded the binary distribution zip file, you are ready to install the MSS for JBoss binary distribution.  Follow the instructions below for the selected platform, whether Linux or Windows.</para>
+    <note id="bssswjicar--binary-SIP_Servlets_Server_with_JBoss-Use_Version_Numbers_Relevant_to_Your_Installation">
+      <title>Version Numbers</title>
+      <para>For clarity, the command line instructions presented in this chapter use specific version numbers and directory names.  Ensure this information is substituted with the binary distribution&apos;s version numbers and file names.</para>
+    </note>
+    <procedure>
+      <title>Installing the MSS for JBoss Binary Distribution on Linux</title>
+      <para>It is assumed that the downloaded archive is saved in the home directory, and that a terminal window is open displaying the home directory</para>
+      <step>
+        <para>Create a subdirectory to extract the MSS for JBoss files into.  For ease of identification, it is recommended that the version number of the binary is included in this directory name.</para>
+        <screen>~]$ mkdir &quot;mss-jboss-&lt;version&gt;&quot;</screen>
+      </step>
+      <step>
+        <para>Move the downloaded zip file into the directory.</para>
+        <screen>~]$ mv &quot;&SSS_MSS4J_ZIP;&quot; &quot;mss-jboss-&lt;version&gt;&quot;</screen>
+      </step>
+      <step>
+        <para>Move into the directory.</para>
+        <screen>~]$ cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
+      </step>
+      <step>
+        <para>Extract the files into the current directory by executing one of the following commands.</para>
+        <itemizedlist>
+          <listitem>
+            <para>Java: <screen>mss-jboss-&lt;version&gt;]$ jar -xvf &quot;&SSS_MSS4J_ZIP;&quot;</screen></para>
+          </listitem>
+          <listitem>
+            <para>Linux: <screen>mss-jboss-&lt;version&gt;]$ unzip &quot;&SSS_MSS4J_ZIP;&quot;</screen></para>
+          </listitem>
         </itemizedlist>
-        <note><para>You can also use <command>unzip</command>'-d &lt;unzip_to_location&gt; to extract the zip file's contents to a location other than the current directory.</para></note>
-			</step>
-			<step>
-				<para>To free disk space, you may want to delete the zip file once you've extracted its contents:</para>
-				<screen>mss-jboss-&lt;version&gt;]$ rm &quot;&SSS_MSS4J_ZIP;&quot;</screen>
-			</step>
-		</procedure>
-		<procedure>
-			<title>Installing the MSS for JBoss Binary Distribution on <productname>Windows</productname></title>
-			<para>For this procedure, it is assumed that the downloaded archive is saved in the <filename>My Downloads</filename> folder.</para>
-			<step>
-				<para>Create a subfolder in <filename>My Downloads</filename> to extract the zip file's contents into.  For ease of identification, it is recommended that the version number of the binary is included in the folder name.  For example, <filename>mss-jboss-&lt;version&gt;</filename>.</para>
-			</step>
-			<step>
-				<para>Extract the contents of the archive, specifying the destination folder as the one created in the previous step.</para>
+        <note>
+          <para>You can also use <command>unzip</command>&apos;-d &lt;unzip_to_location&gt; to extract the zip file&apos;s contents to a location other than the current directory.</para>
+        </note>
+      </step>
+      <step>
+        <para>To free disk space, you may want to delete the zip file once you&apos;ve extracted its contents:</para>
+        <screen>mss-jboss-&lt;version&gt;]$ rm &quot;&SSS_MSS4J_ZIP;&quot;</screen>
+      </step>
+    </procedure>
+    <procedure>
+      <title>Installing the MSS for JBoss Binary Distribution on <productname>Windows</productname></title>
+      <para>For this procedure, it is assumed that the downloaded archive is saved in the <filename>My Downloads</filename> folder.</para>
+      <step>
+        <para>Create a subfolder in <filename>My Downloads</filename> to extract the zip file&apos;s contents into.  For ease of identification, it is recommended that the version number of the binary is included in the folder name.  For example, <filename>mss-jboss-&lt;version&gt;</filename>.</para>
+      </step>
+      <step>
+        <para>Extract the contents of the archive, specifying the destination folder as the one created in the previous step.</para>
       </step>
       <step>
         <para>Alternatively, execute the <command>jar -xvf</command> command to extract the binary distribution files from the zip archive.</para>
         <orderedlist>
-          <listitem><para>Move the downloaded zip file from <filename>My Downloads</filename> to the folder created in the previous step.</para></listitem>
-          <listitem><para>Open the Windows Command Prompt and navigate to the folder that contains the archive using the <command>cd</command> command</para></listitem>
-          <listitem><para>Execute the <command>jar -xvf</command> command to extract the archive contents into the current folder.</para>
-          <screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;jar -xvf &quot;&SSS_MSS4J_ZIP;&quot;</screen>
+          <listitem>
+            <para>Move the downloaded zip file from <filename>My Downloads</filename> to the folder created in the previous step.</para>
+          </listitem>
+          <listitem>
+            <para>Open the Windows Command Prompt and navigate to the folder that contains the archive using the <command>cd</command> command</para>
+          </listitem>
+          <listitem>
+            <para>Execute the <command>jar -xvf</command> command to extract the archive contents into the current folder.</para>
+            <screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;jar -xvf &quot;&SSS_MSS4J_ZIP;&quot;</screen>
           </listitem>
         </orderedlist>
       </step>
-			<step>
-				<para>It is recommended that the folder holding the MSS for JBoss files (in this example, the folder named <filename>mss-jboss-<replaceable>&lt;version&gt;</replaceable>
-					</filename>) is moved to a user-defined location for storing executable programs.  For example, the <filename>Program Files</filename> folder.</para>
-			</step>
-			<step>
-				<para>Consider deleting the archive, if free disk space is an issue.</para>
-				<screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;delete &quot;&SSS_MSS4J_ZIP;&quot;</screen>
-			</step>
-		</procedure>
-	</section>
-	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Setting_the_JBOSS_HOME_Environment_Variable">
-		<title>Setting the JBOSS_HOME Environment Variable</title>
-		<para>Configuring MSS for JBoss consists of setting the <envar>JBOSS_HOME</envar> environment variable and optionally customizing the MSS for JBoss server by adding SIP Connectors, configuring the application router, and logging.</para>
-		<para>After setting <envar>JBOSS_HOME</envar> according to the instructions in the following section, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/> to learn how to configure MSS for JBoss.</para>
-		<para>Alternatively, after having set <envar>JBOSS_HOME</envar>, the MSS for JBoss server can be run.  Return to this section to configure it later. </para>
-		<xi:include href="mob-task-section-Setting_the_JBOSS_HOME_Environment_Variable.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-	</section>
-	<section	id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Configuring">
-		<title>Configuring</title>
-		<para>To configure MMS for JBoss, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/>.</para>
-	</section>
-	<section	id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running">
-		<title>Running</title>
-		<para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with <quote>Started in 23s:648ms</quote>):</para>
-		<programlisting><![CDATA[17:48:01,247 INFO  [Server] JBoss (MX MicroKernel) [4.2.2.GA (build: SVNTag=JBoss_4_2_2_GA date=200710221139)] Started in 20s:861ms]]></programlisting>
-		<para>Detailed instructions are given below, arranged by platform.</para>
-		<procedure>
-			<title>Running MSS for JBoss on Linux</title>
-			<step>
-				<para>Change the working directory to MSS for JBoss's installation directory (the one in which the zip file's contents was extracted to)</para>
-				<screen>downloads]$ cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
-			</step>
-			<step>
-				<para>(Optional) Ensure that the <filename>bin/run.sh</filename> start script is executable.</para>
-				<screen>mss-jboss-&lt;version&gt;]$ chmod +x bin/run.sh</screen>
-			</step>
-			<step>
-				<para>Execute the <filename>run.sh</filename> Bourne shell script.</para>
-				<screen>mss-jboss-&lt;version&gt;]$ ./bin/run.sh</screen>
-			</step>
-		</procedure>
-		<note><para>Instead of executing the Bourne shell script to start the server, the <filename>run.jar</filename> executable Java archive can be executed from the <filename>bin</filename> directory:</para>
-			<screen>mss-jboss-&lt;version&gt;]$ java -jar bin/run.jar</screen></note>
-		<procedure>
-			<title>Running MSS for JBoss on <productname>Windows</productname></title>
-			<para>There are several ways to start MSS for JBoss on Windows. All of the following methods accomplish the same task.</para>
-			<step>
-				<para>Using Windows Explorer, navigate to the <filename>bin</filename> subfolder in the installation directory.</para>
-			</step>
-			<step>
-				<para>The preferred way to start MSS for JBoss from the Command Prompt.  The command line interface displays details of the startup process, including any problems encountered during the startup process.</para>
-				<para>Open the Command Prompt via the <guilabel>Start</guilabel> menu and navigate to the correct folder:</para>
-				<screen>C:&bsol;Users&bsol;&lt;user&gt;My Downloads&gt; cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
-			</step>
+      <step>
+        <para>It is recommended that the folder holding the MSS for JBoss files (in this example, the folder named <filename>mss-jboss-<replaceable>&lt;version&gt;</replaceable></filename>) is moved to a user-defined location for storing executable programs.  For example, the <filename>Program Files</filename> folder.</para>
+      </step>
+      <step>
+        <para>Consider deleting the archive, if free disk space is an issue.</para>
+        <screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;delete &quot;&SSS_MSS4J_ZIP;&quot;</screen>
+      </step>
+    </procedure>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Setting_the_JBOSS_HOME_Environment_Variable">
+    <title>Setting the JBOSS_HOME Environment Variable</title>
+    <para>Configuring MSS for JBoss consists of setting the <envar>JBOSS_HOME</envar> environment variable and optionally customizing the MSS for JBoss server by adding SIP Connectors, configuring the application router, and logging.</para>
+    <para>After setting <envar>JBOSS_HOME</envar> according to the instructions in the following section, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/> to learn how to configure MSS for JBoss.</para>
+    <para>Alternatively, after having set <envar>JBOSS_HOME</envar>, the MSS for JBoss server can be run.  Return to this section to configure it later. </para>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="mob-task-section-Setting_the_JBOSS_HOME_Environment_Variable.xml"/>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Configuring">
+    <title>Configuring</title>
+    <para>To configure MMS for JBoss, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/>.</para>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running">
+    <title>Running</title>
+    <para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with <quote>Started in 23s:648ms</quote>):</para>
+    <programlisting><![CDATA[17:48:01,247 INFO  [Server] JBoss (MX MicroKernel) [4.2.2.GA (build: SVNTag=JBoss_4_2_2_GA date=200710221139)] Started in 20s:861ms]]></programlisting>
+    <para>Detailed instructions are given below, arranged by platform.</para>
+    <procedure>
+      <title>Running MSS for JBoss on Linux</title>
+      <step>
+        <para>Change the working directory to MSS for JBoss&apos;s installation directory (the one in which the zip file&apos;s contents was extracted to)</para>
+        <screen>downloads]$ cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
+      </step>
+      <step>
+        <para>(Optional) Ensure that the <filename>bin/run.sh</filename> start script is executable.</para>
+        <screen>mss-jboss-&lt;version&gt;]$ chmod +x bin/run.sh</screen>
+      </step>
+      <step>
+        <para>Execute the <filename>run.sh</filename> Bourne shell script.</para>
+        <screen>mss-jboss-&lt;version&gt;]$ ./bin/run.sh</screen>
+      </step>
+    </procedure>
+    <note>
+      <para>Instead of executing the Bourne shell script to start the server, the <filename>run.jar</filename> executable Java archive can be executed from the <filename>bin</filename> directory:</para>
+      <screen>mss-jboss-&lt;version&gt;]$ java -jar bin/run.jar</screen>
+    </note>
+    <procedure>
+      <title>Running MSS for JBoss on <productname>Windows</productname></title>
+      <para>There are several ways to start MSS for JBoss on Windows. All of the following methods accomplish the same task.</para>
+      <step>
+        <para>Using Windows Explorer, navigate to the <filename>bin</filename> subfolder in the installation directory.</para>
+      </step>
+      <step>
+        <para>The preferred way to start MSS for JBoss from the Command Prompt.  The command line interface displays details of the startup process, including any problems encountered during the startup process.</para>
+        <para>Open the Command Prompt via the <guilabel>Start</guilabel> menu and navigate to the correct folder:</para>
+        <screen>C:&bsol;Users&bsol;&lt;user&gt;My Downloads&gt; cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
+      </step>
       <step>
         <para>Start the JBoss Application Server by executing one of the following files:
         <itemizedlist>
-          <listitem><para><filename>run.bat</filename> batch file:</para><screen>C:&bsol;Users&bsol;&lt;user&gt;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;run.bat</screen></listitem>
-          <listitem><para><filename>run.jar</filename> executable Java archive:</para><screen>C:&bsol;Users&bsol;&lt;user&gt;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;java -jar bin&bsol;run.jar</screen></listitem>
-        </itemizedlist>
+            <listitem>
+              <para><filename>run.bat</filename> batch file:</para>
+              <screen>C:&bsol;Users&bsol;&lt;user&gt;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;run.bat</screen>
+            </listitem>
+            <listitem>
+              <para><filename>run.jar</filename> executable Java archive:</para>
+              <screen>C:&bsol;Users&bsol;&lt;user&gt;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;java -jar bin&bsol;run.jar</screen>
+            </listitem>
+          </itemizedlist>
         </para>
-			</step>
-		</procedure>
-	</section>
-	<section	id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Using">
-		<title>Using</title>
-		<para>Once the server is running, access the SIP Servlets Management Console by opening <ulink url="http://localhost:8080/sip-servlets-management/"/>.</para>
-	</section>
-	<section	id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping">
-		<title>Stopping</title>
-		<para>Detailed instructions for stopping the JBoss Application Server are given below, arranged by platform.  If the server is correctly stopped, the following three lines are displayed as the last output in the Linux terminal or Command Prompt:</para>
-		<programlisting>[Server] Shutdown complete
+      </step>
+    </procedure>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Using">
+    <title>Using</title>
+    <para>Once the server is running, access the SIP Servlets Management Console by opening <ulink url="http://localhost:8080/sip-servlets-management/"/>.</para>
+  </section>
+  <section>
+    <title>Testing</title>
+    <para>You should see one pre-configured sample application. You can use it to verify that the server is installed and running correctly. The application name is <quote>org.mobicents.servlet.sip.example.SimpleApplication</quote>. From the Management Console you can make sure it is subscribed to receive <literal>INVITE</literal> and <literal>REGISTER</literal> SIP requests.  It is a simple <filename>Click2Call</filename> application allowing SIP registration and calling phones from the Web user interface.</para>
+    <para>The scenario for this example consists of the following steps:</para>
+    <orderedlist>
+      <listitem>
+        <para>Alice and Bob each register a SIP Softphone</para>
+      </listitem>
+      <listitem>
+        <para>Alice clicks on the &quot;Call&quot; link to place a call to Bob</para>
+      </listitem>
+      <listitem>
+        <para>Alice&apos;s phone rings</para>
+      </listitem>
+      <listitem>
+        <para>When Alice picks up her phone, Bob&apos;s phone rings</para>
+      </listitem>
+      <listitem>
+        <para>When Bob answers his phone, the call is connected</para>
+      </listitem>
+      <listitem>
+        <para>When one of them hangs up, the other one is also disconnected </para>
+      </listitem>
+    </orderedlist>
+    <procedure>
+      <title>Testing the Click2Call sample application</title>
+      <step>
+        <para>Open up a browser to <ulink url="http://localhost:8080/click2call/">http://localhost:8080/click2call/</ulink>. If you have no registered SIP clients you will be asked to register at least two.</para>
+      </step>
+      <step>
+        <para>Configure your SIP clients to use the sip servlets server as a register and proxy. (ip address : 127.0.0.1, port: 5080)
+By default it will accept any password</para>
+      </step>
+      <step>
+        <para>After the registration you will see a table where each cell will initiate a call between the corresponding clients.</para>
+      </step>
+      <step>
+        <para>Close the calls.</para>
+      </step>
+      <step>
+        <para>Navigate to <ulink url="http://localhost:8080/click2call/simplecall.html">http://localhost:8080/click2call/simplecall.html</ulink>, which is a simplified version that doesn&apos;t require registered clients.
+</para>
+      </step>
+      <step>
+        <para>Enter the URIs of the two SIP phones you just started and click &quot;Submit&quot;</para>
+      </step>
+      <step>
+        <para>The phones should be ringing again. You can pick them up and you will know that the SIP and the HTTP containers are working properly.</para>
+      </step>
+    </procedure>
+  </section>
+  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping">
+    <title>Stopping</title>
+    <para>Detailed instructions for stopping the JBoss Application Server are given below, arranged by platform.  If the server is correctly stopped, the following three lines are displayed as the last output in the Linux terminal or Command Prompt:</para>
+    <programlisting>[Server] Shutdown complete
 Shutdown complete
 Halting VM</programlisting>
-		<!--<procedure>
-			<title>Stopping MSS for JBoss on Linux by Issuing a Control Code</title>
-			<step>
-				<para>Assuming that you started the JBoss Application Server as a foreground process in the terminal, the easiest way to stop it is by pressing the <keycombo
-						action="simul"><keycap>Ctrl</keycap>
-						<keycap>c</keycap>
-					</keycombo> key combination in the same terminal in which you started it.
-						</para>
-			</step>
-		</procedure>-->
-		<procedure>
-			<title>Stopping MSS for JBoss on Linux</title>
-			<step>
-				<para>Change the working directory to the binary distribution's install directory.</para>
-				<screen>~]$ cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
-			</step>
-			<step>
-				<para>(Optional) Ensure that the bin/shutdown.sh start script is executable:</para>
-				<screen>mss-jboss-&lt;version&gt;]$ chmod +x bin/shutdown.sh</screen>
-			</step>
-			<step>
-				<para>Run the <filename>shutdown.sh</filename> executable Bourne shell script with the <option>-S</option> option (the short option for <option>--shutdown</option>) as a command line argument:</para>
-				<screen>mss-jboss-&lt;version&gt;]$ ./bin/shutdown.sh -S</screen>
-			</step>
-		</procedure>
-		<note><para>The <filename>shutdown.jar</filename> executable Java archive with the <option>-S</option> option can also be used to shut down the server:</para>
-      <screen>mss-jboss-&lt;version&gt;]$ java -jar bin/shutdown.jar -S</screen></note>
-		<procedure>
-			<title>Stopping MSS for JBoss on Windows</title>
-			<step>
-				<para>Stopping the JBoss Application Server on Windows consists in executing either the <filename>shutdown.bat</filename> or the <filename>shutdown.jar</filename> executable file in the <filename>bin</filename> subfolder of the MSS for JBoss binary distribution. Ensure the <option>-S</option> option (the short option for <option>--shutdown</option>) is included in the command line argument.</para>
-				<screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;shutdown.bat -S</screen>
-				<stepalternatives>
-					<step>
-						<para>The <filename>shutdown.jar</filename> executable Java archive with the <option>-S</option> option can also be used to shut down the server:</para>
-						<screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;java -jar bin&bsol;shutdown.jar -S</screen>
-					</step>
-				</stepalternatives>
-			</step>
-		</procedure>
-	</section>
-	<!--<section
-		id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Testing">
-		<title>Testing</title>
-		<para>&nbsp;</para>
-	</section>-->
-	<section	id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Uninstalling">
-		<title>Uninstalling</title>
-		<para>To uninstall MSS for JBoss, delete the directory containing the binary distribution.</para>
-	</section>
+<!--<procedure>
+   <title>Stopping MSS for JBoss on Linux by Issuing a Control Code</title>
+   <step>
+    <para>Assuming that you started the JBoss Application Server as a foreground process in the terminal, the easiest way to stop it is by pressing the <keycombo
+      action="simul"><keycap>Ctrl</keycap>
+      <keycap>c</keycap>
+     </keycombo> key combination in the same terminal in which you started it.
+      </para>
+   </step>
+  </procedure>-->    <procedure>
+      <title>Stopping MSS for JBoss on Linux</title>
+      <step>
+        <para>Change the working directory to the binary distribution&apos;s install directory.</para>
+        <screen>~]$ cd &quot;mss-jboss-&lt;version&gt;&quot;</screen>
+      </step>
+      <step>
+        <para>(Optional) Ensure that the bin/shutdown.sh start script is executable:</para>
+        <screen>mss-jboss-&lt;version&gt;]$ chmod +x bin/shutdown.sh</screen>
+      </step>
+      <step>
+        <para>Run the <filename>shutdown.sh</filename> executable Bourne shell script with the <option>-S</option> option (the short option for <option>--shutdown</option>) as a command line argument:</para>
+        <screen>mss-jboss-&lt;version&gt;]$ ./bin/shutdown.sh -S</screen>
+      </step>
+    </procedure>
+    <note>
+      <para>The <filename>shutdown.jar</filename> executable Java archive with the <option>-S</option> option can also be used to shut down the server:</para>
+      <screen>mss-jboss-&lt;version&gt;]$ java -jar bin/shutdown.jar -S</screen>
+    </note>
+    <procedure>
+      <title>Stopping MSS for JBoss on Windows</title>
+      <step>
+        <para>Stopping the JBoss Application Server on Windows consists in executing either the <filename>shutdown.bat</filename> or the <filename>shutdown.jar</filename> executable file in the <filename>bin</filename> subfolder of the MSS for JBoss binary distribution. Ensure the <option>-S</option> option (the short option for <option>--shutdown</option>) is included in the command line argument.</para>
+        <screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;shutdown.bat -S</screen>
+        <stepalternatives>
+          <step>
+            <para>The <filename>shutdown.jar</filename> executable Java archive with the <option>-S</option> option can also be used to shut down the server:</para>
+            <screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;java -jar bin&bsol;shutdown.jar -S</screen>
+          </step>
+        </stepalternatives>
+      </step>
+    </procedure>
+  </section>
+<!--<section
+  id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Testing">
+  <title>Testing</title>
+  <para>&nbsp;</para>
+ </section>-->  <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Uninstalling">
+    <title>Uninstalling</title>
+    <para>To uninstall MSS for JBoss, delete the directory containing the binary distribution.</para>
+  </section>
 </section>

@@ -1,15 +1,15 @@
-﻿<?xml version='1.0' encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-]><!-- chapter id nickname: afotsss -->
-<chapter id="ssea-SIP_Servlet_Example_Applications">
-	<title>SIP Servlet Example Applications</title>
-	<para>The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server.  <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the avaialble examples, their location, and a brief description about the functionality each example demonstrates.  The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.  Each example is available in both binary and source formats.</para>
-	    <table id="tab-ssea-SIP_Servlet_Example_Applications" frame='all'>
-      <title>Available Examples</title>
-        <tgroup cols='2' align='left' colsep='1' rowsep='1'>
-        <colspec colname='c1'/>
-        <colspec colname='c2'/>
-       <thead>
+]>
+<!-- chapter id nickname: afotsss --><chapter id="ssea-SIP_Servlet_Example_Applications">
+  <title>SIP Servlet Example Applications</title>
+  <para>The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server.  <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the avaialble examples, their location, and a brief description about the functionality each example demonstrates.  The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.  Each example is available in both binary and source formats.</para>
+  <table frame="all" id="tab-ssea-SIP_Servlet_Example_Applications">
+    <title>Available Examples</title>
+    <tgroup cols="2" colsep="1" rowsep="1" align="left">
+      <colspec colname="c1"/>
+      <colspec colname="c2"/>
+      <thead>
         <row>
           <entry align="center">Example</entry>
           <entry align="center">Description</entry>
@@ -17,69 +17,123 @@
       </thead>
       <tbody>
         <row>
-          <entry><xref linkend="sfss-The_Call-Blocking_Service"/></entry><entry>Demonstrates how to block calls by specifiying that the INVITE SIP Extension checks the <literal>From</literal> address to see if it is specified in the block list.  If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.</entry>
+          <entry>
+            <xref linkend="sfss-The_Call-Blocking_Service"/>
+          </entry>
+          <entry>Demonstrates how to block calls by specifiying that the INVITE SIP Extension checks the <literal>From</literal> address to see if it is specified in the block list. If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.</entry>
         </row>
         <row>
-         <entry><xref linkend="sfss-The_Call-Forwarding_Service"/></entry><entry>Demonstrates how to forward calls by specifying that the INVITE SIP Extension checks the <literal>To</literal> address to see if it is specified in the forward list.  If the SIP address matches, the application acts as a back-to-back user agent (B2BUA).</entry>
+          <entry>
+            <xref linkend="sfss-The_Call-Forwarding_Service"/>
+          </entry>
+          <entry>Demonstrates how to forward calls by specifying that the INVITE SIP Extension checks the <literal>To</literal> address to see if it is specified in the forward list. If the SIP address matches, the application acts as a back-to-back user agent (B2BUA).</entry>
         </row>
         <row>
-          <entry><xref linkend="sfss-The_Call-Controller_Service"/></entry><entry>Call Blocking and Call Forwarding are merged to create a new service.</entry>
+          <entry>
+            <xref linkend="sfss-The_Call-Controller_Service"/>
+          </entry>
+          <entry>Call Blocking and Call Forwarding are merged to create a new service.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/speed_dial.html">Speed Dial</ulink></entry><entry>Demonstrates how to implement speed dialling for SIP addresses.  The demonstration uses a pre-defined list of speed dial numbers.  The numbers are translated into a complete address based on prior configuration.  The SIP addresses are proxied without record-routing, or supervised mode.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/speed_dial.html">Speed Dial</ulink>
+          </entry>
+          <entry>Demonstrates how to implement speed dialling for SIP addresses. The demonstration uses a pre-defined list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.</entry>
         </row>
         <row>
-          <entry><xref linkend="sfss-The_Location_Service"/></entry><entry>Demonstrates a location service that performs a lookup based on the request URI, into a hard-coded list of addresses.  The request is proxied to the set of destination addresses associated with that URI.</entry>
+          <entry>
+            <xref linkend="sfss-The_Location_Service"/>
+          </entry>
+          <entry>Demonstrates a location service that performs a lookup based on the request URI, into a hard-coded list of addresses. The request is proxied to the set of destination addresses associated with that URI.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/speeddial_locationservice.html">Composed Speed Dial and Location</ulink></entry><entry>Speed Dial and Location are merged to create a new service.  Speed Dial proxies the speed dial number to a SIP address, then Location Service proxies the call to the actual location of the call recipient.</entry>
-        </row>
-         <row>
-          <entry><ulink url="http://www.mobicents.org/click2call.html">Click to Call</ulink></entry><entry>Demonstrates how SIP Servlets can be used along with HTTP servlets as a converged application to place calls from a web portal.  The example is a modified version of the click to dial example from the Sailfin project, but has been reworked to comply with JSR 289.</entry>
-        </row>
-        <row>
-          <entry><ulink url="http://www.mobicents.org/chatserver.html">Chat Server</ulink></entry><entry>Demonstrates <literal>MESSAGE</literal> SIP Extension support.  This example is based on the chatroom server demonstration from the BEA dev2dev project, and has been modified to meet JSR 289 requirements.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/speeddial_locationservice.html">Composed Speed Dial and Location</ulink>
+          </entry>
+          <entry>Speed Dial and Location are merged to create a new service. Speed Dial proxies the speed dial number to a SIP address, then Location Service proxies the call to the actual location of the call recipient.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/media-demo.html">Media</ulink></entry><entry>Demonstrates how the media playback SIP Servlet can build a media file customised with the name of the user, based on the information in the FROM header.  This example is only compatible with JBoss AS.  The solution is know to work with Ekiga and linphone SIP softphones.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/click2call.html">Click to Call</ulink>
+          </entry>
+          <entry>Demonstrates how SIP Servlets can be used along with HTTP servlets as a converged application to place calls from a web portal. The example is a modified version of the click to dial example from the Sailfin project, but has been reworked to comply with JSR 289.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/shopping-demo.html">Shopping</ulink></entry><entry>Demonstrates integration with Seam and Java Enterprise Edition (JEE), and Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones.  The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/chatserver.html">Chat Server</ulink>
+          </entry>
+          <entry>Demonstrates <literal>MESSAGE</literal> SIP Extension support. This example is based on the chatroom server demonstration from the BEA dev2dev project, and has been modified to meet JSR 289 requirements.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets Interoperability</ulink></entry><entry>Demonstrates how the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform components can work in concert with each other to provide a integrated solution.  All major components of the platform are used in this example, which was created to demonstrate to JavaOne 2008 delegates a possible use case scenario for the platform.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/media-demo.html">Media</ulink>
+          </entry>
+          <entry>Demonstrates how the media playback SIP Servlet can build a media file customised with the name of the user, based on the information in the FROM header. This example is only compatible with JBoss AS. The solution is know to work with Ekiga and linphone SIP softphones.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/facebook-c2c.html">Facebook Click to Call</ulink></entry><entry>Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plugin that allows user to call POTS phones through a SIP-PSTN gateway provider.  This demonstration is only available from the source repository; no binary is available.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/shopping-demo.html">Shopping</ulink>
+          </entry>
+          <entry>Demonstrates integration with Seam and Java Enterprise Edition (JEE), and Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.</entry>
         </row>
         <row>
-          <entry><xref linkend="sfss-The_Diameter_Event-Changing_Service"/></entry><entry>Demonstrates how the Diameter Event Charging, and the Location service, can be used to perform fixed-rated charging of calls (event charging).  When a call is initiated, a debit of ten euros is applied to the <literal>A Party</literal> account.  If the call is rejected by the <literal>B Party</literal>, or <literal>A Party</literal> hangs up before <literal>B Party</literal> can answer the call, the ten euro charge is credited to the <literal>A Party</literal> account.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets Interoperability</ulink>
+          </entry>
+          <entry>Demonstrates how the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform components can work in concert with each other to provide a integrated solution. All major components of the platform are used in this example, which was created to demonstrate to JavaOne 2008 delegates a possible use case scenario for the platform.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/mss-diameter_sh.html">Diameter Sh OpenIMS Integration</ulink></entry><entry>Demonstrates the integration between <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> and OpenIMS, using the Diameter Sh interface to receive profile updates and SIP.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/facebook-c2c.html">Facebook Click to Call</ulink>
+          </entry>
+          <entry>Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plugin that allows user to call POTS phones through a SIP-PSTN gateway provider. This demonstration is only available from the source repository; no binary is available.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/conference-demo.html">Conference</ulink></entry><entry>Demonstrates the capabilities of the Media Server, such as enpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors.  The demonstration uses Google's GWT Ajax framework with server-push updates to provide a desktop-like user interface experience.  </entry>
+          <entry>
+            <xref linkend="sfss-The_Diameter_Event-Changing_Service"/>
+          </entry>
+          <entry>Demonstrates how the Diameter Event Charging, and the Location service, can be used to perform fixed-rated charging of calls (event charging). When a call is initiated, a debit of ten euros is applied to the <literal>A Party</literal> account. If the call is rejected by the <literal>B Party</literal>, or <literal>A Party</literal> hangs up before <literal>B Party</literal> can answer the call, the ten euro charge is credited to the <literal>A Party</literal> account.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX</ulink></entry><entry>Demonstrates how a SIP PBX solution can be deployed using the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform.  For more information, refer to <xref linkend="mipbx-Media_IPBX"/>.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/mss-diameter_sh.html">Diameter Sh OpenIMS Integration</ulink>
+          </entry>
+          <entry>Demonstrates the integration between <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> and OpenIMS, using the Diameter Sh interface to receive profile updates and SIP.</entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/mss-jruby-example.html">JRuby on Rails SIP Servlets</ulink></entry><entry>Demonstrates how JRuby on Rails can be used by the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform to provide a multi-language application that can initiate phonecalls to customers after they log a complaint through a web portal.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/conference-demo.html">Conference</ulink>
+          </entry>
+          <entry>Demonstrates the capabilities of the Media Server, such as enpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google&apos;s GWT Ajax framework with server-push updates to provide a desktop-like user interface experience. </entry>
         </row>
         <row>
-          <entry><ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">Pure JRuby on Rails Telco</ulink></entry><entry>Builds on the JRuby on Rails SIP Servlets demonstration, but adds the ability to call the application rather that initially interact through the web portal.  The application has the ability to set up and tear down the call.</entry>
+          <entry>
+            <ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX</ulink>
+          </entry>
+          <entry>Demonstrates how a SIP PBX solution can be deployed using the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform. For more information, refer to <xref linkend="mipbx-Media_IPBX"/>.</entry>
+        </row>
+        <row>
+          <entry>
+            <ulink url="http://www.mobicents.org/mss-jruby-example.html">JRuby on Rails SIP Servlets</ulink>
+          </entry>
+          <entry>Demonstrates how JRuby on Rails can be used by the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform to provide a multi-language application that can initiate phonecalls to customers after they log a complaint through a web portal.</entry>
+        </row>
+        <row>
+          <entry>
+            <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">Pure JRuby on Rails Telco</ulink>
+          </entry>
+          <entry>Builds on the JRuby on Rails SIP Servlets demonstration, but adds the ability to call the application rather that initially interact through the web portal. The application has the ability to set up and tear down the call.</entry>
         </row>
       </tbody>
     </tgroup>
-    </table>
-	<!--<xi:include href="concept-section-SS_Concurrency_and_Congestion_Control.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Load_Balancer.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_SIP_Servlet_Security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_SIP_Extensions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Seam_Telco_Framework.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_STUN_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Media_IPBX.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_for_JBoss-Clustering_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_for_JBoss-Failover_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />-->
+  </table>
+<!--<xi:include href="concept-section-SS_Concurrency_and_Congestion_Control.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_Load_Balancer.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_SIP_Servlet_Security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_SIP_Extensions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_Seam_Telco_Framework.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_STUN_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_Media_IPBX.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_for_JBoss-Clustering_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_for_JBoss-Failover_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />-->  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Services_for_SIP_Servlets.xml"/>
 </chapter>
