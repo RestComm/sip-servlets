@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<section id="ss_jslee_interop">
+  <title>Sip Servlets - JAIN SLEE Interoperability</title>
+
+  <para>Why implement both specifications ? There is a religion war raging
+  between Sip Servlets and JAIN-SLEE and most see them as competing
+  specifications/products and try to choose between one or the other. </para>
+
+  <para>Our take at JBoss, the only vendor to implement both technologies, is
+  that they don't need to compete since they complete each other very well and
+  it has been one of the leitmotiv behind building Mobicents Sip Servlets.
+  </para>
+
+  <para>JAIN SLEE is a more complex specification than SIP Servlets, and it
+  has been know as heavyweight and with a steep learning curve. However JAIN
+  SLEE has standardized a high performing event driven application server, an
+  execution environment with a a good concurrency model and powerful protocol
+  agnostic capabilities thus covering a variety of telco protocols. </para>
+
+  <para>SIP Servlets on the other is way much simple and easier to get started
+  with. Its focus is currently on SIP + HTTP/JEE only and is more of a
+  programming model while JAIN SLEE is more of an application environment, a
+  platform. The fact that Sip Servlets is focused on SIP+JEE makes it a
+  natural fit to build JEE converged applications and way much simpler than
+  JAIN SLEE. </para>
+
+  <para>To us it feels like JAIN SLEE and Sip Servlets target different
+  audiences, different needs. We wanted to leverage the power of both and make
+  them work hand in hand to build an application that could leverage standards
+  all the way without resorting to vendor proprietary exensions. <ulink
+  url="http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf">Our
+  "JSLEE and SIP-Servlets Interoperability with Mobicents Communication
+  Platform" paper</ulink> describes our approach and the possible different
+  approaches we have identified to achieve the goal of interoperability
+  bewteen Sip Servlets and JSlee. </para>
+
+  <para>You can also use our working JSLEE/SIP Servlets interoperability
+  example showcasing our approach. </para>
+</section>
