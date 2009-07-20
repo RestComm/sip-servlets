@@ -7,14 +7,200 @@
   <section>
     <title>Mobicents Sip Servlets Performance Tips</title>
 
-    <para></para>
-    
+    <section>
+      <title>JBoss</title>
+
+      <para>You can look at the following wiki page: JBossASTuning. Most of
+      the things there don't apply, but it's always good to have a fast AS.
+      The most important thing is to remove logs, leaving just what's strictly
+      needed. Check your log config file in
+      $JBOSS_HOME/server/default/conf/jboss-log4j.xml</para>
+    </section>
+
+    <section>
+      <title>JAIN SIP Stack</title>
+
+      <para>You can fine tune the properties of the Stack. You will find the
+      sip stack properties defined in an external properties file
+      defined</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis
+          role="bold">gov.nist.javax.sip.THREAD_POOL_SIZE</emphasis>
+          <emphasis>Default value: 64</emphasis> This thread pool is
+          responsible for parsing SIP messages, from socket messages into
+          objects. A small value will make the stack less responsive, since
+          new messages have to wait in a queue for free threads. In UDP, this
+          can lead to more retransmissions. Big pool sizes allocate resources
+          that you don't really need.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis
+          role="bold">gov.nist.javax.sip.REENTRANT_LISTENER</emphasis>
+          <emphasis>Default value: true</emphasis> This flag indicates if the
+          SIP stack listener is executed by one only thread, or concurrently
+          by the threads that parse the messages. Since the Mobicents Sip
+          Servlets is based upon the fact that this flag is true, it is
+          advised not to change it</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The full list of jain sip stack properties is available from
+      <ulink
+      url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">here</ulink>
+      and the full list of implementation specific properties are available
+      from <ulink
+      url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">here</ulink></para>
+    </section>
+
+    <section>
+      <title>JVM</title>
+
+      <para>These notes depend on the JVM used, but should be pretty much
+      standard. These where written with Sun JDK 1.6 in mind, but should apply
+      to &gt;= JDK 1.5 as well. To pass arguments to the JVM change
+      $JBOSS_HOME/bin/run.conf or $JBOSS_HOME/bin/run.bat, depending on your
+      operating system. </para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Garbage Collection</emphasis> : JVM
+          ergonomics try to select the best garbage collector for you. The
+          default behaviour is to select the throughput collector. The problem
+          of the throughput collector is that have long pauses times, that
+          block the processing of the JVM. If you don't expect so much load,
+          you can try to use the incremental, low pause, garbage collector
+          (<emphasis>-XX:+UseConcMarkSweepGC
+          -XX:+CMSIncrementalMode</emphasis>). SIP apllications can bennefit a
+          lot from it, since it reduces the among of retransmissions. For more
+          information please read: <ulink
+          url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">Garbage
+          Collector Tuning </ulink></para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Heap</emphasis> <emphasis
+          role="bold">Size</emphasis> Heap size is important because of
+          garbage collection. Having a very big heap can stop you JVM for
+          seconds, to perform garbage collection. Small heap sizes are not
+          desired either, because puts a lot off pressure in garbage
+          collection. For more information please read: <ulink
+          url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance
+          Wite Papper </ulink></para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Operating System </title>
+
+      <para>These notes are for RHEL, but should apply to other versions of
+      unix. </para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Large Memory Pages</emphasis> To know
+          more about large memory pages, and how to set them, please visit:
+          <ulink
+          url="http://java.sun.com/javase/technologies/hotspot/largememory.jsp">Java
+          Support for Large Memory Pages</ulink> Setting large memories pages
+          reduces CPU utilization by 5%. Please make sure you pass the option
+          <emphasis>-XX:+UseLargePages</emphasis> and you don't get "Java
+          HotSpot(TM) Server VM warning: Failed to reserve shared memory
+          (errno = 22)" when starting JBoss. </para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Network buffers</emphasis> You can
+          increase the network buffers size by ading the follwing lines to
+          your <emphasis>/etc/sysctl.conf </emphasis>file: </para>
+
+          <itemizedlist>
+            <listitem>
+              <para>net.core.rmem_max = 16777216</para>
+            </listitem>
+
+            <listitem>
+              <para>net.core.wmem_max = 16777216</para>
+            </listitem>
+
+            <listitem>
+              <para>net.ipv4.tcp_rmem = 4096 87380 16777216</para>
+            </listitem>
+
+            <listitem>
+              <para>net.ipv4.tcp_wmem = 4096 65536 16777216</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+
+      <para>Then restart. You should see improvements in I/O. With SIP, the
+      performance improvement is about 20%. Again, you'll probably don't need
+      it unless you have a very high load.</para>
+    </section>
   </section>
 
   <section>
     <title>NAT Traversal</title>
 
-    <para></para>
-    
+    <section>
+      <title>STUN</title>
+
+      <para>STUN (Session Traversal Utilities for NAT) is not generally
+      considered a viable solution for enterprises because STUN cannot be used
+      with symmetric NATs. And in many situations many enterprise-grade
+      firewalls are symmetric and it requires STUN support in the SIP Client
+      Today most of the proxy/media gateway in place at VoIP providers now
+      recognize the public IP address the packets has been received from and
+      in the case where both SIP end points are behind a NAT they can act as
+      gateways so they can deal with clients behind NAT.</para>
+    </section>
+
+    <section>
+      <title>TURN</title>
+
+      <para>TURN (Traversal Using Relay NAT) is an IETF standard, which
+      implements media relay for SIP end-points. It solves the problems of
+      clients behind symmetric NATs which cannot rely on STUN to solve NAT
+      traversal. TURN connects clients behind a NAT to a single peer to
+      provide the same protection as that created by symmetric NATs and
+      firewalls. The TURN server acts as a relay, any data received is
+      forwarded. The approach however is not ideal. It assumes the clients
+      have a trust relationship with a TURN server and request session
+      allocation based on shared credentials. This has scalability issues,
+      requires changes in the SIP clients and this is not possible to know
+      when you can use a direct connection or use TURN.</para>
+    </section>
+
+    <section>
+      <title>ICE</title>
+
+      <para>ICE (Interactive Connection Establishment), which leverages both
+      STUN and TURN to solve the NAT traversal issues. It allows devices to
+      probe for multiple paths of communication by trying to use different
+      port numbers and STUN techniques. If ICE support is present in both
+      devices, there is a good chance the devices can start communication
+      end-to-end without any intermediary media relay. ICE is also built to
+      detect cases where direct communication is impossible and, only in such
+      cases, fall back to a media relay. ICE isn't really widespread yet and
+      doesn't seem to take off and the ICE capability has to be implemented in
+      the SIP devices which is not the case for most of them. Also depending
+      on the connection negotiated it may often require a reINVITE adding more
+      load to the SIP network and more latency to the call. Also If the
+      initiating ICE client attempts to call a non-ICE client then the call
+      setup-process will revert to a conventional SIP call requiring NAT
+      traversal to be solved by other means. </para>
+    </section>
+
+    <section>
+      <title>Other approaches</title>
+
+      <para>Other approaches include using proxy/media that can act as
+      gateways, Session Border Controllers, enhanced Firewall with Application
+      Layer Gateway (ALG), Tunelling.</para>
+    </section>
   </section>
 </chapter>

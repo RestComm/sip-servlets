@@ -10,11 +10,32 @@
     <section>
       <title>JBoss</title>
 
-      <para>You can look at the following wiki page: JBossASTuning. Most of
-      the things there don't apply, but it's always good to have a fast AS.
-      The most important thing is to remove logs, leaving just what's strictly
-      needed. Check your log config file in
+      <para>You can look at the following wiki page: <ulink
+      url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBossASTuning</ulink>.
+      Most of the things there don't apply, but it's always good to have a
+      fast AS. The most important thing is to remove logs, leaving just what's
+      strictly needed. Check your log config file in
       $JBOSS_HOME/server/default/conf/jboss-log4j.xml</para>
+    </section>
+
+    <section>
+      <title>Mobicents Sip Servlets</title>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Congestion Control</emphasis> : You can
+          turn it off if you don't think it's needed (though not advisable) or
+          fine tune the <emphasis>sipMessageQueueSize</emphasis>and
+          <emphasis>memoryThreshold</emphasis> parameters described in <xref
+          linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /> </para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Concurrency</emphasis> :
+          <emphasis>Default Value : None.</emphasis> To have the better
+          performance, it is recommended to let this value to None.</para>
+        </listitem>
+      </itemizedlist>
     </section>
 
     <section>
@@ -45,6 +66,20 @@
           Servlets is based upon the fact that this flag is true, it is
           advised not to change it</para>
         </listitem>
+
+        <listitem>
+          <para><emphasis
+          role="bold">gov.nist.javax.sip.LOG_MESSAGE_CONTENT</emphasis>
+          Default value :true. Set it to false to remove the logging of the
+          messages </para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis
+          role="bold">gov.nist.javax.sip.TRACE_LEVEL=0</emphasis>
+          <emphasis>Default value: true</emphasis>. Set it to false to remove
+          the logging of the jain sip stack </para>
+        </listitem>
       </itemizedlist>
 
       <para>The full list of jain sip stack properties is available from
@@ -62,7 +97,7 @@
       standard. These where written with Sun JDK 1.6 in mind, but should apply
       to &gt;= JDK 1.5 as well. To pass arguments to the JVM change
       $JBOSS_HOME/bin/run.conf or $JBOSS_HOME/bin/run.bat, depending on your
-      operating system. </para>
+      operating system.</para>
 
       <itemizedlist>
         <listitem>
@@ -94,10 +129,10 @@
     </section>
 
     <section>
-      <title>Operating System </title>
+      <title>Operating System</title>
 
       <para>These notes are for RHEL, but should apply to other versions of
-      unix. </para>
+      unix.</para>
 
       <itemizedlist>
         <listitem>
@@ -109,13 +144,13 @@
           reduces CPU utilization by 5%. Please make sure you pass the option
           <emphasis>-XX:+UseLargePages</emphasis> and you don't get "Java
           HotSpot(TM) Server VM warning: Failed to reserve shared memory
-          (errno = 22)" when starting JBoss. </para>
+          (errno = 22)" when starting JBoss.</para>
         </listitem>
 
         <listitem>
           <para><emphasis role="bold">Network buffers</emphasis> You can
           increase the network buffers size by ading the follwing lines to
-          your <emphasis>/etc/sysctl.conf </emphasis>file: </para>
+          your <emphasis>/etc/sysctl.conf </emphasis>file:</para>
 
           <itemizedlist>
             <listitem>
@@ -192,7 +227,7 @@
       load to the SIP network and more latency to the call. Also If the
       initiating ICE client attempts to call a non-ICE client then the call
       setup-process will revert to a conventional SIP call requiring NAT
-      traversal to be solved by other means. </para>
+      traversal to be solved by other means.</para>
     </section>
 
     <section>
