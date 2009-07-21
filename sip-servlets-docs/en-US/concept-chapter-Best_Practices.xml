@@ -5,8 +5,15 @@
 <chapter id="bp-Best_Practices">
   <title>Best Practices</title>
 
-  <section>
+  <para>This chapter will present some Best Practices related to the Mobicents
+  Sip Servlets usage in real world deployments.</para>
+
+  <section id="bp-Best_Practices_Perf_Tips">
     <title>Mobicents Sip Servlets Performance Tips</title>
+
+    <para>Mobicents Sip Servlets in its default profile is targeted at
+    development environment and as such some tuning is needed to be able to
+    use it in production with the best possible performance.</para>
 
     <section>
       <title>Tuning JBoss</title>
@@ -188,8 +195,14 @@
     </section>
   </section>
 
-  <section>
+  <section id="bp-Best_Practices_NAT">
     <title>NAT Traversal</title>
+
+    <para>In real world deployment, it is often required that SIP and Media
+    has to go through different kinds of NAT to be able to reach the
+    endpoints. NAT Traversal is a complex topic and here are some best
+    practices that can help you decide on which method to use to effectively
+    deal with NAT issues.</para>
 
     <section>
       <title>STUN</title>

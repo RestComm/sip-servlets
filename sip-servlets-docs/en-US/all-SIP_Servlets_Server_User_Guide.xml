@@ -1733,7 +1733,12 @@ ipAddress="127.0.0.1"
 </chapter>
   <!-- chapter id nickname: sssicar --><chapter id="sssicar-SIP_Servlets_Server-Application-Router">
   <title>Application Router</title>
-  <para>The following sections describe the Default Application Router.</para>
+
+  <para>The following sections describe how the Application Routing is
+  performed in the Mobicents Sip Servlets container through its Default
+  Application Router and how other Application Router implementations
+  compliant with the JSR 289 specification can be installed.</para>
+
   <section id="tsdar-Default-Application-Router">
   <title>Default Application Router</title>
 
@@ -2036,6 +2041,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
     page or look at the <xref linkend="tsear-echarts-Application-Router"/>.</para>
   </section>
 </section>
+
   <section id="tsear-echarts-Application-Router">
   <title>ECharts Application Router</title>
 
@@ -4106,9 +4112,9 @@ useStaticAddress="true"/&gt;
     Mobicents Sip Servlets Servers through Jopr with our custom Jopr plug in.
     Note that 2 versions of Jopr are available. One embedded which is more
     targeted to development environment and the full one more targeted for
-    production envrionment.</para>
+    production environment.</para>
 
-    <para>With the Mobicents Sip Servlet Jopr plugin, you can currently see
+    <para>With the Mobicents Sip Servlet Jopr plug in, you can currently see
     metrics related to your deployed applications, metrics related to the SIP
     Servlets Server and manage the Congestion and Concurrency settings of the
     SIP Servlets Server.</para>
@@ -4310,6 +4316,34 @@ useStaticAddress="true"/&gt;
               <imageobject>
                 <imagedata fileref="images/mss-jopr-jboss-web.png"/>
               </imageobject>
+            </mediaobject>
+          </listitem>
+
+          <listitem>
+            <para>Click on the Configuration Tab to be able to tune the
+            Congestion Controls parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-queue.png"/>
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control
+              Parameters Configuration</caption>
+            </mediaobject>
+          </listitem>
+
+          <listitem>
+            <para>Click on the Control Tab to be able to set the Concurrency
+            Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-concurrency.png"/>
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control
+              Parameters Configuration</caption>
             </mediaobject>
           </listitem>
 
@@ -4546,6 +4580,12 @@ Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclus
         Example</ulink> : a Sip Servlet application showing how to use media
         capabilities (Media playback, Text to Speech with FreeTTS and DTMF
         detection).</para>
+      </listitem>
+
+      <listitem>
+        <para><ulink url="http://www.mobicents.org/conference-demo.html">Conference
+        Demo</ulink> : a Conference Media Server demo application built on GWT
+        with server-push updates.</para>
       </listitem>
 
       <listitem>
@@ -5061,72 +5101,163 @@ admin=caller,role1,role2,..
     </procedure>
   </section>
   <section id="mssstun-MSS_STUN">
-    <title>STUN Support</title>
-    <para>The Session Traversal Utilities for NAT (STUN) prococol is used in Network Address Translation (NAT) traversal for real-time voice, video, messaging, and related interactive IP application communications.  This light-weight, client-server protocol allows applications passing through a NAT to obtain the public IP address for the UDP connections the application uses to connect to remote hosts.  </para>
-    <para>STUN support is provided at the SIP connector level, using the <ulink url="https://stun4j.dev.java.net/">STUN for Java</ulink>  project.  The STUN for Java project provides a Java implementation of the STUN Protocol (RFC 3489), which allows each SIP connector to select whether it should use STUN to discover a public IP address, and use this address in the SIP messages sent through the connector.</para>
-    <para>To make a SIP connector STUN-enabled, three attributes must be appended to the &lt;connector&gt; tag in the <filename>server.xml</filename> file.  The properties are:
-      <itemizedlist>
-        <listitem>
-         <para>useStun="true"</para>
-         <para>Enables STUN support for this connector.  Ensure that the <literal>ipAddress</literal> attribute is not set to <literal>127.0.0.1</literal></para>
-        </listitem>
-        <listitem>
-          <para>stunServerAddress="&lt;Public_STUN_Server&gt;"</para>
-          <para>STUN server address used to discover the public IP address of this SIP Connector.  See the table below for a suggested list of public STUN servers.</para>
-        </listitem>
-        <listitem>
-          <para>stunServerPort="3478"</para>
-          <para>STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute.  Both TCP and UDP protocols communicate with STUN servers using this port only.</para>
-        </listitem>
-      </itemizedlist>
-    </para>
-    <note><para>A complete list of available SIP connector attributes and their descriptions is located in the <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/> section of this guide.</para></note>
-    <para>A number of public STUN servers are available, and can be specified in the stunServerAddress.  Depending on the router firmware used, the STUN reply packets' MAPPED_ADDRESS may be changed to the router's WAN port.  To alleviate this problem, certain public STUN servers provide XOR_MAPPED_ADDRESS support.  <xref linkend="tab-pss-Public_STUN_Servers"/> provides a selection of public STUN servers.</para>
-      <table id="tab-pss-Public_STUN_Servers" frame="all">
-      <title>Public STUN Servers</title>
-        <tgroup cols="3" align="left" colsep="1" rowsep="1">
-        <colspec colname="c1"/>
-        <colspec colname="c2"/>
-        <colspec colname="c3"/>
+  <title>STUN Support</title>
+
+  <para>The Session Traversal Utilities for NAT (STUN) prococol is used in
+  Network Address Translation (NAT) traversal for real-time voice, video,
+  messaging, and related interactive IP application communications. This
+  light-weight, client-server protocol allows applications passing through a
+  NAT to obtain the public IP address for the UDP connections the application
+  uses to connect to remote hosts.</para>
+
+  <para>STUN support is provided at the SIP connector level, using the <ulink url="https://stun4j.dev.java.net/">STUN for Java</ulink> project. The STUN
+  for Java project provides a Java implementation of the STUN Protocol (RFC
+  3489), which allows each SIP connector to select whether it should use STUN
+  to discover a public IP address, and use this address in the SIP messages
+  sent through the connector.</para>
+
+  <para>To make a SIP connector STUN-enabled, three attributes must be
+  appended to the &lt;connector&gt; tag in the <filename>server.xml</filename>
+  file. The properties are: <itemizedlist>
+      <listitem>
+        <para>useStun="true"</para>
+
+        <para>Enables STUN support for this connector. Ensure that the
+        <literal>ipAddress</literal> attribute is not set to
+        <literal>127.0.0.1</literal></para>
+      </listitem>
+
+      <listitem>
+        <para>stunServerAddress="&lt;Public_STUN_Server&gt;"</para>
+
+        <para>STUN server address used to discover the public IP address of
+        this SIP Connector. See the table below for a suggested list of public
+        STUN servers.</para>
+      </listitem>
+
+      <listitem>
+        <para>stunServerPort="3478"</para>
+
+        <para>STUN server port of the STUN server used in the
+        <literal>stunServerAddress</literal> attribute. Both TCP and UDP
+        protocols communicate with STUN servers using this port only.</para>
+      </listitem>
+    </itemizedlist></para>
+
+  <note>
+    <para>A complete list of available SIP connector attributes and their
+    descriptions is located in the <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/>
+    section of this guide.</para>
+  </note>
+
+  <para>A number of public STUN servers are available, and can be specified in
+  the stunServerAddress. Depending on the router firmware used, the STUN reply
+  packets' MAPPED_ADDRESS may be changed to the router's WAN port. To
+  alleviate this problem, certain public STUN servers provide
+  XOR_MAPPED_ADDRESS support. <xref linkend="tab-pss-Public_STUN_Servers"/>
+  provides a selection of public STUN servers.</para>
+
+  <table frame="all" id="tab-pss-Public_STUN_Servers">
+    <title>Public STUN Servers</title>
+
+    <tgroup align="left" cols="3" colsep="1" rowsep="1">
+      <colspec colname="c1"/>
+
+      <colspec colname="c2"/>
+
+      <colspec colname="c3"/>
+
       <thead>
         <row>
           <entry align="center">Server Address</entry>
+
           <entry align="center">XOR Support</entry>
+
           <entry align="center">DNS SRV Record</entry>
         </row>
       </thead>
+
       <tbody>
-          <row>
-            <entry>stun.ekiga.net</entry><entry>Yes</entry><entry>Yes</entry>
-          </row>
-         <row>
-           <entry>stun.fwdnet.net</entry><entry>No</entry><entry>Yes</entry>
-          </row>
-         <row>
-           <entry>stun.ideasip.com</entry><entry>No</entry><entry>Yes</entry>
-          </row> 
-          <row>
-           <entry>stun01.sipphone.com</entry><entry>Yes</entry><entry>No</entry>
-          </row>
-          <row>
-           <entry>stun.softjoys.com</entry><entry>No</entry><entry>No</entry>
-          </row>
-         <row>
-           <entry>stun.voipbuster.com</entry><entry>No</entry><entry>No</entry>
-          </row>
-         <row>
-           <entry>stun.voxgratia.org</entry><entry>No</entry><entry>No</entry>
-          </row>
-         <row>
-           <entry>stun.xten.com</entry><entry>Yes</entry><entry>Yes</entry>
-          </row>
-         <row>
-           <entry>stunserver.org</entry><entry>Yes</entry><entry>Yes</entry>
-          </row>
-        </tbody>
+        <row>
+          <entry>stun.ekiga.net</entry>
+
+          <entry>Yes</entry>
+
+          <entry>Yes</entry>
+        </row>
+
+        <row>
+          <entry>stun.fwdnet.net</entry>
+
+          <entry>No</entry>
+
+          <entry>Yes</entry>
+        </row>
+
+        <row>
+          <entry>stun.ideasip.com</entry>
+
+          <entry>No</entry>
+
+          <entry>Yes</entry>
+        </row>
+
+        <row>
+          <entry>stun01.sipphone.com</entry>
+
+          <entry>Yes</entry>
+
+          <entry>No</entry>
+        </row>
+
+        <row>
+          <entry>stun.softjoys.com</entry>
+
+          <entry>No</entry>
+
+          <entry>No</entry>
+        </row>
+
+        <row>
+          <entry>stun.voipbuster.com</entry>
+
+          <entry>No</entry>
+
+          <entry>No</entry>
+        </row>
+
+        <row>
+          <entry>stun.voxgratia.org</entry>
+
+          <entry>No</entry>
+
+          <entry>No</entry>
+        </row>
+
+        <row>
+          <entry>stun.xten.com</entry>
+
+          <entry>Yes</entry>
+
+          <entry>Yes</entry>
+        </row>
+
+        <row>
+          <entry>stunserver.org</entry>
+
+          <entry>Yes</entry>
+
+          <entry>Yes</entry>
+        </row>
+      </tbody>
     </tgroup>
-    </table>
-  </section>
+  </table>
+
+  <note>
+    <para>Please make sure to read our Best Practices regarding NAT Traversal
+    as described in <xref linkend="bp-Best_Practices_NAT"/></para>
+  </note>
+</section>
   <section id="stf-Seam_Telco_Framework">
     <title>Seam Telco Framework</title>
       <para>The Seam Telco Framework (STF) is a telecommunications application framework based on the JSR-289 specification, and JBoss Seam.  The framework plugs the SIP Servlets 1.1 stack and the Media Server Control API into new or existing JBoss Seam applications.  This allows Seam components to implement both the Web and telecommunication logic of the applications.</para>
@@ -5391,8 +5522,15 @@ admin=caller,role1,role2,..
   <!-- This document was created with Syntext Serna Free. --><chapter id="bp-Best_Practices">
   <title>Best Practices</title>
 
-  <section>
+  <para>This chapter will present some Best Practices related to the Mobicents
+  Sip Servlets usage in real world deployments.</para>
+
+  <section id="bp-Best_Practices_Perf_Tips">
     <title>Mobicents Sip Servlets Performance Tips</title>
+
+    <para>Mobicents Sip Servlets in its default profile is targeted at
+    development environment and as such some tuning is needed to be able to
+    use it in production with the best possible performance.</para>
 
     <section>
       <title>Tuning JBoss</title>
@@ -5562,8 +5700,14 @@ admin=caller,role1,role2,..
     </section>
   </section>
 
-  <section>
+  <section id="bp-Best_Practices_NAT">
     <title>NAT Traversal</title>
+
+    <para>In real world deployment, it is often required that SIP and Media
+    has to go through different kinds of NAT to be able to reach the
+    endpoints. NAT Traversal is a complex topic and here are some best
+    practices that can help you decide on which method to use to effectively
+    deal with NAT issues.</para>
 
     <section>
       <title>STUN</title>

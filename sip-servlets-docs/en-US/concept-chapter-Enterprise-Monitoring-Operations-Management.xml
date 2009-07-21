@@ -24,9 +24,9 @@
     Mobicents Sip Servlets Servers through Jopr with our custom Jopr plug in.
     Note that 2 versions of Jopr are available. One embedded which is more
     targeted to development environment and the full one more targeted for
-    production envrionment.</para>
+    production environment.</para>
 
-    <para>With the Mobicents Sip Servlet Jopr plugin, you can currently see
+    <para>With the Mobicents Sip Servlet Jopr plug in, you can currently see
     metrics related to your deployed applications, metrics related to the SIP
     Servlets Server and manage the Congestion and Concurrency settings of the
     SIP Servlets Server.</para>
@@ -237,7 +237,7 @@
             </mediaobject>
           </listitem>
 
-	  <listitem>
+          <listitem>
             <para>Click on the Configuration Tab to be able to tune the
             Congestion Controls parameters as defined in <xref
             linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>

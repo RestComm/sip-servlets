@@ -56,6 +56,13 @@
 
       <listitem>
         <para><ulink
+        url="http://www.mobicents.org/conference-demo.html">Conference
+        Demo</ulink> : a Conference Media Server demo application built on GWT
+        with server-push updates.</para>
+      </listitem>
+
+      <listitem>
+        <para><ulink
         url="http://www.mobicents.org/shopping-demo.html">Shopping
         Example</ulink> : a Converged JEE Application showing SEAM
         integration, JEE, Media integration with TTS and DTMF support.</para>
