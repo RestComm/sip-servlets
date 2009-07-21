@@ -217,7 +217,7 @@
   </section>
   <section>
     <title>Testing</title>
-    <para>You should see one pre-configured sample application. You can use it to verify that the server is installed and running correctly. The application name is <quote>org.mobicents.servlet.sip.example.SimpleApplication</quote>. From the Management Console you can make sure it is subscribed to receive <literal>INVITE</literal> and <literal>REGISTER</literal> SIP requests.  It is a simple <filename>Click2Call</filename> application allowing SIP registration and calling phones from the Web user interface.</para>
+    <para>After installation, there should be one pre-configured sample application deployed in the <literal>default</literal> server onfiguration. You can use it to verify that the server is installed and running correctly. The application name is <quote>org.mobicents.servlet.sip.example.SimpleApplication</quote>. From the Sip Servlets Management Console you can make sure it is subscribed to receive <literal>INVITE</literal> and <literal>REGISTER</literal> SIP requests.  It is a simple <filename>Click2Call</filename> application allowing SIP registration and calling phones from the Web user interface.</para>
     <para>The scenario for this example consists of the following steps:</para>
     <orderedlist>
       <listitem>
@@ -245,7 +245,7 @@
         <para>Open up a browser to <ulink url="http://localhost:8080/click2call/">http://localhost:8080/click2call/</ulink>. If you have no registered SIP clients you will be asked to register at least two.</para>
       </step>
       <step>
-        <para>Configure your SIP clients to use the sip servlets server as a register and proxy. (ip address : 127.0.0.1, port: 5080)
+        <para>Configure your SIP clients to use the sip servlets server as a register and proxy. (IP address : 127.0.0.1, port: 5080)
 By default it will accept any password</para>
       </step>
       <step>
