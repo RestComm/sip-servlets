@@ -2043,24 +2043,24 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
 </section>
 
   <section id="tsear-echarts-Application-Router">
-  <title>ECharts Application Router</title>
+  <title>DFC Application Router</title>
 
   <para> </para>
 
   <section>
-    <title>Description of ECharts Application Router</title>
+    <title>Description of DFC Application Router</title>
 
     <para>Instead of using our Mobicents Default Application Router, any SIP
     Servlets 1.1 compliant Application Router can be used such as the <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC
-    Application Router from eCharts</ulink></para>
+    Application Router from ECharts</ulink></para>
   </section>
 
   <section>
-    <title>Installation of ECharts Application Router</title>
+    <title>Installation of DFC Application Router</title>
 
     <section>
-      <title>Installing ECharts Application Router in Mobicents Sip Servlets
-      on Tomcat</title>
+      <title>Installing DFC Application Router in Mobicents Sip Servlets on
+      Tomcat</title>
 
       <para>Just drop the dfcar.jar from the ECharts distribution package in
       <literal>TOMCAT_HOME/lib</literal> directory and remove the Mobicents
@@ -2069,8 +2069,8 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
     </section>
 
     <section>
-      <title>Installing ECharts Application Router in Mobicents Sip Servlets
-      on JBoss 4.2.x</title>
+      <title>Installing DFC Application Router in Mobicents Sip Servlets on
+      JBoss 4.2.x</title>
 
       <para>Just drop the dfcar.jar from the ECharts distribution package in
       <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal>
@@ -2079,8 +2079,8 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
     </section>
 
     <section>
-      <title>Installing ECharts Application Router in Mobicents Sip Servlets
-      on JBoss 5.1.x</title>
+      <title>Installing DFC Application Router in Mobicents Sip Servlets on
+      JBoss 5.1.x</title>
 
       <para>Just drop the dfcar.jar from the ECharts distribution package in
       <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/
