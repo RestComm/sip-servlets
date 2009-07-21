@@ -65,7 +65,7 @@
 		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home}" />
+			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P docs" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
@@ -188,7 +188,7 @@
 		<copy file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -P set-svn-revision,jboss-distro,docs -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 				
 		<antcall target="deploy-mgmnt" >
@@ -219,7 +219,7 @@
 		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-5-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
 		</exec>
 		
 		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
@@ -442,8 +442,11 @@
 		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-media-server">
 			<fileset dir="${docs.stage.dir}/media/target/docbook/publish/en-US/" />
 		</copy>
-		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
+		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
 			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
+		</copy-->
+		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
+			<fileset dir="${base.path}/../../sip-servlets-docs/target/docbook/publish/en-US/" />
 		</copy>
 		
 		<!--delete dir="${docs.stage.dir}" /-->
