@@ -1,250 +1,299 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <chapter id="emom-Enterprise-Monitoring-Operations-Management">
   <title>Enterprise Monitoring and Management</title>
-
   <para>Jopr is an enterprise management solution for JBoss middleware
   projects and other application technologies. This pluggable project provides
   administration, monitoring, alerting, operational control and configuration
   in an enterprise setting with fine-grained security and an advanced
-  extension model. </para>
-
+  extension model.</para>
   <para>It provides support for monitoring base operating system information
   on six operating systems as well as management of Apache, JBoss Application
   Server and other related projects. See the jopr website for more information
-  or See the jopr embedded website </para>
-
-
+  or See the jopr embedded website</para>
   <section>
     <title>Mobicents Sip Servlets Monitoring and Management</title>
-  <para>This chapter provides information on how to enable the management of
-  Mobicents Sip Servlets Servers through Jopr with our custom Jopr plugin.
-  Note that 2 versions of Jopr are available. One embedded which is more
-  targeted to dev environment and the full one more targeted for production
-  envrionment.</para>
-
-  <para>With the Mobicents Sip Servlet Jopr plugin, you can currently see
-  metrics related to your deployed applications, metrics related to the SIP
-  Servlets Server and manage the Congestion and Concurrency settings of the
-  SIP Servlets Server. </para>
-
-  <section>
-    <title>Installation</title>
-
+    <para>This chapter provides information on how to enable the management of
+    Mobicents Sip Servlets Servers through Jopr with our custom Jopr plugin.
+    Note that 2 versions of Jopr are available. One embedded which is more
+    targeted to dev environment and the full one more targeted for production
+    envrionment.</para>
+    <para>With the Mobicents Sip Servlet Jopr plugin, you can currently see
+    metrics related to your deployed applications, metrics related to the SIP
+    Servlets Server and manage the Congestion and Concurrency settings of the
+    SIP Servlets Server.</para>
     <section>
-      <title>Jopr for Development</title>
-
-      <para>The Embedded Jopr called also JBoss Administration console is
-      already pre installed as an application deployed in the Mobicents SIP
-      Servlets Server.</para>
+      <title>Installation</title>
+      <section>
+        <title>Jopr for Development</title>
+        <para>The Embedded Jopr called also JBoss Administration console is
+        already pre installed as an application deployed in the Mobicents SIP
+        Servlets Server.</para>
+      </section>
+      <section>
+        <title>Jopr for Production</title>
+        <itemizedlist>
+          <listitem>
+            <para>Follow the <ulink url="http://jboss.org/community/docs/DOC-12828">Jopr installation instructions</ulink> to install the latest version of Jopr</para>
+          </listitem>
+          <listitem>
+            <para>Stop the Jopr server and agent if they are running</para>
+          </listitem>
+          <listitem>
+            <para>Get the Mobicents Sip Servlets Jopr Plugin from here
+            :</para>
+          </listitem>
+          <listitem>
+            <para>Start the Jopr server then the agent</para>
+          </listitem>
+          <listitem>
+            <para>Start your Mobicents Sip Servlets Server on JBoss in making
+            sure that you specify the binding address when starting such
+            <emphasis>sh run.sh -b 192.168.0.10</emphasis> (the Server will
+            not get recognized on localhost)</para>
+          </listitem>
+        </itemizedlist>
+      </section>
     </section>
-
     <section>
-      <title>Jopr for Production</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>Follow the <ulink
-          url="http://jboss.org/community/docs/DOC-12828">Jopr installation
-          instructions</ulink> to install the latest version of Jopr</para>
-        </listitem>
-
-        <listitem>
-          <para>Stop the Jopr server and agent if they are running</para>
-        </listitem>
-
-        <listitem>
-          <para>Get the Mobicents Sip Servlets Jopr Plugin from here : </para>
-        </listitem>
-
-        <listitem>
-          <para>Start the Jopr server then the agent</para>
-        </listitem>
-
-        <listitem>
-          <para>Start your Mobicents Sip Servlets Server on JBoss in making
-          sure that you specify the binding address when starting such
-          <emphasis>sh run.sh -b 192.168.0.10</emphasis> (the Server will not
-          get recognized on localhost) </para>
-        </listitem>
-      </itemizedlist>
-    </section>
-  </section>
-
-  <section>
-    <title>Usage Instructions</title>
-
-    <section>
-      <title>Jopr for Development</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>Log in to the jopr console on <ulink
-          url="http://localhost:8080/admin-console">http://localhost:8080/admin-console</ulink>
-          and login as admin (user=admin, password=admin)</para>
-        </listitem>
-
-        <listitem>
-          <para>From the tree on the left side of the screen, under Services ,
-          click on MobicentsSipServlets link then click on the
-          jboss.web:type=SipApplicationDispatcher link to see the metrics
-          coming in.</para>
-
-          <screenshot>
+      <title>Usage Instructions</title>
+      <section>
+        <title>Jopr for Development</title>
+        <itemizedlist>
+          <listitem>
+            <para>Log in to the jopr console on <ulink url="http://localhost:8080/admin-console">http://localhost:8080/admin-console</ulink>
+            and login as admin (user=admin, password=admin)</para>
+          </listitem>
+          <listitem>
+            <para>From the tree on the left side of the screen, under Services
+            , click on MobicentsSipServlets link then click on the
+            jboss.web:type=SipApplicationDispatcher link to see the metrics
+            coming in.</para>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/mss-embjopr-home.png" width="" />
+                <imagedata fileref="images/mss-embjopr-home.png"/>
+              </imageobject>
+              <caption>SIP Application Dispatcher Metrics</caption>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>To get the metrics coming in and see them on the monitoring
+            application, you will need to use an example application such as
+            location service so that the SIP Servlets Server processes SIP
+            Messages.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-embjopr-metrics.png"/>
+              </imageobject>
+              <caption>Selected Application Metrics</caption>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>To see Metrics about your application, click on your
+            application under Converged SIP/Web Application (SAR/WAR)
+            link.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-applications.png"/>
+              </imageobject>
+              <caption>Specific Application Metrics</caption>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>Then select the Metrics tab to actually see the metrics of
+            your application.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-embjopr-session-metrics.png"/>
+              </imageobject>
+              <caption>Specific Application Metrics Detail</caption>
+            </mediaobject>
+          </listitem>
+        </itemizedlist>
+      </section>
+      <section>
+        <title>Jopr For Production</title>
+        <itemizedlist>
+          <listitem>
+            <para>Log in to the jopr console on <ulink url="http://localhost:7080/" type="">http://localhost:7080</ulink> and
+            from the Dashboard Tab, in the Auto Discovery portlet, import your
+            server (by example deruelle-laptop JBossAS 4.2.3.GA default
+            (192.168.0.12:1099)) from under localhost.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-auto-disc.png"/>
               </imageobject>
             </mediaobject>
-          </screenshot>
-        </listitem>
-
-        <listitem>
-          <para>To get the metrics coming in and see them on the monitoring
-          application, you will need to use an example application such as
-          location service so that the SIP Servlets Server processes SIP
-          Messages.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-embjopr-metrics.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>To see Metrics about your application, click on your
-          application under Converged SIP/Web Application (SAR/WAR)
-          link.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-applications.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>Then select the Metrics tab to actually see the metrics of
-          your application.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-embjopr-session-metrics.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-      </itemizedlist>
-    </section>
-
-    <section>
-      <title>Jopr For Production</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>Log in to the jopr console on <ulink type=""
-          url="http://localhost:7080/">http://localhost:7080</ulink> and from
-          the Dashboard Tab, in the Auto Discovery portlet, import your server
-          (by example deruelle-laptop JBossAS 4.2.3.GA default
-          (192.168.0.12:1099)) from under localhost.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-auto-disc.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>Then from the Dashboard, in the Recently Added Resources
-          portlet, click on the server,</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-resources.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>Then on the new Monitor view click on the JBossWeb Server
-          link</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-monitor.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>Then click on the SipApplicationDispatcher link to see the
-          metrics coming in.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-jboss-web.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>To get the metrics coming in, you will need to use an example
-          application such as location service by example so that the
-          SipApplicationDispatcher process requests.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-metrics.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>To see Metrics about your application, click on the Converged
-          SIP/Web Application (SAR/WAR) link.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-sip-apps.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>Then click on your application.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-applications.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>You will need to click on the Configure link for the Monitor
-          Tab to select the metric data you want to see </para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-configure-metrics.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
-        <listitem>
-          <para>and then select the MetaData tab to actually see the metrics
-          of your application.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-session-metrics.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-      </itemizedlist>
+          </listitem>
+          <listitem>
+            <para>Then from the Dashboard, in the Recently Added Resources
+            portlet, click on the server,</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-resources.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>Then on the new Monitor view click on the JBossWeb Server
+            link</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-monitor.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>Then click on the SipApplicationDispatcher link to see the
+            metrics coming in.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-jboss-web.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>To get the metrics coming in, you will need to use an
+            example application such as location service by example so that
+            the SipApplicationDispatcher process requests.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-metrics.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>To see Metrics about your application, click on the
+            Converged SIP/Web Application (SAR/WAR) link.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-sip-apps.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>Then click on your application.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-applications.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>You will need to click on the Configure link for the Monitor
+            Tab to select the metric data you want to see</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-configure-metrics.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+          <listitem>
+            <para>and then select the MetaData tab to actually see the metrics
+            of your application.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-session-metrics.png"/>
+              </imageobject>
+            </mediaobject>
+          </listitem>
+        </itemizedlist>
+      </section>
     </section>
   </section>
+  <section>
+    <title>SIP Load Balancer Monitoring and Management</title>
+    <para>This documentation provides information on how to enable the
+    management of Mobicents SIP Load Balancer through Jopr with our custom SIP
+    Load Balancer Jopr plugin.</para>
+    <para>With the Mobicents Sip Load Balancer Jopr plugin, you can currently
+    see metrics, configure and manage the Mobicents Sip Load Balancer. </para>
+    <section>
+      <title>Installation</title>
+      <itemizedlist>
+        <listitem>
+          <para>Follow the <ulink url="http://jboss.org/community/docs/DOC-12828">Jopr installation instructions</ulink> to install the latest version of jopr. </para>
+        </listitem>
+        <listitem>
+          <para>Stop the jopr server and agent if they are running</para>
+        </listitem>
+        <listitem>
+          <para>Get the Mobicents Sip Load Balancer Jopr Plugin from jboss
+          maven repo at <ulink url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0.BETA1/sip-balancer-jopr-plugin-1.0.BETA1.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0.BETA1/sip-balancer-jopr-plugin-1.0.BETA1.jar</ulink></para>
+        </listitem>
+        <listitem>
+          <para>Copy the Mobicents Sip Load Balancer Jopr Plugin jar to the
+          jopr-server-2.2.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</para>
+        </listitem>
+        <listitem>
+          <para>Start the jopr server then the agent </para>
+        </listitem>
+        <listitem>
+          <para>Start your Mobicents Sip Load Balancer as explained here (and
+          one node that connect to it to see it appear in the list of
+          nodes).</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+    <section>
+      <title>Usage</title>
+      <itemizedlist>
+        <listitem>
+          <para>Log in to the jopr console on and from the Dashboard Tab, in
+          the Auto Discovery portlet, import your Mobicents SIP Load Balancer
+          (by example Mobicents SIP Load Balancer 1.0-SNAPSHOT) from under
+          localhost.</para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/mss-jopr-lb-dashboard.png"/>
+            </imageobject>
+          </mediaobject>
+        </listitem>
+        <listitem>
+          <para>Then from the Dashboard, in the Recently Added Resources
+          portlet, click on the Mobicents SIP Load Balancer, </para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/mss-jopr-lb-dash-added.png"/>
+            </imageobject>
+          </mediaobject>
+        </listitem>
+        <listitem>
+          <para>Then on the new Monitor view click on the
+          mobicents:name=LoadBalancer,type=LoadBalancer link</para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/mss-jopr-lb-monitor.png"/>
+            </imageobject>
+          </mediaobject>
+        </listitem>
+        <listitem>
+          <para>You can now see the metrics coming in </para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/mss-jopr-lb-metrics.png"/>
+            </imageobject>
+          </mediaobject>
+        </listitem>
+        <listitem>
+          <para>To configure the Load Balancer and see the list of nodes in
+          the cluster it is connected to, click on the Configure Tab.</para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/mss-jopr-lb-config.png"/>
+            </imageobject>
+          </mediaobject>
+        </listitem>
+        <listitem>
+          <para>To start and stop the Load Balancer, click on the Operations
+          Tab.</para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/mss-jopr-lb-ops.png"/>
+            </imageobject>
+          </mediaobject>
+        </listitem>
+      </itemizedlist>
+    </section>
   </section>
 </chapter>

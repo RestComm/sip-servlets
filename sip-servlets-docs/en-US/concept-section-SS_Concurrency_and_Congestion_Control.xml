@@ -1,34 +1,40 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <!-- chapter id nickname: sscacc -->
 <section id="sscacc-MSS_Concurrency_and_Congestion_Control">
-  <title>MSS Concurrency and Congestion Control</title>
-  <para>Concurrency control and congestion control refer to settings you can
-  tune that define the way in which messages are processed under heavy load.
-  Needless to say, such configurable settings become highly-important in
-  production environments. Tuning the concurrency control mode changes the way
-  in which the SIP Servlets Server processes messages. Tuning the congestion
-  control parameter means increasing or decreasing the point at which the
-  server begins rejecting new requests. Both of these parameters can be set in
-  one of four different ways: through the SIP Servlets Management Console; by
-  editing the server&apos;s <filename>server.xml</filename> configuration file;
-  from the <literal>dispatcher</literal> MBean; or from the Embedded Jopr
-  integrated management platform.</para>
+  <title>Concurrency and Congestion Control</title>
+
+  <para>Concurrency and Congestion control refer to settings you can tune that
+  define the way in which messages are processed under heavy load. Needless to
+  say, such configurable settings become highly-important in production
+  environments. Tuning the concurrency control mode changes the way in which
+  the SIP Servlets Server processes messages. Tuning the congestion control
+  parameter means increasing or decreasing the point at which the server
+  begins rejecting new requests. Both of these parameters can be set in one of
+  four different ways: through the SIP Servlets Management Console; by editing
+  the server's <filename>server.xml</filename> configuration file; from the
+  <literal>dispatcher</literal> MBean; or from the Embedded Jopr integrated
+  management platform.</para>
+
   <formalpara>
     <title>Concurrency Control</title>
+
     <para>Although the JSR 289 expert group could not agree on a concurrency
     control mechanism for JSR 289, leaving the details up to individual
     implementors, we believe that concurrency control as implemented in the
     Mobicents SIP Servlets Servers provides a highly-useful feature necessary
-    in production environments. Concurrency control is implemented in both MSS
-    for JBoss and MSS for Tomcat as a configurable mode which defines the way
-    in which the SIP Servlets Server processes messages. There are a total of
-    three different modes to choose from, based upon the individual
-    requirements of your setup:</para>
+    in production environments. Concurrency control is implemented in both
+    Mobicents Sip Servlets for JBoss and Mobicents Sip Servlets for Tomcat as
+    a configurable mode which defines the way in which the SIP Servlets Server
+    processes messages. There are a total of three different modes to choose
+    from, based upon the individual requirements of your setup:</para>
   </formalpara>
+
   <variablelist>
     <varlistentry>
       <term>None</term>
+
       <listitem>
         <para>All SIP messages are processed as soon as possible in a thread
         from the global thread pool. Note that when using the
@@ -39,8 +45,10 @@
         thread-safe manner.</para>
       </listitem>
     </varlistentry>
+
     <varlistentry>
       <term>SipSession</term>
+
       <listitem>
         <para>SIP messages are processed as soon as possible except that two
         messages from the same <literal>SipSession</literal> are guaranteed
@@ -56,8 +64,10 @@
         same <literal>SipApplicationSession</literal>.</para>
       </listitem>
     </varlistentry>
+
     <varlistentry>
       <term>SipApplicationSession</term>
+
       <listitem>
         <para>SIP messages are processed as soon as possible with the
         guarantee that no two messages from the same
@@ -72,11 +82,14 @@
       </listitem>
     </varlistentry>
   </variablelist>
+
   <formalpara>
     <title>Congestion Control</title>
+
     <para>Mobicents Sip Servlets currently defines two different congestion
     control mechanisms :</para>
   </formalpara>
+
   <itemizedlist>
     <listitem>
       <para>All SIP messages which cannot be processed immediately are put
@@ -89,6 +102,7 @@
       messages depending of the congestion control policy chosen until the
       queue is once again diminished.</para>
     </listitem>
+
     <listitem>
       <para>If the percentage of memory currently used by the container goes
       over a configurable threshold (90% per default), the container will
@@ -98,84 +112,108 @@
       by the container goes back below the threshold.</para>
     </listitem>
   </itemizedlist>
+
   <para>Note that either situation, only new SIP requests are rejected; SIP
   responses which arrive in the milieu of a full queue are appropriately
   stored and are processed eventually.</para>
+
   <para>A background task is running at regular intervals within Mobicents Sip
   Servlets to gather information about the current server congestion and the
   interval can be adjusted in the configuration. This background task can be
   stopped and congestion control deactivated by setting the interval to 0 or a
   negative value.</para>
+
   <para>Also the congestion control policy, what to do with an incoming
   message when the server is overloaded, is configurable and the possible
   values are :</para>
+
   <itemizedlist>
     <listitem>
       <para>DropMessage - drop any incoming message</para>
     </listitem>
+
     <listitem>
       <para>ErrorResponse - send a 503 - Service Unavailable response to any
       incoming request (Default).</para>
     </listitem>
   </itemizedlist>
+
   <formalpara id="sscacc-Configuring_the_Concurrency_and_Congestion_Control_Settings">
     <title>Configuring the Concurrency and Congestion Control Settings</title>
+
     <para>The concurrency and congestion control settings can be configured
-    through the SIP Servlets Management Console, by editing the server&apos;s
+    through the SIP Servlets Management Console, by editing the server's
     <filename>server.xml</filename> configuration file, from the
     <literal>dispatcher</literal> MBean, or from the Embedded Jopr integrated
     management platform. Instructions for each method are given below.</para>
   </formalpara>
+
   <variablelist>
     <varlistentry>
       <term>Tuning Parameters with the SIP Servlets Management Console</term>
+
       <listitem>
-        <para>The easiest way to configure the <guilabel>SIP Message Queue Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel>
-        tunable parameters is to open the <literal>SIP Servlets Management Console</literal> in your browser (by going to <ulink url="http://localhost:8080/sip-servlets-management"/>), making
+        <para>The easiest way to configure the <guilabel>SIP Message Queue
+        Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel>
+        tunable parameters is to open the <literal>SIP Servlets Management
+        Console</literal> in your browser (by going to <ulink
+        url="http://localhost:8080/sip-servlets-management"></ulink>), making
         your changes, and then <guibutton>Apply</guibutton>ing them. Note that
         configuring the settings in the SIP Servlets Management Console does
         not persist across reboots. To make your settings changes permanent,
-        you should edit your server&apos;s <filename>server.xml</filename>
+        you should edit your server's <filename>server.xml</filename>
         configuration file; instructions for doing so follow.</para>
+
         <mediaobject id="sscacc-sas-MSSSManagementConsole-ss-ServerSettings-1">
           <imageobject>
-            <imagedata width="440" align="center" fileref="images/mss-MSSSManagementConsole-ss-ServerSettings.png" format="PNG"/>
+            <imagedata align="center"
+                       fileref="images/mss-MSSSManagementConsole-ss-ServerSettings.png"
+                       format="PNG" width="440" />
           </imageobject>
-          <caption>
-            <para>Tuning the concurrency and congestion control
-          settings in the SIP Servlets Management Console</para>
-          </caption>
+
+          <caption><para>Tuning the concurrency and congestion control
+          settings in the SIP Servlets Management Console</para></caption>
         </mediaobject>
       </listitem>
     </varlistentry>
+
     <varlistentry>
-      <term>Tuning Parameters Permanently by Editing <filename>server.xml</filename></term>
+      <term>Tuning Parameters Permanently by Editing
+      <filename>server.xml</filename></term>
+
       <listitem>
-        <para>Alternatively, you can edit your server&apos;s
+        <para>Alternatively, you can edit your server's
         <filename>server.xml</filename> configuration file, which has the
         benefit of making your chosen settings changes permanent. Instructions
         follow, grouped by the SIP Servlets Server you are running:</para>
+
         <procedure>
-          <title>Tuning MSS for JBoss Server Settings for Concurrency and Congestion Control</title>
+          <title>Tuning Mobicents Sip Servlets for JBoss Server Settings for
+          Concurrency and Congestion Control</title>
+
           <step>
             <para>Open the
             <filename><envar>$JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename>
             configuration file in a text editor.</para>
           </step>
+
           <step>
             <para>Find the <literal>Service</literal> element and add a
             <literal>concurrencyControlMode</literal> and/or a
             <literal>sipMessageQueueSize</literal> attribute to it.</para>
+
             <para>The default value of the
             <literal>sipMessageQueueSize</literal> attribute is
             <replaceable>1500</replaceable>, of the congestion control
-            checking interval is <emphasis>30000 millisecs (3O seconds)</emphasis>, of the default memory threshold is
+            checking interval is <emphasis>30000 millisecs (3O
+            seconds)</emphasis>, of the default memory threshold is
             <emphasis>90%</emphasis> and the congestion control policy is
             <emphasis>ErrorResponse</emphasis>. Those are the default values
             which are used even if the attribute is not present in
             <filename>server.xml</filename>. You will need to play around with
             this setting for the optimal value, which depends on the hardware
             running your SIP Servlets Server.</para>
+
             <para>Possible values for the
             <literal>concurrencyControlMode</literal> attribute include:
             <replaceable>None</replaceable>,
@@ -184,42 +222,52 @@
             <replaceable>SipSession</replaceable> is the value of this
             attribute when it is not present—and overridden—in
             <filename>server.xml</filename>.</para>
+
             <example id="sscacc-MSSJ-Permanently_Changing_Tunable_Parameters_by_Editing_server.xml">
-              <title>Permanently Changing Tunable Parameters by Editing JBoss&apos;s server.xml</title>
+              <title>Permanently Changing Tunable Parameters by Editing
+              JBoss's server.xml</title>
+
               <programlisting role="XML">&lt;Service
- name=&quot;jboss.web&quot;
- className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
- sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
- concurrencyControlMode=&quot;SipApplicationSession&quot;
- sipMessageQueueSize=&quot;1600&quot;
- congestionControlCheckingInterval=&quot;2000&quot;
- congestionControlPolicy=&quot;DropMessage&quot;
- memoryThreshold=&quot;80&quot;&gt;</programlisting>
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+ concurrencyControlMode="SipApplicationSession"
+ sipMessageQueueSize="1600"
+ congestionControlCheckingInterval="2000"
+ congestionControlPolicy="DropMessage"
+ memoryThreshold="80"&gt;</programlisting>
             </example>
           </step>
         </procedure>
+
         <procedure>
-          <title>Tuning MSS for Tomcat Server Settings for Concurrency and Congestion Control</title>
+          <title>Tuning Mobicents Sip Servlets for Tomcat Server Settings for
+          Concurrency and Congestion Control</title>
+
           <step>
             <para>Open the
             <filename><envar>$CATALINA_HOME</envar>/conf/server.xml</filename>
             configuration file in your text editor.</para>
           </step>
+
           <step>
             <para>Find the <literal>Service</literal> element and add a
             <literal>concurrencyControlMode</literal> and/or a
             <literal>sipMessageQueueSize</literal> attribute to it.</para>
+
             <para>The default value of the
             <literal>sipMessageQueueSize</literal> attribute is
             <replaceable>1500</replaceable>, of the congestion control
-            checking interval is <emphasis>30000 millisecs (3O seconds)</emphasis>, of the default memory threshold is
+            checking interval is <emphasis>30000 millisecs (3O
+            seconds)</emphasis>, of the default memory threshold is
             <emphasis>90%</emphasis> and the congestion control policy is
             <emphasis>ErrorResponse</emphasis>. Those are the default values
             which are used even if the attribute is not present in
             <filename>server.xml</filename>. You will need to play around with
             this setting for the optimal value, which depends on the hardware
             running your SIP Servlets Server.</para>
+
             <para>Possible values for the
             <literal>concurrencyControlMode</literal> attribute include:
             <replaceable>None</replaceable>,
@@ -228,44 +276,53 @@
             <replaceable>SipSession</replaceable> is the value of this
             attribute if when it is not present and overridden in
             <filename>server.xml</filename>.</para>
+
             <example id="sscacc-MSST-Permanently_Changing_Tunable_Parameters_by_Editing_server.xml">
-              <title>Permanently Changing Tunable Parameters by Editing Tomcat&apos;s server.xml</title>
+              <title>Permanently Changing Tunable Parameters by Editing
+              Tomcat's server.xml</title>
+
               <programlisting linenumbering="unnumbered" role="XML">&lt;Service
- name=&quot;jboss.web&quot;
- className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
- sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
- concurrencyControlMode=&quot;SipApplicationSession&quot;
- sipMessageQueueSize=&quot;1600&quot;
- congestionControlCheckingInterval=&quot;2000&quot;
- congestionControlPolicy=&quot;DropMessage&quot;
- memoryThreshold=&quot;80&quot;&gt;</programlisting>
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+ concurrencyControlMode="SipApplicationSession"
+ sipMessageQueueSize="1600"
+ congestionControlCheckingInterval="2000"
+ congestionControlPolicy="DropMessage"
+ memoryThreshold="80"&gt;</programlisting>
             </example>
           </step>
         </procedure>
       </listitem>
     </varlistentry>
+
     <varlistentry>
       <term>Tuning Parameters from the dispatcher MBean</term>
+
       <listitem>
         <para>You can navigate to the <literal>dispatcher</literal> MBean from
-        MSS for JBoss&apos;s JMX console. All changes performed at run time are
-        effective immediately, but are not persisted across reboots (which, if
-        you want to happen, would require editing your server&apos;s
-        <filename>server.xml</filename> configuration file as well, or
-        instead).</para>
-        <para>When editing the <literal>dispatcher</literal> MBean from MSS
-        for JBoss&apos;s JMX console, values allowed for the concurrency control
-        mode are <userinput>None</userinput>,
+        Mobicents Sip Servlets for JBoss's JMX console. All changes performed
+        at run time are effective immediately, but are not persisted across
+        reboots (which, if you want to happen, would require editing your
+        server's <filename>server.xml</filename> configuration file as well,
+        or instead).</para>
+
+        <para>When editing the <literal>dispatcher</literal> MBean from
+        Mobicents Sip Servlets for JBoss's JMX console, values allowed for the
+        concurrency control mode are <userinput>None</userinput>,
         <userinput>SipSession</userinput> or
         <userinput>SipApplicationSession</userinput>.</para>
       </listitem>
     </varlistentry>
+
     <varlistentry>
       <term>Tuning Parameters from Embedded Jopr</term>
+
       <listitem>
         <para>Finally, once you have installed Embedded Jopr, you can change
-        the tunable parameters by pointing your browser at <ulink url="http://localhost:8080/embedded-jopr"/>.</para>
+        the tunable parameters by pointing your browser at <ulink
+        url="http://localhost:8080/embedded-jopr"></ulink>.</para>
       </listitem>
     </varlistentry>
   </variablelist>
