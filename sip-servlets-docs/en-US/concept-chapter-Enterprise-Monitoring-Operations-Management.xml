@@ -79,7 +79,7 @@
     <section>
       <title>Usage Instructions</title>
 
-      <section>
+      <section id="emom-Embedded-Jopr">
         <title>Jopr for Development</title>
 
         <itemizedlist>
@@ -101,6 +101,30 @@
               </imageobject>
 
               <caption>SIP Application Dispatcher Metrics</caption>
+            </mediaobject>
+          </listitem>
+
+	  <listitem>
+            <para>Click on the Configuration Tab to be able to tune the Congestion Controls parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-embjopr-config.png" />
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control Parameters Configuration</caption>
+            </mediaobject>
+          </listitem>
+
+	  <listitem>
+            <para>Click on the Control Tab to be able to set the Concurrency Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-embjopr-control.png" />
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control Parameters Configuration</caption>
             </mediaobject>
           </listitem>
 
@@ -148,7 +172,7 @@
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="emom-Jopr4Production">
         <title>Jopr For Production</title>
 
         <itemizedlist>

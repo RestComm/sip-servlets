@@ -1782,7 +1782,7 @@ ipAddress="127.0.0.1"
     Appendix C.</para>
 
     <section id="tsdar-DAR-Configuration-File">
-      <title>the DAR Configuration file</title>
+      <title>the DAR Configuration File</title>
 
       <para>The Default Application Router (DAR) works off a simple
       configuration text file which is modeled as a Java properties file. It
@@ -1873,8 +1873,8 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
         </listitem>
 
         <listitem>
-          <para>A string representing in which orders the applications should
-          be invoked (starts at 0). This will be removed later on and the
+          <para>A string representing in which orders the applications must be
+          invoked (starts at 0). This will be removed later on and the
           position of sip-router-info data will be the order</para>
         </listitem>
       </itemizedlist>
@@ -1896,7 +1896,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
     </section>
 
     <section>
-      <title>Routing of SIP Messages to applications</title>
+      <title>Routing of SIP Messages to Applications</title>
 
       <section>
         <title>Initial Requests and Application Selection Process</title>
@@ -2013,7 +2013,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
   </section>
 
   <section id="tsdar-Limitations">
-    <title>Limitations</title>
+    <title>Limitations of the Default Application Router</title>
 
     <para>It is not possible to filter out the requests based on the incoming
     request headers to target specific applications. By example, to select an
@@ -2037,33 +2037,48 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
   </section>
 </section>
   <section id="tsear-echarts-Application-Router">
-  <title>eCharts Application Router</title>
+  <title>ECharts Application Router</title>
+
   <para> </para>
+
   <section>
-    <title>Description</title>
+    <title>Description of ECharts Application Router</title>
+
     <para>Instead of using our Mobicents Default Application Router, any SIP
-    Servlets 1.1 compliant Application Router can be used such as the <ulink url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1" type="">DFC Application Router from eCharts</ulink> </para>
+    Servlets 1.1 compliant Application Router can be used such as the <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC
+    Application Router from eCharts</ulink></para>
   </section>
+
   <section>
-    <title>Installation</title>
+    <title>Installation of ECharts Application Router</title>
+
     <section>
-      <title>Tomcat</title>
+      <title>Installing ECharts Application Router in Mobicents Sip Servlets
+      on Tomcat</title>
+
       <para>Just drop the dfcar.jar from the ECharts distribution package in
       <literal>TOMCAT_HOME/lib</literal> directory and remove the Mobicents
       Default Application Router located in
       <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal></para>
     </section>
+
     <section>
-      <title>JBoss 4.2.x</title>
+      <title>Installing ECharts Application Router in Mobicents Sip Servlets
+      on JBoss 4.2.x</title>
+
       <para>Just drop the dfcar.jar from the ECharts distribution package in
       <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal>
       directory and remove the Mobicents Default Application Router located in
       <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal></para>
     </section>
+
     <section>
-      <title>JBoss 5.1.x</title>
+      <title>Installing ECharts Application Router in Mobicents Sip Servlets
+      on JBoss 5.1.x</title>
+
       <para>Just drop the dfcar.jar from the ECharts distribution package in
-      <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory and remove Mobicents Default Application Router
+      <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/
+      </literal>directory and remove Mobicents Default Application Router
       located in
       <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal></para>
     </section>
@@ -4099,7 +4114,8 @@ useStaticAddress="true"/&gt;
     SIP Servlets Server.</para>
 
     <section>
-      <title>Installation</title>
+      <title>Installation of the Enterprise Monitoring and Management
+      Console</title>
 
       <section>
         <title>Jopr for Development</title>
@@ -4144,7 +4160,7 @@ useStaticAddress="true"/&gt;
     <section>
       <title>Usage Instructions</title>
 
-      <section>
+      <section id="emom-Embedded-Jopr">
         <title>Jopr for Development</title>
 
         <itemizedlist>
@@ -4165,6 +4181,30 @@ useStaticAddress="true"/&gt;
               </imageobject>
 
               <caption>SIP Application Dispatcher Metrics</caption>
+            </mediaobject>
+          </listitem>
+
+	  <listitem>
+            <para>Click on the Configuration Tab to be able to tune the Congestion Controls parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-embjopr-config.png"/>
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control Parameters Configuration</caption>
+            </mediaobject>
+          </listitem>
+
+	  <listitem>
+            <para>Click on the Control Tab to be able to set the Concurrency Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-embjopr-control.png"/>
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control Parameters Configuration</caption>
             </mediaobject>
           </listitem>
 
@@ -4212,7 +4252,7 @@ useStaticAddress="true"/&gt;
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="emom-Jopr4Production">
         <title>Jopr For Production</title>
 
         <itemizedlist>
@@ -4332,7 +4372,8 @@ useStaticAddress="true"/&gt;
     see metrics, configure and manage the Mobicents Sip Load Balancer.</para>
 
     <section>
-      <title>Installation</title>
+      <title>Installation of the Enterprise Monitoring and Management
+      Console</title>
 
       <itemizedlist>
         <listitem>
@@ -4367,7 +4408,7 @@ useStaticAddress="true"/&gt;
     </section>
 
     <section>
-      <title>Usage</title>
+      <title>Usage Instructions</title>
 
       <itemizedlist>
         <listitem>
@@ -4457,20 +4498,20 @@ Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclus
   ways.</para>
 
   <section>
-    <title>JSR 309 : Media Server Control API </title>
+    <title>JSR 309 : Media Server Control API</title>
 
     <para>This Specification is a protocol agnostic API for Media Server
     Control. It provides a portable interface to create media rich
     applications with IVR, Conferencing, Speech Recognition, and similar
-    features. </para>
+    features.</para>
 
     <para>Mobicents Media Server provides an implementation of the JSR 309
     specification (currently in public review) using the MGCP protocol to
     allow controlling any Media Server (located in the same Virtual Machine or
     on a remote server) supporting MGCP.</para>
 
-    <para>It is better demonstrated in the JSR 309 example application
-    provided with Mobicents Sip Servlets</para>
+    <para>It is better demonstrated in the <ulink url="http://www.mobicents.org/mss-jsr309-demo.html">JSR 309 example
+    application</ulink> provided with Mobicents Sip Servlets on JBoss 5</para>
   </section>
 
   <section>
@@ -4489,14 +4530,16 @@ Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclus
 
     <itemizedlist>
       <listitem>
-        <para>Media Example : a Sip Servlet application showing how to use
-        media capabilities (Media playback, Text to Speech with FreeTTS and
-        DTMF detection). </para>
+        <para><ulink url="http://www.mobicents.org/media-demo.html">Media
+        Example</ulink> : a Sip Servlet application showing how to use media
+        capabilities (Media playback, Text to Speech with FreeTTS and DTMF
+        detection).</para>
       </listitem>
 
       <listitem>
-        <para>Shopping Example : a Converged JEE Application showing SEAM
-        integration, JEE, Media integration with TTS and DTMF support. </para>
+        <para><ulink url="http://www.mobicents.org/shopping-demo.html">Shopping
+        Example</ulink> : a Converged JEE Application showing SEAM
+        integration, JEE, Media integration with TTS and DTMF support.</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -4813,11 +4856,12 @@ Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclus
     </varlistentry>
 
     <varlistentry>
-      <term>Tuning Parameters from Embedded Jopr</term>
+      <term>Tuning Parameters from Enterprise Monitoring and Managent
+      Console</term>
 
       <listitem>
-        <para>Finally, once you have installed Embedded Jopr, you can change
-        the tunable parameters by pointing your browser at <ulink url="http://localhost:8080/embedded-jopr"/>.</para>
+        <para>Finally, once you have installed the <xref linkend="emom-Enterprise-Monitoring-Operations-Management"/>, you can
+        change the tunable parameters, check <xref linkend="emom-Embedded-Jopr"/> or <xref linkend="emom-Jopr4Production"/></para>
       </listitem>
     </varlistentry>
   </variablelist>
@@ -5243,11 +5287,11 @@ admin=caller,role1,role2,..
     </table>
   </section>
   <section id="jruby-telco-integration">
-  <title>JRuby/Rails Integration with Torquebox Telco Framework</title>
+  <title>JRuby/Rails Integration With Torquebox Telco Framework</title>
 
   <para>Mobicents Sip Servlets is now featuring, through the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework, JRuby on
   Rails integration so that you create powerful pure or converged VoIP JRuby
-  on Rails applications. </para>
+  on Rails applications.</para>
 
   <para>The pros of using JRuby is that you can use a powerful and well
   deployed scripting language that allow you to modify your application at
@@ -5256,7 +5300,7 @@ admin=caller,role1,role2,..
   productivity. In addition, TorqueBox is a new kind of Ruby application
   platform that integrates popular technologies such as Ruby-on-Rails, while
   extending the footprint of Ruby applications to include support for Job
-  Scheduling, Task Queues, SOAP Handling, ... </para>
+  Scheduling, Task Queues, SOAP Handling, ...</para>
 
   <para>To get more information on how to build pure JRuby-Rails applications
   leveraging Mobicents Sip Servlets to handle SIP and Media please checkout
@@ -5265,8 +5309,8 @@ admin=caller,role1,role2,..
 
   <para>Check this <ulink url="http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html">blog
   post</ulink> to help you create your first pure Torquebox JRuby Telco
-  application and our pure JRuby on Rails Telco example showcasing this
-  integration.</para>
+  application and our <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">pure JRuby on Rails
+  TorqueBox Telco example</ulink> showcasing this integration.</para>
 </section>
   <section id="ss_jslee_interop">
   <title>Sip Servlets - JAIN SLEE Interoperability</title>
@@ -5302,8 +5346,8 @@ admin=caller,role1,role2,..
   approaches we have identified to achieve the goal of interoperability
   between Sip Servlets and JSLEE.</para>
 
-  <para>You can also use our working JSLEE/SIP Servlets interoperability
-  example showcasing our approach.</para>
+  <para>You can also use our <ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP
+  Servlets interoperability example</ulink> showcasing our approach.</para>
 </section>
   <section>
     <title>Eclipse IDE Tools</title>
@@ -5339,7 +5383,7 @@ admin=caller,role1,role2,..
     <title>Mobicents Sip Servlets Performance Tips</title>
 
     <section>
-      <title>JBoss</title>
+      <title>Tuning JBoss</title>
 
       <para>You can look at the following wiki page: <ulink url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBossASTuning</ulink>.
       Most of the things there don't apply, but it's always good to have a
@@ -5349,7 +5393,7 @@ admin=caller,role1,role2,..
     </section>
 
     <section>
-      <title>Mobicents Sip Servlets</title>
+      <title>Tuning Mobicents Sip Servlets</title>
 
       <itemizedlist>
         <listitem>
@@ -5368,7 +5412,7 @@ admin=caller,role1,role2,..
     </section>
 
     <section>
-      <title>JAIN SIP Stack</title>
+      <title>Tuning The JAIN SIP Stack</title>
 
       <para>You can fine tune the properties of the Stack. You will find the
       sip stack properties defined in an external properties file
@@ -5414,7 +5458,7 @@ admin=caller,role1,role2,..
     </section>
 
     <section>
-      <title>JVM</title>
+      <title>Tuning The JVM</title>
 
       <para>These notes depend on the JVM used, but should be pretty much
       standard. These where written with Sun JDK 1.6 in mind, but should apply
@@ -5449,7 +5493,7 @@ admin=caller,role1,role2,..
     </section>
 
     <section>
-      <title>Operating System</title>
+      <title>Tuning The Operating System</title>
 
       <para>These notes are for RHEL, but should apply to other versions of
       Unix.</para>
@@ -5559,7 +5603,7 @@ admin=caller,role1,role2,..
     </section>
 
     <section>
-      <title>Other approaches</title>
+      <title>Other Approaches</title>
 
       <para>Other approaches include using proxy/media that can act as
       gateways, Session Border Controllers, enhanced Firewall with Application

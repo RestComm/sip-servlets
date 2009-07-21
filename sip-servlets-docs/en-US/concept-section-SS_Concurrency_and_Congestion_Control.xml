@@ -321,10 +321,9 @@
       Console</term>
 
       <listitem>
-        <para>Finally, once you have installed the <xref
+        <para>Finally, once you have installed the Enterprise Monitoring and Managenemt console as described in <xref
         linkend="emom-Enterprise-Monitoring-Operations-Management" />, you can
-        change the tunable parameters by pointing your browser at <ulink
-        url="http://localhost:8080/embedded-jopr"></ulink>.</para>
+        change the tunable parameters, follow instructions given in <xref linkend="emom-Embedded-Jopr"/> or <xref linkend="emom-Jopr4Production"/></para>
       </listitem>
     </varlistentry>
   </variablelist>
