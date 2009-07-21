@@ -13,7 +13,7 @@
     <note id="sfss-The_Location_Service_Mappings_Cannot_Currently_Be_Configured">
       <title>The Location Service Mappings Cannot Currently Be Configured</title>
       <para>The Location Service currently performs a lookup on a hard-coded
-      list of addresses. This model is evolving towards the eventual use of a
+      list of addresses. This model is evolving toward the eventual use of a
       database.</para>
     </note>
     <para>Regardless of whether you are using the JBoss Application Server or
@@ -39,7 +39,7 @@
       </listitem>
       <listitem>
         <para>One of the destinations returns a <literal>200 OK</literal>
-        status code; the second proxy is then cancelled.</para>
+        status code; the second proxy is then canceled.</para>
       </listitem>
       <listitem>
         <para>The <literal>200 OK</literal> is forwarded to Alice, and call
@@ -62,7 +62,7 @@
       <para>&#160;</para>
       <formalpara id="sfss-binary-Location_Service-Pre-Install_Requirements_and_Prerequisites">
         <title>Pre-Install Requirements and Prerequisites</title>
-        <para>&#160;</para>
+        <para>The following requirements must be met before installation can begin.</para>
       </formalpara>
 <!-- <variablelist
    id="sfss-binary-Location_Service-Hardware_Requirements">
@@ -203,7 +203,7 @@
       <procedure>
         <title/>
         <step>
-          <para>Start two SIP softphones. The first phone should be set up as
+          <para>Start two SIP soft-phones. The first phone should be set up as
           <userinput>sip:receiver@sip-servlets.com</userinput> at IP address
           <userinput>127.0.0.1</userinput> on port
           <userinput>5090</userinput>. The second phone can be set up in any
@@ -224,10 +224,10 @@
   </formalpara>-->      <formalpara id="sfss-binary-Location_Service-Stopping">
         <title>Stopping</title>
         <para>To learn how to stop the SIP Servlets-enabled JBoss Application
-        Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
+        Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
       </formalpara>
       <para>To learn how to stop the SIP Servlets-enabled Tomcat Container,
-      refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
+      refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
       <formalpara id="sfss-binary-Location_Service-Uninstalling">
         <title>Uninstalling</title>
         <para>Unless disk space is at a premium, there is usually no need to
@@ -296,7 +296,7 @@
       JBoss AS. Detailed instructions follow.</para>
       <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Pre-Install_Requirements_and_Prerequisites">
         <title>Pre-Install Requirements and Prerequisites</title>
-        <para>&#160;</para>
+        <para>The following requirements must be met before installation can begin.</para>
       </formalpara>
 <!-- <variablelist
    id="sfss-binary-Diameter_Event-Changing_Service-Hardware_Requirements">
@@ -315,17 +315,12 @@
             <para>Before proceeding, you should follow the instructions for
             installing, configuring, running and testing MSS for JBoss from
             the binary distribution.</para>
-            <itemizedlist>
-              <listitem>
-                <para><xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/></para>
-              </listitem>
-            </itemizedlist>
           </listitem>
         </varlistentry>
       </variablelist>
       <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Downloading">
         <title>Downloading</title>
-        <para>&#160;</para>
+        <para>The following procedure describes how to download the required files.</para>
       </formalpara>
       <procedure>
         <step>
@@ -335,9 +330,9 @@
           <filename>diameter-event-charging-1.0.war</filename>, from <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/diameter-event-charging/1.0/"/>.</para>
         </step>
         <step>
-          <para>Secondly, download the corresponding Disk ARchive
+          <para>Secondly, download the corresponding Disk Archive
           (<acronym>DAR</acronym>) configuration file here:
-          <filename/>, from <ulink url="http://www.mobicents.org/diametereventcharging-dar.properties"/>.</para>
+           <ulink url="http://www.mobicents.org/diametereventcharging-dar.properties"/>.</para>
         </step>
         <step>
           <para>Finally, you will need to download the Ericsson Charging
@@ -346,7 +341,7 @@
       </procedure>
       <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Installing">
         <title>Installing</title>
-        <para>&#160;</para>
+        <para>The following procedure describes how to install the downloaded files.</para>
       </formalpara>
       <procedure>
         <step>
@@ -354,8 +349,8 @@
           WAR archive into the
           <filename>jboss_home/server/&lt;profile&gt;/deploy</filename>
           directory, where <filename>&lt;deploy&gt;</filename> is your
-          Configuration Profile, whether <quote>default</quote> or
-          <quote>all</quote> (the latter if you are using MSS for JBoss&apos;s
+          Configuration Profile, whether &quot;default&quot; or
+          &quot;all&quot; (the latter if you are using MSS for JBoss&apos;s
           clustering capabilities).</para>
         </step>
         <step>
@@ -387,10 +382,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         directory, and edit the value of the
         <literal>darConfigurationFileLocation</literal> attribute of the
         <literal>Service</literal> element so that it is
-        <quote>
-            <literal>conf/dars/mobicents-dar.properties</literal>
-          </quote>.
-        For example:</para>
+        <literal>conf/dars/mobicents-dar.properties</literal>.</para>
       </formalpara>
       <example id="sfss-Editing_the_darConfigurationFileLocation_Attribute_of_the_Service_Tag">
         <title>Editing the <literal>darConfigurationFileLocation</literal> Attribute of the Service Tag</title>
@@ -407,7 +399,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       </example>
 <!--<para>Your server is now set up to run the Event-Changing example.</para>-->      <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Running">
         <title>Running</title>
-        <para>&#160;</para>
+        <para>The following procedure describes how to run the Diameter Event-Changing Service.</para>
       </formalpara>
       <procedure id="sfss-Diameter_Event-Changing_Service">
         <title>Diameter Event-Changing Service</title>
@@ -434,7 +426,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <note id="sfss-SIP_SoftPhone_Which">
         <title>SIP (Soft)Phone? Which?</title>
         <para>The Mobicents team recommends one of the following SIP phones,
-        and has found that they work well: the 3CX Phone, teh SJ Phone or the
+        and has found that they work well: the 3CX Phone, the SJ Phone or the
         WengoPhone.</para>
       </note>
       <procedure id="sfss-Using_the_Diameter_Event-Changing_Service">
@@ -442,15 +434,18 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <step>
           <title>Configure the Ericsson SDK Charging Emulator</title>
           <para>Once you have started the Charging Emulator, you should
-          configure it exactly as portrayed in the screenshot.</para>
-          <mediaobject id="sfss-mss-DiameterEventChanging-ss-ChargingEmulatorConfig">
-            <imageobject>
-              <imagedata width="440" align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingEmulatorConfig.png" format="PNG"/>
-            </imageobject>
-            <caption>
-              <para>Configuring the Charging Emulator</para>
-            </caption>
-          </mediaobject>
+          configure it exactly as portrayed in <xref linkend="figure-mss-ChargingEmulatorConfig"/>.</para>
+          <figure id="figure-mss-ChargingEmulatorConfig">
+            <title>Configuring the Charging Emulator</title>
+            <mediaobject id="sfss-mss-DiameterEventChanging-ss-ChargingEmulatorConfig">
+              <imageobject>
+                <imagedata width="440" align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingEmulatorConfig.png" format="PNG"/>
+              </imageobject>
+              <caption>
+                <para>Configuring the Charging Emulator</para>
+              </caption>
+            </mediaobject>
+          </figure>
           <orderedlist>
             <listitem>
               <para>Set the <literal>Peer Id</literal> to:
@@ -559,7 +554,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <para>&#160;</para>
       <formalpara id="sfss-binary-Call-Blocking_Service-Pre-Install_Requirements_and_Prerequisites">
         <title>Pre-Install Requirements and Prerequisites</title>
-        <para>&#160;</para>
+        <para>The following requirements must be met before installation can begin.</para>
       </formalpara>
 <!-- <variablelist
    id="sfss-binary-Call-Blocking_Service-Hardware_Requirements">
@@ -599,7 +594,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <para>Both the <filename>call-blocking-1.1.war</filename> WAR file and
         the <filename>call-blocking-servlet-dar.properties</filename> DAR file
         that you downloaded should be placed into different directories in
-        your SIP Servlet Server installation hierachy. Which directory depends
+        your SIP Servlet Server installation hierarchy. Which directory depends
         on whether you are using the Call-Blocking Service with MSS for JBoss
         or with MSS for Tomcat:</para>
       </formalpara>
@@ -700,7 +695,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         Service.</para>
       </formalpara>
       <procedure>
-        <title/>
+        <title>Testing the Call Blocking Service</title>
         <step>
           <para>Start a SIP softphone of your choice. The account name should
           be <userinput>blocked-sender</userinput>. The <literal>From Header</literal> should list one of the following addresses:
@@ -720,10 +715,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
   </formalpara>-->      <formalpara id="sfss-binary-Call-Blocking_Service-Stopping">
         <title>Stopping</title>
         <para>To learn how to stop the SIP Servlets-enabled JBoss Application
-        Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
+        Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
       </formalpara>
       <para>To learn how to stop the SIP Servlets-enabled Tomcat Container,
-      refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
+      refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
       <formalpara id="sfss-binary-Call-Blocking_Service-Uninstalling">
         <title>Uninstalling</title>
         <para>Unless disk space is at a premium, there is usually no need to
@@ -744,17 +739,17 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
     address is among those in a list of addresses which need to be forwarded.
     If so, then the Call-Forwarding Service acts as a Back-to-Back User Agent
     (B2BUA), and creates a new call leg to the destination. When the response
-    is received from the new call leg, it sends it an acknowledgement
+    is received from the new call leg, it sends it an acknowledgment
     (<literal>ACK</literal>) and then responds to the original caller. If, on
     the other hand, the server does not receive an <literal>ACK</literal>,
     then it tears down the new call leg with a <literal>BYE</literal>. Once
     the <literal>BYE</literal> is received, then it answers
-    <literal>OK</literal> directly and forwards the <literal>BYE</literal> to
+    <literal>OK</literal> directly and sends the <literal>BYE</literal> to
     the new call leg.</para>
     <note id="sfss-Contacts_to_Forward_Cannot_Currently_Be_Configured">
       <title>Contacts to Forward Cannot Currently Be Configured</title>
       <para>Contacts to forward are currently hard-coded addresses. This model
-      is evolving towards the eventual use of a database.</para>
+      is evolving toward the eventual use of a database.</para>
     </note>
     <para>Here is the current hard-coded list of contacts to forward:</para>
     <itemizedlist>
@@ -770,7 +765,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <para>&#160;</para>
       <formalpara id="sfss-binary-Call-Forwarding_Service-Pre-Install_Requirements_and_Prerequisites">
         <title>Pre-Install Requirements and Prerequisites</title>
-        <para>&#160;</para>
+        <para>The following requirements must be met before installation can begin.</para>
       </formalpara>
 <!-- <variablelist
    id="sfss-binary-Call-Forwarding_Service-Hardware_Requirements">
@@ -809,7 +804,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <para>Both the <filename>call-forwarding-1.1.war</filename> WAR file
         and the <filename>call-forwarding-servlet-dar.properties</filename>
         DAR file that you downloaded should be placed into different
-        directories in your SIP Servlet Server installation hierachy. Which
+        directories in your SIP Servlet Server installation hierarchy. Which
         directory depends on whether you are using the Call-Forwarding Service
         with MSS for JBoss or with MSS for Tomcat:</para>
       </formalpara>
@@ -912,7 +907,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <procedure>
         <title/>
         <step>
-          <para>Start two SIP softphones of your choice. Set the account
+          <para>Start two SIP soft-phones of your choice. Set the account
           settings of the first SIP softphone to:</para>
           <itemizedlist>
             <listitem>
@@ -926,12 +921,12 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
               <para>Port: <userinput>5090</userinput></para>
             </listitem>
           </itemizedlist>
-          <para>Neither of the SIP softphones needs to be registered.</para>
+          <para>Neither of the SIP soft-phones needs to be registered.</para>
         </step>
         <step>
           <para>From the second phone, make a call to
           <literal>sip:receiver@sip-servlets.com</literal>. The first phone,
-          <quote>forward-receiver</quote>, should now be ringing.</para>
+          &quot;forward-receiver&quot;, should now be ringing.</para>
         </step>
       </procedure>
 <!--<formalpara
@@ -941,10 +936,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
   </formalpara>-->      <formalpara id="sfss-binary-Call-Forwarding_Service-Stopping">
         <title>Stopping</title>
         <para>To learn how to stop the SIP Servlets-enabled JBoss Application
-        Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
+        Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
       </formalpara>
       <para>To learn how to stop the SIP Servlets-enabled Tomcat Container,
-      refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
+      refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
       <formalpara id="sfss-binary-Call-Forwarding_Service-Uninstalling">
         <title>Uninstalling</title>
         <para>Unless disk space is at a premium, there is usually no need to
@@ -977,7 +972,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <title>Blocked Contacts and Contacts to Forward Cannot Currently Be Configured</title>
       <para>Both the list of blocked contacts and the list of contacts to
       forward are currently both hard-coded. However, both of those models are
-      evolving towards the eventual use of databases.</para>
+      evolving toward the eventual use of databases.</para>
     </note>
 <!-- The Call-Controller Service -->    <section id="sfss-binary-Call-Controller_Service--Installing_Configuring_and_Running">
       <title>The Call-Controller Service: Installing, Configuring and Running</title>
@@ -993,7 +988,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       with them.</para>
       <formalpara id="sfss-binary-Call-Controller_Service-Pre-Install_Requirements_and_Prerequisites">
         <title>Pre-Install Requirements and Prerequisites</title>
-        <para>&#160;</para>
+        <para>The following requirements must be met before installation can begin.</para>
       </formalpara>
 <!-- <variablelist
    id="sfss-binary-Call-Controller_Service-Hardware_Requirements">
@@ -1036,7 +1031,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <filename>call-forwarding-1.1.war</filename> and
         <filename>call-controller-servlet-dar.properties</filename> archive
         files that you downloaded should be placed into different directories
-        in your SIP Servlet Server installation hierachy. Which directory
+        in your SIP Servlet Server installation hierarchy. Which directory
         depends on whether you are using the Call-Controller Service with MSS
         for JBoss or with MSS for Tomcat:</para>
       </formalpara>
@@ -1132,7 +1127,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <para>To learn how to run the SIP Servlets-enabled JBoss Application
       Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
       <para>To learn how to run the SIP Servlets-enabled Tomcat Container,
-      refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.</para>
+      refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.</para>
       <formalpara id="sfss-binary-Call-Controller_Service-Testing">
         <title>Testing</title>
         <para>Two use-cases can be distinguished for the Call-Controller
@@ -1143,8 +1138,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <procedure id="sfss-Blocking_a_Call_with_the_Call-Controller">
         <title>Blocking a Call with Call-Controller</title>
         <step>
-          <para>Start two SIP softphones of your choice. Set the account
-          settings of the SIP softphones to:</para>
+          <para>Start two SIP soft-phones of your choice. Set the account
+          settings of the SIP soft-phones to:</para>
           <itemizedlist>
             <title>Relevant First Softphone Settings</title>
             <listitem>
@@ -1164,7 +1159,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
               <para>Account name: <userinput>blocked-sender</userinput></para>
             </listitem>
           </itemizedlist>
-          <para>Neither of the SIP softphones needs to be registered.</para>
+          <para>Neither of the SIP soft-phones needs to be registered.</para>
         </step>
         <step>
           <para>From the second phone, <literal>blocked-sender</literal>, make
@@ -1175,8 +1170,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       <procedure id="sfss-Forwarding_a_Call_with_the_Call-Controller">
         <title>Forwarding a Call with Call-Controller</title>
         <step>
-          <para>Start two SIP softphones of your choice. Set the account
-          settings of the SIP softphones to:</para>
+          <para>Start two SIP soft-phones of your choice. Set the account
+          settings of the SIP soft-phones to:</para>
           <itemizedlist>
             <title>Relevant First Softphone Settings</title>
             <listitem>
@@ -1196,7 +1191,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
               <para>Account name: <userinput>forward-sender</userinput></para>
             </listitem>
           </itemizedlist>
-          <para>Neither of the SIP softphones needs to be registered.</para>
+          <para>Neither of the SIP soft-phones needs to be registered.</para>
         </step>
         <step>
           <para>From the second softphone, <literal>forward-sender</literal>,
@@ -1212,10 +1207,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
   </formalpara>-->      <formalpara id="sfss-binary-Call-Controller_Service-Stopping">
         <title>Stopping</title>
         <para>To learn how to stop the SIP Servlets-enabled JBoss Application
-        Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
+        Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
       </formalpara>
       <para>To learn how to stop the SIP Servlets-enabled Tomcat Container,
-      refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
+      refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.</para>
       <formalpara id="sfss-binary-Call-Controller_Service-Uninstalling">
         <title>Uninstalling</title>
         <para>Unless disk space is at a premium, there is usually no need to

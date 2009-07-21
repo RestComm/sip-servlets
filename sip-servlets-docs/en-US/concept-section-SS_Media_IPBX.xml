@@ -1,35 +1,70 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <section id="mipbx-Media_IPBX">
-    <title>Media IPBX</title>
-    <para>The Media IPBX provides an extensible and customizable SIP PBX solution, based on the Seam Telco Framework (STF).  While the PBX is currently provided as a capability demonstration, the ultimate goal is to transition Media IPBX into a fully-fledged SIP PBX solution.</para>
-    <para>Media IPBX terminates all calls to Mobicents Media Server conference endpoints, which provides flexibility in manipulating established calls including server-side conferencing and ringback tones.  The PBX can also be implemented as a Session Border Controller.</para>
-    <note><para>Media IPBX is compatible with Mobicents Sip Servlets with JBoss AS 4.2.3; versions prior to this release do not support Media IPBX.</para></note>
-    <para>Media IPBX provides the following major features:
+  <title>Media IPBX</title>
+  <para>The Media IPBX provides an extensible and customizable SIP PBX solution, based on the Seam Telco Framework (STF).  While the PBX is currently provided as a capability demonstration, the ultimate goal is to transition Media IPBX into a fully-fledged SIP PBX solution.</para>
+  <para>Media IPBX terminates all calls to Mobicents Media Server conference endpoints, which provides flexibility in manipulating established calls including server-side conferencing and ring-back tones.  The PBX can also be implemented as a Session Border Controller.</para>
+  <note>
+    <para>Media IPBX is compatible with Mobicents Sip Servlets with JBoss AS 4.2.3; versions prior to this release do not support Media IPBX.</para>
+  </note>
+  <para>Media IPBX provides the following major features:
       <itemizedlist>
-        <listitem><para>User authentication.</para></listitem>
-        <listitem><para>SIP phone registration.</para></listitem>
-        <listitem><para>System configuration.</para></listitem>
-        <listitem><para>Individual user views.</para></listitem>
-        <listitem><para>Call monitoring and management.</para></listitem>
-        <listitem><para>Multiple SIP phone instances per user.</para></listitem>
-        <listitem><para>Status-based SIP phone assignment for incoming calls.</para></listitem>
-        <listitem><para>Public Switched Telephone Network (PSTN) support including administrative functions.</para></listitem>
-        <listitem><para>Support for SIP REGISTER requests to automatically add phones by matching the username, or username and hostname (in 'strict mode' only).</para></listitem>
-        <listitem><para>Optionally specify local or online sources for announcements and ringback tones.</para></listitem>
-        <listitem><para>Session Border Controller capability.</para></listitem>
-        <listitem><para>Full conferencing support, including:
+      <listitem>
+        <para>User authentication.</para>
+      </listitem>
+      <listitem>
+        <para>SIP phone registration.</para>
+      </listitem>
+      <listitem>
+        <para>System configuration.</para>
+      </listitem>
+      <listitem>
+        <para>Individual user views.</para>
+      </listitem>
+      <listitem>
+        <para>Call monitoring and management.</para>
+      </listitem>
+      <listitem>
+        <para>Multiple SIP phone instances per user.</para>
+      </listitem>
+      <listitem>
+        <para>Status-based SIP phone assignment for incoming calls.</para>
+      </listitem>
+      <listitem>
+        <para>Public Switched Telephone Network (PSTN) support including administrative functions.</para>
+      </listitem>
+      <listitem>
+        <para>Support for SIP REGISTER requests to automatically add phones by matching the username, or username and hostname (in &apos;strict mode&apos; only).</para>
+      </listitem>
+      <listitem>
+        <para>Optionally specify local or online sources for announcements and ringback tones.</para>
+      </listitem>
+      <listitem>
+        <para>Session Border Controller capability.</para>
+      </listitem>
+      <listitem>
+        <para>Full conferencing support, including:
           <itemizedlist>
-            <listitem><para>Privacy functions, such as mute and closed-calls.</para></listitem>
-            <listitem><para>Call status announcement.</para></listitem>
-            <listitem><para>Ringback tones when waiting for other participants to join the conference.</para></listitem>
-            <listitem><para>Joining incoming calls to a conference.</para></listitem>
-            <listitem><para>Parking calls and isolating a single speaker using dual-tone multi-frequency (DTMF) tones.  This feature is currently experimental.</para></listitem>
+            <listitem>
+              <para>Privacy functions, such as mute and closed-calls.</para>
+            </listitem>
+            <listitem>
+              <para>Call status announcement.</para>
+            </listitem>
+            <listitem>
+              <para>Ringback tones when waiting for other participants to join the conference.</para>
+            </listitem>
+            <listitem>
+              <para>Joining incoming calls to a conference.</para>
+            </listitem>
+            <listitem>
+              <para>Parking calls and isolating a single speaker using dual-tone multi-frequency (DTMF) tones.  This feature is currently experimental.</para>
+            </listitem>
           </itemizedlist>
           </para>
-        </listitem>
-      </itemizedlist>
+      </listitem>
+    </itemizedlist>
     </para>
-    <para>Many of the features in Media IPBX are presented to the user as hints on the GUI portal pages.  It is recommended to install Media IPBX and experiment with the demonstration to gain an understading of how the solution works.</para>
-    <para>For information about installing and running Media IPBX, including binary and source code locations, visit the <ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX homepage</ulink>.</para>
-  </section>
+  <para>Many of the features in Media IPBX are presented to the user as hints on the GUI portal pages.  It is recommended to install Media IPBX and experiment with the demonstration to gain an understanding of how the solution works.</para>
+  <para>For information about installing and running Media IPBX, including binary and source code locations, visit the <ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX homepage</ulink>.</para>
+</section>

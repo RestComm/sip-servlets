@@ -17,21 +17,23 @@ Congestion Control, Load Balancing with the Mobicents Load Balancer, and, exclus
   <section>
     <title>Eclipse IDE Tools</title>
     <para>The Mobicents Sip Servlets Eclipse Tools assist developers in creating JSR 289 applications with Mobicents. You can use the Dynamic Web Project wizard to get started with an empty project and then you can test your application with a real Sip Phone right from the IDE.</para>
-    <screenshot>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/mss-ide-screen.png"/>
-        </imageobject>
-      </mediaobject>
-    </screenshot>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/mss-ide-screen.png"/>
+      </imageobject>
+      <caption>SIP Servlets Eclipse IDE Tools</caption>
+    </mediaobject>
     <section>
       <title>Pre-Install requirements</title>
       <para>Eclipse 3.4 is required.</para>
     </section>
-    <section><title>Installation</title><para>The standard Eclipse Update Site installation mechanism is leveraged. The Mobicents Update Site is at the following location: <ulink url="http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site">http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site</ulink> After adding this update site to Eclipse you can proceed with regilar Eclipse Plugin Installation. If you need help the process is demonstrated in <ulink url="http://www.youtube.com/watch?v=LZOmLEC2IeQ">this video</ulink>.</para>. </section>
     <section>
-      <title>Sip Servlets Core Plugin</title>
-      <para>This Plugin allows you to create Dynamic Web Projects with  SIP Facet. There are a number of new Dynamic Web Project configurations for Converged applications. It&apos;s best to use the ones marked as <quote>recommneded</quote>. After you complete the wizards a complete conerged project  skeleton will be generated. Working with this type of project is similar to working with normal Web projects. You can see a demo <ulink url="http://people.redhat.com/vralev/mss-eclipse-plugin-demo/mss-eclipse.htm">here</ulink>.</para>
+      <title>Installation</title>
+      <para>The standard Eclipse Update Site installation mechanism is leveraged. The Mobicents Update Site is at the following location: <ulink url="http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site">http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site</ulink> After adding this update site to Eclipse you can proceed with regilar Eclipse Plugin Installation. If you need help the process is demonstrated in <ulink url="http://www.youtube.com/watch?v=LZOmLEC2IeQ">this video</ulink>.</para>
+    </section>
+    <section>
+      <title>Sip Servlets Core Plug-in</title>
+      <para>This Plugin allows you to create Dynamic Web Projects with  SIP Facet. There are a number of new Dynamic Web Project configurations for Converged applications. It&apos;s best to use the ones marked as &quot;recommneded&quot;. After you complete the wizards a complete converged project  skeleton will be generated. Working with this type of project is similar to working with normal Web projects. You can see a demo <ulink url="http://people.redhat.com/vralev/mss-eclipse-plugin-demo/mss-eclipse.htm">here</ulink>.</para>
     </section>
     <section>
       <title>Sip Phone Plugin</title>

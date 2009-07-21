@@ -43,7 +43,7 @@
   </itemizedlist>
 <!--<bridgehead id="bssswjicar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>-->  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="mob-task-section-Java_Development_Kit-Installing_Configuring_and_Running.xml"/>
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-PreInstall_Requirements_and_Prerequisites">
-    <title>Pre-Install Requirements and Prerequisites</title>
+    <title>Pre-install Requirements and Prerequisites</title>
     <para>&nbsp;</para>
     <variablelist id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Hardware_Requirements">
       <title>Hardware Requirements</title>
@@ -65,9 +65,8 @@
       <varlistentry>
         <term>JDK 5 or Higher</term>
         <listitem>
-          <para>&nbsp;</para>
-<!--<para>A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is currently required in order to run MSS for JBoss binary distribution. For instructions on how to install the JDK, refer to <xref
-       linkend="bssswjicar-Installing_the_Java_Development_Kit"/>.</para>-->        </listitem>
+          <para>A working installation of the Java Development Kit (&lt;acronym&gt;JDK&lt;/acronym&gt;) version 5 or higher is currently required in order to run MSS for JBoss binary distribution. For instructions on how to install the JDK, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing"/></para>
+        </listitem>
       </varlistentry>
     </variablelist>
   </section>
@@ -121,7 +120,7 @@
       <title>Installing the MSS for JBoss Binary Distribution on <productname>Windows</productname></title>
       <para>For this procedure, it is assumed that the downloaded archive is saved in the <filename>My Downloads</filename> folder.</para>
       <step>
-        <para>Create a subfolder in <filename>My Downloads</filename> to extract the zip file&apos;s contents into.  For ease of identification, it is recommended that the version number of the binary is included in the folder name.  For example, <filename>mss-jboss-&lt;version&gt;</filename>.</para>
+        <para>Create a directory in <filename>My Downloads</filename> to extract the zip file&apos;s contents into.  For ease of identification, it is recommended that the version number of the binary is included in the folder name.  For example, <filename>mss-jboss-&lt;version&gt;</filename>.</para>
       </step>
       <step>
         <para>Extract the contents of the archive, specifying the destination folder as the one created in the previous step.</para>
@@ -159,11 +158,11 @@
   </section>
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Configuring">
     <title>Configuring</title>
-    <para>To configure MMS for JBoss, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/>.</para>
+    <para>To configure MSS for JBoss, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/>.</para>
   </section>
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running">
     <title>Running</title>
-    <para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with <quote>Started in 23s:648ms</quote>):</para>
+    <para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with &quot;Started in 23s:648ms&quot;):</para>
     <programlisting><![CDATA[17:48:01,247 INFO  [Server] JBoss (MX MicroKernel) [4.2.2.GA (build: SVNTag=JBoss_4_2_2_GA date=200710221139)] Started in 20s:861ms]]></programlisting>
     <para>Detailed instructions are given below, arranged by platform.</para>
     <procedure>
@@ -189,7 +188,7 @@
       <title>Running MSS for JBoss on <productname>Windows</productname></title>
       <para>There are several ways to start MSS for JBoss on Windows. All of the following methods accomplish the same task.</para>
       <step>
-        <para>Using Windows Explorer, navigate to the <filename>bin</filename> subfolder in the installation directory.</para>
+        <para>Using Windows Explorer, navigate to the <filename>bin</filename> subdirectory in the installation directory.</para>
       </step>
       <step>
         <para>The preferred way to start MSS for JBoss from the Command Prompt.  The command line interface displays details of the startup process, including any problems encountered during the startup process.</para>
@@ -304,7 +303,7 @@ Halting VM</programlisting>
     <procedure>
       <title>Stopping MSS for JBoss on Windows</title>
       <step>
-        <para>Stopping the JBoss Application Server on Windows consists in executing either the <filename>shutdown.bat</filename> or the <filename>shutdown.jar</filename> executable file in the <filename>bin</filename> subfolder of the MSS for JBoss binary distribution. Ensure the <option>-S</option> option (the short option for <option>--shutdown</option>) is included in the command line argument.</para>
+        <para>Stopping the JBoss Application Server on Windows consists in executing either the <filename>shutdown.bat</filename> or the <filename>shutdown.jar</filename> executable file in the <filename>bin</filename> subdirectory of the MSS for JBoss binary distribution. Ensure the <option>-S</option> option (the short option for <option>--shutdown</option>) is included in the command line argument.</para>
         <screen>C:&bsol;Users&bsol;&lt;user&gt;&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;shutdown.bat -S</screen>
         <stepalternatives>
           <step>

@@ -40,10 +40,10 @@
    <para>&nbsp;</para>
   </section>-->    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
       <title>Configuring</title>
-      <para>Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering. SIP and HTTP session state clustering are pre-configured and ready-to-go straight out of the binary distribution. However, to enable session replication in your node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per appication or globally for all applications.</para>
+      <para>Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering. SIP and HTTP session state clustering are pre-configured straight out of the binary distribution. However, to enable session replication in your node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per application or globally for all applications.</para>
       <important id="ssfjcs-You_Must_Use_the_all_Server_Configuration_Profile">
-        <title>You Must Use the <quote>all</quote> Server Configuration Profile</title>
-        <para>You will notice that the following instructions modify one or more properties in the configuration files for the <quote>all</quote> Server Configuration Profile. This is evident in the path names given below. When we start each MSS for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.</para>
+        <title>You Must Use the &quot;all&quot; Server Configuration Profile</title>
+        <para>You will notice that the following instructions modify one or more properties in the configuration files for the &quot;all&quot; Server Configuration Profile. This is evident in the path names given below. When we start each MSS for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.</para>
       </important>
       <para>To do so, open the <filename>web.xml</filename> configuration file, which lives in the <filename>&lt;topmost_directory&gt;/server/all/deploy/jboss-web.deployer/conf/</filename> directory, and add the empty element <literal>&lt;distributable/&gt;</literal> as a child of the document root element, <literal>web-app</literal>:</para>
       <example id="ssfjcs-Enabling_Node_Session_Replication_in_the_web.xml_Deployer">
@@ -76,22 +76,22 @@
     </section>
     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Running">
       <title>Running</title>
-      <para>Clustering with MSS for JBoss nodes requires running all of the nodes using the <quote>all</quote> Server Configuration Profile, which is specified when you invoke <command>run.sh</command> or <command>run.bat</command>.</para>
+      <para>Clustering with MSS for JBoss nodes requires running all of the nodes using the &quot;all&quot; Server Configuration Profile, which is specified when you invoke <command>run.sh</command> or <command>run.bat</command>.</para>
       <formalpara>
-        <title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Linux</title>
-        <para>To run the server on Linux using the <quote>all</quote> Configuration Profile, start the server with the following command:</para>
+        <title>Running MSS for JBoss with the &quot;all&quot; Configuration Profile, on Linux</title>
+        <para>To run the server on Linux using the &quot;all&quot; Configuration Profile, start the server with the following command:</para>
       </formalpara>
       <screen>mss-jboss-&lt;version&gt;]$ ./bin/run.sh -c all</screen>
       <formalpara>
-        <title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Windows</title>
-        <para>To run the server on Windows using the <quote>all</quote> Configuration Profile, open the Command Prompt, change your folder to the topmost folder of your MSS for JBoss installation, and issue the following command:</para>
+        <title>Running MSS for JBoss with the &quot;all&quot; Configuration Profile, on Windows</title>
+        <para>To run the server on Windows using the &quot;all&quot; Configuration Profile, open the Command Prompt, change your folder to the topmost folder of your MSS for JBoss installation, and issue the following command:</para>
       </formalpara>
       <screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-jboss-&lt;version&gt;&gt;bin&bsol;run.bat -c all</screen>
       <formalpara>
-        <title>Distriuting requests between nodes</title>
+        <title>Distributing requests between nodes</title>
         <para>Together with the application server nodes, it is advised to run a SIP load-balancer or an IP load-balancer which will distribute the traffic evenly between the nodes. A load-balancer is a single entry-point to all nodes. All calls should e made through the load-balancer if you need High Availability. You can read more on how to use the SIP load-balancer in <xref linkend="sslb-SIP_Servlets_Load_Balancer-Implementation"/>.</para>
-        <para>By default the servers are configured with one SIP load-balancer at IP address &quot;127.0.0.1&quot;. This is specified in the <literal>balancers</literal> attriute in the <filename>server.xml</filename> configuration file as follows:</para>
       </formalpara>
+      <para>By default the servers are configured with one SIP load-balancer at IP address &quot;127.0.0.1&quot;. This is specified in the <literal>balancers</literal> attribute in the <filename>server.xml</filename> configuration file as follows:</para>
       <programlisting>&lt;Service name=&quot;jboss.web&quot; 
       className=&quot;org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService&quot;
   balancers=&quot;127.0.0.1&quot;  
@@ -135,7 +135,7 @@ concurrencyControlMode=&quot;None&quot;
     </section>
     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Uninstalling">
       <title>Uninstalling</title>
-      <para>Uninstalling a SIP Servlets Cluster would entail deleting the Mobicents SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly unsetting the <envar>JBOSS_HOME</envar> environment variable.</para>
+      <para>Uninstalling a SIP Servlets Cluster would entail deleting the Mobicents SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly removing the unused <envar>JBOSS_HOME</envar> environment variable.</para>
     </section>
   </section>
 </section>

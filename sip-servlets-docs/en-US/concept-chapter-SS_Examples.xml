@@ -3,7 +3,7 @@
 ]>
 <!-- chapter id nickname: afotsss --><chapter id="ssea-SIP_Servlet_Example_Applications">
   <title>SIP Servlet Example Applications</title>
-  <para>The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server.  <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the avaialble examples, their location, and a brief description about the functionality each example demonstrates.  The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.  Each example is available in both binary and source formats.</para>
+  <para>The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server.  <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the available examples, their location, and a brief description about the functionality each example demonstrates.  The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.  Each example is available in both binary and source formats.</para>
   <table frame="all" id="tab-ssea-SIP_Servlet_Example_Applications">
     <title>Available Examples</title>
     <tgroup cols="2" colsep="1" rowsep="1" align="left">
@@ -20,7 +20,7 @@
           <entry>
             <xref linkend="sfss-The_Call-Blocking_Service"/>
           </entry>
-          <entry>Demonstrates how to block calls by specifiying that the INVITE SIP Extension checks the <literal>From</literal> address to see if it is specified in the block list. If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.</entry>
+          <entry>Demonstrates how to block calls by specifying that the INVITE SIP Extension checks the <literal>From</literal> address to see if it is specified in the block list. If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.</entry>
         </row>
         <row>
           <entry>
@@ -38,7 +38,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/speed_dial.html">Speed Dial</ulink>
           </entry>
-          <entry>Demonstrates how to implement speed dialling for SIP addresses. The demonstration uses a pre-defined list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.</entry>
+          <entry>Demonstrates how to implement speed dialing for SIP addresses. The demonstration uses a static list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.</entry>
         </row>
         <row>
           <entry>
@@ -68,7 +68,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/media-demo.html">Media</ulink>
           </entry>
-          <entry>Demonstrates how the media playback SIP Servlet can build a media file customised with the name of the user, based on the information in the FROM header. This example is only compatible with JBoss AS. The solution is know to work with Ekiga and linphone SIP softphones.</entry>
+          <entry>Demonstrates how the media playback SIP Servlet can build a media file customized with the name of the user, based on the information in the FROM header. This example is only compatible with JBoss AS. The solution is know to work with Ekiga and linphone SIP soft-phones.</entry>
         </row>
         <row>
           <entry>
@@ -86,7 +86,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/facebook-c2c.html">Facebook Click to Call</ulink>
           </entry>
-          <entry>Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plugin that allows user to call POTS phones through a SIP-PSTN gateway provider. This demonstration is only available from the source repository; no binary is available.</entry>
+          <entry>Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plug-in that allows user to call POTS phones through a SIP-PSTN gateway provider. This demonstration is only available from the source repository; no binary is available.</entry>
         </row>
         <row>
           <entry>
@@ -104,7 +104,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/conference-demo.html">Conference</ulink>
           </entry>
-          <entry>Demonstrates the capabilities of the Media Server, such as enpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google&apos;s GWT Ajax framework with server-push updates to provide a desktop-like user interface experience. </entry>
+          <entry>Demonstrates the capabilities of the Media Server, such as endpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google&apos;s GWT Ajax framework with server-push updates to provide a desktop-like user interface experience. </entry>
         </row>
         <row>
           <entry>
@@ -116,7 +116,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/mss-jruby-example.html">JRuby on Rails SIP Servlets</ulink>
           </entry>
-          <entry>Demonstrates how JRuby on Rails can be used by the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform to provide a multi-language application that can initiate phonecalls to customers after they log a complaint through a web portal.</entry>
+          <entry>Demonstrates how JRuby on Rails can be used by the <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> platform to provide a multi-language application that can initiate phone calls to customers after they log a complaint through a web portal.</entry>
         </row>
         <row>
           <entry>

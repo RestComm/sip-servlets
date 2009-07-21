@@ -412,20 +412,23 @@ public class ExClient
 	<section id="ittsss-High-Availability-SIP_Servlets_Server_Load_Balancing_Clustering_and_Failover">
 		<title>High-Availability: SIP Servlets Server Load Balancing, Clustering and Failover</title>
 		<para>
-			Telecommunications applications demand High-Availability (HA), fault tolerance, scalability and performance. Providing highly-available end-user applications that are performant and tolerant of faults is usually and primarily achieved through the use of clustering technologies. Clustering is a complex subject that is often used to collectively address a variety of techniques aimed at improving the high-availability and scalability of services and applications. Such techniques include distributed state replication, load balancing, and failover capabilities. The usage of any one of these techniques improves either reliability or performance, but for the sake of the other. It requires careful analysis of real-world scenarios to arrive at an architecture which represents the optimal balance of performance and reliability.
+			Telecommunications applications demand High-Availability (HA), fault tolerance, scalability and performance. Providing highly-available end-user applications that are tolerant of faults is commonly achieved through the use of clustering technologies.
 		</para>
 		<para>
-			Based on experience with production deployments and extensive feedback from the Open Source community, Mobicents HA has undergone several iterations of refinement. In its current incarnation, the architecture can be described as a <quote>star topology</quote> with symmetric application servers and a smart, lightweight load-balancing element with built-in failover logic. The amount of state replication is kept to a minimum for maximum scalability with sufficiently-high reliability.
+			Clustering is a complex subject that is often used to collectively address a variety of techniques aimed at improving the high-availability and scalability of services and applications. Such techniques include distributed state replication, load balancing, and failover capabilities. The usage of any one of these techniques improves either reliability or performance, but for the sake of the other. It requires careful analysis of real-world scenarios to arrive at an architecture which represents the optimal balance of performance and reliability.
+		</para>
+		<para>
+			Based on experience with production deployments and extensive feedback from the Open Source community, Mobicents HA has undergone several iterations of refinement. In its current incarnation, the architecture can be described as a "star topology" with symmetric application servers and a smart, lightweight load-balancing element with built-in failover logic. The amount of state replication is kept to a minimum for maximum scalability with sufficiently-high reliability.
 		</para>
 		<mediaobject id="ittsss-sas-MSSSIPLoadBalancer-dia-StarNetworkTopology">
 			<imageobject>
 				<imagedata align="center" fileref="images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg" format="JPG" scalefit="1" width="550"/>
 			</imageobject>
-			<caption>
-			<para>
-				A cluster of Mobicents SIP Servlets Servers, showing the star network topology.
-			</para>
-			</caption>
+			<textobject>
+				<para>
+					A cluster of Mobicents SIP Servlets Servers, showing the star network topology.
+				</para>
+			</textobject>
 		</mediaobject>
 		<formalpara id="ittsss-Clustering_Terms_and_Definitions_for_SIP_Servlets">
 			<title>Clustering Terms and Definitions for Mobicents SIP Servlets</title>
@@ -589,13 +592,13 @@ public class ExClient
 			</para>
 		</listitem>
 	</itemizedlist>
-	<!-- <bridgehead	id="bssswjicar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead> --><section lang="en-US">
+	<!-- <bridgehead id="bssswjicar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead> --> <section lang="en-US">
 	<!--  chapter id nickname: jdkicar  --><title>Java Development Kit: Installing, Configuring and Running</title>
 	<para>
-		The <application condition="mob">Mobicents</application> platform is written in Java. A working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) must be installed prior to running the server. The required versiom must be version 5 or higher.
+		The <application condition="mob">Mobicents</application> platform is written in Java. A working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) must be installed prior to running the server. The required version must be version 5 or higher.
 	</para>
 	<para>
-		It is possible to run most <application condition="mob">Mobicents</application> servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. However, the XML Document Management Server does not run on Java 6. Check the <ulink url="http://groups.google.com/group/mobicents-public/topics">public support forum</ulink> and <ulink url="http://www.mobicents.org/roadmap.html">project roadmap</ulink> pages to verify Java 6 support prior to running the XML Document Management Server with Java 6.
+		It is possible to run most <application condition="mob">Mobicents</application> servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. However, the XML Document Management Server does not run on Java 6. Check the <ulink url="http://groups.google.com/group/mobicents-public/topics">public support forum</ulink> and <ulink url="http://www.mobicents.org/roadmap.html">project road map</ulink> pages to verify Java 6 support prior to running the XML Document Management Server with Java 6.
 	</para>
 	<formalpara>
 		<title>JRE or JDK?</title>
@@ -606,7 +609,7 @@ public class ExClient
 	<formalpara>
 		<title>32-Bit or 64-Bit JDK</title>
 		<para>
-			If the system uses 64-Bit Linux or Windows architecure, the 64-bit JDK is strongly recommended over the 32-bit version. The following heuristics should be considered in determining whether the 64-bit Java Virtual Machine (JVM) is suitable:
+			If the system uses 64-Bit Linux or Windows architecture, the 64-bit JDK is strongly recommended over the 32-bit version. The following heuristics should be considered in determining whether the 64-bit Java Virtual Machine (JVM) is suitable:
 		</para>
 	</formalpara>
 	<itemizedlist>
@@ -637,30 +640,29 @@ public class ExClient
 		</para>
 	</note>
 	<!--  <formalpara
-			id="jdkicar-binary-Java_Development_Kit-Pre-Install Requirements and Prerequisites">
-			<title>Pre-Install Requirements and Prerequisites</title>
-			<para></para>
-		</formalpara>  --><!--   <variablelist
-			condition="jdkicar-binary-Java_Development_Kit-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para></para>
-				</listitem>
-			</varlistentry>
-		</variablelist>   --><!--   <variablelist
-			condition="jdkicar-binary-Java_Development_Kit-Software_Prerequisites">
-			<title>Software Prerequisites</title>
-			<varlistentry>
-				<term></term>
-				<listitem>
-					<para></para>
-				</listitem>
-			</varlistentry>
-		</variablelist>   -->
-	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Downloading">  --><title>Downloading</title>
+   id="jdkicar-binary-Java_Development_Kit-Pre-Install Requirements and Prerequisites">
+   <title>Pre-Install Requirements and Prerequisites</title>
+   <para></para>
+  </formalpara>  --><!--   <variablelist
+   condition="jdkicar-binary-Java_Development_Kit-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>   --><!--   <variablelist
+   condition="jdkicar-binary-Java_Development_Kit-Software_Prerequisites">
+   <title>Software Prerequisites</title>
+   <varlistentry>
+    <term></term>
+    <listitem>
+     <para></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>   --> <formalpara>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Downloading">  --> <title>Downloading</title>
 		<para>
 			Download the Sun JDK 5.0 (Java 2 Development Kit) from Sun's website: <ulink url="http://java.sun.com/javase/downloads/index_jdk5.jsp"/>. Click the <guilabel>Download</guilabel> link next to "JDK 5.0 Update <replaceable>&lt;x&gt;</replaceable>" (where <replaceable>&lt;x&gt;</replaceable> is the latest minor version release number).
 		</para>
@@ -684,7 +686,7 @@ public class ExClient
 		If installing the JDK on Red Hat Enterprise Linux, Fedora, or another RPM-based Linux system, it is recommended that the self-extracting file containing the RPM package is selected. This option will set up and use the SysV service scripts in addition to installing the JDK. The RPM option is also recommended if the <application condition="mob">Mobicents</application> platform is being set up in a production environment.
 	</para>
 	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Installing">  --><title>Installing</title>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Installing">  --> <title>Installing</title>
 		<para>
 			The following procedures detail how to install the Java Development Kit on both Linux and Windows.
 		</para>
@@ -696,7 +698,7 @@ public class ExClient
 				Ensure the file is executable, then run it:
 			</para>
 			<!--   ~]$ chmod +x "jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
-~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"   -->
+~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"   --> 
 <screen>~]$ chmod +x "jdk-1_5_0_&lt;minor_version&gt;-linux-&lt;architecture&gt;-rpm.bin"
 ~]$ ./"jdk-1_5_0_&lt;minor_version&gt;-linux-&lt;architecture&gt;-rpm.bin"
 </screen>
@@ -724,7 +726,7 @@ public class ExClient
 	</procedure>
 	
 	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Configuring">  --><title>Configuring</title>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Configuring">  --> <title>Configuring</title>
 		<para>
 			Configuring the system for the JDK consists of two tasks: setting the <envar>JAVA_HOME</envar> environment variable, and ensuring the system is using the proper JDK (or JRE) using the <command>alternatives</command> command. Setting <envar>JAVA_HOME</envar> generally overrides the values for <command>java</command>, <command>javac</command> and <command>java_sdk_1.5.0</command> in <command>alternatives</command>, however it is recommended to specify the value for consistency.
 		</para>
@@ -759,12 +761,9 @@ public class ExClient
 		<varlistentry>
 			<term>Setting <envar>java</envar>, <envar>javac</envar> and <envar>java_sdk_1.5.0</envar> using the <command>alternatives</command> command </term>
 			<listitem>
-				<formalpara>
-					<title>Selecting the Correct System JVM on Linux using <command>alternatives</command></title>
-					<para>
-						On systems with the <command>alternatives</command> command, including Red Hat Enterprise Linux and Fedora, it is possible to choose which JDK (or JRE) installation to use, as well as which <command>java</command> and <command>javac</command> executables should be run when called.
-					</para>
-				</formalpara>
+				<para>
+					On systems with the <command>alternatives</command> command, including Red Hat Enterprise Linux and Fedora, it is possible to choose which JDK (or JRE) installation to use, as well as which <command>java</command> and <command>javac</command> executables should be run when called.
+				</para>
 				<para>
 					<emphasis>As the superuser</emphasis>, call <command>/usr/sbin/alternatives</command> with the <option>--config java</option> option to select between JDKs and JREs installed on your system:
 				</para>
@@ -806,7 +805,7 @@ Enter to keep the current selection[+], or type selection number:
 		</varlistentry>
 	</variablelist>
 	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Testing">  --><title>Testing</title>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Testing">  --> <title>Testing</title>
 		<para>
 			To ensure the correct JDK or Java version (5 or higher), and that the java executable is in the <envar>PATH</envar> environment variable, run the <command>java -version</command> command in the terminal from the home directory:
 		</para>
@@ -819,16 +818,15 @@ Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_16-b03)
 Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 </screen>
 	<!--  <formalpara
-		id="jdkicar-binary-Java_Development_Kit-Running">
-		<title>Running</title>
-		<para></para>
-	</formalpara>  --><!--   <formalpara
-		id="jdkicar-binary-Java_Development_Kit-Stopping">
-		<title>Stopping</title>
-		<para></para>
-	</formalpara>   -->
-	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Uninstalling">  --><title>Uninstalling</title>
+  id="jdkicar-binary-Java_Development_Kit-Running">
+  <title>Running</title>
+  <para></para>
+ </formalpara>  --><!--   <formalpara
+  id="jdkicar-binary-Java_Development_Kit-Stopping">
+  <title>Stopping</title>
+  <para></para>
+ </formalpara>   --> <formalpara>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Uninstalling">  --> <title>Uninstalling</title>
 		<para>
 			It is not necessary to remove a particular JDK from a system, because the JDK and JRE version can be switched as required using the <command>alternatives</command> command, and/or by setting <envar>JAVA_HOME</envar>.
 		</para>
@@ -847,7 +845,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 	</formalpara>
 </section>
 	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-PreInstall_Requirements_and_Prerequisites">
-		<title>Pre-Install Requirements and Prerequisites</title>
+		<title>Pre-install Requirements and Prerequisites</title>
 		<para>
 			 
 		</para>
@@ -876,10 +874,8 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 				<term>JDK 5 or Higher</term>
 				<listitem>
 					<para>
-						 
+						A working installation of the Java Development Kit (&lt;acronym&gt;JDK&lt;/acronym&gt;) version 5 or higher is currently required in order to run MSS for JBoss binary distribution. For instructions on how to install the JDK, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing"/>
 					</para>
-					<!-- <para>A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is currently required in order to run MSS for JBoss binary distribution. For instructions on how to install the JDK, refer to <xref
-							linkend="bssswjicar-Installing_the_Java_Development_Kit"/>.</para> -->
 				</listitem>
 			</varlistentry>
 		</variablelist>
@@ -979,7 +975,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 			</para>
 			<step>
 				<para>
-					Create a subfolder in <filename>My Downloads</filename> to extract the zip file's contents into. For ease of identification, it is recommended that the version number of the binary is included in the folder name. For example, <filename>mss-jboss-&lt;version&gt;</filename>.
+					Create a directory in <filename>My Downloads</filename> to extract the zip file's contents into. For ease of identification, it is recommended that the version number of the binary is included in the folder name. For example, <filename>mss-jboss-&lt;version&gt;</filename>.
 				</para>
 			</step>
 			<step>
@@ -1054,11 +1050,11 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 			At the command line, <command>echo</command><userinput>$JBOSS_HOME</userinput> to see if it is currently defined in your environment:
 		</para>
 	</formalpara>
-	<!--   ~]$ echo $JBOSS_HOME   -->
+	<!--   ~]$ echo $JBOSS_HOME   --> 
 <screen>~]$ echo $JBOSS_HOME
 </screen>
 	<para>
-		The <application>Mobicents Platform</application> and most Mobicents servers are built on top of the <application>JBoss Application Server</application> (<application>JBoss AS</application>). When the <application>Mobicents Platform</application> or Mobicents servers are built <emphasis>from source</emphasis>, then <envar>JBOSS_HOME</envar> <emphasis>must</emphasis> be set, because the Mobicents files are installed into (or <quote>over top of</quote> if you prefer) a clean <application>JBoss AS</application> installation, and the build process assumes that the location pointed to by the <envar>JBOSS_HOME</envar> environment variable at the time of building is the <application>JBoss AS</application> installation into which you want it to install the Mobicents files.
+		The <application>Mobicents Platform</application> and most Mobicents servers are built on top of the <application>JBoss Application Server</application> (<application>JBoss AS</application>). When the <application>Mobicents Platform</application> or Mobicents servers are built <emphasis>from source</emphasis>, then <envar>JBOSS_HOME</envar> <emphasis>must</emphasis> be set, because the Mobicents files are installed into (or "over top of" if you prefer) a clean <application>JBoss AS</application> installation, and the build process assumes that the location pointed to by the <envar>JBOSS_HOME</envar> environment variable at the time of building is the <application>JBoss AS</application> installation into which you want it to install the Mobicents files.
 	</para>
 	<para>
 		This guide does not detail building the <application>Mobicents Platform</application> or any Mobicents servers from source. It is nevertheless useful to understand the role played by <application>JBoss AS</application> and <envar>JBOSS_HOME</envar> in the Mobicents ecosystem.
@@ -1115,7 +1111,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 			<para>
 				Open the <filename>~/.bashrc</filename> startup script, which is a hidden file in your home directory, in a text editor, and insert the following line on its own line while substituting for the actual install location on your system:
 			</para>
-			<!--   export JBOSS_HOME="/home/<replaceable>&lt;username&gt;</replaceable>/<replaceable>&lt;path&gt;</replaceable>/<replaceable>&lt;to&gt;</replaceable>/<replaceable>&lt;install_directory&gt;</replaceable>"   -->
+			<!--   export JBOSS_HOME="/home/<replaceable>&lt;username&gt;</replaceable>/<replaceable>&lt;path&gt;</replaceable>/<replaceable>&lt;to&gt;</replaceable>/<replaceable>&lt;install_directory&gt;</replaceable>"   --> 
 <screen>export JBOSS_HOME="/home/&lt;username&gt;/&lt;path&gt;/&lt;to&gt;/&lt;install_directory&gt;"
 </screen>
 		</step>
@@ -1132,7 +1128,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 				</para>
 				</footnote>.
 			</para>
-			<!--   ~]$ source ~/.bashrc   -->
+			<!--   ~]$ source ~/.bashrc   --> 
 <screen>~]$ source ~/.bashrc
 </screen>
 		</step>
@@ -1146,7 +1142,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 				</para>
 			</note>
 			<!--   ~]$ echo $JBOSS_HOME
-/home/silas/&MOB_JBOSS_HOME_LIN;   -->
+/home/silas/&MOB_JBOSS_HOME_LIN;   --> 
 <screen>~]$ echo $JBOSS_HOME
 /home/silas/mobicents-all-1.2.1.GA-jboss-4.2.3.GA/jboss/
 </screen>
@@ -1168,14 +1164,14 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Configuring">
 		<title>Configuring</title>
 		<para>
-			To configure MMS for JBoss, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/>.
+			To configure MSS for JBoss, refer to <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/>.
 		</para>
 	</section>
 	
 	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running">
 		<title>Running</title>
 		<para>
-			To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only). It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems. In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with <quote>Started in 23s:648ms</quote>):
+			To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only). It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems. In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with "Started in 23s:648ms"):
 		</para>
 		
 <programlisting>17:48:01,247 INFO  [Server] JBoss (MX MicroKernel) [4.2.2.GA (build: SVNTag=JBoss_4_2_2_GA date=200710221139)] Started in 20s:861ms
@@ -1227,7 +1223,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 			</para>
 			<step>
 				<para>
-					Using Windows Explorer, navigate to the <filename>bin</filename> subfolder in the installation directory.
+					Using Windows Explorer, navigate to the <filename>bin</filename> subdirectory in the installation directory.
 				</para>
 			</step>
 			<step>
@@ -1275,6 +1271,87 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 		</para>
 	</section>
 	
+	<section>
+		<title>Testing</title>
+		<para>
+			You should see one pre-configured sample application. You can use it to verify that the server is installed and running correctly. The application name is <quote>org.mobicents.servlet.sip.example.SimpleApplication</quote>. From the Management Console you can make sure it is subscribed to receive <literal>INVITE</literal> and <literal>REGISTER</literal> SIP requests. It is a simple <filename>Click2Call</filename> application allowing SIP registration and calling phones from the Web user interface.
+		</para>
+		<para>
+			The scenario for this example consists of the following steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Alice and Bob each register a SIP Softphone
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Alice clicks on the "Call" link to place a call to Bob
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Alice's phone rings
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					When Alice picks up her phone, Bob's phone rings
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					When Bob answers his phone, the call is connected
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					When one of them hangs up, the other one is also disconnected
+				</para>
+			</listitem>
+		</orderedlist>
+		<procedure>
+			<title>Testing the Click2Call sample application</title>
+			<step>
+				<para>
+					Open up a browser to <ulink url="http://localhost:8080/click2call/">http://localhost:8080/click2call/</ulink>. If you have no registered SIP clients you will be asked to register at least two.
+				</para>
+			</step>
+			<step>
+				<para>
+					Configure your SIP clients to use the sip servlets server as a register and proxy. (ip address : 127.0.0.1, port: 5080) By default it will accept any password
+				</para>
+			</step>
+			<step>
+				<para>
+					After the registration you will see a table where each cell will initiate a call between the corresponding clients.
+				</para>
+			</step>
+			<step>
+				<para>
+					Close the calls.
+				</para>
+			</step>
+			<step>
+				<para>
+					Navigate to <ulink url="http://localhost:8080/click2call/simplecall.html">http://localhost:8080/click2call/simplecall.html</ulink>, which is a simplified version that doesn't require registered clients.
+				</para>
+			</step>
+			<step>
+				<para>
+					Enter the URIs of the two SIP phones you just started and click "Submit"
+				</para>
+			</step>
+			<step>
+				<para>
+					The phones should be ringing again. You can pick them up and you will know that the SIP and the HTTP containers are working properly.
+				</para>
+			</step>
+		</procedure>
+
+	</section>
+	
 	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping">
 		<title>Stopping</title>
 		<para>
@@ -1286,16 +1363,15 @@ Shutdown complete
 Halting VM
 </programlisting>
 		<!-- <procedure>
-			<title>Stopping MSS for JBoss on Linux by Issuing a Control Code</title>
-			<step>
-				<para>Assuming that you started the JBoss Application Server as a foreground process in the terminal, the easiest way to stop it is by pressing the <keycombo
-						action="simul"><keycap>Ctrl</keycap>
-						<keycap>c</keycap>
-					</keycombo> key combination in the same terminal in which you started it.
-						</para>
-			</step>
-		</procedure> -->
-		<procedure>
+   <title>Stopping MSS for JBoss on Linux by Issuing a Control Code</title>
+   <step>
+    <para>Assuming that you started the JBoss Application Server as a foreground process in the terminal, the easiest way to stop it is by pressing the <keycombo
+      action="simul"><keycap>Ctrl</keycap>
+      <keycap>c</keycap>
+     </keycombo> key combination in the same terminal in which you started it.
+      </para>
+   </step>
+  </procedure> --> <procedure>
 			<title>Stopping MSS for JBoss on Linux</title>
 			<step>
 				<para>
@@ -1335,7 +1411,7 @@ Halting VM
 			<title>Stopping MSS for JBoss on Windows</title>
 			<step>
 				<para>
-					Stopping the JBoss Application Server on Windows consists in executing either the <filename>shutdown.bat</filename> or the <filename>shutdown.jar</filename> executable file in the <filename>bin</filename> subfolder of the MSS for JBoss binary distribution. Ensure the <option>-S</option> option (the short option for <option>--shutdown</option>) is included in the command line argument.
+					Stopping the JBoss Application Server on Windows consists in executing either the <filename>shutdown.bat</filename> or the <filename>shutdown.jar</filename> executable file in the <filename>bin</filename> subdirectory of the MSS for JBoss binary distribution. Ensure the <option>-S</option> option (the short option for <option>--shutdown</option>) is included in the command line argument.
 				</para>
 				
 <screen>C:\Users\&lt;user&gt;\My Downloads\mss-jboss-&lt;version&gt;&gt;bin\shutdown.bat -S
@@ -1356,11 +1432,10 @@ Halting VM
 	</section>
 	
 	<!-- <section
-		id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Testing">
-		<title>Testing</title>
-		<para>&nbsp;</para>
-	</section> -->
-	<section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Uninstalling">
+  id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Testing">
+  <title>Testing</title>
+  <para>&nbsp;</para>
+ </section> --> <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Uninstalling">
 		<title>Uninstalling</title>
 		<para>
 			To uninstall MSS for JBoss, delete the directory containing the binary distribution.
@@ -1405,10 +1480,10 @@ Halting VM
 	<bridgehead id="bssswticar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead><section lang="en-US">
 	<!--  chapter id nickname: jdkicar  --><title>Java Development Kit: Installing, Configuring and Running</title>
 	<para>
-		The <application condition="mob">Mobicents</application> platform is written in Java. A working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) must be installed prior to running the server. The required versiom must be version 5 or higher.
+		The <application condition="mob">Mobicents</application> platform is written in Java. A working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) must be installed prior to running the server. The required version must be version 5 or higher.
 	</para>
 	<para>
-		It is possible to run most <application condition="mob">Mobicents</application> servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. However, the XML Document Management Server does not run on Java 6. Check the <ulink url="http://groups.google.com/group/mobicents-public/topics">public support forum</ulink> and <ulink url="http://www.mobicents.org/roadmap.html">project roadmap</ulink> pages to verify Java 6 support prior to running the XML Document Management Server with Java 6.
+		It is possible to run most <application condition="mob">Mobicents</application> servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. However, the XML Document Management Server does not run on Java 6. Check the <ulink url="http://groups.google.com/group/mobicents-public/topics">public support forum</ulink> and <ulink url="http://www.mobicents.org/roadmap.html">project road map</ulink> pages to verify Java 6 support prior to running the XML Document Management Server with Java 6.
 	</para>
 	<formalpara>
 		<title>JRE or JDK?</title>
@@ -1419,7 +1494,7 @@ Halting VM
 	<formalpara>
 		<title>32-Bit or 64-Bit JDK</title>
 		<para>
-			If the system uses 64-Bit Linux or Windows architecure, the 64-bit JDK is strongly recommended over the 32-bit version. The following heuristics should be considered in determining whether the 64-bit Java Virtual Machine (JVM) is suitable:
+			If the system uses 64-Bit Linux or Windows architecture, the 64-bit JDK is strongly recommended over the 32-bit version. The following heuristics should be considered in determining whether the 64-bit Java Virtual Machine (JVM) is suitable:
 		</para>
 	</formalpara>
 	<itemizedlist>
@@ -1450,30 +1525,29 @@ Halting VM
 		</para>
 	</note>
 	<!--  <formalpara
-			id="jdkicar-binary-Java_Development_Kit-Pre-Install Requirements and Prerequisites">
-			<title>Pre-Install Requirements and Prerequisites</title>
-			<para></para>
-		</formalpara>  --><!--   <variablelist
-			condition="jdkicar-binary-Java_Development_Kit-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para></para>
-				</listitem>
-			</varlistentry>
-		</variablelist>   --><!--   <variablelist
-			condition="jdkicar-binary-Java_Development_Kit-Software_Prerequisites">
-			<title>Software Prerequisites</title>
-			<varlistentry>
-				<term></term>
-				<listitem>
-					<para></para>
-				</listitem>
-			</varlistentry>
-		</variablelist>   -->
-	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Downloading">  --><title>Downloading</title>
+   id="jdkicar-binary-Java_Development_Kit-Pre-Install Requirements and Prerequisites">
+   <title>Pre-Install Requirements and Prerequisites</title>
+   <para></para>
+  </formalpara>  --><!--   <variablelist
+   condition="jdkicar-binary-Java_Development_Kit-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>   --><!--   <variablelist
+   condition="jdkicar-binary-Java_Development_Kit-Software_Prerequisites">
+   <title>Software Prerequisites</title>
+   <varlistentry>
+    <term></term>
+    <listitem>
+     <para></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>   --> <formalpara>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Downloading">  --> <title>Downloading</title>
 		<para>
 			Download the Sun JDK 5.0 (Java 2 Development Kit) from Sun's website: <ulink url="http://java.sun.com/javase/downloads/index_jdk5.jsp"/>. Click the <guilabel>Download</guilabel> link next to "JDK 5.0 Update <replaceable>&lt;x&gt;</replaceable>" (where <replaceable>&lt;x&gt;</replaceable> is the latest minor version release number).
 		</para>
@@ -1497,7 +1571,7 @@ Halting VM
 		If installing the JDK on Red Hat Enterprise Linux, Fedora, or another RPM-based Linux system, it is recommended that the self-extracting file containing the RPM package is selected. This option will set up and use the SysV service scripts in addition to installing the JDK. The RPM option is also recommended if the <application condition="mob">Mobicents</application> platform is being set up in a production environment.
 	</para>
 	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Installing">  --><title>Installing</title>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Installing">  --> <title>Installing</title>
 		<para>
 			The following procedures detail how to install the Java Development Kit on both Linux and Windows.
 		</para>
@@ -1509,7 +1583,7 @@ Halting VM
 				Ensure the file is executable, then run it:
 			</para>
 			<!--   ~]$ chmod +x "jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
-~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"   -->
+~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"   --> 
 <screen>~]$ chmod +x "jdk-1_5_0_&lt;minor_version&gt;-linux-&lt;architecture&gt;-rpm.bin"
 ~]$ ./"jdk-1_5_0_&lt;minor_version&gt;-linux-&lt;architecture&gt;-rpm.bin"
 </screen>
@@ -1537,7 +1611,7 @@ Halting VM
 	</procedure>
 	
 	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Configuring">  --><title>Configuring</title>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Configuring">  --> <title>Configuring</title>
 		<para>
 			Configuring the system for the JDK consists of two tasks: setting the <envar>JAVA_HOME</envar> environment variable, and ensuring the system is using the proper JDK (or JRE) using the <command>alternatives</command> command. Setting <envar>JAVA_HOME</envar> generally overrides the values for <command>java</command>, <command>javac</command> and <command>java_sdk_1.5.0</command> in <command>alternatives</command>, however it is recommended to specify the value for consistency.
 		</para>
@@ -1572,12 +1646,9 @@ Halting VM
 		<varlistentry>
 			<term>Setting <envar>java</envar>, <envar>javac</envar> and <envar>java_sdk_1.5.0</envar> using the <command>alternatives</command> command </term>
 			<listitem>
-				<formalpara>
-					<title>Selecting the Correct System JVM on Linux using <command>alternatives</command></title>
-					<para>
-						On systems with the <command>alternatives</command> command, including Red Hat Enterprise Linux and Fedora, it is possible to choose which JDK (or JRE) installation to use, as well as which <command>java</command> and <command>javac</command> executables should be run when called.
-					</para>
-				</formalpara>
+				<para>
+					On systems with the <command>alternatives</command> command, including Red Hat Enterprise Linux and Fedora, it is possible to choose which JDK (or JRE) installation to use, as well as which <command>java</command> and <command>javac</command> executables should be run when called.
+				</para>
 				<para>
 					<emphasis>As the superuser</emphasis>, call <command>/usr/sbin/alternatives</command> with the <option>--config java</option> option to select between JDKs and JREs installed on your system:
 				</para>
@@ -1619,7 +1690,7 @@ Enter to keep the current selection[+], or type selection number:
 		</varlistentry>
 	</variablelist>
 	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Testing">  --><title>Testing</title>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Testing">  --> <title>Testing</title>
 		<para>
 			To ensure the correct JDK or Java version (5 or higher), and that the java executable is in the <envar>PATH</envar> environment variable, run the <command>java -version</command> command in the terminal from the home directory:
 		</para>
@@ -1632,16 +1703,15 @@ Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_16-b03)
 Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 </screen>
 	<!--  <formalpara
-		id="jdkicar-binary-Java_Development_Kit-Running">
-		<title>Running</title>
-		<para></para>
-	</formalpara>  --><!--   <formalpara
-		id="jdkicar-binary-Java_Development_Kit-Stopping">
-		<title>Stopping</title>
-		<para></para>
-	</formalpara>   -->
-	<formalpara>
-		<!--  id="jdkicar-binary-Java_Development_Kit-Uninstalling">  --><title>Uninstalling</title>
+  id="jdkicar-binary-Java_Development_Kit-Running">
+  <title>Running</title>
+  <para></para>
+ </formalpara>  --><!--   <formalpara
+  id="jdkicar-binary-Java_Development_Kit-Stopping">
+  <title>Stopping</title>
+  <para></para>
+ </formalpara>   --> <formalpara>
+		<!--  id="jdkicar-binary-Java_Development_Kit-Uninstalling">  --> <title>Uninstalling</title>
 		<para>
 			It is not necessary to remove a particular JDK from a system, because the JDK and JRE version can be switched as required using the <command>alternatives</command> command, and/or by setting <envar>JAVA_HOME</envar>.
 		</para>
@@ -1783,7 +1853,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 			<title>Installing the MSS for Tomcat Binary Distribution on Windows</title>
 			<step>
 				<para>
-					For this example, we'll assume that you downloaded the binary distribution zip file to the <filename>My Downloads</filename> folder. First, using Windows Explorer, create a subfolder in <filename>My Downloads</filename> to extract the zip file's contents into. When you name this folder, it is good practice to include the version number; if you do so, remember to correctly match it with the version of the MSS for Tomcat binary distribution you downloaded. In these instructions, we will refer to this folder as <filename>mss-tomcat-<replaceable>&lt;version&gt;</replaceable></filename>.
+					For this example, we'll assume that you downloaded the binary distribution zip file to the <filename>My Downloads</filename> folder. First, using Windows Explorer, create a subdirectory in <filename>My Downloads</filename> to extract the zip file's contents into. When you name this folder, it is good practice to include the version number; if you do so, remember to correctly match it with the version of the MSS for Tomcat binary distribution you downloaded. In these instructions, we will refer to this folder as <filename>mss-tomcat-<replaceable>&lt;version&gt;</replaceable></filename>.
 				</para>
 			</step>
 			<step>
@@ -1978,7 +2048,7 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm
 					There are several different ways to start the Tomcat Servlet Container on Windows. All of the following methods accomplish the same task.
 				</para>
 				<para>
-					Using Windows Explorer, change your folder to the one in which you unzipped the downloaded zip file, and then to the <filename>bin</filename> subfolder.
+					Using Windows Explorer, change your folder to the one in which you unzipped the downloaded zip file, and then to the <filename>bin</filename> subdirectory.
 				</para>
 			</step>
 			<step>
@@ -1989,7 +2059,7 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm
 				<step>
 					<para>
 						As mentioned above, the best way to start the Tomcat Servlet Container is by using the Command Prompt. Doing it this way will allow you to view all of the server startup details, which will enable you to easily determine whether any problems were encountered during the startup process. You can open the Command Prompt directly from the <filename>&lt;topmost_directory&gt;\bin</filename> folder in Windows Explorer,<!-- (see <xref
-								linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Opening_the_Command_Prompt_from_Windows_Explorer"/> for details) --> or you can open the Command Prompt via the <guilabel>Start</guilabel> menu and navigate to the correct folder:
+        linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Opening_the_Command_Prompt_from_Windows_Explorer"/> for details) --> or you can open the Command Prompt via the <guilabel>Start</guilabel> menu and navigate to the correct folder:
 					</para>
 					
 <screen>C:\Users\Me\My Downloads&gt; cd "mss-tomcat-&lt;version&gt;"
@@ -2052,7 +2122,7 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm
 			<title>Stopping MSS for Tomcat on Windows</title>
 			<step>
 				<para>
-					Stopping the Tomcat Servlet Container on Windows consists in executing the <filename>shutdown.bat</filename> executable batch script in the <filename>bin</filename> subfolder of the SIP Servlets-customized Tomcat binary distribution:
+					Stopping the Tomcat Servlet Container on Windows consists in executing the <filename>shutdown.bat</filename> executable batch script in the <filename>bin</filename> subdirectory of the SIP Servlets-customized Tomcat binary distribution:
 				</para>
 				
 <screen>C:\Users\Me\My Downloads\mss-tomcat-&lt;version&gt;&gt;bin\shutdown.bat
@@ -2104,15 +2174,15 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm
 			<title>Adding a SIP Connector to server.xml</title>
 			
 <programlisting linenumbering="unnumbered" role="XML">
-  &lt;Connector	port="5080" 
+  &lt;Connector port="5080" 
 ipAddress="127.0.0.1"
-	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	signalingTransport="udp"
-	usePrettyEncoding="false"
-	useStun="false"
-	stunServerAddress="stun01.sipphone.com"
-	stunServerPort="3478"
-	sipStackPropertiesFile="conf/mss-sip-stack.properties"/&gt;
+ protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+ signalingTransport="udp"
+ usePrettyEncoding="false"
+ useStun="false"
+ stunServerAddress="stun01.sipphone.com"
+ stunServerPort="3478"
+ sipStackPropertiesFile="conf/mss-sip-stack.properties"/&gt;
 </programlisting>
 		</example>
 		<variablelist>
@@ -2145,7 +2215,7 @@ ipAddress="127.0.0.1"
 				<term>signalingTransport</term>
 				<listitem>
 					<para>
-						Specifies the transport on which the container will be able to receive SIP messages. For example, <quote>udp</quote>.
+						Specifies the transport on which the container will be able to receive SIP messages. For example, "udp".
 					</para>
 				</listitem>
 			</varlistentry>
@@ -2153,7 +2223,7 @@ ipAddress="127.0.0.1"
 				<term>usePrettyEncoding</term>
 				<listitem>
 					<para>
-						Allows Via, Route, and RecordRouteheader field information to be split into multiple lines, rather than each header field being separating with a comma. The attribute defaults to <quote>true</quote>. Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.
+						Allows Via, Route, and RecordRoute header field information to be split into multiple lines, rather than each header field being separating with a comma. The attribute defaults to "true". Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.
 					</para>
 				</listitem>
 			</varlistentry>
@@ -2161,7 +2231,7 @@ ipAddress="127.0.0.1"
 				<term>useStun</term>
 				<listitem>
 					<para>
-						Enables Session Traversal Utilities for NAT (STUN) support for this Connector. The attribute defaults to <quote>false</quote>. If set to <quote>true</quote>, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.
+						Enables Session Traversal Utilities for NAT (STUN) support for this Connector. The attribute defaults to "false". If set to "true", ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.
 					</para>
 				</listitem>
 			</varlistentry>
@@ -2169,7 +2239,7 @@ ipAddress="127.0.0.1"
 				<term>stunServerAddress</term>
 				<listitem>
 					<para>
-						Specifies the STUN server address used to discover the public IP address of the SIP Connector. This attribute is only required if the <literal>useStun</literal> attribute is set to <quote>true</quote>. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN and public STUN servers.
+						Specifies the STUN server address used to discover the public IP address of the SIP Connector. This attribute is only required if the <literal>useStun</literal> attribute is set to "true". Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN and public STUN servers.
 					</para>
 				</listitem>
 			</varlistentry>
@@ -2177,7 +2247,7 @@ ipAddress="127.0.0.1"
 				<term>stunServerPort</term>
 				<listitem>
 					<para>
-						Specifies the STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute. You should rarely need to change this attribute; also, it is only needed if the <literal>useStun</literal> attribute is set to <quote>true</quote>. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.
+						Specifies the STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute. You should rarely need to change this attribute; also, it is only needed if the <literal>useStun</literal> attribute is set to "true". Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.
 					</para>
 				</listitem>
 			</varlistentry>
@@ -2239,7 +2309,7 @@ ipAddress="127.0.0.1"
 		</variablelist>
 		<note>
 			<para>
-				A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface SipStack page on nist.gov</ulink>. For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.
+				A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>. For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.
 			</para>
 		</note>
 	</section>
@@ -2260,10 +2330,10 @@ ipAddress="127.0.0.1"
 			
 <programlisting linenumbering="unnumbered" role="XML">
   &lt;Service name="Sip-Servlets"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
-	sip-servlets-examples/reinvite-demo/reinvite-dar.properties"&gt;
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
+ sip-servlets-examples/reinvite-demo/reinvite-dar.properties"&gt;
 </programlisting>
 		</example>
 		<para>
@@ -2320,13 +2390,16 @@ ipAddress="127.0.0.1"
 </chapter>
 	<chapter id="sssicar-SIP_Servlets_Server-Application-Router" lang="en-US">
 	<!--  chapter id nickname: sssicar  --><title>Application Router</title>
+	<para>
+		The following sections describe the Default Application Router.
+	</para>
 	<section id="tsdar-Default-Application-Router" lang="en-US">
 	<title>Default Application Router</title>
+	<para>
+		The Application Router is called by the container to select a SIP servlet application to service an initial request. It embodies the logic used to choose which applications to invoke.
+	</para>
 	<section id="tsdar-Application-Router-Role">
 		<title>Role of the Application Router</title>
-		<para>
-			The Application Router is called by the container to select a SIP servlet application to service an initial request. It embodies the logic used to choose which applications to invoke.
-		</para>
 		<para>
 			An Application Router is required for a container to function, but it is a separate logical entity from the container. The Application Router is solely responsible for application selection and does not implement application logic. For example, the Application Router cannot modify a request or send a response.
 		</para>
@@ -2349,7 +2422,7 @@ ipAddress="127.0.0.1"
 		<section id="tsdar-DAR-Configuration-File">
 			<title>the DAR Configuration file</title>
 			<para>
-				The Default Application Router (DAR) works off a simple configuration text file which is modeled as a Java properties file. It contains the information needed by the Application Router to select which SIP Serlet application will handle an incoming initial request. Here is the definition of the DAR configuration file :
+				The Default Application Router (DAR) works off a simple configuration text file which is modeled as a Java properties file. It contains the information needed by the Application Router to select which SIP Servlet application will handle an incoming initial request. Here is the definition of the DAR configuration file :
 			</para>
 			<itemizedlist>
 				<listitem>
@@ -2369,7 +2442,7 @@ ipAddress="127.0.0.1"
 				</listitem>
 				<listitem>
 					<para>
-						The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated stringified value for the SipApplicationRouterInfo object.
+						The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated string value for the SipApplicationRouterInfo object.
 					</para>
 					
 <screen>INVITE: (sip-router-info-1), (sip-router-info-2)..
@@ -2384,7 +2457,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 				</para>
 			</note>
 			<para>
-				The sip-router-info data that goes in the properties file is a stringified version of the SipApplicationRouterInfo object. It consists of the following information :
+				The sip-router-info data that goes in the properties file is a string value version of the SipApplicationRouterInfo object. It consists of the following information :
 			</para>
 			<itemizedlist>
 				<listitem>
@@ -2439,7 +2512,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			<section>
 				<title>Initial Requests and Application Selection Process</title>
 				<para>
-					Initial Requests are requests that can essentialy be dialog creating (<emphasis role="bold">"INVITE", "SUBSCRIBE", "NOTIFY", ... </emphasis>) and not part of an already existing dialog. (There is some other corner cases that you can check in the Sip Servlets 1.1 specification, Appendix B Definition of an Initial Request )
+					Initial Requests are requests that can essentially be dialog creating (<emphasis role="bold">"INVITE", "SUBSCRIBE", "NOTIFY", ... </emphasis>) and not part of an already existing dialog. (There is some other corner cases that you can check in the Sip Servlets 1.1 specification, Appendix B Definition of an Initial Request )
 				</para>
 				<para>
 					Those Initial requests are routed to applications deployed in the container according to the Sip Servlets 1.1 specification, Section 15.4.1 Procedure for Routing an Initial Request.
@@ -2456,7 +2529,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 </screen>
 				</para>
 				<para>
-					a new INVITE (not a re-INVITE) arrives at the container. Since it is a dialog creating request and the INVITE is not part of any dialog, the Application Router is called. It will see that the first application to invoke is the LocationService so it will return that information to the container (along with the rest of the sip-router-info data) so that the container knows which application to invoke.
+					A new INVITE (not a re-INVITE) arrives at the container. Since it is a dialog creating request and the INVITE is not part of any dialog, the Application Router is called. It will see that the first application to invoke is the LocationService so it will return that information to the container (along with the rest of the sip-router-info data) so that the container knows which application to invoke.
 				</para>
 				<para>
 					The container thus invokes the LocationService that proxies the INVITE (which is considered essentially as a new INVITE see Sip Servlets 1.1 Specification, Section 15.2.2 Sending an Initial Request) to the known IP Address of the registered user for the Request URI.
@@ -2468,11 +2541,11 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 					The container will route the INVITE within the container to the next application in the chain, The Call Blocking application will decide that the user calling is black listed so it will reject the call with a Forbidden response. Since the Call Blocking acted as a UAS the Application Selection Process is stopped. (the container will not invoke the application router anymore for this INVITE).
 				</para>
 				<para>
-					The path that the INVITE has taken (ie LocationService, CallBlocking) is called the application path. the Routing of the responses will now occur as explained in the next section.
+					The path that the INVITE has taken (that is, LocationService, CallBlocking) is called the application path. The Routing of the responses will now occur as explained in the next section.
 				</para>
 				<note>
 					<para>
-						the assumption of a request coming to the server was taken, but applications can act as UAC and also generate initial requests on their own. In such cases, no entry in the dar file is needed for the given application initiating the request to be able to route it to ohter applications in the container or outside.
+						The assumption of a request coming to the server was taken, but applications can act as UAC and also generate initial requests on their own. In such cases, no entry in the dar file is needed for the given application initiating the request to be able to route it to ohter applications in the container or outside.
 					</para>
 				</note>
 			</section>
@@ -2528,7 +2601,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 	<section>
 		<title>Description</title>
 		<para>
-			Instead of using our Mobicents Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used such as the <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC Application Router from ECharts</ulink>
+			Instead of using our Mobicents Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used such as the <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC Application Router from eCharts</ulink>
 		</para>
 	</section>
 	
@@ -2559,8 +2632,188 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 
 </section>
 </chapter>
-	<chapter id="sfss-Services_for_SIP_Servlets" lang="en-US">
-	<!--  chapter id nickname: sfss  --><title>Services for Mobicents SIP Servlets</title>
+	<chapter id="ssea-SIP_Servlet_Example_Applications" lang="en-US">
+	<!--  chapter id nickname: afotsss  --><title>SIP Servlet Example Applications</title>
+	<para>
+		The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server. <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the available examples, their location, and a brief description about the functionality each example demonstrates. The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples. Each example is available in both binary and source formats.
+	</para>
+	<table frame="all" id="tab-ssea-SIP_Servlet_Example_Applications">
+		<title>Available Examples</title>
+		<tgroup align="left" cols="2" colsep="1" rowsep="1">
+			<colspec colname="c1"/>
+			<colspec colname="c2"/>
+			<thead>
+				<row>
+					<entry align="center">
+						Example
+					</entry>
+					<entry align="center">
+						Description
+					</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>
+						<xref linkend="sfss-The_Call-Blocking_Service"/>
+					</entry>
+					<entry>
+						Demonstrates how to block calls by specifying that the INVITE SIP Extension checks the <literal>From</literal> address to see if it is specified in the block list. If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<xref linkend="sfss-The_Call-Forwarding_Service"/>
+					</entry>
+					<entry>
+						Demonstrates how to forward calls by specifying that the INVITE SIP Extension checks the <literal>To</literal> address to see if it is specified in the forward list. If the SIP address matches, the application acts as a back-to-back user agent (B2BUA).
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<xref linkend="sfss-The_Call-Controller_Service"/>
+					</entry>
+					<entry>
+						Call Blocking and Call Forwarding are merged to create a new service.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/speed_dial.html">Speed Dial</ulink>
+					</entry>
+					<entry>
+						Demonstrates how to implement speed dialing for SIP addresses. The demonstration uses a static list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<xref linkend="sfss-The_Location_Service"/>
+					</entry>
+					<entry>
+						Demonstrates a location service that performs a lookup based on the request URI, into a hard-coded list of addresses. The request is proxied to the set of destination addresses associated with that URI.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/speeddial_locationservice.html">Composed Speed Dial and Location</ulink>
+					</entry>
+					<entry>
+						Speed Dial and Location are merged to create a new service. Speed Dial proxies the speed dial number to a SIP address, then Location Service proxies the call to the actual location of the call recipient.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/click2call.html">Click to Call</ulink>
+					</entry>
+					<entry>
+						Demonstrates how SIP Servlets can be used along with HTTP servlets as a converged application to place calls from a web portal. The example is a modified version of the click to dial example from the Sailfin project, but has been reworked to comply with JSR 289.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/chatserver.html">Chat Server</ulink>
+					</entry>
+					<entry>
+						Demonstrates <literal>MESSAGE</literal> SIP Extension support. This example is based on the chatroom server demonstration from the BEA dev2dev project, and has been modified to meet JSR 289 requirements.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/media-demo.html">Media</ulink>
+					</entry>
+					<entry>
+						Demonstrates how the media playback SIP Servlet can build a media file customized with the name of the user, based on the information in the FROM header. This example is only compatible with JBoss AS. The solution is know to work with Ekiga and linphone SIP soft-phones.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/shopping-demo.html">Shopping</ulink>
+					</entry>
+					<entry>
+						Demonstrates integration with Seam and Java Enterprise Edition (JEE), and Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets Interoperability</ulink>
+					</entry>
+					<entry>
+						Demonstrates how the <productname condition="mob">Mobicents</productname>
+						 platform components can work in concert with each other to provide a integrated solution. All major components of the platform are used in this example, which was created to demonstrate to JavaOne 2008 delegates a possible use case scenario for the platform.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/facebook-c2c.html">Facebook Click to Call</ulink>
+					</entry>
+					<entry>
+						Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plug-in that allows user to call POTS phones through a SIP-PSTN gateway provider. This demonstration is only available from the source repository; no binary is available.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<xref linkend="sfss-The_Diameter_Event-Changing_Service"/>
+					</entry>
+					<entry>
+						Demonstrates how the Diameter Event Charging, and the Location service, can be used to perform fixed-rated charging of calls (event charging). When a call is initiated, a debit of ten euros is applied to the <literal>A Party</literal> account. If the call is rejected by the <literal>B Party</literal>, or <literal>A Party</literal> hangs up before <literal>B Party</literal> can answer the call, the ten euro charge is credited to the <literal>A Party</literal> account.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/mss-diameter_sh.html">Diameter Sh OpenIMS Integration</ulink>
+					</entry>
+					<entry>
+						Demonstrates the integration between <productname condition="mob">Mobicents</productname>
+						 and OpenIMS, using the Diameter Sh interface to receive profile updates and SIP.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/conference-demo.html">Conference</ulink>
+					</entry>
+					<entry>
+						Demonstrates the capabilities of the Media Server, such as endpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google's GWT Ajax framework with server-push updates to provide a desktop-like user interface experience.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX</ulink>
+					</entry>
+					<entry>
+						Demonstrates how a SIP PBX solution can be deployed using the <productname condition="mob">Mobicents</productname>
+						 platform. For more information, refer to <xref linkend="mipbx-Media_IPBX"/>.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/mss-jruby-example.html">JRuby on Rails SIP Servlets</ulink>
+					</entry>
+					<entry>
+						Demonstrates how JRuby on Rails can be used by the <productname condition="mob">Mobicents</productname>
+						 platform to provide a multi-language application that can initiate phone calls to customers after they log a complaint through a web portal.
+					</entry>
+				</row>
+				<row>
+					<entry>
+						<ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">Pure JRuby on Rails Telco</ulink>
+					</entry>
+					<entry>
+						Builds on the JRuby on Rails SIP Servlets demonstration, but adds the ability to call the application rather that initially interact through the web portal. The application has the ability to set up and tear down the call.
+					</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</table>
+	<!-- <xi:include href="concept-section-SS_Concurrency_and_Congestion_Control.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_Load_Balancer.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_SIP_Servlet_Security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_SIP_Extensions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_Seam_Telco_Framework.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_STUN_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_Media_IPBX.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_for_JBoss-Clustering_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+ <xi:include href="concept-section-SS_for_JBoss-Failover_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" /> --> <section id="sfss-Services_for_SIP_Servlets" lang="en-US">
+	<!--  chapter id nickname: sfss  --><title>Operating the Example Applications</title>
 	<section id="sfss-The_Location_Service">
 		<title>The Location Service</title>
 		<para>
@@ -2569,7 +2822,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 		<note id="sfss-The_Location_Service_Mappings_Cannot_Currently_Be_Configured">
 			<title>The Location Service Mappings Cannot Currently Be Configured</title>
 			<para>
-				The Location Service currently performs a lookup on a hard-coded list of addresses. This model is evolving towards the eventual use of a database.
+				The Location Service currently performs a lookup on a hard-coded list of addresses. This model is evolving toward the eventual use of a database.
 			</para>
 		</note>
 		<para>
@@ -2593,7 +2846,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			</listitem>
 			<listitem>
 				<para>
-					One of the destinations returns a <literal>200 OK</literal> status code; the second proxy is then cancelled.
+					One of the destinations returns a <literal>200 OK</literal> status code; the second proxy is then canceled.
 				</para>
 			</listitem>
 			<listitem>
@@ -2618,23 +2871,24 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 				</para>
 			</listitem>
 		</itemizedlist>
-		<!--  The Location Service  -->
-		<section id="sfss-binary-Location_Service--Installing_Configuring_and_Running">
+		<!--  The Location Service  --> <section id="sfss-binary-Location_Service--Installing_Configuring_and_Running">
 			<title>The Location Service: Installing, Configuring and Running</title>
 			<formalpara id="sfss-binary-Location_Service-Pre-Install_Requirements_and_Prerequisites">
 				<title>Pre-Install Requirements and Prerequisites</title>
+				<para>
+					The following requirements must be met before installation can begin.
+				</para>
 			</formalpara>
 			<!--  <variablelist
-			id="sfss-binary-Location_Service-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para>&nbsp;</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>  -->
-			<variablelist id="sfss-binary-Location_Service-Software_Prerequisites">
+   id="sfss-binary-Location_Service-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para>&nbsp;</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>  --> <variablelist id="sfss-binary-Location_Service-Software_Prerequisites">
 				<title>Software Prerequisites</title>
 				<varlistentry>
 					<term>Either an MSS for JBoss or an MSS for Tomcat Installation</term>
@@ -2704,10 +2958,10 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 							<title>Editing MSS for JBoss's server.xml for the Location Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="jboss.web"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/locationservice-dar.properties"&gt;
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/locationservice-dar.properties"&gt;
 </programlisting>
 						</example>
 						<para>
@@ -2725,10 +2979,10 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 							<title>Editing MSS for Tomcat's server.xml for the Location Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="Sip-Servlets"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/locationservice-dar.properties"&gt;
+ name="Sip-Servlets"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/locationservice-dar.properties"&gt;
 </programlisting>
 						</example>
 						<para>
@@ -2759,7 +3013,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 				<title/>
 				<step>
 					<para>
-						Start two SIP softphones. The first phone should be set up as <userinput>sip:receiver@sip-servlets.com</userinput> at IP address <userinput>127.0.0.1</userinput> on port <userinput>5090</userinput>. The second phone can be set up in any way you like. Note that the SIP phones do not have to be registered.
+						Start two SIP soft-phones. The first phone should be set up as <userinput>sip:receiver@sip-servlets.com</userinput> at IP address <userinput>127.0.0.1</userinput> on port <userinput>5090</userinput>. The second phone can be set up in any way you like. Note that the SIP phones do not have to be registered.
 					</para>
 				</step>
 				<step>
@@ -2770,18 +3024,17 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			</procedure>
 			
 			<!-- <formalpara
-			id="sfss-binary-Location_Service-Using">
-			<title>Using</title>
-			<para>&nbsp;</para>
-		</formalpara> -->
-			<formalpara id="sfss-binary-Location_Service-Stopping">
+   id="sfss-binary-Location_Service-Using">
+   <title>Using</title>
+   <para>&nbsp;</para>
+  </formalpara> --> <formalpara id="sfss-binary-Location_Service-Stopping">
 				<title>Stopping</title>
 				<para>
-					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
+					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
 				</para>
 			</formalpara>
 			<para>
-				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
+				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
 			</para>
 			<formalpara id="sfss-binary-Location_Service-Uninstalling">
 				<title>Uninstalling</title>
@@ -2810,63 +3063,58 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 		<procedure id="sfss-Diameter_Event-Changing_Service_Step-By-Step">
 			<title>Diameter Event-Changing Service Step-By-Step</title>
 			<step>
-				<!-- * Alice makes a call to sip:receiver@sip-servlets.com. The INVITE is received by the servlet container which sends the debit request to the Charging Server and invokes the location service -->
-				<para>
+				<!-- * Alice makes a call to sip:receiver@sip-servlets.com. The INVITE is received by the servlet container which sends the debit request to the Charging Server and invokes the location service --> <para>
 					A user, Alice, makes a call to <literal>sip:receiver@sip-servlets.com</literal>. The <literal>INVITE</literal> is received by the servlet container, which sends a request to debit Alice's account to the Charging Server. The servlet container then invokes the location service.
 				</para>
 			</step>
 			<step>
-				<!-- * The location service determines, using non-SIP means, where the callee (receiver) is registered with two locations, identified by, say, two SIP URIs (sip:receiver@127.0.0.1:5090 and sip:receiver@127.0.0.1:6090). -->
-				<para>
+				<!-- * The location service determines, using non-SIP means, where the callee (receiver) is registered with two locations, identified by, say, two SIP URIs (sip:receiver@127.0.0.1:5090 and sip:receiver@127.0.0.1:6090). --> <para>
 					the Location Service determines, without using the SIP protocol itself, where the callee—or receiver—is registered. The callee may be registered at two locations identified by two SIP URIs: <literal>sip:receiver@127.0.0.1:5090</literal> and <literal>sip:receiver@127.0.0.1:6090</literal>.
 				</para>
 			</step>
 			<step>
-				<!-- * The service proxies to those two destinations in parallel, without record-routing, and without the supervised mode. -->
-				<para>
+				<!-- * The service proxies to those two destinations in parallel, without record-routing, and without the supervised mode. --> <para>
 					The Location Service proxies to those two destinations simultaneously, without record-routing and without using supervised mode.
 				</para>
 			</step>
 			<step>
-				<!-- * Once one of the destinations return 200 (OK), the other branch is cancelled by the container. -->
-				<para>
+				<!-- * Once one of the destinations return 200 (OK), the other branch is cancelled by the container. --> <para>
 					One of the destinations returns <literal>200 (OK)</literal>, and so the container cancels the other.
 				</para>
 			</step>
 			<step>
-				<!-- * The 200 is forwarded upstream to Alice and the call setup is completed as per usual. -->
-				<para>
+				<!-- * The 200 is forwarded upstream to Alice and the call setup is completed as per usual. --> <para>
 					The <literal>200 (OK)</literal> is forwarded upstream to Alice and the call setup is carried out as usual.
 				</para>
 			</step>
 			<step>
-				<!-- * If none of the destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to credit the 10.0 euros debited. -->
-				<para>
+				<!-- * If none of the destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to credit the 10.0 euros debited. --> <para>
 					If neither or none of the registered destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to debit the already-credited €10.00
 				</para>
 			</step>
 		</procedure>
 		
-		<!--  Diameter Event-Changing Service  -->
-		<section id="sfss-binary-Diameter_Event-Changing_Service--Installing_Configuring_and_Running">
+		<!--  Diameter Event-Changing Service  --> <section id="sfss-binary-Diameter_Event-Changing_Service--Installing_Configuring_and_Running">
 			<title>Diameter Event-Changing Service: Installing, Configuring and Running</title>
 			<para>
 				Preparing your MSS for JBoss server to run the Diameter Event-Changing example requires downloading a WAR archive, a DAR archive, the Ericsson Charging Emulator, setting an attribute in JBoss's <filename>server.xml</filename> configuration file, and then running JBoss AS. Detailed instructions follow.
 			</para>
 			<formalpara id="sfss-binary-Diameter_Event-Changing_Service-Pre-Install_Requirements_and_Prerequisites">
 				<title>Pre-Install Requirements and Prerequisites</title>
+				<para>
+					The following requirements must be met before installation can begin.
+				</para>
 			</formalpara>
 			<!--  <variablelist
-			id="sfss-binary-Diameter_Event-Changing_Service-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para>&nbsp;</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>  -->
-			<variablelist id="sfss-binary-Diameter_Event-Changing_Service-Software_Prerequisites">
+   id="sfss-binary-Diameter_Event-Changing_Service-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para>&nbsp;</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>  --> <variablelist id="sfss-binary-Diameter_Event-Changing_Service-Software_Prerequisites">
 				<title>Software Prerequisites</title>
 				<varlistentry>
 					<term>One MSS for JBoss Installation</term>
@@ -2874,15 +3122,14 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 						<para>
 							Before proceeding, you should follow the instructions for installing, configuring, running and testing MSS for JBoss from the binary distribution.
 						</para>
-						<itemizedlist>
-							<listitem>
-							</listitem>
-						</itemizedlist>
 					</listitem>
 				</varlistentry>
 			</variablelist>
 			<formalpara id="sfss-binary-Diameter_Event-Changing_Service-Downloading">
 				<title>Downloading</title>
+				<para>
+					The following procedure describes how to download the required files.
+				</para>
 			</formalpara>
 			<procedure>
 				<step>
@@ -2892,7 +3139,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 				</step>
 				<step>
 					<para>
-						Secondly, download the corresponding Disk ARchive (<acronym>DAR</acronym>) configuration file here: <filename/>, from <ulink url="http://www.mobicents.org/diametereventcharging-dar.properties"/>.
+						Secondly, download the corresponding Disk Archive (<acronym>DAR</acronym>) configuration file here: <ulink url="http://www.mobicents.org/diametereventcharging-dar.properties"/>.
 					</para>
 				</step>
 				<step>
@@ -2904,11 +3151,14 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			
 			<formalpara id="sfss-binary-Diameter_Event-Changing_Service-Installing">
 				<title>Installing</title>
+				<para>
+					The following procedure describes how to install the downloaded files.
+				</para>
 			</formalpara>
 			<procedure>
 				<step>
 					<para>
-						Place the <filename>diameter-event-charging-1.0.war</filename> WAR archive into the <filename>jboss_home/server/&lt;profile&gt;/deploy</filename> directory, where <filename>&lt;deploy&gt;</filename> is your Configuration Profile, whether <quote>default</quote> or <quote>all</quote> (the latter if you are using MSS for JBoss's clustering capabilities).
+						Place the <filename>diameter-event-charging-1.0.war</filename> WAR archive into the <filename>jboss_home/server/&lt;profile&gt;/deploy</filename> directory, where <filename>&lt;deploy&gt;</filename> is your Configuration Profile, whether "default" or "all" (the latter if you are using MSS for JBoss's clustering capabilities).
 					</para>
 				</step>
 				<step>
@@ -2936,7 +3186,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			<formalpara id="sfss-binary-Diameter_Event-Changing_Service-Configuring">
 				<title>Configuring</title>
 				<para>
-					To configure the server for the Event-Changing example, simply open the <filename>server.xml</filename> configuration file in your server's <filename><envar>$JBOSS_HOME</envar>/server/&lt;profile&gt;/deploy/jboss-web.deployer/</filename> directory, and edit the value of the <literal>darConfigurationFileLocation</literal> attribute of the <literal>Service</literal> element so that it is <quote><literal>conf/dars/mobicents-dar.properties</literal> </quote>. For example:
+					To configure the server for the Event-Changing example, simply open the <filename>server.xml</filename> configuration file in your server's <filename><envar>$JBOSS_HOME</envar>/server/&lt;profile&gt;/deploy/jboss-web.deployer/</filename> directory, and edit the value of the <literal>darConfigurationFileLocation</literal> attribute of the <literal>Service</literal> element so that it is <literal>conf/dars/mobicents-dar.properties</literal>.
 				</para>
 			</formalpara>
 			<example id="sfss-Editing_the_darConfigurationFileLocation_Attribute_of_the_Service_Tag">
@@ -2946,16 +3196,18 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 
 &lt;Service name="jboss.web"
       className="org.mobicents.servlet.sip.startup.SipStandardService"
-  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
-  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"&gt;
+    sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+    sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter"
+    darConfigurationFileLocation="conf/dars/mobicents-dar.properties"&gt;
 
 ...
 </programlisting>
 			</example>
-			<!-- <para>Your server is now set up to run the Event-Changing example.</para> -->
-			<formalpara id="sfss-binary-Diameter_Event-Changing_Service-Running">
+			<!-- <para>Your server is now set up to run the Event-Changing example.</para> --> <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Running">
 				<title>Running</title>
+				<para>
+					The following procedure describes how to run the Diameter Event-Changing Service.
+				</para>
 			</formalpara>
 			<procedure id="sfss-Diameter_Event-Changing_Service">
 				<title>Diameter Event-Changing Service</title>
@@ -2966,7 +3218,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</step>
 				<step>
 					<para>
-						Then, run the Ericsson Charging Emulator. Open a terminal, change the working directory to the location of the unzipped Charging Emulator files (in <filename>ChargingSDK-1_0_D31E</filename> or a similarly-named directory), and run it with the <command>java -jar <filename>PPSDiamEmul.jar</filename> </command> command:
+						Then, run the Ericsson Charging Emulator. Open a terminal, change the working directory to the location of the unzipped Charging Emulator files (in <filename>ChargingSDK-1_0_D31E</filename> or a similarly-named directory), and run it with the <command>java -jar <filename>PPSDiamEmul.jar</filename></command> command:
 					</para>
 					
 <screen>~]$ java -jar PPSDiamEmul.jar
@@ -2983,7 +3235,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			<note id="sfss-SIP_SoftPhone_Which">
 				<title>SIP (Soft)Phone? Which?</title>
 				<para>
-					The Mobicents team recommends one of the following SIP phones, and has found that they work well: the 3CX Phone, teh SJ Phone or the WengoPhone.
+					The Mobicents team recommends one of the following SIP phones, and has found that they work well: the 3CX Phone, the SJ Phone or the WengoPhone.
 				</para>
 			</note>
 			<procedure id="sfss-Using_the_Diameter_Event-Changing_Service">
@@ -2991,18 +3243,21 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				<step>
 					<title>Configure the Ericsson SDK Charging Emulator</title>
 					<para>
-						Once you have started the Charging Emulator, you should configure it exactly as portrayed in the screenshot.
+						Once you have started the Charging Emulator, you should configure it exactly as portrayed in <xref linkend="figure-mss-ChargingEmulatorConfig"/>.
 					</para>
-					<mediaobject id="sfss-mss-DiameterEventChanging-ss-ChargingEmulatorConfig">
-						<imageobject>
-							<imagedata align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingEmulatorConfig.png" format="PNG" scalefit="1" width="440"/>
-						</imageobject>
-						<caption>
-						<para>
-							Configuring the Charging Emulator
-						</para>
-						</caption>
-					</mediaobject>
+					<figure id="figure-mss-ChargingEmulatorConfig">
+						<title>Configuring the Charging Emulator</title>
+						<mediaobject id="sfss-mss-DiameterEventChanging-ss-ChargingEmulatorConfig">
+							<imageobject>
+								<imagedata align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingEmulatorConfig.png" format="PNG" scalefit="1" width="440"/>
+							</imageobject>
+							<caption>
+							<para>
+								Configuring the Charging Emulator
+							</para>
+							</caption>
+						</mediaobject>
+					</figure>
 					<orderedlist>
 						<listitem>
 							<para>
@@ -3040,8 +3295,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 						</para>
 						</caption>
 					</mediaobject>
-					<!-- <para>You can see the user balance in the emulator: in the menu Config > Account > Click on "00001000-Klas Svensson" and watch the balance. Stretch the window down to see the history.</para> -->
-					<para>
+					<!-- <para>You can see the user balance in the emulator: in the menu Config > Account > Click on "00001000-Klas Svensson" and watch the balance. Stretch the window down to see the history.</para> --> <para>
 						In the <guilabel>Account Configuration</guilabel> window of the Charging Emulator, you can see the user's balances. Select a user to watch the balance. You can also stretch the window lengthwise to view the user's transaction history.
 					</para>
 				</step>
@@ -3051,8 +3305,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					</para>
 				</step>
 				<step>
-					<!-- <para>You should see there is one first request, right after the invite and before the other party accept/reject the call, sent to the Charging Emulator, that's when the debit is made. In case the call is rejected, or the caller gives up, there's a new Diameter Request sent which will be the refund of the unused value. In case the call is accepted, nothing else will happen, related to Diameter.</para> -->
-					<para>
+					<!-- <para>You should see there is one first request, right after the invite and before the other party accept/reject the call, sent to the Charging Emulator, that's when the debit is made. In case the call is rejected, or the caller gives up, there's a new Diameter Request sent which will be the refund of the unused value. In case the call is accepted, nothing else will happen, related to Diameter.</para> --> <para>
 						You should be able to see a request—immediately following the invite and before the other party (i.e. you) accepts or rejects the call—sent to the Charging Emulator. That is when the debit of the user's account is made. In the case that the call is rejected, or the caller gives up, a second, new Diameter request is sent to refund the initial amount charged by the call. On the other hand, if the call is accepted, nothing else related to Diameter happens, and no second request takes place.
 					</para>
 					<para>
@@ -3062,20 +3315,20 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			</procedure>
 			
 			<!-- <formalpara
-			id="sfss-binary-Diameter_Event-Changing_Service-Stopping">
-			<title>Stopping</title>
-			<para>&nbsp;</para>
-		</formalpara>
-		<formalpara
-			id="sfss-binary-Diameter_Event-Changing_Service-Testing">
-			<title>Testing</title>
-			<para>&nbsp;</para>
-		</formalpara>
-		<formalpara
-			id="sfss-binary-Diameter_Event-Changing_Service-Uninstalling">
-			<title>Uninstalling</title>
-			<para>&nbsp;</para>
-		</formalpara> -->
+   id="sfss-binary-Diameter_Event-Changing_Service-Stopping">
+   <title>Stopping</title>
+   <para>&nbsp;</para>
+  </formalpara>
+  <formalpara
+   id="sfss-binary-Diameter_Event-Changing_Service-Testing">
+   <title>Testing</title>
+   <para>&nbsp;</para>
+  </formalpara>
+  <formalpara
+   id="sfss-binary-Diameter_Event-Changing_Service-Uninstalling">
+   <title>Uninstalling</title>
+   <para>&nbsp;</para>
+  </formalpara> -->
 		</section>
 
 	</section>
@@ -3106,23 +3359,24 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</listitem>
 		</itemizedlist>
-		<!--  The Call-Blocking Service  -->
-		<section id="sfss-binary-Call-Blocking_Service--Installing_Configuring_and_Running">
+		<!--  The Call-Blocking Service  --> <section id="sfss-binary-Call-Blocking_Service--Installing_Configuring_and_Running">
 			<title>The Call-Blocking Service: Installing, Configuring and Running</title>
 			<formalpara id="sfss-binary-Call-Blocking_Service-Pre-Install_Requirements_and_Prerequisites">
 				<title>Pre-Install Requirements and Prerequisites</title>
+				<para>
+					The following requirements must be met before installation can begin.
+				</para>
 			</formalpara>
 			<!--  <variablelist
-			id="sfss-binary-Call-Blocking_Service-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para>&nbsp;</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>  -->
-			<variablelist id="sfss-binary-Call-Blocking_Service-Software_Prerequisites">
+   id="sfss-binary-Call-Blocking_Service-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para>&nbsp;</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>  --> <variablelist id="sfss-binary-Call-Blocking_Service-Software_Prerequisites">
 				<title>Software Prerequisites</title>
 				<varlistentry>
 					<term>Either an MSS for JBoss or an MSS for Tomcat Installation</term>
@@ -3192,10 +3446,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							<title>Editing MSS for JBoss's server.xml for the Call-Blocking Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="jboss.web"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"&gt;
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"&gt;
 </programlisting>
 						</example>
 						<para>
@@ -3213,10 +3467,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							<title>Editing MSS for Tomcat's server.xml for the Call-Blocking Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="Sip-Servlets"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"&gt;
+ name="Sip-Servlets"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"&gt;
 </programlisting>
 						</example>
 						<para>
@@ -3244,7 +3498,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</formalpara>
 			<procedure>
-				<title/>
+				<title>Testing the Call Blocking Service</title>
 				<step>
 					<para>
 						Start a SIP softphone of your choice. The account name should be <userinput>blocked-sender</userinput>. The <literal>From Header</literal> should list one of the following addresses: <userinput>sip:blocked-sender@sip-servlets.com</userinput> or <userinput>sip:blocked-sender@127.0.0.1</userinput>. The SIP softphone does not need to be registered.
@@ -3258,18 +3512,17 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			</procedure>
 			
 			<!-- <formalpara
-			id="sfss-binary-Call-Blocking_Service-Using">
-			<title>Using</title>
-			<para>&nbsp;</para>
-		</formalpara> -->
-			<formalpara id="sfss-binary-Call-Blocking_Service-Stopping">
+   id="sfss-binary-Call-Blocking_Service-Using">
+   <title>Using</title>
+   <para>&nbsp;</para>
+  </formalpara> --> <formalpara id="sfss-binary-Call-Blocking_Service-Stopping">
 				<title>Stopping</title>
 				<para>
-					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
+					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
 				</para>
 			</formalpara>
 			<para>
-				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
+				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
 			</para>
 			<formalpara id="sfss-binary-Call-Blocking_Service-Uninstalling">
 				<title>Uninstalling</title>
@@ -3310,23 +3563,24 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</listitem>
 		</itemizedlist>
-		<!--  The Call-Forwarding Service  -->
-		<section id="sfss-binary-Call-Forwarding_Service--Installing_Configuring_and_Running">
+		<!--  The Call-Forwarding Service  --> <section id="sfss-binary-Call-Forwarding_Service--Installing_Configuring_and_Running">
 			<title>The Call-Forwarding Service: Installing, Configuring and Running</title>
 			<formalpara id="sfss-binary-Call-Forwarding_Service-Pre-Install_Requirements_and_Prerequisites">
 				<title>Pre-Install Requirements and Prerequisites</title>
+				<para>
+					The following requirements must be met before installation can begin.
+				</para>
 			</formalpara>
 			<!--  <variablelist
-			id="sfss-binary-Call-Forwarding_Service-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para>&nbsp;</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>  -->
-			<variablelist id="sfss-binary-Call-Forwarding_Service-Software_Prerequisites">
+   id="sfss-binary-Call-Forwarding_Service-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para>&nbsp;</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>  --> <variablelist id="sfss-binary-Call-Forwarding_Service-Software_Prerequisites">
 				<title>Software Prerequisites</title>
 				<varlistentry>
 					<term>Either an MSS for JBoss or an MSS for Tomcat Installation</term>
@@ -3396,10 +3650,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							<title>Editing MSS for JBoss's server.xml for the Call-Forwarding Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="jboss.web"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"&gt;
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"&gt;
 </programlisting>
 						</example>
 						<para>
@@ -3417,10 +3671,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							<title>Editing MSS for Tomcat's server.xml for the Call-Forwarding Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="Sip-Servlets"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"&gt;
+ name="Sip-Servlets"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"&gt;
 </programlisting>
 						</example>
 						<para>
@@ -3476,24 +3730,23 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</step>
 				<step>
 					<para>
-						From the second phone, make a call to <literal>sip:receiver@sip-servlets.com</literal>. The first phone, <quote>forward-receiver</quote>, should now be ringing.
+						From the second phone, make a call to <literal>sip:receiver@sip-servlets.com</literal>. The first phone, "forward-receiver", should now be ringing.
 					</para>
 				</step>
 			</procedure>
 			
 			<!-- <formalpara
-			id="sfss-binary-Call-Forwarding_Service-Using">
-			<title>Using</title>
-			<para>&nbsp;</para>
-		</formalpara> -->
-			<formalpara id="sfss-binary-Call-Forwarding_Service-Stopping">
+   id="sfss-binary-Call-Forwarding_Service-Using">
+   <title>Using</title>
+   <para>&nbsp;</para>
+  </formalpara> --> <formalpara id="sfss-binary-Call-Forwarding_Service-Stopping">
 				<title>Stopping</title>
 				<para>
-					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
+					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
 				</para>
 			</formalpara>
 			<para>
-				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
+				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
 			</para>
 			<formalpara id="sfss-binary-Call-Forwarding_Service-Uninstalling">
 				<title>Uninstalling</title>
@@ -3531,26 +3784,27 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				Both the list of blocked contacts and the list of contacts to forward are currently both hard-coded. However, both of those models are evolving towards the eventual use of databases.
 			</para>
 		</note>
-		<!--  The Call-Controller Service  -->
-		<section id="sfss-binary-Call-Controller_Service--Installing_Configuring_and_Running">
+		<!--  The Call-Controller Service  --> <section id="sfss-binary-Call-Controller_Service--Installing_Configuring_and_Running">
 			<title>The Call-Controller Service: Installing, Configuring and Running</title>
 			<para>
 				The Call-Controller service requires the two WAR files for the Call-Blocking and Call-Forwarding services to be placed in the correct directory inside your Mobicents SIP Servlets Server binary installation. However, the Call-Controller service does <emphasis>not</emphasis> require their corresponding DAR files: you need only to download and install a DAR file customized for the Call-Controller service. The instructions below show you how to do precisely this; there is no need, therefore, to first install either the Call-Blocking or the Call-Forwarding services, though it is helpful to at least be familiar with them.
 			</para>
 			<formalpara id="sfss-binary-Call-Controller_Service-Pre-Install_Requirements_and_Prerequisites">
 				<title>Pre-Install Requirements and Prerequisites</title>
+				<para>
+					The following requirements must be met before installation can begin.
+				</para>
 			</formalpara>
 			<!--  <variablelist
-			id="sfss-binary-Call-Controller_Service-Hardware_Requirements">
-			<title>Hardware Requirements</title>
-			<varlistentry>
-				<term>Sufficient Disk Space</term>
-				<listitem>
-					<para>&nbsp;</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>  -->
-			<variablelist id="sfss-binary-Call-Controller_Service-Software_Prerequisites">
+   id="sfss-binary-Call-Controller_Service-Hardware_Requirements">
+   <title>Hardware Requirements</title>
+   <varlistentry>
+    <term>Sufficient Disk Space</term>
+    <listitem>
+     <para>&nbsp;</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>  --> <variablelist id="sfss-binary-Call-Controller_Service-Software_Prerequisites">
 				<title>Software Prerequisites</title>
 				<varlistentry>
 					<term>Either an MSS for JBoss or an MSS for Tomcat Installation</term>
@@ -3623,10 +3877,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							<title>Editing MSS for JBoss's server.xml for the Call-Controller Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="jboss.web"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/call-controller-servlet-dar.properties "&gt;
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/call-controller-servlet-dar.properties "&gt;
 </programlisting>
 						</example>
 						<para>
@@ -3644,10 +3898,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							<title>Editing MSS for Tomcat's server.xml for the Call-Controller Service</title>
 							
 <programlisting role="XML">&lt;Service
-	name="Sip-Servlets"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/call-controller-servlet-dar.properties "&gt;
+ name="Sip-Servlets"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/call-controller-servlet-dar.properties "&gt;
 </programlisting>
 						</example>
 						<para>
@@ -3666,7 +3920,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				To learn how to run the SIP Servlets-enabled JBoss Application Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.
 			</para>
 			<para>
-				To learn how to run the SIP Servlets-enabled Tomcat Container, refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.
+				To learn how to run the SIP Servlets-enabled Tomcat Container, refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.
 			</para>
 			<formalpara id="sfss-binary-Call-Controller_Service-Testing">
 				<title>Testing</title>
@@ -3761,18 +4015,17 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			</procedure>
 			
 			<!-- <formalpara
-			id="sfss-binary-Call-Controller_Service-Using">
-			<title>Using</title>
-			<para>&nbsp;</para>
-		</formalpara> -->
-			<formalpara id="sfss-binary-Call-Controller_Service-Stopping">
+   id="sfss-binary-Call-Controller_Service-Using">
+   <title>Using</title>
+   <para>&nbsp;</para>
+  </formalpara> --> <formalpara id="sfss-binary-Call-Controller_Service-Stopping">
 				<title>Stopping</title>
 				<para>
-					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <ulink url="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
+					To learn how to stop the SIP Servlets-enabled JBoss Application Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.
 				</para>
 			</formalpara>
 			<para>
-				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
+				To learn how to stop the SIP Servlets-enabled Tomcat Container, refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping"/>.
 			</para>
 			<formalpara id="sfss-binary-Call-Controller_Service-Uninstalling">
 				<title>Uninstalling</title>
@@ -3904,188 +4157,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 		For information about installing and running Media IPBX, including binary and source code locations, visit the <ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX homepage</ulink>.
 	</para>
 </section>
-</chapter>
-	<chapter id="ssea-SIP_Servlet_Example_Applications" lang="en-US">
-	<!--  chapter id nickname: afotsss  --><title>SIP Servlet Example Applications</title>
-	<para>
-		The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server. <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the avaialble examples, their location, and a brief description about the functionality each example demonstrates. The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples. Each example is available in both binary and source formats.
-	</para>
-	<table frame="all" id="tab-ssea-SIP_Servlet_Example_Applications">
-		<title>Available Examples</title>
-		<tgroup align="left" cols="2" colsep="1" rowsep="1">
-			<colspec colname="c1"/>
-			<colspec colname="c2"/>
-			<thead>
-				<row>
-					<entry align="center">
-						Example
-					</entry>
-					<entry align="center">
-						Description
-					</entry>
-				</row>
-			</thead>
-			<tbody>
-				<row>
-					<entry>
-						<xref linkend="sfss-The_Call-Blocking_Service"/>
-					</entry>
-					<entry>
-						Demonstrates how to block calls by specifiying that the INVITE SIP Extension checks the <literal>From</literal> address to see if it is specified in the block list. If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<xref linkend="sfss-The_Call-Forwarding_Service"/>
-					</entry>
-					<entry>
-						Demonstrates how to forward calls by specifying that the INVITE SIP Extension checks the <literal>To</literal> address to see if it is specified in the forward list. If the SIP address matches, the application acts as a back-to-back user agent (B2BUA).
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<xref linkend="sfss-The_Call-Controller_Service"/>
-					</entry>
-					<entry>
-						Call Blocking and Call Forwarding are merged to create a new service.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/speed_dial.html">Speed Dial</ulink>
-					</entry>
-					<entry>
-						Demonstrates how to implement speed dialling for SIP addresses. The demonstration uses a pre-defined list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<xref linkend="sfss-The_Location_Service"/>
-					</entry>
-					<entry>
-						Demonstrates a location service that performs a lookup based on the request URI, into a hard-coded list of addresses. The request is proxied to the set of destination addresses associated with that URI.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/speeddial_locationservice.html">Composed Speed Dial and Location</ulink>
-					</entry>
-					<entry>
-						Speed Dial and Location are merged to create a new service. Speed Dial proxies the speed dial number to a SIP address, then Location Service proxies the call to the actual location of the call recipient.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/click2call.html">Click to Call</ulink>
-					</entry>
-					<entry>
-						Demonstrates how SIP Servlets can be used along with HTTP servlets as a converged application to place calls from a web portal. The example is a modified version of the click to dial example from the Sailfin project, but has been reworked to comply with JSR 289.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/chatserver.html">Chat Server</ulink>
-					</entry>
-					<entry>
-						Demonstrates <literal>MESSAGE</literal> SIP Extension support. This example is based on the chatroom server demonstration from the BEA dev2dev project, and has been modified to meet JSR 289 requirements.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/media-demo.html">Media</ulink>
-					</entry>
-					<entry>
-						Demonstrates how the media playback SIP Servlet can build a media file customised with the name of the user, based on the information in the FROM header. This example is only compatible with JBoss AS. The solution is know to work with Ekiga and linphone SIP softphones.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/shopping-demo.html">Shopping</ulink>
-					</entry>
-					<entry>
-						Demonstrates integration with Seam and Java Enterprise Edition (JEE), and Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets Interoperability</ulink>
-					</entry>
-					<entry>
-						Demonstrates how the <productname condition="mob">Mobicents</productname>
-						 platform components can work in concert with each other to provide a integrated solution. All major components of the platform are used in this example, which was created to demonstrate to JavaOne 2008 delegates a possible use case scenario for the platform.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/facebook-c2c.html">Facebook Click to Call</ulink>
-					</entry>
-					<entry>
-						Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plugin that allows user to call POTS phones through a SIP-PSTN gateway provider. This demonstration is only available from the source repository; no binary is available.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<xref linkend="sfss-The_Diameter_Event-Changing_Service"/>
-					</entry>
-					<entry>
-						Demonstrates how the Diameter Event Charging, and the Location service, can be used to perform fixed-rated charging of calls (event charging). When a call is initiated, a debit of ten euros is applied to the <literal>A Party</literal> account. If the call is rejected by the <literal>B Party</literal>, or <literal>A Party</literal> hangs up before <literal>B Party</literal> can answer the call, the ten euro charge is credited to the <literal>A Party</literal> account.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/mss-diameter_sh.html">Diameter Sh OpenIMS Integration</ulink>
-					</entry>
-					<entry>
-						Demonstrates the integration between <productname condition="mob">Mobicents</productname>
-						 and OpenIMS, using the Diameter Sh interface to receive profile updates and SIP.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/conference-demo.html">Conference</ulink>
-					</entry>
-					<entry>
-						Demonstrates the capabilities of the Media Server, such as enpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google's GWT Ajax framework with server-push updates to provide a desktop-like user interface experience.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX</ulink>
-					</entry>
-					<entry>
-						Demonstrates how a SIP PBX solution can be deployed using the <productname condition="mob">Mobicents</productname>
-						 platform. For more information, refer to <xref linkend="mipbx-Media_IPBX"/>.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/mss-jruby-example.html">JRuby on Rails SIP Servlets</ulink>
-					</entry>
-					<entry>
-						Demonstrates how JRuby on Rails can be used by the <productname condition="mob">Mobicents</productname>
-						 platform to provide a multi-language application that can initiate phonecalls to customers after they log a complaint through a web portal.
-					</entry>
-				</row>
-				<row>
-					<entry>
-						<ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">Pure JRuby on Rails Telco</ulink>
-					</entry>
-					<entry>
-						Builds on the JRuby on Rails SIP Servlets demonstration, but adds the ability to call the application rather that initially interact through the web portal. The application has the ability to set up and tear down the call.
-					</entry>
-				</row>
-			</tbody>
-		</tgroup>
-	</table>
-	<!-- <xi:include href="concept-section-SS_Concurrency_and_Congestion_Control.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Load_Balancer.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_SIP_Servlet_Security.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_SIP_Extensions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Seam_Telco_Framework.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_STUN_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_Media_IPBX.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_for_JBoss-Clustering_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	<xi:include href="concept-section-SS_for_JBoss-Failover_Support.xml" xmlns:xi="http://www.w3.org/2001/XInclude" /> -->
+</section>
 </chapter>
 	<chapter>
 		<title>Clustering and High Availability</title>
@@ -4147,9 +4219,9 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering. SIP and HTTP session state clustering are pre-configured and ready-to-go straight out of the binary distribution. However, to enable session replication in your node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per appication or globally for all applications.
 			</para>
 			<important id="ssfjcs-You_Must_Use_the_all_Server_Configuration_Profile">
-				<title>You Must Use the <quote>all</quote> Server Configuration Profile</title>
+				<title>You Must Use the "all" Server Configuration Profile</title>
 				<para>
-					You will notice that the following instructions modify one or more properties in the configuration files for the <quote>all</quote> Server Configuration Profile. This is evident in the path names given below. When we start each MSS for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.
+					You will notice that the following instructions modify one or more properties in the configuration files for the "all" Server Configuration Profile. This is evident in the path names given below. When we start each MSS for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.
 				</para>
 			</important>
 			<para>
@@ -4191,21 +4263,21 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 		<section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Running">
 			<title>Running</title>
 			<para>
-				Clustering with MSS for JBoss nodes requires running all of the nodes using the <quote>all</quote> Server Configuration Profile, which is specified when you invoke <command>run.sh</command> or <command>run.bat</command>.
+				Clustering with MSS for JBoss nodes requires running all of the nodes using the "all" Server Configuration Profile, which is specified when you invoke <command>run.sh</command> or <command>run.bat</command>.
 			</para>
 			<formalpara>
-				<title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Linux</title>
+				<title>Running MSS for JBoss with the "all" Configuration Profile, on Linux</title>
 				<para>
-					To run the server on Linux using the <quote>all</quote> Configuration Profile, start the server with the following command:
+					To run the server on Linux using the "all" Configuration Profile, start the server with the following command:
 				</para>
 			</formalpara>
 			
 <screen>mss-jboss-&lt;version&gt;]$ ./bin/run.sh -c all
 </screen>
 			<formalpara>
-				<title>Running MSS for JBoss with the <quote>all</quote> Configuration Profile, on Windows</title>
+				<title>Running MSS for JBoss with the "all" Configuration Profile, on Windows</title>
 				<para>
-					To run the server on Windows using the <quote>all</quote> Configuration Profile, open the Command Prompt, change your folder to the topmost folder of your MSS for JBoss installation, and issue the following command:
+					To run the server on Windows using the "all" Configuration Profile, open the Command Prompt, change your folder to the topmost folder of your MSS for JBoss installation, and issue the following command:
 				</para>
 			</formalpara>
 			
@@ -4216,10 +4288,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				<para>
 					Together with the application server nodes, it is advised to run a SIP load-balancer or an IP load-balancer which will distribute the traffic evenly between the nodes. A load-balancer is a single entry-point to all nodes. All calls should e made through the load-balancer if you need High Availability. You can read more on how to use the SIP load-balancer in <xref linkend="sslb-SIP_Servlets_Load_Balancer-Implementation"/>.
 				</para>
-				<para>
-					By default the servers are configured with one SIP load-balancer at IP address "127.0.0.1". This is specified in the <literal>balancers</literal> attriute in the <filename>server.xml</filename> configuration file as follows:
-				</para>
 			</formalpara>
+			<para>
+				By default the servers are configured with one SIP load-balancer at IP address "127.0.0.1". This is specified in the <literal>balancers</literal> attriute in the <filename>server.xml</filename> configuration file as follows:
+			</para>
 			
 <programlisting>&lt;Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
@@ -4292,10 +4364,10 @@ concurrencyControlMode="None"
 	</para>
 	<formalpara>
 		<title>Testing a cluster</title>
+		<para>
+			This choice of implementation has many benefits. Among them are:
+		</para>
 	</formalpara>
-	<para>
-		This choice of implementation has many benefits. Among them are:
-	</para>
 	<itemizedlist>
 		<listitem>
 			<para>
@@ -4304,7 +4376,7 @@ concurrencyControlMode="None"
 		</listitem>
 		<listitem>
 			<para>
-				There is no need to ensure that requests are directed to the <quote>right node</quote>, because in a SIP Servlets-enabled JBoss Application Server (or Mobicents JAIN SLEE server) cluster, any node can serve any request to any User Agent (UA).
+				There is no need to ensure that requests are directed to the correct node, because in a SIP Servlets-enabled JBoss Application Server (or Mobicents JAIN SLEE server) cluster, any node can serve any request to any User Agent (UA).
 			</para>
 		</listitem>
 		<listitem>
@@ -4384,7 +4456,7 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 </remark> --><!--  MSS for JBoss Cluster  --> <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover--Installing_Configuring_and_Running">
 		<title>MSS for JBoss Cluster: Installing, Configuring and Running</title>
 		<para>
-			There are a number of options you can specify for MSS clustering. By default most of them are configured in the <quote>all</quote> server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.
+			There are a number of options you can specify for MSS clustering. By default most of them are configured in the "all" server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.
 		</para>
 		<section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover-Downloading">
 			<title>Downloading</title>
@@ -4450,7 +4522,7 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 		</imageobject>
 		<caption>
 		<para>
-			The <quote>star cluster topology</quote> with the Mobicents SIP load balancer as the central element.
+			The "star cluster topology" with the Mobicents SIP load balancer as the central element.
 		</para>
 		</caption>
 	</mediaobject>
@@ -4483,7 +4555,7 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 	<section id="sslb-SIP_Servlets_Load_Balancer-Implementation">
 		<title>Implementation of the Mobicents SIP Servlets Load Balancer</title>
 		<para>
-			Each individual Mobicents SIP Servlets Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular <quote>heartbeats</quote> to it. From these health status reports and heartbeats, the SIP load balancer creates and maintains a list of all available and healthy nodes in the cluster. The load balancer will then forward SIP requests to and from these cluster nodes based upon a provisioning algorithm for as long as they are healthy and are still sending heartbeats. A failure to do so will cause the SIP load balancer to remove the unhealthy or unresponsive node from its list. In addition, mid-session and mid-call messages can be failed over. The <literal>Failover</literal> section goes into more detail about this aspect of the load balancer; see: <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>.
+			Each individual Mobicents SIP Servlets Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular "heartbeats" to it. From these health status reports and heartbeats, the SIP load balancer creates and maintains a list of all available and healthy nodes in the cluster. The load balancer will then forward SIP requests to and from these cluster nodes based upon a provisioning algorithm for as long as they are healthy and are still sending heartbeats. A failure to do so will cause the SIP load balancer to remove the unhealthy or unresponsive node from its list. In addition, mid-session and mid-call messages can be failed over. The <literal>Failover</literal> section goes into more detail about this aspect of the load balancer; see: <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>.
 		</para>
 		<para>
 			The SIP load balancer first receives SIP requests from endpoints on a port that is specified in its Configuration Properties configuration file. The SIP load balancer, using a round-robin algorithm, then selects a node to which it forwards the SIP requests. The load balancer will forward all same-session requests to the node first selected to initiate the session, as long as that node is healthy and available.
@@ -4493,7 +4565,7 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 	<section>
 		<title>SIP Message Flow</title>
 		<para>
-			The Mobicents SIP load balancer adds itself to the <literal>Via</literal> header of requests so that responses return to the SIP Balancer before they are sent to the originating endpoint. The load balancer also adds itself to the path of subsequent requests by adding Record-Route headers. It can thus handle mid-call failover by forwarding subsequent requests to a different node in the cluster if the node that had originally handled an initial request failed somehow fails or becomes unavailable. The SIP load balancer will immediately fail over if it stops receiving heartbeats from a node, or receives an <quote>unhealthy</quote> status alert. As mentioned, supplying both of these to the SIP load balancer is the responsibility of the nodes themselves.
+			The Mobicents SIP load balancer adds itself to the <literal>Via</literal> header of requests so that responses return to the SIP Balancer before they are sent to the originating endpoint. The load balancer also adds itself to the path of subsequent requests by adding Record-Route headers. It can thus handle mid-call failover by forwarding subsequent requests to a different node in the cluster if the node that had originally handled an initial request failed somehow fails or becomes unavailable. The SIP load balancer will immediately fail over if it stops receiving heartbeats from a node, or receives an "unhealthy" status alert. As mentioned, supplying both of these to the SIP load balancer is the responsibility of the nodes themselves.
 		</para>
 		<para>
 			SIP Servlets Server extend the <literal>SipStandardService</literal> class, which extends the Tomcat <literal>StandardService</literal> class, which implements the Tomcat <literal>Service</literal> interface. In Tomcat's architecture, a service is an intermediate component which lives inside a server and ties one or more <literal>Connectors</literal> to exactly one <literal>Engine</literal>. When the service is started, the new <literal>SipStandardBalancerNodeService</literal> looks up its configuration and gets the address of the SIP load balancer and sends a heartbeat and health status to it, so as to identify itself as an available node of the cluster.
@@ -4674,25 +4746,28 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 							</para>
 						</listitem>
 					</itemizedlist>
-					<note>
-						<title>Configuration File Locations</title>
-						<para>
-							On MSS for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.
-						</para>
-						<para>
-							On MSS for JBoss server installations, the <quote>default</quote> <filename>server.xml</filename> configuration file is located in <filename>server/default/deploy/jboss-web.deployer</filename>.
-						</para>
-						<para>
-							On MSS for JBoss installations, with JBoss clustering support enabled, the <quote>all</quote> <filename>server.xml</filename> file must be configured. It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.
-						</para>
-						<para>
-							To determine if the <quote>all</quote> or <emphasis>default</emphasis> profile should be altered for MSS for JBoss installation(s), refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.
-						</para>
-					</note>
-					<sidebar><title>Easy Node Configuration with JMX</title>
-					<para>
-						Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces which allow for easy configuration of the server. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>. Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console; here are their descriptions:
-					</para>
+				</step>
+			</procedure>
+			
+			<note>
+				<title>Configuration File Locations</title>
+				<para>
+					On MSS for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.
+				</para>
+				<para>
+					On MSS for JBoss server installations, the default <filename>server.xml</filename> configuration file is located in <filename>server/default/deploy/jboss-web.deployer</filename>.
+				</para>
+				<para>
+					On MSS for JBoss installations, with JBoss clustering support enabled, the "all" <filename>server.xml</filename> file must be configured. It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.
+				</para>
+				<para>
+					To determine if the "all" or <emphasis>default</emphasis> profile should be altered for MSS for JBoss installation(s), refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.
+				</para>
+			</note>
+			<formalpara>
+				<title>Easy Node Configuration with JMX</title>
+				<para>
+					Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces which allow for easy configuration of the server. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>. Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console; here are their descriptions:
 					<variablelist>
 						<varlistentry>
 							<term>balancers</term>
@@ -4711,10 +4786,8 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 							</listitem>
 						</varlistentry>
 					</variablelist>
-					</sidebar>
-				</step>
-			</procedure>
-			
+				</para>
+			</formalpara>
 			<section>
 				<title>Converged load balancing</title>
 				<para>
@@ -4969,13 +5042,12 @@ useStaticAddress="true"/&gt;
 						<para>
 							From the tree on the left side of the screen, under Services , click on MobicentsSipServlets link then click on the jboss.web:type=SipApplicationDispatcher link to see the metrics coming in.
 						</para>
-						<screenshot>
 						<mediaobject>
 							<imageobject>
 								<imagedata fileref="images/mss-embjopr-home.png" format="PNG" scalefit="1" width=""/>
 							</imageobject>
+							<caption>SIP Application Dispatcher Metrics</caption>
 						</mediaobject>
-						</screenshot>
 					</listitem>
 					<listitem>
 						<para>
@@ -4985,6 +5057,7 @@ useStaticAddress="true"/&gt;
 							<imageobject>
 								<imagedata fileref="images/mss-embjopr-metrics.png" format="PNG" scalefit="1"/>
 							</imageobject>
+							<caption>Selected Application Metrics</caption>
 						</mediaobject>
 					</listitem>
 					<listitem>
@@ -4995,6 +5068,7 @@ useStaticAddress="true"/&gt;
 							<imageobject>
 								<imagedata fileref="images/mss-jopr-applications.png" format="PNG" scalefit="1"/>
 							</imageobject>
+							<caption>Specific Application Metrics</caption>
 						</mediaobject>
 					</listitem>
 					<listitem>
@@ -5005,6 +5079,7 @@ useStaticAddress="true"/&gt;
 							<imageobject>
 								<imagedata fileref="images/mss-embjopr-session-metrics.png" format="PNG" scalefit="1"/>
 							</imageobject>
+							<caption>Specific Application Metrics Detail</caption>
 						</mediaobject>
 					</listitem>
 				</itemizedlist>
@@ -5321,7 +5396,7 @@ useStaticAddress="true"/&gt;
 	<itemizedlist>
 		<listitem>
 			<para>
-				All SIP messages which cannot be processed immediately are put into a queue, and therein wait for either a free thread or for the lock on their session to be released. The exact size of this SIP message queue is a tunable parameter, and it currently defaults to <constant>1500</constant>. If the SIP Message queue becomes full, the container immediately begins rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen until the queue is once again diminished.
+				All SIP messages which cannot be processed immediately are put into a queue, and therein wait for either a free thread or for the lock on their session to be released. The exact size of this SIP message queue is a tunable parameter, and it currently defaults to <literal>1500</literal>. If the SIP Message queue becomes full, the container immediately begins rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen until the queue is once again diminished.
 			</para>
 		</listitem>
 		<listitem>
@@ -5361,6 +5436,9 @@ useStaticAddress="true"/&gt;
 		<varlistentry>
 			<term>Tuning Parameters with the SIP Servlets Management Console</term>
 			<listitem>
+				<para>
+					The easiest way to configure the <guilabel>SIP Message Queue Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel> tunable parameters is to open the <literal>SIP Servlets Management Console</literal> in your browser (by going to <ulink url="http://localhost:8080/sip-servlets-management"/>), making your changes, and then <guibutton>Apply</guibutton>ing them. Note that configuring the settings in the SIP Servlets Management Console does not persist across reboots. To make your settings changes permanent, you should edit your server's <filename>server.xml</filename> configuration file; instructions for doing so follow.
+				</para>
 				<mediaobject id="sscacc-sas-MSSSManagementConsole-ss-ServerSettings-1">
 					<imageobject>
 						<imagedata align="center" fileref="images/mss-MSSSManagementConsole-ss-ServerSettings.png" format="PNG" scalefit="1" width="440"/>
@@ -5371,9 +5449,6 @@ useStaticAddress="true"/&gt;
 					</para>
 					</caption>
 				</mediaobject>
-				<para>
-					The easiest way to configure the <guilabel>SIP Message Queue Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel> tunable parameters is to open the <literal>SIP Servlets Management Console</literal> in your browser (by going to <ulink url="http://localhost:8080/sip-servlets-management"/>), making your changes, and then <guibutton>Apply</guibutton>ing them. Note that configuring the settings in the SIP Servlets Management Console does not persist across reboots. To make your settings changes permanent, you should edit your server's <filename>server.xml</filename> configuration file; instructions for doing so follow.
-				</para>
 			</listitem>
 		</varlistentry>
 		<varlistentry>
@@ -5403,15 +5478,15 @@ useStaticAddress="true"/&gt;
 							<title>Permanently Changing Tunable Parameters by Editing JBoss's server.xml</title>
 							
 <programlisting role="XML">&lt;Service
-	name="jboss.web"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
-	concurrencyControlMode="SipApplicationSession"
-	sipMessageQueueSize="1600"
-	congestionControlCheckingInterval="2000"
-	congestionControlPolicy="DropMessage"
-	memoryThreshold="80"&gt;
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+ concurrencyControlMode="SipApplicationSession"
+ sipMessageQueueSize="1600"
+ congestionControlCheckingInterval="2000"
+ congestionControlPolicy="DropMessage"
+ memoryThreshold="80"&gt;
 </programlisting>
 						</example>
 					</step>
@@ -5438,15 +5513,15 @@ useStaticAddress="true"/&gt;
 							<title>Permanently Changing Tunable Parameters by Editing Tomcat's server.xml</title>
 							
 <programlisting linenumbering="unnumbered" role="XML">&lt;Service
-	name="jboss.web"
-	className="org.mobicents.servlet.sip.startup.SipStandardService"
-	sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-	darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
-	concurrencyControlMode="SipApplicationSession"
-	sipMessageQueueSize="1600"
-	congestionControlCheckingInterval="2000"
-	congestionControlPolicy="DropMessage"
-	memoryThreshold="80"&gt;
+ name="jboss.web"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+ concurrencyControlMode="SipApplicationSession"
+ sipMessageQueueSize="1600"
+ congestionControlCheckingInterval="2000"
+ congestionControlPolicy="DropMessage"
+ memoryThreshold="80"&gt;
 </programlisting>
 						</example>
 					</step>
@@ -6382,9 +6457,50 @@ admin=caller,role1,role2,..
 		You can also use our working JSLEE/SIP Servlets interoperability example showcasing our approach.
 	</para>
 </section>
+	<section>
+		<title>Eclipse IDE Tools</title>
+		<para>
+			The Mobicents Sip Servlets Eclipse Tools assist developers in creating JSR 289 applications with Mobicents. You can use the Dynamic Web Project wizard to get started with an empty project and then you can test your application with a real Sip Phone right from the IDE.
+		</para>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/mss-ide-screen.png" format="PNG"/>
+			</imageobject>
+			<caption>SIP Servlets Eclipse IDE Tools</caption>
+		</mediaobject>
+		<section>
+			<title>Pre-Install requirements</title>
+			<para>
+				Eclipse 3.4 is required.
+			</para>
+		</section>
+		
+		<section>
+			<title>Installation</title>
+			<para>
+				The standard Eclipse Update Site installation mechanism is leveraged. The Mobicents Update Site is at the following location: <ulink url="http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site">http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site</ulink> After adding this update site to Eclipse you can proceed with regilar Eclipse Plugin Installation. If you need help the process is demonstrated in <ulink url="http://www.youtube.com/watch?v=LZOmLEC2IeQ">this video</ulink>.
+			</para>
+		</section>
+		
+		<section>
+			<title>Sip Servlets Core Plug-in</title>
+			<para>
+				This Plugin allows you to create Dynamic Web Projects with SIP Facet. There are a number of new Dynamic Web Project configurations for Converged applications. It's best to use the ones marked as "recommneded". After you complete the wizards a complete converged project skeleton will be generated. Working with this type of project is similar to working with normal Web projects. You can see a demo <ulink url="http://people.redhat.com/vralev/mss-eclipse-plugin-demo/mss-eclipse.htm">here</ulink>.
+			</para>
+		</section>
+		
+		<section>
+			<title>Sip Phone Plugin</title>
+			<para>
+				The SIP Phone plugin integrates a SIP phone inside your Eclipse IDE. You can use the phone to test your SIP or Media applications. The Phone uses the Microphone and the Speakers on your computer and allows to simulate real-world scenarios.
+			</para>
+		</section>
+
+	</section>
+
 </chapter>
 	<chapter id="bp-Best_Practices" lang="en-US">
-	<title>Best Practices</title>
+	<!--  This document was created with Syntext Serna Free.  --><title>Best Practices</title>
 	<section>
 		<title>Mobicents Sip Servlets Performance Tips</title>
 		<section>
@@ -6497,7 +6613,17 @@ admin=caller,role1,role2,..
 								net.ipv4.tcp_wmem = 4096 65536 16777216
 							</para>
 						</listitem>
+						<listitem>
+							<para>
+								net.core.netdev_max_backlog = 300000
+							</para>
+						</listitem>
 					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						sudo ifconfig eth0 txqueuelen 1000 # replace eth0 with your actual interface
+					</para>
 				</listitem>
 			</itemizedlist>
 			<para>

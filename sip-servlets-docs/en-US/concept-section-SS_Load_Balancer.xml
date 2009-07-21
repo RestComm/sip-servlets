@@ -8,7 +8,7 @@
       <imagedata width="440" fileref="images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg" format="JPG"/>
     </imageobject>
     <caption>
-      <para>The <quote>star cluster topology</quote> with the Mobicents SIP load balancer as the central element.</para>
+      <para>The &quot;star cluster topology&quot; with the Mobicents SIP load balancer as the central element.</para>
     </caption>
   </mediaobject>
   <para>The Mobicents SIP load balancer is used to balance the load of SIP service requests and responses between nodes in a SIP Servlets Server cluster. Both MSS for JBoss and MSS for Tomcat servers can be used in conjunction with the SIP load balancer to increase the performance and availability of SIP services and applications. In terms of functionality, the Mobicents SIP load balancer is a simple proxy server that intelligently forwards SIP session requests and responses between User Agents (UAs) on a Wide Area Network (WAN), and SIP Servlets Server nodes, which are almost always located on a Local Area Network (LAN). All SIP requests and responses pass through the SIP load balancer.</para>
@@ -26,12 +26,12 @@
   </section>
   <section id="sslb-SIP_Servlets_Load_Balancer-Implementation">
     <title>Implementation of the Mobicents SIP Servlets Load Balancer</title>
-    <para>Each individual Mobicents SIP Servlets Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular <quote>heartbeats</quote> to it. From these health status reports and heartbeats, the SIP load balancer creates and maintains a list of all available and healthy nodes in the cluster. The load balancer will then forward SIP requests to and from these cluster nodes based upon a provisioning algorithm for as long as they are healthy and are still sending heartbeats. A failure to do so will cause the SIP load balancer to remove the unhealthy or unresponsive node from its list. In addition, mid-session and mid-call messages can be failed over. The <literal>Failover</literal> section goes into more detail about this aspect of the load balancer; see: <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>.</para>
+    <para>Each individual Mobicents SIP Servlets Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular &quot;heartbeats&quot; to it. From these health status reports and heartbeats, the SIP load balancer creates and maintains a list of all available and healthy nodes in the cluster. The load balancer will then forward SIP requests to and from these cluster nodes based upon a provisioning algorithm for as long as they are healthy and are still sending heartbeats. A failure to do so will cause the SIP load balancer to remove the unhealthy or unresponsive node from its list. In addition, mid-session and mid-call messages can be failed over. The <literal>Failover</literal> section goes into more detail about this aspect of the load balancer; see: <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>.</para>
     <para>The SIP load balancer first receives SIP requests from endpoints on a port that is specified in its Configuration Properties configuration file. The SIP load balancer, using a round-robin algorithm, then selects a node to which it forwards the SIP requests. The load balancer will forward all same-session requests to the node first selected to initiate the session, as long as that node is healthy and available.</para>
   </section>
   <section>
     <title>SIP Message Flow</title>
-    <para>The Mobicents SIP load balancer adds itself to the <literal>Via</literal> header of requests so that responses return to the SIP Balancer before they are sent to the originating endpoint. The load balancer also adds itself to the path of subsequent requests by adding Record-Route headers. It can thus handle mid-call failover by forwarding subsequent requests to a different node in the cluster if the node that had originally handled an initial request failed somehow fails or becomes unavailable. The SIP load balancer will immediately fail over if it stops receiving heartbeats from a node, or receives an <quote>unhealthy</quote> status alert. As mentioned, supplying both of these to the SIP load balancer is the responsibility of the nodes themselves.</para>
+    <para>The Mobicents SIP load balancer adds itself to the <literal>Via</literal> header of requests so that responses return to the SIP Balancer before they are sent to the originating endpoint. The load balancer also adds itself to the path of subsequent requests by adding Record-Route headers. It can thus handle mid-call failover by forwarding subsequent requests to a different node in the cluster if the node that had originally handled an initial request failed somehow fails or becomes unavailable. The SIP load balancer will immediately fail over if it stops receiving heartbeats from a node, or receives an &quot;unhealthy&quot; status alert. As mentioned, supplying both of these to the SIP load balancer is the responsibility of the nodes themselves.</para>
     <para>SIP Servlets Server extend the <literal>SipStandardService</literal> class, which extends the Tomcat <literal>StandardService</literal> class, which implements the Tomcat <literal>Service</literal> interface. In Tomcat&apos;s architecture, a service is an intermediate component which lives inside a server and ties one or more <literal>Connectors</literal> to exactly one <literal>Engine</literal>. When the service is started, the new <literal>SipStandardBalancerNodeService</literal> looks up its configuration and gets the address of the SIP load balancer and sends a heartbeat and health status to it, so as to identify itself as an available node of the cluster.</para>
     <para>The parameters of the nodes are configurable through their <literal>MBean</literal> interfaces; information on their configuration is provided in the following sections.</para>
     <para>Note that, in advanced configurations, it is also possible to run more than one SIP load balancer.</para>
@@ -56,7 +56,7 @@
           <term>A SIP Servlet-Enabled JBoss Application Server or Tomcat Servlet Container</term>
           <listitem>
             <para>Running the SIP load balancer requires at least one SIP Servlets Server as a client node, although you obviously cannot test or do anything interesting with your setup until you start at least two nodes. Therefore, before configuring the SIP load balancer, we should make sure we&apos;ve installed a SIP Servlets Server first. The Mobicents SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server <emphasis>or</emphasis> a SIP Servlets-enabled Tomcat Container.</para>
-            <para>However, if you intend to cluster multiple nodes for performance, reliability and failover purposes, then you will want to install and set up SIP Servlets-enabled JBoss AS nodes, because only they can be clustered, and not SIP-Servletized Tomcat Containers.</para>
+            <para>However, if you intend to cluster multiple nodes for performance, reliability and failover purposes, then you will want to install and set up SIP Servlets-enabled JBoss AS nodes, because only they can be clustered, and not SIP-Servlet Tomcat Containers.</para>
             <itemizedlist>
               <listitem>
                 <para>To install a SIP Servlet-enabled JBoss Application Server, follow the instructions here: <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>.</para>
@@ -146,7 +146,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
             </varlistentry>
           </variablelist>
           <note>
-            <para>The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing.  To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface SipStack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
+            <para>The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing.  To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
           </note>
         </step>
         <step>
@@ -160,36 +160,35 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
               <para>The <literal>balancers</literal> attribute must contain a IP address (or list of addresses) of the SIP load balancer(s) to which heartbeat information .</para>
             </listitem>
           </itemizedlist>
-          <note>
-            <title>Configuration File Locations</title>
-            <para>On MSS for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.</para>
-            <para>On MSS for JBoss server installations, the <quote>default</quote> <filename>server.xml</filename> configuration file is located in <filename>server/default/deploy/jboss-web.deployer</filename>.</para>
-            <para>On MSS for JBoss installations, with JBoss clustering support enabled, the <quote>all</quote> <filename>server.xml</filename> file must be configured.  It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.</para>
-            <para>To determine if the <quote>all</quote> or <emphasis>default</emphasis> profile should be altered for MSS for JBoss installation(s), refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.</para>
-          </note>
-          <sidebar>
-            <title>Easy Node Configuration with JMX</title>
-            <para>Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces which allow for easy configuration of the server. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>.  Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console; here are their descriptions:</para>
-            <variablelist>
-              <varlistentry>
-                <term>balancers</term>
-                <listitem>
-                  <para>Host names of the SIP load balancer(s) with corresponding <literal>addBalancerAddress</literal> and <literal>removeBalancerAddress</literal> methods.</para>
-                </listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>heartBeatInterval</term>
-                <listitem>
-                  <para>Interval at which each heartbeat is sent to the SIP load balancer(s).</para>
-                </listitem>
-              </varlistentry>
-            </variablelist>
-          </sidebar>
         </step>
       </procedure>
+      <note>
+        <title>Configuration File Locations</title>
+        <para>On MSS for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.</para>
+        <para>On MSS for JBoss server installations, the default <filename>server.xml</filename> configuration file is located in <filename>server/default/deploy/jboss-web.deployer</filename>.</para>
+        <para>On MSS for JBoss installations, with JBoss clustering support enabled, the &quot;all&quot; <filename>server.xml</filename> file must be configured.  It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.</para>
+        <para>To determine if the &quot;all&quot; or <emphasis>default</emphasis> profile should be altered for MSS for JBoss installation(s), refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.</para>
+      </note>
+      <formalpara>
+        <title>Easy Node Configuration with JMX</title>
+        <para>Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces which allow for easy configuration of the server. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>.  Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console; here are their descriptions:<variablelist>
+            <varlistentry>
+              <term>balancers</term>
+              <listitem>
+                <para>Host names of the SIP load balancer(s) with corresponding <literal>addBalancerAddress</literal> and <literal>removeBalancerAddress</literal> methods.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>heartBeatInterval</term>
+              <listitem>
+                <para>Interval at which each heartbeat is sent to the SIP load balancer(s).</para>
+              </listitem>
+            </varlistentry>
+          </variablelist> </para>
+      </formalpara>
       <section>
         <title>Converged load balancing</title>
-        <para>The MSS SIP load balancer can work in cooperation with HTTP load balancers like <literal>mod_jk</literal>. Whenever an HTTP session is stuck to a particular node, an instruction is sent to the SIP load balancer to direct the SIP calls from the same application session to the same node. It is sufficient to configure <literal>mod_jk</literal> to work for HTTP in JBoss in order to enable coopertaive load balancing. MSS will read the configuration and will use it without any extra configuration. You can read more about configuring <literal>mod_jk</literal> with JBoss in your JBoss Application Server documentation.</para>
+        <para>The MSS SIP load balancer can work in cooperation with HTTP load balancers like <literal>mod_jk</literal>. Whenever an HTTP session is stuck to a particular node, an instruction is sent to the SIP load balancer to direct the SIP calls from the same application session to the same node. It is sufficient to configure <literal>mod_jk</literal> to work for HTTP in JBoss in order to enable cooperative load balancing. MSS will read the configuration and will use it without any extra configuration. You can read more about configuring <literal>mod_jk</literal> with JBoss in your JBoss Application Server documentation.</para>
       </section>
     </section>
     <section id="sslb-binary-SIP_Load_Balancer-Running">
@@ -214,7 +213,7 @@ INFO: Node registry started</screen>
         </step>
         <step>
           <title>Configure SIP Servlet Server Nodes</title>
-          <para>SIP Servlets Server nodes can run on the JBoss Application Server, or the Tomcat Servlet Container.  The SIP Servlets Server binary distributions define the type of SIP Servlets Server nodes used, and should already be installed from the pre-requisites section <xref linkend="sslb-binary-SIP_Load_Balancer-Software_Prerequisites"/></para>
+          <para>SIP Servlets Server nodes can run on the JBoss Application Server, or the Tomcat Servlet Container.  The SIP Servlets Server binary distributions define the type of SIP Servlets Server nodes used, and should already be installed from <xref linkend="sslb-binary-SIP_Load_Balancer-Software_Prerequisites"/>.</para>
           <para>The <filename>server.xml</filename> file specifies the nodes used.  Because there is more then one client node specified, unique listener ports must be specified for each node to monitor HTTP and/or SIP connections.  <xref linkend="sslb-Changing_the_SIP_Connector_Port_for_Servlet_Server_Nodes"/> describes the affected element in the <filename>server.xml</filename> file.</para>
           <note>
             <title>Configuration File Location</title>

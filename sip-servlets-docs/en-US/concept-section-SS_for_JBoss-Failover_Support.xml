@@ -7,14 +7,14 @@
   <para>The Mobicents SIP load balancer, which is a SIP Call-ID-aware load balancer, is used as the man-in-the-middle. Its job is to forward stateful transaction requests to cluster nodes based on its provisioning algorithm. The SIP load balancer acts as an entry-point to the cluster and distributes the incoming requests between nodes. It is always advised to use a SIP load balancer or an IP load balancer in a cluster configuration. </para>
   <formalpara>
     <title>Testing a cluster</title>
+    <para>This choice of implementation has many benefits. Among them are:</para>
   </formalpara>
-  <para>This choice of implementation has many benefits. Among them are:</para>
   <itemizedlist>
     <listitem>
       <para>There is no need for standby nodes, because the remaining nodes in a degraded cluster automatically and transparently (to the user) take on the load of the failed node. This can be done because both the SIP load balancer and SIP Servlet-enabled JBoss Application Servers support mid-call failover.</para>
     </listitem>
     <listitem>
-      <para>There is no need to ensure that requests are directed to the <quote>right node</quote>, because in a SIP Servlets-enabled JBoss Application Server (or Mobicents JAIN SLEE server) cluster, any node can serve any request to any User Agent (UA).</para>
+      <para>There is no need to ensure that requests are directed to the correct node, because in a SIP Servlets-enabled JBoss Application Server (or Mobicents JAIN SLEE server) cluster, any node can serve any request to any User Agent (UA).</para>
     </listitem>
     <listitem>
       <para>All hardware is in use, reducing costs.</para>
@@ -88,7 +88,7 @@ Limitations
 Mobicents Sip Servlets doesn't currently support mid call failover for converged applications only pure sip applications (Uas, Uac, B2BUA, Proxy).
 </remark>--><!-- MSS for JBoss Cluster -->  <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover--Installing_Configuring_and_Running">
     <title>MSS for JBoss Cluster: Installing, Configuring and Running</title>
-    <para>There are a number of options you can specify for MSS clustering. By default most of them are configured in the <quote>all</quote> server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.</para>
+    <para>There are a number of options you can specify for MSS clustering. By default most of them are configured in the &quot;all&quot; server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.</para>
     <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover-Downloading">
       <title>Downloading</title>
       <para>&nbsp;</para>

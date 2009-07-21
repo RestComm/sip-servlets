@@ -1,113 +1,91 @@
-<?xml version='1.0'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-]><!-- chapter id nickname: ittsss -->
-<chapter
-	id="ittsss-Introduction_to_the_SIP_Servlets_Server">
-	<title>Introduction to the SIP Servlets Server</title>
-	<para>
-		<application
-			condition="mob">Mobicents</application>
-		<application
-			condition="jbcp">JBCP</application> SIP (Session Initiation Protocol) Servlets deliver a consistent, open platform on which to develop and deploy portable and distributed SIP and Java Enterprise Edition services. The <application
-			condition="mob">Mobicents</application>
-		<application
-			condition="jbcp">JBCP</application> SIP Servlets Server is a <emphasis>certified</emphasis> implementation of the SIP Servlet v1.1 (JSR 289) specification that can run on top of either the JBoss Application Server or the Tomcat Servlet Container.</para>
-	<para>
-		<application
-			condition="mob">Mobicents</application>
-		<application
-			condition="jbcp">JBCP</application> SIP Servlets for JBoss (MSS for JBoss) strives to develop interoperability standards between SIP Servlets and the Java Service Logic Execution Environment (JSLEE) so that applications can exploit the strengths of both. The JAIN-SIP Reference Implementation is leveraged as the SIP stack, and the <application
-			condition="mob">Mobicents</application>
-		<application
-			condition="jbcp">JBCP</application> JAIN SLEE Server is used as the SLEE implementation.</para>
-	<itemizedlist
-		id="ittsss-Principal_and_new_features_of_SIP_Servlets">
-		<title>Features of the Mobicents SIP Servlets Server</title>
-		<listitem>
-			<para>the first <emphasis>certified</emphasis> SIP Servlet v1.1 (JSR 289) implementation</para>
-		</listitem>
-		<listitem>
-			<para>a current call rate of 100 calls per second over a 24-hour duration: 8,640,000 total calls</para>
-		</listitem>
-		<listitem>
-			<para>load balancing, cluster and failover support</para>
-		</listitem>
-		<listitem>
-			<para>merged SIP and HTTP session management</para>
-		</listitem>
-		<listitem>
-			<para>a browser-based Management Console</para>
-		</listitem>
-		<listitem>
-			<para>a bundled JSLEE/SIP interoperability demonstration application for MSS for JBoss</para>
-		</listitem>
-		<listitem>
-			<para>Mobicents Media Server</para>
-		</listitem>
-		<listitem>
-			<para>extensions such as SUBSCRIBE/NOTIFY, among others</para>
-		</listitem>
-	</itemizedlist>
-
-	<section
-		id="ittsss-High-Availability-SIP_Servlets_Server_Load_Balancing_Clustering_and_Failover">
-		<title>High-Availability: SIP Servlets Server Load Balancing, Clustering and Failover</title>
-		<para>Telecommunications applications demand High-Availability (HA), fault tolerance, scalability and performance. Providing highly-available end-user applications that are performant and tolerant of faults is usually and primarily achieved through the use of clustering technologies. Clustering is a complex subject that is often used to collectively address a variety of techniques aimed at improving the high-availability and scalability of services and applications. Such techniques include distributed state replication, load balancing, and failover capabilities. The usage of any one of these techniques improves either reliability or performance, but for the sake of the other. It requires careful analysis of real-world scenarios to arrive at an architecture which represents the optimal balance of performance and reliability.</para>
-		<para>Based on experience with production deployments and extensive feedback from the Open Source community, Mobicents HA has undergone several iterations of refinement. In its current incarnation, the architecture can be described as a <quote>star topology</quote> with symmetric application servers and a smart, lightweight load-balancing element with built-in failover logic. The amount of state replication is kept to a minimum for maximum scalability with sufficiently-high reliability.</para>
-		<mediaobject
-			id="ittsss-sas-MSSSIPLoadBalancer-dia-StarNetworkTopology">
-			<imageobject>
-				<imagedata
-					width="550"
-					align="center"
-					fileref="images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg"
-					format="JPG"/>
-			</imageobject>
-			<caption>
-				<para>A cluster of Mobicents SIP Servlets Servers, showing the star network topology.</para>
-			</caption>
-		</mediaobject>
-		<formalpara
-			id="ittsss-Clustering_Terms_and_Definitions_for_SIP_Servlets">
-			<title>Clustering Terms and Definitions for Mobicents SIP Servlets</title>
-			<para>For purposes of clarity, the SIP Servlets High-Availability sections use terms&#x2014;such as <emphasis>cluster</emphasis>&#x2014;with meanings specific to the context of Mobicents SIP Servlets. Therefore, the following definitions are provided to clarify more precisely what is meant by the terms <emphasis>cluster</emphasis>, <emphasis>node</emphasis>, <emphasis>SIP Servlets Server</emphasis> and so on, in the subsequent sections, and in the context of Mobicents High-Availability.</para>
-		</formalpara>
-		<important
-			id="ittsss-Distinguishing_Between_a_Cluster_and_Clustering_Capabilities">
-			<title>Distinguishing Between a Cluster and Clustering Capabilities</title>
-			<para>The crux of possible confusion is this: any heterogeneous group of SIP Servlets Servers behind a SIP load balancer is, by definition, a <emphasis>cluster</emphasis>. Those SIP Servlets Servers can be either MSS for JBoss servers or MSS for Tomcat servers. However, a homogeneous group of MSS for JBoss servers served by a SIP load balancer, in addition to being a cluster, also possesses JBoss-specific <emphasis>clustering capabilities</emphasis>. Those clustering capabilities include, principally, state replication and the ability to fail over. Therefore, when specific <emphasis>clustering capabilities</emphasis> are spoken of, they are always referring to the context of a homogeneous cluster of MSS for JBoss server nodes served by a load balancer.</para>
-		</important>
-
-		<variablelist
-			id="ittsss-Glossary_of_Cluster-Related_Terms">
-			<title>Glossary of Cluster-Related Terms</title>
-			<varlistentry>
-				<term>SIP Servlets Server</term>
-				<listitem>
-					<para>A Mobicents <emphasis>SIP Servlets Server</emphasis> refers to either a SIP Servlets-enabled JBoss Application Server (MSS for JBoss) or a SIP Servlets-enabled Tomcat Servlet Container (MSS for Tomcat). Anywhere the term SIP Servlets Server is used, you are free to substitute the JBoss or the Tomcat variety depending on the one you are interested in.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>node</term>
-				<listitem>
-					<para>A <emphasis>node</emphasis> is simply a SIP Servlets Server in a <emphasis>cluster</emphasis>. In this document, a node can be either an MSS for JBoss server or an MSS for Tomcat server.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>cluster</term>
-				<listitem>
-					<para>A <emphasis>cluster</emphasis>, as used in this document, refers simply to a group of one or more <emphasis>nodes</emphasis>, i.e. <emphasis>SIP Servlets Servers</emphasis>, behind a SIP load balancer. The minimum number of nodes in a cluster is one. The case of a <emphasis>cluster</emphasis> with one node almost always occurs in a <emphasis>degraded cluster</emphasis>: one in which other nodes, for some reason, have become unavailable.</para>
-				</listitem>
-			</varlistentry>
-			<varlistentry>
-				<term>SIP load balancer</term>
-				<listitem>
-					<para>The <application>Mobicents SIP load balancer</application> is not a full-fledged SIP Servlets Server itself. Rather, it is a simple <emphasis>proxy server</emphasis> whose primary purpose is to intelligently route SIP requests and replies between healthy and available SIP Servlets Servers residing in a <emphasis>cluster</emphasis> on a Local Area Network (LAN), and User Agents (UAs) accessing a SIP service or application from a Wide Area Network (WAN). The SIP load balancer therefore acts as a kind of gateway between a Wide Area Network with User Agents, and a Local Area Network wherein the SIP Servlets Server <emphasis>cluster nodes</emphasis> reside.</para>
-				</listitem>
-			</varlistentry>
-		</variablelist>
-	</section>
-	<xi:include
-		xmlns:xi="http://www.w3.org/2001/XInclude"
-		href="concept-section-Working_with_the_SIP_Servlets_Management_Console.xml"/>
+]>
+<!-- chapter id nickname: ittsss --><chapter id="ittsss-Introduction_to_the_SIP_Servlets_Server">
+  <title>Introduction to the SIP Servlets Server</title>
+  <para>
+  <application condition="mob">Mobicents</application>
+  <application condition="jbcp">JBCP</application> SIP (Session Initiation Protocol) Servlets deliver a consistent, open platform on which to develop and deploy portable and distributed SIP and Java Enterprise Edition services. The <application condition="mob">Mobicents</application>
+  <application condition="jbcp">JBCP</application> SIP Servlets Server is a <emphasis>certified</emphasis> implementation of the SIP Servlet v1.1 (JSR 289) specification that can run on top of either the JBoss Application Server or the Tomcat Servlet Container.</para>
+  <para>
+  <application condition="mob">Mobicents</application>
+  <application condition="jbcp">JBCP</application> SIP Servlets for JBoss (MSS for JBoss) strives to develop interoperability standards between SIP Servlets and the Java Service Logic Execution Environment (JSLEE) so that applications can exploit the strengths of both. The JAIN-SIP Reference Implementation is leveraged as the SIP stack, and the <application condition="mob">Mobicents</application>
+  <application condition="jbcp">JBCP</application> JAIN SLEE Server is used as the SLEE implementation.</para>
+  <itemizedlist id="ittsss-Principal_and_new_features_of_SIP_Servlets">
+    <title>Features of the Mobicents SIP Servlets Server</title>
+    <listitem>
+      <para>the first <emphasis>certified</emphasis> SIP Servlet v1.1 (JSR 289) implementation</para>
+    </listitem>
+    <listitem>
+      <para>a current call rate of 100 calls per second over a 24-hour duration: 8,640,000 total calls</para>
+    </listitem>
+    <listitem>
+      <para>load balancing, cluster and failover support</para>
+    </listitem>
+    <listitem>
+      <para>merged SIP and HTTP session management</para>
+    </listitem>
+    <listitem>
+      <para>a browser-based Management Console</para>
+    </listitem>
+    <listitem>
+      <para>a bundled JSLEE/SIP interoperability demonstration application for MSS for JBoss</para>
+    </listitem>
+    <listitem>
+      <para>Mobicents Media Server</para>
+    </listitem>
+    <listitem>
+      <para>extensions such as SUBSCRIBE/NOTIFY, among others</para>
+    </listitem>
+  </itemizedlist>
+  <section id="ittsss-High-Availability-SIP_Servlets_Server_Load_Balancing_Clustering_and_Failover">
+    <title>High-Availability: SIP Servlets Server Load Balancing, Clustering and Failover</title>
+    <para>Telecommunications applications demand High-Availability (HA), fault tolerance, scalability and performance. Providing highly-available end-user applications that are  tolerant of faults is commonly achieved through the use of clustering technologies.  </para>
+    <para>Clustering is a complex subject that is often used to collectively address a variety of techniques aimed at improving the high-availability and scalability of services and applications. Such techniques include distributed state replication, load balancing, and failover capabilities. The usage of any one of these techniques improves either reliability or performance, but for the sake of the other. It requires careful analysis of real-world scenarios to arrive at an architecture which represents the optimal balance of performance and reliability.</para>
+    <para>Based on experience with production deployments and extensive feedback from the Open Source community, Mobicents HA has undergone several iterations of refinement. In its current incarnation, the architecture can be described as a &quot;star topology&quot; with symmetric application servers and a smart, lightweight load-balancing element with built-in failover logic. The amount of state replication is kept to a minimum for maximum scalability with sufficiently-high reliability.</para>
+    <mediaobject id="ittsss-sas-MSSSIPLoadBalancer-dia-StarNetworkTopology">
+      <imageobject>
+        <imagedata width="550" align="center" fileref="images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg" format="JPG"/>
+      </imageobject>
+      <textobject>
+        <para>A cluster of Mobicents SIP Servlets Servers, showing the star network topology.</para>
+      </textobject>
+    </mediaobject>
+    <formalpara id="ittsss-Clustering_Terms_and_Definitions_for_SIP_Servlets">
+      <title>Clustering Terms and Definitions for Mobicents SIP Servlets</title>
+      <para>For purposes of clarity, the SIP Servlets High-Availability sections use terms—such as <emphasis>cluster</emphasis>—with meanings specific to the context of Mobicents SIP Servlets. Therefore, the following definitions are provided to clarify more precisely what is meant by the terms <emphasis>cluster</emphasis>, <emphasis>node</emphasis>, <emphasis>SIP Servlets Server</emphasis> and so on, in the subsequent sections, and in the context of Mobicents High-Availability.</para>
+    </formalpara>
+    <important id="ittsss-Distinguishing_Between_a_Cluster_and_Clustering_Capabilities">
+      <title>Distinguishing Between a Cluster and Clustering Capabilities</title>
+      <para>The crux of possible confusion is this: any heterogeneous group of SIP Servlets Servers behind a SIP load balancer is, by definition, a <emphasis>cluster</emphasis>. Those SIP Servlets Servers can be either MSS for JBoss servers or MSS for Tomcat servers. However, a homogeneous group of MSS for JBoss servers served by a SIP load balancer, in addition to being a cluster, also possesses JBoss-specific <emphasis>clustering capabilities</emphasis>. Those clustering capabilities include, principally, state replication and the ability to fail over. Therefore, when specific <emphasis>clustering capabilities</emphasis> are spoken of, they are always referring to the context of a homogeneous cluster of MSS for JBoss server nodes served by a load balancer.</para>
+    </important>
+    <variablelist id="ittsss-Glossary_of_Cluster-Related_Terms">
+      <title>Glossary of Cluster-Related Terms</title>
+      <varlistentry>
+        <term>SIP Servlets Server</term>
+        <listitem>
+          <para>A Mobicents <emphasis>SIP Servlets Server</emphasis> refers to either a SIP Servlets-enabled JBoss Application Server (MSS for JBoss) or a SIP Servlets-enabled Tomcat Servlet Container (MSS for Tomcat). Anywhere the term SIP Servlets Server is used, you are free to substitute the JBoss or the Tomcat variety depending on the one you are interested in.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>node</term>
+        <listitem>
+          <para>A <emphasis>node</emphasis> is simply a SIP Servlets Server in a <emphasis>cluster</emphasis>. In this document, a node can be either an MSS for JBoss server or an MSS for Tomcat server.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>cluster</term>
+        <listitem>
+          <para>A <emphasis>cluster</emphasis>, as used in this document, refers simply to a group of one or more <emphasis>nodes</emphasis>, i.e. <emphasis>SIP Servlets Servers</emphasis>, behind a SIP load balancer. The minimum number of nodes in a cluster is one. The case of a <emphasis>cluster</emphasis> with one node almost always occurs in a <emphasis>degraded cluster</emphasis>: one in which other nodes, for some reason, have become unavailable.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>SIP load balancer</term>
+        <listitem>
+          <para>The <application>Mobicents SIP load balancer</application> is not a full-fledged SIP Servlets Server itself. Rather, it is a simple <emphasis>proxy server</emphasis> whose primary purpose is to intelligently route SIP requests and replies between healthy and available SIP Servlets Servers residing in a <emphasis>cluster</emphasis> on a Local Area Network (LAN), and User Agents (UAs) accessing a SIP service or application from a Wide Area Network (WAN). The SIP load balancer therefore acts as a kind of gateway between a Wide Area Network with User Agents, and a Local Area Network wherein the SIP Servlets Server <emphasis>cluster nodes</emphasis> reside.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-Working_with_the_SIP_Servlets_Management_Console.xml"/>
 </chapter>
