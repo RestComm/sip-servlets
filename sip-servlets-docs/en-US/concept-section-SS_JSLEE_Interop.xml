@@ -36,6 +36,7 @@
   approaches we have identified to achieve the goal of interoperability
   between Sip Servlets and JSLEE.</para>
 
-  <para>You can also use our working JSLEE/SIP Servlets interoperability
-  example showcasing our approach.</para>
+  <para>You can also use our <ulink
+  url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP
+  Servlets interoperability example</ulink> showcasing our approach.</para>
 </section>

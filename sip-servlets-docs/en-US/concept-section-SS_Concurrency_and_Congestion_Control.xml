@@ -317,11 +317,13 @@
     </varlistentry>
 
     <varlistentry>
-      <term>Tuning Parameters from Embedded Jopr</term>
+      <term>Tuning Parameters from Enterprise Monitoring and Managent
+      Console</term>
 
       <listitem>
-        <para>Finally, once you have installed Embedded Jopr, you can change
-        the tunable parameters by pointing your browser at <ulink
+        <para>Finally, once you have installed the <xref
+        linkend="emom-Enterprise-Monitoring-Operations-Management" />, you can
+        change the tunable parameters by pointing your browser at <ulink
         url="http://localhost:8080/embedded-jopr"></ulink>.</para>
       </listitem>
     </varlistentry>

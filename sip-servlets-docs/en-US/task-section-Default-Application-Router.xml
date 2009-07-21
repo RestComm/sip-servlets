@@ -49,7 +49,7 @@
     Appendix C.</para>
 
     <section id="tsdar-DAR-Configuration-File">
-      <title>the DAR Configuration file</title>
+      <title>the DAR Configuration File</title>
 
       <para>The Default Application Router (DAR) works off a simple
       configuration text file which is modeled as a Java properties file. It
@@ -142,8 +142,8 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
         </listitem>
 
         <listitem>
-          <para>A string representing in which orders the applications should
-          be invoked (starts at 0). This will be removed later on and the
+          <para>A string representing in which orders the applications must be
+          invoked (starts at 0). This will be removed later on and the
           position of sip-router-info data will be the order</para>
         </listitem>
       </itemizedlist>
@@ -165,7 +165,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
     </section>
 
     <section>
-      <title>Routing of SIP Messages to applications</title>
+      <title>Routing of SIP Messages to Applications</title>
 
       <section>
         <title>Initial Requests and Application Selection Process</title>
@@ -282,7 +282,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
   </section>
 
   <section id="tsdar-Limitations">
-    <title>Limitations</title>
+    <title>Limitations of the Default Application Router</title>
 
     <para>It is not possible to filter out the requests based on the incoming
     request headers to target specific applications. By example, to select an

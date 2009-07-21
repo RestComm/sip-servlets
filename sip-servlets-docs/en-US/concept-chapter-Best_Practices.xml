@@ -9,7 +9,7 @@
     <title>Mobicents Sip Servlets Performance Tips</title>
 
     <section>
-      <title>JBoss</title>
+      <title>Tuning JBoss</title>
 
       <para>You can look at the following wiki page: <ulink
       url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBossASTuning</ulink>.
@@ -20,7 +20,7 @@
     </section>
 
     <section>
-      <title>Mobicents Sip Servlets</title>
+      <title>Tuning Mobicents Sip Servlets</title>
 
       <itemizedlist>
         <listitem>
@@ -40,7 +40,7 @@
     </section>
 
     <section>
-      <title>JAIN SIP Stack</title>
+      <title>Tuning The JAIN SIP Stack</title>
 
       <para>You can fine tune the properties of the Stack. You will find the
       sip stack properties defined in an external properties file
@@ -92,7 +92,7 @@
     </section>
 
     <section>
-      <title>JVM</title>
+      <title>Tuning The JVM</title>
 
       <para>These notes depend on the JVM used, but should be pretty much
       standard. These where written with Sun JDK 1.6 in mind, but should apply
@@ -130,7 +130,7 @@
     </section>
 
     <section>
-      <title>Operating System</title>
+      <title>Tuning The Operating System</title>
 
       <para>These notes are for RHEL, but should apply to other versions of
       Unix.</para>
@@ -241,7 +241,7 @@
     </section>
 
     <section>
-      <title>Other approaches</title>
+      <title>Other Approaches</title>
 
       <para>Other approaches include using proxy/media that can act as
       gateways, Session Border Controllers, enhanced Firewall with Application
