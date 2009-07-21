@@ -58,8 +58,16 @@
           </listitem>
 
           <listitem>
-            <para>Get the Mobicents Sip Servlets Jopr Plug in from here
-            :</para>
+            <para>Get the Mobicents Sip Servlets Jopr Plug in from here :
+            <ulink
+            url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para>Copy the jopr-mobicents-sip-servlets-plugin-1.3.jar just
+            downloaded to the
+            jopr-server/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/
+            directory</para>
           </listitem>
 
           <listitem>
@@ -104,27 +112,33 @@
             </mediaobject>
           </listitem>
 
-	  <listitem>
-            <para>Click on the Configuration Tab to be able to tune the Congestion Controls parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+          <listitem>
+            <para>Click on the Configuration Tab to be able to tune the
+            Congestion Controls parameters as defined in <xref
+            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
 
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/mss-embjopr-config.png" />
               </imageobject>
 
-              <caption>SIP Application Dispatcher Congestion Control Parameters Configuration</caption>
+              <caption>SIP Application Dispatcher Congestion Control
+              Parameters Configuration</caption>
             </mediaobject>
           </listitem>
 
-	  <listitem>
-            <para>Click on the Control Tab to be able to set the Concurrency Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+          <listitem>
+            <para>Click on the Control Tab to be able to set the Concurrency
+            Control Mode and Congestion Control Policy as defined in <xref
+            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
 
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/mss-embjopr-control.png" />
               </imageobject>
 
-              <caption>SIP Application Dispatcher Congestion Control Parameters Configuration</caption>
+              <caption>SIP Application Dispatcher Congestion Control
+              Parameters Configuration</caption>
             </mediaobject>
           </listitem>
 
@@ -223,6 +237,36 @@
             </mediaobject>
           </listitem>
 
+	  <listitem>
+            <para>Click on the Configuration Tab to be able to tune the
+            Congestion Controls parameters as defined in <xref
+            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-queue.png" />
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control
+              Parameters Configuration</caption>
+            </mediaobject>
+          </listitem>
+
+          <listitem>
+            <para>Click on the Control Tab to be able to set the Concurrency
+            Control Mode and Congestion Control Policy as defined in <xref
+            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-concurrency.png" />
+              </imageobject>
+
+              <caption>SIP Application Dispatcher Congestion Control
+              Parameters Configuration</caption>
+            </mediaobject>
+          </listitem>
+
           <listitem>
             <para>To get the metrics coming in, you will need to use an
             example application such as location service by example so that
@@ -310,12 +354,13 @@
         <listitem>
           <para>Get the Mobicents Sip Load Balancer Jopr Plug in from JBoss
           maven repository at <ulink
-          url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0.BETA1/sip-balancer-jopr-plugin-1.0.BETA1.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0.BETA1/sip-balancer-jopr-plugin-1.0.BETA1.jar</ulink></para>
+          url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar</ulink></para>
         </listitem>
 
         <listitem>
           <para>Copy the Mobicents Sip Load Balancer Jopr Plug in jar to the
-          jopr-server-2.2.0.GA/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</para>
+          jopr-serve/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/
+          directory</para>
         </listitem>
 
         <listitem>
