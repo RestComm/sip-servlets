@@ -39,7 +39,7 @@ Version 1.0 is out !
 		 	
 		 	** {{{./user_guides/sip_servlets/index.html#jruby-telco-integration}JRuby Torquebox Telco Framework}}
 		 	
-		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/}ECharts For SIP Servlets framework (E4SS)}} : Check out the {{{mss-echarts.html}<<announcement>>}} 
+		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/What-is-ECharts-for-SIP-Servlets.html}ECharts For SIP Servlets framework (E4SS)}} : Check out the {{{mss-echarts.html}<<announcement>>}} 
 		 	
 		 * {{{./user_guides/sip_servlets/index.html#sscacc-MSS_Concurrency_and_Congestion_Control}Concurrency and Congestion Control}}
 		 
