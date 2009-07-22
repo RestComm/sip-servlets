@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0</version>
 	</parent>
 	<artifactId>session-state-uac</artifactId>
 	<packaging>war</packaging>

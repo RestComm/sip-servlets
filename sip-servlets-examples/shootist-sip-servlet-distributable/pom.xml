@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.4-SNAPSHOT</version>
+		<version>1.4</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>shootist-sip-servlet-distributable</artifactId>

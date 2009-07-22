@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-application-router</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 	<name>Sip Servlets Default Application Router</name>
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
@@ -17,14 +17,14 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.10-SNAPSHOT</version>
+			<version>1.1.10</version>
 		</dependency>
 		
 		<!-- sip servlet impl dependency -->
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-impl</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 
 		<!-- logging dependency -->
