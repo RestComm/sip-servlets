@@ -3,11 +3,11 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>1.0</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>annotated-servlet</artifactId>
 	<packaging>war</packaging>
-	<version>1.4</version>
+	<version>1.5-SNAPSHOT</version>
 	<name>Annoatated Sip Servlet Example</name>
 	<build>
 		<plugins>

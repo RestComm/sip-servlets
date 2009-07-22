@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.4</version>
+		<version>1.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>diameter-event-charging</artifactId>
 	<packaging>war</packaging>
-	<version>1.4</version>
+	<version>1.5-SNAPSHOT</version>
 	<name>Diameter Event Charging Sip Servlet Example</name>
 	<dependencies>
     <dependency>
