@@ -1,0 +1,11 @@
+ECharts for SIP Servlets
+
+[e4ss-logo.jpg]
+
+	Mobicents 1.0 supports applications developed using the {{{http://echarts.org/ECharts-for-SIP-Servlets/}ECharts For SIP Servlets framework (E4SS)}}.  
+	
+	E4SS is open source software that allows the use of the ECharts state-machine programming language to program converged SIP applications.  
+	Instead of overriding servlet methods and managing sessions, the programmer defines the application in terms of feature boxes, SIP message ports, and state-machine logic specified in the ECharts language.  
+	The use of ECharts to specify application logic greatly encourages component re-use and manages complexity.  
+	The E4SS distribution includes a number of reusable SIP features, which have Java APIs for customization, as well as a library of common call-control fragments that may be used to develop custom features.
+	See {{{http://echarts.org/}http://echarts.org/}} for more information.

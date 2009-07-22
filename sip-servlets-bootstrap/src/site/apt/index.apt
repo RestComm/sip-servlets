@@ -19,7 +19,7 @@ Goals
 
 Version 1.0 is out !
 
-	We are proud to announce our {{{}Mobicents Sip Servlets 1.0 version}}, certified against Sip Servlets 1.1 specification and working on top of the following containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> and <JBoss AS 5.1.0.GA>. 
+	We are proud to announce our {{{}Mobicents Sip Servlets 1.0 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of the following containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> and <JBoss AS 5.1.0.GA>. 
 	
 	Following is the list of features making it the best open source JSR 289 implementation out there :
 	
@@ -39,7 +39,7 @@ Version 1.0 is out !
 		 	
 		 	** {{{./user_guides/sip_servlets/index.html#jruby-telco-integration}JRuby Torquebox Telco Framework}}
 		 	
-		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/}ECharts For SIP Servlets}}
+		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/}ECharts For SIP Servlets framework (E4SS)}} : Check out the {{{mss-echarts.html}<<announcement>>}} 
 		 	
 		 * {{{./user_guides/sip_servlets/index.html#sscacc-MSS_Concurrency_and_Congestion_Control}Concurrency and Congestion Control}}
 		 
