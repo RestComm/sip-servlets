@@ -53,7 +53,9 @@ Version 1.0 is out !
 	 
 	It is shipped with :		
 	
-		* {{{./user_guides/sip_servlets/index.html#wwtssmc-Working_with_the_SIP_Servlets_Management_Console}Management Console}}
+		* {{{./user_guides/sip_servlets/index.html#wwtssmc-Working_with_the_SIP_Servlets_Management_Console}Application Router Management Console}} to configure the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Application-Router}Application Router}} to route SIP Messages to your applications
+		
+		* {{{./user_guides/sip_servlets/index.html#emom-Enterprise-Monitoring-Operations-Management}An Enterprise Monitoring and Management Console}} to effectively manage and monitor the server and your applications		
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
 		
