@@ -2391,7 +2391,7 @@ ipAddress="127.0.0.1"
 	<chapter id="sssicar-SIP_Servlets_Server-Application-Router" lang="en-US">
 	<!--  chapter id nickname: sssicar  --><title>Application Router</title>
 	<para>
-		The following sections describe how the Application Routing is performed in the Mobicents Sip Servlets container through its Default Application Router and how other Application Router implementations compliant with the JSR 289 specification can be installed.
+		Application Routing is performed within the Mobicents Sip Servlets container by the Default Application Router. The following sections describe the Default Application Router, and how other Application Router implementations compliant with the JSR 289 specification can be installed.
 	</para>
 	<section id="tsdar-Default-Application-Router" lang="en-US">
 	<title>Default Application Router</title>
@@ -2404,13 +2404,16 @@ ipAddress="127.0.0.1"
 			An Application Router is required for a container to function, but it is a separate logical entity from the container. The Application Router is solely responsible for application selection and does not implement application logic. For example, the Application Router cannot modify a request or send a response.
 		</para>
 		<para>
-			There is no direct interaction between the Application Router and applications, only between the Sip Servlets Container and the Application Router
+			There is no direct interaction between the Application Router and applications, only between the Sip Servlets Container and the Application Router.
 		</para>
 		<para>
-			So that the Application Router can make knowledgeable decisions, the Sip Servlets container is responsible for passing a number of information related to the initial request. Besides the information passed by the container, the Application Router is free to make use of any other information or data stores. How it accesses that information and what information it makes use of is a matter of its implementation and is not defined in the Sip Servlets 1.1 specification.
+			The Sip Servlets container is responsible for passing the required information to the Application Router within the initial request so the Application Router can make informed routing decisions. Except for the information passed by the container, the Application Router is free to make use of any other information or data stores. It is up to the individual implementation how the Application Router makes use of the information or data stores.
 		</para>
 		<para>
-			The role of the deployer is defined in the Servlet API : The deployer in a SIP Servlet environment controls application composition by defining and deploying the Application Router implementation. Giving the deployer control over application composition is desirable because it is the deployer who is most aware of and responsible for the totality of services provided to his or her subscribers. Furthermore, the SIP Servlets specification intentionally allows the Application Router implementation to consult arbitrary information or data stores. This is because the deployer maintains subscriber information and this information is often private and valuable.
+			The deployer in a SIP Servlet environment controls application composition by defining and deploying the Application Router implementation. Giving the deployer control over application composition is desirable because the deployer is solely responsible for the services available to subscribers.
+		</para>
+		<para>
+			Furthermore, the SIP Servlets specification intentionally allows the Application Router implementation to consult arbitrary information or data stores. This is because the deployer maintains subscriber information and this information is often private and valuable.
 		</para>
 	</section>
 	
@@ -2422,12 +2425,12 @@ ipAddress="127.0.0.1"
 		<section id="tsdar-DAR-Configuration-File">
 			<title>the DAR Configuration File</title>
 			<para>
-				The Default Application Router (DAR) works off a simple configuration text file which is modeled as a Java properties file. It contains the information needed by the Application Router to select which SIP Servlet application will handle an incoming initial request. Here is the definition of the DAR configuration file :
+				The Default Application Router (DAR) works off a simple configuration text file which is modeled as a Java properties file. It contains the information needed by the Application Router to select which SIP Servlet application will handle an incoming initial request. The properties file has the following requirements:
 			</para>
 			<itemizedlist>
 				<listitem>
 					<para>
-						The properties file MUST be made available to the DAR and the location/content of this file MUST be accessible from a hierarchical URI which itself is to be supplied as a system property "javax.servlet.sip.ar.dar.configuration". In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file (See the <xref linkend="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml"/> for more details) or the (See the <xref linkend="wwtssmc-Working_with_the_SIP_Servlets_Management_Console"/>)
+						It MUST be made available to the DAR and the location/content of this file MUST be accessible from a hierarchical URI which itself is to be supplied as a system property "javax.servlet.sip.ar.dar.configuration". In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file (See the <xref linkend="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml"/> for more details) or the (See the <xref linkend="wwtssmc-Working_with_the_SIP_Servlets_Management_Console"/>)
 					</para>
 				</listitem>
 				<listitem>
@@ -2453,7 +2456,10 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			</itemizedlist>
 			<note>
 				<para>
-					In addition to what is defined in the Sip Servlet 1.1 Specification, Mobicents Sip Servlets defines a new keyword called ALL allowing a mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an application that listen to all incoming methods. If both the ALL and a specific method are defined in the DAR file, the specific method takes precedence over the ALL, and ALL is called when there is no applications to serve for the specific method anymore.
+					In addition to what is defined in the Sip Servlet 1.1 Specification, Mobicents Sip Servlets defines a new keyword called ALL. This keyword allows mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an application that listen to all incoming methods.
+				</para>
+				<para>
+					If both the ALL and a specific method are defined in the DAR file, the specific method takes precedence over the ALL, and ALL is called when there is no applications to serve for the specific method anymore.
 				</para>
 			</note>
 			<para>
@@ -2512,16 +2518,16 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			<section>
 				<title>Initial Requests and Application Selection Process</title>
 				<para>
-					Initial Requests are requests that can essentially be dialog creating (<emphasis role="bold">"INVITE", "SUBSCRIBE", "NOTIFY", ... </emphasis>) and not part of an already existing dialog. (There is some other corner cases that you can check in the Sip Servlets 1.1 specification, Appendix B Definition of an Initial Request )
+					Initial Requests are those that can essentially be dialog creating (<emphasis role="bold">"INVITE", "SUBSCRIBE", "NOTIFY", ... </emphasis>) and not part of an already existing dialog. (There is some other corner cases that you can check in the Sip Servlets 1.1 specification, Appendix B Definition of an Initial Request )
 				</para>
 				<para>
 					Those Initial requests are routed to applications deployed in the container according to the Sip Servlets 1.1 specification, Section 15.4.1 Procedure for Routing an Initial Request.
 				</para>
 				<para>
-					Here is a quick summary that takes the example of the routing (through the Default Application Router) of an INVITE to two applications deployed in the container. Those 2 applications are a Location Service and a Call Blocking application :
+					Here is a quick summary that takes the example of the routing (through the Default Application Router) of an INVITE to two applications deployed in the container. Those two applications are a Location Service and a Call Blocking application :
 				</para>
 				<para>
-					The DAR file will contain the following information for those 2 applications to be invoked in the correct order
+					The DAR file will contain the following information for those two applications to be invoked in the correct order
 				</para>
 				<para>
 					
@@ -2532,13 +2538,16 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 					A new INVITE (not a re-INVITE) arrives at the container. Since it is a dialog creating request and the INVITE is not part of any dialog, the Application Router is called. It will see that the first application to invoke is the LocationService so it will return that information to the container (along with the rest of the sip-router-info data) so that the container knows which application to invoke.
 				</para>
 				<para>
-					The container thus invokes the LocationService that proxies the INVITE (which is considered essentially as a new INVITE see Sip Servlets 1.1 Specification, Section 15.2.2 Sending an Initial Request) to the known IP Address of the registered user for the Request URI.
+					The container then invokes the LocationService that proxies the INVITE (considered essentially as a new INVITE (see Sip Servlets 1.1 Specification, Section 15.2.2 Sending an Initial Request)) to the known IP Address of the registered user for the Request URI.
 				</para>
 				<para>
 					Since the INVITE has been proxied, the container will invoke the Application Router for the proxied INVITE to see if any more applications are interested into it. The Application Router will see that the second application to invoke is the CallBlocking application so it will return that information to the container (along with the rest of the sip-router-info data) so that the container knows which application to invoke.
 				</para>
 				<para>
-					The container will route the INVITE within the container to the next application in the chain, The Call Blocking application will decide that the user calling is black listed so it will reject the call with a Forbidden response. Since the Call Blocking acted as a UAS the Application Selection Process is stopped. (the container will not invoke the application router anymore for this INVITE).
+					The container will route the INVITE within the container to the next application in the chain.
+				</para>
+				<para>
+					The Call Blocking application will decide that the user calling is black listed so it will reject the call with a Forbidden response. Since the Call Blocking acted as a UAS, the Application Selection Process is stopped (the container will not invoke the application router anymore for this INVITE).
 				</para>
 				<para>
 					The path that the INVITE has taken (that is, LocationService, CallBlocking) is called the application path. The Routing of the responses will now occur as explained in the next section.
@@ -2556,7 +2565,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 					Responses always follow the reverse of the path taken by the corresponding request. In our case the Forbidden response will first go back to LocationService then back to the caller. This is true for responses to both initial and subsequent requests. The application path is a logical concept and as such may or may not be explicitly represented within containers.
 				</para>
 				<para>
-					Another possible outcome could have be that the Call Blocking application instead of sending a Forbidden response, allowed the call and proxied the INVITE to the same Request URI chosen by the Location Service. Then when the callee sends back the 200 OK Response, this response goes back the same way through the application path, so in the present case Call Blocking, then Location Service, then back to the caller.
+					Another possible outcome could have been that the Call Blocking application instead of sending a Forbidden response, allowed the call and proxied the INVITE to the same Request URI chosen by the Location Service. Then when the callee sends back the 200 OK Response, this response goes back the same way through the application path (so in the present case Call Blocking, then Location Service, then back to the caller).
 				</para>
 				<note>
 					<para>
@@ -2571,7 +2580,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 					Subsequent requests are all requests that are not Initial.
 				</para>
 				<para>
-					The second scenario where the Call Blocking application allowed the call will be used in this section to showcase subsequent requests. So the caller has received the 200 OK response back. Now according to the SIP specification (RFC 3261), it sends an ACK. The ACK arrives at the container and is not a dialog creating request and is already part of an ongoing dialog (early dialog) so the request is detected as a Subsequent request and will follow the application path created by the initial request. So the ACK will go through Location Service, Call Blocking and then to the callee.
+					The second scenario where the Call Blocking application allowed the call will be used in this section to showcase subsequent requests. So the caller has received the 200 OK response back. Now according to the SIP specification (RFC 3261), it sends an ACK. The ACK arrives at the container and is not a dialog creating request and is already part of an ongoing dialog (early dialog) so the request is detected as a Subsequent request and will follow the application path created by the initial request. The ACK will go through Location Service, Call Blocking, and finally to the callee.
 				</para>
 			</section>
 
@@ -2585,13 +2594,10 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			It is not possible to filter out the requests based on the incoming request headers to target specific applications. By example, to select an application based on the From Header domain part of the URI is not possible at the moment
 		</para>
 		<para>
-			As you would notice, this is a minimalist Application Router with no processing logic besides the declaration of the application order. It is expected that in real world deployments, the Application Router shall play an extremely important role in application orchestration and composition. It is likely to make use of complex rules and diverse data repositories.
+			As you would notice, this is a minimalist Application Router with no processing logic besides the declaration of the application order. It is expected that in real world deployments, the Application Router would play an extremely important role in application orchestration and composition. It is likely that the Application Router would make use of complex rules and diverse data repositories.
 		</para>
 		<para>
 			The DAR is intended to be a very simple implementation that is available as part of the reference implementation, and could be used instead of a real world Application Router.
-		</para>
-		<para>
-			So far we didn't had requests for a more elaborated Application Router but if you need one you can either open an issue see the feedback page or look at the <xref linkend="tsear-echarts-Application-Router"/>.
 		</para>
 	</section>
 
@@ -2601,7 +2607,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 	<section>
 		<title>Description of DFC Application Router</title>
 		<para>
-			Instead of using our Mobicents Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used such as the <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC Application Router from ECharts</ulink>
+			Instead of using the Mobicents Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used, such as the eCharts <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC Application Router</ulink>
 		</para>
 	</section>
 	
@@ -2610,21 +2616,21 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 		<section>
 			<title>Installing DFC Application Router in Mobicents Sip Servlets on Tomcat</title>
 			<para>
-				Just drop the dfcar.jar from the ECharts distribution package in <literal>TOMCAT_HOME/lib</literal> directory and remove the Mobicents Default Application Router located in <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal>
+				Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>TOMCAT_HOME/lib</literal> directory and remove the Mobicents Default Application Router located in <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal>
 			</para>
 		</section>
 		
 		<section>
 			<title>Installing DFC Application Router in Mobicents Sip Servlets on JBoss 4.2.x</title>
 			<para>
-				Just drop the dfcar.jar from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal> directory and remove the Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal>
+				Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal> directory and remove the Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal>
 			</para>
 		</section>
 		
 		<section>
 			<title>Installing DFC Application Router in Mobicents Sip Servlets on JBoss 5.1.x</title>
 			<para>
-				Just drop the dfcar.jar from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory and remove Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal>
+				Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory and remove Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal>
 			</para>
 		</section>
 
@@ -4167,7 +4173,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 		Mobicents supports the clustering of SIP Servlets-enabled JBoss Application Servers for performance, reliability and failover purposes. Note that only MSS for JBoss Servers can be used as cluster nodes; MSS for Tomcat Containers are not supported.
 	</para>
 	<para>
-		As the SIP Servlets Server employs JBoss Application Server as its servlet container and takes advantage of its capabilities, including clustering and failover, familiarity with the basics of JBoss Clustering is helpful. Refer to this chapter in the Clustering Guide for background or if you wish to dig further: <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/index.html">JBoss Application Server Clustering Guide</ulink>.
+		The SIP Servlets Server uses the JBoss Application Server as its servlet container, and takes advantage of its capabilities, including clustering and failover. For detailed background information about JBoss Application Server clustering refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/index.html">JBoss Application Server Clustering Guide</ulink>.
 	</para>
 	<!--  SIP Servlets Server Cluster  --> <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing_Configuring_and_Running">
 		<title>SIP Servlets Server Cluster: Installing, Configuring and Running</title>
@@ -4185,7 +4191,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					<term>A SIP Servlets-enabled JBoss Application Server</term>
 					<listitem>
 						<para>
-							Before proceeding, you should follow the instructions for installing, configuring, running and testing MSS for JBoss from the binary distribution:
+							Before proceeding, ensure you have correctly configured your JBoss Application Server, according to SIP Servlet Server requirements:
 						</para>
 						<itemizedlist>
 							<listitem>
@@ -4195,10 +4201,13 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 							</listitem>
 						</itemizedlist>
 						<para>
-							The easiest way to set up a cluster of SIP Servlets-enabled JBoss Application Servers is to install, configure and test the binary distribution on one machine, and then simply copy the entire installation (directory) to the other machines in the cluster. This is the approach taken in this chapter.
+							The easiest way to set up a cluster of SIP Servlets-enabled JBoss Application Servers is to install, configure and test the binary distribution on one machine, and then copy the entire installation (directory) to the other machines in the cluster. This is the approach taken in this chapter.
 						</para>
 						<para>
-							First, install your SIP Servlets Server with JBoss by following these instructions: <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>. Then proceed to <xref linkend="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring"/> below.
+							Install a SIP Servlets Server with JBoss by following the instructions detailed in <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>.
+						</para>
+						<para>
+							Afer meeting the requirement you can begin to configure the server <xref linkend="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring"/> below.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -4216,7 +4225,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
   </section> --> <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
 			<title>Configuring</title>
 			<para>
-				Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering. SIP and HTTP session state clustering are pre-configured straight out of the binary distribution. However, to enable session replication in your node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per application or globally for all applications.
+				Once installed, the MSS for JBoss binary distribution requires only minor configuration in order to enable clustering.
+			</para>
+			<para>
+				SIP, and HTTP session state clustering is pre-configured straight out of the binary distribution. However, to enable session replication in a node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per application or globally for all applications.
 			</para>
 			<important id="ssfjcs-You_Must_Use_the_all_Server_Configuration_Profile">
 				<title>You Must Use the "all" Server Configuration Profile</title>
@@ -4225,10 +4237,16 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</important>
 			<para>
-				To do so, open the <filename>web.xml</filename> configuration file, which lives in the <filename>&lt;topmost_directory&gt;/server/all/deploy/jboss-web.deployer/conf/</filename> directory, and add the empty element <literal>&lt;distributable/&gt;</literal> as a child of the document root element, <literal>web-app</literal>:
+				To change the correct profile, open the <filename>web.xml</filename> configuration file, which is stored in the <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/conf/</filename> directory,
+			</para>
+			<para>
+				Add the empty element <literal>&lt;distributable/&gt;</literal> as a child of the root element &lt;<literal>web-app&gt;.</literal>
+			</para>
+			<para>
+				This one configuration change is sufficient for enabling clustering capabilities in MSS for JBoss servers for all applications. For further information on session replication and clustering with JBoss, refer to <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/clustering-http-app.html">Enabling session replication in your application</ulink> in the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Getting_Started_Guide/beta422/html/index.html">JBoss Application Server Getting Started Guide</ulink>.
 			</para>
 			<example id="ssfjcs-Enabling_Node_Session_Replication_in_the_web.xml_Deployer">
-				<title>Enabling Node Session Replication in the default web.xml descriptor</title>
+				<title>Enabling Node Session Replication in the Default web.xml Descriptor</title>
 				
 <programlisting linenumbering="unnumbered" role="XML">&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
 &lt;web-app
@@ -4255,9 +4273,6 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
  &lt;/context-param&gt;
 </programlisting>
 			</example>
-			<para>
-				This one configuration change is sufficient for enabling clustering capabilities in MSS for JBoss servers for all applications. For further information on session replication and clustering with JBoss, refer to <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/clustering-http-app.html">Enabling session replication in your application</ulink> in the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Getting_Started_Guide/beta422/html/index.html">JBoss Application Server Getting Started Guide</ulink>.
-			</para>
 		</section>
 		
 		<section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Running">
@@ -4281,19 +4296,19 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</formalpara>
 			
-<screen>C:\Users\Me\My Downloads\mss-jboss-&lt;version&gt;&gt;bin\run.bat -c all
+<screen>C:\Users\user\&lt;username&gt;\My Downloads\mss-jboss-&lt;version&gt;&gt;bin\run.bat -c all
 </screen>
 			<formalpara>
 				<title>Distributing requests between nodes</title>
 				<para>
-					Together with the application server nodes, it is advised to run a SIP load-balancer or an IP load-balancer which will distribute the traffic evenly between the nodes. A load-balancer is a single entry-point to all nodes. All calls should e made through the load-balancer if you need High Availability. You can read more on how to use the SIP load-balancer in <xref linkend="sslb-SIP_Servlets_Load_Balancer-Implementation"/>.
+					Together with the application server nodes, it is advised to run a SIP load-balancer or an IP load-balancer. The IP load balancer will distribute the traffic evenly between the nodes. A load-balancer is a single entry-point to all nodes. All calls should be made through the load balancer if High Availability is required. For more information about load balancing, refer to <xref linkend="sslb-SIP_Servlets_Load_Balancer-Implementation"/>.
 				</para>
 			</formalpara>
 			<para>
-				By default the servers are configured with one SIP load-balancer at IP address "127.0.0.1". This is specified in the <literal>balancers</literal> attribute in the <filename>server.xml</filename> configuration file as follows:
+				By default, the servers are configured with one SIP load-balancer set to the IP address <literal>127.0.0.1</literal>. This is specified in the <literal>balancers</literal> attribute in the <filename>server.xml</filename> configuration file as follows:
 			</para>
 			
-<programlisting>&lt;Service name="jboss.web" 
+<programlisting role="XML">&lt;Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
   balancers="127.0.0.1"  
   sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
@@ -4333,7 +4348,7 @@ concurrencyControlMode="None"
 		<section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Testing">
 			<title>Testing</title>
 			<para>
-				To test your MSS your JBoss cluster setup for mid-call failover, refer to:
+				To test your JBoss cluster setup for mid-call failover, refer to:
 			</para>
 			<itemizedlist>
 				<listitem>
@@ -4357,15 +4372,15 @@ concurrencyControlMode="None"
 		<section id="ssfjfs-SS_for_JBoss-Failover_Support" lang="en-US">
 	<!--  chapter id nickname: ssfjfs  --><title>MSS for JBoss: Transparent Failover</title>
 	<para>
-		Just as with a Mobicents JAIN SLEE cluster, a Mobicents SIP Servlets Server for JBoss cluster does not employ any standby nodes. Typically, therefore, proxies and/or registrars will need to share the user location table by using a database cluster.
+		Just as with a Mobicents JAIN SLEE cluster, a Mobicents SIP Servlets Server for JBoss cluster does not employ any standby nodes. Typically, therefore, proxies and registrars must share the user location table by using a database cluster.
 	</para>
 	<para>
-		The Mobicents SIP load balancer, which is a SIP Call-ID-aware load balancer, is used as the man-in-the-middle. Its job is to forward stateful transaction requests to cluster nodes based on its provisioning algorithm. The SIP load balancer acts as an entry-point to the cluster and distributes the incoming requests between nodes. It is always advised to use a SIP load balancer or an IP load balancer in a cluster configuration.
+		The Mobicents SIP load balancer, which is a SIP Call ID-aware load balancer, is used as the intermediary. The SIP load balancer forwards stateful transaction requests to cluster nodes based on its provisioning algorithm. The SIP load balancer acts as an entry-point to the cluster and distributes the incoming requests between nodes. It is always advised to use a SIP load balancer or an IP load balancer in a cluster configuration.
 	</para>
 	<formalpara>
 		<title>Testing a cluster</title>
 		<para>
-			This choice of implementation has many benefits. Among them are:
+			This choice of implementation has many benefits:
 		</para>
 	</formalpara>
 	<itemizedlist>
@@ -4453,7 +4468,7 @@ name="jboss.system:service=ServiceBindingManager" >
 Limitations
 
 Mobicents Sip Servlets doesn't currently support mid call failover for converged applications only pure sip applications (Uas, Uac, B2BUA, Proxy).
-</remark> --><!--  MSS for JBoss Cluster  --> <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover--Installing_Configuring_and_Running">
+</remark> --> <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover--Installing_Configuring_and_Running">
 		<title>MSS for JBoss Cluster: Installing, Configuring and Running</title>
 		<para>
 			There are a number of options you can specify for MSS clustering. By default most of them are configured in the "all" server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.
@@ -4516,18 +4531,19 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 </section>
 		<section id="sslb-MSS_Load_Balancer" lang="en-US">
 	<!--  chapter id nickname: sslb  --><title>MSS Load Balancer</title>
-	<!-- Removed star network image because it's also in the introductory section, and jdocbook can't shrink it or align the caption --> <mediaobject id="sslb-mss-MSSSIPLoadBalancer-dia-StarNetworkTopology">
-		<imageobject>
-			<imagedata fileref="images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg" format="JPG" scalefit="1" width="440"/>
-		</imageobject>
-		<caption>
-		<para>
-			The "star cluster topology" with the Mobicents SIP load balancer as the central element.
-		</para>
-		</caption>
-	</mediaobject>
+	<!-- Removed star network image because it's also in the introductory section, and jdocbook can't shrink it or align the caption --> <figure>
+		<title>Star Cluster Topology.</title>
+		<mediaobject id="sslb-mss-MSSSIPLoadBalancer-dia-StarNetworkTopology">
+			<imageobject>
+				<imagedata fileref="images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg" format="JPG" scalefit="1" width="440"/>
+			</imageobject>
+		</mediaobject>
+	</figure>
 	<para>
-		The Mobicents SIP load balancer is used to balance the load of SIP service requests and responses between nodes in a SIP Servlets Server cluster. Both MSS for JBoss and MSS for Tomcat servers can be used in conjunction with the SIP load balancer to increase the performance and availability of SIP services and applications. In terms of functionality, the Mobicents SIP load balancer is a simple proxy server that intelligently forwards SIP session requests and responses between User Agents (UAs) on a Wide Area Network (WAN), and SIP Servlets Server nodes, which are almost always located on a Local Area Network (LAN). All SIP requests and responses pass through the SIP load balancer.
+		The Mobicents SIP load balancer is used to balance the load of SIP service requests and responses between nodes in a SIP Servlets Server cluster. Both MSS for JBoss and MSS for Tomcat servers can be used in conjunction with the SIP load balancer to increase the performance and availability of SIP services and applications.
+	</para>
+	<para>
+		In terms of functionality, the Mobicents SIP load balancer is a simple proxy server that intelligently forwards SIP session requests and responses between User Agents (UAs) on a Wide Area Network (WAN), and SIP Servlets Server nodes, which are almost always located on a Local Area Network (LAN). All SIP requests and responses pass through the SIP load balancer.
 	</para>
 	<!-- <note>
   <title/>
@@ -4536,59 +4552,72 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
  </note> --> <section id="sslb-SIP_Load_Balancing_Basics">
 		<title>SIP Load Balancing Basics</title>
 		<para>
-			All User Agents send SIP messages, such as <literal>INVITE</literal>, <literal>MESSAGE</literal> and so on, to the same SIP URI—the IP address and port number of the SIP load balancer on the WAN—and the load balancer then parses, alters, and forwards those messages to an available and healthy node in the cluster. If the message was sent as a part of an existing SIP session, it will be forwarded to the cluster node which processed that User Agent's original transaction request.
+			All User Agents send SIP messages, such as <literal>INVITE</literal> and <literal>MESSAGE</literal>, to the same SIP URI (the IP address and port number of the SIP load balancer on the WAN). The load balancer then parses, alters, and forwards those messages to an available node in the cluster. If the message was sent as a part of an existing SIP session, it will be forwarded to the cluster node which processed that User Agent's original transaction request.
 		</para>
 		<para>
-			The SIP Servlets Server which receives the message then acts upon it and sends its response back to the SIP load balancer which, again, parses, alters and forwards the message back to the original User Agent. Needless to say, this entire proxying and provisioning process is carried out unbeknownst to the User Agent, which need only concern itself with the SIP service or application it is using.
+			The SIP Servlets Server that receives the message acts upon it and sends a response back to the SIP load balancer. The SIP load balancer reparses, alters and forwards the message back to the original User Agent. This entire proxying and provisioning process is carried out independent of the User Agent, which is only concernd with the SIP service or application it is using.
 		</para>
 		<para>
-			By using the load balancer, SIP traffic is balanced across a pool of healthy and available SIP Servlets Servers, increasing the overall throughput of the SIP service or application running on either individual nodes of the cluster, or, if using MSS for JBoss's <literal>&lt;/distributed&gt;</literal> capabilities, across the entire cluster.
+			By using the load balancer, SIP traffic is balanced across a pool of available SIP Servlets Servers, increasing the overall throughput of the SIP service or application running on either individual nodes of the cluster. In the case of MSS for JBoss's <literal>&lt;/distributed&gt;</literal> capabilities, load balancing advantages are applied across the entire cluster.
 		</para>
 		<para>
-			The SIP load balancer is also able to fail over requests mid-call from unhealthy or unavailable nodes to healthy and available ones, thus increasing the reliability of the SIP service or application. In this way, the load balancer increases throughput and reliability by dynamically provisioning SIP service requests and responses across responsive nodes in a cluster, thus enabling SIP applications to meet the real-time demand for SIP services.
-		</para>
-		<para>
-			The Mobicents SIP load balancer implementation, its installation, configuration and an example application, are all detailed below.
+			The SIP load balancer is also able to fail over requests mid-call from unavailable nodes to available ones, thus increasing the reliability of the SIP service or application. The load balancer increases throughput and reliability by dynamically provisioning SIP service requests and responses across responsive nodes in a cluster. This enables SIP applications to meet the real-time demand for SIP services.
 		</para>
 	</section>
 	
 	<section id="sslb-SIP_Servlets_Load_Balancer-Implementation">
 		<title>Implementation of the Mobicents SIP Servlets Load Balancer</title>
 		<para>
-			Each individual Mobicents SIP Servlets Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular "heartbeats" to it. From these health status reports and heartbeats, the SIP load balancer creates and maintains a list of all available and healthy nodes in the cluster. The load balancer will then forward SIP requests to and from these cluster nodes based upon a provisioning algorithm for as long as they are healthy and are still sending heartbeats. A failure to do so will cause the SIP load balancer to remove the unhealthy or unresponsive node from its list. In addition, mid-session and mid-call messages can be failed over. The <literal>Failover</literal> section goes into more detail about this aspect of the load balancer; see: <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>.
+			Each individual Mobicents SIP Servlets Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular "heartbeats". <!-- Issue #822 Editor Comment - would it be worthwhile describing heartbeats in more detail here?  Can you link to another area in the guide which discusses heartbeats in more detail (to avoid duplicating information)? -->
 		</para>
 		<para>
-			The SIP load balancer first receives SIP requests from endpoints on a port that is specified in its Configuration Properties configuration file. The SIP load balancer, using a round-robin algorithm, then selects a node to which it forwards the SIP requests. The load balancer will forward all same-session requests to the node first selected to initiate the session, as long as that node is healthy and available.
+			From these health status reports and heartbeats, the SIP load balancer creates and maintains a list of all available and healthy nodes in the cluster. The load balancer forwards SIP requests between these cluster nodes, providing that the provisioning algorithm reports that each node is healthy and is still sending heartbeats.
+		</para>
+		<para>
+			If an abnormality is detected, the SIP load balancer removes the unhealthy or unresponsive node from the list of available nodes. In addition, mid-session and mid-call messages are failed over to a healthy node.
+		</para>
+		<para>
+			For more information about this aspect of the load balancer, refer to <xref linkend="ssfjfs-SS_for_JBoss-Failover_Support"/>.
+		</para>
+		<para>
+			The SIP load balancer first receives SIP requests from endpoints on a port that is specified in its Configuration Properties configuration file. The SIP load balancer, using a round-robin algorithm, then selects a node to which it forwards the SIP requests. The load balancer forwards all same-session requests to the first node selected to initiate the session, providign that the node is healthy and available.
 		</para>
 	</section>
 	
 	<section>
 		<title>SIP Message Flow</title>
 		<para>
-			The Mobicents SIP load balancer adds itself to the <literal>Via</literal> header of requests so that responses return to the SIP Balancer before they are sent to the originating endpoint. The load balancer also adds itself to the path of subsequent requests by adding Record-Route headers. It can thus handle mid-call failover by forwarding subsequent requests to a different node in the cluster if the node that had originally handled an initial request failed somehow fails or becomes unavailable. The SIP load balancer will immediately fail over if it stops receiving heartbeats from a node, or receives an "unhealthy" status alert. As mentioned, supplying both of these to the SIP load balancer is the responsibility of the nodes themselves.
+			The Mobicents SIP load balancer appends itself to the <literal>Via</literal> header of each request, so that returned responses are sent to the SIP Balancer before they are sent to the originating endpoint.
 		</para>
 		<para>
-			SIP Servlets Server extend the <literal>SipStandardService</literal> class, which extends the Tomcat <literal>StandardService</literal> class, which implements the Tomcat <literal>Service</literal> interface. In Tomcat's architecture, a service is an intermediate component which lives inside a server and ties one or more <literal>Connectors</literal> to exactly one <literal>Engine</literal>. When the service is started, the new <literal>SipStandardBalancerNodeService</literal> looks up its configuration and gets the address of the SIP load balancer and sends a heartbeat and health status to it, so as to identify itself as an available node of the cluster.
+			The load balancer also adds itself to the path of subsequent requests by adding Record-Route headers. It can subsequenty handle mid-call failover by forwarding requests to a different node in the cluster if the node that originally handled the request fails or becomes unavailable. The SIP load balancer immediately fails over if it receives and unhealthy status, or irregular heartbeats from a node.
 		</para>
 		<para>
-			The parameters of the nodes are configurable through their <literal>MBean</literal> interfaces; information on their configuration is provided in the following sections.
+			The SIP Servlets Server extends the <literal>SipStandardService</literal> class, which extends the Tomcat <literal>StandardService</literal> class. The <literal>StandardService</literal> class is responsible for implementing the Tomcat <literal>Service</literal> interface.
 		</para>
 		<para>
-			Note that, in advanced configurations, it is also possible to run more than one SIP load balancer.
+			In Tomcat architecture, a service is an intermediate component which resides inside a server, and binds one or more <literal>Connectors</literal> to exactly one <literal>Engine</literal>. When the service is started, the new <literal>SipStandardBalancerNodeService</literal> looks up its configuration information and obtains the SIP load balancer address. The heartbeat and health status is sent to the SIP load balancer address to identify the service as an available node of the cluster.
 		</para>
-		<mediaobject id="sslb-mss-MSSSIPLoadBalancer-dia-ClusterIPsAndPorts">
-			<imageobject>
-				<imagedata align="center" fileref="images/mss-MSSSIPLoadBalancer-dia-ClusterIPsAndPorts.jpg" format="JPG" scalefit="1" width="532"/>
-			</imageobject>
-			<caption>
-			<para>
-				Example IP and Port Cluster Configuration, 192.168.1.1 Being the SIP Load Balancer
-			</para>
-			</caption>
-		</mediaobject>
+		<para>
+			The node parameters are configurable through their <literal>MBean</literal> interfaces; information on their configuration is provided in the following sections.
+		</para>
+		<para>
+			In advanced configurations, it is possible to run more than one SIP load balancer.<!-- Issue #822 Editor Comment - is there more information regarding how to enable this? -->
+		</para>
+		<para>
+			<xref linkend="figure-mss-Basic_IP_and_Port_Cluster_Configuration"/> describes a basic IP and Port Cluster Configuration. In the diagram, the SIP load balancer is the server with the IP address of <literal>192.168.1.1</literal>.
+		</para>
+		<figure id="figure-mss-Basic_IP_and_Port_Cluster_Configuration">
+			<title>Basic IP and Port Cluster Configuration</title>
+			<mediaobject id="sslb-mss-MSSSIPLoadBalancer-dia-ClusterIPsAndPorts">
+				<imageobject>
+					<imagedata align="center" fileref="images/mss-MSSSIPLoadBalancer-dia-ClusterIPsAndPorts.jpg" format="JPG" scalefit="1" width="532"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
 	</section>
 	
-	<!--  SIP Load Balancer  --> <section id="sslb-binary-SIP_Load_Balancer-Installing_Configuring_and_Running">
+	<section id="sslb-binary-SIP_Load_Balancer-Installing_Configuring_and_Running">
 		<title>SIP Load Balancer: Installing, Configuring and Running</title>
 		<para>
 			 
@@ -4600,11 +4629,16 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 			</para>
 			<variablelist id="sslb-binary-SIP_Load_Balancer-Software_Prerequisites">
 				<title>Software Prerequisites</title>
-				<varlistentry>
+				<!-- Issue #822 Editor Comment - if I understand correctly, clustering won't work on Tomcat Servlet Containers.  If that is the case, it's probably easier to say:
+
+1. Load balancing requires at least two Sip Servlet Servers.
+2. Only SIP Servlet JBoss AS containers supported.  Tomcat Servlet Containers cannot be clustered.  
+
+Or something similar to that.  Do you agree? --> <varlistentry>
 					<term>A SIP Servlet-Enabled JBoss Application Server or Tomcat Servlet Container</term>
 					<listitem>
 						<para>
-							Running the SIP load balancer requires at least one SIP Servlets Server as a client node, although you obviously cannot test or do anything interesting with your setup until you start at least two nodes. Therefore, before configuring the SIP load balancer, we should make sure we've installed a SIP Servlets Server first. The Mobicents SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server <emphasis>or</emphasis> a SIP Servlets-enabled Tomcat Container.
+							Running the SIP load balancer requires at least two SIP Servlets Servers as a client nodes. Therefore, before configuring the SIP load balancer, we should make sure we've installed a SIP Servlets Server first. The Mobicents SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server <emphasis>or</emphasis> a SIP Servlets-enabled Tomcat Container.
 						</para>
 						<para>
 							However, if you intend to cluster multiple nodes for performance, reliability and failover purposes, then you will want to install and set up SIP Servlets-enabled JBoss AS nodes, because only they can be clustered, and not SIP-Servlet Tomcat Containers.
@@ -4629,7 +4663,7 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 		<section id="sslb-binary-SIP_Load_Balancer-Downloading">
 			<title>Downloading</title>
 			<para>
-				There is not need to download additional files in order to use the SIP load balancer. The load balancer is located in the <filename>sip-balancer</filename> top-level directory of the MSS distribution. You will find the following files there:
+				The load balancer is located in the <filename>sip-balancer</filename> top-level directory of the MSS distribution. You will find the following files in the directory:
 			</para>
 			<variablelist>
 				<varlistentry>
@@ -4670,13 +4704,14 @@ Mobicents Sip Servlets doesn't currently support mid call failover for converged
 		<section id="sslb-binary-SIP_Load_Balancer-Configuring">
 			<title>Configuring</title>
 			<para>
-				Configuring the SIP load balancer and the two SIP Servlets-enabled Server nodes is not difficult.
+				Configuring the SIP load balancer and the two SIP Servlets-enabled Server nodes is described in <xref linkend="sslb-Configuring_the_SIP_Load_Balancer_and_Servlet_Server_Nodes"/>.
 			</para>
 			<procedure id="sslb-Configuring_the_SIP_Load_Balancer_and_Servlet_Server_Nodes">
 				<title>Configuring the Mobicents SIP Load Balancer and Servlet Server Nodes</title>
 				<step>
+					<title>Configure lb.properties Configuration Properties File</title>
 					<para>
-						First, configure the SIP load balancer's Configuration Properties file which you downloaded by substituting valid values for your personal setup. Here is a sample <filename>lb.properties</filename> file; descriptions of the important lines are provided beneath.
+						Configure the SIP load balancer's Configuration Properties file by substituting valid values for your personal setup. <xref linkend="sslb-Complete_Sample_lb.properties_File"/> shows a sample <filename>lb.properties</filename> file, with key element descriptions provided after the example.
 					</para>
 					<example id="sslb-Complete_Sample_lb.properties_File">
 						<title>Complete Sample lb.properties File</title>
@@ -4732,7 +4767,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 				<step>
 					<title>Configure the <filename>server.xml</filename> configuration files</title>
 					<para>
-						Ensure the following attributes are configured for the &lt;service&gt; element in <filename>server.xml</filename>.
+						Ensure the following attributes are configured for the <literal>&lt;service&gt;</literal> element in <filename>server.xml</filename>.
 					</para>
 					<itemizedlist>
 						<listitem>
@@ -4742,7 +4777,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 						</listitem>
 						<listitem>
 							<para>
-								The <literal>balancers</literal> attribute must contain a IP address (or list of addresses) of the SIP load balancer(s) to which heartbeat information .
+								The <literal>balancers</literal> attribute must contain a IP address (or list of addresses) of the SIP load balancer(s) to which heartbeat information will be sent.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -4761,37 +4796,43 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 					On MSS for JBoss installations, with JBoss clustering support enabled, the "all" <filename>server.xml</filename> file must be configured. It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.
 				</para>
 				<para>
-					To determine if the "all" or <emphasis>default</emphasis> profile should be altered for MSS for JBoss installation(s), refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.
+					To determine what profile should be altered for each MSS for JBoss installation, refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.
 				</para>
 			</note>
 			<formalpara>
 				<title>Easy Node Configuration with JMX</title>
 				<para>
-					Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces which allow for easy configuration of the server. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>. Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console; here are their descriptions:
-					<variablelist>
-						<varlistentry>
-							<term>balancers</term>
-							<listitem>
-								<para>
-									Host names of the SIP load balancer(s) with corresponding <literal>addBalancerAddress</literal> and <literal>removeBalancerAddress</literal> methods.
-								</para>
-							</listitem>
-						</varlistentry>
-						<varlistentry>
-							<term>heartBeatInterval</term>
-							<listitem>
-								<para>
-									Interval at which each heartbeat is sent to the SIP load balancer(s).
-								</para>
-							</listitem>
-						</varlistentry>
-					</variablelist>
+					Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces that allow for easy server configuration. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>.
 				</para>
 			</formalpara>
+			<para>
+				Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console.
+				<variablelist>
+					<varlistentry>
+						<term>balancers</term>
+						<listitem>
+							<para>
+								Host names of the SIP load balancer(s) with corresponding <literal>addBalancerAddress</literal> and <literal>removeBalancerAddress</literal> methods.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>heartBeatInterval</term>
+						<listitem>
+							<para>
+								Interval at which each heartbeat is sent to the SIP load balancer(s).
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</para>
 			<section>
-				<title>Converged load balancing</title>
+				<title>Converged Load Balancing</title>
 				<para>
-					The MSS SIP load balancer can work in cooperation with HTTP load balancers like <literal>mod_jk</literal>. Whenever an HTTP session is stuck to a particular node, an instruction is sent to the SIP load balancer to direct the SIP calls from the same application session to the same node. It is sufficient to configure <literal>mod_jk</literal> to work for HTTP in JBoss in order to enable cooperative load balancing. MSS will read the configuration and will use it without any extra configuration. You can read more about configuring <literal>mod_jk</literal> with JBoss in your JBoss Application Server documentation.
+					The MSS SIP load balancer can work in concert with HTTP load balancers such as <literal>mod_jk</literal>. Whenever an HTTP session is bound to a particular node, an instruction is sent to the SIP load balancer to direct the SIP calls from the same application session to the same node.
+				</para>
+				<para>
+					It is sufficient to configure <literal>mod_jk</literal> to work for HTTP in JBoss in order to enable cooperative load balancing. MSS will read the configuration and will use it without any extra configuration. You can read more about configuring <literal>mod_jk</literal> with JBoss in your JBoss Application Server documentation.
 				</para>
 			</section>
 
@@ -4810,7 +4851,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 <screen>java -jar sip-balancer-1.0-20080829.103906-21-jar-with-dependencies.jar lb-configuration.properties
 </screen>
 					<para>
-						Executing the SIP load balancer will produce output similar to the following example:
+						Executing the SIP load balancer produces output similar to the following example:
 					</para>
 					
 <screen>home]$ java -jar sip-balancer-1.0-20080829.103906-21-jar-with-dependencies.jar lb-configuration.properties 
@@ -4853,8 +4894,9 @@ INFO: Node registry started
 				<step>
 					<title>Start Load Balancer Client Nodes</title>
 					<para>
-						Start all of your SIP load balancer client nodes.
+						Start all SIP load balancer client nodes.
 					</para>
+					<!-- Issue #822 Editor Comment - What command would you execute to start all the client nodes? -->
 				</step>
 			</procedure>
 
@@ -4922,34 +4964,43 @@ INFO: Stopping the sip forwarder
 		<section id="sslb-binary-SIP_Load_Balancer-Uninstalling">
 			<title>Uninstalling</title>
 			<para>
-				To uninstall the SIP load balancer, simply delete the JAR file you installed.
+				To uninstall the SIP load balancer, delete the JAR file you installed.
 			</para>
 		</section>
 
 	</section>
 	
 	<section>
-		<title>IP load balancing</title>
+		<title>IP Load Balancing</title>
 		<section>
-			<title>IP load balancers</title>
+			<title>IP Load Balancers</title>
 			<para>
-				An IP load-balancer is a network appliance that distributes traffic to application server (or real servers) based on some load-balancing algorithm. The routing decisions are made only based on OSI layer 2, 3 or 4 data. In other words this type of load balancer only examines low-level TCP, UDP or ethernet packet structures such as MAC addresses, IP addresses, ports, protocol type (TCP or UDP or other) and so on. This type of load balancer never reads the payload of the TCP/IP packets and thus never parses SIP or HTTP or any protocol above layer 4. Since this device is not SIP or HTTP aware in any way it is much more performant than <literal>mod_jk</literal> or the MSS SIP load-balancer. The IP load-balancing is often used when the other load-balancers' capacity is exceeded and can not scale further without hardware upgrades.
+				An IP load-balancer is a network appliance that distributes traffic to an application server (or actual servers) using a load-balancing algorithm. IP load-balancing is often used when the other load-balancers' capacity is exceeded and can not scale further without hardware upgrades.
+			</para>
+			<para>
+				Routing decisions are made based on OSI Layer 2, 3 or 4 data. This type of load balancer only examines low-level TCP, UDP or ethernet packet structures including MAC addresses, IP addresses, ports, and protocol types (TCP or UDP or other).
+			</para>
+			<para>
+				An IP load balancer never reads the payload of the TCP/IP packets and therefore never parses SIP or HTTP (or any protocol above OSI Layer 4). Because an IP load balancing device is not SIP or HTTP aware in any way, it is much more performant than <literal>mod_jk</literal> or the MSS SIP load-balancer.
 			</para>
 		</section>
 		
 		<section>
 			<title>Technical overview</title>
 			<para>
-				In the simplest form the IP load-balancer usually "owns" the public-facing IP address (known as VIP) and routes the traffic to real server in it's private network similarly to NAT. It is also possible to not change the IP address and just work on the MAC address by assuming that all real server are configured to accept packets for the VIP address. It depends on the load-balancer vendor what features are supported. Some examples of software Linux-based load balancers include <ulink url="http://www.redhat.com/cluster_suite/">Red Hat Cluster Suite (RHCS)</ulink> and <ulink url="http://www.linuxvirtualserver.org/">LVS</ulink>. There are many hardware vendors as well.
+				In its simplest form, the IP load-balancer usually "owns" the public-facing IP address (known as a VIP). <!-- Issue #822 Editor Comment - VIP = Virtual IP? --> The traffic is routed to actual servers in it's private network similar to NAT. It is also possible to not change the IP address and just work on the MAC address by assuming that all actual servers are configured to accept packets for the VIP address. The features offered by the IP load balancer depend largely on the vendor.
 			</para>
 			<para>
-				It is worth to note some drawbacks when using IP load balancers - they can not make routing decisions based on SIP messages and (with some exceptions) they can not work cooperatively with HTTP or other load balancers.
+				Some examples of Linux-based software load balancers include <ulink url="http://www.redhat.com/cluster_suite/">Red Hat Cluster Suite (RHCS)</ulink> and <ulink url="http://www.linuxvirtualserver.org/">Linux Virtual Server (LVS)</ulink>. There are many hardware vendors as well.
+			</para>
+			<para>
+				One main drawback relating to IP load balancers is that they can not make routing decisions based on SIP messages and (with some exceptions) they can not work cooperatively with HTTP or other load balancers.
 			</para>
 		</section>
 		
 		<section>
-			<title>Configuring MSS cluster with IP load balancers</title>
-			<para>
+			<title>Configuring MSS Cluster with IP Load Balancers</title>
+			<!-- Issue #822 Editor Comment - This paragraph block needs to be converted into a <procedure>. --> <para>
 				First you need to remove the SIP load balancers from any configuration in MSS. In particular the <literal>balancers</literal> attribute in <filename>server.xml</filename>. and edit the jboss.web engine tag. You should remove the balancers attribute from the Service tag of jboss.web service. This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer. Next you must configure MSS to put the IP load balancer IP address in the <literal>Via</literal>, <literal>Contact</literal> and other system headers where the IP address of the server machine is required. This will ensure that any responses or subsequent SIP requests follow the same path, but always hit the load balancer instead of particular cluster node that may fail. To specify the IP load balancer address in MSS your should edit this file <filename>JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml</filename> and specify <literal>staticServerAddress</literal> such as:
 			</para>
 			
@@ -6551,15 +6602,15 @@ admin=caller,role1,role2,..
 	</table>
 </section>
 	<section id="jruby-telco-integration" lang="en-US">
-	<title>JRuby/Rails Integration With Torquebox Telco Framework</title>
+	<title>JRuby/Rails Integration with Torquebox Telco Framework</title>
 	<para>
-		Mobicents Sip Servlets is now featuring, through the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework, JRuby on Rails integration so that you create powerful pure or converged VoIP JRuby on Rails applications.
+		Mobicents Sip Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework JRuby on Rails integration. The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications.
 	</para>
 	<para>
-		The pros of using JRuby is that you can use a powerful and well deployed scripting language that allow you to modify your application at runtime (this is true even for the SIP and Media part that Mobicents Sip Servlets offer) without restarting the server allowing for greater productivity. In addition, TorqueBox is a new kind of Ruby application platform that integrates popular technologies such as Ruby-on-Rails, while extending the footprint of Ruby applications to include support for Job Scheduling, Task Queues, SOAP Handling, ...
+		JRuby features a powerful and well deployed scripting language that allows you to modify your application at runtime (this is true even for the SIP and Media part that Mobicents Sip Servlets offer) without restarting the server. In addition, TorqueBox is a new kind of Ruby application platform that integrates popular technologies such as Ruby-on-Rails, while extending the footprint of Ruby applications to include support for Job Scheduling, Task Queues, SOAP Handling, and other capabilities.
 	</para>
 	<para>
-		To get more information on how to build pure JRuby-Rails applications leveraging Mobicents Sip Servlets to handle SIP and Media please checkout the <ulink url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox documentation</ulink>
+		To obtain more information about building pure JRuby-Rails applications that leverage Mobicents SIP Servlets SIP and mediat capabilities, refer to the <ulink url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox User Documentation</ulink>.
 	</para>
 	<para>
 		Check this <ulink url="http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html">blog post</ulink> to help you create your first pure Torquebox JRuby Telco application and our <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">pure JRuby on Rails TorqueBox Telco example</ulink> showcasing this integration.
@@ -6568,7 +6619,15 @@ admin=caller,role1,role2,..
 	<section id="ss_jslee_interop" lang="en-US">
 	<title>Sip Servlets - JAIN SLEE Interoperability</title>
 	<para>
-		Why implement both specifications ? There is a religion war raging between Sip Servlets and JAIN-SLEE and most see them as competing specifications/products and try to choose between one or the other.
+		<!-- Issue #818 Editor Comment - Hmm, this reads like marketing copy, not really information that is suitable for user documentation. 
+
+Language like "religion war" is not the sort of stuff that belongs in user docs, right? :)
+
+To fix this, I would suggest including the information about JAIN SLEE advantages and disadvantages and creating a table that lists these clearly for the reader. 
+
+Instead of linking readers to the pdf, which is essentially marketing copy as well, perhaps extract the key points out of this document and list them in this section.  Approach the information you extract from the user perspective; what would they really want to know about from that document.
+
+Describe to the user how JAIN SLEE and SIP Servlets Servers play nicely together. -->Why implement both specifications ? There is a religion war raging between Sip Servlets and JAIN-SLEE and most see them as competing specifications/products and try to choose between one or the other.
 	</para>
 	<para>
 		Our take at JBoss, the only vendor to implement both technologies, is that they don't need to compete since they complete each other very well and it has been one of the leitmotiv behind building Mobicents Sip Servlets.
@@ -6641,7 +6700,7 @@ admin=caller,role1,role2,..
 		<section>
 			<title>Tuning JBoss</title>
 			<para>
-				To ensure the server is finely tuned for a production envirionment, certain configuration must be changed. Visit the <ulink url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBoss Application Server Tuning</ulink>wiki page to learn about optimization techniques.
+				To ensure the server is finely tuned for a production envirionment, certain configuration must be changed. Visit the <ulink url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBoss Application Server Tuning</ulink> wiki page to learn about optimization techniques.
 			</para>
 			<para>
 				While it is preferrable to have a fast Application Server, most of the information doesn't apply to Mobicents. In summary, the most important optimization technique is to remove logs, leaving only what is required.
@@ -6666,7 +6725,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
 				</listitem>
 				<listitem>
 					<para>
-						<emphasis role="bold">Concurrency</emphasis> : <emphasis>Default Value : None.</emphasis> It is recommended to leave this value set to <userinput>None</userinput> for better performance.
+						<emphasis role="bold">Concurrency</emphasis> : <emphasis>Default Value : None.</emphasis> For better performance, it is recommended to leave this value set to <userinput>None</userinput>.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -6675,7 +6734,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
 		<section>
 			<title>Tuning The JAIN SIP Stack</title>
 			<para>
-				The stack can be fine-tuned by altering the following sip stack properties defined in the external properties file.<!-- Issue #838 Editor Note - so where is this file located?  Is the information documented in another chapter/section that you can reference to? -->
+				The stack can be fine-tuned by altering the following SIP stack properties, as defined in the external properties file.<!-- Issue #838 Editor Note - so where is this file located?  Is the information documented in another chapter/section that you can reference to? -->
 			</para>
 			<!-- Issue #838 Editor Note - Do not apply emphasis types to <emphasis> tags.  Let Publican and Maven decide how to format the text in the <emphasis> tag.  Remember that XML has the advantage of separating format from content.  Applying specific emphasis types to text defeats the main purpose of XML authoring :) --> <itemizedlist>
 				<listitem>
@@ -6692,7 +6751,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
 						A smaller value will make the stack less responsive, since new messages have to wait in a queue for free threads. In UDP, this can lead to more retransmissions.
 					</para>
 					<para>
-						Big pool sizes allocate resources that you don't really need.
+						Large thread pool sizes result in allocating resources that are otherwise not required.
 					</para>
 				</listitem>
 				<listitem>
@@ -6733,14 +6792,14 @@ Would it be better to say "It is recommended that this feature is enabled and th
 				</listitem>
 			</itemizedlist>
 			<para>
-				The full list of JAIN SIP stack properties is available from <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">the SIP Stack Properties Home Page</ulink> and the full list of implementation specific properties are available from <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">The SIP Stack Implementation Home Page</ulink>.
+				The full list of JAIN SIP stack properties is available from <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">the SIP Stack Properties Home Page</ulink> and the full list of implementation specific properties are available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">SIP Stack Implementation Home Page</ulink>.
 			</para>
 		</section>
 		
 		<section>
 			<title>Tuning The JVM</title>
 			<para>
-				The following tuning information applies to Sun JDK 1.6, however the information should apply to Sun JDK 1.5 as well.
+				The following tuning information applies to Sun JDK 1.6, however the information should also apply to Sun JDK 1.5.
 			</para>
 			<note>
 				<para>
@@ -6756,10 +6815,10 @@ Would it be better to say "It is recommended that this feature is enabled and th
 						<emphasis role="bold">Garbage Collection</emphasis>
 					</para>
 					<para>
-						JVM ergonomics attempt to select the best garbage collector automatically. The default behaviour is to select the throughput collector, however a disadvantage of the throughput collector is that it can have long pauses times, which ultimately blocks JVM processing.
+						JVM ergonomics automatically attempt to select the best garbage collector. The default behaviour is to select the throughput collector, however a disadvantage of the throughput collector is that it can have long pauses times, which ultimately blocks JVM processing.
 					</para>
 					<para>
-						For low-load implementations, consider using the incremental, low-pause, garbage collector (activated by specifying <emphasis><userinput>-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode</userinput></emphasis>). Many SIP applications can benefit from this garbage collector type because it reduces the amount of retransmissions.
+						For low-load implementations, consider using the incremental, low-pause, garbage collector (activated by specifying <emphasis><userinput>-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode</userinput></emphasis>). Many SIP applications can benefit from this garbage collector type because it reduces the retransmission amount.
 					</para>
 					<para>
 						For more information please read: <ulink url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">Garbage Collector Tuning </ulink>
@@ -6770,7 +6829,10 @@ Would it be better to say "It is recommended that this feature is enabled and th
 						<emphasis role="bold">Heap</emphasis> <emphasis role="bold">Size</emphasis>
 					</para>
 					<para>
-						Heap size is an important consideration for garbage collection. Having an unnecessarily large heap can stop the JVM for seconds, to perform garbage collection. Small heap sizes are not recommended either, because they put a lot of pressure on the garbage collection system.
+						Heap size is an important consideration for garbage collection. Having an unnecessarily large heap can stop the JVM for seconds, to perform garbage collection.
+					</para>
+					<para>
+						Small heap sizes are not recommended either, because they put unnecessary pressure on the garbage collection system.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -6779,7 +6841,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
 		<section>
 			<title>Tuning The Operating System</title>
 			<para>
-				The following tuning information is provided for Red Hat Enterprise Linux ( RHEL) servers that are running high-load configurations. The tuning information should also apply to other distributions of Linux.
+				The following tuning information is provided for Red Hat Enterprise Linux (RHEL) servers that are running high-load configurations. The tuning information should also apply to other Linux distributions.
 			</para>
 			<para>
 				After you have configured RHEL with the tuning information, you must restart the operating system. You should see improvements in I/O response times. With SIP, the performance improvement can be as high as 20%.
@@ -6845,7 +6907,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
 						<command>sudo ifconfig [eth0] txqueuelen 1000 # </command>
 					</para>
 					<para>
-						Replace [eth0} with the address of the actual network interface.
+						Replace [eth0] with the address of the actual network interface.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -6856,7 +6918,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
 	<section id="bp-Best_Practices_NAT">
 		<title>NAT Traversal</title>
 		<para>
-			In a production environment, it is common to see SIP and Media passing through different kinds of Network Address Translation (NAT) to reach the required endpoints. Because NAT Traversal is a complex topic, refer to the following best practices to help determine the most effective method to handle NAT issues.
+			In a production environment, it is common to see SIP and Media data passing through different kinds of Network Address Translation (NAT) to reach the required endpoints. Because NAT Traversal is a complex topic, refer to the following best practices<!-- Issue #838 Editor Comment - after reading the sections on ICE, TURN, and STUN, they read more like "pros and cons", not really "best practices".  Consider rewording this lead-in sentence to better reflect the information contained in the proceeding sections.  --> to help determine the most effective method to handle NAT issues.
 		</para>
 		<section>
 			<title>STUN</title>
@@ -6911,7 +6973,11 @@ Would it be better to say "It is recommended that this feature is enabled and th
 		
 		<section>
 			<title>Other Approaches</title>
-			<para>
+			<!-- Issue #838 Editor comment - After reading this section, I got the impression that STUN, TURN, and ICE are not recommended solutions.  
+
+So if these are not the right methods, what should a user be configuring?  
+
+Can you link to other sections in the guide that can show the reader what they should be considering? --> <para>
 				Other approaches include using proxy and media that can act as gateways, Session Border Controllers, enhanced Firewall with Application Layer Gateway (ALG) and Tunnelling.<!-- Issue #838 Editor Comment - is there more information available on some websites that the reader can refer to? -->
 			</para>
 		</section>
