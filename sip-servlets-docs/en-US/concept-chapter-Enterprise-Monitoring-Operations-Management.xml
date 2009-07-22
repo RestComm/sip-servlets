@@ -1,372 +1,321 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <chapter id="emom-Enterprise-Monitoring-Operations-Management">
   <title>Enterprise Monitoring and Management</title>
-
   <para>Jopr is an enterprise management solution for JBoss middleware
   projects and other application technologies. This pluggable project provides
   administration, monitoring, alerting, operational control and configuration
   in an enterprise setting with fine-grained security and an advanced
   extension model.</para>
-
   <para>It provides support for monitoring base operating system information
   on six operating systems as well as management of Apache, JBoss Application
-  Server and other related projects. See the <ulink
-  url="http://www.jboss.org/jopr">Jopr website</ulink> for more information or
-  see the <ulink url="http://www.jboss.org/embjopr">Jopr embedded
-  website</ulink></para>
-
+  Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> for more information or
+  see the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink></para>
   <section>
     <title>Mobicents Sip Servlets Monitoring and Management</title>
-
     <para>This chapter provides information on how to enable the management of
     Mobicents Sip Servlets Servers through Jopr with our custom Jopr plug in.
-    Note that 2 versions of Jopr are available. One embedded which is more
-    targeted to development environment and the full one more targeted for
-    production environment.</para>
-
-    <para>With the Mobicents Sip Servlet Jopr plug in, you can currently see
-    metrics related to your deployed applications, metrics related to the SIP
-    Servlets Server and manage the Congestion and Concurrency settings of the
+    Two versions of Jopr are available: an  embedded version, which is 
+    better suited to development environments; and a full version, which is better suited to
+    production environments.</para>
+    <para>The Mobicents Sip Servlet Jopr plug in provides a facility to view
+    metrics related to the deployed applications, metrics related to the SIP
+    Servlets Server.  Additionally, the plugin provides the option to manage the Congestion and Concurrency settings of the
     SIP Servlets Server.</para>
-
     <section>
-      <title>Installation of the Enterprise Monitoring and Management
-      Console</title>
-
+      <title>Installation of the Enterprise Monitoring and Management Console</title>
       <section>
         <title>Jopr for Development</title>
-
-        <para>The Embedded Jopr called also JBoss Administration console is
-        already pre installed as an application deployed in the Mobicents SIP
+        <para>The Embedded Jopr (also known as the  JBoss Administration Console) is
+         pre-installed as an application deployed in the Mobicents SIP
         Servlets Server.</para>
       </section>
-
       <section>
         <title>Jopr for Production</title>
-
-        <itemizedlist>
+<!--Ticket #709 - Editor Comment - this list should be a procedure, and expanded to explain the process a bit more thoroughly.-->        <itemizedlist>
           <listitem>
-            <para>Follow the <ulink
-            url="http://jboss.org/community/docs/DOC-12828">Jopr installation
-            instructions</ulink> to install the latest version of Jopr</para>
+            <para>Follow the <ulink url="http://jboss.org/community/docs/DOC-12828">Jopr installation instructions</ulink> to install the latest version of Jopr.</para>
           </listitem>
-
           <listitem>
-            <para>Stop the Jopr server and agent if they are running</para>
+            <para>Stop the Jopr server and agent if they are running.</para>
           </listitem>
-
           <listitem>
             <para>Get the Mobicents Sip Servlets Jopr Plug in from here :
-            <ulink
-            url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar</ulink></para>
+            <ulink url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar</ulink></para>
           </listitem>
-
           <listitem>
             <para>Copy the jopr-mobicents-sip-servlets-plugin-1.3.jar just
             downloaded to the
-            jopr-server/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/
+            <filename>jopr-server/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</filename>
             directory</para>
           </listitem>
-
           <listitem>
-            <para>Start the Jopr server then the agent</para>
+            <para>Start the Jopr server then the agent.</para>
           </listitem>
-
           <listitem>
-            <para>Start your Mobicents Sip Servlets Server on JBoss in making
-            sure that you specify the binding address when starting such
-            <emphasis>sh run.sh -b 192.168.0.10</emphasis> (the Server will
+            <para>Start the  Mobicents Sip Servlets Server on JBoss, and ensure the binding address is specified </para>
+            <para>
+            <userinput>sh run.sh -b 192.168.0.10</userinput> (the Server will
             not get recognized on localhost)</para>
           </listitem>
         </itemizedlist>
       </section>
     </section>
-
     <section>
       <title>Usage Instructions</title>
-
-      <section id="emom-Embedded-Jopr">
+<!--Issue #706 Editor Note - if you made these <sections> into <procedures>, (for example "Using Jopr for Development" and "Using Jopr for Production") you would avoid some of the 5 level headings you have here.  Also consider the usage of images in this section.  Do they *really* enhance the user's understanding of the step?  Think about writing about the images and documenting the critical fields that the user must complete.-->      <section id="emom-Embedded-Jopr">
         <title>Jopr for Development</title>
-
         <itemizedlist>
           <listitem>
-            <para>Log in to the Jopr console on <ulink
-            url="http://localhost:8080/admin-console">http://localhost:8080/admin-console</ulink>
-            and login as admin (user=admin, password=admin)</para>
+            <para>Log in to the Jopr console on <ulink url="http://localhost:8080/admin-console">http://localhost:8080/admin-console</ulink>
+            and login as admin (user=admin, password=admin).</para>
           </listitem>
-
           <listitem>
             <para>From the tree on the left side of the screen, under Services
-            , click on MobicentsSipServlets link then click on the
-            jboss.web:type=SipApplicationDispatcher link to see the metrics
-            coming in.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-embjopr-home.png" />
-              </imageobject>
-
-              <caption>SIP Application Dispatcher Metrics</caption>
-            </mediaobject>
+            , click on <guimenuitem>MobicentsSipServlets</guimenuitem> link, then click on the
+            <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
+<!--Issue #706 Editor note - I have converted  all screenshots from <mediaobjects> to <figures> for you :)  I've also set the width attribute to 700 (<imagedata width="700") (usually, the limit for good formatting in HTML is 450).  The images, due to their size, were scaling off the html page.  For massive screenshots like this, consider capturing only the section of the screen that you are discussing in each step.  It will mean the information in the screenshot is more useful to the reader.-->            <figure>
+              <title>SIP Application Dispatcher Metrics</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-embjopr-home.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Click on the Configuration Tab to be able to tune the
-            Congestion Controls parameters as defined in <xref
-            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-embjopr-config.png" />
-              </imageobject>
-
-              <caption>SIP Application Dispatcher Congestion Control
-              Parameters Configuration</caption>
-            </mediaobject>
+            <para>Click on the Configuration Tab to  tune the
+            Congestion Controls parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+            <figure>
+              <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-embjopr-config.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Click on the Control Tab to be able to set the Concurrency
-            Control Mode and Congestion Control Policy as defined in <xref
-            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-embjopr-control.png" />
-              </imageobject>
-
-              <caption>SIP Application Dispatcher Congestion Control
-              Parameters Configuration</caption>
-            </mediaobject>
+            <para>Click on the <guilabel>Control Tab</guilabel> to  set the Concurrency
+            Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+            <figure>
+              <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-embjopr-control.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>To get the metrics coming in and see them on the monitoring
-            application, you will need to use an example application such as
-            location service so that the SIP Servlets Server processes SIP
+            <para>To begin metrics collection, and see them on the monitoring
+            application, you must use an example application (such as
+            location service) so that the SIP Servlets Server processes SIP
             Messages.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-embjopr-metrics.png" />
-              </imageobject>
-
-              <caption>Selected Application Metrics</caption>
-            </mediaobject>
+            <figure>
+              <title>Selected Application Metrics</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-embjopr-metrics.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>To see Metrics about your application, click on your
-            application under Converged SIP/Web Application (SAR/WAR)
+            <para>To see metrics for the  application, click on the 
+            application under the Converged SIP/Web Application (SAR/WAR)
             link.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-applications.png" />
-              </imageobject>
-
-              <caption>Specific Application Metrics</caption>
-            </mediaobject>
+            <figure>
+              <title>Specific Application Metrics</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-applications.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Then select the Metrics tab to actually see the metrics of
-            your application.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-embjopr-session-metrics.png" />
-              </imageobject>
-
-              <caption>Specific Application Metrics Detail</caption>
-            </mediaobject>
+            <para>Then select the <guilabel>Metrics</guilabel> tab to actually see the metrics for the  application.</para>
+            <figure>
+              <title>Specific Application Metrics Detail</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-embjopr-session-metrics.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
         </itemizedlist>
       </section>
-
       <section id="emom-Jopr4Production">
         <title>Jopr For Production</title>
-
-        <itemizedlist>
+<!--Issue #706 Editor Comment - these figures must have information about each figure in the <title> tag.  Please complete.--><!--Issue #706 Editor Comment - make the step wording the same as Jopr for Development (for consistency)-->        <itemizedlist>
           <listitem>
-            <para>Log in to the Jopr console on <ulink type=""
-            url="http://localhost:7080/">http://localhost:7080</ulink> and
-            from the Dashboard Tab, in the Auto Discovery portlet, import your
-            server (by example deruelle-laptop JBossAS 4.2.3.GA default
+            <para>Log in to the Jopr console on <ulink url="http://localhost:7080/" type="">http://localhost:7080</ulink> </para>
+            <para>From the <guilabel>Dashboard</guilabel> tab, in the Auto Discovery portlet, import your
+            server (for example, deruelle-laptop JBossAS 4.2.3.GA default
             (192.168.0.12:1099)) from under localhost.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-auto-disc.png" />
-              </imageobject>
-            </mediaobject>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-auto-disc.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Then from the Dashboard, in the Recently Added Resources
-            portlet, click on the server,</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-resources.png" />
-              </imageobject>
-            </mediaobject>
+            <para>From the Dashboard, in the Recently Added Resources
+            portlet, click on the server.</para>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-resources.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Then on the new Monitor view click on the JBossWeb Server
-            link</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-monitor.png" />
-              </imageobject>
-            </mediaobject>
+            <para>On the new Monitor view click on the JBossWeb Server
+            link.</para>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-monitor.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Then click on the SipApplicationDispatcher link to see the
+            <para>Click on the SipApplicationDispatcher link to see the
             metrics coming in.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-jboss-web.png" />
-              </imageobject>
-            </mediaobject>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-jboss-web.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>Click on the Configuration Tab to be able to tune the
-            Congestion Controls parameters as defined in <xref
-            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-queue.png" />
-              </imageobject>
-
-              <caption>SIP Application Dispatcher Congestion Control
-              Parameters Configuration</caption>
-            </mediaobject>
+            <para>Click on the <guilabel>Configuration</guilabel> tab to  tune the
+            Congestion Control parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+            <figure>
+              <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-queue.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
             <para>Click on the Control Tab to be able to set the Concurrency
-            Control Mode and Congestion Control Policy as defined in <xref
-            linkend="sscacc-MSS_Concurrency_and_Congestion_Control" /></para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-concurrency.png" />
-              </imageobject>
-
-              <caption>SIP Application Dispatcher Congestion Control
-              Parameters Configuration</caption>
-            </mediaobject>
+            Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+            <figure>
+              <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-concurrency.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
             <para>To get the metrics coming in, you will need to use an
             example application such as location service by example so that
             the SipApplicationDispatcher process requests.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-metrics.png" />
-              </imageobject>
-            </mediaobject>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-metrics.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
             <para>To see Metrics about your application, click on the
             Converged SIP/Web Application (SAR/WAR) link.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-sip-apps.png" />
-              </imageobject>
-            </mediaobject>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-sip-apps.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
             <para>Then click on your application.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-applications.png" />
-              </imageobject>
-            </mediaobject>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-applications.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>You will need to click on the Configure link for the Monitor
-            Tab to select the metric data you want to see</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-configure-metrics.png" />
-              </imageobject>
-            </mediaobject>
+            <para>Click on the <guilabel>Configure</guilabel> link for the <guilabel>Monitor</guilabel>
+            tab to select the metric data to view.</para>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-configure-metrics.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
-
           <listitem>
-            <para>and then select the MetaData tab to actually see the metrics
+            <para>Select the <guilabel>MetaData</guilabel> tab to  see the metrics
             of your application.</para>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/mss-jopr-session-metrics.png" />
-              </imageobject>
-            </mediaobject>
+            <figure>
+              <title/>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="images/mss-jopr-session-metrics.png" width="700"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
           </listitem>
         </itemizedlist>
       </section>
     </section>
   </section>
-
   <section>
     <title>SIP Load Balancer Monitoring and Management</title>
-
     <para>This documentation provides information on how to enable the
     management of Mobicents SIP Load Balancer through Jopr with our custom SIP
     Load Balancer Jopr plug in.</para>
-
     <para>With the Mobicents Sip Load Balancer Jopr plug in, you can currently
     see metrics, configure and manage the Mobicents Sip Load Balancer.</para>
-
-    <section>
-      <title>Installation of the Enterprise Monitoring and Management
-      Console</title>
-
-      <itemizedlist>
+<!--Issue #706 Editor Comment - consider changing the sections to <procedures>.-->    <section>
+      <title>Installation of the Enterprise Monitoring and Management Console</title>
+<!--Issue #706 Editor comment - Don't forget: Itemised list para items should be complete sentences, therefore they should be finished with a full stop.  Likewise, they should start with a capital letter :)-->      <itemizedlist>
         <listitem>
-          <para>Follow the <ulink
-          url="http://jboss.org/community/docs/DOC-12828">Jopr installation
-          instructions</ulink> to install the latest version of Jopr.</para>
+          <para>Follow the <ulink url="http://jboss.org/community/docs/DOC-12828">Jopr installation instructions</ulink> to install the latest version of Jopr.</para>
         </listitem>
-
         <listitem>
-          <para>Stop the Jopr server and agent if they are running</para>
+          <para>Stop the Jopr server and agent if they are running.</para>
         </listitem>
-
         <listitem>
           <para>Get the Mobicents Sip Load Balancer Jopr Plug in from JBoss
-          maven repository at <ulink
-          url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar</ulink></para>
+          maven repository at <ulink url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar</ulink></para>
         </listitem>
-
         <listitem>
           <para>Copy the Mobicents Sip Load Balancer Jopr Plug in jar to the
-          jopr-serve/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/
-          directory</para>
+          following directory:</para>
+          <para><filename>jopr-server/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</filename></para>
         </listitem>
-
         <listitem>
-          <para>Start the Jopr server then the agent</para>
+          <para>Start the Jopr server then the agent.</para>
         </listitem>
-
         <listitem>
           <para>Start your Mobicents Sip Load Balancer as explained here (and
           one node that connect to it to see it appear in the list of
@@ -374,76 +323,81 @@
         </listitem>
       </itemizedlist>
     </section>
-
-    <section>
+<!--Issue #706 Editor Comment - consider changing the sections to <procedures>.-->    <section>
       <title>Usage Instructions</title>
-
-      <itemizedlist>
+<!--Issue #706 Editor Comment - Remember, try to keep one succinct step per procedural step.  Too many substeps in a single step confuses the reader.  Also, usage instructions like this should be numbered (which would be automatic in a <procedure> to assist the reader. :)-->      <itemizedlist>
         <listitem>
-          <para>Log in to the Jopr console on and from the Dashboard Tab, in
+          <para>Log in to the Jopr console from the <guilabel>Dashboard</guilabel> tab, in
           the Auto Discovery portlet, import your Mobicents SIP Load Balancer
           (by example Mobicents SIP Load Balancer 1.0-SNAPSHOT) from under
           localhost.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-lb-dashboard.png" />
-            </imageobject>
-          </mediaobject>
+          <figure>
+            <title/>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-lb-dashboard.png" width="700"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
         </listitem>
-
+<!--Issue #706 Editor Comment - Avoid using "Then do this..." to start a step.  The reader knows that each step is sequential, and these extra words are not required :)-->        <listitem>
+          <para>From the Dashboard, in the Recently Added Resources
+          portlet, click on the Mobicents SIP Load Balancer.</para>
+<!--Issue #706 Editor Comment - because you have described the location of the item so well, you don't actually need the screenshot here.  Save maintenance and use this writing technique in as many procedures as you can.-->          <figure>
+            <title/>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-lb-dash-added.png" width="700"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+        </listitem>
         <listitem>
-          <para>Then from the Dashboard, in the Recently Added Resources
-          portlet, click on the Mobicents SIP Load Balancer,</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-lb-dash-added.png" />
-            </imageobject>
-          </mediaobject>
+          <para>In the new Monitor view, click on the
+          <guimenuitem>mobicents:name=LoadBalancer,type=LoadBalancer</guimenuitem> link</para>
+          <figure>
+            <title/>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-lb-monitor.png"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
         </listitem>
-
-        <listitem>
-          <para>Then on the new Monitor view click on the
-          mobicents:name=LoadBalancer,type=LoadBalancer link</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-lb-monitor.png" />
-            </imageobject>
-          </mediaobject>
-        </listitem>
-
         <listitem>
           <para>You can now see the metrics coming in</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-lb-metrics.png" />
-            </imageobject>
-          </mediaobject>
+          <figure>
+            <title/>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-lb-metrics.png"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
         </listitem>
-
         <listitem>
           <para>To configure the Load Balancer and see the list of nodes in
-          the cluster it is connected to, click on the Configure Tab.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-lb-config.png" />
-            </imageobject>
-          </mediaobject>
+          the cluster it is connected to, click on the <guilabel>Configure</guilabel> tab.</para>
+          <figure>
+            <title/>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-lb-config.png"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
         </listitem>
-
         <listitem>
-          <para>To start and stop the Load Balancer, click on the Operations
-          Tab.</para>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/mss-jopr-lb-ops.png" />
-            </imageobject>
-          </mediaobject>
+          <para>To start and stop the Load Balancer, click on the <guilabel>Operations</guilabel>
+          tab.</para>
+          <figure>
+            <title/>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="images/mss-jopr-lb-ops.png"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
         </listitem>
       </itemizedlist>
     </section>
