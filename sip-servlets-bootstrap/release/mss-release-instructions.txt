@@ -6,7 +6,8 @@ if thet svn tag fails, do a svn update then retry  mvn release:prepare -P releas
 
 Update your local jboss repo or create one if that is not already done (See http://wiki.jboss.org/auth/wiki/MavenReleaseRepository and ask Paul Gier to add you in the authorized list to upload to the main JBoss repository)
 
-mvn release:perform -P release -Dmaven.test.skip=true, if that fails (usually due to sip servlets management console don't know why) do cd target/checkout, and then mvn deploy -P release -Dmaven.test.skip=true
+mvn release:perform -P release -Dmaven.test.skip=true, 
+(if that fails (usually due to sip servlets management console don't know why) do cd target/checkout, and then mvn deploy -P release -Dmaven.test.skip=true or upgrade to maven 2.1.0+)
 
 Go into your local jboss repo and add and commit all artifacts corresponding to the release that has been done.
 
