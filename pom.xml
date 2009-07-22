@@ -191,7 +191,6 @@
 				<module>sip-servlets-jboss5-metadata</module>	
 				<module>sip-servlets-jboss5</module>			
 				<module>sip-servlets-management</module>
-				<module>jopr-plugin</module>
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
 				<module>sip-servlets-docs</module>
