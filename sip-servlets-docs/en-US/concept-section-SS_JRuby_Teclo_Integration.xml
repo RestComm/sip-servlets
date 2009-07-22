@@ -1,33 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <section id="jruby-telco-integration">
-  <title>JRuby/Rails Integration With Torquebox Telco Framework</title>
-
-  <para>Mobicents Sip Servlets is now featuring, through the <ulink
-  url="http://torquebox.org/">Torquebox</ulink> Telco Framework, JRuby on
-  Rails integration so that you create powerful pure or converged VoIP JRuby
+  <title>JRuby/Rails Integration with Torquebox Telco Framework</title>
+  <para>Mobicents Sip Servlets is compatible with  the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework  JRuby on
+  Rails integration.  The framework allows you to create powerful, pure or converged VoIP JRuby
   on Rails applications.</para>
-
-  <para>The pros of using JRuby is that you can use a powerful and well
-  deployed scripting language that allow you to modify your application at
+  <para>JRuby features a powerful and well
+  deployed scripting language that allows  you to modify your application at
   runtime (this is true even for the SIP and Media part that Mobicents Sip
-  Servlets offer) without restarting the server allowing for greater
-  productivity. In addition, TorqueBox is a new kind of Ruby application
+  Servlets offer) without restarting the server.  In addition, TorqueBox is a new kind of Ruby application
   platform that integrates popular technologies such as Ruby-on-Rails, while
   extending the footprint of Ruby applications to include support for Job
-  Scheduling, Task Queues, SOAP Handling, ...</para>
-
-  <para>To get more information on how to build pure JRuby-Rails applications
-  leveraging Mobicents Sip Servlets to handle SIP and Media please checkout
-  the <ulink
-  url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox
-  documentation</ulink></para>
-
-  <para>Check this <ulink
-  url="http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html">blog
-  post</ulink> to help you create your first pure Torquebox JRuby Telco
-  application and our <ulink
-  url="http://www.mobicents.org/mss-pure-jruby-telco.html">pure JRuby on Rails
-  TorqueBox Telco example</ulink> showcasing this integration.</para>
+  Scheduling, Task Queues, SOAP Handling, and other capabilities.</para>
+  <para>To obtain more information about building pure JRuby-Rails applications that 
+  leverage Mobicents SIP Servlets SIP and mediat capabilities, refer to the <ulink url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox User Documentation</ulink>.</para>
+  <para>Check this <ulink url="http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html">blog post</ulink> to help you create your first pure Torquebox JRuby Telco
+  application and our <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">pure JRuby on Rails TorqueBox Telco example</ulink> showcasing this integration.</para>
 </section>
