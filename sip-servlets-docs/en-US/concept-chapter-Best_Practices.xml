@@ -21,24 +21,18 @@
       <title>Tuning Mobicents Sip Servlets</title>
 <!--Issue #838 Editor Comment - consider using a <variablelist> here.  You can put headings such as "Congestion Control" in the <term> element, and describe the tuning recommendations in a <listitem><para> element.-->      <itemizedlist>
         <listitem>
-          <para><emphasis role="bold">Congestion Control</emphasis><!--Issue #838 Editor Note - so how would a user determine whether they *should* turn this off?  What metrics would they use to make this decision?
-
-Would it be better to say "It is recommended that this feature is enabled and the sipMessageQueueSize and memoryThreshold parameters are tuned according to <section reference>." --> : You can
-          turn it off if you don&apos;t think it&apos;s needed (though not advisable) or
-          fine tune the <emphasis>sipMessageQueueSize</emphasis> and
-          <emphasis>memoryThreshold</emphasis> parameters described in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+          <para><emphasis>Congestion Control</emphasis> : It is recommended that this feature is enabled to avoid overload of the server and that the <emphasis>sipMessageQueueSize</emphasis> and <emphasis>memoryThreshold</emphasis> parameters are tuned according to <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">Concurrency</emphasis> :
+          <para><emphasis>Concurrency</emphasis> :
           <emphasis>Default Value : None.</emphasis>  For better performance, it is recommended to leave  this value set to <userinput>None</userinput>.</para>
         </listitem>
       </itemizedlist>
     </section>
     <section>
       <title>Tuning The JAIN SIP Stack</title>
-      <para>The stack can be fine-tuned by altering the
-      following SIP stack properties, as defined in the  external properties file.<!--Issue #838 Editor Note - so where is this file located?  Is the information documented in another chapter/section that you can reference to?--></para>
-<!--Issue #838 Editor Note - Do not apply emphasis types to <emphasis> tags.  Let Publican and Maven decide how to format the text in the <emphasis> tag.  Remember that XML has the advantage of separating format from content.  Applying specific emphasis types to text defeats the main purpose of XML authoring :)-->      <itemizedlist>
+      <para>The stack can be fine-tuned by altering the SIP stack properties, defined in the external properties file specified by the <emphasis>sipStackPropertiesFile</emphasis> attribute as described in <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/>.</para>
+    <itemizedlist>
         <listitem>
           <para><emphasis>gov.nist.javax.sip.THREAD_POOL_SIZE</emphasis>
           </para>
@@ -129,16 +123,16 @@ Would it be better to say "It is recommended that this feature is enabled and th
               <userinput>-XX:+UseLargePages</userinput>
             </emphasis> is passed and ensure that the following Java
           HotSpot(TM) Server VM warning does not occur:</para>
-          <para><literal>Failed to reserve shared memory (errno = 22)&quot; when starting JBoss.</literal><!--Issue #838 Editor Comment - what shoud the user do if they do encounter this error?--></para>
+          <para><literal>Failed to reserve shared memory (errno = 22)&quot; when starting JBoss.</literal> It means that the number of pages at OS level is still not enough.</para>
           <para>To learn
           more about large memory pages, and how to configure them, refer to 
-          <ulink url="http://java.sun.com/javase/technologies/hotspot/largememory.jsp">Java Support for Large Memory Pages</ulink>.</para>
+          <ulink url="http://java.sun.com/javase/technologies/hotspot/largememory.jsp">Java Support for Large Memory Pages</ulink> and <ulink url="http://andrigoss.blogspot.com/2008/02/jvm-performance-tuning.html">Andrig's Miller blog post</ulink>.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">Network buffers</emphasis> </para>
+          <para><emphasis>Network buffers</emphasis> </para>
           <para>You can
           increase the network buffers size by adding the following lines to
-          your <!--Issue #838 Editor Comment - for all paths, and filename information, enclose the text in <filename> tags.  Publican and Maven make these entries monospaced, which is the common formatting people are used to for path and filename info. :)--><filename>/etc/sysctl.conf</filename> file:</para>
+          your <filename>/etc/sysctl.conf</filename> file:</para>
           <itemizedlist>
             <listitem>
               <para><userinput>net.core.rmem_max = 16777216</userinput></para>
@@ -158,10 +152,10 @@ Would it be better to say "It is recommended that this feature is enabled and th
           </itemizedlist>
         </listitem>
         <listitem>
-<!--Issue #838 Editor Comment - I had to add a lead-in sentence to this point, because it was just a command with no context.  Is my interpretation of the command, and what it does, correct?-->          <para>Execute the following command to set the network interface address:</para>
+	  <para>Execute the following command to set the network interface address:</para>
           <para><command>sudo ifconfig [eth0] txqueuelen 1000 # </command></para>
-          <para>Replace [eth0] with the address of the
-          actual network interface.</para>
+          <para>Replace [eth0] with the correct name of the
+          actual network interface you are setting up.</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -170,8 +164,7 @@ Would it be better to say "It is recommended that this feature is enabled and th
     <title>NAT Traversal</title>
     <para>In a production environment,  it is common to see SIP and Media
     data passing through different kinds of Network Address Translation (NAT)  to reach the
-    required endpoints. Because NAT Traversal is a complex topic, refer to the following best
-    practices<!--Issue #838 Editor Comment - after reading the sections on ICE, TURN, and STUN, they read more like "pros and cons", not really "best practices".  Consider rewording this lead-in sentence to better reflect the information contained in the proceeding sections. --> to help determine the most effective method to handle NAT issues.</para>
+    required endpoints. Because NAT Traversal is a complex topic, refer to the following information to help determine the most effective method to handle NAT issues.</para>
     <section>
       <title>STUN</title>
       <para>STUN (Session Traversal Utilities for NAT) is not generally
