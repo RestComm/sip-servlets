@@ -61,10 +61,10 @@ Version 1.0 is out !
 		
 		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 	
-		* For JBoss 4.2.3 only, Mobicents Media Server 1.0.3.GA, Mobicents Diameter 1.0.1.GA, the Mobicents SIP load Balancer BETA7 and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
+		* For JBoss 4.2.3 only, {{{./products_media_server.html}Mobicents Media Server 1.0.3.GA}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.0.1.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer BETA7}} and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
 		to test clustering and mid call failover. 					
 		
-		* For JBoss 5.1.0 only, Mobicents Media Server 2.0.0.BETA1, the Mobicents SIP load Balancer BETA7 and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
+		* For JBoss 5.1.0 only, {{{./products_media_server.html}Mobicents Media Server 2.0.0.BETA1}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer BETA7}} and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
 		to test clustering and mid call failover.				  
   
 Try it !
