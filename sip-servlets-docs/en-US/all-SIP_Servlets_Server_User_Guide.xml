@@ -13,12 +13,12 @@ If this final separator is missing, then the documentation will be wrong. --><!-
 <!ENTITY HOLDER "Red Hat Inc">
 <!-- Shared: Configuring the JBOSS_HOME Environment Variable --><!ENTITY MOB_JBOSS_HOME_LIN "mobicents-all-1.2.1.GA-jboss-4.2.3.GA/jboss/">
 <!ENTITY JBCP_JBOSS_HOME_LIN "jboss-eap-4.3/jboss-as/">
-<!-- SIP Servlet Server Installation Guide --><!ENTITY SSS_MSS4J_VERSION "1.0.0">
+<!-- SIP Servlet Server Installation Guide --><!ENTITY SSS_MSS4J_VERSION "1.0">
 <!ENTITY SSS_MSS4J_SIZE "135 MB">
-<!ENTITY SSS_MSS4J_ZIP "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip">
+<!ENTITY SSS_MSS4J_ZIP "mss-1.0-jboss-4.2.3.GA-0904221307.zip">
 <!ENTITY SSS_MSS4T_VERSION "0.5">
 <!ENTITY SSS_MSS4T_SIZE "20 MB">
-<!ENTITY SSS_MSS4T_ZIP "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip">
+<!ENTITY SSS_MSS4T_ZIP "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip">
 ]>
 <book lang="en-US">
 	<!--  This document was created with Syntext Serna Free.  --><bookinfo id="sssug-SIP_Servlets_Server_User_Guide" lang="en-US">
@@ -855,7 +855,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 				<term>Sufficient Disk Space</term>
 				<listitem>
 					<para>
-						Once unzipped, version 1.0.0 of the MSS for JBoss binary release requires a minimum of 135 MB free disk space.
+						Once unzipped, version 1.0 of the MSS for JBoss binary release requires a minimum of 135 MB free disk space.
 					</para>
 				</listitem>
 			</varlistentry>
@@ -920,7 +920,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					Move the downloaded zip file into the directory.
 				</para>
 				
-<screen>~]$ mv "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip" "mss-jboss-&lt;version&gt;"
+<screen>~]$ mv "mss-1.0-jboss-4.2.3.GA-0904221307.zip" "mss-jboss-&lt;version&gt;"
 </screen>
 			</step>
 			<step>
@@ -939,14 +939,14 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					<listitem>
 						<para>
 							Java: 
-<screen>mss-jboss-&lt;version&gt;]$ jar -xvf "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip"
+<screen>mss-jboss-&lt;version&gt;]$ jar -xvf "mss-1.0-jboss-4.2.3.GA-0904221307.zip"
 </screen>
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							Linux: 
-<screen>mss-jboss-&lt;version&gt;]$ unzip "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip"
+<screen>mss-jboss-&lt;version&gt;]$ unzip "mss-1.0-jboss-4.2.3.GA-0904221307.zip"
 </screen>
 						</para>
 					</listitem>
@@ -962,7 +962,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					To free disk space, you may want to delete the zip file once you've extracted its contents:
 				</para>
 				
-<screen>mss-jboss-&lt;version&gt;]$ rm "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip"
+<screen>mss-jboss-&lt;version&gt;]$ rm "mss-1.0-jboss-4.2.3.GA-0904221307.zip"
 </screen>
 			</step>
 		</procedure>
@@ -1003,7 +1003,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 							Execute the <command>jar -xvf</command> command to extract the archive contents into the current folder.
 						</para>
 						
-<screen>C:\Users\&lt;user&gt;\My Downloads\mss-jboss-&lt;version&gt;&gt;jar -xvf "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip"
+<screen>C:\Users\&lt;user&gt;\My Downloads\mss-jboss-&lt;version&gt;&gt;jar -xvf "mss-1.0-jboss-4.2.3.GA-0904221307.zip"
 </screen>
 					</listitem>
 				</orderedlist>
@@ -1018,7 +1018,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					Consider deleting the archive, if free disk space is an issue.
 				</para>
 				
-<screen>C:\Users\&lt;user&gt;\My Downloads\mss-jboss-&lt;version&gt;&gt;delete "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip"
+<screen>C:\Users\&lt;user&gt;\My Downloads\mss-jboss-&lt;version&gt;&gt;delete "mss-1.0-jboss-4.2.3.GA-0904221307.zip"
 </screen>
 			</step>
 		</procedure>
@@ -1805,7 +1805,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					Move the downloaded zip file into the directory you have just created:
 				</para>
 				
-<screen>~]$ mv "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip" "mss-tomcat-&lt;version&gt;"
+<screen>~]$ mv "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip" "mss-tomcat-&lt;version&gt;"
 </screen>
 			</step>
 			<step>
@@ -1821,7 +1821,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					Finally, use Java's <command>jar <option>-xvf</option></command> command to extract the contents of the zip file into the current directory, thus completing the install:
 				</para>
 				
-<screen>mss-tomcat-&lt;version&gt;]$ jar -xvf "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip"
+<screen>mss-tomcat-&lt;version&gt;]$ jar -xvf "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip"
 </screen>
 				<stepalternatives>
 				<step>
@@ -1829,7 +1829,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 						Alternatively, if Linux's <command>unzip</command> utility is present on your system or is installable, you can use it in lieu of Java's <command>jar <option>-xvf</option></command> command:
 					</para>
 					
-<screen>mss-tomcat-&lt;version&gt;]$ unzip "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip"
+<screen>mss-tomcat-&lt;version&gt;]$ unzip "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip"
 </screen>
 					<note>
 						<para>
@@ -1844,7 +1844,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					To free disk space, you may want to delete the zip file once you've extracted its contents:
 				</para>
 				
-<screen>mss-tomcat-&lt;version&gt;]$ rm "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip"
+<screen>mss-tomcat-&lt;version&gt;]$ rm "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip"
 </screen>
 			</step>
 		</procedure>
@@ -1882,7 +1882,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 						Finally, use the <command>jar <option>-xvf</option></command> command to extract the archive contents into the current folder.
 					</para>
 					
-<screen>C:\Users\Me\My Downloads\mss-tomcat-&lt;version&gt;&gt;jar -xvf "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip"
+<screen>C:\Users\Me\My Downloads\mss-tomcat-&lt;version&gt;&gt;jar -xvf "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip"
 </screen>
 				</step>
 				</stepalternatives>
@@ -1897,7 +1897,7 @@ Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
 					You may want to delete the zip file after extracting its contents in order to free disk space:
 				</para>
 				
-<screen>C:\Users\Me\My Downloads\mss-tomcat-&lt;version&gt;&gt;delete "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip"
+<screen>C:\Users\Me\My Downloads\mss-tomcat-&lt;version&gt;&gt;delete "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip"
 </screen>
 			</step>
 		</procedure>
@@ -2918,7 +2918,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 				</para>
 			</formalpara>
 			<para>
-				Download the Location Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/location-service/1.1/location-service-1.1.war"/>.
+				Download the Location Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/location-service/1.4/location-service-1.4.war"/>.
 			</para>
 			<para>
 				Download the Location Service's DAR file from here: <ulink url="http://www.mobicents.org/locationservice-dar.properties"/>.
@@ -2926,7 +2926,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 			<formalpara id="sfss-binary-Location_Service-Installing">
 				<title>Installing</title>
 				<para>
-					Both the <filename>location-service-1.1.war</filename> WAR file and the <filename>locationservice-dar.properties</filename> DAR file that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Location Service with MSS for JBoss or with MSS for Tomcat:
+					Both the <filename>location-service-1.4.war</filename> WAR file and the <filename>locationservice-dar.properties</filename> DAR file that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Location Service with MSS for JBoss or with MSS for Tomcat:
 				</para>
 			</formalpara>
 			<variablelist>
@@ -2934,7 +2934,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 					<term>MSS for JBoss</term>
 					<listitem>
 						<para>
-							Place <filename>location-service-1.1.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>locationservice-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
+							Place <filename>location-service-1.4.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>locationservice-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -2942,7 +2942,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 					<term>MSS for Tomcat</term>
 					<listitem>
 						<para>
-							Place <filename>location-service-1.1.war</filename> into the <filename><envar>CATALINA_HOME</envar>/webapps/</filename> directory, and <filename>locationservice-dar.properties</filename> into the <filename><envar>CATALINA_HOME</envar>/conf/dars/</filename> directory.
+							Place <filename>location-service-1.4.war</filename> into the <filename><envar>CATALINA_HOME</envar>/webapps/</filename> directory, and <filename>locationservice-dar.properties</filename> into the <filename><envar>CATALINA_HOME</envar>/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -3406,7 +3406,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</formalpara>
 			<para>
-				Download the Call-Blocking Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.1/call-blocking-1.1.war"/>.
+				Download the Call-Blocking Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.4/call-blocking-1.4.war"/>.
 			</para>
 			<para>
 				Download the Call-Blocking Service's DAR file from here: <ulink url="http://www.mobicents.org/call-blocking-servlet-dar.properties"/>.
@@ -3414,7 +3414,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			<formalpara id="sfss-binary-Call-Blocking_Service-Installing">
 				<title>Installing</title>
 				<para>
-					Both the <filename>call-blocking-1.1.war</filename> WAR file and the <filename>call-blocking-servlet-dar.properties</filename> DAR file that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Call-Blocking Service with MSS for JBoss or with MSS for Tomcat:
+					Both the <filename>call-blocking-1.4.war</filename> WAR file and the <filename>call-blocking-servlet-dar.properties</filename> DAR file that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Call-Blocking Service with MSS for JBoss or with MSS for Tomcat:
 				</para>
 			</formalpara>
 			<variablelist>
@@ -3422,7 +3422,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					<term>MSS for JBoss</term>
 					<listitem>
 						<para>
-							Place <filename>call-blocking-1.1.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>call-blocking-servlet-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
+							Place <filename>call-blocking-1.4.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>call-blocking-servlet-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -3610,7 +3610,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</formalpara>
 			<para>
-				Download the Call-Forwarding Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.1/call-forwarding-1.1.war"/>.
+				Download the Call-Forwarding Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.4/call-forwarding-1.4.war"/>.
 			</para>
 			<para>
 				Download the Call-Forwarding Service's DAR file from here: <ulink url="http://www.mobicents.org/call-forwarding-servlet-dar.properties"/>.
@@ -3618,7 +3618,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			<formalpara id="sfss-binary-Call-Forwarding_Service-Installing">
 				<title>Installing</title>
 				<para>
-					Both the <filename>call-forwarding-1.1.war</filename> WAR file and the <filename>call-forwarding-servlet-dar.properties</filename> DAR file that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Call-Forwarding Service with MSS for JBoss or with MSS for Tomcat:
+					Both the <filename>call-forwarding-1.4.war</filename> WAR file and the <filename>call-forwarding-servlet-dar.properties</filename> DAR file that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Call-Forwarding Service with MSS for JBoss or with MSS for Tomcat:
 				</para>
 			</formalpara>
 			<variablelist>
@@ -3626,7 +3626,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					<term>MSS for JBoss</term>
 					<listitem>
 						<para>
-							Place <filename>call-forwarding-1.1.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>call-forwarding-servlet-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
+							Place <filename>call-forwarding-1.4.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>call-forwarding-servlet-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -3634,7 +3634,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					<term>MSS for Tomcat</term>
 					<listitem>
 						<para>
-							Place <filename>call-forwarding-1.1.war</filename> into the <filename><envar>CATALINA_HOME</envar>/webapps/</filename> directory, and <filename>call-forwarding-servlet-dar.properties</filename> into the <filename><envar>CATALINA_HOME</envar>/conf/dars/</filename> directory.
+							Place <filename>call-forwarding-1.4.war</filename> into the <filename><envar>CATALINA_HOME</envar>/webapps/</filename> directory, and <filename>call-forwarding-servlet-dar.properties</filename> into the <filename><envar>CATALINA_HOME</envar>/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -3834,10 +3834,10 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</formalpara>
 			<para>
-				Download the Call-Blocking Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.1/call-blocking-1.1.war"/>.
+				Download the Call-Blocking Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.4/call-blocking-1.4.war"/>.
 			</para>
 			<para>
-				Download the Call-Forwarding Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.1/call-forwarding-1.1.war"/>.
+				Download the Call-Forwarding Service's WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.4/call-forwarding-1.4.war"/>.
 			</para>
 			<para>
 				Download the Call-Controller Service's DAR file from here: <ulink url="http://www.mobicents.org/call-controller-servlet-dar.properties"/>.
@@ -3845,7 +3845,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 			<formalpara id="sfss-binary-Call-Controller_Service-Installing">
 				<title>Installing</title>
 				<para>
-					The <filename>call-blocking-1.1.war</filename>, <filename>call-forwarding-1.1.war</filename> and <filename>call-controller-servlet-dar.properties</filename> archive files that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Call-Controller Service with MSS for JBoss or with MSS for Tomcat:
+					The <filename>call-blocking-1.4.war</filename>, <filename>call-forwarding-1.4.war</filename> and <filename>call-controller-servlet-dar.properties</filename> archive files that you downloaded should be placed into different directories in your SIP Servlet Server installation hierarchy. Which directory depends on whether you are using the Call-Controller Service with MSS for JBoss or with MSS for Tomcat:
 				</para>
 			</formalpara>
 			<variablelist>
@@ -3853,7 +3853,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					<term>MSS for JBoss</term>
 					<listitem>
 						<para>
-							Place <filename>call-blocking-1.1.war</filename> and <filename>call-forwarding-1.1.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>call-controller-servlet-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
+							Place <filename>call-blocking-1.4.war</filename> and <filename>call-forwarding-1.4.war</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename> directory, and <filename>call-controller-servlet-dar.properties</filename> into the <filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -3861,7 +3861,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 					<term>MSS for Tomcat</term>
 					<listitem>
 						<para>
-							Place <filename>call-blocking-1.1.war</filename> and <filename>call-forwarding-1.1.war</filename> into the <filename><envar>CATALINA_HOME</envar>/webapps/</filename> directory, and <filename>call-controller-servlet-dar.properties</filename> into the <filename><envar>CATALINA_HOME</envar>/conf/dars/</filename> directory.
+							Place <filename>call-blocking-1.4.war</filename> and <filename>call-forwarding-1.4.war</filename> into the <filename><envar>CATALINA_HOME</envar>/webapps/</filename> directory, and <filename>call-controller-servlet-dar.properties</filename> into the <filename><envar>CATALINA_HOME</envar>/conf/dars/</filename> directory.
 						</para>
 					</listitem>
 				</varlistentry>
