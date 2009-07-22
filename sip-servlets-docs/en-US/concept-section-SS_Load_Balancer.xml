@@ -39,7 +39,7 @@
     <para>The SIP Servlets Server extends the <literal>SipStandardService</literal> class, which extends the Tomcat <literal>StandardService</literal> class.  The <literal>StandardService</literal> class is responsible for  implementing  the Tomcat <literal>Service</literal> interface. </para>
     <para>In  Tomcat architecture, a service is an intermediate component which resides inside a server,  and binds  one or more <literal>Connectors</literal> to exactly one <literal>Engine</literal>. When the service is started, the new <literal>SipStandardBalancerNodeService</literal> looks up its configuration information and obtains the SIP load balancer address.  The  heartbeat and health status is sent to the SIP load balancer address  to identify the service  as an available node of the cluster.</para>
     <para>The node parameters are configurable through their <literal>MBean</literal> interfaces; information on their configuration is provided in the following sections.</para>
-    <para>In  advanced configurations, it is  possible to run more than one SIP load balancer.<!--Issue #822 Editor Comment - is there more information regarding how to enable this?--></para>
+    <para>In advanced configurations, it is possible to run more than one SIP load balancer.<!--Issue #822 Editor Comment - is there more information regarding how to enable this?--></para>
     <para><xref linkend="figure-mss-Basic_IP_and_Port_Cluster_Configuration"/> describes a basic  IP and Port Cluster Configuration.  In the diagram, the SIP load balancer is the server with the IP address of <literal>192.168.1.1</literal>.</para>
     <figure id="figure-mss-Basic_IP_and_Port_Cluster_Configuration">
       <title>Basic IP and Port Cluster Configuration</title>
@@ -66,7 +66,7 @@
 Or something similar to that.  Do you agree?-->        <varlistentry>
           <term>A SIP Servlet-Enabled JBoss Application Server or Tomcat Servlet Container</term>
           <listitem>
-            <para>Running the SIP load balancer requires at least two  SIP Servlets Servers as a client nodes.  Therefore, before configuring the SIP load balancer, we should make sure we&apos;ve installed a SIP Servlets Server first. The Mobicents SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server <emphasis>or</emphasis> a SIP Servlets-enabled Tomcat Container.</para>
+            <para>Running the SIP load balancer requires at least two SIP Servlets Servers as client nodes.  Therefore, before configuring the SIP load balancer, we should make sure we&apos;ve installed a SIP Servlets Server first. The Mobicents SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server <emphasis>or</emphasis> a SIP Servlets-enabled Tomcat Container.</para>
             <para>However, if you intend to cluster multiple nodes for performance, reliability and failover purposes, then you will want to install and set up SIP Servlets-enabled JBoss AS nodes, because only they can be clustered, and not SIP-Servlet Tomcat Containers.</para>
             <itemizedlist>
               <listitem>
@@ -243,7 +243,7 @@ INFO: Node registry started</screen>
         </step>
         <step>
           <title>Start Load Balancer Client Nodes</title>
-          <para>Start all  SIP load balancer client nodes.</para>
+          <para>Start all SIP load balancer client nodes.</para>
 <!--Issue #822 Editor Comment - What command would you execute to start all the client nodes?-->        </step>
       </procedure>
     </section>

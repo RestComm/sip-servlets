@@ -1,38 +1,192 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <section id="ss_jslee_interop">
   <title>Sip Servlets - JAIN SLEE Interoperability</title>
-  <para><!--Issue #818 Editor Comment - Hmm, this reads like marketing copy, not really information that is suitable for user documentation. 
 
-Language like "religion war" is not the sort of stuff that belongs in user docs, right? :)
-
-To fix this, I would suggest including the information about JAIN SLEE advantages and disadvantages and creating a table that lists these clearly for the reader. 
-
-Instead of linking readers to the pdf, which is essentially marketing copy as well, perhaps extract the key points out of this document and list them in this section.  Approach the information you extract from the user perspective; what would they really want to know about from that document.
-
-Describe to the user how JAIN SLEE and SIP Servlets Servers play nicely together.-->Why implement both specifications ? There is a religion war raging
-  between Sip Servlets and JAIN-SLEE and most see them as competing
-  specifications/products and try to choose between one or the other.</para>
-  <para>Our take at JBoss, the only vendor to implement both technologies, is
-  that they don&apos;t need to compete since they complete each other very well and
-  it has been one of the leitmotiv behind building Mobicents Sip
-  Servlets.</para>
   <para>JAIN SLEE is a more complex specification than SIP Servlets, and it
   has been know as heavyweight and with a steep learning curve. However JAIN
   SLEE has standardized a high performing event driven application server, an
   execution environment with a good concurrency model and powerful protocol
   agnostic capabilities thus covering a variety of Telco protocols.</para>
+
   <para>SIP Servlets on the other is way much simple and easier to get started
-  with. Its focus is currently on SIP + HTTP/JEE only and is more of a
-  programming model while JAIN SLEE is more of an application environment, a
-  platform. The fact that Sip Servlets is focused on SIP+JEE makes it a
-  natural fit to build JEE converged applications and way much simpler than
-  JAIN SLEE.</para>
-  <para>To us it feels like JAIN SLEE and Sip Servlets target different
-  audiences, different needs. We wanted to leverage the power of both and make
-  them work hand in hand to build an application that could leverage standards
-  all the way without resorting to vendor proprietary extensions. <ulink url="http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf">Our &quot;JSLEE and SIP-Servlets Interoperability with Mobicents Communication Platform&quot; paper</ulink> describes our approach and the possible different
+  with. Its focus is on extending the HTTP Servlets and Java EE hosting
+  environments with SIP capabilities. Hence SIP Servlets is more of a SIP
+  programming framework while JSLEE is a complete, self sufficient application
+  environment, a platform. The fact that Sip Servlets is focused on SIP and
+  Java EE makes it a natural fit to build JEE converged applications and way
+  much simpler than JAIN SLEE.</para>
+
+  <para><table frame="all" id="tab-ss_vs_jslee">
+      <title>Sip Servlets / JAIN SLEE Comparison Table</title>
+
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" />
+
+        <colspec colname="c2" />
+
+        <thead>
+          <row>
+            <entry align="center">Sip Servlets</entry>
+
+            <entry align="center">JAIN SLEE</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Application Architecture</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">Based on HTTP Servlets. Unit of logic is the SIP
+            Servlets</entry>
+
+            <entry align="center">Component based, Object Orientated architecture. Unit of
+            logic is the Service Building Block</entry>
+          </row>
+
+          <row>
+            <entry align="center">Composition through Application Router</entry>
+
+            <entry align="center">Composition through parent-child relationship</entry>
+          </row>
+
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Application State</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">Servlets are stateless</entry>
+
+            <entry align="center">SBBs may be stateful.</entry>
+          </row>
+
+          <row>
+            <entry align="center">Shared state stored in a session and visible to all
+            Servlets with access to the session</entry>
+
+            <entry align="center">SBB state is transacted and a property of the SBB itself.
+            Shared state may be stored in a separate ActivityContext via a
+            type safe interface</entry>
+          </row>
+
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Concurrency Control</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">Application managed : use of Java monitors</entry>
+
+            <entry align="center">System Managed : isolation of concurrent
+            transactions</entry>
+          </row>
+
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Facilities (Utilities for
+            Applications)</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">Timer, Listeners</entry>
+
+            <entry align="center">Timer, Trace, Alarm, Statistics, Profiles.</entry>
+          </row>
+
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Protocol Support</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">SIP and HTTP</entry>
+
+            <entry align="center">Protocol agnostic. Consistent event model, regardless of
+            protocol/resource</entry>
+          </row>
+
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Availability Mechanisms</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">Container managed state (session object) that can be
+            replicated</entry>
+
+            <entry align="center">Container managed state (SBB CMP, Facility,
+            ActivityContext) that can be replicated</entry>
+          </row>
+
+          <row>
+            <entry align="center">No transaction context for SIP message processing</entry>
+
+            <entry align="center">Transaction context for event delivery</entry>
+          </row>
+
+          <row>
+            <entry align="center">Non transacted state operations</entry>
+
+            <entry align="center">Container managed state operations are transacted</entry>
+          </row>
+
+          <row>
+            <entry>Facilities are non transacted</entry>
+
+            <entry>Facilities, timers, are transacted</entry>
+          </row>
+
+          <row>
+            <entry align="center">No defined failure model</entry>
+
+            <entry align="center">Well defined and understood failure model via
+            transactions</entry>
+          </row>
+
+          <row>
+            <entry align="center" nameend="c2" namest="c1"><emphasis
+            role="bold">Management</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="center">No standard management mechanisms defined</entry>
+
+            <entry align="center">JMX Interface for managing applications, life cycle,
+            upgrades, ...</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table></para>
+
+  <para>JSLEE and SIP Servlets target different audiences with different needs
+  but they can be complementary in a number of real world cases.</para>
+
+  <para>SIP Servlets focuses on SIP and its integration with Java EE. It is
+  also more of a SIP framework within Java EE while JSLEE is an event driven
+  application server with protocol agnostic architecture, spanning any legacy
+  or potential future protocols. SIP Servlets applications are generally
+  simpler to implement and accelerate time to market for Web and SIP
+  deployment scenarios. JSLEE has a steeper learning curve and covers a wider
+  set of target deployment environments.</para>
+
+  <para>As JBoss is the only vendor to implement both specifications through
+  Mobicents, this makes it a natural fit to build converged and interoperable
+  JSLEE/SIP Servlets applications that are able to comply with standards in a
+  portable manner, we built an application that could leverage standards all
+  the way without resorting to vendor proprietary extensions by making Sip
+  Servlets and JSLEE work together. <ulink
+  url="http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf">Our
+  "JSLEE and SIP-Servlets Interoperability with Mobicents Communication
+  Platform" paper</ulink> describes our approach and the possible different
   approaches we have identified to achieve the goal of interoperability
   between Sip Servlets and JSLEE.</para>
-  <para>You can also use our <ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets interoperability example</ulink> showcasing our approach.</para>
+
+  <para>You can also use our <ulink
+  url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP
+  Servlets interoperability example</ulink> showcasing our approach.</para>
 </section>

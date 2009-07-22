@@ -5,8 +5,8 @@
   <para>&#160;</para>
   <section>
     <title>Description of DFC Application Router</title>
-    <para>Instead of using the  Mobicents Default Application Router, any SIP
-    Servlets 1.1 compliant Application Router can be used,  such as the eCharts <ulink url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1" type="">DFC Application Router</ulink></para>
+    <para>Instead of using the Mobicents Default Application Router, any SIP
+    Servlets 1.1 compliant Application Router can be used,  such as the ECharts <ulink url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1" type="">DFC Application Router</ulink></para>
   </section>
   <section>
     <title>Installation of DFC Application Router</title>

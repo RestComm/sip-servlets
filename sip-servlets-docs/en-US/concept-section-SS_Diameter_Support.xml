@@ -2,6 +2,6 @@
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <section id="ssds-Diameter_Support">
     <title>Diameter Support</title>
-    <para>The Diameter Base Protocol (<ulink url="http://www.ietf.org/rfc/rfc3588.txt">RFC 3588</ulink>) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA).  Diameter can be used as a stand-alone solution, or within the JAIN SLEE Server environment using Resource Adapters.</para>
-    <para>For more information regarding Diameter support, refer to the <ulink url="http://groups.google.com/group/mobicents-public/web/mobicents-diameter">Diameter Home Page</ulink>.  For a list of Resource Adapter examples, refer to <xref linkend="ssea-SIP_Servlet_Example_Applications"></xref>.</para>
+    <para>The Diameter Protocol (<ulink url="http://www.ietf.org/rfc/rfc3588.txt">RFC 3588</ulink>) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA). the Diameter version included in Mobicents Sip Servlets currently support Base, Sh, Ro and Rf.</para>
+    <para>For more information regarding Diameter support, refer to the <ulink url="http://groups.google.com/group/mobicents-public/web/mobicents-diameter">Diameter Home Page</ulink>.  For a list of Diameter examples, refer to <xref linkend="ssea-SIP_Servlet_Example_Applications"></xref>.</para>
   </section>
