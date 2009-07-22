@@ -75,7 +75,7 @@
             , click on <guimenuitem>MobicentsSipServlets</guimenuitem> link, then click on the
             <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
 <!--Issue #706 Editor note - I have converted  all screenshots from <mediaobjects> to <figures> for you :)  I've also set the width attribute to 700 (<imagedata width="700") (usually, the limit for good formatting in HTML is 450).  The images, due to their size, were scaling off the html page.  For massive screenshots like this, consider capturing only the section of the screen that you are discussing in each step.  It will mean the information in the screenshot is more useful to the reader.-->            <figure>
-              <title>SIP Application Dispatcher Metrics</title>
+              <title>Mobicents SIP Servlets Server Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-embjopr-home.png" width="700"/>
@@ -135,7 +135,7 @@
             </figure>
           </listitem>
           <listitem>
-            <para>Then select the <guilabel>Metrics</guilabel> tab to actually see the metrics for the  application.</para>
+            <para>Select the <guilabel>Metrics</guilabel> tab to actually see the metrics for the  application.</para>
             <figure>
               <title>Specific Application Metrics Detail</title>
               <mediaobject>
@@ -148,15 +148,14 @@
         </itemizedlist>
       </section>
       <section id="emom-Jopr4Production">
-        <title>Jopr For Production</title>
-<!--Issue #706 Editor Comment - these figures must have information about each figure in the <title> tag.  Please complete.--><!--Issue #706 Editor Comment - make the step wording the same as Jopr for Development (for consistency)-->        <itemizedlist>
+        <title>Jopr For Production</title><!--Issue #706 Editor Comment - make the step wording the same as Jopr for Development (for consistency)-->        <itemizedlist>
           <listitem>
             <para>Log in to the Jopr console on <ulink url="http://localhost:7080/" type="">http://localhost:7080</ulink> </para>
             <para>From the <guilabel>Dashboard</guilabel> tab, in the Auto Discovery portlet, import your
             server (for example, deruelle-laptop JBossAS 4.2.3.GA default
             (192.168.0.12:1099)) from under localhost.</para>
             <figure>
-              <title/>
+              <title>Server Import for Monitoring</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-auto-disc.png" width="700"/>
@@ -168,7 +167,7 @@
             <para>From the Dashboard, in the Recently Added Resources
             portlet, click on the server.</para>
             <figure>
-              <title/>
+              <title>Selecting the Server for Monitoring</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-resources.png" width="700"/>
@@ -180,7 +179,7 @@
             <para>On the new Monitor view click on the JBossWeb Server
             link.</para>
             <figure>
-              <title/>
+              <title>Servlet Container Monitoring</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-monitor.png" width="700"/>
@@ -189,10 +188,9 @@
             </figure>
           </listitem>
           <listitem>
-            <para>Click on the SipApplicationDispatcher link to see the
-            metrics coming in.</para>
+            <para>Click on the <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
             <figure>
-              <title/>
+              <title>Mobicents SIP Servlets Server Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-jboss-web.png" width="700"/>
@@ -225,11 +223,12 @@
             </figure>
           </listitem>
           <listitem>
-            <para>To get the metrics coming in, you will need to use an
-            example application such as location service by example so that
-            the SipApplicationDispatcher process requests.</para>
+            <para>To begin metrics collection, and see them on the monitoring
+            application, you must use an example application (such as
+            location service) so that the SIP Servlets Server processes SIP
+            Messages.</para>
             <figure>
-              <title/>
+              <title>Selected Application Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-metrics.png" width="700"/>
@@ -241,7 +240,7 @@
             <para>To see Metrics about your application, click on the
             Converged SIP/Web Application (SAR/WAR) link.</para>
             <figure>
-              <title/>
+              <title>Specific Application Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-sip-apps.png" width="700"/>
@@ -250,9 +249,9 @@
             </figure>
           </listitem>
           <listitem>
-            <para>Then click on your application.</para>
+            <para>Click on the application to actually see the metrics for the application.</para>
             <figure>
-              <title/>
+              <title>Specific Application Metrics Detail</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-applications.png" width="700"/>
@@ -264,7 +263,7 @@
             <para>Click on the <guilabel>Configure</guilabel> link for the <guilabel>Monitor</guilabel>
             tab to select the metric data to view.</para>
             <figure>
-              <title/>
+              <title>Selecting Application Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-configure-metrics.png" width="700"/>
@@ -276,7 +275,7 @@
             <para>Select the <guilabel>MetaData</guilabel> tab to  see the metrics
             of your application.</para>
             <figure>
-              <title/>
+              <title>Selected Application Metrics Detail</title>
               <mediaobject>
                 <imageobject>
                   <imagedata fileref="images/mss-jopr-session-metrics.png" width="700"/>
@@ -328,7 +327,7 @@
 <!--Issue #706 Editor Comment - Remember, try to keep one succinct step per procedural step.  Too many substeps in a single step confuses the reader.  Also, usage instructions like this should be numbered (which would be automatic in a <procedure> to assist the reader. :)-->      <itemizedlist>
         <listitem>
           <para>Log in to the Jopr console from the <guilabel>Dashboard</guilabel> tab, in
-          the Auto Discovery portlet, import your Mobicents SIP Load Balancer
+          the Auto Discovery portlet and import your Mobicents SIP Load Balancer
           (by example Mobicents SIP Load Balancer 1.0-SNAPSHOT) from under
           localhost.</para>
           <figure>
@@ -340,7 +339,7 @@
             </mediaobject>
           </figure>
         </listitem>
-<!--Issue #706 Editor Comment - Avoid using "Then do this..." to start a step.  The reader knows that each step is sequential, and these extra words are not required :)-->        <listitem>
+	<listitem>
           <para>From the Dashboard, in the Recently Added Resources
           portlet, click on the Mobicents SIP Load Balancer.</para>
 <!--Issue #706 Editor Comment - because you have described the location of the item so well, you don't actually need the screenshot here.  Save maintenance and use this writing technique in as many procedures as you can.-->          <figure>
@@ -354,7 +353,7 @@
         </listitem>
         <listitem>
           <para>In the new Monitor view, click on the
-          <guimenuitem>mobicents:name=LoadBalancer,type=LoadBalancer</guimenuitem> link</para>
+          <guimenuitem>mobicents:name=LoadBalancer,type=LoadBalancer</guimenuitem> link.</para>
           <figure>
             <title/>
             <mediaobject>
@@ -365,7 +364,7 @@
           </figure>
         </listitem>
         <listitem>
-          <para>You can now see the metrics coming in</para>
+          <para>You can now see the metrics coming in.</para>
           <figure>
             <title/>
             <mediaobject>
