@@ -17,10 +17,10 @@ If this final separator is missing, then the documentation will be wrong. -->
 <!ENTITY JBCP_JBOSS_HOME_LIN "jboss-eap-4.3/jboss-as/">
 
 <!-- SIP Servlet Server Installation Guide -->
-<!ENTITY SSS_MSS4J_VERSION "1.0.0">
+<!ENTITY SSS_MSS4J_VERSION "1.0">
 <!ENTITY SSS_MSS4J_SIZE "135 MB">
-<!ENTITY SSS_MSS4J_ZIP "mss-1.0.0-jboss-4.2.3.GA-0904211307.zip">
+<!ENTITY SSS_MSS4J_ZIP "mss-1.0-jboss-4.2.3.GA-0904221307.zip">
 
 <!ENTITY SSS_MSS4T_VERSION "0.5">
 <!ENTITY SSS_MSS4T_SIZE "20 MB">
-<!ENTITY SSS_MSS4T_ZIP "mss-1.0.0.GA-apache-tomcat-6.0.14-0904211257.zip">
+<!ENTITY SSS_MSS4T_ZIP "mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip">
