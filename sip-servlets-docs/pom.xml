@@ -40,7 +40,7 @@
 					<!--<sourceDocumentName>${env.DOCNAME}</sourceDocumentName>-->
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<imageResource>
-						<directory>${basedir}</directory>
+						<directory>${basedir}/en-US</directory>
 						<includes>
 							<include>images/*</include>
 						</includes>
