@@ -95,11 +95,11 @@
         more information about WAR files, refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta422/html/index.html">JBoss Application Server Administration and Development Guide</ulink>. For
         more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 spec, Appendix C</ulink>.</para>
       </formalpara>
-      <para>Download the Location Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/location-service/1.1/location-service-1.1.war"/>.</para>
+      <para>Download the Location Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/location-service/1.4/location-service-1.4.war"/>.</para>
       <para>Download the Location Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/locationservice-dar.properties"/>.</para>
       <formalpara id="sfss-binary-Location_Service-Installing">
         <title>Installing</title>
-        <para>Both the <filename>location-service-1.1.war</filename> WAR file
+        <para>Both the <filename>location-service-1.4.war</filename> WAR file
         and the <filename>locationservice-dar.properties</filename> DAR file
         that you downloaded should be placed into different directories in
         your SIP Servlet Server installation hierarchy. Which directory
@@ -110,7 +110,7 @@
         <varlistentry>
           <term>MSS for JBoss</term>
           <listitem>
-            <para>Place <filename>location-service-1.1.war</filename> into the
+            <para>Place <filename>location-service-1.4.war</filename> into the
             <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
             directory, and <filename>locationservice-dar.properties</filename>
             into the
@@ -121,7 +121,7 @@
         <varlistentry>
           <term>MSS for Tomcat</term>
           <listitem>
-            <para>Place <filename>location-service-1.1.war</filename> into the
+            <para>Place <filename>location-service-1.4.war</filename> into the
             <filename><envar>CATALINA_HOME</envar>/webapps/</filename>
             directory, and <filename>locationservice-dar.properties</filename>
             into the
@@ -587,11 +587,11 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         more information about WAR files, refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta422/html/index.html">JBoss Application Server Administration and Development Guide</ulink>. For
         more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 spec, Appendix C</ulink>.</para>
       </formalpara>
-      <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.1/call-blocking-1.1.war"/>.</para>
+      <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.4/call-blocking-1.4.war"/>.</para>
       <para>Download the Call-Blocking Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/call-blocking-servlet-dar.properties"/>.</para>
       <formalpara id="sfss-binary-Call-Blocking_Service-Installing">
         <title>Installing</title>
-        <para>Both the <filename>call-blocking-1.1.war</filename> WAR file and
+        <para>Both the <filename>call-blocking-1.4.war</filename> WAR file and
         the <filename>call-blocking-servlet-dar.properties</filename> DAR file
         that you downloaded should be placed into different directories in
         your SIP Servlet Server installation hierarchy. Which directory depends
@@ -602,7 +602,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <varlistentry>
           <term>MSS for JBoss</term>
           <listitem>
-            <para>Place <filename>call-blocking-1.1.war</filename> into the
+            <para>Place <filename>call-blocking-1.4.war</filename> into the
             <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
             directory, and
             <filename>call-blocking-servlet-dar.properties</filename> into the
@@ -797,11 +797,11 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         your installed SIP Servlets Server. For more information about WAR and
         DAR files, refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta422/html/index.html">JBoss Application Server Administration and Development Guide</ulink>.</para>
       </formalpara>
-      <para>Download the Call-Forwarding Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.1/call-forwarding-1.1.war"/>.</para>
+      <para>Download the Call-Forwarding Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.4/call-forwarding-1.4.war"/>.</para>
       <para>Download the Call-Forwarding Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/call-forwarding-servlet-dar.properties"/>.</para>
       <formalpara id="sfss-binary-Call-Forwarding_Service-Installing">
         <title>Installing</title>
-        <para>Both the <filename>call-forwarding-1.1.war</filename> WAR file
+        <para>Both the <filename>call-forwarding-1.4.war</filename> WAR file
         and the <filename>call-forwarding-servlet-dar.properties</filename>
         DAR file that you downloaded should be placed into different
         directories in your SIP Servlet Server installation hierarchy. Which
@@ -812,7 +812,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <varlistentry>
           <term>MSS for JBoss</term>
           <listitem>
-            <para>Place <filename>call-forwarding-1.1.war</filename> into the
+            <para>Place <filename>call-forwarding-1.4.war</filename> into the
             <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
             directory, and
             <filename>call-forwarding-servlet-dar.properties</filename> into
@@ -824,7 +824,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <varlistentry>
           <term>MSS for Tomcat</term>
           <listitem>
-            <para>Place <filename>call-forwarding-1.1.war</filename> into the
+            <para>Place <filename>call-forwarding-1.4.war</filename> into the
             <filename><envar>CATALINA_HOME</envar>/webapps/</filename>
             directory, and
             <filename>call-forwarding-servlet-dar.properties</filename> into
@@ -1022,13 +1022,13 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         more information about WAR files, refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta422/html/index.html">JBoss Application Server Administration and Development Guide</ulink>. For
         more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 spec, Appendix C</ulink></para>
       </formalpara>
-      <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.1/call-blocking-1.1.war"/>.</para>
-      <para>Download the Call-Forwarding Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.1/call-forwarding-1.1.war"/>.</para>
+      <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.4/call-blocking-1.4.war"/>.</para>
+      <para>Download the Call-Forwarding Service&apos;s WAR file from here: <ulink url="http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.4/call-forwarding-1.4.war"/>.</para>
       <para>Download the Call-Controller Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/call-controller-servlet-dar.properties"/>.</para>
       <formalpara id="sfss-binary-Call-Controller_Service-Installing">
         <title>Installing</title>
-        <para>The <filename>call-blocking-1.1.war</filename>,
-        <filename>call-forwarding-1.1.war</filename> and
+        <para>The <filename>call-blocking-1.4.war</filename>,
+        <filename>call-forwarding-1.4.war</filename> and
         <filename>call-controller-servlet-dar.properties</filename> archive
         files that you downloaded should be placed into different directories
         in your SIP Servlet Server installation hierarchy. Which directory
@@ -1039,8 +1039,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <varlistentry>
           <term>MSS for JBoss</term>
           <listitem>
-            <para>Place <filename>call-blocking-1.1.war</filename> and
-            <filename>call-forwarding-1.1.war</filename> into the
+            <para>Place <filename>call-blocking-1.4.war</filename> and
+            <filename>call-forwarding-1.4.war</filename> into the
             <filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
             directory, and
             <filename>call-controller-servlet-dar.properties</filename> into
@@ -1052,8 +1052,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <varlistentry>
           <term>MSS for Tomcat</term>
           <listitem>
-            <para>Place <filename>call-blocking-1.1.war</filename> and
-            <filename>call-forwarding-1.1.war</filename> into the
+            <para>Place <filename>call-blocking-1.4.war</filename> and
+            <filename>call-forwarding-1.4.war</filename> into the
             <filename><envar>CATALINA_HOME</envar>/webapps/</filename>
             directory, and
             <filename>call-controller-servlet-dar.properties</filename> into
