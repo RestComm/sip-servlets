@@ -12,8 +12,8 @@ Call Controller :  a Composed Application
 ** From the binary
 
 	You can find the war files corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.3/call-blocking-1.3.war}here}} and 
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.3/call-forwarding-1.3.war}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-blocking/1.4/call-blocking-1.4.war}here}} and 
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/call-forwarding/1.4/call-forwarding-1.4.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/call-controller-servlet-dar.properties}dar configuration file}}.\

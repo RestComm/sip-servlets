@@ -12,58 +12,66 @@ Goals
   Mobicents Sip Servlets delivers a consistent, open platform on which to develop and deploy portable 
   and distributable SIP and Converged JEE services. 
   It is the first open source certified implementation of the SIP Servlet v1.1 (JSR 289 Spec) on top of Tomcat & JBoss containers and 
-  strive to develop interoperability standards between Sip Servlets and JSLEE so that applications 
+  strive to feature best performances, security, foster innovation and develop interoperability standards between Sip Servlets and JSLEE so that applications 
   may exploit the strengths of both. 
   {{{http://jain-sip.dev.java.net}The JAIN-SIP Reference implementation}} is leveraged as the SIP stack and 
   Mobicents JSLEE is used as the SLEE implementation.
 
-Version 0.9 is out !
+Version 1.0 is out !
+
+	We are proud to announce our {{{}Mobicents Sip Servlets 1.0 version}}, certified against Sip Servlets 1.1 specification and working on top of the following containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> and <JBoss AS 5.1.0.GA>. 
 	
-	Our latest release working on top of the following containers <Tomcat 6.0.14> or <JBoss AS 4.2.3.GA> and now on <JBoss AS 5.0.1.GA> provides new features : 		  
-		
-		* {{{load-balancer.html}Mobicents Sip servlets now features Converged HTTP/SIP failover with complete converged replication}}
-		
-		* {{{mss-eclipse-tools.html}Tooling with the Mobicents Sip Servlets Eclipse Plugin (Technology preview)}}
-		
-		* {{{mss-jruby.html}JRuby integration}} to be able to add telco features to existing or new JRuby applications
-		
-		* {{{mss-ipbx.html}The Mobicents IPBX advances to BETA1 version}} with the {{{http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets?hl=en}new Seam Telco Framework 2.0}}.
-		
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=522}Java EE/EJBs/SIP converged applications are now supported for the JBoss 5 version}}
-				
-		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label%3ASip-Servlets-Milestone-0.9+&colspec=ID+Priority+Component+Milestone+Version+Release+Type+Status+Owner+Summary&cells=tiles}More than 20 bug fixes}}		
+	Following is the list of features making it the best open source JSR 289 implementation out there :
+	
+		 * {{{./user_guides/sip_servlets/index.html#tab-ssea-SIP_Servlet_Example_Applications}Around 15 examples}}
+		 
+		 * {{{./user_guides/sip_servlets/index.html#d0e5172}Clustering and High Availibility}}
+		 
+		 * {{{./user_guides/sip_servlets/index.html#emom-Enterprise-Monitoring-Operations-Management}An Enterprise Monitoring and Management Console}}
+		 		  
+		 * {{{./user_guides/sip_servlets/index.html#mipbx-Media_Support}Media Support to build PBX, Announcement, Conference, IVR, Call Centers, ... applications}}
+		 
+		 * {{{./user_guides/sip_servlets/index.html#d0e7609}Eclipse Tooling}}
+		 
+		 * Development Frameworks to enhance your productivity :
+		 
+		 	** {{{./user_guides/sip_servlets/index.html#stf-Seam_Telco_Framework}Seam Telco Framework}}
+		 	
+		 	** {{{./user_guides/sip_servlets/index.html#jruby-telco-integration}JRuby Torquebox Telco Framework}}
+		 	
+		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/}ECharts For SIP Servlets}}
+		 	
+		 * {{{./user_guides/sip_servlets/index.html#sscacc-MSS_Concurrency_and_Congestion_Control}Concurrency and Congestion Control}}
+		 
+		 * {{{./user_guides/sip_servlets/index.html#ssds-Diameter_Support}Diameter}} and {{{./user_guides/sip_servlets/index.html#saimse-SIP_and_IMS_Extensions}IMS}} Support
+		 
+		 * {{{./user_guides/sip_servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}	
 		
 	Check the Roadmap to see {{{roadmap.html} the feature details and the usual round of bug fixes}} too.
 	
-	Checkout the {{{http://hudson.jboss.org/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html}shiny Mobicents Sip Servlets User Guide}}, courtesy of Douglas Silas Hensley.   
+	Checkout the {{{./user_guides/sip_servlets/index.html}shiny Mobicents Sip Servlets User Guide}}   
 	 
 	It is shipped with :		
 	
-		* {{{sip-servlets-managment.htm}Management Console}}
+		* {{{./user_guides/sip_servlets/index.html#wwtssmc-Working_with_the_SIP_Servlets_Management_Console}Management Console}}
 	
 		* Educational converged example : {{{click2call.html}Click To Call}}
 		
 		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 	
-		* For JBoss only, Mobicents Media Server 1.0.0.GA, Mobicents Diameter 1.0.0.BETA3, the Mobicents SIP load Balancer BETA4 and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
-		to test clustering and mid call failover. 
-	 
-	To download this release and try it out, follow the following link : 
-
-	{{{https://sourceforge.net/project/showfiles.php?group_id=102670&package_id=262024&release_id=677419}Mobicents Sip Servlet 0.9 downloads}}
-					
+		* For JBoss 4.2.3 only, Mobicents Media Server 1.0.3.GA, Mobicents Diameter 1.0.1.GA, the Mobicents SIP load Balancer BETA7 and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
+		to test clustering and mid call failover. 					
+		
+		* For JBoss 5.1.0 only, Mobicents Media Server 2.0.0.BETA1, the Mobicents SIP load Balancer BETA7 and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
+		to test clustering and mid call failover.
 					
 Roadmap
 
-  Now that we are Sip Servlets 1.1 certified, Please check out our {{{roadmap.html}roadmap}} to follow the project progress and to know what will happen next.  
-
-  Here is a {{{http://spreadsheets.google.com/pub?key=pl-Xe-Wa5z7INjR4kdhxBEg&gid=1}document}} showing their approximative completion.
+ 	Please check out our {{{roadmap.html}roadmap}} to follow the project progress and to know what will happen next.  
   
 Try it !
 
-	Follow the {{{installation.html}installation instructions}} first on how to setup Tomcat 6.0.14 or JBoss 4.2.3.GA or JBoss 5.0.1.GA to become a sip-servlet converged container.
-	
-	Then have fun with the {{{examples.html}different examples}} provided with this distribution.
+	Follow the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Installing_Configuring_and_Running}Installation Instructions}} first on how to setup Mobicents Sip Servlets on Tomcat 6.0.14 or JBoss 4.2.3.GA or JBoss 5.1.0.GA.
 	
 License
 

@@ -1,6 +1,6 @@
 Installation Instructions
 
-	<More detailed and better looking installation instructions are available from the {{{http://hudson.jboss.org/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html}Mobicents Sip Servlets User Guide}}> 
+	<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Installing_Configuring_and_Running}Mobicents Sip Servlets User Guide}}> 
 
 * From the binary
 	

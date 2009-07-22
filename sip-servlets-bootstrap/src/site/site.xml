@@ -8,21 +8,13 @@
 	<body>
 		<menu name="Overview">
 			<item name="Introduction" href="products_sip_servlets.html" />
-			<item name="Downloads" href="mss-downloads.html" />
-			<item name="User Guide" href="http://hudson.jboss.org/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html"/>				
-			<item name="Installation" href="installation.html" collapse="true">
-				<item name="Tomcat Installation" href="installation-tomcat.html" />
-				<item name="Jboss AS 4.x Installation" href="installation-jboss.html" />
-				<item name="Jboss AS 5.x Installation" href="installation-jboss-5.html" />
-			</item>
-			<item name="Configuration" href="configuration.html" />
+			<item name="Downloads" href="mss-downloads.html" />						
 			<item name="Roadmap" href="roadmap.html" />
 			<item name="License" href="license.html" />
 			<item name="QA" href="qa.html" />
 		</menu>
-		<menu name="Application Router">
-			<item name="Default Application Router" href="mss-dar.html" />
-			<item name="ECharts DFC Application Router" href="mss-dfc.html" />
+		<menu name="Documentation">
+			<item name="Community User Guide" href="./user_guides/sip_servlets/index.html"/>
 		</menu>
 		<menu name="Examples">
 			<item name="Examples" href="examples.html" collapse="true">
@@ -50,39 +42,7 @@
 				<item name="Pure JRuby/Rails Telco Example" href="mss-pure-jruby-telco.html"/>
 				<item name="Media JSR309 Demo" href="mss-jsr309-demo.html" />				
 			</item>
-		</menu>
-		<menu name="Advanced Features">
-			<item name="SIP Extensions" href="mss-sip-extensions.html" />
-			<item name="Media support" href="media.html" />
-			<item name="Security" href="security.html" />
-			<item name="STUN suport" href="stun.html" />
-			<item name="Concurrency" href="concurrency.html" />			
-			<item name="Congestion Control" href="mss-congestion.html" />
-			<item name="JBoss Seam Integration" href="mss-seam.html" />
-			<item name="JSLEE/Sip Servlets Interoperability" href="mobicents-sip-servlets-jslee-intero.html" />
-			<item name="JRuby-Rails Integration" href="mss-jruby.html" />
-			<item name="Eclipse Development Tools" href="mss-eclipse-tools.html" />
-		</menu>
-		<menu name="Other Protocols Support">
-			<item name="Diameter" href="mss-diameter.html" collapse="true">
-				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
-				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
-			</item>
-		</menu>
-		<menu name="IMS">
-			<item name="OpenIMS Core Integration" href="mss-ims-integration.html" />
-		</menu>
-		<menu name="Server Monitoring - Operations - Management">
-			<item name="Management Console" href="sip-servlets-managment.htm" />
-			<item name="Server Monitoring Jopr Integration" href="mss-jopr-plugin.html" />
-			<item name="Sip Load Balancer Monitoring Jopr Integration" href="mss-jopr-lb-plugin.html" />
-		</menu>
-		<menu name="High Availability">
-			<item name="SIP Load Balancer" href="load-balancer.html" />
-			<item name="Clustering" href="clustering.html" />
-			<item name="Failover" href="failover.html" />
-			<item name="IP Load Balancing" href="mss-ip-balancers.html" />
-		</menu>
+		</menu>		
 		<menu name="Contribute">			
 			<item name="How to Contribute" href="contributor.html" />
 			<item name="Write a Test/Run the Testsuite" href="tests.html" />

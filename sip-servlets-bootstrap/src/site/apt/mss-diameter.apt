@@ -1,5 +1,7 @@
 Diameter Support
 
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#ssds-Diameter_Support}Mobicents Sip Servlets User Guide}}>
+
 * Description
 
 	Mobicents Sip Servlets is providing support for applications to use the Diameter protocol for Authentication, Authorization and Accounting 

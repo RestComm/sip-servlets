@@ -31,3 +31,5 @@ Acknowledgements
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=568}Issue 568}} and contributed a fix for it.
 		
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=585}Issue 585}} and contributed a fix for it.
+	
+	* Eric Cheung and Tom Smith from AT&T ECharts team for making sure E4SS is working continuously on Mobicents Sip Servlets and for their excellent bug reports.

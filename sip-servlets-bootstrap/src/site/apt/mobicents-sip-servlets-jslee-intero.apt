@@ -1,5 +1,7 @@
 Sip Servlets JSLEE Interoperability
 
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#ss_jslee_interop}Mobicents Sip Servlets User Guide}}>
+
 	As you might know, there is a constant war raging between Sip Servlets and JAIN-SLEE and most see them as competing specifications/products and try to choose between one or the other.
 
 	Our take at JBoss, the only vendor to implement both technologies, is that they don't need to compete since they complete each other very well and it has been one of the leitmotiv behind building Mobicents Sip Servlets.

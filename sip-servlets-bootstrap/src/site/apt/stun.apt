@@ -1,5 +1,7 @@
 STUN Support
 
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#mssstun-MSS_STUN}Mobicents Sip Servlets User Guide}}>
+
 * STUN Description
 
 	STUN provides a mean for applications to discover the presence and type of firewalls or NATs 

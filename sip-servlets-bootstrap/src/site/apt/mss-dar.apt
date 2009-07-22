@@ -1,5 +1,7 @@
 Default Application Router
 
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Application-Router}Mobicents Sip Servlets User Guide}}>
+
 * Role of the Application router 
 
 	The Application Router is called by the container to select a SIP servlet application to service an initial request.\

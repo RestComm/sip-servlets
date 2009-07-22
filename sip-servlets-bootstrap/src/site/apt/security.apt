@@ -1,5 +1,7 @@
 Enable Security for Sip Servlets Applications
 
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#sss-SIP_Servlet_Security}Mobicents Sip Servlets User Guide}}>
+
 * To enable security in JBoss AS
 
 	To enable security for JBoss Application Server, basically you have to create a security 

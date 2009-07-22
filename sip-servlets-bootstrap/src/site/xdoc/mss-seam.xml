@@ -3,6 +3,9 @@
 		<title>JBoss Seam Integration</title>
 	</properties>
 	<body>
+		<p>
+			<b><i>This page is obsolete : More detailed and better looking installation instructions are available from the <a href="./user_guides/sip_servlets/index.html#stf-Seam_Telco_Framework">Mobicents Sip Servlets User Guide</a></i></b>
+		</p>
 			<section name="The Seam Telco Framework (STF)">
 			<p>On top of <a href="http://www.seamframework.org/">JBoss Seam</a>, Sip Servlets and MSC API (from Mobicents Media Server), we have built another framework that
 			allows you to handle SIP and Media events in your Seam components. The STF application are extremely
@@ -11,7 +14,7 @@
 			<a href="http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets?hl=en">Click here to read the complete documentation of The Seam Telco Framework.</a>
 			
 			There are a number of examples you can see in the documentation. We are also building <a href="mss-ipbx.html">our Mobicents IPBX</a> using STF.
-</p>
+		</p>
 		</section>
 		<section name="Using JBoss Seam as a Web Framework without STF">
 			<p>

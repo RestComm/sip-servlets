@@ -1,5 +1,7 @@
 Configuration
 
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#bsssc-binary-SIP_Servlets_Server-Configuring}Mobicents Sip Servlets User Guide}}>
+
 	Here is the few things you can configure in the Mobicents Sip Servlets container through the server.xml Tomcat file located 
 	on jboss under <jboss_home>/server/default/deploy/jboss-web.deployer/server.xml or  
 	on Tomcat under <tomcat_home>/conf/server.xml

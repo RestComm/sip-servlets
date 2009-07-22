@@ -34,7 +34,7 @@ Location Service
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/location-service/1.3/location-service-1.3.war}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/location-service/1.4/location-service-1.4.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/locationservice-dar.properties}dar configuration file}}.\
