@@ -1,51 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <section id="tsear-echarts-Application-Router">
   <title>DFC Application Router</title>
-
-  <para> </para>
-
+  <para>&#160;</para>
   <section>
     <title>Description of DFC Application Router</title>
-
-    <para>Instead of using our Mobicents Default Application Router, any SIP
-    Servlets 1.1 compliant Application Router can be used such as the <ulink
-    type=""
-    url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC
-    Application Router from ECharts</ulink></para>
+    <para>Instead of using the  Mobicents Default Application Router, any SIP
+    Servlets 1.1 compliant Application Router can be used,  such as the eCharts <ulink url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1" type="">DFC Application Router</ulink></para>
   </section>
-
   <section>
     <title>Installation of DFC Application Router</title>
-
     <section>
-      <title>Installing DFC Application Router in Mobicents Sip Servlets on
-      Tomcat</title>
-
-      <para>Just drop the dfcar.jar from the ECharts distribution package in
+      <title>Installing DFC Application Router in Mobicents Sip Servlets on Tomcat</title>
+      <para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in
       <literal>TOMCAT_HOME/lib</literal> directory and remove the Mobicents
       Default Application Router located in
       <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal></para>
     </section>
-
     <section>
-      <title>Installing DFC Application Router in Mobicents Sip Servlets on
-      JBoss 4.2.x</title>
-
-      <para>Just drop the dfcar.jar from the ECharts distribution package in
+      <title>Installing DFC Application Router in Mobicents Sip Servlets on JBoss 4.2.x</title>
+      <para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in
       <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal>
       directory and remove the Mobicents Default Application Router located in
       <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal></para>
     </section>
-
     <section>
-      <title>Installing DFC Application Router in Mobicents Sip Servlets on
-      JBoss 5.1.x</title>
-
-      <para>Just drop the dfcar.jar from the ECharts distribution package in
-      <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/
-      </literal>directory and remove Mobicents Default Application Router
+      <title>Installing DFC Application Router in Mobicents Sip Servlets on JBoss 5.1.x</title>
+      <para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in
+      <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory and remove Mobicents Default Application Router
       located in
       <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal></para>
     </section>
