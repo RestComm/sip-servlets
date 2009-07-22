@@ -2,11 +2,9 @@
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
 <section id="jruby-telco-integration">
   <title>JRuby/Rails Integration with Torquebox Telco Framework</title>
-  <para>Mobicents Sip Servlets is compatible with  the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework  JRuby on
-  Rails integration.  The framework allows you to create powerful, pure or converged VoIP JRuby
-  on Rails applications.</para>
+  <para>Mobicents Sip Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework. The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications using the same model as Sip Servlets and allowing for Media Control.</para>
   <para>JRuby features a powerful and well
-  deployed scripting language that allows  you to modify your application at
+  deployed scripting language that allows you to modify your application at
   runtime (this is true even for the SIP and Media part that Mobicents Sip
   Servlets offer) without restarting the server.  In addition, TorqueBox is a new kind of Ruby application
   platform that integrates popular technologies such as Ruby-on-Rails, while
