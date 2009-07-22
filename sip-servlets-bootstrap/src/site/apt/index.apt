@@ -23,15 +23,15 @@ Version 1.0 is out !
 	
 	Following is the list of features making it the best open source Sip Servlets 1.1 implementation out there :
 	
-		 * {{{./user_guides/sip_servlets/index.html#tab-ssea-SIP_Servlet_Example_Applications}More than 15 examples}}
+		 * {{{./user_guides/sip_servlets/index.html#tab-ssea-SIP_Servlet_Example_Applications}More than 15 examples}} covering all imporant features to boostrap you real fast
 		 
-		 * {{{./user_guides/sip_servlets/index.html#d0e5172}Clustering and High Availibility}}
+		 * {{{./user_guides/sip_servlets/index.html#d0e5172}Clustering and High Availibility}} for scaling out
 		 
-		 * {{{./user_guides/sip_servlets/index.html#emom-Enterprise-Monitoring-Operations-Management}An Enterprise Monitoring and Management Console}}
+		 * {{{./user_guides/sip_servlets/index.html#emom-Enterprise-Monitoring-Operations-Management}An Enterprise Monitoring and Management Console}} to effectively manage and monitor the server and your applications
 		 		  
-		 * {{{./user_guides/sip_servlets/index.html#mipbx-Media_Support}Built-in Media Support to build PBX, Announcement, Conference, IVR, Call Centers, ... applications}}
+		 * {{{./user_guides/sip_servlets/index.html#mipbx-Media_Support}Built-in Media Support}} to build PBX, Announcement, Conference, IVR, Call Centers kind of applications
 		 
-		 * {{{./user_guides/sip_servlets/index.html#d0e7609}Eclipse Tooling}}
+		 * {{{./user_guides/sip_servlets/index.html#d0e7609}Eclipse Tooling}} to quickly create new Sip Servlets projects in your favorite Eclipse IDE
 		 
 		 * Development Frameworks to enhance your productivity :
 		 
