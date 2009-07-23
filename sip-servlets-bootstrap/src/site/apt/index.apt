@@ -19,7 +19,7 @@ Goals
 
 Version 1.0 is out !
 
-	We are proud to announce our {{{./mss-downloads}Mobicents Sip Servlets 1.0 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.14> and <JBoss AS 4.2.3.GA & 5.1.0.GA>. 
+	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 1.0 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.14> and <JBoss AS 4.2.3.GA & 5.1.0.GA>. 
 	
 	Following is the list of features making it the best open source Sip Servlets 1.1 implementation out there :
 	
@@ -69,7 +69,7 @@ Version 1.0 is out !
   
 Try it !
 
-	Get it from {{{}here}} and follow the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Installing_Configuring_and_Running}Installation Instructions}} to setup it up.
+	Get it from {{{./mss-downloads.html}here}} and follow the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Installing_Configuring_and_Running}Installation Instructions}} to setup it up.
 	
 Roadmap
 
