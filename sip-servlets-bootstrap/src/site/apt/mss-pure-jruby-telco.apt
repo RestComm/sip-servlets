@@ -1,14 +1,13 @@
-Pure JRuby on Rails Sip Servlets application that can <make and receive phone calls>
-
-	<<Note : the information over there is outdated since the move from JBoss Rails to Torquebox, so please checkout the Torquebox documentation instead>>
+Pure JRuby on Rails Sip Servlets application that can <<make and receive phone calls>> and <<play media>>
 
 * Service Description
 
 	The application will allow one to file complaints and every time a complaint is filed, 
-	a confirmation call is made to your phone saying that is has been taken into account and has been routed to a sales representative.\
-	Moreover you can call directly the application and the pure jruby application will be able to handle the SIP signalling and setup and teardown the call. 
+	A Confirmation call is made to your phone with a media announcement being made and then it recognize DTMF and play back to you which touch you just pressed.\
+	Moreover you can call directly the application and the pure jruby application will do the same thing as stated above it will play a media announcement and recognize DTMF. 
 	 
-	To get more information on how to build pure JRuby-Rails applications leveraging Mobicents Sip Servlets to handle SIP please checkout the {{{http://torquebox.org/documentation/}Torquebox documentation}}
+	To get more information on how to build pure JRuby-Rails applications leveraging Mobicents Sip Servlets to handle SIP and Media please checkout the {{{http://torquebox.org/documentation/browse/LATEST/telecom.html}Torquebox documentation}}
+	or browse through the source code of the example below.
 	 
 * How to activate it   
 

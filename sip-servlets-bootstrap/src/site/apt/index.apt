@@ -25,7 +25,7 @@ Version 1.0 is out !
 	
 		 * {{{./user_guides/sip_servlets/index.html#tab-ssea-SIP_Servlet_Example_Applications}More than 15 examples}} covering all imporant features to boostrap you real fast
 		 
-		 * {{{./user_guides/sip_servlets/index.html#d0e5172}Clustering and High Availibility}} for scaling out
+		 * {{{./user_guides/sip_servlets/index.html#d0e5172}Clustering and High Availability}} for scaling out
 		 
 		 * {{{./user_guides/sip_servlets/index.html#emom-Enterprise-Monitoring-Operations-Management}An Enterprise Monitoring and Management Console}} to effectively manage and monitor the server and your applications
 		 		  
@@ -39,7 +39,7 @@ Version 1.0 is out !
 		 	
 		 	** {{{./user_guides/sip_servlets/index.html#jruby-telco-integration}JRuby Torquebox Telco Framework}}
 		 	
-		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/What-is-ECharts-for-SIP-Servlets.html}ECharts For SIP Servlets framework (E4SS)}} : Check out the {{{mss-echarts.html}<<announcement>>}} 
+		 	** {{{http://echarts.org/ECharts-for-SIP-Servlets/What-is-ECharts-for-SIP-Servlets.html}ECharts For SIP Servlets framework (E4SS)}} : Check out the {{{mss-echarts.html}<<announcement>>}}, <<ECharts is now officially supported !>> 
 		 	
 		 * {{{./user_guides/sip_servlets/index.html#sscacc-MSS_Concurrency_and_Congestion_Control}Concurrency and Congestion Control}}
 		 
