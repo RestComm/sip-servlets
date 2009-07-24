@@ -2550,6 +2550,9 @@ Any questions regarding this, give me a yell and we can work through it. --> <ti
 						The following example describes how the DAR routes an INVITE to two applications deployed in a container. The applications in this example are a Location Service and a Call Blocking application.
 					</para>
 					<para>
+						In the example, the assumption of a request coming to the server is described. However, applications can act as a UAC, and generate initial requests on their own. For routing purposes, it is not necessary for the specified application initiating the request to have an entry in the DAR file.
+					</para>
+					<para>
 						The DAR file contains the required information for the two applications to be invoked in the correct order.
 					</para>
 					<para>
@@ -2574,7 +2577,7 @@ Any questions regarding this, give me a yell and we can work through it. --> <ti
 								The Application Router is called.
 							</para>
 							<para>
-								From the <literal>INVITE</literal> information, the first application to invoke is the LocationService.
+								From the <literal>INVITE</literal> information, the first application to invoke is the Location Service.
 							</para>
 						</listitem>
 						<listitem>
@@ -2584,23 +2587,23 @@ Any questions regarding this, give me a yell and we can work through it. --> <ti
 						</listitem>
 						<listitem>
 							<para>
-								The container invokes the LocationService that proxies the INVITE.
+								The container invokes the LocationService that proxies the <literal>INVITE</literal>.
 							</para>
 							<para>
-								The proxied INVITE is considered as a new INVITE to the known IP Address of the registered user for the Request URI
+								The proxied <literal>INVITE</literal> is considered as a new <literal>INVITE</literal> to the known IP Address of the registered user for the Request URI
 							</para>
 							<para>
-								For further detail regarding INVITE handling, refer to Section 15.2.2 Sending an Initial Request in the SIP Servlets 1.1 Specification.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								Because the INVITE has been proxied, the container invokes the Application Router for the proxied INVITE to see if any more applications are interested in the event.
+								For further information regarding <literal>INVITE</literal> handling, refer to "Section 15.2.2 Sending an Initial Request" in the SIP Servlets 1.1 Specification.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								From the proxied invite, the Application Router determines that the second application to invoke is the CallBlocking application.
+								Because the <literal>INVITE</literal> has been proxied, the container invokes the Application Router for the proxied <literal>INVITE</literal> to see if any more applications are interested in the event.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								From the proxied invite, the Application Router determines that the second application to invoke is the Call Blocking application.
 							</para>
 						</listitem>
 						<listitem>
@@ -2610,29 +2613,24 @@ Any questions regarding this, give me a yell and we can work through it. --> <ti
 						</listitem>
 						<listitem>
 							<para>
-								The container routes the INVITE for the Call Blocking application to the next application in the chain.
+								The container routes the <literal>INVITE</literal> for the Call Blocking application to the next application in the chain.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								The Call Blocking application determines that the user that initiated the call is black listed. The application rejects the call with a Forbidden response.
+								The Call Blocking application determines that the user that initiated the call is black listed. The application rejects the call with a "Forbidden" response.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								Because the Call Blocking application acts as a UAS, the Application Selection Process is stopped for the original INVITE.
+								Because the Call Blocking application acts as a UAS, the Application Selection Process is stopped for the original <literal>INVITE</literal>.
 							</para>
 						</listitem>
 					</orderedlist>
 					<para>
-						The path the INVITE has taken (that is, LocationService to CallBlocking) is called the application path. The Routing of the responses will now occur as explained in the next section.
+						The path the <literal>INVITE</literal> has taken (that is, LocationService to CallBlocking) is called the application path. The Routing of the responses will now occur as explained in the next section.
 					</para>
 				</example>
-				<note>
-					<para>
-						The assumption of a request coming to the server was taken, but applications can act as UAC and also generate initial requests on their own. In such cases, no entry in the dar file is needed for the given application initiating the request to be able to route it to other applications in the container or outside.
-					</para>
-				</note>
 			</section>
 			
 			<section>
