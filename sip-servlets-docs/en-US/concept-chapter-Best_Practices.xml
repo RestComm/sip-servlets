@@ -3,10 +3,10 @@
 <chapter id="bp-Best_Practices">
   <title>Best Practices</title>
   <para>This chapter discusses Best Practices related to  Mobicents
-  Sip Servlets usage in real world deployments.</para>
+  SIP Servlets usage in real world deployments.</para>
   <section id="bp-Best_Practices_Perf_Tips">
-    <title>Mobicents Sip Servlets Performance Tips</title>
-    <para>Because the default profile of Mobicents Sip Servlets  is targeted at a
+    <title>Mobicents SIP Servlets Performance Tips</title>
+    <para>Because the default profile of Mobicents SIP Servlets  is targeted at a
     development environment,  some tuning is required to make the server performance  suitable for a  production environment.</para>
     <section>
       <title>Tuning JBoss</title>
@@ -18,7 +18,7 @@
       <para><filename>$JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename></para>
     </section>
     <section>
-      <title>Tuning Mobicents Sip Servlets</title>
+      <title>Tuning Mobicents SIP Servlets</title>
 <!--Issue #838 Editor Comment - consider using a <variablelist> here.  You can put headings such as "Congestion Control" in the <term> element, and describe the tuning recommendations in a <listitem><para> element.-->      <itemizedlist>
         <listitem>
           <para><emphasis>Congestion Control</emphasis> : It is recommended that this feature is enabled to avoid overload of the server and that the <emphasis>sipMessageQueueSize</emphasis> and <emphasis>memoryThreshold</emphasis> parameters are tuned according to <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
@@ -32,7 +32,7 @@
     <section>
       <title>Tuning The JAIN SIP Stack</title>
       <para>The stack can be fine-tuned by altering the SIP stack properties, defined in the external properties file specified by the <emphasis>sipStackPropertiesFile</emphasis> attribute as described in <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/>.</para>
-    <itemizedlist>
+      <itemizedlist>
         <listitem>
           <para><emphasis>gov.nist.javax.sip.THREAD_POOL_SIZE</emphasis>
           </para>
@@ -53,7 +53,7 @@
           <para>This flag indicates whether the
           SIP stack listener is executed by a single thread, or concurrently
           by the threads that parse the messages. </para>
-          <para>Mobicents Sip
+          <para>Mobicents SIP
           Servlets expects this flag to be set to <userinput>true</userinput>, therefore do not change the value.</para>
         </listitem>
         <listitem>
@@ -126,7 +126,7 @@
           <para><literal>Failed to reserve shared memory (errno = 22)&quot; when starting JBoss.</literal> It means that the number of pages at OS level is still not enough.</para>
           <para>To learn
           more about large memory pages, and how to configure them, refer to 
-          <ulink url="http://java.sun.com/javase/technologies/hotspot/largememory.jsp">Java Support for Large Memory Pages</ulink> and <ulink url="http://andrigoss.blogspot.com/2008/02/jvm-performance-tuning.html">Andrig's Miller blog post</ulink>.</para>
+          <ulink url="http://java.sun.com/javase/technologies/hotspot/largememory.jsp">Java Support for Large Memory Pages</ulink> and <ulink url="http://andrigoss.blogspot.com/2008/02/jvm-performance-tuning.html">Andrig&apos;s Miller blog post</ulink>.</para>
         </listitem>
         <listitem>
           <para><emphasis>Network buffers</emphasis> </para>
@@ -152,7 +152,7 @@
           </itemizedlist>
         </listitem>
         <listitem>
-	  <para>Execute the following command to set the network interface address:</para>
+          <para>Execute the following command to set the network interface address:</para>
           <para><command>sudo ifconfig [eth0] txqueuelen 1000 # </command></para>
           <para>Replace [eth0] with the correct name of the
           actual network interface you are setting up.</para>

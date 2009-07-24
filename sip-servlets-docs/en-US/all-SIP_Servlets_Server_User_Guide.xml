@@ -2404,10 +2404,10 @@ ipAddress="127.0.0.1"
 			An Application Router is required for a container to function, but it is a separate logical entity from the container. The Application Router is solely responsible for application selection and does not implement application logic. For example, the Application Router cannot modify a request or send a response.
 		</para>
 		<para>
-			There is no direct interaction between the Application Router and applications, only between the Sip Servlets Container and the Application Router.
+			There is no direct interaction between the Application Router and applications, only between the SIP Servlets Container and the Application Router.
 		</para>
 		<para>
-			The Sip Servlets container is responsible for passing the required information to the Application Router within the initial request so the Application Router can make informed routing decisions. Except for the information passed by the container, the Application Router is free to make use of any other information or data stores. It is up to the individual implementation how the Application Router makes use of the information or data stores.
+			The SIP Servlets container is responsible for passing the required information to the Application Router within the initial request so the Application Router can make informed routing decisions. Except for the information passed by the container, the Application Router is free to make use of any other information or data stores. It is up to the individual implementation how the Application Router makes use of the information or data stores.
 		</para>
 		<para>
 			The deployer in a SIP Servlet environment controls application composition by defining and deploying the Application Router implementation. Giving the deployer control over application composition is desirable because the deployer is solely responsible for the services available to subscribers.
@@ -2420,80 +2420,86 @@ ipAddress="127.0.0.1"
 	<section id="tsdar-Mobicents-Default-Application-Router">
 		<title>Mobicents Default Application Router</title>
 		<para>
-			Mobicents Sip Servlets provides an implementation of the Default Application Router (DAR) as defined per Sip Servlets 1.1 specification, Appendix C.
+			Mobicents SIP Servlets provides an implementation of the Default Application Router (DAR) as defined in the SIP Servlets 1.1 specification, Appendix C.
 		</para>
 		<section id="tsdar-DAR-Configuration-File">
-			<title>the DAR Configuration File</title>
+			<title>The DAR Configuration File</title>
 			<para>
-				The Default Application Router (DAR) works off a simple configuration text file which is modeled as a Java properties file. It contains the information needed by the Application Router to select which SIP Servlet application will handle an incoming initial request. The properties file has the following requirements:
+				The Default Application Router (DAR) obtains its operational parameters from a configuration text file that is modeled as a Java properties file. <!-- Issue #814 Editor Comment - So what is the name of the properties file, and what path location does it reside in? -->The configuration file contains the information needed by the Application Router to select which SIP Servlet application will handle an incoming initial request.
+			</para>
+			<para>
+				In the case of Mobicents SIP Servlets, it is also possible to configure the DAR through the <filename>server.xml</filename> configuration file (see <xref linkend="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml"/> and <xref linkend="wwtssmc-Working_with_the_SIP_Servlets_Management_Console"/>).
+			</para>
+			<para>
+				The properties file has the following characteristics and requirements:
 			</para>
 			<itemizedlist>
 				<listitem>
 					<para>
-						It MUST be made available to the DAR and the location/content of this file MUST be accessible from a hierarchical URI which itself is to be supplied as a system property "javax.servlet.sip.ar.dar.configuration". In the case of Mobicents Sip Servlets, it is also possible to configure it through the server.xml configuration file (See the <xref linkend="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml"/> for more details) or the (See the <xref linkend="wwtssmc-Working_with_the_SIP_Servlets_Management_Console"/>)
+						It must be made available to the DAR.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						The properties file is first read by the container when it loads up.
+						It must allow the contents and file structure to be accessible from a hierarchical URI supplied as a system property <filename>javax.servlet.sip.ar.dar.configuration</filename>.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						The properties file is refreshed each time an application is deployed/undeployed.
+						It is first read by the container when it loads up and is refreshed each time an application is deployed and undeployed.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						The properties file has a simple format in which the name of the property is the SIP method and the value is a simple comma separated string value for the SipApplicationRouterInfo object.
+						It has a simple format in which the name of the property is the SIP method and the value is a comma-separated string value for the <literal>SipApplicationRouterInfo</literal> object.
 					</para>
 					
 <screen>INVITE: (sip-router-info-1), (sip-router-info-2)..
 SUBSCRIBE: (sip-router-info-3), (sip-router-info-4)..
 ALL: (sip-router-info-5), (sip-router-info-6)..
 </screen>
+					<para>
+						Mobicents SIP Servlets defines a new keyword called <literal>ALL</literal>. The keyword allows mapping between the sip-router-info data, and all methods supported by the container (for example, INVITE, REGISTER, SUBSCRIBE). This maping can save time when configuring an application that listens to all incoming methods.
+					</para>
 				</listitem>
 			</itemizedlist>
 			<note>
 				<para>
-					In addition to what is defined in the Sip Servlet 1.1 Specification, Mobicents Sip Servlets defines a new keyword called ALL. This keyword allows mapping between a sip-router-info data and all methods supported by the container (INVITE, REGISTER, SUBSCRIBE, etc...) to save time for the configuration of an application that listen to all incoming methods.
-				</para>
-				<para>
-					If both the ALL and a specific method are defined in the DAR file, the specific method takes precedence over the ALL, and ALL is called when there is no applications to serve for the specific method anymore.
+					If <literal>ALL</literal>, and a specific method are defined in the DAR file, the specific method takes precedence over <literal>ALL</literal>. When the specific method no longer has applications to serve, <literal>ALL</literal> is enabled again.
 				</para>
 			</note>
 			<para>
-				The sip-router-info data that goes in the properties file is a string value version of the SipApplicationRouterInfo object. It consists of the following information :
+				The sip-router-info data specified in the properties file is a string value version of the <literal>SipApplicationRouterInfo</literal> object. It consists of the following information:
 			</para>
 			<itemizedlist>
 				<listitem>
 					<para>
-						The name of the application as known to the container. (read as is present in the app-name tag of the sip.xml deployment descriptor of the application or the @SipApplication annotation)
+						The name of the application as known to the container. The application name can be obtained from the <markup>&lt;app-name&gt;</markup> element of the <filename>sip.xml</filename> deployment descriptor of the application, or the <literal>@SipApplication</literal> annotation.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						The identity of the subscriber that the DAR returns. It can return any header in the SIP request using the DAR directive DAR:SIP_HEADER e.g "DAR:From" would return the SIP URI in From header. Or alternatively it can return any string.
+						The identity of the subscriber that the DAR returns. The DAR can return any header in the SIP request using the DAR directive <literal>DAR:SIP_HEADER</literal>. For example, <literal>DAR:From</literal> would return the SIP URI in the <literal>From</literal> header. The DAR can alternatively return any string from the SIP request.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						The routing region, one of the strings "ORIGINATING", "TERMINATING" or "NEUTRAL" (Currently this information is not used by the DAR to make routing decisions)
+						The routing region, which consists of one of the following strings: <literal>ORIGINATING</literal>, <literal>TERMINATING</literal> or <literal>NEUTRAL</literal>. This information is not currently used by the DAR to make routing decisions.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						A SIP URI indicating the route as returned by the Application Router, it can be an empty string. (this can be used to route the request externally)
+						A SIP URI indicating the route as returned by the Application Router, which can be used to route the request externally. The value may be an empty string.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						A route modifier which can be any one of the strings "ROUTE", "ROUTE_BACK" or "NO_ROUTE" (to be used in conjunction with the above route to route a request externally)
+						A route modifier, which consists of one of the following strings: <literal>ROUTE</literal>, <literal>ROUTE_BACK</literal> or <literal>NO_ROUTE</literal>. The route modifier is used in conjunction with the route information to route a request externally.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						A string representing in which orders the applications must be invoked (starts at 0). This will be removed later on and the position of sip-router-info data will be the order
+						A string representing the order in which applications must be invoked (starts at 0). The string is removed later on in the routing process, and substituted with the order positions of sip-router-info data.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -2506,52 +2512,122 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 </screen>
 			</para>
 			<para>
-				In this example, the DAR is setup to invoke two applications on INVITE request, one each in the originating and the terminating half. The applications are identified by their names as defined in the application deployment descriptors and used here.
+				In this example, the DAR is configured to invoke two applications on INVITE request, one each in the originating and the terminating half. The applications are identified by their names as defined in the application deployment descriptors.
 			</para>
 			<para>
-				The subscriber identity returned in this case is the URI from the From and To header respectively for the two applications. The DAR does not return any route to the container and maintains the invocation state in the stateInfo as the index of the last application in the list.
+				The subscriber identity returned in this case is the URI from the <literal>From</literal> and <literal>To</literal> header respectively from each application respectively. The DAR does not return any route to the container, and maintains the invocation state in the <literal>stateInfo</literal> as the index of the last application in the list.
 			</para>
 		</section>
 		
 		<section>
 			<title>Routing of SIP Messages to Applications</title>
 			<section>
-				<title>Initial Requests and Application Selection Process</title>
+				<!-- Issue #814 Editor Comment - The info in these sections are nested too deeply.  
+
+To get around this issue, you can create <examples> for each stage of the routing, and include these in the "Routing of SIP Messages to Applications" section.  
+
+Take a look at Example 3.1.2.2.1.1 INVITE Routing to get an idea of how you would structure this.
+
+In "Section 3.1.2.2. Routing of SIP Messages to Applications", put an introductory paragraph about the basic flow (from Invite to Response Routing to Subsequent Requests), then insert each <example> that describes the process in more detail.  
+
+Break each paragraph up into individual steps using <orderedlist> steps, which will increase readability.
+
+Any questions regarding this, give me a yell and we can work through it. --> <title>Initial Requests and Application Selection Process</title>
 				<para>
-					Initial Requests are those that can essentially be dialog creating (<emphasis role="bold">"INVITE", "SUBSCRIBE", "NOTIFY", ... </emphasis>) and not part of an already existing dialog. (There is some other corner cases that you can check in the Sip Servlets 1.1 specification, Appendix B Definition of an Initial Request )
+					Initial Requests are those that can essentially be dialog creating (such as, <literal>INVITE</literal>, <literal>SUBSCRIBE</literal> and <literal>NOTIFY</literal>), and not part of an already existing dialog.
 				</para>
 				<para>
-					Those Initial requests are routed to applications deployed in the container according to the Sip Servlets 1.1 specification, Section 15.4.1 Procedure for Routing an Initial Request.
+					Initial requests are routed to applications deployed in the container according to the SIP Servlets 1.1 specification, Section 15.4.1 Procedure for Routing an Initial Request.
 				</para>
-				<para>
-					Here is a quick summary that takes the example of the routing (through the Default Application Router) of an INVITE to two applications deployed in the container. Those two applications are a Location Service and a Call Blocking application :
-				</para>
-				<para>
-					The DAR file will contain the following information for those two applications to be invoked in the correct order
-				</para>
-				<para>
-					
+				<note>
+					<para>
+						There are some other corner cases that apply to initial requests. Refer to Appendix B Definition of an Initial Request in the SIP Servlets 1.1 specification.
+					</para>
+				</note>
+				<!-- Issue #814 Editor Comment - to show you how to structure an example in a different way, I have taken the time to restructure the original section.  You can put quite a bit of formatting into an Example, not just a code snippet for example.  Check it out. --> <example>
+					<title>INVITE Routing</title>
+					<para>
+						The following example describes how the DAR routes an INVITE to two applications deployed in a container. The applications in this example are a Location Service and a Call Blocking application.
+					</para>
+					<para>
+						The DAR file contains the required information for the two applications to be invoked in the correct order.
+					</para>
+					<para>
+						
 <screen>INVITE: ("LocationService", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), ("CallBlocking", "DAR:To", "TERMINATING", "","NO_ROUTE", "1")
 </screen>
-				</para>
-				<para>
-					A new INVITE (not a re-INVITE) arrives at the container. Since it is a dialog creating request and the INVITE is not part of any dialog, the Application Router is called. It will see that the first application to invoke is the LocationService so it will return that information to the container (along with the rest of the sip-router-info data) so that the container knows which application to invoke.
-				</para>
-				<para>
-					The container then invokes the LocationService that proxies the INVITE (considered essentially as a new INVITE (see Sip Servlets 1.1 Specification, Section 15.2.2 Sending an Initial Request)) to the known IP Address of the registered user for the Request URI.
-				</para>
-				<para>
-					Since the INVITE has been proxied, the container will invoke the Application Router for the proxied INVITE to see if any more applications are interested into it. The Application Router will see that the second application to invoke is the CallBlocking application so it will return that information to the container (along with the rest of the sip-router-info data) so that the container knows which application to invoke.
-				</para>
-				<para>
-					The container will route the INVITE within the container to the next application in the chain.
-				</para>
-				<para>
-					The Call Blocking application will decide that the user calling is black listed so it will reject the call with a Forbidden response. Since the Call Blocking acted as a UAS, the Application Selection Process is stopped (the container will not invoke the application router anymore for this INVITE).
-				</para>
-				<para>
-					The path that the INVITE has taken (that is, LocationService, CallBlocking) is called the application path. The Routing of the responses will now occur as explained in the next section.
-				</para>
+					</para>
+					<para>
+						Processing occurs in the following order:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								A new <literal>INVITE</literal> (not a re-INVITE) arrives at the container.
+							</para>
+							<para>
+								The <literal>INVITE</literal> is a dialog creating request, and is not part of any dialog.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Application Router is called.
+							</para>
+							<para>
+								From the <literal>INVITE</literal> information, the first application to invoke is the LocationService.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Application Router returns the application invocation order information to the container (along with the rest of the sip-router-info data) so the container knows which application to invoke.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The container invokes the LocationService that proxies the INVITE.
+							</para>
+							<para>
+								The proxied INVITE is considered as a new INVITE to the known IP Address of the registered user for the Request URI
+							</para>
+							<para>
+								For further detail regarding INVITE handling, refer to Section 15.2.2 Sending an Initial Request in the SIP Servlets 1.1 Specification.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Because the INVITE has been proxied, the container invokes the Application Router for the proxied INVITE to see if any more applications are interested in the event.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								From the proxied invite, the Application Router determines that the second application to invoke is the CallBlocking application.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Application Router returns information regarding the Call Blocking application to the container (along with the rest of the sip-router-info data) so the container knows which application to invoke.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The container routes the INVITE for the Call Blocking application to the next application in the chain.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Call Blocking application determines that the user that initiated the call is black listed. The application rejects the call with a Forbidden response.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Because the Call Blocking application acts as a UAS, the Application Selection Process is stopped for the original INVITE.
+							</para>
+						</listitem>
+					</orderedlist>
+					<para>
+						The path the INVITE has taken (that is, LocationService to CallBlocking) is called the application path. The Routing of the responses will now occur as explained in the next section.
+					</para>
+				</example>
 				<note>
 					<para>
 						The assumption of a request coming to the server was taken, but applications can act as UAC and also generate initial requests on their own. In such cases, no entry in the dar file is needed for the given application initiating the request to be able to route it to other applications in the container or outside.
@@ -2569,7 +2645,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 				</para>
 				<note>
 					<para>
-						An important note here with regard to that second scenario that according to the Sip Servlets 1.1 specification, Sections 15.1.2 The Role of Applications and 15.1.4 Application Independence, the Call Blocking application cannot just do nothing with the request and expect the container to route the request in its place (either to a next application in chain if another one is present or to the outside world if none is present). The Application has to do something with request (either proxy it or act as a UAS).
+						An important note here with regard to that second scenario that according to the SIP Servlets 1.1 specification, Sections 15.1.2 The Role of Applications and 15.1.4 Application Independence, the Call Blocking application cannot just do nothing with the request and expect the container to route the request in its place (either to a next application in chain if another one is present or to the outside world if none is present). The Application has to do something with request (either proxy it or act as a UAS).
 					</para>
 				</note>
 			</section>
@@ -2591,13 +2667,13 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 	<section id="tsdar-Limitations">
 		<title>Limitations of the Default Application Router</title>
 		<para>
-			It is not possible to filter out the requests based on the incoming request headers to target specific applications. By example, to select an application based on the From Header domain part of the URI is not possible at the moment
+			The DAR is a minimalist Application Router implementation that is part of the reference implementation. While it could be used instead of a production Application Router, it offers no processing logic except for the declaration of the application order.
 		</para>
 		<para>
-			As you would notice, this is a minimalist Application Router with no processing logic besides the declaration of the application order. It is expected that in real world deployments, the Application Router would play an extremely important role in application orchestration and composition. It is likely that the Application Router would make use of complex rules and diverse data repositories.
+			It is not currently possible to target specific application and filter out requests based on the incoming request headers.
 		</para>
 		<para>
-			The DAR is intended to be a very simple implementation that is available as part of the reference implementation, and could be used instead of a real world Application Router.
+			In real world deployments, the Application Router plays an extremely important role in application orchestration and composition. It is likely that the Application Router would make use of complex rules and diverse data repositories in future implementations.
 		</para>
 	</section>
 
@@ -2607,32 +2683,67 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 	<section>
 		<title>Description of DFC Application Router</title>
 		<para>
-			Instead of using the Mobicents Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used, such as the ECharts <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC Application Router</ulink>
+			Instead of using the Mobicents Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used, such as the eCharts <ulink type="" url="http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1">DFC Application Router</ulink>
 		</para>
 	</section>
 	
 	<section>
-		<title>Installation of DFC Application Router</title>
-		<section>
-			<title>Installing DFC Application Router in Mobicents Sip Servlets on Tomcat</title>
-			<para>
-				Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>TOMCAT_HOME/lib</literal> directory and remove the Mobicents Default Application Router located in <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal>
-			</para>
-		</section>
+		<title>Installing the DFC Application Router</title>
+		<!-- Issue #814 Editor Comment - again, these sections are getting a little bit heavily nested.  
+
+Because there is only really procedural information in the sub-sections, these <sections> are probably better converted to <procedures>, and included in Section 3.2.2 Installing the DFC Application Router.  
+
+I've changed them for you so you can see how the nesting is better.
+ --> <para>
+			The following procedures describe how to install the eCharts DFC Application Router (DFCAR) on a variety of SIP Servlet Server platforms.
+		</para>
+		<procedure>
+			<title>Installing DFCAR on Tomcat</title>
+			<step>
+				<title>Deploy the DFCAR</title>
+				<para>
+					Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>TOMCAT_HOME/lib</literal> directory
+				</para>
+			</step>
+			<step>
+				<title>Remove the DAR</title>
+				<para>
+					Remove the Mobicents Default Application Router located in <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal>
+				</para>
+			</step>
+		</procedure>
 		
-		<section>
-			<title>Installing DFC Application Router in Mobicents Sip Servlets on JBoss 4.2.x</title>
-			<para>
-				Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal> directory and remove the Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal>
-			</para>
-		</section>
+		<procedure>
+			<title>Installing DFCAR on JBoss 4.2.x</title>
+			<step>
+				<title>Deploy the DFCAR</title>
+				<para>
+					Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal> directory.
+				</para>
+			</step>
+			<step>
+				<title>Remove the DAR</title>
+				<para>
+					Remove the Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal>
+				</para>
+			</step>
+		</procedure>
 		
-		<section>
-			<title>Installing DFC Application Router in Mobicents Sip Servlets on JBoss 5.1.x</title>
-			<para>
-				Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory and remove Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal>
-			</para>
-		</section>
+		<procedure>
+			<title>Installing DFCAR on JBoss 5.1.x</title>
+			<step>
+				<title>Deploy the DFCAR</title>
+				<para>
+					Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory.
+				</para>
+			</step>
+			<step>
+				<title>Remove the DAR</title>
+				<para>
+					Remove the Mobicents Default Application Router located in <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal>
+				</para>
+			</step>
+		</procedure>
 
 	</section>
 
@@ -3196,7 +3307,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 				</para>
 			</formalpara>
 			<example id="sfss-Editing_the_darConfigurationFileLocation_Attribute_of_the_Service_Tag">
-				<title>Editing the <literal>darConfigurationFileLocation</literal> Attribute of the Service Tag</title>
+				<title>Editing the darConfigurationFileLocation Attribute of the Service Tag</title>
 				
 <programlisting linenumbering="unnumbered" role="XML">...
 
@@ -4061,7 +4172,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip
 	</para>
 	<note>
 		<para>
-			Media IPBX is compatible with Mobicents Sip Servlets with JBoss AS 4.2.3; versions prior to this release do not support Media IPBX.
+			Media IPBX is compatible with Mobicents SIP Servlets with JBoss AS 4.2.3; versions prior to this release do not support Media IPBX.
 		</para>
 	</note>
 	<para>
@@ -4760,7 +4871,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 					</variablelist>
 					<note>
 						<para>
-							The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing. To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>. For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.
+							The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing. To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface SIP Stack page on nist.gov</ulink>. For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.
 						</para>
 					</note>
 				</step>
@@ -5030,12 +5141,12 @@ useStaticAddress="true"/&gt;
 		It provides support for monitoring base operating system information on six operating systems as well as management of Apache, JBoss Application Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> for more information or see the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink>
 	</para>
 	<section>
-		<title>Mobicents Sip Servlets Monitoring and Management</title>
+		<title>Mobicents SIP Servlets Monitoring and Management</title>
 		<para>
-			This chapter provides information on how to enable the management of Mobicents Sip Servlets Servers through Jopr with our custom Jopr plug in. Two versions of Jopr are available: an embedded version, which is better suited to development environments; and a full version, which is better suited to production environments.
+			This chapter provides information on how to enable the management of Mobicents SIP Servlets Servers through Jopr with our custom Jopr plug in. Two versions of Jopr are available: an embedded version, which is better suited to development environments; and a full version, which is better suited to production environments.
 		</para>
 		<para>
-			The Mobicents Sip Servlet Jopr plug in provides a facility to view metrics related to the deployed applications, metrics related to the SIP Servlets Server. Additionally, the plugin provides the option to manage the Congestion and Concurrency settings of the SIP Servlets Server.
+			The Mobicents SIP Servlet Jopr plug in provides a facility to view metrics related to the deployed applications, metrics related to the SIP Servlets Server. Additionally, the plugin provides the option to manage the Congestion and Concurrency settings of the SIP Servlets Server.
 		</para>
 		<section>
 			<title>Installation of the Enterprise Monitoring and Management Console</title>
@@ -5061,7 +5172,7 @@ useStaticAddress="true"/&gt;
 					</listitem>
 					<listitem>
 						<para>
-							Get the Mobicents Sip Servlets Jopr Plug in from here : <ulink url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar</ulink>
+							Get the Mobicents SIP Servlets Jopr Plug in from here : <ulink url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar</ulink>
 						</para>
 					</listitem>
 					<listitem>
@@ -5076,7 +5187,7 @@ useStaticAddress="true"/&gt;
 					</listitem>
 					<listitem>
 						<para>
-							Start the Mobicents Sip Servlets Server on JBoss, and ensure the binding address is specified
+							Start the Mobicents SIP Servlets Server on JBoss, and ensure the binding address is specified
 						</para>
 						<para>
 							<userinput>sh run.sh -b 192.168.0.10</userinput> (the Server will not get recognized on localhost)
@@ -5340,7 +5451,7 @@ useStaticAddress="true"/&gt;
 			This documentation provides information on how to enable the management of Mobicents SIP Load Balancer through Jopr with our custom SIP Load Balancer Jopr plug in.
 		</para>
 		<para>
-			With the Mobicents Sip Load Balancer Jopr plug in, you can currently see metrics, configure and manage the Mobicents Sip Load Balancer.
+			With the Mobicents SIP Load Balancer Jopr plug in, you can currently see metrics, configure and manage the Mobicents SIP Load Balancer.
 		</para>
 		<!-- Issue #706 Editor Comment - consider changing the sections to <procedures>. --> <section>
 			<title>Installation of the Enterprise Monitoring and Management Console</title>
@@ -5357,12 +5468,12 @@ useStaticAddress="true"/&gt;
 				</listitem>
 				<listitem>
 					<para>
-						Get the Mobicents Sip Load Balancer Jopr Plug in from JBoss maven repository at <ulink url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar</ulink>
+						Get the Mobicents SIP Load Balancer Jopr Plug in from JBoss maven repository at <ulink url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar</ulink>
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						Copy the Mobicents Sip Load Balancer Jopr Plug in jar to the following directory:
+						Copy the Mobicents SIP Load Balancer Jopr Plug in jar to the following directory:
 					</para>
 					<para>
 						<filename>jopr-server/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</filename>
@@ -5375,7 +5486,7 @@ useStaticAddress="true"/&gt;
 				</listitem>
 				<listitem>
 					<para>
-						Start your Mobicents Sip Load Balancer as explained here (and one node that connect to it to see it appear in the list of nodes).
+						Start your Mobicents SIP Load Balancer as explained here (and one node that connect to it to see it appear in the list of nodes).
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -5476,10 +5587,10 @@ useStaticAddress="true"/&gt;
 	<section id="mipbx-Media_Support" lang="en-US">
 	<title>Media Support</title>
 	<para>
-		Mobicents Sip Servlets by implementing the Sip Servlets 1.1 specification is providing natively support for applications to setup calls through SIP Support.
+		Mobicents SIP Servlets by implementing the SIP Servlets 1.1 specification is providing natively support for applications to setup calls through SIP Support.
 	</para>
 	<para>
-		But since most Telco services have the need for managing and controlling media, by example to play announcements, mixing calls, recognize DTMF, ... Mobicents Sip Servlets allows applications to control media in 2 ways.
+		But since most Telco services have the need for managing and controlling media, by example to play announcements, mixing calls, recognize DTMF, ... Mobicents SIP Servlets allows applications to control media in 2 ways.
 	</para>
 	<section>
 		<title>JSR 309 : Media Server Control API</title>
@@ -5490,14 +5601,14 @@ useStaticAddress="true"/&gt;
 			Mobicents Media Server provides an implementation of the JSR 309 specification (currently in public review) using the MGCP protocol to allow controlling any Media Server (located in the same Virtual Machine or on a remote server) supporting MGCP.
 		</para>
 		<para>
-			It is better demonstrated in the <ulink url="http://www.mobicents.org/mss-jsr309-demo.html">JSR 309 example application</ulink> provided with Mobicents Sip Servlets on JBoss 5
+			It is better demonstrated in the <ulink url="http://www.mobicents.org/mss-jsr309-demo.html">JSR 309 example application</ulink> provided with Mobicents SIP Servlets on JBoss 5
 		</para>
 	</section>
 	
 	<section>
 		<title>Mobicents Media Server Control API (MSC API)</title>
 		<para>
-			Since JSR 309 is not final yet, the Mobicents Media Server provides it's own client API so that any applications within Mobicents Sip Servlets can interact with the Mobicents Media Server. One limitation with this API is that you can only control the Media Server if it's located in the same JVM as the Mobicents Sip Servlets container.
+			Since JSR 309 is not final yet, the Mobicents Media Server provides it's own client API so that any applications within Mobicents SIP Servlets can interact with the Mobicents Media Server. One limitation with this API is that you can only control the Media Server if it's located in the same JVM as the Mobicents SIP Servlets container.
 		</para>
 		<para>
 			The documentation of the API is provided <ulink url="http://hudson.jboss.org/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/media/index.html#captms-MMS_Control_API">in the Mobicents Media Server user guide</ulink>
@@ -5508,7 +5619,7 @@ useStaticAddress="true"/&gt;
 		<itemizedlist>
 			<listitem>
 				<para>
-					<ulink url="http://www.mobicents.org/media-demo.html">Media Example</ulink> : a Sip Servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
+					<ulink url="http://www.mobicents.org/media-demo.html">Media Example</ulink> : a SIP Servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
 				</para>
 			</listitem>
 			<listitem>
@@ -5533,7 +5644,7 @@ useStaticAddress="true"/&gt;
 	<formalpara>
 		<title>Concurrency Control</title>
 		<para>
-			Although the JSR 289 expert group could not agree on a concurrency control mechanism for JSR 289, leaving the details up to individual implementors, we believe that concurrency control as implemented in the Mobicents SIP Servlets Servers provides a highly-useful feature necessary in production environments. Concurrency control is implemented in both Mobicents Sip Servlets for JBoss and Mobicents Sip Servlets for Tomcat as a configurable mode which defines the way in which the SIP Servlets Server processes messages. There are a total of three different modes to choose from, based upon the individual requirements of your setup:
+			Although the JSR 289 expert group could not agree on a concurrency control mechanism for JSR 289, leaving the details up to individual implementors, we believe that concurrency control as implemented in the Mobicents SIP Servlets Servers provides a highly-useful feature necessary in production environments. Concurrency control is implemented in both Mobicents SIP Servlets for JBoss and Mobicents SIP Servlets for Tomcat as a configurable mode which defines the way in which the SIP Servlets Server processes messages. There are a total of three different modes to choose from, based upon the individual requirements of your setup:
 		</para>
 	</formalpara>
 	<variablelist>
@@ -5584,7 +5695,7 @@ useStaticAddress="true"/&gt;
 		Note that either situation, only new SIP requests are rejected; SIP responses which arrive in the milieu of a full queue are appropriately stored and are processed eventually.
 	</para>
 	<para>
-		A background task is running at regular intervals within Mobicents Sip Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration. This background task can be stopped and congestion control deactivated by setting the interval to 0 or a negative value.
+		A background task is running at regular intervals within Mobicents SIP Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration. This background task can be stopped and congestion control deactivated by setting the interval to 0 or a negative value.
 	</para>
 	<para>
 		Also the congestion control policy, what to do with an incoming message when the server is overloaded, is configurable and the possible values are :
@@ -5633,7 +5744,7 @@ useStaticAddress="true"/&gt;
 					Alternatively, you can edit your server's <filename>server.xml</filename> configuration file, which has the benefit of making your chosen settings changes permanent. Instructions follow, grouped by the SIP Servlets Server you are running:
 				</para>
 				<procedure>
-					<title>Tuning Mobicents Sip Servlets for JBoss Server Settings for Concurrency and Congestion Control</title>
+					<title>Tuning Mobicents SIP Servlets for JBoss Server Settings for Concurrency and Congestion Control</title>
 					<step>
 						<para>
 							Open the <filename><envar>$JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename> configuration file in a text editor.
@@ -5668,7 +5779,7 @@ useStaticAddress="true"/&gt;
 				</procedure>
 				
 				<procedure>
-					<title>Tuning Mobicents Sip Servlets for Tomcat Server Settings for Concurrency and Congestion Control</title>
+					<title>Tuning Mobicents SIP Servlets for Tomcat Server Settings for Concurrency and Congestion Control</title>
 					<step>
 						<para>
 							Open the <filename><envar>$CATALINA_HOME</envar>/conf/server.xml</filename> configuration file in your text editor.
@@ -5708,10 +5819,10 @@ useStaticAddress="true"/&gt;
 			<term>Tuning Parameters from the dispatcher MBean</term>
 			<listitem>
 				<para>
-					You can navigate to the <literal>dispatcher</literal> MBean from Mobicents Sip Servlets for JBoss's JMX console. All changes performed at run time are effective immediately, but are not persisted across reboots (which, if you want to happen, would require editing your server's <filename>server.xml</filename> configuration file as well, or instead).
+					You can navigate to the <literal>dispatcher</literal> MBean from Mobicents SIP Servlets for JBoss's JMX console. All changes performed at run time are effective immediately, but are not persisted across reboots (which, if you want to happen, would require editing your server's <filename>server.xml</filename> configuration file as well, or instead).
 				</para>
 				<para>
-					When editing the <literal>dispatcher</literal> MBean from Mobicents Sip Servlets for JBoss's JMX console, values allowed for the concurrency control mode are <userinput>None</userinput>, <userinput>SipSession</userinput> or <userinput>SipApplicationSession</userinput>.
+					When editing the <literal>dispatcher</literal> MBean from Mobicents SIP Servlets for JBoss's JMX console, values allowed for the concurrency control mode are <userinput>None</userinput>, <userinput>SipSession</userinput> or <userinput>SipApplicationSession</userinput>.
 				</para>
 			</listitem>
 		</varlistentry>
@@ -6238,7 +6349,7 @@ admin=caller,role1,role2,..
 	<section id="ssds-Diameter_Support" lang="en-US">
 	<title>Diameter Support</title>
 	<para>
-		The Diameter Protocol (<ulink url="http://www.ietf.org/rfc/rfc3588.txt">RFC 3588</ulink>) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA). the Diameter version included in Mobicents Sip Servlets currently support Base, Sh, Ro and Rf.
+		The Diameter Protocol (<ulink url="http://www.ietf.org/rfc/rfc3588.txt">RFC 3588</ulink>) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA). the Diameter version included in Mobicents SIP Servlets currently support Base, Sh, Ro and Rf.
 	</para>
 	<para>
 		For more information regarding Diameter support, refer to the <ulink url="http://groups.google.com/group/mobicents-public/web/mobicents-diameter">Diameter Home Page</ulink>. For a list of Diameter examples, refer to <xref linkend="ssea-SIP_Servlet_Example_Applications"/>.
@@ -6604,10 +6715,10 @@ admin=caller,role1,role2,..
 	<section id="jruby-telco-integration" lang="en-US">
 	<title>JRuby/Rails Integration with Torquebox Telco Framework</title>
 	<para>
-		Mobicents Sip Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework. The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications using the same model as Sip Servlets and allowing for Media Control.
+		Mobicents SIP Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework. The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications using the same model as Sip Servlets and allowing for Media Control.
 	</para>
 	<para>
-		JRuby features a powerful and well deployed scripting language that allows you to modify your application at runtime (this is true even for the SIP and Media part that Mobicents Sip Servlets offer) without restarting the server. In addition, TorqueBox is a new kind of Ruby application platform that integrates popular technologies such as Ruby-on-Rails, while extending the footprint of Ruby applications to include support for Job Scheduling, Task Queues, SOAP Handling, and other capabilities.
+		JRuby features a powerful and well deployed scripting language that allows you to modify your application at runtime (this is true even for the SIP and Media part that Mobicents SIP Servlets offer) without restarting the server. In addition, TorqueBox is a new kind of Ruby application platform that integrates popular technologies such as Ruby-on-Rails, while extending the footprint of Ruby applications to include support for Job Scheduling, Task Queues, SOAP Handling, and other capabilities.
 	</para>
 	<para>
 		To obtain more information about building pure JRuby-Rails applications that leverage Mobicents SIP Servlets SIP and mediat capabilities, refer to the <ulink url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox User Documentation</ulink>.
@@ -6617,23 +6728,23 @@ admin=caller,role1,role2,..
 	</para>
 </section>
 	<section id="ss_jslee_interop" lang="en-US">
-	<title>Sip Servlets - JAIN SLEE Interoperability</title>
+	<title>SIP Servlets - JAIN SLEE Interoperability</title>
 	<para>
 		JAIN SLEE is a more complex specification than SIP Servlets, and it has been know as heavyweight and with a steep learning curve. However JAIN SLEE has standardized a high performing event driven application server, an execution environment with a good concurrency model and powerful protocol agnostic capabilities thus covering a variety of Telco protocols.
 	</para>
 	<para>
-		SIP Servlets on the other is way much simple and easier to get started with. Its focus is on extending the HTTP Servlets and Java EE hosting environments with SIP capabilities. Hence SIP Servlets is more of a SIP programming framework while JSLEE is a complete, self sufficient application environment, a platform. The fact that Sip Servlets is focused on SIP and Java EE makes it a natural fit to build JEE converged applications and way much simpler than JAIN SLEE.
+		SIP Servlets on the other hand is much simpler and easier to get started with. Its focus is on extending the HTTP Servlets and Java EE hosting environments with SIP capabilities. SIP Servlets is more of a SIP programming framework, while JSLEE is a complete, self sufficient application platform. The fact that SIP Servlets is focused on SIP and Java EE makes it a natural fit to build JEE converged applications.
 	</para>
 	<para>
 		<table frame="all" id="tab-ss_vs_jslee">
-			<title>Sip Servlets / JAIN SLEE Comparison Table</title>
+			<title>SIP Servlets / JAIN SLEE Comparison Table</title>
 			<tgroup align="left" cols="2" colsep="1" rowsep="1">
 				<colspec colname="c1"/>
 				<colspec colname="c2"/>
 				<thead>
 					<row>
 						<entry align="center">
-							Sip Servlets
+							SIP Servlets
 						</entry>
 						<entry align="center">
 							JAIN SLEE
@@ -6791,7 +6902,7 @@ admin=caller,role1,role2,..
 		SIP Servlets focuses on SIP and its integration with Java EE. It is also more of a SIP framework within Java EE while JSLEE is an event driven application server with protocol agnostic architecture, spanning any legacy or potential future protocols. SIP Servlets applications are generally simpler to implement and accelerate time to market for Web and SIP deployment scenarios. JSLEE has a steeper learning curve and covers a wider set of target deployment environments.
 	</para>
 	<para>
-		As JBoss is the only vendor to implement both specifications through Mobicents, this makes it a natural fit to build converged and interoperable JSLEE/SIP Servlets applications that are able to comply with standards in a portable manner, we built an application that could leverage standards all the way without resorting to vendor proprietary extensions by making Sip Servlets and JSLEE work together. <ulink url="http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf">Our "JSLEE and SIP-Servlets Interoperability with Mobicents Communication Platform" paper</ulink> describes our approach and the possible different approaches we have identified to achieve the goal of interoperability between Sip Servlets and JSLEE.
+		As JBoss is the only vendor to implement both specifications through Mobicents, this makes it a natural fit to build converged and interoperable JSLEE/SIP Servlets applications that are able to comply with standards in a portable manner, we built an application that could leverage standards all the way without resorting to vendor proprietary extensions by making SIP Servlets and JSLEE work together. <ulink url="http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf">Our "JSLEE and SIP-Servlets Interoperability with Mobicents Communication Platform" paper</ulink> describes our approach and the possible different approaches we have identified to achieve the goal of interoperability between SIP Servlets and JSLEE.
 	</para>
 	<para>
 		You can also use our <ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets interoperability example</ulink> showcasing our approach.
@@ -6800,7 +6911,7 @@ admin=caller,role1,role2,..
 	<section>
 		<title>Eclipse IDE Tools</title>
 		<para>
-			The Mobicents Sip Servlets Eclipse Tools assist developers in creating JSR 289 applications with Mobicents. You can use the Dynamic Web Project wizard for Converged Applications to get started with an empty project and then you can test your application with a real SIP Phone right from the IDE.
+			The Mobicents SIP Servlets Eclipse Tools assist developers in creating JSR 289 applications with Mobicents. You can use the Dynamic Web Project wizard for Converged Applications to get started with an empty project and then you can test your application with a real SIP Phone right from the IDE.
 		</para>
 		<mediaobject>
 			<imageobject>
@@ -6823,14 +6934,14 @@ admin=caller,role1,role2,..
 		</section>
 		
 		<section>
-			<title>Sip Servlets Core Plug-in</title>
+			<title>SIP Servlets Core Plug-in</title>
 			<para>
 				This Plug-in allows you to create Dynamic Web Projects with SIP Facet. There are a number of new Dynamic Web Project configurations for Converged applications. It's best to use the ones marked as "recommended". After you complete the wizards a complete converged project skeleton will be generated. Working with this type of project is similar to working with normal Web projects. You can see a demo <ulink url="http://people.redhat.com/vralev/mss-eclipse-plugin-demo/mss-eclipse.htm">here</ulink>.
 			</para>
 		</section>
 		
 		<section>
-			<title>Sip Phone Plug-in</title>
+			<title>SIP Phone Plug-in</title>
 			<para>
 				The SIP Phone plug-in integrates a SIP phone inside your Eclipse IDE. You can use the phone to test your SIP or Media applications. The Phone uses the Microphone and the Speakers on your computer and allows to simulate real-world scenarios.
 			</para>
@@ -6842,12 +6953,12 @@ admin=caller,role1,role2,..
 	<chapter id="bp-Best_Practices" lang="en-US">
 	<!--  This document was created with Syntext Serna Free.  --><title>Best Practices</title>
 	<para>
-		This chapter discusses Best Practices related to Mobicents Sip Servlets usage in real world deployments.
+		This chapter discusses Best Practices related to Mobicents SIP Servlets usage in real world deployments.
 	</para>
 	<section id="bp-Best_Practices_Perf_Tips">
-		<title>Mobicents Sip Servlets Performance Tips</title>
+		<title>Mobicents SIP Servlets Performance Tips</title>
 		<para>
-			Because the default profile of Mobicents Sip Servlets is targeted at a development environment, some tuning is required to make the server performance suitable for a production environment.
+			Because the default profile of Mobicents SIP Servlets is targeted at a development environment, some tuning is required to make the server performance suitable for a production environment.
 		</para>
 		<section>
 			<title>Tuning JBoss</title>
@@ -6866,7 +6977,7 @@ admin=caller,role1,role2,..
 		</section>
 		
 		<section>
-			<title>Tuning Mobicents Sip Servlets</title>
+			<title>Tuning Mobicents SIP Servlets</title>
 			<!-- Issue #838 Editor Comment - consider using a <variablelist> here.  You can put headings such as "Congestion Control" in the <term> element, and describe the tuning recommendations in a <listitem><para> element. --> <itemizedlist>
 				<listitem>
 					<para>
@@ -6915,7 +7026,7 @@ admin=caller,role1,role2,..
 						This flag indicates whether the SIP stack listener is executed by a single thread, or concurrently by the threads that parse the messages.
 					</para>
 					<para>
-						Mobicents Sip Servlets expects this flag to be set to <userinput>true</userinput>, therefore do not change the value.
+						Mobicents SIP Servlets expects this flag to be set to <userinput>true</userinput>, therefore do not change the value.
 					</para>
 				</listitem>
 				<listitem>

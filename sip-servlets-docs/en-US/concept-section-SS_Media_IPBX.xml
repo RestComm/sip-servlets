@@ -5,7 +5,7 @@
   <para>The Media IPBX provides an extensible and customizable SIP PBX solution, based on the Seam Telco Framework (STF).  While the PBX is currently provided as a capability demonstration, the ultimate goal is to transition Media IPBX into a fully-fledged SIP PBX solution.</para>
   <para>Media IPBX terminates all calls to Mobicents Media Server conference endpoints, which provides flexibility in manipulating established calls including server-side conferencing and ring-back tones.  The PBX can also be implemented as a Session Border Controller.</para>
   <note>
-    <para>Media IPBX is compatible with Mobicents Sip Servlets with JBoss AS 4.2.3; versions prior to this release do not support Media IPBX.</para>
+    <para>Media IPBX is compatible with Mobicents SIP Servlets with JBoss AS 4.2.3; versions prior to this release do not support Media IPBX.</para>
   </note>
   <para>Media IPBX provides the following major features:
       <itemizedlist>

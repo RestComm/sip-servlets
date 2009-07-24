@@ -158,7 +158,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
             </varlistentry>
           </variablelist>
           <note>
-            <para>The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing.  To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
+            <para>The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing.  To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface SIP Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
           </note>
         </step>
         <step>

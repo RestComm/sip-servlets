@@ -385,7 +385,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         <literal>conf/dars/mobicents-dar.properties</literal>.</para>
       </formalpara>
       <example id="sfss-Editing_the_darConfigurationFileLocation_Attribute_of_the_Service_Tag">
-        <title>Editing the <literal>darConfigurationFileLocation</literal> Attribute of the Service Tag</title>
+        <title>Editing the darConfigurationFileLocation Attribute of the Service Tag</title>
         <programlisting linenumbering="unnumbered" role="XML">...
 
 &lt;Service name=&quot;jboss.web&quot;
