@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.address;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -363,7 +364,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	}
 	
 	public static final Map<String, String> getParameters(Parameters headerParams) {
-		Map<String, String> params = new ConcurrentHashMap<String, String>();
+		Map<String, String> params = new HashMap<String, String>();
 		Iterator<String> parameterNames = headerParams.getParameterNames();			
 		while (parameterNames.hasNext()) {
 			String name = (String) parameterNames.next();

@@ -25,6 +25,7 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
@@ -43,6 +44,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
 	
 	private static String USE_HOSTNAME = "useHostName";
+	private static String CHECK_URI = "check_uri";
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
 
 	@Override
@@ -73,10 +75,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 			host = "localhost";
 			logger.info("using Host Name for proxy test");
 		}
-		
+						
 		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();		
 		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
-		
+						
 		ArrayList<URI> uris = new ArrayList<URI>();
 		uris.add(uri1);
 		if(!fromURI.getUser().equals("unique-location")) {
@@ -110,8 +112,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 		proxy.setSupervised(true);
 		if(recordRoute) {
 			proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
-		}
+		}		
 		proxy.setParallel(true);
+		if(CHECK_URI.equals(fromURI.getUser())) {
+			Address routeAddress = sipFactory.createAddress("sip:127.0.0.1:5057");
+			request.pushRoute(routeAddress);
+			Address ra = request.getAddressHeader("Route");
+			logger.info("doInvite: ra = " + ra);
+			URI uri = ra.getURI(); // this causes NPE
+			logger.info("doInvite: uri = " + uri);
+			proxy.setParallel(false);
+		}
 		proxy.setProxyTimeout(4);
 		proxy.proxyTo(uris);
 	}

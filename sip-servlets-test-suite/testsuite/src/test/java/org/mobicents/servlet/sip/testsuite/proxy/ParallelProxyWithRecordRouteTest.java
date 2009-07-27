@@ -84,6 +84,27 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
 	}
+	
+	/**
+	 * Non regression test for Issue 851 : NPE on handling URI parameters in address headers
+	 * http://code.google.com/p/mobicents/issues/detail?id=851
+	 */
+	public void testProxyURIParams() {
+		this.shootme.init("stackName");
+		this.cutme.init();
+		this.shootist.init("check_uri",false);
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");		
+	}
 
 	@Override
 	public void tearDown() throws Exception {
