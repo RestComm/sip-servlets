@@ -51,7 +51,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss-5,release-tomcat,release-jboss,make-src-zip,clean" />
+	<target name="release" depends="clean,release-jboss,release-jboss-5,release-tomcat,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	
@@ -324,6 +324,7 @@
 		<and>
 			<available file="${base.path}/target/dependencies/media/1.x/core/.svn/entries" />
 			<available file="${base.path}/target/dependencies/media/2.x/core/.svn/entries" />
+			<available file="${base.path}/target/dependencies/diameter/.svn/entries" />
 			<available file="${base.path}/target/dependencies/sip-balancer/.svn/entries" />
 		</and>
 	</condition>
@@ -359,6 +360,13 @@
 		</exec>				
 	</target>
 	
+	<target name="build-mobicents-diameter" depends="get-deps">
+		<echo>Building Mobicents Diameter</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
+		</exec>				
+	</target>
+	
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
 		<echo>Building Mobicents SIP Load Balancer</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer">
@@ -387,7 +395,7 @@
 	
 	<!-- Download dependencies from SourceForge -->
 	
-	<target name="build-mobicents-diameter" depends="get-mobicents-diameter">
+	<!--target name="build-mobicents-diameter" depends="get-mobicents-diameter">
 		<unzip overwrite="true" dest="${diameter.extracted}" src="${diameter.distro.zip.path}">
 			<patternset>
 				<include name="core/mux/mobicents-diameter-mux-${diameter.version}.sar/**/*" />
@@ -402,7 +410,7 @@
 	<target name="get-mobicents-diameter" unless="got.mobicents-diameter">
 		<echo>Downloading Mobicents Diameter</echo>
 			<get dest="${diameter.distro.zip.path}" src="${diameter.download.url}" />
-	</target>
+	</target-->
 	
 	<!-- Fetch and build documentation -->
 	

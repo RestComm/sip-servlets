@@ -13,6 +13,7 @@
         
         <media.core.1.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.3.GA</media.core.1.x.connectionURL>
         <media.core.2.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/2.x.y/core/mms-core-2.0.0.BETA1</media.core.2.x.connectionURL>
+        <diameter.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.0.1.GA/</diameter.connectionURL>
         <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.0.BETA7</sip.balancer.connectionURL>
         <!--sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL-->
     </properties>
@@ -64,6 +65,20 @@
                                     <checkoutDirectory>${checkout.basedir}/sip-balancer</checkoutDirectory>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
                                     <connectionUrl>${sip.balancer.connectionURL}</connectionUrl>
+                                    <username>${checkout.username}</username>
+                                    <password>${checkout.password}</password>
+                                </configuration>
+                            </execution>
+                             <execution>
+                                <id>diameter-checkout</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <checkoutDirectory>${checkout.basedir}/diameter</checkoutDirectory>
+                                    <skipCheckoutIfExists>true</skipCheckoutIfExists>
+                                    <connectionUrl>${diameter.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
@@ -123,6 +138,21 @@
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
                                     <connectionUrl>${sip.balancer.connectionURL}</connectionUrl>
+                                    <username>${checkout.username}</username>
+                                    <password>${checkout.password}</password>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>diameter-update</id>
+                                <goals>
+                                    <goal>update</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <basedir>${checkout.basedir}/diameter</basedir>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
+                                    <connectionUrl>${diameter.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
