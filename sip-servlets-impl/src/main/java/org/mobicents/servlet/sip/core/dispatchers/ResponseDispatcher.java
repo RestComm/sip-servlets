@@ -348,8 +348,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 */
 	public void checkInitialRemoteInformation(SipServletMessageImpl sipServletMessage, ViaHeader nextViaHeader) {		
 		final SIPTransaction transaction = (SIPTransaction)sipServletMessage.getTransaction();
-		final String initialRemoteAddr = transaction.getPeerAddress();
-		final int initialRemotePort = transaction.getPeerPort();
+		String remoteAddr = transaction.getPeerAddress();
+		int remotePort = transaction.getPeerPort();
+		if(transaction.getPeerPacketSourceAddress() != null) {
+			remoteAddr = transaction.getPeerPacketSourceAddress().getHostAddress();
+			remotePort = transaction.getPeerPacketSourcePort();
+		}		
+		final String initialRemoteAddr = remoteAddr;
+		final int initialRemotePort = remotePort;
 		final String initialRemoteTransport = transaction.getTransport();
 		final TransactionApplicationData transactionApplicationData = sipServletMessage.getTransactionApplicationData();
 		// if the message comes from an external source we add the initial remote info from the transaction
@@ -369,10 +375,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 		} else {
 			// if the message comes from an internal source we add the initial remote info from the previously added headers
 			transactionApplicationData.setInitialRemoteHostAddress(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME));
-			String remotePort = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME);
+			String remotePortHeader = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME);
 			int intRemotePort = -1;
-			if(remotePort != null) {
-				intRemotePort = Integer.parseInt(remotePort);
+			if(remotePortHeader != null) {
+				intRemotePort = Integer.parseInt(remotePortHeader);
 			}
 			transactionApplicationData.setInitialRemotePort(intRemotePort);
 			transactionApplicationData.setInitialRemoteTransport(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));

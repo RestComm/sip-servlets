@@ -794,7 +794,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public String getRemoteAddr() {
 		if(getTransaction() != null) {
-			return ((SIPTransaction)getTransaction()).getPeerAddress();
+			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+				return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
+			} else {
+				return ((SIPTransaction)getTransaction()).getPeerAddress();
+			}
 		} else {
 			return null;
 		}
@@ -806,7 +810,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public int getRemotePort() {
 		if(getTransaction() != null) {
-			return ((SIPTransaction)getTransaction()).getPeerPort();
+			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+				return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
+			} else {
+				return ((SIPTransaction)getTransaction()).getPeerPort();
+			}
 		} else {
 			return -1;
 		}

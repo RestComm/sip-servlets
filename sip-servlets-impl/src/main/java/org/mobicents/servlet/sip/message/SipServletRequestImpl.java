@@ -1504,15 +1504,23 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getInitialRemoteAddr() {
-		return ((SIPTransaction)getTransaction()).getPeerAddress();
+	public String getInitialRemoteAddr() {		
+		if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+			return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
+		} else {
+			return ((SIPTransaction)getTransaction()).getPeerAddress();
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getInitialRemotePort() {
-		return ((SIPTransaction)getTransaction()).getPeerPort();
+	public int getInitialRemotePort() {		
+		if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+			return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
+		} else {
+			return ((SIPTransaction)getTransaction()).getPeerPort();
+		}
 	}
 
 	/**
