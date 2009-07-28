@@ -27,6 +27,7 @@
 		<module>location-service</module>
 		<module>location-service-distributable</module>
 		<module>media-playback-servlet</module>
+		<module>media-jsr309-servlet</module>
 		<module>shootist-sip-servlet</module>
 		<module>shootist-sip-servlet-distributable</module>
 		<module>shopping-demo</module>
@@ -34,6 +35,7 @@
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
 		<module>uac-register</module>
+		<module>pure-jruby-telco</module>
 	</modules>
 
 	<properties>
