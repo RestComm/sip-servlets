@@ -1,9 +1,9 @@
 <document>
 	<properties>
-		<title>Roadmap</title>
+		<title>1.0 Roadmap</title>
 	</properties>
 	<body>
-		<section name="Roadmap">
+		<section name="The Road to 1.0">
 			<p>
 				If you would like to propose any kind of features that you would like to see supported,  
 				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
