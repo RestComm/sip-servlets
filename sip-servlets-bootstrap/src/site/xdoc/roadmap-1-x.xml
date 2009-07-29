@@ -1,0 +1,1185 @@
+<document>
+	<properties>
+		<title>Roadmap</title>
+	</properties>
+	<body>
+		<section name="Roadmap">
+			<p>
+				If you would like to propose any kind of features that you would like to see supported,  
+				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
+			</p>		
+			<subsection name="Released Versions">
+				<subsection name="Version 1.0 - 23th July 2009">
+					<p>													
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=109">
+						Mobicents Application Router
+						</a>
+						<br />																		
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=520">
+						Jopr plugin for MSS on JBoss 5
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=521">
+						Clustering for MSS on JBoss AS 5
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=731">
+						 Investigate IP Load Balancer setup for MSS HA
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=663">
+						JSR 309 Sip Servlets Example
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=687">
+						Move to JBoss AS 5.1.0.GA
+						</a>
+						<br />	
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=703">
+						Move from JBoss Rails to the new TorqueBox
+						</a>
+						<br />										
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=670">
+									loop for invite request on the default port when no application is configured in the AR
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=671">
+									Cannot load dar file located in a path with a blank space
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=675">
+									MSS on JBoss 5 is missing support for servlet-selection in sip.xml  
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=676">
+									Tags not removed when using SipFactory.createRequest()
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=678">
+									Add config option for splitting headers on multiple lines
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=681">
+									Cannot define more than one servlet mapping for SIP application
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=682">
+									doRequest not called for CANCEL when received INVITE has been CONTINUEd
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=683">
+									Missing appname param in Via header causes NullPointerException while it should be DispatcherException
+								</a>								
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=689">
+									Incorrect Session Invalidation on setInvalidateWhenReady(false)
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=695">
+									DAR getSubscriberURI() returns an Address not a URI
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=700">
+									@SipApplicationKey method Class Loader issue
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=712">
+									Classes located in jar within WEB-INF/lib are not scanned for annotations
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=720">
+									Allow configurable address for headers instered by Sip Servlets
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=732">
+									duplicate parameters when using sipFactory.createAddress(uri) with a uri having parameters
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=733">
+									JSR 289 Section 5.6.1 Parameters incorrectly implemented
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=747">
+									Non Record Routing Proxy is adding Record Route on informational response
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=748">
+									B2BUA/UAS apps should not have Record Route in their responses
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=750">
+									SipServletRequest.getSubscriberURI returns null in @SipApplicationKey method
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=755">
+									SipURI parameters not escaped
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=766">
+									Loosen JSIP dialog usage in Proxy-B2BUA application routing case
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=787">
+									Allow configurable Parameterable headers
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=790">
+									1 SipSession should not be used in 2 different app session
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=791">
+									MSS is calling the AR 2 times when routing an INVITE back to the container
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=796">
+									SIP servlet (simple proxy) does not receive "Cancel" requests.
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=797">
+									Race Condition on 180/200 in MSS	
+								</a>								
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=805">
+									Proxy not seeing retransmissions	
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=813">
+									SipApplicationSession invalidates too soon when HttpSession are present
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=823">
+									Container not proxying statelessly subsequent requests not targeted at itself
+								</a>								
+							</li>
+						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.9 - 21th April 2009">
+					<p>										
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=322">
+						Mid Call Failover Support for Converged Applications
+						</a>
+						<br />	
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=129">
+						Eclipse plugin
+						</a>
+						<br />	
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=484">
+						JRuby integration
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=522">
+						EAR Deployer integration for MSS on JBoss 5
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=480">
+								 	SipSession and SipApplicationSession Concurrency control modes cannot sustain load test
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=563">
+									Don't use STUN for local network addresses		
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=584">
+									"Contact" header not added to request by container for challenge requests created by B2buaHelper.createRequest(session, request,...)
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=585">
+									Request's content not copied with B2buaHelper.createRequest(session, origRequest, ...)		
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=596">
+								 	External Application Routing Problem		
+								</a>								
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=611">
+								 	SipApplicationSession is invlidated when HttpSessions are still alive
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=612">
+								 	SipApplicationSession Expiry Timer never started anew when the session or underlying sessions are accessed
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=613">
+								 	SipFactory.createSipApplicationSession from a http session creates a new SipAppSession
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=614">
+								 	Allow different call ids within a Sip Application Session
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=643">
+								 	Replication doesnt work for sessions stored in sessions
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=648">
+								 	SipServletMessage not serialized correctly 
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=649">
+								 	B2BUA removes the Route Header
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=650">
+								 	Load Balancer stickiness not working for subsequent requests
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=651">
+								 	NullPointerException occurred, if no app-name tag in sip.xml
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=652">
+								 	The behavior of SipServletListener is not based upon Servlet 2.4 Specification.
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=654">
+								 	Implement hash,equals methods on SipSession and SipApplicationSession.
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=657">
+								 	B2buaHelper new request has the same call-ID
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=658">
+								 	Allow sip servlets applications to work in non distributable environment even if marked as distributable
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=659">
+								 	SIP Servlets 1.1 Section 15.7 not implemented for responses
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=662">
+								 	Exception on multi value headers
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=622">
+								 	Move to JBoss AS 5.0.1.GA
+								</a>								
+							</li>
+						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.8 - 7th February 2009">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=347">
+						Port to JBoss AS 5 - Loading pure sip servlet applications and converged SIP/HTTP applications
+						</a>
+						<br />													
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=122">
+						Basic IPBX
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=491">
+						Jopr Integration for Mobicents SIP Load Balancer
+						</a>	
+						<br />	
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=492">
+						Diameter Sh Example
+						</a>								
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=323">
+						Mobicents Sip Servlets working as IMS SIP Application Server
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=483">
+						Concurrency control at application level
+						</a>								
+						<br/>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=395">
+						More Congestion Control mechanisms
+						</a>
+						<br/>								
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=229">
+						More Extensions : JOIN/Replaces
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=470">
+						More Extensions : PATH
+						</a>
+						<br />							
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=481">
+									SipServletMessageImpl.getAddressHeader(..) throws exception instead of returning null
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=482">
+									Sip Servlet Listeners can not load classes from WEB-INF/lib
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=482">
+									Clustering perf improvements
+								</a>								
+							</li>																				
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=489">
+									Proxy bug for subsequent requests
+								</a>								
+							</li>	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=494">
+									Duplication of URI parameters in SipURIImpl
+								</a>								
+							</li>															
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=497">
+									address.toString() doesn't contain any Address parameters									  	 
+								</a>								
+							</li>																	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=504">
+									Route to Load Balancer not added in HA proxy case									  	 
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=505">
+									PRACK can not be proxied properly
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=507">
+									URI encoded by SipApplicationSession is not UTF8 encoded
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=514">
+									Proxying subsequest INVITE overrides CSeq
+								</a>								
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=519">
+									Tomcat/JBoss 4 sip.xml parsing not compliant with the xsd
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=523">
+									HTTP session already invalidated on SipApplicationSessionImpl.invalidate()
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=555">
+									Subsequent request routing wrong when app don't send final response		
+								</a>								
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=568">
+									second SIP request in SIP session cannot be "proxied"		
+								</a>								
+							</li>
+						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.7 - 20th November 2008">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=133">
+						Concurrency Control
+						</a>						
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=395">
+						Congestion Control
+						</a>						
+						<br />													
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=119">
+						Diameter support
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=130">						
+						User Guide with DocBook Documentation
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=320">
+						Mid Call Failover Support for Proxy Applications
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=321">
+						Mid Call Failover Support for B2BUA Applications
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=454">
+						Mid Call Failover Support for UAC Applications
+						</a>
+						<br />		
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=125">
+						JOPR Integration
+						</a>
+						<br />																		
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=127">
+						More Extensions : PRACK, OPTIONS, INFO
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=308">
+									MSS CLustering improvements
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=362">
+									Incorrect Session Invalidation for SUBSCRIBE/NOTIFY
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=245">
+									Implementation of 17.8 P-Asserted Identity Security 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=410">
+									SipURIImpl.getUser() throws NullPointerException instead of returning null 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=411">
+									SipFactoryImpl.createSipServletRequest(...) uses App. Session key as Call-ID instead of random, unique ID
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=413">
+									One SipServlet and no main-handler tag in sip.xml doesn't work
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=416">
+									Long From tags cause some phones to fail
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=456">
+									Externalize jain sip stack configuration in a separate properties file
+								</a>
+							</li>
+						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.6 - 30th September 2008">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=120">
+						TCK compliance : (Address, AuthInfo, B2BUAHelper, ConvergedHttpSession, Parameterable, ServletTimer, JNDI fixes)
+						</a>
+						<br />	
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=227">
+									Fix location where Facilities are stored in JNDI
+								</a>
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=332">
+									Incorrect Session Invalidation on final response to INVITE 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=336">
+									Creation of request with TelURL 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=337">
+									CANCEL to INVITE not passed to the application 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=344">
+									SIP Servlets not deployed through the Tomcat manager
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=351">
+									B2buaHelper session cloning and linkage not working in some cases
+								</a>
+							</li>
+						</ul>					
+					</p>
+				</subsection>
+				<subsection name="Version 0.5 - 15th August 2008">
+					<p>																								
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=114">
+						Distributable applications
+						</a>
+						<br />						
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=124">
+						JSR 289 Proposed Final Draft-2  API Alignement
+						</a>
+						<br />						
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=121">
+						15.11 Encode URI and Session Targeting
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=134">
+						4.2.2 TelURL
+						</a>
+						<br/>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=199">
+							15.4.2 New Application Router Packaging and Deployment
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=251">
+							6.2.5 The RequestDispatcher Interface
+						</a>
+						<br/>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=126">
+						More Extensions : REFER/PUBLISH/UPDATE
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=200">
+									Implement the new Session invalidation methods from JSR 289 PFD
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=202">
+									Implement the doBranchResponse callback
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=250">
+									SipSession.setHander() does not work reliably
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=259">
+									Classing loading issues when deployed as EAR
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=280">
+									Routing to external application server incorrectly adds 'route' header
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=65">
+								Load Balancer : CANCEL support, externalize configuration, Fix memory leak, mid call failover support
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=123">
+								Open IMS integration : Record Route wrongly added in UAC mode
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=312">
+								HTTP Session timeout ignored
+								</a>
+							</li>
+						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.4 - 24th June 2008">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=111">
+							Merge SIP Session Management with HTTP Session Management
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=113">
+						Failover support
+						</a>
+						<br />															
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=110">
+							Performance improvement/Performance apps
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=115">
+						JSLEE/SIPS interop app
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=116">
+						JSR 289 Proposed Final Draft API Alignement
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=118">
+						More Extensions : SUBSCRIBE/NOTIFY
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes :
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=117">
+									Derived Sip Sessions
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=108">
+									Servlet-mapping still supported in 1.1
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=107">
+									New Cancel methods on Proxy feature
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=112">
+									Move adding of Via header to send() instead of B2buaHelper.createRequest
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=138">
+									Routing to external application server 
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=160">
+									Application Redeployment Bug
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=171">
+									Escaped characters not supported in SIP URI
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=232">
+									sipSession.createRequest() can result in a different Session object for the new request
+								</a>
+							</li>
+						</ul>
+					</p>
+				</subsection>
+				<subsection name="Version 0.3 - 14th April 2008">
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=7">
+							J2EE integration/J2EE converged applications
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=19">
+							Media Server Control Connector (JSR 309)
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=21">
+							Mobicents Sip Servlets Management Application
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=20">
+							STUN support
+						</a>
+						<br />						
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=28">
+							DNS NAPTR and SRV resolver
+						</a>
+						<br />												
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes :
+						<ul>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=17">
+									B2BUAHelper removing SDP content
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=18">
+									Content-Encoding header abusely
+									added
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=24">
+									Annotations parser Refactoring
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=26">
+									DNS resolution and 0.0.0.0 binding problems
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=27">
+									REGISTER problem
+								</a>
+							</li>							
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29">
+									Record-routes by default unless proxyTo() called
+								</a>							
+							</li>	
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=31">
+									Bug on 2xx final responses received causing NPE
+								</a>							
+							</li>												
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=32">
+									Via header missing for requests not handled by any servlets
+								</a>							
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=33">
+									SipServlet.doRequest() doesn't delegate to doRefer(), doUpdate() and doPublish()
+								</a>							
+							</li>							
+						</ul>
+						<br />
+					</p>
+				</subsection>
+				<subsection name="Version 0.2 - 9th February 2008">
+					<p>
+						<i>
+							This version has been rescheduled to a week
+							later than initially planned due to JSR 289
+							face to face meeting
+						</i>
+					</p>
+					<p>
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=12">
+							Listeners
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=2">
+							Security
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=6">
+							Servlet 2.5 Alignement and Annotations
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=4">
+							Running on top of Tomcat 6
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=5">
+							Running on top of Jboss AS
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						<a
+							href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=17">
+							support for MESSAGE sip extension
+						</a>
+						<br />
+						<img src="green.jpeg" />
+						Various Enhancements and Bug fixes :
+						<ul>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=14">
+									Application Session Expiration
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=15">
+									Sip Session State
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=3">
+									JSR 289 Public Review API Alignement
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=8">
+									More sip phones interoperability
+								</a>
+							</li>
+						</ul>
+						<br />
+					</p>
+				</subsection>
+				<subsection name="Version 0.1 - 1st January 2008">
+					<p>
+						<img src="green.jpeg" />
+						Servlet Loading
+						<br />
+						<img src="green.jpeg" />
+						Application Routing
+						<br />
+						<img src="green.jpeg" />
+						Proxying
+						<br />
+						<img src="green.jpeg" />
+						B2BUA
+						<br />
+						<img src="green.jpeg" />
+						Http Converged Applications
+						<br />
+						<img src="green.jpeg" />
+						Sessions
+						<br />
+						<img src="green.jpeg" />
+						Timers
+					</p>
+				</subsection>
+			</subsection>			
+		</section>
+	</body>
+</document>
