@@ -163,6 +163,26 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertEquals(toParamValue , RFC2396UrlDecoder.decode(toParam));
 	}
 	
+	/**
+	 * non regression test for Issue 859 http://code.google.com/p/mobicents/issues/detail?id=859
+	 * JAIN SIP ACK Creation not interoperable with Microsoft OCS 
+	 */
+	public void testJainSipAckCreationViaParams() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setTestAckViaParam(true);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();		
+		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}
+	
 	public void testShootistCallerSendsBye() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(

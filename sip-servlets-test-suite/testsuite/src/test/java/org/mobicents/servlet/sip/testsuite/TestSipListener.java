@@ -231,6 +231,8 @@ public class TestSipListener implements SipListener {
 	public boolean b2buamessagereceived;
 	
 	private boolean sendSubsequentRequestsThroughSipProvider;
+	
+	private boolean testAckViaParam;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -919,6 +921,10 @@ public class TestSipListener implements SipListener {
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 				Response finalResponse = protocolObjects.messageFactory
 						.createResponse(finalResponseToSend, request);
+				if(testAckViaParam) {
+					ViaHeader viaHeader = (ViaHeader)finalResponse.getHeader(ViaHeader.NAME);
+					viaHeader.setParameter("testAckViaParam", "true");
+				}
 				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
 				if(toHeader.getTag() == null) {
 					toHeader.setTag(TO_TAG); // Application is supposed to set.
@@ -972,6 +978,10 @@ public class TestSipListener implements SipListener {
 			ServerTransaction serverTransactionId) {
 		try {
 			logger.info("shootist:  got a bye . ServerTxId = " + serverTransactionId);
+			if(abortProcessing) {
+				logger.error("Processing Aborted!");
+				return ;
+			}
 			this.byeReceived  = true;
 			if (serverTransactionId == null) {
 				logger.info("shootist:  null TID.");
@@ -1003,6 +1013,15 @@ public class TestSipListener implements SipListener {
 			//we don't count retransmissions
 			if(serverTransactionId != null) {
 				ackCount ++;
+			}
+			if(testAckViaParam) {
+				ViaHeader viaHeader = (ViaHeader)request.getHeader(ViaHeader.NAME);
+				String param = viaHeader.getParameter("testAckViaParam");
+				if(param != null) {
+					abortProcessing = true;
+					logger.error("the Via Param set in the response shouldn't be present in the ACK");
+					return;
+				}
 			}
 			if(sendBye) {											
 				Thread.sleep(1000);
@@ -2234,6 +2253,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isSendSubsequentRequestsThroughSipProvider() {
 		return sendSubsequentRequestsThroughSipProvider;
+	}
+
+	/**
+	 * @param testAckViaParam the testAckViaParam to set
+	 */
+	public void setTestAckViaParam(boolean testAckViaParam) {
+		this.testAckViaParam = testAckViaParam;
+	}
+
+	/**
+	 * @return the testAckViaParam
+	 */
+	public boolean isTestAckViaParam() {
+		return testAckViaParam;
 	}
 
 }
