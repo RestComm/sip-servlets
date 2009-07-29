@@ -35,6 +35,11 @@
 						<br />
 						<img src="red.jpeg" />
 						
+						HA colocating LB and nodes
+						
+						<br />
+						<img src="red.jpeg" />
+						
 						Load Balancer pluggable algorithms 
 						
 						<br />
@@ -45,7 +50,7 @@
 						<br />
 						<img src="red.jpeg" />
 						
-						Load Balancer grouping strategy 
+						Load Balancer grouping strategy and notification API 
 						
 						<br />
 						<img src="red.jpeg" />
@@ -101,8 +106,8 @@
 						<br />
 						<img src="red.jpeg" />
 						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=721">
-						Plug JSLEE RAs into MSS
+							href="http://code.google.com/p/mobicents/issues/detail?id=627">
+						XCAP Support
 						</a>
 						<br />
 						<img src="red.jpeg" />
@@ -110,12 +115,6 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=702">
 						Integrate with JVoiceXML
 						</a>	
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=131">
-						XMPP support
-						</a>
 						<br />
 						<img src="red.jpeg" />
 						REST support						
@@ -136,39 +135,91 @@
 						SipX Interop/Integration Example							
 						<br />
 					</p>
-				</subsection>																						
-				<subsection name="Post 1.2 - No defined date">
-					<p>							
+				</subsection>
+				<subsection name="1.3 - 1st February 2010 ">
+					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=721">
+						Plug JSLEE RAs into MSS
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=131">
+						XMPP support
+						</a>
+						<br />	
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=132">
 						Parlay X support
 						</a>
-						<br />		
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=324">
-						Sip Servlets working as IMS node (HSS or CSCF)
-						</a>
-						<br />
+						<br />						
+					</p>
+				</subsection>		
+				<subsection name="1.4 - 15th April 2010 ">
+					<p>
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=579">
 						Support for ICE and TURN
 						</a>
 						<br />
+						<img src="red.jpeg" />
+						ENUM Support
+						<br/>
+						<img src="red.jpeg" />
+						SS7 support
+						<br />	
+						<img src="red.jpeg" />
+						<a							href="http://code.google.com/p/mobicents/issues/detail?id=324">
+						Sip Servlets working as IMS node (HSS or CSCF)
+						</a>
+						<br />
+					</p>
+				</subsection>					
+				<subsection name="1.5 - 1st June 2010 ">
+					<p>
+						<img src="red.jpeg" />
+						Mocking Framework
+						<br/>
+						<img src="red.jpeg" />
+						Torquebox Media Abstraction API
+						<br />
+						<img src="red.jpeg" />
+						Torquebox SIP Framework
+						<br />
+					</p>
+				</subsection>	
+				<subsection name="1.6 - 15th Agust 2010 ">
+					<p>
+						<img src="red.jpeg" />
+						Rolling upgrade
+						<br/>
 						<img src="orange.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=674">
 						Remove dependency on JAIN SIP internal classes	  
 						</a>	
-						<br />							
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=684">
-							Buddy replication testsuite
-						</a>								
-					</p>		
+						<br />						
+					</p>
+				</subsection>
+				<subsection name="1.7">
+					<p>
+					</p>
+				</subsection>
+				<subsection name="1.8">
+					<p>
+					</p>
+				</subsection>
+				<subsection name="1.9">
+					<p>
+					</p>
+				</subsection>
+				<subsection name="2.0">
+					<p>
+					</p>
 				</subsection>
 			</subsection>
 		</section>
