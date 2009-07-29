@@ -83,6 +83,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @see javax.servlet.sip.Parameterable#getParameter(java.lang.String)
 	 */
 	public String getParameter(String name) {
+		if(name == null) {
+			throw new NullPointerException("the parameter given in parameter is null !");
+		}
 		String value = this.parameters.get(name);
 		if(value != null) {			
 			return RFC2396UrlDecoder.decode(value);
