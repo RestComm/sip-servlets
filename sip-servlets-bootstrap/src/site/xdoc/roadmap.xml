@@ -5,12 +5,14 @@
 	<body>
 		<section name="The Road to 2.0">
 			<p>
-				This is the tentative roadmap (Still a work in progress) for the Mobicents Sip Servlets 1.x series to release our 2.0 version.<br/>
+				This is the tentative roadmap (Still a work in progress) for the Mobicents Sip Servlets 1.x series to release our 2.0 version.<br/><br/>
 				The roadmap is subject to change based on new features asked or contributed by the community.
-				<br/> 
+			</p>
+			<p>
+				<br/>
 				If you would like to propose any kind of features that you would like to see supported,  
 				Feel free to open a new thread on mobicents-public@google-groups.com to discuss it with us or open a new issue.
-				<br/>
+				<br/><br/>
 				Note : our archived 1.0 roadmap for our 0.x to 1.0 releases is available <a href="./roadmap-1-x.html">here</a>  
 			</p>		
 			<subsection name="Released Versions">
