@@ -24,29 +24,25 @@
 						JAIN SIP Blocking IO UDP Buffering 
 						<br />						
 						<img src="red.jpeg" />
-						
 						HA perf tests and improvements 
-						
 						<br />
 						<img src="red.jpeg" />
-						
 						HA colocating LB and nodes
-						
 						<br />
 						<img src="red.jpeg" />
-						
+						Distributed LB
+						<br />
+						<img src="red.jpeg" />
+						HTTP redirect-based cooperative load-balancing
+						<br />
+						<img src="red.jpeg" />
 						Load Balancer pluggable algorithms 
-						
 						<br />
 						<img src="red.jpeg" />
-						
 						Load Balancer support for SIP extensions 
-						
 						<br />
 						<img src="red.jpeg" />
-						
 						Load Balancer grouping strategy and notification API 
-						
 						<br />						
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=660">
@@ -54,9 +50,7 @@
 						</a>
 						<br />		
 						<img src="red.jpeg" />
-						
 						Geographical redundancy  
-						
 						<br />						
 						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes :
