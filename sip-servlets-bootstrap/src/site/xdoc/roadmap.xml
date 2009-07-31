@@ -15,19 +15,11 @@
 			<subsection name="Released Versions">
 			</subsection>				
 			<subsection name="Planned Versions">	
-				<subsection name="1.1 - 1st November 2009">
+				<subsection name="Version 1.1 - 1st November 2009">
 					<p>
-						<img src="red.jpeg" />
-						
+						<img src="green.jpeg" />
 						JAIN SIP Blocking IO UDP Buffering 
-						
-						<br />
-						<img src="red.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=704">
-						NIO and lazy parsing in jain sip 
-						</a>
-						<br />
+						<br />						
 						<img src="red.jpeg" />
 						
 						HA perf tests and improvements 
@@ -45,29 +37,24 @@
 						<br />
 						<img src="red.jpeg" />
 						
-						Load Balancer support for extensions 
+						Load Balancer support for SIP extensions 
 						
 						<br />
 						<img src="red.jpeg" />
 						
 						Load Balancer grouping strategy and notification API 
 						
-						<br />
-						<img src="red.jpeg" />
-						
-						Diameter Ro/Rf examples 
-						
-						<br />
+						<br />						
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=660">
 						HA persistent timers
 						</a>
-						<br />
+						<br />		
 						<img src="red.jpeg" />
-						<a href="http://code.google.com/p/mobicents/issues/detail?id=677">
-						Hot deployment of Application Router
-						</a>
-						<br />
+						
+						Geographical redundancy  
+						
+						<br />						
 						<img src="green.jpeg" />
 						Various Enhancements and Bug fixes :
 						<ul>
@@ -96,8 +83,17 @@
 						<br />						
 					</p>		
 				</subsection>									
-				<subsection name="1.2 - 15th December 2009 ">
+				<subsection name="Version 1.2 - 15th December 2009 ">
 					<p>
+						<img src="red.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=704">
+						NIO and lazy parsing in jain sip 
+						</a>
+						<br />						
+						<img src="red.jpeg" />						
+						Diameter Ro/Rf examples 						
+						<br />
 						<img src="red.jpeg" />
 						<a
 							href="http://code.google.com/p/mobicents/issues/detail?id=627">
@@ -115,9 +111,13 @@
 							href="http://code.google.com/p/mobicents/issues/detail?id=702">
 						Integrate with JVoiceXML
 						</a>	
-						<br />
+						<br />														
+					</p>
+				</subsection>
+				<subsection name="Version 1.3 - 1st February 2010 ">
+					<p>
 						<img src="red.jpeg" />
-						REST support						
+						JBoss RESTEasy integration example						
 						<br />
 						<img src="red.jpeg" />
 						JBoss Messaging integration example						
@@ -133,10 +133,10 @@
 						<br />
 						<img src="red.jpeg" />
 						SipX Interop/Integration Example							
-						<br />
-					</p>
+						<br />					
+					</p>	
 				</subsection>
-				<subsection name="1.3 - 1st February 2010 ">
+				<subsection name="Version 1.4 - 15th April 2010 ">
 					<p>
 						<img src="red.jpeg" />
 						<a
@@ -158,7 +158,7 @@
 						<br />						
 					</p>
 				</subsection>		
-				<subsection name="1.4 - 15th April 2010 ">
+				<subsection name="Version 1.5 - 1st June 2010 ">
 					<p>
 						<img src="red.jpeg" />
 						<a
@@ -174,12 +174,61 @@
 						<br />	
 						<img src="red.jpeg" />
 						<a							href="http://code.google.com/p/mobicents/issues/detail?id=324">
-						Sip Servlets working as IMS node (HSS or CSCF)
+						Sip Servlets working as IMS node (CSCF)
 						</a>
-						<br />
+						<br />						
 					</p>
 				</subsection>					
-				<subsection name="1.5 - 1st June 2010 ">
+				<subsection name="Version 1.6 - 15th August 2010 ">
+					<p>
+						<img src="red.jpeg" />
+						Server Logging Localization
+						<br />		
+						<img src="red.jpeg" />
+						SNMP Support
+						<br />
+						<img src="red.jpeg" />
+						Call tracing and Jopr Console Logging
+						<br />
+						<img src="red.jpeg" />
+						More Congestion Controls : Sip Session/ Sip App Session Creation per sec, ... and Alerts and value or percentage for back to normal
+						<br />
+						<img src="red.jpeg" />
+						More Monitoring Stats : per Status code, Request Method, per sip listener, ...
+						<br />
+						<img src="red.jpeg" />
+						More Monitoring Stats LB : per Status code, per Request Method, per sip listener, per node
+						<br />
+						<img src="red.jpeg" />
+						Server Header Support
+						<br />										
+					</p>					
+				</subsection>
+				<subsection name="Version 1.7 - 1st October 2010 ">					
+					<p>
+						<img src="red.jpeg" />
+						Rolling upgrade
+						<br/>
+						<img src="red.jpeg" />
+						SAF Integration
+						<br />
+						<img src="red.jpeg" />
+						Allow Regexp in Application Router to select based on headers.
+						<br />
+						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=677">
+						Hot deployment of Application Router
+						</a>
+						<br />
+						<img src="orange.jpeg" />
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=674">
+						Remove dependency on JAIN SIP internal classes	  
+						</a>	
+						<br />						
+					</p>
+				</subsection>				
+				<subsection name="Version 1.8 - 15th December 2010">
 					<p>
 						<img src="red.jpeg" />
 						Mocking Framework
@@ -191,33 +240,12 @@
 						Torquebox SIP Framework
 						<br />
 					</p>
-				</subsection>	
-				<subsection name="1.6 - 15th Agust 2010 ">
-					<p>
-						<img src="red.jpeg" />
-						Rolling upgrade
-						<br/>
-						<img src="orange.jpeg" />
-						<a
-							href="http://code.google.com/p/mobicents/issues/detail?id=674">
-						Remove dependency on JAIN SIP internal classes	  
-						</a>	
-						<br />						
-					</p>
 				</subsection>
-				<subsection name="1.7">
+				<subsection name="Version 1.9">
 					<p>
 					</p>
 				</subsection>
-				<subsection name="1.8">
-					<p>
-					</p>
-				</subsection>
-				<subsection name="1.9">
-					<p>
-					</p>
-				</subsection>
-				<subsection name="2.0">
+				<subsection name="Version 2.0">
 					<p>
 					</p>
 				</subsection>
