@@ -47,7 +47,7 @@ Version 1.0 is out !
 		 
 		 * {{{./user_guides/sip_servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}	
 		
-	Check the Roadmap to see {{{roadmap.html} the feature details and the usual round of bug fixes}} too.
+	Check the Roadmap to see {{{roadmap-1-x.html} the feature details and the usual round of bug fixes}} too.
 	
 	Checkout the {{{./user_guides/sip_servlets/index.html}shiny Mobicents Sip Servlets User Guide}}.  
 	 

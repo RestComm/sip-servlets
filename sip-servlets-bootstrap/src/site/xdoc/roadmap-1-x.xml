@@ -6,8 +6,11 @@
 		<section name="The Road to 1.0">
 			<p>
 				If you would like to propose any kind of features that you would like to see supported,  
-				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.
+				Feel free to open a new thread on mobicents-public@google-groups.com or on dev or users lists to discuss it with us or open a new issue categorized as feature.				
 			</p>		
+			<p>
+				Note : This is our archived 1.0 roadmap for our 0.x to 1.0 releases, the new roadmap is available <a href="./roadmap.html">here</a>  
+			</p>
 			<subsection name="Released Versions">
 				<subsection name="Version 1.0 - 23th July 2009">
 					<p>													
