@@ -232,7 +232,11 @@ public class Shootist implements SipListener {
 		// If the caller is supposed to send the bye
 		if ( !byeTaskRunning && dialog != null) {
 			byeTaskRunning = true;
-			new Timer().schedule(new ByeTask(dialog), 4000) ;
+			if(!response.getHeader("From").toString().contains("sequential")) {
+				new Timer().schedule(new ByeTask(dialog), 4000) ;
+			} else {
+				new Timer().schedule(new ByeTask(dialog), 9000) ;
+			}
 		}
 		System.out.println("transaction state is " + tid.getState());
 		//System.out.println("Dialog = " + tid.getDialog());

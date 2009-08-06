@@ -68,63 +68,78 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 				+ request.getMethod());		
 		//This is a proxying sample.
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-				
+
 		String host = "127.0.0.1";
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
 		if(USE_HOSTNAME.equals(fromURI.getUser())) {		
 			host = "localhost";
 			logger.info("using Host Name for proxy test");
 		}
-						
+
 		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();		
 		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
-						
-		ArrayList<URI> uris = new ArrayList<URI>();
-		uris.add(uri1);
-		if(!fromURI.getUser().equals("unique-location")) {
-			uris.add(uri2);
-		}
-		Proxy proxy = request.getProxy();
-		List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
-		
-		if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
-		
-		SipURI obi = null;
-		
-		for(SipURI uri:outboundInterfaces) {
-			if(uri.toString().indexOf("127.0.0.1")>0) {
-				// pick the lo interface, since its universal on all machines
-				proxy.setOutboundInterface(new InetSocketAddress(InetAddress.getByName(uri.getHost()),uri.getPort()));
-				obi = uri;
-				break;
-			}
-		}
-		
-		if(obi == null) throw new NullPointerException("No loopback interface found.");
-		
-		boolean recordRoute = true;
-		if(NON_RECORD_ROUTING.equals(fromURI.getUser())) {		
-			recordRoute = false;
-			logger.info("not record routing");
-		}
-		//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
-		proxy.setRecordRoute(recordRoute);
-		proxy.setSupervised(true);
-		if(recordRoute) {
-			proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
-		}		
-		proxy.setParallel(true);
-		if(CHECK_URI.equals(fromURI.getUser())) {
-			Address routeAddress = sipFactory.createAddress("sip:127.0.0.1:5057");
-			request.pushRoute(routeAddress);
-			Address ra = request.getAddressHeader("Route");
-			logger.info("doInvite: ra = " + ra);
-			URI uri = ra.getURI(); // this causes NPE
-			logger.info("doInvite: uri = " + uri);
+		if(request.getFrom().getURI().toString().contains("sequential")) {
+			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
+			proxy.setProxyTimeout(5);
+			proxy.setRecordRoute(true);
+			ArrayList<URI> uris = new ArrayList<URI>();
+			if(request.getFrom().getURI().toString().contains("sequential-reverse")) {
+				uris.add(uri1);
+				uris.add(uri2);
+			} else {
+				uris.add(uri2);
+				uris.add(uri1);
+			}
+			proxy.proxyTo(uris);
+		} else {
+			ArrayList<URI> uris = new ArrayList<URI>();
+			uris.add(uri1);
+			if(!fromURI.getUser().equals("unique-location")) {
+				uris.add(uri2);
+			}
+			Proxy proxy = request.getProxy();
+			List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
+
+			if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
+
+			SipURI obi = null;
+
+			for(SipURI uri:outboundInterfaces) {
+				if(uri.toString().indexOf("127.0.0.1")>0) {
+					// pick the lo interface, since its universal on all machines
+					proxy.setOutboundInterface(new InetSocketAddress(InetAddress.getByName(uri.getHost()),uri.getPort()));
+					obi = uri;
+					break;
+				}
+			}
+
+			if(obi == null) throw new NullPointerException("No loopback interface found.");
+
+			boolean recordRoute = true;
+			if(NON_RECORD_ROUTING.equals(fromURI.getUser())) {		
+				recordRoute = false;
+				logger.info("not record routing");
+			}
+			//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
+			proxy.setRecordRoute(recordRoute);
+			proxy.setSupervised(true);
+			if(recordRoute) {
+				proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
+			}		
+			proxy.setParallel(true);
+			if(CHECK_URI.equals(fromURI.getUser())) {
+				Address routeAddress = sipFactory.createAddress("sip:127.0.0.1:5057");
+				request.pushRoute(routeAddress);
+				Address ra = request.getAddressHeader("Route");
+				logger.info("doInvite: ra = " + ra);
+				URI uri = ra.getURI(); // this causes NPE
+				logger.info("doInvite: uri = " + uri);
+				proxy.setParallel(false);
+			}
+			proxy.setProxyTimeout(4);
+			proxy.proxyTo(uris);
 		}
-		proxy.setProxyTimeout(4);
-		proxy.proxyTo(uris);
 	}
 
 	/**
