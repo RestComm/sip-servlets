@@ -457,9 +457,13 @@ public class ProxyImpl implements Proxy, Serializable {
 		
 		// Cancel all others if 2xx or 6xx 10.2.4 and it's not a retransmission
 		if(!isNoCancel && response.getTransaction() != null) {
-			if( (response.getStatus() >= 200 && response.getStatus() < 300) 
+			if(this.getParallel()) {
+				if( (response.getStatus() >= 200 && response.getStatus() < 300) 
 					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
-				if(this.getParallel()) {
+					cancelAllExcept(branch, null, null, null, false);
+				}
+			} else {
+				if( (response.getStatus() >= 200 && response.getStatus() < 300) ) {
 					cancelAllExcept(branch, null, null, null, false);
 				}
 			}
@@ -529,6 +533,7 @@ public class ProxyImpl implements Proxy, Serializable {
 		{
 			if(!parallel)
 			{
+				branch.cancel();
 				startNextUntriedBranch();
 			}
 		}
