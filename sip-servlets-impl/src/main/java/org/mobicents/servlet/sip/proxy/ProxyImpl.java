@@ -462,10 +462,6 @@ public class ProxyImpl implements Proxy, Serializable {
 					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
 					cancelAllExcept(branch, null, null, null, false);
 				}
-			} else {
-				if( (response.getStatus() >= 200 && response.getStatus() < 300) ) {
-					cancelAllExcept(branch, null, null, null, false);
-				}
 			}
 		}
 		// Recurse if allowed
@@ -513,11 +509,17 @@ public class ProxyImpl implements Proxy, Serializable {
 		}
 		
 		// Check if we are waiting for more response
-		if(allResponsesHaveArrived()) {
+		if(parallel && allResponsesHaveArrived()) {
 			finalBranchForSubsequentRequests = bestBranch;
 			sendFinalResponse(bestResponse, bestBranch);
-		} else if(!parallel) {
-			startNextUntriedBranch();
+		} 
+		if(!parallel) {
+			if(bestResponse.getStatus()>=200 && bestResponse.getStatus()<300) {
+				finalBranchForSubsequentRequests = bestBranch;
+				sendFinalResponse(bestResponse, bestBranch);
+			} else {
+				startNextUntriedBranch();
+			}
 		}
 
 	}
