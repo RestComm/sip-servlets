@@ -17,9 +17,12 @@
 package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.stack.SIPClientTransaction;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.text.ParseException;
@@ -129,19 +132,37 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		try {			
 			cancelTimer();
 			if(this.isStarted() && !canceled && !timedOut &&
-				outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+					outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+				if(lastResponse != null) { /* According to SIP RFC we should send cancel only if we receive any response first*/
 					SipServletRequest cancelRequest = outgoingRequest.createCancel();
 					//Adding reason headers if needed
 					if(protocol != null && reasonCode != null && reasonText != null
-						&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
+							&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
 						for (int i = 0; i < protocol.length; i++) {
 							((SipServletRequestImpl)cancelRequest).
-								addHeaderInternal("Reason", 
-										protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"",
-										false);
+							addHeaderInternal("Reason", 
+									protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"",
+									false);
 						}
 					}
 					cancelRequest.send();
+				} else {
+					// We dont send cancel, but we must stop the invite retrans
+					SIPClientTransaction tx = (SIPClientTransaction) outgoingRequest.getTransaction();
+
+					Method disableRetransmissionTimer = SIPTransaction.class.getDeclaredMethod("disableRetransmissionTimer");
+					Method disableTimeoutTimer = SIPTransaction.class.getDeclaredMethod("disableTimeoutTimer");
+					disableRetransmissionTimer.setAccessible(true);
+					disableTimeoutTimer.setAccessible(true);
+					disableRetransmissionTimer.invoke(tx);
+					disableTimeoutTimer.invoke(tx);
+					try {
+						tx.terminate();
+					} catch(Exception e2) {
+						logger.error("Can not terminate transaction", e2);
+					}
+
+				}
 				canceled = true;
 			}
 			if(!this.isStarted() &&
