@@ -580,7 +580,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 * party is still online.
 	 *
 	 */
-	void updateTimer() {
+	synchronized void updateTimer() {
 		if(proxyTimeoutTask != null) {
 			proxyTimeoutTask.cancel();
 		}
