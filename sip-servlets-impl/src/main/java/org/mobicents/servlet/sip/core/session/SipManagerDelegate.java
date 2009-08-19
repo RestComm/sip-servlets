@@ -314,7 +314,7 @@ public abstract class SipManagerDelegate {
 			sipSessionImpl.setHandler(new String(parentSipSession.getHandler()));
 		} catch (ServletException e) {
 			//cannot happen
-			logger.error(e);
+			logger.error("Problem creating derived session", e);
 		}
 		sipSessionImpl.setRoutingRegion(parentSipSession.getRegion());
 		// dialog will be set when the response will be associated with this session
