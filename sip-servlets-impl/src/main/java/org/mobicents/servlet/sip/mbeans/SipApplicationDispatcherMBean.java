@@ -32,7 +32,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  * @author Jean Deruelle
  */
 
-public class SipApplicationDispatcherMBean extends BaseModelMBean {
+public class SipApplicationDispatcherMBean {
 
     /**
      * The <code>MBeanServer</code> for this application.

@@ -215,7 +215,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 								if(logger.isDebugEnabled()) {
 									logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
 								}
-								if(proxyBranch.getProxy().getSupervised()) {
+								if(proxyBranch.getProxy().getSupervised() && response.getStatusCode() != Response.TRYING) {
 									callServlet(sipServletResponse);
 								}
 								// Handle it at the branch
@@ -223,6 +223,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 								//we don't forward the response here since this has been done by the proxy
 							}
 							else {
+								//if this is a trying response, the response is dropped
+								if(Response.TRYING == response.getStatusCode()) {
+									if(logger.isDebugEnabled()) {
+										logger.debug("the response is dropped accordingly to JSR 289 " +
+												"since this a 100");
+									}
+									return;
+								}		
 								// in non proxy case we drop the retransmissions
 								if(sipServletResponse.getTransaction() == null && sipServletResponse.getDialog() == null) {
 									if(logger.isDebugEnabled()) {

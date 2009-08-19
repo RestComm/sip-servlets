@@ -156,11 +156,14 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 					disableTimeoutTimer.setAccessible(true);
 					disableRetransmissionTimer.invoke(tx);
 					disableTimeoutTimer.invoke(tx);
+					/*
 					try {
-						tx.terminate();
+						//tx.terminate();
+						// Do not terminate the tx here, because ProxyCancel test is failing. If the tx
+						// is terminated 100 Trying is dropped at JSIP.
 					} catch(Exception e2) {
 						logger.error("Can not terminate transaction", e2);
-					}
+					}*/
 
 				}
 				canceled = true;
@@ -354,6 +357,19 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 */
 	public void onResponse(SipServletResponseImpl response)
 	{
+		// If we are canceled but still receiving provisional responses try to cancel them
+		if(canceled && response.getStatus() < 200) {
+			try {
+				SipServletRequest cancelRequest = outgoingRequest.createCancel();
+				cancelRequest.send();
+			} catch (Exception e) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Failed to cancel again a provisional response " + response.toString()
+							, e);
+				}
+			}
+		}
+
 		// We have already sent TRYING, don't send another one
 		if(response.getStatus() == 100)
 			return;

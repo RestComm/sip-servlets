@@ -32,8 +32,6 @@ import javax.sip.header.Parameters;
 
 import org.apache.log4j.Logger;
 
-import com.sun.jndi.ldap.EntryChangeResponseControl;
-
 
 /**
  * Implementation of the parameterable interface.

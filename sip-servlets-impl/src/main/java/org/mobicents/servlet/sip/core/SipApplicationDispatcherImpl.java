@@ -614,14 +614,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			return;
 		}
-		//if this is a trying response, the response is dropped
-		if(Response.TRYING == response.getStatusCode()) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("the response is dropped accordingly to JSR 289 " +
-						"since this a 100");
-			}
-			return;
-		}		
+
 		responsesProcessed.incrementAndGet();
 		final ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
 		final Dialog dialog = responseEvent.getDialog();
