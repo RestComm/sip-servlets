@@ -604,14 +604,22 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
 		}
-		if(proxyBranchTimeout != 0)
-			timer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
+		if(proxyBranchTimeout != 0) {
+			try {
+				timer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
+			} catch (Exception e) {
+				// Failsafe for Google Issue 880
+				timer = new Timer();
+				proxyTimeoutTask = new ProxyBranchTimerTask(this);
+				timer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
+			}
+		}
 	}
 	
 	/**
 	 * Stop the C Timer.
 	 */
-	public void cancelTimer()
+	public synchronized  void cancelTimer()
 	{
 		if(proxyTimeoutTask != null)
 		{

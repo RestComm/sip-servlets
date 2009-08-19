@@ -18,7 +18,10 @@ package org.mobicents.servlet.sip.proxy;
 
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 public class ProxyBranchTimerTask extends TimerTask{
+	private static transient Logger logger = Logger.getLogger(ProxyBranchTimerTask.class);
 	private ProxyBranchImpl proxyBranch;
 	
 	public ProxyBranchTimerTask(ProxyBranchImpl proxyBranch)
@@ -28,6 +31,10 @@ public class ProxyBranchTimerTask extends TimerTask{
 	
 	public void run()
 	{
-		proxyBranch.onTimeout();
+		try {
+			proxyBranch.onTimeout();
+		} catch (Exception e) {
+			logger.error(e);
+		}
 	}
 }
