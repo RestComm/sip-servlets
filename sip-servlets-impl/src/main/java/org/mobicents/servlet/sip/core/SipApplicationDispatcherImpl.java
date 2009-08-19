@@ -563,6 +563,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(rejectSipMessages || memoryToHigh) {
 					if(!Request.ACK.equals(requestMethod) && !Request.PRACK.equals(requestMethod)) {
 						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+						return;
 					}
 				}
 				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
