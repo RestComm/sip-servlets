@@ -42,12 +42,31 @@ public class SequentialProxyTest extends SipServletTestCase {
 		this.shootme = new Shootme(5057);
 		this.cutme = new Cutme();
 	}
+	
+	public void testTreePhonesSecondAnswer() {
+		this.shootme.init("stackName");
+		this.cutme.init();
+		this.shootist.init("sequential-three", false);
+		for (int q = 0; q < 30; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+	}
 
 	public void testFirstTargetTimeout() {
 		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init("sequential", false);
-		for (int q = 0; q < 20; q++) {
+		for (int q = 0; q < 30; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
 					Thread.sleep(TIMEOUT);

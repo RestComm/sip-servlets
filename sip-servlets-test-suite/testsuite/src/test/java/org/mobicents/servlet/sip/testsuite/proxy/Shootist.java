@@ -234,8 +234,6 @@ public class Shootist implements SipListener {
 			byeTaskRunning = true;
 			if(!response.getHeader("From").toString().contains("sequential")) {
 				new Timer().schedule(new ByeTask(dialog), 4000) ;
-			} else {
-				new Timer().schedule(new ByeTask(dialog), 9000) ;
 			}
 		}
 		System.out.println("transaction state is " + tid.getState());
@@ -254,7 +252,7 @@ public class Shootist implements SipListener {
 //						if (count == 1) {
 							//assertTrue(dialog != this.dialog);
 							logger.info("Sending ACK");
-							dialog.sendAck(ackRequest);							
+							dialog.sendAck(ackRequest);	
 							
 //						} else {
 //							// Kill the first dialog by sending a bye.
@@ -272,6 +270,16 @@ public class Shootist implements SipListener {
 						System.out.println("Dialog State after 200 OK  " + dialog.getState());
 						System.out.println("Sending ACK");
 						dialog.sendAck(ackRequest);
+						
+						try {
+							 Thread.sleep(2000);
+							   Request byeRequest = dialog.createRequest(Request.BYE);
+							   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+							   dialog.sendRequest(ct);
+							} catch (Exception ex) {
+								ex.printStackTrace();
+								System.exit(0);
+							}
 					}
 					okToInviteRecevied = true;
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {

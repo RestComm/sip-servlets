@@ -78,6 +78,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 
 		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();		
 		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
+		URI uri3 = sipFactory.createAddress("sip:nonexist@" + host + ":5856").getURI();
+
 		if(request.getFrom().getURI().toString().contains("sequential")) {
 			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
@@ -87,10 +89,15 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 			if(request.getFrom().getURI().toString().contains("sequential-reverse")) {
 				uris.add(uri1);
 				uris.add(uri2);
+			} else if(request.getFrom().getURI().toString().contains("sequential-three")) {
+				uris.add(uri3);
+				uris.add(uri2);
+				uris.add(uri1);
 			} else {
 				uris.add(uri2);
 				uris.add(uri1);
 			}
+
 			proxy.proxyTo(uris);
 		} else {
 			ArrayList<URI> uris = new ArrayList<URI>();
