@@ -76,6 +76,69 @@
 									User Guide : Add section to configure a cluster on the same machine
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=867">
+									Sequential proxy misbehaviour
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=868">
+									SIP Load Balancer keep routing CANCEL requiests to dead nodes
+								</a>
+							</li>
+							<li>
+								<img src="orange.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=869">
+									MSS can't process CANCEL after original node failure
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=870">
+									SIP Load Balancer keep routing CANCEL requiests to dead nodes
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=873">
+									Replication issue with handlerServlet
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=879">
+									Proxy generates excessive retransmissions on cancelled branches
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=880">
+									MSS crashes under proxy load
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=882">
+									HTTP requests to a SIP application always create an HTTP session, even for static resources
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=885">
+									Allow killing retransmission timers in JSIP
+								</a>
+							</li>
 						</ul>
 						<br />						
 					</p>		
