@@ -41,9 +41,11 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
@@ -705,6 +707,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(tad != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
+			if(sipServletMessage instanceof SipServletRequestImpl) {
+				try {
+					SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
+					sipServletMessage.setTransaction(transaction);
+					SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
+
+					MessageDispatcher.callServlet(response);
+				} catch (Exception e) {
+					logger.error("Failed to deliver 408 respone on transaction timeout" + transaction, e);
+				}
+			}
 			if(sipSession != null) {
 				sipSession.removeOngoingTransaction(transaction);			
 				//notifying SipErrorListener that no ACK has been received for a UAS only

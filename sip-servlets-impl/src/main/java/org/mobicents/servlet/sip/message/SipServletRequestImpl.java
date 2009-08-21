@@ -233,8 +233,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public SipServletResponse createResponse(int statusCode) {
 		return createResponse(statusCode, null);
 	}
-
+	
 	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase) {
+		return createResponse(statusCode, reasonPhrase, true);
+	}
+
+	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean validate) {
 		checkReadOnly();
 		final Transaction transaction = getTransaction();
 		if(RoutingState.CANCELLED.equals(routingState)) {
@@ -242,8 +246,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 		if (transaction == null
 				|| transaction instanceof ClientTransaction) {
-			throw new IllegalStateException(
+			if(validate) {
+				throw new IllegalStateException(
 					"Cannot create a response - not a server transaction");
+			}
 		}
 		try {
 			final Request request = transaction.getRequest();
@@ -294,7 +300,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			
 			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
-					(ServerTransaction) transaction, session, getDialog());
+					validate ? (ServerTransaction) transaction : transaction, session, getDialog());
 			newSipServletResponse.setOriginalRequest(this);
 			if(!Request.PRACK.equals(method) && statusCode >= Response.OK && 
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE) {	
