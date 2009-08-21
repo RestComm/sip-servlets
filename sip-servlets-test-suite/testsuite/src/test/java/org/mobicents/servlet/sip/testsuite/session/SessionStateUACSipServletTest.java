@@ -106,7 +106,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 			logger.info(message);
 		}		
 		
-		assertEquals(send_1xx_4xx_sessionStateList.size(), receiver.getAllMessagesContent().size());		
+		assertEquals(send_1xx_4xx_sessionStateList.size() + 1, receiver.getAllMessagesContent().size()); // +1 because we check for tx termination as well		
 		for (int i = 0; i < send_1xx_4xx_sessionStateList.size(); i++) {
 			assertTrue(receiver.getAllMessagesContent().contains(send_1xx_4xx_sessionStateList.get(i)));
 		}	
