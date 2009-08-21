@@ -230,6 +230,8 @@ public class TestSipListener implements SipListener {
 	
 	public boolean b2buamessagereceived;
 	
+	public boolean txTimeoutReceived;
+	
 	private boolean sendSubsequentRequestsThroughSipProvider;
 	
 	private boolean testAckViaParam;
@@ -686,7 +688,9 @@ public class TestSipListener implements SipListener {
 	
 	private void processMessage(Request request,
 			ServerTransaction serverTransactionId) {
-		
+		if(request.toString().contains("408 received")) {
+			txTimeoutReceived = true;
+		}
 		ServerTransaction serverTransaction = null;
 
         try {

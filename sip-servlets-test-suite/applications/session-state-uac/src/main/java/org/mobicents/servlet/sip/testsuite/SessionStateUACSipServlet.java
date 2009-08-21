@@ -65,6 +65,10 @@ public class SessionStateUACSipServlet
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			sendMessage(sipFactory, sipServletResponse.getSession().getState().toString());		
 		}
+		if(sipServletResponse.getStatus() == 408) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			sendMessage(sipFactory, "408 received");
+		}
 	}	
 
 	// SipServletListener methods
@@ -89,6 +93,7 @@ public class SessionStateUACSipServlet
 			logger.error("An Io exception occured while trying to set the content or send the request", e);
 		}		
 		sendMessage(sipFactory, sipServletRequest.getSession().getState().toString());
+		sendMessage(sipFactory, "This request must timeout", "sip:timeout@127.0.0.1:4794");
 	}
 	
 	/**
@@ -104,6 +109,26 @@ public class SessionStateUACSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			SipURI sipUri = sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(messageContent.length());
+			sipServletRequest.setContent(messageContent, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
+	
+	public void sendMessage(SipFactory sipFactory, String messageContent, String addr) {
+		try {
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri = (SipURI) sipFactory.createURI(addr);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);

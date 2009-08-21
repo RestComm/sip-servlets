@@ -48,7 +48,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	private List<String> send_4xx_sessionStateList;
 	private List<String> send_2xx_sessionStateList;
 
-	private static final int TIMEOUT = 5000;
+	private static final int TIMEOUT = 35000;
 	
 	TestSipListener receiver;
 	
@@ -110,6 +110,18 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 		for (int i = 0; i < send_1xx_4xx_sessionStateList.size(); i++) {
 			assertTrue(receiver.getAllMessagesContent().contains(send_1xx_4xx_sessionStateList.get(i)));
 		}	
+	}	
+	
+	// Test for SS spec 11.1.6 transaction timeout notification
+	public void testTransactionTimeoutResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {		
+		Thread.sleep(TIMEOUT);
+		
+		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue(receiver.txTimeoutReceived);
 	}	
 
 	@Override
