@@ -518,7 +518,11 @@ public class ProxyImpl implements Proxy, Serializable {
 				finalBranchForSubsequentRequests = bestBranch;
 				sendFinalResponse(bestResponse, bestBranch);
 			} else {
-				startNextUntriedBranch();
+				if(allResponsesHaveArrived()) {
+					sendFinalResponse(bestResponse, bestBranch);
+				} else {
+					startNextUntriedBranch();
+				}
 			}
 		}
 
