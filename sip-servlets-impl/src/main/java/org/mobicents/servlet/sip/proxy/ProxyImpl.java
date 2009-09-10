@@ -353,8 +353,12 @@ public class ProxyImpl implements Proxy, Serializable {
 		if(seconds<=0) throw new IllegalArgumentException("Negative or zero timeout not allowed");
 		
 		proxyTimeout = seconds;
-		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
-			proxyBranch.setProxyBranchTimeout(seconds);
+		for(ProxyBranch proxyBranch : proxyBranches.values()) {	
+			boolean inactive = ((ProxyBranchImpl)proxyBranch).isCanceled() || ((ProxyBranchImpl)proxyBranch).isTimedOut();
+			
+			if(!inactive) {
+				proxyBranch.setProxyBranchTimeout(seconds);
+			}
 		}
 
 	}

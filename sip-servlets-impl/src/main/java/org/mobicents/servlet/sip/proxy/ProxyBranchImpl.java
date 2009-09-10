@@ -248,6 +248,11 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		if(seconds<=0) 
 			throw new IllegalArgumentException("Negative or zero timeout not allowed");
 		
+		if(isCanceled() || isTimedOut()) {
+			logger.error("Cancelled or timed out proxy branch should not be updated with new timeout values");
+			return;
+		}
+		
 		this.proxyBranchTimeout = seconds;
 		if(this.started) updateTimer();
 	}
