@@ -101,6 +101,24 @@ public class SequentialProxyTest extends SipServletTestCase {
 			fail("This party must not ever be contacted");
 	}
 	
+	public void testFirstTargetRespondsBusy() {
+		this.shootme.inviteResponseCode = 483;
+		this.shootme.init("stackName");
+		this.cutme.init();
+		this.shootist.init("sequential-reverse-one", false);
+		for (int q = 0; q <2; q++) {
+			if (shootist.ended == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.lastResponse.getStatusCode() != 483)
+			fail("We expected 483 here");
+	}
+	
 	@Override
 	public void tearDown() throws Exception {
 		shootist.destroy();

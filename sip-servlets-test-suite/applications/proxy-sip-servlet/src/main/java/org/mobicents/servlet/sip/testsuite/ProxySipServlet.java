@@ -88,7 +88,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 			ArrayList<URI> uris = new ArrayList<URI>();
 			if(request.getFrom().getURI().toString().contains("sequential-reverse")) {
 				uris.add(uri1);
-				uris.add(uri2);
+				if(!request.getFrom().getURI().toString().contains("sequential-reverse-one")) {
+					uris.add(uri2);
+				}
 			} else if(request.getFrom().getURI().toString().contains("sequential-three")) {
 				uris.add(uri3);
 				uris.add(uri2);

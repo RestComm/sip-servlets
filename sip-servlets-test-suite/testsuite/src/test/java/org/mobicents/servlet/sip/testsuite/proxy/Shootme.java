@@ -84,6 +84,8 @@ public class Shootme implements SipListener {
 	
 	public boolean usePrack = false;
 	
+	public int inviteResponseCode = 0;
+	
 	public static final boolean callerSendsBye = true;
 
 	class MyTimerTask extends TimerTask {
@@ -252,8 +254,15 @@ public class Shootme implements SipListener {
 			// Answered in 1 second ( this guy is fast at taking calls)
 			this.inviteRequest = request;
 	
-			if(!usePrack)
-				new Timer().schedule(new MyTimerTask(this), 1000);
+			if(!usePrack) {
+				if(inviteResponseCode == 0) {
+					new Timer().schedule(new MyTimerTask(this), 1000);
+				} else {
+					Response customResp = messageFactory.createResponse(inviteResponseCode,
+							request);
+					serverTransaction.sendResponse(customResp);
+				}
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
