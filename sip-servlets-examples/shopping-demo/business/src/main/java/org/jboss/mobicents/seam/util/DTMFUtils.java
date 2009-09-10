@@ -64,20 +64,7 @@ public class DTMFUtils {
 	public static void orderApproval(SipSession session, String signal, String pathToAudioDirectory) {
 		long orderId = (Long) session.getAttribute("orderId");
 		
-		if("1".equalsIgnoreCase(signal)) {
-			// Order Confirmed
-			logger.info("Order " + orderId + " confirmed !");
-			String audioFile = pathToAudioDirectory + "OrderApproved.wav";					
-			
-			playFileInResponseToDTMFInfo(session, audioFile);
-			try {
-				InitialContext ctx = new InitialContext();
-				OrderManager orderManager = (OrderManager) ctx.lookup("shopping-demo/OrderManagerBean/remote");
-				orderManager.confirmOrder(orderId);
-			} catch (NamingException e) {
-				logger.error("An exception occured while retrieving the EJB OrderManager",e);
-			}					
-		} else if("2".equalsIgnoreCase(signal)) {
+		if("2".equalsIgnoreCase(signal)) {
 			// Order cancelled
 			logger.info("Order " + orderId + " cancelled !");
 			String audioFile = pathToAudioDirectory + "OrderCancelled.wav";					
@@ -90,6 +77,19 @@ public class DTMFUtils {
 			} catch (NamingException e) {
 				logger.error("An exception occured while retrieving the EJB OrderManager",e);
 			}
+		} else {
+			// Order Confirmed
+			logger.info("Order " + orderId + " confirmed !");
+			String audioFile = pathToAudioDirectory + "OrderApproved.wav";					
+			
+			playFileInResponseToDTMFInfo(session, audioFile);
+			try {
+				InitialContext ctx = new InitialContext();
+				OrderManager orderManager = (OrderManager) ctx.lookup("shopping-demo/OrderManagerBean/remote");
+				orderManager.confirmOrder(orderId);
+			} catch (NamingException e) {
+				logger.error("An exception occured while retrieving the EJB OrderManager",e);
+			}					
 		}
 	}
 
