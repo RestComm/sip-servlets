@@ -87,7 +87,7 @@
 								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=868">
-									SIP Load Balancer keep routing CANCEL requiests to dead nodes
+									SIP Load Balancer keep routing CANCEL requests to dead nodes
 								</a>
 							</li>
 							<li>
@@ -101,7 +101,7 @@
 								<img src="red.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=870">
-									SIP Load Balancer keep routing CANCEL requiests to dead nodes
+									Sip Load Balancer should not OK CANCEL requests
 								</a>
 							</li>
 							<li>
@@ -137,6 +137,20 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=885">
 									Allow killing retransmission timers in JSIP
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=886">
+									JSR 289 Section 11.1.6 Transaction Timeout not implemented
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=917">
+									Sequential proxy doesn't forward bad final responses if used in single branch mode
 								</a>
 							</li>
 						</ul>

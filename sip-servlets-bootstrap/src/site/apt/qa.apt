@@ -14,6 +14,8 @@ Quality Assurance
 	
 * Mobicents Sip Servlets Load and Performance Tests
 
+	{{{http://groups.google.com/group/mobicents-public/browse_thread/thread/fcf1a66697a4c5a9}Report of a Mobicents Sip Servlets 1.0 Soak Test}} on a Jboss Labs server : a current call rate of 450 calls per second over a 74-hour duration for a total of 120,000,000 calls.
+
 	{{{http://groups.google.com/group/mobicents-public/browse_thread/thread/48512088d2c563f8}Report of a Mobicents Sip Servlets 0.9 Soak Test}} on a Jboss Labs server : a current call rate of 370 calls per second over a 75-hour duration for a total of 100,000,000 calls.
 
 	{{{http://groups.google.com/group/mobicents-public/browse_thread/thread/d0ce822bd5a9221d}Report of a Mobicents Sip Servlets 0.7.1 Soak Test}} on a Jboss Labs server : a current call rate of 350 calls per second over a 80-hour duration for a total of 100,000,000 calls.
