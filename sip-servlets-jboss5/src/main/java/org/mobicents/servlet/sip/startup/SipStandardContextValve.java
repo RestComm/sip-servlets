@@ -24,6 +24,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
@@ -212,7 +213,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 					logger.error("Unexpected exception while parsing the sip application session key" + sipApplicationKey, pe);
 				}
 			} else {
-				context.getSipFactoryFacade().storeHttpSession(request.getSession());
+				// Fix for Issue 882 : HTTP requests to a SIP application always create an HTTP session, even for static resources
+				// Don't create an http session if not already created
+				final HttpSession httpSession = request.getSession(false);
+				if(httpSession != null) {
+					context.getSipFactoryFacade().storeHttpSession(httpSession);
+				}
 			}
 		}
         wrapper.getPipeline().getFirst().invoke(request, response);
