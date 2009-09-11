@@ -32,7 +32,9 @@ import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.log4j.Logger;
 
@@ -75,6 +77,10 @@ public class SimpleWebServlet extends HttpServlet
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
 //        SipApplicationSession appSession = 
 //        	sipFactory.createApplicationSession();
+        if(!appSession.getSessions("HTTP").hasNext()) {
+        	response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
+        	return;
+        }
         SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
         
         // Set some attribute

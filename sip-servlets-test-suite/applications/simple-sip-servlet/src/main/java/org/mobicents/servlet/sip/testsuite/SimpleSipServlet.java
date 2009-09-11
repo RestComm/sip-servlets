@@ -67,6 +67,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 
 	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static String TEST_REINVITE_USERNAME = "reinvite";
+	private static String TEST_IS_SEND_REINVITE_USERNAME = "isendreinvite";
 	private static String TEST_CANCEL_USERNAME = "cancel";
 	
 	/** Creates a new instance of SimpleProxyServlet */
@@ -201,6 +202,14 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					logger.error("the newly created subsequent request doesn't have " +
 							"the same session instance as the one it has been created from");
 				}
+			} else if(TEST_IS_SEND_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
+				Integer nbOfAcks = (Integer) req.getSession().getAttribute("nbAcks");
+				if(nbOfAcks == null) {
+					nbOfAcks = new Integer(1);
+				} else {
+					nbOfAcks = new Integer(nbOfAcks.intValue() + 1);
+				}
+				req.getSession().setAttribute("nbAcks", nbOfAcks);
 			}
 		}
 	}
@@ -237,8 +246,17 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 
+		int statusCode = SipServletResponse.SC_OK;
+		
 		logger.info("Got BYE request: " + request);
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		if(TEST_IS_SEND_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
+			Integer nbOfAcks = (Integer) request.getSession().getAttribute("nbAcks");
+			if(nbOfAcks == null || nbOfAcks.intValue() != 2) {
+				statusCode = SipServletResponse.SC_DECLINE;
+			}
+		} 
+		SipServletResponse sipServletResponse = request.createResponse(statusCode);
+	
 		
 		// Force fail by not sending OK if the doBranchResponse is called. In non-proxy app
 		// this would be wrong.

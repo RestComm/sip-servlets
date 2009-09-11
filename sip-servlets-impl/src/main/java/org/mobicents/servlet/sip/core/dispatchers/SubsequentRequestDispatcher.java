@@ -86,6 +86,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final Request request = (Request) sipServletRequest.getMessage();
 		final Dialog dialog = sipServletRequest.getDialog();		
 		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader();
+		final String method = request.getMethod();
+		
 		String applicationName = null; 
 		String applicationId = null;		
 		if(poppedRouteHeader != null){
@@ -125,7 +127,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}
 					return;
 				} else {
-					if(Request.ACK.equals(request.getMethod())) {
+					if(Request.ACK.equals(method)) {
 						//Means that this is an ACK to a container generated error response, so we can drop it
 						if(logger.isDebugEnabled()) {
 							logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
@@ -209,31 +211,41 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 		
-		final boolean isAck = request.getMethod().equalsIgnoreCase("ACK");
-		final boolean isAckRetranmission = sipSession.isAckReceived() && isAck;
+		final boolean isAck = Request.ACK.equalsIgnoreCase(method);
+		final boolean isAckRetranmission = sipSession.isAckReceived() && isAck;			
 		
 		if(isAck) {
 			sipSession.setAckReceived(true);
-		}
+		} 
 
 		//CSeq validation should only be done for non proxy applications
-		if(sipSession.getProxy() == null) {
+		if(sipSession.getProxy() == null) {			
+			
+			final long localCseq = sipSession.getCseq();
+			final long remoteCseq =  ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
+									
 			if(isAckRetranmission) {
 				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
 				return;
 			}
-			final CSeqHeader cseq = (CSeqHeader) request.getHeader(CSeqHeader.NAME);
-			final long localCseq = sipSession.getCseq();
-			final long remoteCseq = cseq.getSeqNumber();
 			
 			if(localCseq>remoteCseq) {
 				logger.error("CSeq out of order for the following request");
-				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
-				try {
-					response.send();
-				} catch (IOException e) {
-					logger.error("Can not send error response", e);
+				if(!isAck) {
+					final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
+					try {
+						response.send();
+					} catch (IOException e) {
+						logger.error("Can not send error response", e);
+					}
+				}
+			}
+			if(Request.INVITE.equalsIgnoreCase(method)){			
+				//if it's a reinvite, we reset the ACK retransmission flag
+				sipSession.setAckReceived(false);
+				if(logger.isDebugEnabled()) {
+					logger.debug("resetting the ack retransmission flag on the sip session " + sipSession.getKey() + " because following reINVITE has been received " + request);
 				}
 			}
 			sipSession.setCseq(remoteCseq);
