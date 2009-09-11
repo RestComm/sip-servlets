@@ -61,7 +61,7 @@ public abstract class SipServletTestCase extends TestCase {
 		try{
 			properties.load(inputStream);
 		} catch (NullPointerException e) {
-			inputStream = getClass().getResourceAsStream(
+			inputStream = SipServletTestCase.class.getResourceAsStream(
 				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
 			properties.load(inputStream);
 		}
