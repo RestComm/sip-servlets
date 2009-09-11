@@ -222,6 +222,12 @@
 			</modules>			
 		</profile>
 		<profile>			
+			<id>tomcat-distro</id>
+			<modules>				
+				<module>sip-servlets-tomcat-jboss4</module>				
+			</modules>			
+		</profile>
+		<profile>			
 			<id>jboss-distro</id>
 			<modules>				
 				<module>sip-servlets-tomcat-jboss4</module>				
