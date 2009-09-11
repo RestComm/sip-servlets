@@ -98,7 +98,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="orange.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=870">
 									Sip Load Balancer should not OK CANCEL requests
@@ -126,7 +126,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=882">
 									HTTP requests to a SIP application always create an HTTP session, even for static resources
@@ -149,8 +149,36 @@
 							<li>
 								<img src="green.jpeg" />
 								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=905">
+									ACK is not passed to SipServlet for non-initial INVITE
+								</a>
+							</li>
+							<!--li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=906">
+									CSeq is not increased correctly for REGISTER requests if registrar requires authentication.
+								</a>
+							</li-->
+							<li>
+								<img src="green.jpeg" />
+								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=917">
 									Sequential proxy doesn't forward bad final responses if used in single branch mode
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=924">
+									calling setProxyTimeout second time causes Exceptions / Instabillity
+								</a>
+							</li>
+							<li>
+								<img src="orange.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=925">
+									timeout on trying / timeout on some response(s)
 								</a>
 							</li>
 						</ul>
