@@ -65,7 +65,7 @@
 		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P docs" />
+			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
