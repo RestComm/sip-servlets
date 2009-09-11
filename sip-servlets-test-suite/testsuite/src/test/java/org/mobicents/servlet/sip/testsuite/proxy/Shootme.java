@@ -63,7 +63,7 @@ public class Shootme implements SipListener {
 	
 	private static SipProvider sipProvider;
 
-	private static SipStack sipStack;
+	private SipStack sipStack;
 
 	private static final String myAddress = "127.0.0.1";
 
@@ -290,8 +290,7 @@ public class Shootme implements SipListener {
 	 */
 	public void processBye(RequestEvent requestEvent,
 			ServerTransaction serverTransactionId) {
-		ended = true;
-		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+		ended = true;		
 		Request request = requestEvent.getRequest();
 		Dialog dialog = requestEvent.getDialog();
 		System.out.println("local party = " + dialog.getLocalParty());
@@ -311,7 +310,6 @@ public class Shootme implements SipListener {
 
 	public void processCancel(RequestEvent requestEvent,
 			ServerTransaction serverTransactionId) {		
-		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
 		try {
 			System.out.println("shootme:  got a cancel.");

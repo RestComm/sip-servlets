@@ -1177,7 +1177,7 @@ public class TestSipListener implements SipListener {
 					if(sendBye) {
 						sendBye();
 					}
-					if(sendByeAfterTerminatingNotify || sendByeAfterTerminatingNotify) {
+					if(sendByeAfterTerminatingNotify) {
 						 tid.getDialog().terminateOnBye(false);
 					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {

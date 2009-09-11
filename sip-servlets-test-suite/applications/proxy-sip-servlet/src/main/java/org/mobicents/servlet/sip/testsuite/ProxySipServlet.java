@@ -184,7 +184,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener,
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {
-		logger.info("doBranchResponse callback was called.");
+		logger.info("doBranchResponse callback was called.");		
 		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");
 		super.doBranchResponse(resp);
 	}	

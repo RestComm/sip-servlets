@@ -75,7 +75,7 @@ public class Shootist implements SipListener {
 
 	private static HeaderFactory headerFactory;
 
-	private static SipStack sipStack;
+	private SipStack sipStack;
 
 	private ContactHeader contactHeader;
 

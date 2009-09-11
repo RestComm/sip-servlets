@@ -37,7 +37,7 @@ public abstract class ScenarioHarness extends TestCase implements SipListener {
 
 	protected ProtocolObjects shootmeProtocolObjects;
 
-	protected static String transport = "udp";
+	protected final static String transport = "udp";
 
 	protected java.util.Map<SipProvider, SipListener> providerTable;
 

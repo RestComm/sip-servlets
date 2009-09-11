@@ -53,7 +53,7 @@ public class Tracker implements SipListener {
 
 	private static HeaderFactory headerFactory;
 
-	private static SipStack sipStack;
+	private SipStack sipStack;
 
 	private static final String myAddress = "127.0.0.1";
 
