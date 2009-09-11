@@ -231,7 +231,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				}
 				// Check if the session remains in INITIAL state, if not, the test will fail for missing registers
 				if(resp.getSession().getState().equals(State.INITIAL))
-					resp.getSession().createRequest("REGISTER").send();
+					resp.getSession().createRequest(resp.getMethod()).send();
 			}
 			return;
 		}
@@ -256,7 +256,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				AuthInfo authInfo = sipFactory.createAuthInfo();
 				authInfo.addAuthInfo(response.getStatus(), "sip-servlets-realm", "user", "pass");
 				SipServletRequest challengeRequest = response.getSession().createRequest(
-						response.getRequest().getMethod());
+						response.getMethod());
 				challengeRequest.addAuthHeader(response, authInfo);
 				challengeRequest.send();
 			}
