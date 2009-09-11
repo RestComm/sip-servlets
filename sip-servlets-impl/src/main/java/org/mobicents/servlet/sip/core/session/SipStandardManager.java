@@ -50,7 +50,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
-    protected static String name = "SipStandardManager";
+    protected final static String name = "SipStandardManager";
 
     
 	/**

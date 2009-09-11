@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.sip.SipURI;
 import javax.sip.ListeningPoint;
@@ -81,6 +83,7 @@ public class SipNetworkInterfaceManager {
 	Map<String, List<ExtendedListeningPoint>> transportMappingCacheMap = null;	
 	Map<String, ExtendedListeningPoint> extendedListeningPointsCacheMap = null;
 	
+	Lock lock = null;
 	
 	/**
 	 * Default Constructor
@@ -98,7 +101,8 @@ public class SipNetworkInterfaceManager {
 		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
 		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
 		// creating the ipaddress/port/transport cache map
-		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();		
+		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();
+		lock = new ReentrantLock();
 	}
 	
 	/**
@@ -280,13 +284,15 @@ public class SipNetworkInterfaceManager {
 							extendedListeningPoint.getTransport() + " to the outbound interfaces", e);
 				}
 			}
-		}					
-		synchronized (outboundInterfaces) {
-			outboundInterfaces  = newlyComputedOutboundInterfaces;
-		}
-		synchronized (outboundInterfacesIpAddresses) {
+		}				
+		lock.lock();
+		try {
+			outboundInterfaces  = newlyComputedOutboundInterfaces;		
 			outboundInterfacesIpAddresses  = newlyComputedOutboundInterfacesIpAddresses;
+		} finally {
+			lock.unlock();
 		}
+		
 	}
 	
 	public static boolean findUsePublicAddress(Message message) {

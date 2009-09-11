@@ -36,16 +36,16 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.spi.ServiceRegistry;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
@@ -153,6 +153,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	protected transient ScheduledFuture congestionControlTimerFuture;
 	
 	private Boolean started = Boolean.FALSE;
+	private Lock statusLock = new ReentrantLock();
 
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
@@ -275,13 +276,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * {@inheritDoc}
 	 */
-	public void start() {
-		synchronized (started) {
+	public void start() {		
+		statusLock.lock();
+		try {
 			if(started) {
 				return;
 			}
 			started = Boolean.TRUE;
+		} finally {
+			statusLock.unlock();
 		}
+		
 		congestionControlTimerTask = new CongestionControlTimerTask();
 		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
 				congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
@@ -310,11 +315,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * {@inheritDoc}
 	 */
 	public void stop() {
-		synchronized (started) {
+		statusLock.lock();
+		try {
 			if(!started) {
 				return;
 			}
 			started = Boolean.FALSE;
+		} finally {
+			statusLock.unlock();
 		}
 		sipApplicationRouter.destroy();		
 		if(oname != null) {
@@ -360,10 +368,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
 		//if the ApplicationDispatcher is started, notification is sent that the servlets are ready for service
 		//otherwise the notification will be delayed until the ApplicationDispatcher has started
-		synchronized (started) {
+		statusLock.lock();
+		try {
 			if(started) {
 				sipApplication.notifySipServletsListeners();
 			}
+		} finally {
+			statusLock.unlock();
 		}
 		if(logger.isInfoEnabled()) {
 			logger.info("the following sip servlet application has been added : " + sipApplicationName);
@@ -1209,20 +1220,25 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setCongestionControlCheckingInterval(
 			long congestionControlCheckingInterval) {
 		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
-		if(started) {
-			if(congestionControlTimerFuture != null) {
-				congestionControlTimerFuture.cancel(false);
+		statusLock.lock();
+		try {
+			if(started) {
+				if(congestionControlTimerFuture != null) {
+					congestionControlTimerFuture.cancel(false);
+				}
+				if(congestionControlCheckingInterval > 0) {
+					congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+					if(logger.isInfoEnabled()) {
+				 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
+				 	}
+				} else {
+					if(logger.isInfoEnabled()) {
+				 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
+				 	}
+				}
 			}
-			if(congestionControlCheckingInterval > 0) {
-				congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
-				if(logger.isInfoEnabled()) {
-			 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
-			 	}
-			} else {
-				if(logger.isInfoEnabled()) {
-			 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
-			 	}
-			}
+		} finally {
+			statusLock.unlock();
 		}
 	}
 
