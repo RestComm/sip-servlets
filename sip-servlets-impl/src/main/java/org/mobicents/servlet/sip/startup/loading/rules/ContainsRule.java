@@ -31,7 +31,7 @@ public class ContainsRule extends RequestRule implements MatchingRule {
         super(var);
         this.value = value;
         if (ignoreCase) { 
-        	value = value.toLowerCase();
+        	this.value = value.toLowerCase();
         }
         this.ignoreCase = ignoreCase;
     }
