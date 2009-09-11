@@ -48,8 +48,7 @@
   <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-util/1.2.0.GA/rhq-core-util-1.2.0.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-jmx-plugin/1.2.0.GA/rhq-jmx-plugin-1.2.0.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/hyperic/sigar/1.6.0.14/sigar-1.6.0.14.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar"/>
-  <classpathentry kind="lib" path="/home/deruelle/java/jdk1.6.0_10/lib/tools.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar"/>  
   <classpathentry kind="var" path="M2_REPO/apache-xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/apache-xerces/xml-apis/2.9.1/xml-apis-2.9.1.jar"/>
 </classpath>
