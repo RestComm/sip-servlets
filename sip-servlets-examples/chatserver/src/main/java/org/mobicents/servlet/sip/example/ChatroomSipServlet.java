@@ -40,10 +40,10 @@ public class ChatroomSipServlet extends SipServlet {
 	private static Logger logger = Logger.getLogger(ChatroomSipServlet.class);
 	
 	/** Context attribute key to store user list. */
-    public static String USER_LIST="userList";
+    public final static String USER_LIST="userList";
     
     /** Init parameter key to retrieve the chatroom's address. */
-    public static String CHATROOM_SERVER_NAME="chatroomservername";
+    public final static String CHATROOM_SERVER_NAME="chatroomservername";
 
     /** This chatroom server's address, retrieved from the init params. */
     public String serverAddress;
