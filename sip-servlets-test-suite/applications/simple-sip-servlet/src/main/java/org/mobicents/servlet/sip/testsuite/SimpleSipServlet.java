@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -240,6 +241,30 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		}
 	}
 
+	@Override
+	protected void doErrorResponse(SipServletResponse response)
+			throws ServletException, IOException {
+			
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		if(response.getStatus() == SipServletResponse.SC_UNAUTHORIZED || 
+				response.getStatus() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
+		
+			// Avoid re-sending if the auth repeatedly fails.
+			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
+			{
+				getServletContext().setAttribute("FirstResponseRecieved", "true");
+				AuthInfo authInfo = sipFactory.createAuthInfo();
+				authInfo.addAuthInfo(response.getStatus(), "sip-servlets-realm", "user", "pass");
+				SipServletRequest challengeRequest = response.getSession().createRequest(
+						response.getRequest().getMethod());
+				challengeRequest.addAuthHeader(response, authInfo);
+				challengeRequest.send();
+			}
+		}
+		
+		logger.info("Got response: " + response);	
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

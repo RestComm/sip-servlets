@@ -782,17 +782,40 @@ public class TestSipListener implements SipListener {
 	}
 	
 	private void processRegister(Request request,
-			ServerTransaction serverTransactionId) {
-		
-		ServerTransaction serverTransaction = null;
+			ServerTransaction serverTransactionId) {				
 
         try {
-
+        	ServerTransaction serverTransaction = serverTransactionId == null? sipProvider.getNewServerTransaction(request) : serverTransactionId;
+        	
+        	System.out.println("challenge Requests ? " +  challengeRequests);
+        	if(challengeRequests) {
+				// Verify AUTHORIZATION !!!!!!!!!!!!!!!!
+		        dsam = new DigestServerAuthenticationMethod();
+		        dsam.initialize(); // it should read values from file, now all static
+		        if ( !checkProxyAuthorization(request) ) {
+		            Response responseauth = protocolObjects.messageFactory.createResponse(Response.PROXY_AUTHENTICATION_REQUIRED,request);
+		
+		            ProxyAuthenticateHeader proxyAuthenticate = 
+		            	protocolObjects.headerFactory.createProxyAuthenticateHeader(dsam.getScheme());
+		            proxyAuthenticate.setParameter("realm",dsam.getRealm(null));
+		            proxyAuthenticate.setParameter("nonce",dsam.generateNonce());
+		            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
+		            proxyAuthenticate.setParameter("opaque","");
+		            proxyAuthenticate.setParameter("stale","FALSE");
+		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
+		            responseauth.setHeader(proxyAuthenticate);
+		
+		            if (serverTransaction!=null)
+		                serverTransaction.sendResponse(responseauth);
+		            else 
+		                sipProvider.sendResponse(responseauth);
+		
+		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
+		            return;
+		        }		        
+			}        	
         	lastRegisterCSeqNumber = ((CSeqHeader)request.getHeader("CSeq")).getSeqNumber();
-            serverTransaction = 
-            	(serverTransactionId == null? 
-            			sipProvider.getNewServerTransaction(request): 
-            				serverTransactionId);
+            
 			Response okResponse = protocolObjects.messageFactory.createResponse(
 					Response.OK, request);			
 			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);

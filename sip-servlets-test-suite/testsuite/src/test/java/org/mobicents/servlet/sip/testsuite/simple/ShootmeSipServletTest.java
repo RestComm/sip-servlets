@@ -146,6 +146,18 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isFinalResponseReceived());
 	}
 	
+	public void testShootmeRegisterCSeqIncreaseAuth() throws Exception {
+		String fromName = "testRegisterCSeq";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		registerReciever.setChallengeRequests(true);		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT_CSEQ_INCREASE);
+		assertTrue(registerReciever.getLastRegisterCSeqNumber() == 4);
+		assertTrue(sender.isFinalResponseReceived());
+	}	
+	
 	public void testShootmeCancel() throws Exception {
 		String fromName = "cancel";
 		String fromSipAddress = "sip-servlets.com";
