@@ -2,13 +2,14 @@
 
 package org.mobicents.servlet.sip.testsuite;
 
-import java.security.*;
-import java.util.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.Random;
 
-import javax.sip.*;
-import javax.sip.message.*;
-import javax.sip.header.*;
-import javax.sip.address.*;
+import javax.sip.address.URI;
+import javax.sip.header.AuthorizationHeader;
+import javax.sip.message.Request;
 
 /**
  * Implements the HTTP digest authentication method.
@@ -23,11 +24,11 @@ public class DigestServerAuthenticationMethod implements AuthenticationMethod {
 
 	public static final String DEFAULT_ALGORITHM = "MD5";
 
-	public static String DEFAULT_REALM = "sip-servlets-realm";
+	public final static String DEFAULT_REALM = "sip-servlets-realm";
 
-	public static String USER_AUTH = "user";
+	public final static String USER_AUTH = "user";
 
-	public static String PASS_AUTH = "pass";
+	public final static String PASS_AUTH = "pass";
 
 	private MessageDigest messageDigest;
 
