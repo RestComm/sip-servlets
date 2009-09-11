@@ -124,8 +124,6 @@ public class DefaultApplicationRouterParser {
 	 * @throws ParseException
 	 */
 	public Map<String, List<DefaultSipApplicationRouterInfo>> parse(String configuration) throws ParseException {
-		Map<String, List<DefaultSipApplicationRouterInfo>> sipApplicationRoutingInfo = 
-			new HashMap<String, List<DefaultSipApplicationRouterInfo>>();
 		Properties tempProperties = new Properties();
 		// tempProperties.load(new StringReader(configuration)); // This needs Java 1.6
 		ByteArrayInputStream stringStream = new ByteArrayInputStream(configuration.getBytes());
@@ -146,8 +144,6 @@ public class DefaultApplicationRouterParser {
 	 * @throws ParseException
 	 */
 	public Map<String, List<DefaultSipApplicationRouterInfo>> parse(Properties properties) throws ParseException {
-		Map<String, List<DefaultSipApplicationRouterInfo>> sipApplicationRoutingInfo = 
-			new HashMap<String, List<DefaultSipApplicationRouterInfo>>();
 		this.properties = properties;
 		return parse();
 	}
