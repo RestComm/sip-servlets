@@ -8,7 +8,7 @@ Instructions to build and deploy
 
 To Deploy : 
 Drop the generated war file in JBoss deploy directory.
-Copy the media-jsr309-dar.properties to your jboss_home/server/default/conf/dars. To use this dar file for this service, specify in the Service xml tag, darConfigurationFileLocation attribute of the jboss_home/server/default/deploy/jboss-web.deployer/server.xml , the following : conf/dars/media-jsr309-dar.properties.
+Copy the media-jsr309-dar.properties to your jboss_home/server/default/conf/dars. To use this dar file for this service, specify in the Service xml tag, darConfigurationFileLocation attribute of the jboss_home/server/default/deploy/jbossweb.sar/server.xml , the following : conf/dars/media-jsr309-dar.properties.
 
 You can now run your JBoss container. If MMS is standalone, start it. If its embedded in JBoss AS, it starts with JBoss container.
 
