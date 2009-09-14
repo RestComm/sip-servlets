@@ -25,11 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.URI;
-import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.HeaderAddress;
-import javax.sip.header.HeaderFactory;
 import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.SipFactories;
@@ -51,10 +49,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	private static final String PARAM_SEPARATOR = ";";
 	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
 	private javax.sip.address.Address address;	
-	
-	private static HeaderFactory headerFactory = SipFactories.headerFactory;
-	private static AddressFactory addressFactory = SipFactories.addressFactory;
-	
+		
 	public javax.sip.address.Address getAddress() {
 		return address;
 	}
@@ -207,7 +202,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 				this.removeParameter(EXPIRES_PARAM_NAME);
 				return;
 			}
-			this.setParameter(EXPIRES_PARAM_NAME, new Integer(seconds).toString());
+			this.setParameter(EXPIRES_PARAM_NAME, Integer.valueOf(seconds).toString());
 		} else {
 			throw new IllegalArgumentException(
 					"Can only set parameter for Sip URI");
@@ -288,9 +283,9 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 	 */
 	public void setValue(String value) {
 		try {			
-			ContactHeader contactHeader = (ContactHeader) headerFactory.createHeader(
+			ContactHeader contactHeader = (ContactHeader) SipFactories.headerFactory.createHeader(
 					ContactHeader.NAME, value);
-			this.address = addressFactory.createAddress(value);
+			this.address = SipFactories.addressFactory.createAddress(value);
 			this.parameters = getParameters(((Parameters) contactHeader));
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal argument", ex);
