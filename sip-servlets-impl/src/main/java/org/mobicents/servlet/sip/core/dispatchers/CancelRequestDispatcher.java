@@ -23,7 +23,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipSession.State;
-import javax.sip.ClientTransaction;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
@@ -36,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -102,7 +100,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 	 * {@inheritDoc} 
 	 */
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
-		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipApplicationDispatcher.getSipNetworkInterfaceManager();
+//		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipApplicationDispatcher.getSipNetworkInterfaceManager();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isInfoEnabled()) {
 			logger.info("Routing of Cancel Request " + sipServletRequest);

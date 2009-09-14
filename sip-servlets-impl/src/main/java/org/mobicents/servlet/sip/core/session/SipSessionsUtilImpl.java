@@ -124,12 +124,12 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	 * @param headerName the header name
 	 */
 	public void addCorrespondingSipSession(MobicentsSipSession newSession, MobicentsSipSession correspondingSipSession, String headerName) {
-		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
+		if(JoinHeader.NAME.equalsIgnoreCase(headerName)) {
 			joinSession.putIfAbsent(newSession.getKey(), correspondingSipSession);
-		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
+		} else if (ReplacesHeader.NAME.equalsIgnoreCase(headerName)) {
 			replacesSession.putIfAbsent(newSession.getKey(), correspondingSipSession);
 		} else {
-			throw new IllegalArgumentException("headerName argument should either be one of Join or Replaces");
+			throw new IllegalArgumentException("headerName argument should either be one of Join or Replaces, was : " + headerName);
 		}
 	}
 	

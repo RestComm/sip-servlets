@@ -49,13 +49,14 @@ public class ApplicationRoutingHeaderStack {
 	}
 	
 	public String toString() {
-		String text = "";
+		StringBuffer text = new StringBuffer();
 		for(int q=0; q<this.nodes.size(); q++) {
-			text += this.nodes.get(q).application + "!" + this.nodes.get(q).handler + "/";
+			text.append(this.nodes.get(q).application).append("!").append(this.nodes.get(q).handler).append("/");
 		}
-		if(text.length()>0)
-			text = text.substring(0, text.length() - 1);
-		return text;
+		if(text.length()>0) {
+			text.append(text.substring(0, text.length() - 1));
+		}
+		return text.toString();
 	}
 
 }

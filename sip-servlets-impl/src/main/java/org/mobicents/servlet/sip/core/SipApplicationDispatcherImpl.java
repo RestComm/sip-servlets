@@ -203,7 +203,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		sipFactoryImpl = new SipFactoryImpl(this);
 		hostNames = new CopyOnWriteArraySet<String>();
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager(this);
-		maxMemory = Runtime.getRuntime().maxMemory() / 1024;
+		maxMemory = Runtime.getRuntime().maxMemory() / (double)1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
 				new ThreadPoolExecutor.CallerRunsPolicy());
@@ -479,7 +479,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		double freeMemory = runtime.freeMemory() / 1024;
 		
 		double totalFreeMemory = freeMemory + (maxMemory - allocatedMemory);
-		this.percentageOfMemoryUsed=  (100 - ((totalFreeMemory / maxMemory) * 100));
+		this.percentageOfMemoryUsed=  (((double)100) - ((totalFreeMemory / maxMemory) * ((double)100)));
 
 		if(memoryToHigh) {
 			if(percentageOfMemoryUsed < memoryThreshold) {
