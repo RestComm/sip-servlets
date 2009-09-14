@@ -175,7 +175,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();
-		if(!ConcurrencyControlMode.None.equals(sipContext.getConcurrencyControlMode())) {
+		if(sipContext != null && !ConcurrencyControlMode.None.equals(sipContext.getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);
 		}
 		this.key = key;
@@ -361,8 +361,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid) {
 			throw new IllegalStateException("this sip application session is not valid anymore");
 		}
+		if(expirationTimerTask == null) {
+			return 0;
+		}
 		long expirationTime = expirationTimerTask.getDelay();
-		if(expirationTimerTask == null || expirationTime <= 0) {
+		if(expirationTime <= 0) {
 			return 0;
 		}
 		if(expired) {
@@ -828,14 +831,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			return Integer.MAX_VALUE;
 		} else {
 			long deltaMilliseconds = 0;
-			if(expirationTimerTask != null) {
+//			if(expirationTimerTask != null) {
 				//extending the app session life time
 //				expirationTime = expirationTimerFuture.getDelay(TimeUnit.MILLISECONDS) + deltaMinutes * 1000 * 60;
-				deltaMilliseconds = deltaMinutes * 1000 * 60;
-			} else {
+				deltaMilliseconds = deltaMinutes * 1000L * 60;
+//			} else {
 				//the app session was scheduled to never expire and now an expiration time is set
-				deltaMilliseconds = deltaMinutes * 1000 * 60;
-			}
+//				deltaMilliseconds = deltaMinutes * 1000L * 60;
+//			}
 			if(expirationTimerTask != null) {				
 				expirationTime = System.currentTimeMillis() + deltaMilliseconds;
 				if(logger.isDebugEnabled()) {
@@ -846,9 +849,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				cancelExpirationTimer();
 				expirationTimerTask = null;
 				expirationTimerFuture = null;
-				expirationTimerTask = new SipApplicationSessionTimerTask();
-				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getThreadPoolExecutor().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
 			}
+			expirationTimerTask = new SipApplicationSessionTimerTask();
+			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getThreadPoolExecutor().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
+
 			return deltaMinutes;
 		}				
 	}

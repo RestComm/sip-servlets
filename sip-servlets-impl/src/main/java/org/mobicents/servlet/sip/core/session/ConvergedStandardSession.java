@@ -36,12 +36,17 @@ public class ConvergedStandardSession
 		implements ConvergedSession {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * The facade associated with this session.  NOTE:  This value is not
      * included in the serialized version of this object.
      */
-    protected transient ConvergedSessionFacade facade = null;
+    protected transient ConvergedSessionFacade convergedFacade = null;
     
-    private ConvergedSessionDelegate convergedSessionDelegate = null;
+    private transient ConvergedSessionDelegate convergedSessionDelegate = null;
 	/**
 	 * 
 	 * @param sessionManager
@@ -53,19 +58,19 @@ public class ConvergedStandardSession
 	
 	@Override
 	public HttpSession getSession() {
-        if (facade == null){
+        if (convergedFacade == null){
             if (SecurityUtil.isPackageProtectionEnabled()){
                 final ConvergedSession fsession = this;
-                facade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction<ConvergedSessionFacade>(){
+                convergedFacade = (ConvergedSessionFacade)AccessController.doPrivileged(new PrivilegedAction<ConvergedSessionFacade>(){
                     public ConvergedSessionFacade run(){
                         return new ConvergedSessionFacade(fsession);
                     }
                 });
             } else {
-                facade = new ConvergedSessionFacade(this);
+                convergedFacade = new ConvergedSessionFacade(this);
             }
         }
-        return (facade);
+        return (convergedFacade);
 	}
 	
 	/*
