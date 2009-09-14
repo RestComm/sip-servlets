@@ -102,8 +102,7 @@ public class SimpleWebServlet extends HttpServlet
         out.println("Click to call - converger sip servlet");
         out.println("</TITLE></HEAD><BODY>");
         out.println("<H1>Click To Call Converged Demo Sip Servlet</H1>");
-        out.println("<P>Calling from <b>" + fromAddr + "</b> to <b>" + toAddr + "</b>...");
-        if(sipFactory == null) out.println("</BR>Error: SipFactory is null");
+        out.println("<P>Calling from <b>" + fromAddr + "</b> to <b>" + toAddr + "</b>...");        
         out.println("</BODY></HTML>");
         out.close();
     }
