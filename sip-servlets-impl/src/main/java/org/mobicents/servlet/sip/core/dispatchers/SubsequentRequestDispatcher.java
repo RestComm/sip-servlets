@@ -276,8 +276,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 						 						
 							if (subscriptionStateHeader != null && 
-												SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState())) {					
+												(SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
 								sipSession.addSubscription(sipServletRequest);
 							}
 						}						
