@@ -24,6 +24,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
+import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -164,7 +165,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			sipServletResponse.send();
 			
 			SipApplicationSession app = sipFactory.createApplicationSession();
-			sipFactory.createRequest(app, "REGISTER", "sip:me@simple-servlet.com", "sip:you@localhost:5058").send();
+			SipServletRequest register = sipFactory.createRequest(app, "REGISTER", "sip:me@simple-servlet.com", "sip:you@localhost:5058");
+			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
+			register.addParameterableHeader("Contact", contact, true);			
+			register.addHeader("Expires", "3600");
+			register.addHeader("test", "test");
+			register.send();
 			return;
 		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
