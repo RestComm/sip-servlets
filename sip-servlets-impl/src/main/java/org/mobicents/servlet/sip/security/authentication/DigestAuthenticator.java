@@ -71,13 +71,6 @@ public class DigestAuthenticator
 
     public DigestAuthenticator() {
         super();
-        try {
-            if (md5Helper == null)
-                md5Helper = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new IllegalStateException();
-        }
     }
 
 
@@ -87,8 +80,15 @@ public class DigestAuthenticator
     /**
      * MD5 message digest provider.
      */
-    protected static MessageDigest md5Helper;
+    protected volatile static MessageDigest md5Helper;
 
+    static {
+    	try {            
+             md5Helper = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {            
+            throw new IllegalStateException(e);
+        }
+    }
 
     /**
      * Private key.

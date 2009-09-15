@@ -725,8 +725,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
 
 					MessageDispatcher.callServlet(response);
-				} catch (Exception e) {
-					logger.error("Failed to deliver 408 respone on transaction timeout" + transaction, e);
+				} catch (Throwable t) {
+					logger.error("Failed to deliver 408 respone on transaction timeout" + transaction, t);
 				}
 			}
 			if(sipSession != null) {
@@ -1041,44 +1041,44 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param stateInfo the state info to serialize
 	 * @return the state info serialized and deserialized
 	 */
-	private Serializable serializeStateInfo(Serializable stateInfo) {
-		ByteArrayOutputStream baos = null;
-		ObjectOutputStream out = null;
-		ByteArrayInputStream bais = null;
-		ObjectInputStream in = null;
-		
-		try{
-			baos = new ByteArrayOutputStream();
-			out = new ObjectOutputStream(baos);
-			out.writeObject(stateInfo);					
-			bais = new ByteArrayInputStream(baos.toByteArray());
-			in =new ObjectInputStream(bais);
-			return (Serializable)in.readObject();			
-		} catch (IOException e) {
-			logger.error("Impossible to serialize the state info", e);
-			return stateInfo;
-		} catch (ClassNotFoundException e) {
-			logger.error("Impossible to serialize the state info", e);
-			return stateInfo;
-		} finally {
-			try {
-				if(out != null) {
-					out.close();
-				}
-				if(in != null) {
-					in.close();
-				}
-				if(baos != null) {
-					baos.close();
-				}
-				if(bais != null) {
-					bais.close();
-				}
-			} catch (IOException e) {
-				logger.error("Impossible to close the streams after serializing state info", e);
-			}
-		}
-	}
+//	private Serializable serializeStateInfo(Serializable stateInfo) {
+//		ByteArrayOutputStream baos = null;
+//		ObjectOutputStream out = null;
+//		ByteArrayInputStream bais = null;
+//		ObjectInputStream in = null;
+//		
+//		try{
+//			baos = new ByteArrayOutputStream();
+//			out = new ObjectOutputStream(baos);
+//			out.writeObject(stateInfo);					
+//			bais = new ByteArrayInputStream(baos.toByteArray());
+//			in =new ObjectInputStream(bais);
+//			return (Serializable)in.readObject();			
+//		} catch (IOException e) {
+//			logger.error("Impossible to serialize the state info", e);
+//			return stateInfo;
+//		} catch (ClassNotFoundException e) {
+//			logger.error("Impossible to serialize the state info", e);
+//			return stateInfo;
+//		} finally {
+//			try {
+//				if(out != null) {
+//					out.close();
+//				}
+//				if(in != null) {
+//					in.close();
+//				}
+//				if(baos != null) {
+//					baos.close();
+//				}
+//				if(bais != null) {
+//					bais.close();
+//				}
+//			} catch (IOException e) {
+//				logger.error("Impossible to close the streams after serializing state info", e);
+//			}
+//		}
+//	}
 
 	/*
 	 * (non-Javadoc)

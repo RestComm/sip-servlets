@@ -94,7 +94,7 @@ import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
-		SipServletRequest, Cloneable {
+		SipServletRequest {
 
 	private static final long serialVersionUID = 1L;
 
@@ -1187,7 +1187,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			WWWAuthenticateHeader wwwAuthHeader = 
 				(WWWAuthenticateHeader) authHeaderIterator.next();
-			String uri = wwwAuthHeader.getParameter("uri");
+//			String uri = wwwAuthHeader.getParameter("uri");
 			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
 			
 			if(authInfoEntry == null) throw new SecurityException(
@@ -1205,7 +1205,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			ProxyAuthenticateHeader wwwAuthHeader = 
 				(ProxyAuthenticateHeader) authHeaderIterator.next();
-			String uri = wwwAuthHeader.getParameter("uri");
+//			String uri = wwwAuthHeader.getParameter("uri");
 			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
 			
 			if(authInfoEntry == null) throw new SecurityException(
@@ -1237,7 +1237,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			WWWAuthenticateHeader wwwAuthHeader = 
 				(WWWAuthenticateHeader) authHeaderIterator.next();
-			String uri = wwwAuthHeader.getParameter("uri");
+//			String uri = wwwAuthHeader.getParameter("uri");
 			addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
 		}
 		

@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.message;
 
-import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;

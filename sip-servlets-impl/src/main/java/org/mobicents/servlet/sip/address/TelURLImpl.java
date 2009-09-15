@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.SipFactories;
  * 
  */
 public class TelURLImpl extends URIImpl implements TelURL {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(TelURLImpl.class
 			.getCanonicalName());
 

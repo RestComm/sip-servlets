@@ -254,85 +254,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
 		
 		
-		final DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
-
-			public void dispatch() throws DispatcherException {
-				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
-				
-				final String requestMethod = sipServletRequest.getMethod();
-				try {
-					sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
-					// JSR 289 Section 6.2.1 :
-					// any state transition caused by the reception of a SIP message, 
-					// the state change must be accomplished by the container before calling 
-					// the service() method of any SipServlet to handle the incoming message.
-					sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
-					try {
-						// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
-						// a new subscription and a new dialog (unless they have already been
-						// created by a matching response, as described above).								
-						if(Request.NOTIFY.equals(requestMethod)) {
-							final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-								sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
-						 						
-							if (subscriptionStateHeader != null && 
-												(SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-												SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
-								sipSession.addSubscription(sipServletRequest);
-							}
-						}						
-								
-						// See if the subsequent request should go directly to the proxy
-						final ProxyImpl proxy = sipSession.getProxy();
-						if(proxy != null) {
-							final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
-							if(finalBranch != null) {								
-								proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
-								proxy.setOriginalRequest(sipServletRequest);
-								// if(!isAckRetranmission) { // We should pass the ack retrans (implied by 10.2.4.1 Handling 2xx Responses to INVITE)
-									callServlet(sipServletRequest);
-
-								finalBranch.proxySubsequentRequest(sipServletRequest);
-							} else if(requestMethod.equals(Request.PRACK)) {
-								callServlet(sipServletRequest);
-								List<ProxyBranch> branches = proxy.getProxyBranches();
-								for(ProxyBranch pb : branches) {
-									ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
-									if(proxyBranch.isWaitingForPrack()) {
-										proxyBranch.proxyDialogStateless(sipServletRequest);
-										proxyBranch.setWaitingForPrack(false);
-									}
-								}
-							}
-						}
-						// If it's not for a proxy then it's just an AR, so go to the next application
-						else {							
-							callServlet(sipServletRequest);				
-						}						
-					} catch (ServletException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-					} catch (SipException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-					} catch (IOException e) {				
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-					} 	 
-				} finally {
-					// A subscription is destroyed when a notifier sends a NOTIFY request
-					// with a "Subscription-State" of "terminated".			
-					if(Request.NOTIFY.equals(requestMethod)) {
-						final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-							sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
-					
-						if (subscriptionStateHeader != null && 
-											SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
-							sipSession.removeSubscription(sipServletRequest);
-						}
-					}
-					sipContext.exitSipApp(sipServletRequest, null);
-				}
-				//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	
-			}
-		};
+		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
 		// if the flag is set we bypass the executor 
 		if(sipApplicationDispatcher.isBypassRequestExecutor()) {
 			dispatchTask.dispatchAndHandleExceptions();
@@ -341,4 +263,94 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 	}	
 
+	public static class SubsequentDispatchTask extends DispatchTask {
+		SubsequentDispatchTask(SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
+			super(sipServletRequest, sipProvider);
+		}
+		
+		public void dispatch() throws DispatcherException {
+			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
+			final MobicentsSipSession sipSession = sipServletRequest.getSipSession();
+			final MobicentsSipApplicationSession appSession = sipSession.getSipApplicationSession();
+			final SipContext sipContext = appSession.getSipContext();
+			final SipManager sipManager = (SipManager)sipContext.getManager();
+			final Request request = (Request) sipServletRequest.getMessage();
+			
+			sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
+			
+			final String requestMethod = sipServletRequest.getMethod();
+			try {
+				sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
+				// JSR 289 Section 6.2.1 :
+				// any state transition caused by the reception of a SIP message, 
+				// the state change must be accomplished by the container before calling 
+				// the service() method of any SipServlet to handle the incoming message.
+				sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
+				try {
+					// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
+					// a new subscription and a new dialog (unless they have already been
+					// created by a matching response, as described above).								
+					if(Request.NOTIFY.equals(requestMethod)) {
+						final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+							sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
+					 						
+						if (subscriptionStateHeader != null && 
+											(SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+											SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
+							sipSession.addSubscription(sipServletRequest);
+						}
+					}						
+							
+					// See if the subsequent request should go directly to the proxy
+					final ProxyImpl proxy = sipSession.getProxy();
+					if(proxy != null) {
+						final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
+						if(finalBranch != null) {								
+							proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
+							proxy.setOriginalRequest(sipServletRequest);
+							// if(!isAckRetranmission) { // We should pass the ack retrans (implied by 10.2.4.1 Handling 2xx Responses to INVITE)
+								callServlet(sipServletRequest);
+
+							finalBranch.proxySubsequentRequest(sipServletRequest);
+						} else if(requestMethod.equals(Request.PRACK)) {
+							callServlet(sipServletRequest);
+							List<ProxyBranch> branches = proxy.getProxyBranches();
+							for(ProxyBranch pb : branches) {
+								ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
+								if(proxyBranch.isWaitingForPrack()) {
+									proxyBranch.proxyDialogStateless(sipServletRequest);
+									proxyBranch.setWaitingForPrack(false);
+								}
+							}
+						}
+					}
+					// If it's not for a proxy then it's just an AR, so go to the next application
+					else {							
+						callServlet(sipServletRequest);				
+					}						
+				} catch (ServletException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+				} catch (SipException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+				} catch (IOException e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+				} 	 
+			} finally {
+				// A subscription is destroyed when a notifier sends a NOTIFY request
+				// with a "Subscription-State" of "terminated".			
+				if(Request.NOTIFY.equals(requestMethod)) {
+					final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+						sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
+				
+					if (subscriptionStateHeader != null && 
+										SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
+						sipSession.removeSubscription(sipServletRequest);
+					}
+				}
+				sipContext.exitSipApp(sipServletRequest, null);
+			}
+			//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	
+		}
+	}
+	
 }

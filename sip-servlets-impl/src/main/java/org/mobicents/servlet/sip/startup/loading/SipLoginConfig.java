@@ -23,7 +23,8 @@ import org.apache.catalina.deploy.LoginConfig;
  * 
  *
  */
-public class SipLoginConfig extends LoginConfig {
+public class SipLoginConfig extends LoginConfig {	
+	private static final long serialVersionUID = 1L;
 	public static final String BASIC_AUTHENTICATION_METHOD = "BASIC";
 	public static final String DIGEST_AUTHENTICATION_METHOD = "DIGEST";
 	public static final String CLIENT_CERT_AUTHENTICATION_METHOD = "CLIENT_CERT";

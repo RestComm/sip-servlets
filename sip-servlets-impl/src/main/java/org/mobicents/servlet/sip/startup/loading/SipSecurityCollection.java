@@ -22,6 +22,8 @@ import java.util.List;
 import org.apache.catalina.deploy.SecurityCollection;
 
 public class SipSecurityCollection extends SecurityCollection {
+
+	private static final long serialVersionUID = 1L;
 	public List<String> servletNames = new ArrayList<String>();
 	public List<String> sipMethods = new ArrayList<String>();
 		
@@ -80,7 +82,7 @@ public class SipSecurityCollection extends SecurityCollection {
 	}
 	
 	public String[] findServletNames() {
-		String[] ret = null;
+		String[] ret = new String[servletNames.size()];
 		servletNames.toArray(ret);
 		return ret;
 	}

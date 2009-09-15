@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.startup;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardEngine;
@@ -31,8 +30,9 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  * 
  * @author Jean Deruelle
  */
-public class SipStandardEngine extends StandardEngine implements Engine {
+public class SipStandardEngine extends StandardEngine {
 	
+	private static final long serialVersionUID = 1L;
 	/**
      * The descriptive information string for this implementation.
      */

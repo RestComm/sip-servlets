@@ -87,11 +87,13 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class SipServletMessageImpl implements SipServletMessage, Serializable {
 
+
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SipServletMessageImpl.class
 			.getCanonicalName());
 	
 	private transient static final String CONTENT_TYPE_TEXT = "text";
-	private transient static final String HCOLON = " : ";
+//	private transient static final String HCOLON = " : ";
 	private transient static final HeaderFactory headerFactory = SipFactories.headerFactory;
 	
 	protected Message message;
@@ -266,11 +268,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	}
 	
 	//check if the submitted value is of the form header-value *(COMMA header-value)
-	private boolean isMultipleValue(String value) {
-		StringTokenizer tokenizer = new StringTokenizer(value, ",");
-		tokenizer.nextToken();
-		return tokenizer.hasMoreTokens();
-	}
+//	private boolean isMultipleValue(String value) {
+//		StringTokenizer tokenizer = new StringTokenizer(value, ",");
+//		tokenizer.nextToken();
+//		return tokenizer.hasMoreTokens();
+//	}
 
 	/*
 	 * (non-Javadoc)
@@ -1218,7 +1220,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if(form == HeaderForm.DEFAULT)
 			return;
 		
-		if(form == HeaderForm.COMPACT) {			 
+//		if(form == HeaderForm.COMPACT) {			 
 //			for(String fullName : headerFull2CompactNamesMappings.keySet()) {
 //				if(message.getHeader(fullName) != null) {
 //					try {
@@ -1231,7 +1233,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 //					}
 //				}
 //			}
-		}
+//		}
 	}
 	
 	/*

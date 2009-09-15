@@ -104,9 +104,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isInfoEnabled()) {
 			logger.info("Routing of Cancel Request " + sipServletRequest);
-		}
-		
-		final Request request = (Request) sipServletRequest.getMessage();		
+		}				
 		/*
 		 * WARNING: routing of CANCEL is special because CANCEL does not contain Route headers as other requests related
 		 * to the dialog. But still it has to be routed through the app path
@@ -134,99 +132,8 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
-		}				
-		final Transaction inviteTransaction = ((ServerTransactionExt) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
-		if(inviteTransaction == null) {
-			logger.error("couldn't find the original invite transaction for this cancel " + request);
-			return;
-		}
-		final TransactionApplicationData inviteAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
-		final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
-			inviteAppData.getSipServletMessage();
-		final MobicentsSipSession sipSession = inviteRequest.getSipSession();
-		sipServletRequest.setSipSession(sipSession);
-		DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
-
-			public void dispatch() throws DispatcherException {
-				if(logger.isDebugEnabled()) {
-					logger.debug("message associated with the inviteAppData " +
-							"of the CANCEL " + inviteRequest);
-				}
-				if(logger.isDebugEnabled()) {
-					logger.debug("invite transaction associated with the inviteAppData " +
-							"of the CANCEL " + inviteTransaction);
-				}
-				if(logger.isDebugEnabled()) {
-					logger.debug("app data of the invite transaction associated with the inviteAppData " +
-							"of the CANCEL " + inviteAppData);
-				}	
-				if(logger.isDebugEnabled()) {
-					logger.debug("routing state of the INVITE request for the CANCEL = " + inviteRequest.getRoutingState());
-				}
-				Proxy proxy = sipSession.getProxy();
-				if(proxy != null) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("proxying the CANCEL " + sipServletRequest);
-					}			
-					// Routing State : PROXY case				
-					if(!RoutingState.PROXIED.equals(inviteRequest.getRoutingState())) {				
-						// 10.2.6 if the original request has not been proxied yet the container 
-						// responds to it with a 487 final response
-						try {
-							send487Response(inviteTransaction, inviteRequest);
-						} catch(IllegalStateException iae) {
-							logger.info("request already proxied, dropping the cancel");
-							return;
-						}
-					} else {
-						// otherwise, all branches are cancelled, and response processing continues as usual
-						proxy.cancel();
-					}
-					// Fix for Issue 796 : SIP servlet (simple proxy) does not receive "Cancel" requests. (http://code.google.com/p/mobicents/issues/detail?id=796)
-					// JSR 289 Section 10.2.6 Receiving CANCEL : In either case, the application is subsequently invoked with the CANCEL request
-					try{
-						callServlet(sipServletRequest);
-					} catch (ServletException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
-					} catch (IOException e) {				
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
-					} 
-				} else if(RoutingState.FINAL_RESPONSE_SENT.equals(inviteRequest.getRoutingState())) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("the final response has already been sent, nothing to do here");
-					}
-				} else {			
-							
-					if(logger.isDebugEnabled()) {
-						logger.debug("invite transaction of the CANCEL " + inviteTransaction);
-					}
-					if(logger.isDebugEnabled()) {
-						logger.debug("invite message : 1xx response was generated ? " + ((SipServletRequestImpl)inviteAppData.getSipServletMessage()).is1xxResponseGenerated());
-					}
-					if(logger.isDebugEnabled()) {
-						logger.debug("invite message : Final response was generated ? " + ((SipServletRequestImpl)inviteAppData.getSipServletMessage()).isFinalResponseGenerated());
-					}
-		            
-	            	if(logger.isDebugEnabled()) {
-	    				logger.debug("replying 487 to INVITE cancelled");				
-	    			}
-	            	//otherwise it means that this is for the app
-	            	try {
-						send487Response(inviteTransaction, inviteRequest);
-					} catch(IllegalStateException iae) {
-						logger.info("request already proxied, dropping the cancel");
-						return;
-					}
-					try{
-						callServlet(sipServletRequest);
-					} catch (ServletException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
-					} catch (IOException e) {				
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
-					} 	
-				} 	
-			}			
-		};
+		}								
+		DispatchTask dispatchTask = new CancelDispatchTask(sipServletRequest, sipProvider);
 		// Execute CANCEL without waiting for previous requests because if we wait for an INVITE to complete
 		// all responses will be already sent by the time the CANCEL is out of the queue.
 		((SipApplicationDispatcherImpl)this.sipApplicationDispatcher).getAsynchronousExecutor().execute(dispatchTask);
@@ -253,5 +160,105 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		} catch (InvalidArgumentException e) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the 487 to the INVITE transaction corresponding to CANCEL", e);
 		}		
+	}
+	
+	public static class CancelDispatchTask extends DispatchTask {
+		
+		CancelDispatchTask(SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
+			super(sipServletRequest, sipProvider);
+		}
+		
+		public void dispatch() throws DispatcherException {
+			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
+			final Request request = (Request) sipServletRequest.getMessage();	
+			final Transaction inviteTransaction = ((ServerTransactionExt) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
+			if(inviteTransaction == null) {
+				logger.error("couldn't find the original invite transaction for this cancel " + request);
+				return;
+			}
+			final TransactionApplicationData inviteAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
+			final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
+				inviteAppData.getSipServletMessage();
+			final MobicentsSipSession sipSession = inviteRequest.getSipSession();			
+			sipServletRequest.setSipSession(sipSession);
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("message associated with the inviteAppData " +
+						"of the CANCEL " + inviteRequest);
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("invite transaction associated with the inviteAppData " +
+						"of the CANCEL " + inviteTransaction);
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("app data of the invite transaction associated with the inviteAppData " +
+						"of the CANCEL " + inviteAppData);
+			}	
+			if(logger.isDebugEnabled()) {
+				logger.debug("routing state of the INVITE request for the CANCEL = " + inviteRequest.getRoutingState());
+			}
+			Proxy proxy = sipSession.getProxy();
+			if(proxy != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("proxying the CANCEL " + sipServletRequest);
+				}			
+				// Routing State : PROXY case				
+				if(!RoutingState.PROXIED.equals(inviteRequest.getRoutingState())) {				
+					// 10.2.6 if the original request has not been proxied yet the container 
+					// responds to it with a 487 final response
+					try {
+						send487Response(inviteTransaction, inviteRequest);
+					} catch(IllegalStateException iae) {
+						logger.info("request already proxied, dropping the cancel");
+						return;
+					}
+				} else {
+					// otherwise, all branches are cancelled, and response processing continues as usual
+					proxy.cancel();
+				}
+				// Fix for Issue 796 : SIP servlet (simple proxy) does not receive "Cancel" requests. (http://code.google.com/p/mobicents/issues/detail?id=796)
+				// JSR 289 Section 10.2.6 Receiving CANCEL : In either case, the application is subsequently invoked with the CANCEL request
+				try{
+					callServlet(sipServletRequest);
+				} catch (ServletException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
+				} catch (IOException e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
+				} 
+			} else if(RoutingState.FINAL_RESPONSE_SENT.equals(inviteRequest.getRoutingState())) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("the final response has already been sent, nothing to do here");
+				}
+			} else {			
+						
+				if(logger.isDebugEnabled()) {
+					logger.debug("invite transaction of the CANCEL " + inviteTransaction);
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("invite message : 1xx response was generated ? " + ((SipServletRequestImpl)inviteAppData.getSipServletMessage()).is1xxResponseGenerated());
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("invite message : Final response was generated ? " + ((SipServletRequestImpl)inviteAppData.getSipServletMessage()).isFinalResponseGenerated());
+				}
+	            
+            	if(logger.isDebugEnabled()) {
+    				logger.debug("replying 487 to INVITE cancelled");				
+    			}
+            	//otherwise it means that this is for the app
+            	try {
+					send487Response(inviteTransaction, inviteRequest);
+				} catch(IllegalStateException iae) {
+					logger.info("request already proxied, dropping the cancel");
+					return;
+				}
+				try{
+					callServlet(sipServletRequest);
+				} catch (ServletException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
+				} catch (IOException e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
+				} 	
+			} 	
+		}			
 	}
 }

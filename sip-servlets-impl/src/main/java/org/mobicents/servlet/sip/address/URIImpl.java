@@ -16,14 +16,13 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.URI;
 import javax.sip.header.Parameters;
 
-public abstract class URIImpl extends ParameterableImpl implements URI, Serializable {
-
+public abstract class URIImpl extends ParameterableImpl implements URI {
+	private static final long serialVersionUID = 1L;
 //	private static Log logger = LogFactory.getLog(URIImpl.class
 //			.getCanonicalName());
 
@@ -36,7 +35,7 @@ public abstract class URIImpl extends ParameterableImpl implements URI, Serializ
 	public URIImpl(javax.sip.address.TelURL telUrl) {
 		this.uri = telUrl;
 		if(this.uri instanceof Parameters) {
-			super.setParameters(AddressImpl.getParameters((Parameters)uri));
+			super.setParameters(AddressImpl.getParameters((Parameters)this.uri));
 		} else {
 			super.setParameters(new ConcurrentHashMap<String, String>());
 		}	
@@ -45,7 +44,7 @@ public abstract class URIImpl extends ParameterableImpl implements URI, Serializ
 	public URIImpl(javax.sip.address.SipURI sipUri) {
 		this.uri = sipUri;
 		if(this.uri instanceof Parameters) {
-			super.setParameters(AddressImpl.getParameters((Parameters)uri));
+			super.setParameters(AddressImpl.getParameters((Parameters)this.uri));
 		} else {
 			super.setParameters(new ConcurrentHashMap<String, String>());
 		}

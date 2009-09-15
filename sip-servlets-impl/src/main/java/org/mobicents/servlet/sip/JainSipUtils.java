@@ -90,7 +90,7 @@ public class JainSipUtils {
 	
     private static transient Logger logger = Logger.getLogger(JainSipUtils.class);
 
-	public static String GLOBAL_IPADDRESS = "0.0.0.0";
+	public static final String GLOBAL_IPADDRESS = "0.0.0.0";
 	
 	public static final TreeSet<String> dialogCreatingMethods = new TreeSet<String>(
 			new NamesComparator());

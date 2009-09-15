@@ -19,7 +19,6 @@ package org.mobicents.servlet.sip.address;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -42,8 +39,8 @@ import org.apache.log4j.Logger;
  */
 
 public abstract class ParameterableImpl implements Parameterable ,Cloneable, Serializable {
-	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());
-	
+	private static final long serialVersionUID = 1L;
+//	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());	
 	private static final String PARAM_SEPARATOR = ";";
 	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
 	

@@ -97,7 +97,6 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	
 	protected transient static final HashSet<String> b2buaSystemHeaders = new HashSet<String>();
 	static {
-
 		b2buaSystemHeaders.add(CallIdHeader.NAME);
 		b2buaSystemHeaders.add(CSeqHeader.NAME);
 		b2buaSystemHeaders.add(ViaHeader.NAME);

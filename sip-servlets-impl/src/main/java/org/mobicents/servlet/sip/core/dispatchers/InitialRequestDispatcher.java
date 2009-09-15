@@ -206,11 +206,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces Header : no match is found as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
 			} else 
 			//Likewise, if the Join/Replaces header field matches a dialog which was not created with an INVITE, the UAS MUST reject the request with a 481 response.	
-			if(joinReplacesDialog != null && ((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getSipServletMessage().getMethod())) {					 
+			if(((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getSipServletMessage().getMethod())) {					 
 				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces header field matches a dialog which was not created with an INVITE as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
 			} else
 			// If the Join/Replaces header field matches a dialog which has already terminated, the UA SHOULD decline the request with a 603 Declined response.
-			if(joinReplacesDialog != null && DialogState.TERMINATED.equals(joinReplacesDialog.getState())) {
+			if(DialogState.TERMINATED.equals(joinReplacesDialog.getState())) {
 				throw new DispatcherException(Response.DECLINE, "Join/Replaces header field matches a dialog which has already terminated as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
 			}
 			//TODO If the initiator of the new INVITE has authenticated successfully as equivalent to the user who is being joined, then the join is authorized
@@ -383,60 +383,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			sipContext.getSipSessionsUtil().addCorrespondingSipSession(sipSessionImpl, joinReplacesSipSession, headerName);		
 		}
 		
-		final DispatchTask dispatchTask = new DispatchTask(sipServletRequest, sipProvider) {
-
-			public void dispatch() throws DispatcherException {
-				sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
-				try {
-					sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());
-					
-					// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
-					sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
-					sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
-					sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
-					sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI());
-					
-					String sipSessionHandlerName = sipSessionImpl.getHandler();						
-					if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
-						String mainServlet = appSession.getCurrentRequestHandler();
-						if(mainServlet != null && mainServlet.length() > 0) {
-							sipSessionHandlerName = mainServlet;				
-						} else {
-							SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
-							if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
-								logger.error("Sending 404 because no matching servlet found for this request ");
-								sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
-								return;
-							} else if(sipServletMapping != null) {
-								sipSessionHandlerName = sipServletMapping.getServletName();
-							}
-						}
-						if(sipSessionHandlerName!= null) {							
-							try {
-								sipSessionImpl.setHandler(sipSessionHandlerName);
-							} catch (ServletException e) {
-								// this should never happen
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing an initial request",e);
-							} 
-						}
-					}
-					try {
-						callServlet(sipServletRequest);
-						if(logger.isInfoEnabled()) {
-							logger.info("Request event dispatched to " + sipContext.getApplicationName());
-						}
-					} catch (ServletException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following initial request " + request, e);
-					} catch (IOException e) {				
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following initial request " + request, e);
-					}
-				} finally {
-					sipContext.exitSipApp(sipServletRequest, null);
-				}
-				//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing							
-			}
-			
-		};
+		// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
+		sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
+		sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
+		sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
+		sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI());
+		
+		final InitialDispatchTask dispatchTask = new InitialDispatchTask(sipServletRequest, sipProvider);
 		// if the flag is set we bypass the executor 
 		if(sipApplicationDispatcher.isBypassRequestExecutor()) {
 			dispatchTask.dispatchAndHandleExceptions();
@@ -673,5 +626,64 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		}
 		
 		return null;
+	}
+	
+	public static class InitialDispatchTask extends DispatchTask {
+		
+		InitialDispatchTask(SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
+			super(sipServletRequest, sipProvider);
+		}
+		
+		public void dispatch() throws DispatcherException {
+			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
+			final MobicentsSipSession sipSessionImpl = sipServletRequest.getSipSession();
+			final MobicentsSipApplicationSession appSession = sipSessionImpl.getSipApplicationSession();
+			final SipContext sipContext = appSession.getSipContext();
+			final SipManager sipManager = (SipManager)sipContext.getManager();
+			final Request request = (Request) sipServletRequest.getMessage();
+			
+			sipContext.enterSipApp(sipServletRequest, null, sipManager, true, true);
+			try {
+				sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());								
+				
+				String sipSessionHandlerName = sipSessionImpl.getHandler();						
+				if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
+					String mainServlet = appSession.getCurrentRequestHandler();
+					if(mainServlet != null && mainServlet.length() > 0) {
+						sipSessionHandlerName = mainServlet;				
+					} else {
+						SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
+						if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
+							logger.error("Sending 404 because no matching servlet found for this request ");
+							sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
+							return;
+						} else if(sipServletMapping != null) {
+							sipSessionHandlerName = sipServletMapping.getServletName();
+						}
+					}
+					if(sipSessionHandlerName!= null) {							
+						try {
+							sipSessionImpl.setHandler(sipSessionHandlerName);
+						} catch (ServletException e) {
+							// this should never happen
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing an initial request",e);
+						} 
+					}
+				}
+				try {
+					callServlet(sipServletRequest);
+					if(logger.isInfoEnabled()) {
+						logger.info("Request event dispatched to " + sipContext.getApplicationName());
+					}
+				} catch (ServletException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following initial request " + request, e);
+				} catch (IOException e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following initial request " + request, e);
+				}
+			} finally {
+				sipContext.exitSipApp(sipServletRequest, null);
+			}
+			//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing							
+		}		
 	}
 }

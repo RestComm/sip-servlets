@@ -32,6 +32,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Jean Deruelle
  */
 public class SipServletImpl extends StandardWrapper {
+	private static final long serialVersionUID = 1L;
 	/**
      * The descriptive information string for this implementation.
      */

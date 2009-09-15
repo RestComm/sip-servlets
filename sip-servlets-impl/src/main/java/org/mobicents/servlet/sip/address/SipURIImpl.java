@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.address;
 
 import gov.nist.javax.sip.address.SipURIExt;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,8 +36,8 @@ import org.mobicents.servlet.sip.SipFactories;
  * @author M. Ranganathan
  * 
  */
-public class SipURIImpl extends URIImpl implements SipURI, Serializable {
-
+public class SipURIImpl extends URIImpl implements SipURI {
+	private static final long serialVersionUID = 1L;
 	private static final String LR_PARAM = "lr";
 	private static final String MADDR = "maddr";
 	protected static final String METHOD = "method";

@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,11 +38,13 @@ import org.mobicents.servlet.sip.SipFactories;
  * @author bartek
  * 
  */
-public class AddressImpl extends ParameterableImpl implements Address, Serializable {
+public class AddressImpl extends ParameterableImpl implements Address {
 	
 //	private static Log logger = LogFactory.getLog(AddressImpl.class
 //			.getCanonicalName());
 	
+
+	private static final long serialVersionUID = 1L;
 	private static final String Q_PARAM_NAME = "q";
 	private static final String EXPIRES_PARAM_NAME = "expires";
 	private static final String PARAM_SEPARATOR = ";";
@@ -202,7 +203,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 				this.removeParameter(EXPIRES_PARAM_NAME);
 				return;
 			}
-			this.setParameter(EXPIRES_PARAM_NAME, Integer.valueOf(seconds).toString());
+			this.setParameter(EXPIRES_PARAM_NAME, Integer.toString(seconds));
 		} else {
 			throw new IllegalArgumentException(
 					"Can only set parameter for Sip URI");
@@ -220,7 +221,7 @@ public class AddressImpl extends ParameterableImpl implements Address, Serializa
 		if(q > 1.0 || q < 0) {
 			throw new IllegalArgumentException("the new qvalue isn't between 0.0 and 1.0 (inclusive) and isn't -1.0.");
 		}
-		this.setParameter(Q_PARAM_NAME, new Float(q).toString());
+		this.setParameter(Q_PARAM_NAME, Float.toString(q));
 		/*
 		try {
 			Parameters uri = (Parameters) this.address.getURI();

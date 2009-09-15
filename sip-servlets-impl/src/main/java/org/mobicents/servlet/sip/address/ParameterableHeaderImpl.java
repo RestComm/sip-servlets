@@ -30,7 +30,7 @@ import javax.sip.header.Parameters;
  * 
  */
 public class ParameterableHeaderImpl extends ParameterableImpl {
-
+	private static final long serialVersionUID = 1L;
 	protected String value = null;
 	
 	public ParameterableHeaderImpl() {

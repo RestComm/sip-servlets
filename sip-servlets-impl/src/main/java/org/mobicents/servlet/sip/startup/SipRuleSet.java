@@ -381,7 +381,7 @@ public class SipRuleSet extends RuleSetBase {
  * only 1 time within the web.xml
  */
 final class SetLoginConfig extends Rule {
-    protected boolean isLoginConfigSet = false;
+	boolean isLoginConfigSet = false;
     public SetLoginConfig() {
     }
 
@@ -401,7 +401,7 @@ final class SetLoginConfig extends Rule {
  * only 1 time within the web.xml
  */
 final class SetSessionConfig extends Rule {
-    protected boolean isSessionConfigSet = false;
+	boolean isSessionConfigSet = false;
     public SetSessionConfig() {
     }
 
@@ -421,7 +421,7 @@ final class SetSessionConfig extends Rule {
  * only 1 time within the web.xml
  */
 final class SetProxyConfig extends Rule {
-    protected boolean isProxyConfigSet = false;
+    boolean isProxyConfigSet = false;
     public SetProxyConfig() {
     }
 
@@ -441,8 +441,8 @@ final class SetProxyConfig extends Rule {
  * within the sip.xml
  */
 final class SetServletSelection extends Rule {
-    protected boolean isServletMapping;
-    protected boolean isMainServlet;
+    boolean isServletMapping;
+    boolean isMainServlet;
     public SetServletSelection() {
     }
 

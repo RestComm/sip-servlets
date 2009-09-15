@@ -36,8 +36,8 @@ public abstract class DispatchTask implements Runnable {
 	
 	private static transient Logger logger = Logger.getLogger(DispatchTask.class);
 	
-	private SipServletMessageImpl sipServletMessage;
-	private SipProvider sipProvider;
+	protected SipServletMessageImpl sipServletMessage;
+	protected SipProvider sipProvider;
 	
 	public DispatchTask(SipServletMessageImpl sipServletMessage, SipProvider sipProvider) {
 		this.sipProvider = sipProvider;

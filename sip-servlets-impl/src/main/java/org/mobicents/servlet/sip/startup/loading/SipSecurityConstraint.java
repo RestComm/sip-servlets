@@ -22,7 +22,8 @@ import org.apache.catalina.deploy.SecurityConstraint;
  * Sip Security 
  *
  */
-public class SipSecurityConstraint extends SecurityConstraint {	
+public class SipSecurityConstraint extends SecurityConstraint {
+	private static final long serialVersionUID = 1L;
 	public boolean proxyAuthentication;
 
 	/**
