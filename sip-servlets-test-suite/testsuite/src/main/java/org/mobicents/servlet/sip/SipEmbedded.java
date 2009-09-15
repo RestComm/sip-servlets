@@ -291,10 +291,10 @@ public class SipEmbedded {
     protected static final String CATALINA_HOME_TOKEN = "${catalina.home}";
     protected static final String CATALINA_BASE_TOKEN = "${catalina.base}";
 
-    protected static final Integer IS_DIR = new Integer(0);
-    protected static final Integer IS_JAR = new Integer(1);
-    protected static final Integer IS_GLOB = new Integer(2);
-    protected static final Integer IS_URL = new Integer(3);
+    protected static final Integer IS_DIR = Integer.valueOf(0);
+    protected static final Integer IS_JAR = Integer.valueOf(1);
+    protected static final Integer IS_GLOB = Integer.valueOf(2);
+    protected static final Integer IS_URL = Integer.valueOf(3);
     
     protected ClassLoader commonLoader = null;
     protected ClassLoader catalinaLoader = null;
@@ -450,12 +450,12 @@ public class SipEmbedded {
         if (locations != null && types != null && locations.length == types.length) {
             for (int i = 0; i < locations.length; i++)  {
                 String location = locations[i];
-                if ( types[i] == IS_URL ) {
+                if ( types[i].equals(IS_URL) ) {
                     URL url = new URL(location);
                     if (log.isDebugEnabled())
                         log.debug("  Including URL " + url);
                     list.add(url);
-                } else if ( types[i] == IS_DIR ) {
+                } else if ( types[i].equals(IS_DIR) ) {
                     File directory = new File(location);
                     directory = new File(directory.getCanonicalPath());
                     if (!directory.exists() || !directory.isDirectory() ||
@@ -465,7 +465,7 @@ public class SipEmbedded {
                     if (log.isDebugEnabled())
                         log.debug("  Including directory " + url);
                     list.add(url);
-                } else if ( types[i] == IS_JAR ) {
+                } else if ( types[i].equals(IS_JAR) ) {
                     File file=new File(location);
                     file = new File(file.getCanonicalPath());
                     if (!file.exists() || !file.canRead())
@@ -474,7 +474,7 @@ public class SipEmbedded {
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + url);
                     list.add(url);
-                } else if ( types[i] == IS_GLOB ) {
+                } else if ( types[i].equals(IS_GLOB) ) {
                     File directory=new File(location);
                     if (!directory.exists() || !directory.isDirectory() ||
                         !directory.canRead())

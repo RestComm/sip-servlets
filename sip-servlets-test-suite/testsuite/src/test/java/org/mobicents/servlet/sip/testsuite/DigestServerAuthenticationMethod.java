@@ -113,8 +113,8 @@ public class DigestServerAuthenticationMethod implements AuthenticationMethod {
 		long time = date.getTime();
 		Random rand = new Random();
 		long pad = rand.nextLong();
-		String nonceString = (new Long(time)).toString()
-				+ (new Long(pad)).toString();
+		String nonceString = (Long.valueOf(time)).toString()
+				+ (Long.valueOf(pad)).toString();
 		byte mdbytes[] = messageDigest.digest(nonceString.getBytes());
 		// Convert the mdbytes array into a hex string.
 		return toHexString(mdbytes);
@@ -139,8 +139,7 @@ public class DigestServerAuthenticationMethod implements AuthenticationMethod {
 	public boolean doAuthenticate(String user, AuthorizationHeader authHeader,
 			Request request) {
 		String realm = authHeader.getRealm();
-		String username = authHeader.getUsername();
-		URI requestURI = request.getRequestURI();
+		String username = authHeader.getUsername();		
 
 		if (username == null) {
 			System.out
