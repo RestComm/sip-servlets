@@ -301,13 +301,14 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		List<String> contactHeaderList = new ArrayList<String>();
 		if(headerMap != null) {
 			for (Entry<String, List<String>> entry : headerMap.entrySet()) {
-				if(!entry.getKey().equalsIgnoreCase(ContactHeader.NAME)) {
-					if(b2buaSystemHeaders.contains(entry)) {
-						throw new IllegalArgumentException(entry + " in the provided map is a system header");
+				final String headerName = entry.getKey();
+				if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
+					if(b2buaSystemHeaders.contains(headerName)) {
+						throw new IllegalArgumentException(headerName + " in the provided map is a system header");
 					}
 					for (String value : entry.getValue()) {							
 						final Header header = SipFactories.headerFactory.createHeader(
-								entry.getKey(), value);					
+								headerName, value);					
 						if(! singletonHeadersNames.contains(header.getName())) {
 							newRequest.addHeader(header);
 						} else {
@@ -315,7 +316,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						}
 					}
 				} else {
-					contactHeaderList = headerMap.get(entry);
+					contactHeaderList = headerMap.get(headerName);
 				}
 			}
 		}
