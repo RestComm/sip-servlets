@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 
 
 public class LocationServiceSipServlet extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(LocationServiceSipServlet.class);
 	
 	private static final String LOCAL_TRANSPORT = "udp";

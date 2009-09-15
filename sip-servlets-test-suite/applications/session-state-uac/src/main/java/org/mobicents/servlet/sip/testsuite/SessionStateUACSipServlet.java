@@ -36,16 +36,16 @@ import org.apache.log4j.Logger;
 public class SessionStateUACSipServlet
 		extends SipServlet 
 		implements SipServletListener {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SessionStateUACSipServlet.class);
 	
-	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";		
-	private static final String SEND_1XX_2XX = "send1xx_2xx";
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String SEND_1XX_4XX = "send1xx_4xx";
-	private static final String SEND_4XX = "send4xx";
-	private static final String SEND_2XX = "send2xx";
-	
-	private SipFactory sipFactory;	
+//	private static final String SEND_1XX_2XX = "send1xx_2xx";	
+//	private static final String SEND_4XX = "send4xx";
+//	private static final String SEND_2XX = "send2xx";
+//	
+//	private SipFactory sipFactory;	
 	
 	/** Creates a new instance of SessionStateUACSipServlet */
 	public SessionStateUACSipServlet() {

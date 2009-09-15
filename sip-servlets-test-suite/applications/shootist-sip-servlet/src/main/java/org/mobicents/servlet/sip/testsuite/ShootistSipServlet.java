@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 public class ShootistSipServlet 
 		extends SipServlet 
 		implements SipServletListener,TimerListener {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;

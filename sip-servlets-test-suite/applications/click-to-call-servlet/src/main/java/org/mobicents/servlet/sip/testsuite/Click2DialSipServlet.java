@@ -42,6 +42,7 @@ import javax.servlet.sip.SipApplicationSession.Protocol;
 import org.apache.log4j.Logger;
 
 public class Click2DialSipServlet extends SipServlet implements SipApplicationSessionListener {
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(Click2DialSipServlet.class);
 	private static final String SIP_APP_SESSION_DESTROYED = "sipAppSessionDestroyed";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";

@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 
 public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-	
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SpeedDialSipServlet.class);
 	private static final String REMOTE_TRANSPORT = "udp";
 	private static final int REMOTE_PORT = 5080;

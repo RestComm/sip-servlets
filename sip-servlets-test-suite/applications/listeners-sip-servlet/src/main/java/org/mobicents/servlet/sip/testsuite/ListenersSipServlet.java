@@ -64,7 +64,7 @@ public class ListenersSipServlet
 		SipSessionListener, SipSessionActivationListener, SipSessionBindingListener,
 		SipApplicationSessionListener, SipApplicationSessionActivationListener, SipApplicationSessionBindingListener,
 		SipSessionAttributeListener, SipApplicationSessionAttributeListener, TimerListener {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ListenersSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";

@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  */
 public class MainHandlerSipServlet
 		extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(MainHandlerSipServlet.class);
 	
 	private SipFactory sipFactory;	

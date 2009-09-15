@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 
 public class ServletMappingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ServletMappingSipServlet.class);
 	
 	

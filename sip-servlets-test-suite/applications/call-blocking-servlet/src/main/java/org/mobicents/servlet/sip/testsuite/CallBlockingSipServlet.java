@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 
 public class CallBlockingSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(CallBlockingSipServlet.class);
 	List<String> blockedUris = null;
 	

@@ -32,14 +32,12 @@ import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.log4j.Logger;
 
-public class SimpleWebServlet extends HttpServlet
-{ 	
+public class SimpleWebServlet extends HttpServlet { 	
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SimpleWebServlet.class);
 	private SipFactory sipFactory;
 	

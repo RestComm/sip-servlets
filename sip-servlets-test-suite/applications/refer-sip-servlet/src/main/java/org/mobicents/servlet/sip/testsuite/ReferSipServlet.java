@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class ReferSipServlet extends SipServlet implements SipServletListener, TimerListener, SipSessionListener {
-
+	private static final long serialVersionUID = 1L;
 	private static final String REFER_SESSION = "referSession";
 	private static transient Logger logger = Logger.getLogger(ReferSipServlet.class);
 	private final static String TRYING_CONTENT = "SIP/2.0 100 Trying";

@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class UpdateSipServlet extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(UpdateSipServlet.class);
 	
 	/** Creates a new instance of SimpleProxyServlet */

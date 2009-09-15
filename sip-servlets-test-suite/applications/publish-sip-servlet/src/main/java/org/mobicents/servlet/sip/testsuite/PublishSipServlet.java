@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class PublishSipServlet extends SipServlet implements SipServletListener, TimerListener {
-
+	private static final long serialVersionUID = 1L;
 	private static final String SUBSCRIBER_SESSIONS = "subscriberSessions";
 	private static final String PUBLISH_SIP_ETAGS = "publishSIP-ETag_s";
 	private static transient Logger logger = Logger.getLogger(PublishSipServlet.class);

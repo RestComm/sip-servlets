@@ -46,7 +46,7 @@ import org.apache.log4j.Logger;
 public class SubscriberSipServlet 
 		extends SipServlet 
 		implements SipServletListener, TimerListener, SipSessionListener {
-
+	private static final long serialVersionUID = 1L;
 	private static final String TEST_SAME_CONTAINER_USER_NAME = "sameContainerUserName";
 	private static transient Logger logger = Logger.getLogger(SubscriberSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";

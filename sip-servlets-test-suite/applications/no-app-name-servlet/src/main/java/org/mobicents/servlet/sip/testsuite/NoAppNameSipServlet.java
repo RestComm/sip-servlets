@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 
 public class NoAppNameSipServlet extends SipServlet implements SipErrorListener, TimerListener {
 	
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(NoAppNameSipServlet.class);
 	
 	/** Creates a new instance of SimpleProxyServlet */

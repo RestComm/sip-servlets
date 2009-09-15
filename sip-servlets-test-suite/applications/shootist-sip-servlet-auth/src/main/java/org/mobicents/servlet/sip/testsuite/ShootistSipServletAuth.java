@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 public class ShootistSipServletAuth 
 		extends SipServlet 
 		implements SipServletListener {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ShootistSipServletAuth.class);
 	
 	

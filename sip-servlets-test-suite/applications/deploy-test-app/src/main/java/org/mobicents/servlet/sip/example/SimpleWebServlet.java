@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 
 public class SimpleWebServlet extends HttpServlet
 { 	
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SimpleWebServlet.class);
 	private SipFactory sipFactory;
 	@Resource

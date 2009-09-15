@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class NotifierSipServlet extends SipServlet implements SipSessionListener {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(NotifierSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String SIP_SESSION_READY_TO_BE_INVALIDATED = "sipSessionReadyToBeInvalidated";

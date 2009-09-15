@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 
 
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
-	
+	private static final long serialVersionUID = 1L;
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
 	private static final String TEST_SUBSCRIBER_URI = "testSubscriberUri";
 	private static final String TEST_EXTERNAL_ROUTING = "testExternalRouting";

@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
 public class SameInstanceSipServlet 
 	extends SipServlet 
 	implements SipApplicationSessionListener, TimerListener {
-	
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SameInstanceSipServlet.class);
 	private static String INSTANCES_DIFFERENT = "KO"; 
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";

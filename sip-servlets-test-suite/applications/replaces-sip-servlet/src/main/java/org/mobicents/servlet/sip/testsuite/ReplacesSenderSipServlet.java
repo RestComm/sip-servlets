@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 
 
 public class ReplacesSenderSipServlet extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ReplacesSenderSipServlet.class);
 	Map<String, List<URI>> registeredUsers = null;
 	

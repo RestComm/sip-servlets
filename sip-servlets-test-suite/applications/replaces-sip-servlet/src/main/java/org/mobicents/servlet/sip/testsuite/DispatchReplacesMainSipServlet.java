@@ -18,24 +18,19 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 
-import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.log4j.Logger;
-
 
 public class DispatchReplacesMainSipServlet extends SipServlet {
-
-	private static transient Logger logger = Logger.getLogger(DispatchReplacesMainSipServlet.class);
-	
-	@Resource
-	private SipFactory sipFactory;
+	private static final long serialVersionUID = 1L;
+//	private static transient Logger logger = Logger.getLogger(DispatchReplacesMainSipServlet.class);	
+//	@Resource
+//	private SipFactory sipFactory;
 	
 	/** Creates a new instance of DispatchReplacesMainSipServlet */
 	public DispatchReplacesMainSipServlet() {

@@ -45,7 +45,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 @SipListener
 @javax.servlet.sip.annotation.SipServlet(loadOnStartup=1)
 public class AnnotatedServlet extends SipServlet implements Servlet, SipServletListener {
-	
+	private static final long serialVersionUID = 1L;
 	@Resource
 	SipFactory sipFactory;
 	@Resource

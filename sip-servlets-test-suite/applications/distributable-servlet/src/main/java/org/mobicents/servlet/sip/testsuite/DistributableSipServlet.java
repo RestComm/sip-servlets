@@ -25,7 +25,7 @@ import javax.servlet.sip.SipServletResponse;
 
 public class DistributableSipServlet 
 	extends SipServlet {
-	
+	private static final long serialVersionUID = 1L;
 	@Override
 	public void doInvite(SipServletRequest req) throws ServletException, IOException {
 		req.createResponse(SipServletResponse.SC_OK).send();

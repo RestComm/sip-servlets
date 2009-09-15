@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 
 public class ShootmeSipServletAuth extends SipServlet implements SipErrorListener,
 		Servlet {
-
+	private static final long serialVersionUID = 1L;
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {

@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 public class TimersSipServlet
 		extends SipServlet 
 		implements SipApplicationSessionListener, TimerListener {
-
+	private static final long serialVersionUID = 1L;
 	private static final String RECURRING_TIME = "recurringTime";
 	private static final String RECURRING = "recurring";
 	private static final String ALREADY_EXTENDED = "alreadyExtended";
