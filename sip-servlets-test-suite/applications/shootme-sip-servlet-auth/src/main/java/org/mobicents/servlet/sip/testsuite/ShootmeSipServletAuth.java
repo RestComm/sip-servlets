@@ -31,8 +31,7 @@ import javax.servlet.sip.SipURI;
 import org.apache.log4j.Logger;
 
 
-public class ShootmeSipServletAuth extends SipServlet implements SipErrorListener,
-		Servlet {
+public class ShootmeSipServletAuth extends SipServlet implements SipErrorListener {
 	private static final long serialVersionUID = 1L;
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)

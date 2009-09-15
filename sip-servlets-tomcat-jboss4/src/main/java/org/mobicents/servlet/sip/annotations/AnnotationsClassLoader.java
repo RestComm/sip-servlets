@@ -146,7 +146,7 @@ public class AnnotationsClassLoader
      * but where the corresponding JAR files are required to run on
      * earlier versions.
      */
-    protected static final String[] triggers = {
+    static final String[] triggers = {
         "javax.servlet.Servlet"                     // Servlet API
     };
 
@@ -932,7 +932,7 @@ public class AnnotationsClassLoader
         // Return the class we have located
         if (log.isTraceEnabled())
             log.debug("      Returning class " + clazz);
-        if ((log.isTraceEnabled()) && (clazz != null))
+        if (log.isTraceEnabled())
             log.debug("      Loaded by " + clazz.getClassLoader());
         return (clazz);
 
@@ -2365,11 +2365,18 @@ public class AnnotationsClassLoader
             if (file.isDirectory()) {
                 deleteDir(file);
             } else {
-                file.delete();
+            	try {
+            		file.delete();
+            	} catch (SecurityException se) {
+            		log.error("The file " + file.getAbsolutePath() + " couldn't be deleted");
+            	}
             }
         }
-        dir.delete();
-
+        try {
+        	dir.delete();
+        } catch (SecurityException se) {
+    		log.error("The directory " + dir.getAbsolutePath() + " couldn't be deleted");
+    	}
     }
 
 

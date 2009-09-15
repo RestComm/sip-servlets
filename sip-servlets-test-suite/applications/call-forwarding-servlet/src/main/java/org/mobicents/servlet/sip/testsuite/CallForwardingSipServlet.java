@@ -32,8 +32,7 @@ import javax.servlet.sip.SipURI;
 import org.apache.log4j.Logger;
 
 
-public class CallForwardingSipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class CallForwardingSipServlet extends SipServlet implements SipErrorListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(CallForwardingSipServlet.class);
 	

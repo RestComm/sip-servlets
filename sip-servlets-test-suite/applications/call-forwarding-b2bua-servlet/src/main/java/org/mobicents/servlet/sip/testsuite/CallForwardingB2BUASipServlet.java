@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.AuthInfo;
@@ -39,8 +38,7 @@ import javax.servlet.sip.SipURI;
 import org.apache.log4j.Logger;
 
 
-public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener {
 	private static final long serialVersionUID = 1L;
 	private static final String ACT_AS_UAS = "actAsUas";
 	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);

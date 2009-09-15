@@ -85,9 +85,11 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  * 
  */
 public class SipStandardContext extends StandardContext implements SipContext {
+	
+	private static final long serialVersionUID = 1L;
 	//	 the logger
 	private static transient Logger logger = Logger.getLogger(SipStandardContext.class);
-	private SipRubyController rubyController;
+	private transient SipRubyController rubyController;
 
 	/**
      * The descriptive information string for this implementation.
@@ -105,18 +107,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected String description;
 	protected int proxyTimeout;
 	protected int sipApplicationSessionTimeout;
-	protected SipListenersHolder listeners;
+	protected transient SipListenersHolder listeners;
 	protected String mainServlet;	
-	protected SipFactoryFacade sipFactoryFacade;	
-	protected SipSessionsUtilImpl sipSessionsUtil;
-	protected SipLoginConfig sipLoginConfig;
+	protected transient SipFactoryFacade sipFactoryFacade;	
+	protected transient SipSessionsUtilImpl sipSessionsUtil;
+	protected transient SipLoginConfig sipLoginConfig;
 	
 	protected boolean hasDistributableManager;
 	
     protected String namingContextName;
     
-    protected Method sipApplicationKeyMethod;
-    protected ConcurrencyControlMode concurrencyControlMode;    
+    protected transient Method sipApplicationKeyMethod;
+    protected transient ConcurrencyControlMode concurrencyControlMode;    
 	/**
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
@@ -129,12 +131,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
      */
     protected List<SipServletMapping> sipServletMappings = new ArrayList<SipServletMapping>();
     
-    protected SipApplicationDispatcher sipApplicationDispatcher = null;
+    protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
     
     protected Map<String, Container> childrenMap;
     protected Map<String, Container> childrenMapByClassName;
 
-    protected ScheduledThreadPoolExecutor executor = null;
+    protected transient ScheduledThreadPoolExecutor executor = null;
 	/**
 	 * 
 	 */

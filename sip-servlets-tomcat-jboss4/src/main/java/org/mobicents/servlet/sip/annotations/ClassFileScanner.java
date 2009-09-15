@@ -285,7 +285,9 @@ public class ClassFileScanner {
 		if (appName == null) {
 			appName = servlet.applicationName();
 		}
-
+		if(sipContext.getApplicationName() == null && appName != null) {
+			sipContext.setApplicationName(appName);
+		}
 		String name = null;
 		if (servlet.name() == null || servlet.name().equals("")) {
 			name = clazz.getSimpleName(); // if no name is specified deduce
@@ -293,7 +295,7 @@ public class ClassFileScanner {
 		} else {
 			name = servlet.name();
 		}
-
+		
 		if (sipContext.getMainServlet() == null
 				|| sipContext.getMainServlet().equals("")) {
 			sipContext.setMainServlet(name);

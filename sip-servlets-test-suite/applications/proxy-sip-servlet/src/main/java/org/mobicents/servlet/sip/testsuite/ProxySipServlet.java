@@ -38,8 +38,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 
-public class ProxySipServlet extends SipServlet implements SipErrorListener,
-		Servlet {
+public class ProxySipServlet extends SipServlet implements SipErrorListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
 	

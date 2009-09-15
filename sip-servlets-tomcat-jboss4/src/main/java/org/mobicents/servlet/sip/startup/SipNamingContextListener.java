@@ -58,7 +58,7 @@ public class SipNamingContextListener extends NamingContextListener {
 	@Override
 	public void lifecycleEvent(LifecycleEvent event) {
 		super.lifecycleEvent(event);
-		if (event.getType() == Lifecycle.START_EVENT) {
+		if (event.getType().equalsIgnoreCase(Lifecycle.START_EVENT)) {
 			if (container instanceof SipContext) {
 				((SipAnnotationProcessor)((SipContext)container).getAnnotationProcessor()).setContext(envCtx);
 			}

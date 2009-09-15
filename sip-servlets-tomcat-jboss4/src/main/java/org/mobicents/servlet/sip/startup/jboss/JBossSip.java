@@ -17,8 +17,6 @@
 package org.mobicents.servlet.sip.startup.jboss;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -41,7 +39,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.deployment.SubDeployerExt;
-import org.jboss.ejb.plugins.cmp.jdbc2.FindByPrimaryKeyCommand;
 import org.jboss.metadata.WebMetaData;
 import org.jboss.mx.util.MBeanProxyExt;
 import org.jboss.security.plugins.JaasSecurityManagerServiceMBean;
@@ -448,13 +445,13 @@ public class JBossSip extends AbstractConvergedContainer
       server.setAttribute(objectName, new Attribute
          ("configFile", serverConfigFile));
       server.setAttribute(objectName, new Attribute
-         ("useNaming", new Boolean(false)));
+         ("useNaming", Boolean.valueOf(false)));
       server.setAttribute(objectName, new Attribute
-         ("useShutdownHook", new Boolean(false)));
+         ("useShutdownHook", Boolean.valueOf(false)));
       server.setAttribute(objectName, new Attribute
-         ("await", new Boolean(false)));
+         ("await", Boolean.valueOf(false)));
       server.setAttribute(objectName, new Attribute
-         ("redirectStreams", new Boolean(false)));
+         ("redirectStreams", Boolean.valueOf(false)));
 
       server.invoke(objectName, "create", new Object[]{},
          new String[]{});

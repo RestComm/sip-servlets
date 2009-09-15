@@ -26,7 +26,6 @@ import javax.servlet.ServletContext;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardWrapper;
@@ -51,8 +50,7 @@ import org.xml.sax.EntityResolver;
  * @author Jean Deruelle
  * 
  */
-public class SipContextConfig extends ContextConfig implements
-		LifecycleListener {	
+public class SipContextConfig extends ContextConfig {	
 
 	private static transient final Logger logger = Logger.getLogger(SipContextConfig.class);
 
@@ -235,7 +233,7 @@ public class SipContextConfig extends ContextConfig implements
 				docBase = file.getCanonicalPath();
 			}
 			file = new File(docBase);
-			String origDocBase = docBase;
+//			String origDocBase = docBase;
 			if ((docBase.toLowerCase().endsWith(".sar") || docBase.toLowerCase()
 					.endsWith(".war"))
 					&& !file.isDirectory() && unpackWARs) {

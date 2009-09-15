@@ -34,9 +34,7 @@ import javax.servlet.sip.SipURI;
 import org.apache.log4j.Logger;
 
 public class B2BUASipServlet extends SipServlet {	
-	private static final long serialVersionUID = 1L;
-
-	B2buaHelper helper = null;
+	private static final long serialVersionUID = 1L;	
 	
 	private static transient Logger logger = Logger.getLogger(B2BUASipServlet.class);
 
@@ -49,7 +47,7 @@ public class B2BUASipServlet extends SipServlet {
 		toHeaderList.add("sip:aa@sip-servlets.com");
 		headers.put("To", toHeaderList);
 		
-		helper = request.getB2buaHelper();
+		B2buaHelper helper = request.getB2buaHelper();
 		SipServletRequest forkedRequest = helper.createRequest(request, true,
 				headers);
 		
@@ -80,6 +78,7 @@ public class B2BUASipServlet extends SipServlet {
 			if(cSeqValue.indexOf("INVITE") != -1) {
 				SipServletRequest ackRequest = sipServletResponse.createAck();
 				ackRequest.send();
+				B2buaHelper helper = sipServletResponse.getRequest().getB2buaHelper();
 				//create and sends OK for the first call leg
 				SipSession originalSession =   
 				    helper.getLinkedSession(sipServletResponse.getSession());					
@@ -105,7 +104,7 @@ public class B2BUASipServlet extends SipServlet {
 		response.send();
 
 		SipSession session = request.getSession();		
-		SipSession linkedSession = helper.getLinkedSession(session);
+		SipSession linkedSession = request.getB2buaHelper().getLinkedSession(session);
 		SipServletRequest newRequest = linkedSession.createRequest("BYE");
 		logger.info(newRequest);
 		newRequest.send();

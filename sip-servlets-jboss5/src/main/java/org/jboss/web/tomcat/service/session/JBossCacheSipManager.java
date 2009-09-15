@@ -40,6 +40,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -1607,6 +1608,21 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					// Do the actual replication
 					begin = System.currentTimeMillis();
 					processSipApplicationSessionRepl(session);
+					// we make sure we replicate all underlying sip sessions that could have been made dirty
+					Iterator<ClusteredSipSession<OutgoingDistributableSessionData>> sipSessionIt = 
+						(Iterator<ClusteredSipSession<OutgoingDistributableSessionData>>)
+							((MobicentsSipApplicationSession)session).getSessions("SIP");
+					if(logger.isDebugEnabled()) {
+						logger.debug("checking if the underlying sip sessions are dirty and need to be replicated as well");
+					}
+					while (sipSessionIt.hasNext()) {						
+						ClusteredSipSession sipSession = (ClusteredSipSession) sipSessionIt
+								.next();
+						if(logger.isDebugEnabled()) {
+							logger.debug("checking if the underlying sip session " + sipSession.getKey() + " is dirty and need to be replicated as well");
+						}
+						storeSipSession(sipSession);
+					}					
 					elapsed = System.currentTimeMillis() - begin;
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
@@ -2325,29 +2341,26 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						batchingManager.endBatch();
 				}
 			}
-			if (session != null)
-	         {            
-	            if (mustAdd)
-	            {
-	               add(session, false); // don't replicate
-	               if (!passivated)
-	               {
-	                  session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
-	               }
-	            }
-	            long elapsed = System.currentTimeMillis() - begin;
-	            stats_.updateLoadStats(key.toString(), elapsed);
+		}
+		if (session != null) {
+			if (mustAdd) {
+				add(session, false); // don't replicate
+				if (!passivated) {
+					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
+				}
+			}
+			long elapsed = System.currentTimeMillis() - begin;
+			stats_.updateLoadStats(key.toString(), elapsed);
 
-	            if (trace_)
-	            {
-	               log_.trace("loadSession(): id= " + key + ", session=" + session);
-	            }
-	         }
-	         else if (trace_)
-	         {
-	            log_.trace("loadSession(): session " + key +
-	                       " not found in distributed cache");
-	         }
+			if (trace_) {
+				log_
+						.trace("loadSession(): id= " + key + ", session="
+								+ session);
+			}
+		} else if (trace_) {
+			log_.trace("loadSession(): session " + key
+					+ " not found in distributed cache");
+		}
 //				if (sessionInCache != null) {
 //					// Need to initialize.
 //					sessionInCache.initAfterLoad(this);
@@ -2364,8 +2377,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //				} else if (log_.isDebugEnabled()) {
 //					log_.debug("loadSession(): session " + key.toString()
 //							+ " not found in distributed cache");
-//				}
-		}	
+//				}		
 		return session;
 	}
 	
@@ -3056,6 +3068,20 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			session = loadSipApplicationSession(key, create);
 			if (session != null) {
 				add(session);
+				Iterator<ClusteredSipSession<OutgoingDistributableSessionData>> sipSessionIt = 
+					(Iterator<ClusteredSipSession<OutgoingDistributableSessionData>>)
+						((MobicentsSipApplicationSession)session).getSessions("SIP");
+				if(logger.isDebugEnabled()) {
+					logger.debug("loading the underlying sip sessions from the cache");
+				}
+				while (sipSessionIt.hasNext()) {						
+					ClusteredSipSession sipSession = (ClusteredSipSession) sipSessionIt
+							.next();
+					if(logger.isDebugEnabled()) {
+						logger.debug("loading the underlying sip session from the cache " + sipSession.getKey());
+					}
+					getSipSession(sipSession.getKey(), false, null, session);
+				}	
 				// TODO should we advise of a new session?
 				// tellNew();
 			}
