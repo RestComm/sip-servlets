@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>MonitoringApp</app-name>
+	<display-name>Monitoring Application</display-name>	
+	
+	<servlet>
+		<servlet-name>PhoneCallSipServlet</servlet-name>
+		<display-name>PhoneCallServlet</display-name>
+		<description>Phone Call SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.monitoring.PhoneCallSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>		             
+    
+    <context-param>
+      <param-name>alert.feedback.url</param-name>
+      <param-value>http://localhost:7080/alertFeedback</param-value>
+    </context-param>    
+    
+    <context-param>
+      <param-name>caller.domain</param-name>
+      <param-value>sip.callwithus.com</param-value>
+    </context-param>    
+    
+    <context-param>
+      <param-name>caller.sip</param-name>
+      <param-value>650390127</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>caller.password</param-name>
+      <param-value>311578</param-value>
+    </context-param>
+	
+	<!-- Uncomment to enable security
+	<security-constraint>
+	   <display-name>REGISTER Method Security Constraint</display-name>
+	      <resource-collection>
+	          <resource-name>SimpleSipServlet</resource-name>
+	          <description>Require authenticated REGSITER requests</description>
+	          <servlet-name>SimpleSipServlet</servlet-name>
+	          <sip-method>REGISTER</sip-method>   
+	     </resource-collection>   
+	     <auth-constraint>      
+	           <role-name>caller</role-name>  
+	     </auth-constraint>
+	 </security-constraint>
+	 
+	 <login-config> 
+         	<auth-method>DIGEST</auth-method> 
+         	<realm-name>sip-servlets-realm</realm-name> 
+   	 </login-config> -->
+</sip-app>
