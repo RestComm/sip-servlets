@@ -26,8 +26,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
@@ -76,6 +78,8 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  */
 
 public class B2buaHelperImpl implements B2buaHelper, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private static transient Logger logger = Logger.getLogger(B2buaHelperImpl.class);
 	
 	protected transient static final HashSet<String> singletonHeadersNames = new HashSet<String>();
@@ -207,10 +211,14 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			originalSession.setB2buaHelper(this);
 			
 			return newSipServletRequest;
-		} catch (Exception ex) {
+		} catch (ParseException ex) {
+			logger.error("Unexpected parse exception ", ex);
+			throw new IllegalArgumentException(
+					"Illegal arg encountered while creating b2bua", ex);
+		} catch (ServletException ex) {
 			logger.error("Unexpected exception ", ex);
 			throw new IllegalArgumentException(
-					"Illegal arg ecnountered while creatigng b2bua", ex);
+					"Unexpected problem while creating b2bua", ex);
 		}
 	}
 
@@ -293,14 +301,14 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throws ParseException {
 		List<String> contactHeaderList = new ArrayList<String>();
 		if(headerMap != null) {
-			for (String headerName : headerMap.keySet()) {
-				if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
-					if(b2buaSystemHeaders.contains(headerName)) {
-						throw new IllegalArgumentException(headerName + " in the provided map is a system header");
+			for (Entry<String, List<String>> entry : headerMap.entrySet()) {
+				if(!entry.getKey().equalsIgnoreCase(ContactHeader.NAME)) {
+					if(b2buaSystemHeaders.contains(entry)) {
+						throw new IllegalArgumentException(entry + " in the provided map is a system header");
 					}
-					for (String value : headerMap.get(headerName)) {							
+					for (String value : entry.getValue()) {							
 						final Header header = SipFactories.headerFactory.createHeader(
-								headerName, value);					
+								entry.getKey(), value);					
 						if(! singletonHeadersNames.contains(header.getName())) {
 							newRequest.addHeader(header);
 						} else {
@@ -308,7 +316,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						}
 					}
 				} else {
-					contactHeaderList = headerMap.get(headerName);
+					contactHeaderList = headerMap.get(entry);
 				}
 			}
 		}

@@ -72,6 +72,7 @@ import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
 public class SipFactoryImpl implements Serializable {	
 
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SipFactoryImpl.class
 			.getCanonicalName());
 	private static final String TAG_PARAM = "tag";
@@ -84,7 +85,9 @@ public class SipFactoryImpl implements Serializable {
 	private boolean useLoadBalancer = false;
 	private BalancerDescription loadBalancerToUse = null;
 	
-	public static class NamesComparator implements Comparator<String> {
+	public static class NamesComparator implements Comparator<String>, Serializable {		
+		private static final long serialVersionUID = 1L;
+
 		public int compare(String o1, String o2) {
 			return o1.compareToIgnoreCase(o2);
 		}

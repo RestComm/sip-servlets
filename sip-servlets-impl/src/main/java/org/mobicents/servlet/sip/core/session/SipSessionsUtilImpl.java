@@ -19,7 +19,6 @@ package org.mobicents.servlet.sip.core.session;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,16 +34,16 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author Jean Deruelle
  *
  */
-public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
+public class SipSessionsUtilImpl implements SipSessionsUtil {
 	private static transient Logger logger = Logger.getLogger(SipSessionsUtilImpl.class);
 	
-	private transient SipContext sipContext;
+	private SipContext sipContext;
 	
-	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> joinSession;
-	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> replacesSession;
+	private ConcurrentHashMap<SipSessionKey, MobicentsSipSession> joinSession;
+	private ConcurrentHashMap<SipSessionKey, MobicentsSipSession> replacesSession;
 	
-	private transient ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> joinApplicationSession;
-	private transient ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> replacesApplicationSession;
+	private ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> joinApplicationSession;
+	private ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> replacesApplicationSession;
 
 	public SipSessionsUtilImpl(SipContext sipContext) {
 		this.sipContext = sipContext;

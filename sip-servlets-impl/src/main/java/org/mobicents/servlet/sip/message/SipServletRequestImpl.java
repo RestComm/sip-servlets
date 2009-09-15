@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -94,6 +95,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest, Cloneable {
+
+	private static final long serialVersionUID = 1L;
+
 	private static transient Logger logger = Logger.getLogger(SipServletRequestImpl.class);
 	
 	private static final String EXCEPTION_MESSAGE = "The context does not allow you to modify this request !";
@@ -274,7 +278,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						toHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), session.getKey().getApplicationName(), sipAppSessionKey.getId()));
 					} else {							
 						//if the sessions are null, it means it is a cancel response
-						toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+						toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
 					}
 				}
 				if (statusCode == Response.OK ) {
@@ -1033,8 +1037,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// a new subscription and a new dialog (unless they have already been
 				// created by a matching response, as described above).
 				if (subscriptionStateHeader != null && 
-									SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-									SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState())) {					
+									(SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+									SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
 					session.addSubscription(this);
 				}
 				// A subscription is destroyed when a notifier sends a NOTIFY request

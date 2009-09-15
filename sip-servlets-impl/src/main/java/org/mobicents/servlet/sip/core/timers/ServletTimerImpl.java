@@ -177,7 +177,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 				// used for debugging/optimizeIt purpose
 				// kan be kept in production code since object should
 				// be due for gc anyway....
-				isCanceled = new Boolean(res);
+				isCanceled = Boolean.valueOf(res);
 				appSessionToCancelThisTimersFrom = appSession;
 				future = null;
 			}

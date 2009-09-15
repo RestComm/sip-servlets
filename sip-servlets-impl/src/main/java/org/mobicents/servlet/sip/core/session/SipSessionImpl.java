@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1159,11 +1160,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method)) || response.getStatus() == 487) {
 			boolean hasOngoingSubscriptions = false;
 			if(subscriptions != null) {				
-				synchronized (subscriptions) {
-					if(subscriptions.size() > 0) {
-						hasOngoingSubscriptions = true;
-					}
-				}				
+				if(subscriptions.size() > 0) {
+					hasOngoingSubscriptions = true;
+				}
 				if(!hasOngoingSubscriptions) {
 					if(sessionCreatingDialog != null) {
 						sessionCreatingDialog.delete();
@@ -1489,11 +1488,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 			logger.info("adding subscription " + eventHeader + " to sip session " + getId());
 		}
 		if(subscriptions == null) {
-			this.subscriptions = new HashSet<EventHeader>();
+			this.subscriptions = new CopyOnWriteArraySet<EventHeader>();
 		}
-		synchronized (subscriptions) {
-			subscriptions.add(eventHeader);	
-		}		
+		subscriptions.add(eventHeader);	
+				
 		if(logger.isDebugEnabled()) {
 			logger.debug("Request from Original Transaction is " + originalMethod);
 			logger.debug("Dialog is " + sessionCreatingDialog);
@@ -1513,11 +1511,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		boolean hasOngoingSubscriptions = false;
 		if(subscriptions != null) {
-			synchronized (subscriptions) {
-				subscriptions.remove(eventHeader);
-				if(subscriptions.size() > 0) {
-					hasOngoingSubscriptions = true;
-				}
+			subscriptions.remove(eventHeader);
+			if(subscriptions.size() > 0) {
+				hasOngoingSubscriptions = true;
 			}
 			if(!hasOngoingSubscriptions) {		
 				if(subscriptions.size() < 1) {

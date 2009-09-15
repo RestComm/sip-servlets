@@ -31,7 +31,7 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
  * 
  *@author mranga
  */
-public class TransactionApplicationData implements Serializable {
+public class TransactionApplicationData {
 	private transient ProxyBranchImpl proxyBranch;	
 	private transient SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;

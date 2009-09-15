@@ -245,8 +245,8 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	public void setMaxActiveSipSessions(int max) {
 		int oldMaxActiveSipSessions = this.sipManagerDelegate.maxActiveSipSessions;
 		this.sipManagerDelegate.maxActiveSipSessions = max;
-		support.firePropertyChange("maxActiveSipSessions", new Integer(
-				oldMaxActiveSipSessions), new Integer(
+		support.firePropertyChange("maxActiveSipSessions", Integer.valueOf(
+				oldMaxActiveSipSessions), Integer.valueOf(
 				this.sipManagerDelegate.maxActiveSipSessions));
 	}
 
@@ -270,8 +270,8 @@ public class SipStandardManager extends StandardManager implements SipManager {
 		support
 				.firePropertyChange(
 						"maxActiveSipApplicationSessions",
-						new Integer(oldMaxActiveSipApplicationSessions),
-						new Integer(
+						Integer.valueOf(oldMaxActiveSipApplicationSessions),
+						Integer.valueOf(
 								this.sipManagerDelegate.maxActiveSipApplicationSessions));
 	}
 

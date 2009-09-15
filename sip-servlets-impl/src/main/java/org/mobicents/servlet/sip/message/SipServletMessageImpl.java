@@ -92,7 +92,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 	private transient static final String CONTENT_TYPE_TEXT = "text";
 	private transient static final String HCOLON = " : ";
-	private transient static HeaderFactory headerFactory = SipFactories.headerFactory;
+	private transient static final HeaderFactory headerFactory = SipFactories.headerFactory;
 	
 	protected Message message;
 	protected transient SipFactoryImpl sipFactoryImpl;
@@ -100,7 +100,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 	private Transaction transaction;
-	protected TransactionApplicationData transactionApplicationData;		
+	protected transient TransactionApplicationData transactionApplicationData;		
 
 	protected String defaultEncoding = "UTF8";
 
@@ -559,7 +559,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 					content = new String(message.getRawContent(), charset);
 				}
 			} else {
-				content = new String();
+				content = "";
 			}
 			return content;
 		} else {

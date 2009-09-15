@@ -68,6 +68,9 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  */
 public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
+	
+	private static final long serialVersionUID = 1L;
+
 	private transient static final String REL100_OPTION_TAG = "100rel";
 
 	private static transient Logger logger = Logger.getLogger(SipServletResponseImpl.class);
@@ -477,7 +480,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			final Dialog dialog  = transaction.getDialog();
 			//keeping track of application data and transaction in the dialog
-			if(transaction != null && dialog != null) {
+			if(dialog != null) {
 				if(dialog.getApplicationData() == null) {
 					dialog.setApplicationData(
 							originalRequest.getTransactionApplicationData());	

@@ -29,7 +29,7 @@ import javax.servlet.sip.TimerService;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
-public class TimerServiceImpl implements TimerService, Serializable {
+public class TimerServiceImpl implements TimerService {
 	
 	private static transient Logger logger = Logger.getLogger(TimerServiceImpl.class
 			.getName());
