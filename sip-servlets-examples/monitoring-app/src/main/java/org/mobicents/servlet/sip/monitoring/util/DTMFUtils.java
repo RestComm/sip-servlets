@@ -82,7 +82,7 @@ public class DTMFUtils {
 
 	public static void answerBack(String alertId, String signal, String feedbackUrl) {
 		logger.info("Sending signal " + signal + " for alertId " + alertId + " to the alerting application  on URL " + feedbackUrl);
-		String finalUrl = feedbackUrl + "?alertId=" + alertId + "&signal=" + signal;
+		String finalUrl = feedbackUrl + "?alertId=" + alertId + "&action=" + signal;
 		
 		try {
 			URL url = new URL(finalUrl);
