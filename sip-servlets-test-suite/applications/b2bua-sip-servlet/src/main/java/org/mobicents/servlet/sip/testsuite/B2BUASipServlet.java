@@ -33,7 +33,8 @@ import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
 
-public class B2BUASipServlet extends SipServlet {
+public class B2BUASipServlet extends SipServlet {	
+	private static final long serialVersionUID = 1L;
 
 	B2buaHelper helper = null;
 	

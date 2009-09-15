@@ -37,17 +37,17 @@ import org.apache.log4j.Logger;
 
 public class ChatRoomSipServlet
 		extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ChatRoomSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	
-	private static final String OK = "OK";
-	private static final String KO = "KO";
-	
-	private static final String ATTRIBUTE = "attribute";
-	private static final String VALUE = "value";
-	private static final String NEW_VALUE = "new_value";
+//	private static final String OK = "OK";
+//	private static final String KO = "KO";
+//	
+//	private static final String ATTRIBUTE = "attribute";
+//	private static final String VALUE = "value";
+//	private static final String NEW_VALUE = "new_value";
 	
 	private SipFactory sipFactory;	
 	

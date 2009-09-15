@@ -41,20 +41,12 @@ import org.apache.log4j.Logger;
 
 public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
-
+	private static final long serialVersionUID = 1L;
 	private static final String ACT_AS_UAS = "actAsUas";
 	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);
-	B2buaHelper helper = null;
-	Map<String, String[]> forwardingUris = null;
+	private static Map<String, String[]> forwardingUris = null;
 	
-	/** Creates a new instance of CallForwardingB2BUASipServlet */
-	public CallForwardingB2BUASipServlet() {
-	}
-
-	@Override
-	public void init(ServletConfig servletConfig) throws ServletException {
-		logger.info("the call forwarding B2BUA sip servlet has been started");
-		super.init(servletConfig);
+	static {
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
@@ -80,6 +72,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:cancel-forward-samesipsession@127.0.0.1:5070", "sip:cancel-forward-samesipsession@127.0.0.1:5070"});
 		forwardingUris.put("sip:error-samesipsession@sip-servlets.com", 
 				new String[]{"sip:error-forward-samesipsession@127.0.0.1:5070", "sip:error-forward-samesipsession@127.0.0.1:5070"});
+	}
+
+	@Override
+	public void init(ServletConfig servletConfig) throws ServletException {
+		logger.info("the call forwarding B2BUA sip servlet has been started");
+		super.init(servletConfig);		
 	}
 	
 	@Override
@@ -124,7 +122,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		
 		
 		if(forwardingUri != null && forwardingUri.length > 0) {
-			helper = request.getB2buaHelper();						
+			B2buaHelper helper = request.getB2buaHelper();						
 			
 			helper.createResponseToOriginalRequest(request.getSession(), SipServletResponse.SC_TRYING, "").send();
 			
@@ -160,7 +158,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
 			//we forward the BYE
 			SipSession session = request.getSession();		
-			SipSession linkedSession = helper.getLinkedSession(session);		
+			SipSession linkedSession = request.getB2buaHelper().getLinkedSession(session);		
 			SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
 			logger.info("forkedRequest = " + forkedRequest);			
 			forkedRequest.send();
@@ -188,7 +186,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info("Got : " + sipServletResponse.toString());
 		
 		SipSession originalSession =   
-		    helper.getLinkedSession(sipServletResponse.getSession());
+		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {
