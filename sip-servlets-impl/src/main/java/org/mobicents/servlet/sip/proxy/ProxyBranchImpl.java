@@ -29,8 +29,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
@@ -83,7 +81,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	private int proxyBranchTimeout;
 	private transient ProxyBranchTimerTask proxyTimeoutTask;
 	private transient boolean proxyBranchTimerStarted;
-	private transient ReentrantReadWriteLock cTimerLock;
+	private transient Object cTimerLock;
 	private boolean canceled;
 	private boolean isAddToPath;
 	private transient List<ProxyBranch> recursedBranches;
@@ -108,7 +106,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		this.canceled = false;
 		this.recursedBranches = new ArrayList<ProxyBranch>();
 		proxyBranchTimerStarted = false;
-		cTimerLock = new ReentrantReadWriteLock();
+		cTimerLock = new Object();
 		
 		// Here we create a clone which is available through getRequest(), the user can add
 		// custom headers and push routes here. Later when we actually proxy the request we
@@ -609,52 +607,39 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 *
 	 */
 	void updateTimer() {
-		cancelTimer();	
-		cTimerLock.readLock().lock();
-		if(proxyBranchTimeout > 0 && !proxyBranchTimerStarted) {
-			// upgrade lock manually, must unlock first to obtain writelock
-			cTimerLock.readLock().unlock();
-			cTimerLock.writeLock().lock();
-			if(!proxyBranchTimerStarted) { // recheck
-				try {
-					ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this);
-					if(logger.isDebugEnabled()) {
-						logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
-					}
-					timer.schedule(timerCTask, proxyBranchTimeout * 1000L);
-					proxyTimeoutTask = timerCTask;				
-				} catch (IllegalStateException e) {
-					logger.error("Unexpected exception while scheduling Timer C" ,e);
+		cancelTimer();			
+		if(proxyBranchTimeout > 0) {			
+			synchronized (cTimerLock) {
+				if(!proxyBranchTimerStarted) {
+					try {
+						ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this);
+						if(logger.isDebugEnabled()) {
+							logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
+						}
+						timer.schedule(timerCTask, proxyBranchTimeout * 1000L);
+						proxyTimeoutTask = timerCTask;
+						proxyBranchTimerStarted = true;
+					} catch (IllegalStateException e) {
+						logger.error("Unexpected exception while scheduling Timer C" ,e);
+					}	
 				}
 			}
-			// downgrade lock
-			cTimerLock.readLock().lock();			
-			cTimerLock.writeLock().unlock();
-		}
-		cTimerLock.readLock().unlock();
+		}		
 	}
 	
 	/**
 	 * Stop the C Timer.
 	 */
 	public void cancelTimer()
-	{
-		cTimerLock.readLock().lock();
-		if(proxyTimeoutTask != null && proxyBranchTimerStarted)
-		{
-			// upgrade lock manually, must unlock first to obtain writelock
-			cTimerLock.readLock().unlock();
-			cTimerLock.writeLock().lock();
-			if(proxyBranchTimerStarted){ //recheck
+	{		
+		synchronized (cTimerLock) {
+			if(proxyTimeoutTask != null && proxyBranchTimerStarted)
+			{			
 				proxyTimeoutTask.cancel();
 				proxyTimeoutTask = null;
-				proxyBranchTimerStarted = false;
-			}
-			// downgrade lock
-			cTimerLock.readLock().lock();			
-			cTimerLock.writeLock().unlock();
-		}
-		cTimerLock.readLock().unlock();
+				proxyBranchTimerStarted = false;		
+			}	
+		}		
 	}
 
 	public boolean isCanceled() {
