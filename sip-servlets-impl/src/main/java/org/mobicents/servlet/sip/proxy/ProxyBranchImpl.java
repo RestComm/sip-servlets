@@ -47,7 +47,6 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -63,6 +62,8 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  *
  */
 public class ProxyBranchImpl implements ProxyBranch, Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxyBranchImpl.class);
 	private ProxyImpl proxy;
 	private transient SipServletRequestImpl originalRequest;
@@ -601,22 +602,20 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	 * party is still online.
 	 *
 	 */
-	synchronized void updateTimer() {
-		if(proxyTimeoutTask != null) {
-			proxyTimeoutTask.cancel();
-		}
-		proxyTimeoutTask = new ProxyBranchTimerTask(this);
-		if(logger.isDebugEnabled()) {
-			logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
-		}
-		if(proxyBranchTimeout != 0) {
+	void updateTimer() {
+		cancelTimer();	
+		if(proxyBranchTimeout > 0) {
 			try {
-				timer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
-			} catch (Exception e) {
-				// Failsafe for Google Issue 880
-				timer = new Timer();
-				proxyTimeoutTask = new ProxyBranchTimerTask(this);
-				timer.schedule(proxyTimeoutTask, proxyBranchTimeout * 1000);
+				ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
+				}
+				timer.schedule(timerCTask, proxyBranchTimeout * 1000L);
+				// Affecting the timerCTask when the timer has already been started makes Issue 880 impossible
+				// and help to remove synchronized keywords that could impair perf
+				proxyTimeoutTask = timerCTask;
+			} catch (IllegalStateException e) {
+				logger.error("Unexpected exception while scheduling Timer C" ,e);
 			}
 		}
 	}
@@ -624,7 +623,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	/**
 	 * Stop the C Timer.
 	 */
-	public synchronized  void cancelTimer()
+	public void cancelTimer()
 	{
 		if(proxyTimeoutTask != null)
 		{
