@@ -212,9 +212,9 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			} else if(TEST_IS_SEND_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
 				Integer nbOfAcks = (Integer) req.getSession().getAttribute("nbAcks");
 				if(nbOfAcks == null) {
-					nbOfAcks = new Integer(1);
+					nbOfAcks = Integer.valueOf(1);
 				} else {
-					nbOfAcks = new Integer(nbOfAcks.intValue() + 1);
+					nbOfAcks = Integer.valueOf(nbOfAcks.intValue() + 1);
 				}
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
 			}

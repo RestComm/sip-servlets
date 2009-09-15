@@ -18,10 +18,8 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.Properties;
 
-import javax.sip.ListeningPoint;
 import javax.sip.message.Response;
 
-import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
@@ -29,7 +27,7 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
-	private static transient Logger logger = Logger.getLogger(ProxyBranchTimeoutTest.class);
+//	private static transient Logger logger = Logger.getLogger(ProxyBranchTimeoutTest.class);
 
 	private SipStack sipStackSender;
 	private SipStack[] sipStackReceivers;
@@ -106,9 +104,9 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 		sipPhoneReceivers = new SipPhone[receiversCount];
 		
 		sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5058);
-		ListeningPoint lp = sipStackSender.getSipProvider()
-				.getListeningPoint("udp");
-		String stackIPAddress = lp.getIPAddress();
+//		ListeningPoint lp = sipStackSender.getSipProvider()
+//				.getListeningPoint("udp");
+//		String stackIPAddress = lp.getIPAddress();
 		sipPhoneSender = sipStackSender.createSipPhone("localhost",
 				SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");
 

@@ -88,7 +88,7 @@ public class ProtocolObjects {
 		// Set to 0 in your production code for max speed.
 		// You need 16 for logging traces. 32 for debug + traces.
 		// Your code will limp at 32 but it is best for debugging.
-		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", new Integer(
+		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", Integer.valueOf(
 				logLevel).toString());
 
 		try {

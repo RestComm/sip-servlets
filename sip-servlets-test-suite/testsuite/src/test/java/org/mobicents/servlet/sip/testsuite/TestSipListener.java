@@ -27,6 +27,7 @@ import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -357,7 +358,7 @@ public class TestSipListener implements SipListener {
 			
 			Response response = protocolObjects.messageFactory.createResponse(
 					Response.ACCEPTED, request);
-			sipETag = Integer.toString((int) (Math.random()*10000000));
+			sipETag = Integer.toString(new Random().nextInt(10000000));
 			st.sendResponse(response);
 			this.transactionCount++;
 			logger.info("shootist:  Sending ACCEPTED.");			
@@ -432,7 +433,7 @@ public class TestSipListener implements SipListener {
 			
 				Response response = protocolObjects.messageFactory.createResponse(
 						200, request);
-				sipETag = Integer.toString((int) (Math.random()*10000000));
+				sipETag = Integer.toString(new Random().nextInt(10000000));
 				SIPETagHeader sipTagHeader = protocolObjects.headerFactory.createSIPETagHeader(sipETag);
 				response.addHeader(sipTagHeader);
 				response.addHeader(request.getHeader(ExpiresHeader.NAME));
@@ -733,7 +734,7 @@ public class TestSipListener implements SipListener {
 					Response.OK, request);			
 			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
 			if (toHeader.getTag() == null) {
-				toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+				toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
 			}
 //			okResponse.addHeader(contactHeader);
 			serverTransaction.sendResponse(okResponse);
@@ -820,7 +821,7 @@ public class TestSipListener implements SipListener {
 					Response.OK, request);			
 			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
 			if (toHeader.getTag() == null) {
-				toHeader.setTag(Integer.toString((int) (Math.random()*10000000)));
+				toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
 			}
 //			okResponse.addHeader(contactHeader);
 			serverTransaction.sendResponse(okResponse);
@@ -1540,7 +1541,7 @@ public class TestSipListener implements SipListener {
 		Address fromNameAddress = protocolObjects.addressFactory
 				.createAddress(fromURI);			
 		FromHeader fromHeader = protocolObjects.headerFactory
-				.createFromHeader(fromNameAddress, Integer.toString((int) (Math.random()*10000000)));
+				.createFromHeader(fromNameAddress, Integer.toString(new Random().nextInt(10000000)));
 
 		// create To Header			
 		Address toNameAddress = protocolObjects.addressFactory
@@ -1675,7 +1676,7 @@ public class TestSipListener implements SipListener {
 		Address fromNameAddress = protocolObjects.addressFactory
 				.createAddress(fromURI);			
 		FromHeader fromHeader = protocolObjects.headerFactory
-				.createFromHeader(fromNameAddress, Integer.toString((int) (Math.random()*10000000)));
+				.createFromHeader(fromNameAddress, Integer.toString(new Random().nextInt(10000000)));
 
 		// create To Header			
 		Address toNameAddress = protocolObjects.addressFactory

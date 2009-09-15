@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -135,7 +136,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 		if(subscriberSession != null && sipIfMatchFound) {						
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.addHeader("Expires", request.getHeader("Expires"));
-			String sipETag = Integer.toString((int) (Math.random()*10000000));
+			String sipETag = Integer.toString(new Random().nextInt(10000000));
 			sipETags.put(request.getRequestURI(), sipETag);
 			sipServletResponse.addHeader("SIP-ETag", sipETag);
 			sipServletResponse.send();

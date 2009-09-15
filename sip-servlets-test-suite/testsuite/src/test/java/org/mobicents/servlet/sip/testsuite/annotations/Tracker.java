@@ -39,36 +39,18 @@ import javax.sip.SipProvider;
 import javax.sip.SipStack;
 import javax.sip.Transaction;
 import javax.sip.TransactionTerminatedEvent;
-import javax.sip.address.AddressFactory;
-import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 public class Tracker implements SipListener {
 
-	private static AddressFactory addressFactory;
-
-	private static MessageFactory messageFactory;
-
-	private static HeaderFactory headerFactory;
-
+	private MessageFactory messageFactory;
 	private SipStack sipStack;
-
-	private static final String myAddress = "127.0.0.1";
-
 	private static final int myPort = 5058;
-
 	protected ServerTransaction inviteTid;
-
-	private Response okResponse;
-
-	private Request inviteRequest;
-
 	private Dialog dialog;
-
 	public static final boolean callerSendsBye = true;
-	
 	public boolean receivedInvite = false;
 
 	public void processRequest(RequestEvent requestEvent) {
@@ -153,7 +135,7 @@ public class Tracker implements SipListener {
 				st = sipProvider.getNewServerTransaction(request);
 			}
 			dialog = st.getDialog();
-			inviteRequest = request;
+//			inviteRequest = request;
 			st.sendResponse(response);
 			this.receivedInvite = true;
 			// If we dont send final response this will receive cancel.
@@ -208,8 +190,8 @@ public class Tracker implements SipListener {
 		}
 
 		try {
-			headerFactory = sipFactory.createHeaderFactory();
-			addressFactory = sipFactory.createAddressFactory();
+//			headerFactory = sipFactory.createHeaderFactory();
+//			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
 			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
 					myPort, "udp");

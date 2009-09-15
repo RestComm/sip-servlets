@@ -104,7 +104,7 @@ public class TimersSipServlet
 		timerService.createTimer(request.getApplicationSession(), 1000, false, null);
 		//create a recurring timer to test the feature					
 		timerService.createTimer(request.getApplicationSession(), 3000, 3000, true, false, RECURRING);
-		request.getApplicationSession().setAttribute(RECURRING_TIME, new Integer(0));
+		request.getApplicationSession().setAttribute(RECURRING_TIME, Integer.valueOf(0));
 	}
 	
 	@Override
@@ -188,7 +188,7 @@ public class TimersSipServlet
 			sendMessage(sipApplicationSession, storedFactory, TIMER_EXPIRED);
 		} else {			
 			int temp = recurringTime.intValue() + 1;			
-			sipApplicationSession.setAttribute(RECURRING_TIME, new Integer(temp));
+			sipApplicationSession.setAttribute(RECURRING_TIME, Integer.valueOf(temp));
 			if(temp > 2) {
 				sendMessage(sipApplicationSession, storedFactory, RECURRING_TIMER_EXPIRED);
 				timer.cancel();
