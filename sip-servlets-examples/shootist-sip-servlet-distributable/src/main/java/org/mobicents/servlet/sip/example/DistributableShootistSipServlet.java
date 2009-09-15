@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 public class DistributableShootistSipServlet 
 		extends SipServlet 
 		implements SipServletListener {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableShootistSipServlet.class);
 		
 	private static final String SENT = "Sent";

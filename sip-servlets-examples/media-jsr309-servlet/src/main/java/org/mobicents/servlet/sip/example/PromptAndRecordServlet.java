@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  */
 public class PromptAndRecordServlet extends PlayerServlet implements
 		TimerListener {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger
 			.getLogger(PromptAndRecordServlet.class);
 

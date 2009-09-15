@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 
 public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 		Servlet {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	private SipFactory sipFactory;

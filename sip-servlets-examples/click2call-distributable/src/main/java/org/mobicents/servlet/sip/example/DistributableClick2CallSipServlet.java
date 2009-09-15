@@ -17,26 +17,17 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
-import javax.servlet.sip.ServletTimer;
-import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipURI;
-import javax.servlet.sip.TimerListener;
-import javax.servlet.sip.TimerService;
-import javax.servlet.sip.SipSession.State;
-import javax.servlet.sip.annotation.SipApplicationKey;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DistributableClick2CallSipServlet 
 		extends SipServlet {
-	
+	private static final long serialVersionUID = 1L;
 	@Resource
 	private SipFactory sipFactory;
 	

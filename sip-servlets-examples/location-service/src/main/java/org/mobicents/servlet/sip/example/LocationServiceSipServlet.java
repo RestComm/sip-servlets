@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class LocationServiceSipServlet extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(LocationServiceSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	Map<String, List<URI>> registeredUsers = null;

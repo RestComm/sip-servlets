@@ -36,7 +36,7 @@ import javax.servlet.sip.SipServletResponse;
 import org.apache.log4j.Logger;
 
 public class ChatroomSipServlet extends SipServlet {
-	
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(ChatroomSipServlet.class);
 	
 	/** Context attribute key to store user list. */

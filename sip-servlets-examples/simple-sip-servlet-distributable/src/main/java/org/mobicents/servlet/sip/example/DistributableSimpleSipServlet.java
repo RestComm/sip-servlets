@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 public class DistributableSimpleSipServlet 
 		extends SipServlet 
 		implements TimerListener {
-	
+	private static final long serialVersionUID = 1L;
 	private static final String RECEIVED = "Received";
 
 	private static Logger logger = Logger.getLogger(DistributableSimpleSipServlet.class);

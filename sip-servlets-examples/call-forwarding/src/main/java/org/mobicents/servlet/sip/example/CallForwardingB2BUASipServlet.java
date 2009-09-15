@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class CallForwardingB2BUASipServlet extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);	
 	Map<String, String[]> forwardingUris = null;
 

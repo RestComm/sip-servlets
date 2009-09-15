@@ -23,14 +23,10 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsPeer;
-import org.mobicents.mscontrol.MsPeerFactory;
 import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
 import org.mobicents.servlet.sip.conference.server.media.ConferenceCenter;
@@ -43,7 +39,7 @@ import org.mobicents.servlet.sip.conference.server.media.ConferenceCenter;
 @javax.servlet.sip.annotation.SipServlet
 public class ConferenceServlet extends SipServlet {
 	private static Log logger = LogFactory.getLog(ConferenceServlet.class);
-	
+	private static final long serialVersionUID = 1L;
 	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
 	
 	/**

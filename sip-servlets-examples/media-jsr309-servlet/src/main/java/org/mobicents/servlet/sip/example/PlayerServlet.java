@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  */
 public class PlayerServlet extends SipServlet {
 	private static Logger logger = Logger.getLogger(PlayerServlet.class);
-
+	private static final long serialVersionUID = 1L;
 	protected MsControlFactory msControlFactory;
 
 	/**

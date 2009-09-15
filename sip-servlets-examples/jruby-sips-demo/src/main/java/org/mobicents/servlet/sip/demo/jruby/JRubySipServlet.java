@@ -31,9 +31,10 @@ import org.mobicents.mscontrol.MsProvider;
 import org.mobicents.mscontrol.MsSession;
 
 public class JRubySipServlet extends SipServlet {
+	private static final long serialVersionUID = 1L;
 	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
 	private static Logger logger = Logger.getLogger(JRubySipServlet.class);
-	private static final String AUDIO_DIR = "/audio";
+//	private static final String AUDIO_DIR = "/audio";
 		
 	@Override
     	protected void doSuccessResponse(SipServletResponse resp)

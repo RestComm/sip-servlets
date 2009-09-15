@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableCallForwardingB2BUASipServlet.class);
 	B2buaHelper helper = null;
 	private static final String RECEIVED = "Received";

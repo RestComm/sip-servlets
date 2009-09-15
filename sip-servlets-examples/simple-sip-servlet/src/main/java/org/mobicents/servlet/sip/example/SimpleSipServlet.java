@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
  */
 public class SimpleSipServlet extends SipServlet implements TimerListener {
 	private static Logger logger = Logger.getLogger(SimpleSipServlet.class);
-	
+	private static final long serialVersionUID = 1L;
 	private static final String CALLEE_SEND_BYE = "YouSendBye";
 	//60 sec
 	private static final int DEFAULT_BYE_DELAY = 60000;

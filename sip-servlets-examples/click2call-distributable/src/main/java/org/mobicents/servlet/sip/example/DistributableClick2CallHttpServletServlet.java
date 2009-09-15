@@ -19,13 +19,8 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
-import java.util.Properties;
 
 import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 public class DistributableClick2CallHttpServletServlet extends HttpServlet
 { 	
 	private static Log logger = LogFactory.getLog(DistributableClick2CallHttpServletServlet.class);
-
+	private static final long serialVersionUID = 1L;
 	@Resource
 	private SipFactory sipFactory;	
 	/**

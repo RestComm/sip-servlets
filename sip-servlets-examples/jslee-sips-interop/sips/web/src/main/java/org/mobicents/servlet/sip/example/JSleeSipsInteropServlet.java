@@ -28,7 +28,7 @@ import org.mobicents.servlet.sip.example.util.DTMFUtils;
  */
 public class JSleeSipsInteropServlet 
 	extends SipServlet {
-	
+	private static final long serialVersionUID = 1L;
 	private static Log logger = LogFactory.getLog(JSleeSipsInteropServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	

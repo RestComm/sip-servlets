@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public class PromptAndCollectServlet extends PlayerServlet {
-
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger
 			.getLogger(PromptAndCollectServlet.class);
 

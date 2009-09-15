@@ -50,7 +50,7 @@ import org.mobicents.mscontrol.MsSession;
 public class ShoppingSipServlet 
 	extends SipServlet  
 	implements TimerListener {
-	
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(ShoppingSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
 	

@@ -46,7 +46,7 @@ import com.sun.speech.freetts.audio.SingleFileAudioPlayer;
  */
 public class MediaPlaybackServlet extends SipServlet {
 	private static Logger logger = Logger.getLogger(MediaPlaybackServlet.class);
-	
+	private static final long serialVersionUID = 1L;
 	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
 	
 	public MediaPlaybackServlet() {
