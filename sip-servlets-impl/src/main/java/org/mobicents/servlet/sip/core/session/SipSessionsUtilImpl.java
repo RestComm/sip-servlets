@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core.session;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,13 +35,14 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author Jean Deruelle
  *
  */
-public class SipSessionsUtilImpl implements SipSessionsUtil {
+public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SipSessionsUtilImpl.class);
 	
-	private SipContext sipContext;
+	private transient SipContext sipContext;
 	
-	private ConcurrentHashMap<SipSessionKey, MobicentsSipSession> joinSession;
-	private ConcurrentHashMap<SipSessionKey, MobicentsSipSession> replacesSession;
+	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> joinSession;
+	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> replacesSession;
 	
 	private ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> joinApplicationSession;
 	private ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> replacesApplicationSession;

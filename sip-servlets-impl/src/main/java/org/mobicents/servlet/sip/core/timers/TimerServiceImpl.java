@@ -29,8 +29,9 @@ import javax.servlet.sip.TimerService;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
-public class TimerServiceImpl implements TimerService {
+public class TimerServiceImpl implements TimerService, Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(TimerServiceImpl.class
 			.getName());
 	

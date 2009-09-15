@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import java.io.Serializable;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.Address;
@@ -41,7 +43,9 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author Jean Deruelle
  *
  */
-public class SipFactoryFacade implements SipFactory {
+public class SipFactoryFacade implements SipFactory, Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SipFactoryFacade.class
 			.getName());
 	

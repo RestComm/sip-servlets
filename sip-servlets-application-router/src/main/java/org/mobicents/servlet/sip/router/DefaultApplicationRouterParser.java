@@ -82,8 +82,9 @@ public class DefaultApplicationRouterParser {
 			//if the uri contains space this will fail, so getting the path will work
 			darConfigurationFile = new File(url.getPath());
 		}				
+		FileInputStream fis = null;
 		try {
-			FileInputStream fis = new FileInputStream(darConfigurationFile);
+			fis = new FileInputStream(darConfigurationFile);
 			properties.load(fis);
 		} catch (FileNotFoundException e) {
 			log.fatal("Cannot find the default application router file ! ",e);
@@ -91,6 +92,14 @@ public class DefaultApplicationRouterParser {
 		} catch (IOException e) {
 			log.fatal("Cannot load the default application router file ! ",e);
 			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" cannot be loaded ! ",e);
+		} finally {			
+			if(fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					log.error("fail to close the following file " + darConfigurationFile.getAbsolutePath(), e);
+				}
+			}
 		}		
 	}
 	

@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.router;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -356,11 +357,20 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 			throw new IllegalStateException("Configuration file name is empty.");
 		
 		File configFile = new File(configFileLocation);
-		
+		FileOutputStream fis = null;
 		try {
-			properties.store(new FileOutputStream(configFile), "Application Router Configuration");
+			fis = new FileOutputStream(configFile);
+			properties.store(fis, "Application Router Configuration");
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to store configuration file.", e);
+		} finally {			
+			if(fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					log.error("fail to close the following file " + configFile.getAbsolutePath(), e);
+				}
+			}
 		}
 		
 		log.info("Stored DAR configuration in " + configFile.getAbsolutePath());
