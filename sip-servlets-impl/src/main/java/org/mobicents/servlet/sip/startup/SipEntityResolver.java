@@ -35,8 +35,7 @@ public class SipEntityResolver implements EntityResolver
     */
    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException
    {
-      if (this.validate == false) { return new InputSource(new ByteArrayInputStream((new String("<!-- -->"))
-            .getBytes())); }
+      if (this.validate == false) { return new InputSource(new ByteArrayInputStream("<!-- -->".getBytes())); }
       InputStream inputStream = null;
       URL sipXsdFile = SipEntityResolver.class.getClassLoader().getResource(SIP_XSD_FILE);
       inputStream = sipXsdFile.openStream();

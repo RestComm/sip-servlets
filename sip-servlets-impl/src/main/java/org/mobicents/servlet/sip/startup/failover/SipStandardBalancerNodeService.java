@@ -343,8 +343,12 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 						e = (Engine) c;
 					}
 				}
+				String jvmRoute = null;
+				if(e != null) {
+					jvmRoute = e.getJvmRoute();
+				}
 				SIPNode node = new SIPNode(hostName, address, port,
-						transports, e.getJvmRoute());
+						transports, jvmRoute);
 
 				info.add(node);
 			}

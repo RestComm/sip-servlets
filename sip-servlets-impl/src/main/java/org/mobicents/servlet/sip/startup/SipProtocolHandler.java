@@ -20,6 +20,7 @@ import gov.nist.javax.sip.SipStackExt;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -240,86 +241,96 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	}		
 	
 	public void start() throws Exception {
-		try {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Starting a sip protocol handler");
-			}						
-			
-			String catalinaHome = System.getProperty("catalina.home");
-	        if (catalinaHome == null) {
-	        	catalinaHome = System.getProperty("catalina.base");
-	        }
-	        if(catalinaHome == null) {
-	        	catalinaHome = ".";
-	        }
-	        if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
-				sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
-	 		}	
-	        sipStackProperties = new Properties();
-	        boolean isPropsLoaded = false;
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Starting a sip protocol handler");
+		}						
+		
+		String catalinaHome = System.getProperty("catalina.home");
+        if (catalinaHome == null) {
+        	catalinaHome = System.getProperty("catalina.base");
+        }
+        if(catalinaHome == null) {
+        	catalinaHome = ".";
+        }
+        if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
+			sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
+ 		}	
+        sipStackProperties = new Properties();
+        boolean isPropsLoaded = false;
+		if (logger.isDebugEnabled()) {
+			logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFileLocation);
+		}
+		if(sipStackPropertiesFileLocation != null) {
+			//hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html, 
+			// we create a URL since it's permissive enough
+			File sipStackPropertiesFile = null;
+			URL url = null;
 			try {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFileLocation);
-				}
-				if(sipStackPropertiesFileLocation != null) {
-					//hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html, 
-					// we create a URL since it's permissive enough
-					File sipStackPropertiesFile = null;
-					URL url = null;
-					try {
-						url = new URL(sipStackPropertiesFileLocation);
-					} catch (MalformedURLException e) {
-						logger.fatal("Cannot find the sip stack properties file ! ",e);
-						throw new IllegalArgumentException("The Default Application Router file Location : "+sipStackPropertiesFileLocation+" is not valid ! ",e);
-					}
-					try {
-						sipStackPropertiesFile = new File(new URI(sipStackPropertiesFileLocation));
-					} catch (URISyntaxException e) {
-						//if the uri contains space this will fail, so getting the path will work
-						sipStackPropertiesFile = new File(url.getPath());
-					}		
-					FileInputStream sipStackPropertiesInputStream = new FileInputStream(sipStackPropertiesFile);
-					sipStackProperties.load(sipStackPropertiesInputStream);
-					String debugLog = sipStackProperties.getProperty(DEBUG_LOG_STACK_PROP);
-					if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
-						sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
-							catalinaHome + "/" + debugLog);
-					}
-					String serverLog = sipStackProperties.getProperty(SERVER_LOG_STACK_PROP);
-					if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
-						sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
-							catalinaHome + "/" + serverLog);
-					}
-					// The whole MSS is built upon those assumptions, so those properties are not overrideable
-					sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
-					sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
-					isPropsLoaded = true;
-				} else {
-					logger.warn("no sip stack properties file defined ");		
-				}
+				url = new URL(sipStackPropertiesFileLocation);
+			} catch (MalformedURLException e) {
+				logger.fatal("Cannot find the sip stack properties file ! ",e);
+				throw new IllegalArgumentException("The Default Application Router file Location : "+sipStackPropertiesFileLocation+" is not valid ! ",e);
+			}
+			try {
+				sipStackPropertiesFile = new File(new URI(sipStackPropertiesFileLocation));
+			} catch (URISyntaxException e) {
+				//if the uri contains space this will fail, so getting the path will work
+				sipStackPropertiesFile = new File(url.getPath());
+			}		
+			FileInputStream sipStackPropertiesInputStream = null;
+			try {
+				sipStackPropertiesInputStream = new FileInputStream(sipStackPropertiesFile);
+				sipStackProperties.load(sipStackPropertiesInputStream);
 			} catch (Exception e) {
 				logger.warn("Could not find or problem when loading the sip stack properties file : " + sipStackPropertiesFileLocation, e);		
-			}
-			
-			if(!isPropsLoaded) {
-				logger.warn("loading default Mobicents Sip Servlets sip stack properties");
-				// Silently set default values
-				sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
-						"true");
-				sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
-						"32");
+			} finally {			
+				if(sipStackPropertiesInputStream != null) {
+					try {
+						sipStackPropertiesInputStream.close();
+					} catch (IOException e) {
+						logger.error("fail to close the following file " + sipStackPropertiesFile.getAbsolutePath(), e);
+					}
+				}
+			}	
+				
+			String debugLog = sipStackProperties.getProperty(DEBUG_LOG_STACK_PROP);
+			if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
 				sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
-						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-debug.txt");
-				sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
-						catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-messages.xml");
-				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + ipAddress + "-" + port);
-				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
-				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
-				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
-				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
-				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+					catalinaHome + "/" + debugLog);
 			}
-			
+			String serverLog = sipStackProperties.getProperty(SERVER_LOG_STACK_PROP);
+			if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
+				sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
+					catalinaHome + "/" + serverLog);
+			}
+			// The whole MSS is built upon those assumptions, so those properties are not overrideable
+			sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
+			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+			isPropsLoaded = true;
+		} else {
+			logger.warn("no sip stack properties file defined ");		
+		}			
+		
+		if(!isPropsLoaded) {
+			logger.warn("loading default Mobicents Sip Servlets sip stack properties");
+			// Silently set default values
+			sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+					"true");
+			sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+					"32");
+			sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
+					catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-debug.txt");
+			sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
+					catalinaHome + "/" + "mss-jsip-" + ipAddress + "-" + port+"-messages.xml");
+			sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + ipAddress + "-" + port);
+			sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
+			sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+			sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+			sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+		}
+		try {	
 			//checking the external ip address if stun enabled			
 			String globalIpAddress = null;			
 			int globalPort = -1;

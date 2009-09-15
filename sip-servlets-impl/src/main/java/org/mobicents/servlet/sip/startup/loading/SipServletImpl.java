@@ -38,10 +38,10 @@ public class SipServletImpl extends StandardWrapper {
     protected static final String info =
         "org.mobicents.servlet.sip.startup.loading.SipServletImpl/1.0";
     
-    protected static final String[] DEFAULT_SIP_SERVLET_METHODS = new String[] {
+    static final String[] DEFAULT_SIP_SERVLET_METHODS = new String[] {
         "INVITE", "ACK", "BYE", "CANCEL", "INFO", "MESSAGE", "SUBSCRIBE", "NOTIFY",
         "OPTIONS", "PRACK", "PUBLISH", "REFER", "REGISTER", "UPDATE", 
-        "SUCESS_RESPONSE", "ERROR_RESPONSE", "BRANCN_RESPONSE", "REDIRECT_RESPONSE", "PROVISIONAL_RESPONSE" };
+        "SUCCESS_RESPONSE", "ERROR_RESPONSE", "BRANCH_RESPONSE", "REDIRECT_RESPONSE", "PROVISIONAL_RESPONSE" };
     
 	private String icon;
 	private String servletName;

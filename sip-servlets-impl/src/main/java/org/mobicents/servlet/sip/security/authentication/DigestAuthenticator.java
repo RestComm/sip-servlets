@@ -56,7 +56,7 @@ public class DigestAuthenticator
     /**
      * The MD5 helper object for this class.
      */
-    protected static final MD5Encoder md5Encoder = new MD5Encoder();
+    static final MD5Encoder md5Encoder = new MD5Encoder();
 
 
     /**
@@ -314,7 +314,7 @@ public class DigestAuthenticator
         } else if (quotedString.length() > 2) {
             return quotedString.substring(1, quotedString.length() - 1);
         } else {
-            return new String();
+            return "";
         }
     }
 

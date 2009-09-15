@@ -526,7 +526,7 @@ final class SetPublicIdRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
-        Context context = (Context) digester.peek(digester.getCount() - 1);
+        digester.peek(digester.getCount() - 1);
         Object top = digester.peek();
         Class paramClasses[] = new Class[1];
         paramClasses[0] = "String".getClass();
@@ -574,7 +574,7 @@ final class WrapperCreateRule extends Rule {
 
     public void end(String namespace, String name)
         throws Exception {
-        Wrapper wrapper = (Wrapper) digester.pop();
+        digester.pop();
 //        if (digester.getLogger().isDebugEnabled())
 //            digester.getLogger().debug("pop " + wrapper.getClass().getName());
     }

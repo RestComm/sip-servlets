@@ -57,6 +57,9 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyImpl implements Proxy, Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private static transient Logger logger = Logger.getLogger(ProxyImpl.class);
 	
 	private transient SipServletRequestImpl originalRequest;

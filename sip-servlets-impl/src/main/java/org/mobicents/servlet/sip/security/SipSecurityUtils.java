@@ -189,7 +189,9 @@ public class SipSecurityUtils {
 			while(getPrincipalMethod == null) {
 				try {
 					getPrincipalMethod = clazz.getDeclaredMethod("getPrincipal", String.class);
-				} catch (NoSuchMethodException e) {}
+				} catch (NoSuchMethodException e) {
+					log.warn("unexpected exception while impersonatePrincipal", e);
+				}
 				clazz = clazz.getSuperclass();
 				if(clazz == null) break;
 			}
