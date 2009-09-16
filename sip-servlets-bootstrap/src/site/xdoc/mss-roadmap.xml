@@ -306,7 +306,8 @@
 						SS7 support
 						<br />	
 						<img src="red.jpeg" />
-						<a							href="http://code.google.com/p/mobicents/issues/detail?id=324">
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=324">
 						Sip Servlets working as IMS node (CSCF)
 						</a>
 						<br />						
