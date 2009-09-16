@@ -100,9 +100,7 @@ public class PhoneCallSipServlet extends SipServlet {
 			//creates the connection
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
-			String sdp = new String(sdpBytes);		
-			String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
-//			sipServletResponse.getSession().setAttribute("audioFilePath", pathToAudioDirectory);
+			String sdp = new String(sdpBytes);					
 			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
 			if(!connection.getState().equals(MsConnectionState.OPEN)) {
 				logger.info("Creating the end to end media connection");
@@ -114,7 +112,7 @@ public class PhoneCallSipServlet extends SipServlet {
 						connection, 
 						(MsLink)sipServletResponse.getSession().getAttribute("link"), 
 						sipServletResponse.getSession(), 
-						pathToAudioDirectory + (String)sipServletResponse.getSession().getAttribute("fileName"),
+						(String)sipServletResponse.getSession().getAttribute("fileName"),
 						(String)sipServletResponse.getSession().getAttribute("alertId"),
 						(String)getServletContext().getAttribute("alert.feedback.url"));
 			}						

@@ -69,8 +69,10 @@ public class MediaLinkListener implements MsLinkListener {
 		logger.info("link connected " + link.getEndpoints()[0].getLocalName() +
 				" " + link.getEndpoints()[1].getLocalName());
 
-		inviteRequest.getSession().setAttribute("link", link);		
-		playAnnouncement(connection, link, inviteRequest.getSession(), (String)inviteRequest.getSession().getAttribute("fileName"), (String)inviteRequest.getSession().getAttribute("alertId"), (String)inviteRequest.getSession().getAttribute("feedbackUrl"));		
+		inviteRequest.getSession().setAttribute("link", link);
+		if(Boolean.TRUE.equals(inviteRequest.getSession().getAttribute("playAnnouncement"))) {
+			playAnnouncement(connection, link, inviteRequest.getSession(), (String)inviteRequest.getSession().getAttribute("fileName"), (String)inviteRequest.getSession().getAttribute("alertId"), (String)inviteRequest.getSession().getAttribute("feedbackUrl"));
+		}
 	}
 
 	public void linkDisconnected(MsLinkEvent evt) {

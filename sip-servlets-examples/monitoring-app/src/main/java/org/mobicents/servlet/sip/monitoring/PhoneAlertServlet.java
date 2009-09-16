@@ -80,14 +80,15 @@ public class PhoneAlertServlet extends HttpServlet
 //        String fileName= System.nanoTime() + "-monitoring-alert-" + alertId;
         try {
 			TTSUtils.buildAudio(alertText, fileName);
+			fileName = fileName+ ".wav";
+			logger.info("Speech created at " + fileName);
 		} catch (Exception e) {
 			logger.error("Unexpected exception while creating the text to speech file", e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			String errorBody = "<HTML><BODY>Phone Alert not Sent, could not generate the Text to Speech file !</BODY></HTML>";
 			sendHttpResponse(response, errorBody);
 			return;
-		}		
-        fileName = fileName+ ".wav";
+		}		                
         
 		// Create app session and request
         SipApplicationSession appSession = 
