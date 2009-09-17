@@ -1103,6 +1103,11 @@ public class TestSipListener implements SipListener {
 				sendBye();
 				sendBye(replacesDialog);
 			}
+			if(sendReinvite && !reinviteSent) {
+				sendInDialogSipRequest("INVITE", null, null, null, null);
+				reinviteSent = true;
+				return;
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);

@@ -75,20 +75,22 @@ public class DistributableLocationServiceSipServlet extends SipServlet {
 
 		logger.info("Got request:\n" + request.toString());		
 		
-		List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
-		if(contactAddresses != null && contactAddresses.size() > 0) {
-			request.getSession().setAttribute("INVITE", RECEIVED);
-			request.getApplicationSession().setAttribute("INVITE", RECEIVED);
-			Proxy proxy = request.getProxy();
-			proxy.setRecordRoute(true);
-			proxy.setParallel(true);
-			proxy.setSupervised(true);
-			proxy.proxyTo(contactAddresses);		
-		} else {
-			logger.info(request.getRequestURI().toString() + " is not currently registered");
-			SipServletResponse sipServletResponse = 
-				request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
-			sipServletResponse.send();
+		if(request.isInitial()) {
+			List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
+			if(contactAddresses != null && contactAddresses.size() > 0) {
+				request.getSession().setAttribute("INVITE", RECEIVED);
+				request.getApplicationSession().setAttribute("INVITE", RECEIVED);
+				Proxy proxy = request.getProxy();
+				proxy.setRecordRoute(true);
+				proxy.setParallel(true);
+				proxy.setSupervised(true);
+				proxy.proxyTo(contactAddresses);		
+			} else {
+				logger.info(request.getRequestURI().toString() + " is not currently registered");
+				SipServletResponse sipServletResponse = 
+					request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
+				sipServletResponse.send();
+			}
 		}
 	}
 

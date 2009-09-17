@@ -73,6 +73,7 @@ public class LocationServiceSipServlet extends SipServlet {
 		uriList  = new ArrayList<URI>();
 		uriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:5090"));
 		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
+		registeredUsers.put("sip:receiver-failover@127.0.0.1:5090", uriList);
 		uriList  = new ArrayList<URI>();
 		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:5070"));
 		registeredUsers.put("sip:proxy-b2bua@127.0.0.1:5070", uriList);
@@ -118,22 +119,24 @@ public class LocationServiceSipServlet extends SipServlet {
 			}
 		}
 		
-		List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
-		if(contactAddresses != null && contactAddresses.size() > 0) {			
-			Proxy proxy = request.getProxy();
-			proxy.setProxyTimeout(3);
-			proxy.setRecordRoute(true);
-			proxy.setParallel(true);
-			proxy.setSupervised(true);			
-			for (URI uri : contactAddresses) {
-				logger.info("proxying to " + uri);
+		if(request.isInitial()) {
+			List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
+			if(contactAddresses != null && contactAddresses.size() > 0) {			
+				Proxy proxy = request.getProxy();
+				proxy.setProxyTimeout(3);
+				proxy.setRecordRoute(true);
+				proxy.setParallel(true);
+				proxy.setSupervised(true);			
+				for (URI uri : contactAddresses) {
+					logger.info("proxying to " + uri);
+				}
+				proxy.proxyTo(contactAddresses);		
+			} else {
+				logger.info(request.getRequestURI().toString() + " is not currently registered");
+				SipServletResponse sipServletResponse = 
+					request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
+				sipServletResponse.send();
 			}
-			proxy.proxyTo(contactAddresses);		
-		} else {
-			logger.info(request.getRequestURI().toString() + " is not currently registered");
-			SipServletResponse sipServletResponse = 
-				request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
-			sipServletResponse.send();
 		}
 	}
 	
