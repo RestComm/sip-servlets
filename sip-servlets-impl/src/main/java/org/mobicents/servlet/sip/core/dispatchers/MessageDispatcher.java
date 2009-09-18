@@ -255,7 +255,9 @@ public abstract class MessageDispatcher {
 			Thread.currentThread().setContextClassLoader(cl);
 			
 			sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), request);
-		}				
+		} else {
+			logger.error("no handler found for sip session " + session.getKey() + " and request " + request);
+		}
 	}
 	
 	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		

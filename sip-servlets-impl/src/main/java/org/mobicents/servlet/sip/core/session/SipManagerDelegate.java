@@ -311,7 +311,7 @@ public abstract class SipManagerDelegate {
 		MobicentsSipSession sipSessionImpl = getNewMobicentsSipSession(sessionKey, sipFactoryImpl, parentSipSession.getSipApplicationSession());
 		sipSessionImpl.setSipSessionAttributeMap(parentSipSession.getSipSessionAttributeMap());
 		try {
-			sipSessionImpl.setHandler(new String(parentSipSession.getHandler()));
+			sipSessionImpl.setHandler(parentSipSession.getHandler());
 		} catch (ServletException e) {
 			//cannot happen
 			logger.error("Problem creating derived session", e);

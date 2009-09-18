@@ -47,7 +47,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	public Object clone() {
 		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl();
 		cloned.parameters = cloneParameters(super.parameters);
-		cloned.value = new String(this.value);
+		cloned.value = this.value;
 		cloned.header = (Parameters)((Header)super.header).clone();
 		return cloned;
 	}
@@ -99,7 +99,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	
 	@Override
 	public String toString() {
-		String retVal = new String(value);
+		String retVal = value;
 		if(retVal.trim().startsWith("<") && !retVal.trim().endsWith(">")) {
 			retVal = retVal.concat(">");
 		}

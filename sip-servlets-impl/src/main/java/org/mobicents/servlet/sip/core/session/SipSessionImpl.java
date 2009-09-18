@@ -937,9 +937,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		sipApplicationSession.setCurrentRequestHandler(handlerServlet);
 		if(logger.isDebugEnabled()) {
 			if(name !=null) {
-				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet);
+				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet + " on sip session " + key);
 			} else {
-				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + sipContext.getSipRubyController());
+				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + sipContext.getSipRubyController() + " on sip session " + key);
 			}
 		}
 	}
