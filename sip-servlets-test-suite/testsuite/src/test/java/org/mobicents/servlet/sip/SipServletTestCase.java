@@ -113,8 +113,9 @@ public abstract class SipServletTestCase extends TestCase {
 	}
 	
 	@Override
-	protected void tearDown() throws Exception {	
-		tomcat.stopTomcat();
+	protected void tearDown() throws Exception {
+		if(createTomcatOnStartup)
+			tomcat.stopTomcat();
 		super.tearDown();
 	}
 

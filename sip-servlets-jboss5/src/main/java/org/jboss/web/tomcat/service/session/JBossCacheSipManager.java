@@ -2274,7 +2274,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> newTempSession = session;
 		boolean initialLoad = false;
-		if (session == null && sipApplicationSessionImpl != null) {
+		if (session == null && sipApplicationSessionImpl != null && create) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server

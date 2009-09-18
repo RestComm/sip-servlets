@@ -67,6 +67,7 @@ public class DistributableLocationServiceSipServlet extends SipServlet {
 		ArrayList<URI> failOverUriList  = new ArrayList<URI>();
 		failOverUriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:5090"));
 		registeredUsers.put("sip:receiver-failover@sip-servlets.com", failOverUriList);
+		registeredUsers.put("sip:receiver-failover@127.0.0.1:5090", failOverUriList);
 	}
 
 	@Override

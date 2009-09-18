@@ -1411,7 +1411,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		boolean mustAdd = false;
 		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		ClusteredSipSession newTempSession = session;
-		if (session == null && sipApplicationSessionImpl != null) {
+		if (session == null && sipApplicationSessionImpl != null && create) {
 			// This is either the first time we've seen this session on this
 			// server, or we previously expired it and have since gotten
 			// a replication message from another server
