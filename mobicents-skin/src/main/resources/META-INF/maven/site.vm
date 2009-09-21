@@ -377,6 +377,9 @@ $bodyContent
 <div class="right_articles">
 #mainMenu( $decoration.body.menus )
 </div>
+<div align="center">
+<a href="http://www.jboss.org/jopr/"><img src="http://www.jboss.org/dms/jopr/images/managedbyjopr_badge_gold.png"/></a>
+</div>
 </div>
 </div>
 <div class="footer">
