@@ -75,7 +75,7 @@ Shopping Demo
 
 * How to play with it
 
-	http://jboss bind address:8080/shopping-demo/
+	http://localhost:8080/shopping-demo/
 
 	Start a Sip Phone, make it register as a customer (let's say sip:jean@shopping-demo.com) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).
 	
