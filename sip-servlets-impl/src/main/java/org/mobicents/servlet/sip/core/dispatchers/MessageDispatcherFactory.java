@@ -32,17 +32,17 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  */
 public class MessageDispatcherFactory {
 
-	InitialRequestDispatcher initialRequestDispatcher;
-	SubsequentRequestDispatcher subsequentRequestDispatcher;
-	CancelRequestDispatcher cancelRequestDispatcher;
-	ResponseDispatcher responseDispatcher;
+	private static final InitialRequestDispatcher initialRequestDispatcher = new InitialRequestDispatcher();
+	private static final SubsequentRequestDispatcher subsequentRequestDispatcher  = new SubsequentRequestDispatcher();
+	private static final CancelRequestDispatcher cancelRequestDispatcher = new CancelRequestDispatcher();
+	private static final ResponseDispatcher responseDispatcher = new ResponseDispatcher();
 	
 	public MessageDispatcherFactory(SipApplicationDispatcher sipApplicationDispatcher) {
 		// pre initializing the dispatcher to avoid creating them every time we process a message
-		initialRequestDispatcher = new InitialRequestDispatcher(sipApplicationDispatcher);
-		subsequentRequestDispatcher = new SubsequentRequestDispatcher(sipApplicationDispatcher);
-		cancelRequestDispatcher = new CancelRequestDispatcher(sipApplicationDispatcher);
-		responseDispatcher = new ResponseDispatcher(sipApplicationDispatcher);
+		initialRequestDispatcher.sipApplicationDispatcher = sipApplicationDispatcher;
+		subsequentRequestDispatcher.sipApplicationDispatcher = sipApplicationDispatcher;
+		cancelRequestDispatcher.sipApplicationDispatcher = sipApplicationDispatcher;
+		responseDispatcher.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
 	
 	public final RequestDispatcher getRequestDispatcher(SipServletRequestImpl sipServletRequest, SipApplicationDispatcherImpl sipApplicationDispatcher) {

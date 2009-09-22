@@ -103,9 +103,11 @@ public abstract class MessageDispatcher {
 	
 	protected SipApplicationDispatcher sipApplicationDispatcher = null;
 		
-	public MessageDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {
-		this.sipApplicationDispatcher = sipApplicationDispatcher;
-	}
+	public MessageDispatcher() {}
+	
+//	public MessageDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {
+//		this.sipApplicationDispatcher = sipApplicationDispatcher;
+//	}
 	
 	/**
 	 * 

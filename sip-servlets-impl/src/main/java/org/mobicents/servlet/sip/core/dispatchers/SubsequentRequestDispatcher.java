@@ -39,7 +39,6 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -68,11 +67,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 
 	private static transient Logger logger = Logger.getLogger(SubsequentRequestDispatcher.class);
 	
-	public SubsequentRequestDispatcher(
-			SipApplicationDispatcher sipApplicationDispatcher) {
-		super(sipApplicationDispatcher);
-	}
+	public SubsequentRequestDispatcher() {}
 	
+//	public SubsequentRequestDispatcher(
+//			SipApplicationDispatcher sipApplicationDispatcher) {
+//		super(sipApplicationDispatcher);
+//	}
+
 	/**
 	 * {@inheritDoc}
 	 */

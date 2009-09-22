@@ -56,7 +56,6 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -84,18 +83,20 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 public class InitialRequestDispatcher extends RequestDispatcher {
 
 	private static transient Logger logger = Logger.getLogger(InitialRequestDispatcher.class);
-	private SipApplicationRouter sipApplicationRouter;
 	
-	public InitialRequestDispatcher(
-			SipApplicationDispatcher sipApplicationDispatcher) {		
-		super(sipApplicationDispatcher);
-		this.sipApplicationRouter = sipApplicationDispatcher.getSipApplicationRouter();
-	}
+	public InitialRequestDispatcher() {}
+	
+//	public InitialRequestDispatcher(
+//			SipApplicationDispatcher sipApplicationDispatcher) {		
+//		super(sipApplicationDispatcher);
+//		
+//	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
+		final SipApplicationRouter sipApplicationRouter = sipApplicationDispatcher.getSipApplicationRouter();
 		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isDebugEnabled()) {

@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -54,9 +53,11 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 
 	private static transient Logger logger = Logger.getLogger(RequestDispatcher.class);
 	
-	public RequestDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {
-		super(sipApplicationDispatcher);
-	}
+	public RequestDispatcher() {}
+	
+//	public RequestDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {
+//		super(sipApplicationDispatcher);
+//	}
 
 	/**
 	 * Forward statefully a request whether it is initial or subsequent

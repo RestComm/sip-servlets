@@ -35,7 +35,6 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
@@ -60,9 +59,11 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public class ResponseDispatcher extends MessageDispatcher {
 	private static transient Logger logger = Logger.getLogger(ResponseDispatcher.class);
 	
-	public ResponseDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {
-		super(sipApplicationDispatcher);
-	}
+	public ResponseDispatcher() {}
+	
+//	public ResponseDispatcher(SipApplicationDispatcher sipApplicationDispatcher) {
+//		super(sipApplicationDispatcher);
+//	}
 
 	/**
 	 * {@inheritDoc}
