@@ -34,6 +34,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
@@ -41,10 +42,10 @@ import javax.servlet.sip.SipSession.State;
 
 import org.apache.log4j.Logger;
 
-
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
+	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
 	private static final String TEST_SUBSCRIBER_URI = "testSubscriberUri";
 	private static final String TEST_EXTERNAL_ROUTING = "testExternalRouting";
 	private static final String TEST_EXTERNAL_ROUTING_NO_INFO = "testExternalRoutingNoInfo";
@@ -59,6 +60,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	SipFactory sipFactory;
 	@Resource
 	TimerService timerService;
+	SipSession registerSipSession;
 	
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
@@ -164,13 +166,16 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.send();
 			
-			SipApplicationSession app = sipFactory.createApplicationSession();
-			SipServletRequest register = sipFactory.createRequest(app, "REGISTER", "sip:me@simple-servlet.com", "sip:you@localhost:5058");
-			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
-			register.addParameterableHeader("Contact", contact, true);			
-			register.addHeader("Expires", "3600");
-			register.addHeader("test", "test");
-			register.send();
+			sendRegister(null);			
+			return;
+		}
+		if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			sipServletResponse.send();
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+			
+			sendRegister();
 			return;
 		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
@@ -184,8 +189,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("unexpected exception while waiting ", e);
 			}
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.send();
@@ -232,12 +236,18 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					// Put some delay as per http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
 					Thread.sleep(15000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Unexpected exception", e);
 				}
 				// Check if the session remains in INITIAL state, if not, the test will fail for missing registers
-				if(resp.getSession().getState().equals(State.INITIAL))
-					resp.getSession().createRequest(resp.getMethod()).send();
+				if(resp.getSession().getState().equals(State.INITIAL)) {
+					String fromString = resp.getFrom().toString();
+					if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
+						registerSipSession = resp.getSession();
+						sendRegister();
+					} else {
+						sendRegister(resp.getSession());
+					}					
+				}
 			}
 			return;
 		}
@@ -257,12 +267,21 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		
 			// Avoid re-sending if the auth repeatedly fails.
 			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
-			{
+			{				
 				getServletContext().setAttribute("FirstResponseRecieved", "true");
 				AuthInfo authInfo = sipFactory.createAuthInfo();
 				authInfo.addAuthInfo(response.getStatus(), "sip-servlets-realm", "user", "pass");
-				SipServletRequest challengeRequest = response.getSession().createRequest(
-						response.getMethod());
+				SipServletRequest challengeRequest = null;
+				String fromString = response.getFrom().toString();
+				if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
+					registerSipSession = response.getSession();
+					challengeRequest = registerSipSession.createRequest(
+							response.getMethod());
+				} else {
+					challengeRequest = response.getSession().createRequest(
+							response.getMethod());
+				}					
+				
 				challengeRequest.addAuthHeader(response, authInfo);
 				challengeRequest.send();
 			}
@@ -375,6 +394,41 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		} catch (IOException e) {
 			logger.error("Unexpected exception while sending the OK", e);
 		}
+	}
+	
+	private void sendRegister() throws ServletParseException, IOException {
+		SipServletRequest register = null;
+		if (registerSipSession != null) {
+			logger.info("saved session instance : " + registerSipSession);			
+			logger.info("session attribute is : " + registerSipSession.getAttribute("attribute"));
+			register = registerSipSession.createRequest("REGISTER");			
+		} else {
+			SipApplicationSession app = sipFactory.createApplicationSession();
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@localhost:5058");
+			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
+			register.addParameterableHeader("Contact", contact, true);
+			registerSipSession = register.getSession();
+			logger.info("saved session instance : " + registerSipSession);
+			registerSipSession.setAttribute("attribute", "value");
+		}
+		register.setHeader("Expires", "3600");
+		register.setHeader("test", "test");
+		register.send();
+	}
+	
+	private void sendRegister(SipSession sipSession) throws ServletParseException, IOException {
+		SipServletRequest register = null;
+		if (sipSession != null) {			
+			register = sipSession.createRequest("REGISTER");
+		} else {
+			SipApplicationSession app = sipFactory.createApplicationSession();
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@localhost:5058");
+			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
+			register.addParameterableHeader("Contact", contact, true);			
+		}
+		register.setHeader("Expires", "3600");
+		register.setHeader("test", "test");
+		register.send();
 	}
 
 }
