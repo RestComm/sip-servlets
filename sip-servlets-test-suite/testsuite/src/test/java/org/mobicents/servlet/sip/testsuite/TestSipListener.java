@@ -805,7 +805,12 @@ public class TestSipListener implements SipListener {
 		            proxyAuthenticate.setParameter("stale","FALSE");
 		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
 		            responseauth.setHeader(proxyAuthenticate);
-		
+		            // alexander kozlov : Adding the to tag to 407 as well 
+		            ToHeader toHeader = (ToHeader) responseauth.getHeader(ToHeader.NAME);
+					if (toHeader.getTag() == null) {
+						toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
+					}
+					
 		            if (serverTransaction!=null)
 		                serverTransaction.sendResponse(responseauth);
 		            else 
