@@ -81,7 +81,7 @@ Shopping Demo
 	
 	Start another Sip Phone, make it register as admin (if you're using the binary or if you didn't change the sip.xml file it should be sip:admin@shopping-demo.com) to your Jboss AS SIP Connector listening point (default to 127.0.0.1:5080).
 
-	Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone (here sip:jean@shopping-demo.com).\
+	Before shopping create a new account and make sure that you enter the SIP address for Phone field of your registered Sip Phone (here sip:jean@shopping-demo.com).
 	 
 	<Note: The new account created won't survive server restart. If you want it to survive server restart, it requires you to modify import.sql which is stored under "ShoppingDemo.ear/ShoppingDemo.jar".
 	This is because the SIP phone addresses for all the users (user1,user2 etc...) are hardcoded here and we are using an in-memory database called HSQLDB that is created and dropped on every restart. 

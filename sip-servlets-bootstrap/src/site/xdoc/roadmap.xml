@@ -22,7 +22,10 @@
 					<p>
 						<img src="green.jpeg" />
 						JAIN SIP Blocking IO UDP Buffering 
-						<br />						
+						<br />
+						<img src="red.jpeg" />
+						JAIN SIP pluggable data structures and clustering 
+						<br />							
 						<img src="red.jpeg" />
 						HA perf tests and improvements 
 						<br />
@@ -90,13 +93,13 @@
 									SIP Load Balancer keep routing CANCEL requests to dead nodes
 								</a>
 							</li>
-							<li>
+							<!--li>
 								<img src="orange.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=869">
 									MSS can't process CANCEL after original node failure
 								</a>
-							</li>
+							</li-->
 							<li>
 								<img src="orange.jpeg" />
 								<a
@@ -105,7 +108,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=873">
 									Replication issue with handlerServlet
@@ -132,13 +135,13 @@
 									HTTP requests to a SIP application always create an HTTP session, even for static resources
 								</a>
 							</li>
-							<li>
+							<!--li>
 								<img src="red.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=885">
 									Allow killing retransmission timers in JSIP
 								</a>
-							</li>
+							</li-->
 							<li>
 								<img src="green.jpeg" />
 								<a
@@ -179,6 +182,13 @@
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=925">
 									timeout on trying / timeout on some response(s)
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=943">
+									JAIN SIP dialog is null in the stack for reINVITE after a failover crash
 								</a>
 							</li>
 						</ul>
@@ -306,7 +316,8 @@
 						SS7 support
 						<br />	
 						<img src="red.jpeg" />
-						<a							href="http://code.google.com/p/mobicents/issues/detail?id=324">
+						<a
+							href="http://code.google.com/p/mobicents/issues/detail?id=324">
 						Sip Servlets working as IMS node (CSCF)
 						</a>
 						<br />						
