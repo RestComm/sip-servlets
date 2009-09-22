@@ -30,7 +30,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
@@ -151,7 +151,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(200);
+		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());

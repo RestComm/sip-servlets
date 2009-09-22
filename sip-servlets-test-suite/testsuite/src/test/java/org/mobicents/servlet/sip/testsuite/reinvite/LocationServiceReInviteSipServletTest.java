@@ -77,13 +77,13 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG, null);		
 					
-		sender = new TestSipListener(5070, 5080, senderProtocolObjects, false);
-		sender.setRecordRoutingProxyTesting(true);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true); 
 		SipProvider senderProvider = sender.createProvider();					
 		senderProvider.addSipListener(sender);		
 		senderProtocolObjects.start();			
 		
-		receiver = new TestSipListener(5090, 5080, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
