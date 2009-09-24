@@ -23,33 +23,47 @@
 						<img src="green.jpeg" />
 						JAIN SIP Blocking IO UDP Buffering 
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=902">
 						JAIN SIP pluggable data structures and clustering 
+						</a>
 						<br />							
 						<img src="red.jpeg" />
 						HA perf tests and improvements 
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=955">
 						HA colocating LB and nodes
+						</a>
 						<br />
 						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=956">
 						Distributed LB
+						</a>
+						<br />
+						<img src="orange.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=953">
+						Stateless LB
+						</a>
 						<br />
 						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=958">
 						HTTP redirect-based cooperative load-balancing
+						</a>
 						<br />
+						<img src="orange.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=954">
+						Load Balancer pluggable algorithms
+						</a> 
+						<br />						
 						<img src="red.jpeg" />
-						Load Balancer pluggable algorithms 
-						<br />
-						<img src="red.jpeg" />
-						Load Balancer support for SIP extensions 
-						<br />
-						<img src="red.jpeg" />
-						Load Balancer grouping strategy and notification API 
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=956">
+						Load Balancer grouping strategy and notification API
+						</a> 
 						<br />						
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=660">
-						HA persistent timers
+						HA persistent timers (JB5 version only)
 						</a>
 						<br />		
 						<img src="red.jpeg" />
@@ -156,13 +170,13 @@
 									ACK is not passed to SipServlet for non-initial INVITE
 								</a>
 							</li>
-							<!--li>
-								<img src="red.jpeg" />
+							<li>
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=906">
 									CSeq is not increased correctly for REGISTER requests if registrar requires authentication.
 								</a>
-							</li-->
+							</li>
 							<li>
 								<img src="green.jpeg" />
 								<a

@@ -31,7 +31,7 @@
 						<img src="red.jpeg" />
 						HA perf tests and improvements 
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=955">
 						HA colocating LB and nodes
 						</a>
@@ -41,7 +41,7 @@
 						Distributed LB
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=953">
 						Stateless LB
 						</a>
@@ -51,7 +51,7 @@
 						HTTP redirect-based cooperative load-balancing
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=954">
 						Load Balancer pluggable algorithms
 						</a> 
