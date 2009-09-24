@@ -242,7 +242,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				if(resp.getSession().getState().equals(State.INITIAL)) {
 					String fromString = resp.getFrom().toString();
 					if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
-						registerSipSession = resp.getSession();
+//						registerSipSession = resp.getSession();
 						sendRegister();
 					} else {
 						sendRegister(resp.getSession());
@@ -274,7 +274,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				SipServletRequest challengeRequest = null;
 				String fromString = response.getFrom().toString();
 				if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
-					registerSipSession = response.getSession();
+//					registerSipSession = response.getSession();
 					challengeRequest = registerSipSession.createRequest(
 							response.getMethod());
 				} else {

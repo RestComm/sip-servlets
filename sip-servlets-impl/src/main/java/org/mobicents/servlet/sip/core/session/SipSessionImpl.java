@@ -987,11 +987,18 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {
 		this.sessionCreatingTransaction = sessionCreatingTransaction;
-		if(originalMethod == null && sessionCreatingTransaction != null) {
-			originalMethod = sessionCreatingTransaction.getRequest().getMethod();
-		}
 		if(sessionCreatingTransaction != null) {
+			if(originalMethod == null) {
+				originalMethod = sessionCreatingTransaction.getRequest().getMethod();
+			}		
 			addOngoingTransaction(sessionCreatingTransaction);
+			// Issue 906 : CSeq is not increased correctly for REGISTER requests if registrar requires authentication.
+			// http://code.google.com/p/mobicents/issues/detail?id=906
+			// we update the parent session for the REGISTER so that the CSeq is correctly increased
+			// if the session is stored
+			if(parentSession != null && Request.REGISTER.equals(originalMethod)) {
+				parentSession.setSessionCreatingTransaction(sessionCreatingTransaction);
+			}
 		}
 	}
 	
