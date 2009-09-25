@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	
+	<parent>
+		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<artifactId>alerting-app-jslee-events-parent</artifactId>
+		<version>1.5-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>alerting-app-jslee-events-DU</artifactId>
+									
+	<dependencies>
+		<dependency>
+			<groupId>org.mobicents.servlet.sip.example</groupId>
+			<artifactId>alerting-app-jslee-custom-events</artifactId>			
+			<version>1.5-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mobicents.tools</groupId>
+				<artifactId>maven-du-plugin</artifactId>
+				<version>1.0.0.CR1</version>
+				<extensions>true</extensions>
+				<configuration />
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>deploy-DU</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy overwrite="true" file="target/${project.build.finalName}.jar" todir="${env.JBOSS_HOME}/server/default/deploy" />
+							</tasks>
+						</configuration>
+					</execution>
+					<execution>
+						<id>undeploy-DU</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<delete file="${env.JBOSS_HOME}/server/default/deploy/${project.build.finalName}.jar" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>

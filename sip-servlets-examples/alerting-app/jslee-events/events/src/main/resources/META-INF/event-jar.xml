@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE event-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Event 1.0//EN"
+                           "http://java.sun.com/dtd/slee-event-jar_1_0.dtd">
+<event-jar>
+    <event-definition>
+        <description>send sms alert</description>
+        <event-type-name>org.mobicents.slee.service.alerting.SEND_SMS</event-type-name>
+        <event-type-vendor>org.mobicents</event-type-vendor>
+        <event-type-version>1.0</event-type-version>
+        <event-class-name>org.mobicents.slee.service.events.SmsAlertingCustomEvent</event-class-name>
+    </event-definition>                         
+</event-jar>

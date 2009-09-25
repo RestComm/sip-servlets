@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="jslee-services/sms-alerting-sbb/target/classes" path="jslee-services/sms-alerting-sbb/src/main/java"/>
+	<classpathentry kind="src" output="jslee-events/events/target/classes" path="jslee-events/events/src/main/java"/>
+	<classpathentry kind="src" output="jslee-services/sms-alerting-sbb/target/classes" path="jslee-services/sms-alerting-sbb/src/main/resources"/>
+	<classpathentry kind="src" output="jslee-services/services-du/target/classes" path="jslee-services/services-du/src/main/resources"/>
+	<classpathentry kind="src" output="jslee-events/events/target/classes" path="jslee-events/events/src/main/resources"/>
+	<classpathentry kind="src" output="sip-servlets/src/main/sipapp/WEB-INF/classes" path="sip-servlets/src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-commons-annotations/3.3.0.ga/hibernate-commons-annotations-3.3.0.ga.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-el/2.0.0.GA/jboss-el-2.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam/2.0.1.GA/jboss-seam-2.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam-debug/2.0.1.GA/jboss-seam-debug-2.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam-ui/2.0.1.GA/jboss-seam-ui-2.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/el/el-api/1.0/el-api-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-ejb_3.0_spec/1.0/geronimo-ejb_3.0_spec-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.11-SNAPSHOT/sip-servlets-spec-1.1.11-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/slee/jain-slee/1.0/jain-slee-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee_1.4_spec/1.1/geronimo-j2ee_1.4_spec-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/resources/smpp-ratype/1.2.6.GA/smpp-ratype-1.2.6.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/resources/smpp-events/1.2.6.GA/smpp-events-1.2.6.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/cmu_time_awb/1.0/cmu_time_awb-1.0.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/cmu_us_kal/1.0/cmu_us_kal-1.0.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/cmudict04/1.0/cmudict04-1.0.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/cmulex/1.0/cmulex-1.0.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/cmutimelex/1.0/cmutimelex-1.0.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/en_us/1.0/en_us-1.0.jar"/>  	
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-constants/1.0.3.GA/mobicents-media-server-constants-1.0.3.GA.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api-local-impl/1.0.3.GA/mobicents-media-server-msc-api-local-impl-1.0.3.GA.jar"/>
+  	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/media/mobicents-media-server-msc-api/1.0.3.GA/mobicents-media-server-msc-api-1.0.3.GA.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

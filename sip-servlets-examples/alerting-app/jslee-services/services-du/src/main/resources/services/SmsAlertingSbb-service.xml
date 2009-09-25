@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE service-xml PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Service 1.0//EN" "http://java.sun.com/dtd/slee-service_1_0.dtd">
+
+<service-xml>
+  <service>
+
+    <service-name>JSLEE SIPS Sms Alerting SBB Service</service-name>
+    <service-vendor>org.mobicents</service-vendor>
+    <service-version>1.0</service-version>
+        
+    <!-- JSLEE v1.1 Specification, Early Draft Review Page 36 
+         "A root-sbb element.
+          This element identifies the root SBB of the Service. A root-sbb element contains the following
+          sub-elements.
+           * A description element.
+             This is an optional informational element.
+           * An sbb-name element, an sbb-vendor element, and an sbb-version element.
+             These elements uniquely identify the root SBB." -->
+    <root-sbb>
+      <sbb-name>SmsAlertingSbb</sbb-name>
+      <sbb-vendor>org.mobicents</sbb-vendor>
+      <sbb-version>1.0</sbb-version>
+    </root-sbb>
+
+    <!-- JSLEE v1.1 Specification, Early Draft Review Page 36 
+         "A default-priority element.
+          This element specifies the default event delivery priority for the child relation from the SLEE to
+          root SBB." -->
+    <default-priority>0</default-priority>
+
+  </service>
+</service-xml>
