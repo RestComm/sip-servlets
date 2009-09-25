@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,7 +31,10 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
  * 
  *@author mranga
  */
-public class TransactionApplicationData {
+public class TransactionApplicationData implements Serializable {
+		
+	private static final long serialVersionUID = 1L;
+	
 	private transient ProxyBranchImpl proxyBranch;	
 	private transient SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
