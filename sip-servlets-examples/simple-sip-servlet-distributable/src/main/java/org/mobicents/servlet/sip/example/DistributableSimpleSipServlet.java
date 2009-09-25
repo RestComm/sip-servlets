@@ -81,9 +81,9 @@ public class DistributableSimpleSipServlet
 		request.getSession().setAttribute("activationListener", new SipSessionActivationListenerAttribute());
 		request.getApplicationSession().setAttribute("INVITE", RECEIVED);
 		request.getSession().setAttribute("activationListener", new SipApplicationSessionActivationListenerAttribute());
-//		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
-//		sipServletResponse.send();
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+		sipServletResponse.send();
+		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 		if(CALLEE_SEND_BYE.equalsIgnoreCase(((SipURI)request.getTo().getURI()).getUser())) {
 			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
