@@ -9,7 +9,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.11-SNAPSHOT/sip-servlets-spec-1.1.11-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jboss/jboss-system/4.2.3.GA/jboss-system-4.2.3.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jboss/jboss-jmx/4.2.3.GA/jboss-jmx-4.2.3.GA.jar"/>	
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/mobicents-diameter-mux-jar/1.0.0.BETA3/mobicents-diameter-mux-jar-1.0.0.BETA3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/jdiameter-api/1.5.0.1-build185/jdiameter-api-1.5.0.1-build185.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/mobicents-diameter-mux-jar/1.0.1.GA/mobicents-diameter-mux-jar-1.0.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/jdiameter-api/1.5.2.2-build212/jdiameter-api-1.5.2.2-build212.jar"/>
 	<classpathentry kind="output" path="src/main/sipapp/WEB-INF/classes"/>
 </classpath>
