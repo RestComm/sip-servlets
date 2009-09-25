@@ -72,6 +72,11 @@ public class DistributableSimpleSipServlet
 			logger.info("Distributable Simple Servlet: Got request:\n"
 				+ request.getMethod());
 		}
+		if(request.isInitial() && request.getHeader("CSeq").indexOf("2") != -1) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Reinvite not recognized as subsequent");
+			sipServletResponse.send();
+			return;
+		}
 		request.getSession().setAttribute("INVITE", RECEIVED);
 		request.getSession().setAttribute("activationListener", new SipSessionActivationListenerAttribute());
 		request.getApplicationSession().setAttribute("INVITE", RECEIVED);
