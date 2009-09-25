@@ -139,7 +139,7 @@
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
-			</plugin>			
+			</plugin>				
 		</plugins>		
 	</build>
 </project>

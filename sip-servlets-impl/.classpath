@@ -9,16 +9,16 @@
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.12/log4j-1.2.12.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.14/catalina-6.0.14.jar" sourcepath="/TOMCAT_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.14/coyote-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.14/juli-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.14/servlet-api-6.0.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/tools/sip-balancer/1.0.BETA7/sip-balancer-1.0.BETA7.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.108/jain-sip-ri-1.2.108.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.122-SNAPSHOT/jain-sip-ri-1.2.122-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>	
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
