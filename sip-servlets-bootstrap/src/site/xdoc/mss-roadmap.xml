@@ -27,6 +27,10 @@
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=902">
 						JAIN SIP pluggable data structures and clustering 
 						</a>
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=965">
+						Sip Session Dialog replication moved to JAIN SIP HA
+						</a>
 						<br />							
 						<img src="red.jpeg" />
 						HA perf tests and improvements 
