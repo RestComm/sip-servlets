@@ -229,7 +229,12 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		// Minimalist application router implementation with no processing logic 
 		// besides the declaration of the application order as specified in JSR 289 - Appendix C
 		SipApplicationRouterInfo sipApplicationRouterInfo = null;
-		if(initialRequest != null) {									
+		if(initialRequest != null) {	
+			if(log.isDebugEnabled()) {
+				log.debug(this + " checking for next application for request " + initialRequest 
+						+ " , region=" + region + " , directive=" + directive + 
+						", targetedRequestInfo="+ targetedRequestInfo + ", stateinfo=" + stateInfo + " with following dar " + defaultApplicationRouterParser.getProperties());
+			}
 			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
 				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());		
 			sipApplicationRouterInfo = getNextApplication(initialRequest, stateInfo,
@@ -251,6 +256,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 			SipServletRequest initialRequest,
 			Serializable stateInfo,
 			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList) {
+		
 		if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
 			int previousAppOrder = 0; 
 			if(stateInfo != null) {					
