@@ -79,7 +79,8 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 	
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();						
+		super.setUp();		
+		System.setProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider", "org.mobicents.servlet.sip.router.DefaultApplicationRouterProvider");
 	}
 
 	public SipStack makeStack(String transport, int port) throws Exception {
@@ -105,10 +106,13 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 				SipStack.PROTOCOL_UDP, 5069, fromAddress);		
 	}
 	
-	public void testExternalRouting() throws Exception {		
+	public void testExternalRouting() throws Exception {
+		//start the most remote server first
+		tomcat.startTomcat();
+		deployApplication();
 		//create and start the closest server
 		//starting tomcat
-		closestTomcat = new SipEmbedded(serverName, serviceFullClassName);
+		closestTomcat = new SipEmbedded("SIP-Servlet-Closest-Tomcat-Server", serviceFullClassName);
 		closestTomcat.setLoggingFilePath(  
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
@@ -119,10 +123,7 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 		closestTomcat.setDarConfigurationFilePath(getDarConfigurationFileForClosestServer());
 		closestTomcat.initTomcat(tomcatBasePath);						
 		closestTomcat.addSipConnector("SIP-Servlet-Closest-Tomcat-Server", sipIpAddress, 5069, ListeningPoint.UDP);						
-		closestTomcat.startTomcat();
-		//start the most remote server
-		tomcat.startTomcat();
-		deployApplication();
+		closestTomcat.startTomcat();		
 		Thread.sleep(TIMEOUT);
 		setupPhone("sip:sender@sip-servlets.com", "sip:receiver@sip-servlets.com");
 		boolean registerOK = sipPhoneSender.register(null, 3600);

@@ -134,6 +134,7 @@ public class TimersSipServlet
 	public void sessionExpired(SipApplicationSessionEvent ev) {
 		logger.info("sip application session expired " +  ev.getApplicationSession());
 		if(!ev.getApplicationSession().isReadyToInvalidate() && ev.getApplicationSession().getAttribute(ALREADY_EXTENDED) == null) {
+			logger.info("extending lifetime of sip app session" +  ev.getApplicationSession());
 			ev.getApplicationSession().setExpires(1);
 			ev.getApplicationSession().setAttribute(ALREADY_EXTENDED, Boolean.TRUE);
 		}

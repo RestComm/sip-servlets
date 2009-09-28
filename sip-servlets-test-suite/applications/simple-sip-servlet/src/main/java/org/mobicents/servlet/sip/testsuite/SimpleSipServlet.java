@@ -422,7 +422,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			register = sipSession.createRequest("REGISTER");
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
-			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@localhost:5058");
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterCSeq@simple-servlet.com", "sip:you@localhost:5058");
 			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
 			register.addParameterableHeader("Contact", contact, true);			
 		}

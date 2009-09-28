@@ -199,7 +199,16 @@
    <category name="org.jboss.serial">
       <priority value="ERROR"/>
    </category>
+
+   <category name="org.jboss">
+      <priority value="ERROR"/>
+   </category>
    
+   <category name="org.mobicents">
+      <priority value="DEBUG"/>
+   </category>
+   
+
    <!-- Decrease the priority threshold for the org.jboss.varia category
    <category name="org.jboss.varia">
      <priority value="DEBUG"/>
@@ -293,7 +302,7 @@
    <!-- ======================= -->
 
    <root>
-   	  <priority value ="INFO" />  
+   	  <priority value ="DEBUG" />  
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
    </root>

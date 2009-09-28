@@ -1058,11 +1058,13 @@ public class TestSipListener implements SipListener {
 			}
 			if(sendBye) {											
 				Thread.sleep(1000);
-				Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
-				ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
-				logger.info("Sending BYE : " + byeRequest);
-				serverTransactionId.getDialog().sendRequest(ct);
-				logger.info("Dialog State = " + serverTransactionId.getDialog().getState());
+				if(serverTransactionId != null && serverTransactionId.getDialog() != null) {
+					Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
+					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+					logger.info("Sending BYE : " + byeRequest);
+					serverTransactionId.getDialog().sendRequest(ct);
+					logger.info("Dialog State = " + serverTransactionId.getDialog().getState());
+				}
 			}	
 			if(!joinRequestReceived && sendJoinMessage) {
 				String fromUser = "join";

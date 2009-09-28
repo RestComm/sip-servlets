@@ -43,27 +43,32 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 	protected String serviceFullClassName = "org.mobicents.servlet.sip.startup.SipStandardService";
 	protected String sipIpAddress = "127.0.0.1";
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
+	protected String listeningPointTransport = ListeningPoint.UDP;
+	protected boolean createTomcatOnStartup = true;
 	protected boolean autoDeployOnStartup = true;
+	protected boolean initTomcatOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
-	
+	protected boolean addSipConnectorOnStartup = true;
+		
 	public SipUnitServletTestCase(String name) {
 		super(name);
 	}
 	
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();
+		super.setUp();		
 		//Reading properties
 		Properties properties = new Properties();
 		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-		"org/mobicents/servlet/sip/testsuite/testsuite.properties");		
+				"org/mobicents/servlet/sip/testsuite/testsuite.properties");		
 		try{
 			properties.load(inputStream);
 		} catch (NullPointerException e) {
 			inputStream = SipServletTestCase.class.getResourceAsStream(
 				"org/mobicents/servlet/sip/testsuite/testsuite.properties");
 			properties.load(inputStream);
-		}	
+		}
+		
 		// First try to use the env variables - useful for shell scripting
 		tomcatBasePath = System.getenv("CATALINA_HOME");	
 		projectHome = System.getenv("SIP_SERVLETS_HOME");
@@ -76,38 +81,44 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 		logger.info("Tomcat base Path is : " + tomcatBasePath);
 		logger.info("Project Home is : " + projectHome);
 		//starting tomcat
-		tomcat = new SipEmbedded(serverName, serviceFullClassName);
-		tomcat.setLoggingFilePath(  
-				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
-				File.separatorChar + "testsuite" + 
-				File.separatorChar + "src" +
-				File.separatorChar + "test" + 
-				File.separatorChar + "resources" + File.separatorChar);
-		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
-		String darConfigurationFile = getDarConfigurationFile();
-		tomcat.setDarConfigurationFilePath(darConfigurationFile);	
-		tomcat.initTomcat(tomcatBasePath);
-		//HTTP connector
-		tomcat.addHttpConnector(8080);
-		/*
-		 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
-		 * logLevel="DEBUG" port="5070"
-		 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-		 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
-		 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
-		 */
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.UDP);
-		if(startTomcatOnStartup) {
-			tomcat.startTomcat();
-		}
-		if(autoDeployOnStartup) {
-			deployApplication();
+		if(createTomcatOnStartup) {
+			tomcat = new SipEmbedded(serverName, serviceFullClassName);
+			tomcat.setLoggingFilePath(				
+					projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+					File.separatorChar + "testsuite" + 
+					File.separatorChar + "src" +
+					File.separatorChar + "test" + 
+					File.separatorChar + "resources" + File.separatorChar);
+			logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
+			String darConfigurationFile = getDarConfigurationFile();
+			tomcat.setDarConfigurationFilePath(darConfigurationFile);
+			if(initTomcatOnStartup) {
+				tomcat.initTomcat(tomcatBasePath);
+				tomcat.addHttpConnector(8080);
+				/*
+				 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
+				 * logLevel="DEBUG" port="5070"
+				 * protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+				 * serverLog="../logs/serverlog.txt" signalingTransport="udp"
+				 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
+				 */
+				if(addSipConnectorOnStartup) {
+					tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+				}
+			}		
+			if(startTomcatOnStartup) {
+				tomcat.startTomcat();
+			}
+			if(autoDeployOnStartup) {
+				deployApplication();
+			}
 		}
 	}
 	
 	@Override
-	public void tearDown() throws Exception {	
-		tomcat.stopTomcat();
+	public void tearDown() throws Exception {
+		if(createTomcatOnStartup)
+			tomcat.stopTomcat();
 		super.tearDown();
 	}
 

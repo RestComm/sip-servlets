@@ -46,6 +46,7 @@
 
 	<!-- Define a SIP Connector -->
     <Connector port="5081" 
+    	 sipPathName="org.mobicents.ha" 
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp"
