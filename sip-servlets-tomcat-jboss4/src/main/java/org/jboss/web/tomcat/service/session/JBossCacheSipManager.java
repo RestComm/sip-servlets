@@ -1410,78 +1410,77 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
 		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
-		ClusteredSipSession newTempSession = session;
-		if (session == null && sipApplicationSessionImpl != null && create) {
-			// This is either the first time we've seen this session on this
-			// server, or we previously expired it and have since gotten
-			// a replication message from another server
-			mustAdd = true;
-			newTempSession = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
-		}		
-		if(newTempSession != null) {
-			synchronized (newTempSession) {
-				ClusteredSipSession sessionInCache = null;
-				boolean doTx = false;
-				try {
-					// We need transaction so any data gravitation replication
-					// is sent in batch.
-					// Don't do anything if there is already transaction context
-					// associated with this thread.
-					if (tm.getTransaction() == null)
-						doTx = true;
-	
-					if (doTx)
-						tm.begin();
-	
-					// Ignore cache notifications we may generate for this
-					// session if data gravitation occurs.
-					ConvergedSessionReplicationContext.startSipCacheActivity();
-	
-					sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
-				} catch (Exception ex) {
-					try {
-						// if(doTx)
-						// Let's set it no matter what.
-						tm.setRollbackOnly();
-					} catch (Exception exn) {
-						log_.error("Problem rolling back session mgmt transaction",
-								exn);
-					}
-	
-					// We will need to alert Tomcat of this exception.
-					if (ex instanceof RuntimeException)
-						throw (RuntimeException) ex;
-	
-					throw new RuntimeException("Failed to load session " + key.toString(),
-							ex);
-				} finally {
-					try {
-						if (doTx)
-							endTransaction(key.toString());
-					} finally {
-						ConvergedSessionReplicationContext.finishSipCacheActivity();
-					}
-				}
-	
-				if (sessionInCache != null) {
-					// Need to initialize.
-					sessionInCache.initAfterLoad(this);
-					if (mustAdd)
-						add(sessionInCache, false); // don't replicate
-					long elapsed = System.currentTimeMillis() - begin;
-					stats_.updateLoadStats(key.toString(), elapsed);
-	
-					if (log_.isDebugEnabled()) {
-						log_.debug("loadSession(): id= " + key.toString() + ", session="
-								+ newTempSession);
-					}
-					return sessionInCache;
-				} else if (log_.isDebugEnabled()) {
-					log_.debug("loadSession(): session " + key.toString()
-							+ " not found in distributed cache");
-				}
+		
+		boolean doTx = false;
+		try {
+			// We need transaction so any data gravitation replication
+			// is sent in batch.
+			// Don't do anything if there is already transaction context
+			// associated with this thread.
+			if (tm.getTransaction() == null)
+				doTx = true;
+
+			if (doTx)
+				tm.begin();
+
+			// Ignore cache notifications we may generate for this
+			// session if data gravitation occurs.
+			ConvergedSessionReplicationContext.startSipCacheActivity();
+			
+			Object sessionData = proxy_.getSipSessionData(sipApplicationSessionImpl.getId(), key.toString());
+			if(sessionData != null) {
+				if (session == null && sipApplicationSessionImpl != null) {
+					// This is either the first time we've seen this session on this
+					// server, or we previously expired it and have since gotten
+					// a replication message from another server
+					mustAdd = true;
+					session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+				}		
+				session = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), session, sessionData);
+			}
+		} catch (Exception ex) {
+			try {
+				// if(doTx)
+				// Let's set it no matter what.
+				tm.setRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Problem rolling back session mgmt transaction",
+						exn);
+			}
+
+			// We will need to alert Tomcat of this exception.
+			if (ex instanceof RuntimeException)
+				throw (RuntimeException) ex;
+
+			throw new RuntimeException("Failed to load session " + key.toString(),
+					ex);
+		} finally {
+			try {
+				if (doTx)
+					endTransaction(key.toString());
+			} finally {
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
 			}
 		}
+
+		if (session != null) {
+			
+			// Need to initialize.
+			session.initAfterLoad(this);
+			if (mustAdd)
+				add(session, false); // don't replicate
+			long elapsed = System.currentTimeMillis() - begin;
+			stats_.updateLoadStats(key.toString(), elapsed);
+
+			if (log_.isDebugEnabled()) {
+				log_.debug("loadSession(): id= " + key.toString() + ", session="
+						+ session);
+			}
+			return session;
+		} else if (log_.isDebugEnabled()) {
+			log_.debug("loadSession(): session " + key.toString()
+					+ " not found in distributed cache");
+		}			
 		if(session != null) {
 			ConvergedSessionReplicationContext.bindSipSession(session,
 				snapshotManager_);
@@ -1514,75 +1513,76 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
 		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
-		if (session == null) {			
-			// This is either the first time we've seen this session on this
-			// server, or we previously expired it and have since gotten
-			// a replication message from another server
-			mustAdd = true;
-			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
-		}		
-		synchronized (session) {
-			ClusteredSipApplicationSession sessionInCache = null;
-			boolean doTx = false;
+		boolean doTx = false;
+		try {
+			// We need transaction so any data gravitation replication
+			// is sent in batch.
+			// Don't do anything if there is already transaction context
+			// associated with this thread.
+			if (tm.getTransaction() == null)
+				doTx = true;
+
+			if (doTx)
+				tm.begin();
+
+			// Ignore cache notifications we may generate for this
+			// session if data gravitation occurs.
+			ConvergedSessionReplicationContext.startSipCacheActivity();
+
+			Object sessionData = proxy_.getSipApplicationSessionData(key.toString());
+			if(sessionData != null) {			
+				if (session == null) {			
+					// This is either the first time we've seen this session on this
+					// server, or we previously expired it and have since gotten
+					// a replication message from another server
+					mustAdd = true;
+					session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
+				}
+				session = proxy_.loadSipApplicationSession(session, sessionData);
+			}
+		} catch (Exception ex) {
 			try {
-				// We need transaction so any data gravitation replication
-				// is sent in batch.
-				// Don't do anything if there is already transaction context
-				// associated with this thread.
-				if (tm.getTransaction() == null)
-					doTx = true;
-
-				if (doTx)
-					tm.begin();
-
-				// Ignore cache notifications we may generate for this
-				// session if data gravitation occurs.
-				ConvergedSessionReplicationContext.startSipCacheActivity();
-
-				sessionInCache = proxy_.loadSipApplicationSession(key.toString(), session);
-			} catch (Exception ex) {
-				try {
-					// if(doTx)
-					// Let's set it no matter what.
-					tm.setRollbackOnly();
-				} catch (Exception exn) {
-					log_.error("Problem rolling back session mgmt transaction",
-							exn);
-				}
-
-				// We will need to alert Tomcat of this exception.
-				if (ex instanceof RuntimeException)
-					throw (RuntimeException) ex;
-
-				throw new RuntimeException("Failed to load session " + key,
-						ex);
-			} finally {
-				try {
-					if (doTx)
-						endTransaction(key.toString());
-				} finally {
-					ConvergedSessionReplicationContext.finishSipCacheActivity();
-				}
+				// if(doTx)
+				// Let's set it no matter what.
+				tm.setRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Problem rolling back session mgmt transaction",
+						exn);
 			}
 
-			if (sessionInCache != null) {
-				// Need to initialize.
-				sessionInCache.initAfterLoad(this);
-				if (mustAdd)
-					add(sessionInCache, false); // don't replicate
-				long elapsed = System.currentTimeMillis() - begin;
-				stats_.updateLoadStats(key.toString(), elapsed);
+			// We will need to alert Tomcat of this exception.
+			if (ex instanceof RuntimeException)
+				throw (RuntimeException) ex;
 
-				if (log_.isDebugEnabled()) {
-					log_.debug("loadSession(): id= " + key.toString() + ", session="
-							+ sessionInCache);
-				}
-				return sessionInCache;
-			} else if (log_.isDebugEnabled()) {
-				log_.debug("loadSession(): session " + key.toString()
-						+ " not found in distributed cache");				
+			throw new RuntimeException("Failed to load session " + key,
+					ex);
+		} finally {
+			try {
+				if (doTx)
+					endTransaction(key.toString());
+			} finally {
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
 			}
 		}
+
+		if (session != null) {
+			// Need to initialize.
+			session.initAfterLoad(this);
+			if (mustAdd)
+				add(session, false); // don't replicate
+			long elapsed = System.currentTimeMillis() - begin;
+			stats_.updateLoadStats(key.toString(), elapsed);
+
+			if (log_.isDebugEnabled()) {
+				log_.debug("loadSession(): id= " + key.toString() + ", session="
+						+ session);
+			}
+			return session;
+		} else if (log_.isDebugEnabled()) {
+			log_.debug("loadSession(): session " + key.toString()
+					+ " not found in distributed cache");				
+		}
+		
 		ConvergedSessionReplicationContext.bindSipApplicationSession(session,
 				snapshotManager_);
 		return session;

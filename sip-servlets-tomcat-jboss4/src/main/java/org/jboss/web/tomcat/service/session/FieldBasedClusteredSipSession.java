@@ -134,7 +134,7 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
       // This is a shortcut to remove session and it's child attributes.
       // Note that there is no need to remove attribute first since caller 
       // will do that already.
-      proxy_.removeSipSession(sipApplicationSession.getId(), getId());
+      proxy_.removeSipSession(sipApplicationSessionKey.getId(), getId());
    }
 
    public void removeMyselfLocal()
@@ -146,8 +146,8 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
       // removePojosLocal call here in order to evict the ATTRIBUTE node.  
       // Otherwise empty nodes for the session root and child ATTRIBUTE will 
       // remain in the tree and screw up our list of session names.
-      proxy_.removeSipSessionPojosLocal(sipApplicationSession.getId(), getId());
-      proxy_.removeSipSessionLocal(sipApplicationSession.getId(), getId());
+      proxy_.removeSipSessionPojosLocal(sipApplicationSessionKey.getId(), getId());
+      proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getId());
    }
 
    // ------------------------------------------------ JBoss internal abstract method
@@ -163,7 +163,7 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
       // Preserve any local attributes that were excluded from replication
       Map excluded = removeExcludedAttributes(attributes_);
       
-      Set keys = proxy_.getSipSessionPojoKeys(sipApplicationSession.getId(), getId());
+      Set keys = proxy_.getSipSessionPojoKeys(sipApplicationSessionKey.getId(), getId());
       Set oldKeys = new HashSet(attributes_.keySet());
       
       // Since we are going to touch each attribute, might as well
@@ -179,7 +179,7 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
             String name = (String) it.next();
             
             Object oldAttrib = null;
-            Object newAttrib = proxy_.getSipSessionPojo(sipApplicationSession.getId(), getId(), name);
+            Object newAttrib = proxy_.getSipSessionPojo(sipApplicationSessionKey.getId(), getId(), name);
             if (newAttrib != null)
             {
                oldAttrib = attributes_.put(name, newAttrib);
@@ -262,9 +262,9 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
       if (localCall && !replicationExcludes.contains(name))
       { 
          if (localOnly)         
-            proxy_.removeSipSessionPojoLocal(sipApplicationSession.getId(), getId(), name);      
+            proxy_.removeSipSessionPojoLocal(sipApplicationSessionKey.getId(), getId(), name);      
          else
-            proxy_.removeSipSessionPojo(sipApplicationSession.getId(), getId(), name); 
+            proxy_.removeSipSessionPojo(sipApplicationSessionKey.getId(), getId(), name); 
          
          sessionAttributesDirty();
       }
@@ -319,7 +319,7 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
       Object oldVal = null;
       if (!replicationExcludes.contains(key))
       {   
-         oldVal = proxy_.setSipSessionPojo(sipApplicationSession.getId(), getId(), key, value);
+         oldVal = proxy_.setSipSessionPojo(sipApplicationSessionKey.getId(), getId(), key, value);
          if(oldVal != null)
          {  // We are done with the old one.
             proxy_.removeObserver(this, oldVal);
@@ -331,7 +331,7 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
             if( value instanceof Map || value instanceof Collection)
             {
                // We need to obtain the proxy first.
-               value = proxy_.getSipSessionPojo(sipApplicationSession.getId(), getId(), key);
+               value = proxy_.getSipSessionPojo(sipApplicationSessionKey.getId(), getId(), key);
             }
 
             // Need to use obj since it can return as a proxy.

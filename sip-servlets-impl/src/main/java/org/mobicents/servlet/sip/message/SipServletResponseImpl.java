@@ -164,7 +164,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		if(!Request.INVITE.equals(getTransaction().getRequest().getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
 			throw new IllegalStateException("the transaction state is such that it doesn't allow an ACK to be sent now, e.g. the original request was not an INVITE, or this response is provisional only, or an ACK has already been generated");
 		}
-		Dialog dialog = super.session.getSessionCreatingDialog();
+		final MobicentsSipSession session = getSipSession();
+		Dialog dialog = session.getSessionCreatingDialog();
 		CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		SipServletRequestImpl sipServletAckRequest = null; 
 		try {
@@ -213,7 +214,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		if(!Request.INVITE.equals(getTransaction().getRequest().getMethod())) {
 			throw new Rel100Exception(Rel100Exception.NOT_INVITE);
 		}		
-		Dialog dialog = super.session.getSessionCreatingDialog();
+		final MobicentsSipSession session = getSipSession();
+		Dialog dialog = session.getSessionCreatingDialog();
 		SipServletRequestImpl sipServletPrackRequest = null; 
 		try {
 			if(logger.isDebugEnabled()) {
@@ -412,6 +414,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		}
 		try {	
 			final int statusCode = response.getStatusCode();
+			final MobicentsSipSession session = getSipSession();
 			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
 			final SipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
 			final ProxyImpl proxy = session.getProxy();
@@ -462,7 +465,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
 							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
 					&& getTransaction().getDialog() == null 
-					&& JainSipUtils.dialogCreatingMethods.contains(method)) {					
+					&& JainSipUtils.dialogCreatingMethods.contains(getMethod())) {					
 				final String transport = JainSipUtils.findTransport(transaction.getRequest());
 				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();

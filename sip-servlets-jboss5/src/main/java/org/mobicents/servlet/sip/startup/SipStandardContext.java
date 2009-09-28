@@ -849,9 +849,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			case SipApplicationSession:
 				MobicentsSipApplicationSession sipApplicationSession = null;
 				if(request != null) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession(false));
 				} else if (response != null ) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession(false));
 				}
 				if(sipApplicationSession != null) {
 					sipApplicationSession.getSemaphore().acquireUninterruptibly();
@@ -886,9 +886,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			case SipApplicationSession:
 				MobicentsSipApplicationSession sipApplicationSession = null;
 				if(request != null) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession());
+					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession(false));
 				} else if (response != null ) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession());
+					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession(false));
 				}
 				if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
 					sipApplicationSession.getSemaphore().release();

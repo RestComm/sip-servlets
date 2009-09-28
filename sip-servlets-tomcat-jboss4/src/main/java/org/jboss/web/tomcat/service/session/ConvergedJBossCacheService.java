@@ -374,24 +374,31 @@ public class ConvergedJBossCacheService extends JBossCacheService
     *         <code>null</code> if the cache had no data stored
     *         under the given session id.
     */
-   public ClusteredSipSession loadSipSession(String id, String realId, ClusteredSipSession toLoad)
+   public Object getSipSessionData(String id, String realId)
    {
 	  if(log_.isDebugEnabled()) {
-		  log_.debug("loading sip session from the cache " + id + " / " + realId);
+		  log_.debug("getting sip session data from the cache " + id + " / " + realId);
 	  }
       Fqn fqn = getSipSessionFqn(id, realId);
    
-      
-      Object sessionData = cacheWrapper_.get(fqn, realId, true);
-      
-      if (sessionData == null) {
-    	  if(log_.isDebugEnabled()) {
-    		  log_.debug("sip session " + id + " / " + realId + " is no longer in the cache. FQN = "+ fqn);
-    	  }
-         // Requested session is no longer in the cache; return null
-         return null;
-      }
-      
+      return cacheWrapper_.get(fqn, realId, true);            
+   }
+   
+   /**
+    * Loads any serialized data in the cache into the given session
+    * using its <code>readExternal</code> method.
+    *
+    * @return the session passed as <code>toLoad</code>, or
+    *         <code>null</code> if the cache had no data stored
+    *         under the given session id.
+    */
+   public ClusteredSipSession loadSipSession(String id, ClusteredSipSession toLoad, Object sessionData)
+   {
+	   String realId = toLoad.getId();
+	  if(log_.isDebugEnabled()) {
+		  log_.debug("loading sip session from the cache " + id + " / " + realId);
+	  }
+     
       boolean firstLoad = (toLoad.getVersion() == 0);
       
 //      if (useTreeCacheMarshalling_)
@@ -432,6 +439,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       // need to fix the version
       if (firstLoad)
       {         
+    	 Fqn fqn = getSipSessionFqn(id, realId);
          Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
          if (ver != null)
             toLoad.setVersion(ver.intValue());
@@ -448,25 +456,27 @@ public class ConvergedJBossCacheService extends JBossCacheService
     *         <code>null</code> if the cache had no data stored
     *         under the given session id.
     */
-   public ClusteredSipApplicationSession loadSipApplicationSession(String realId, ClusteredSipApplicationSession toLoad)
+   public Object getSipApplicationSessionData(String realId)
    {
 	   if(log_.isDebugEnabled()) {
 		   log_.debug("loading sip app session from the cache " + realId);
 	   }
-      Fqn fqn = getSipApplicationSessionFqn(realId);
+	   Fqn fqn = getSipApplicationSessionFqn(realId);
    
-      
-      Object sessionData = cacheWrapper_.get(fqn, realId, true);
-      
-      if (sessionData == null) {
-    	  if(log_.isDebugEnabled()) {
-    		  log_.debug("sip app session " + realId + " is no longer in the cache. FQN = "+ fqn);
-    	  }
-         // Requested session is no longer in the cache; return null
-         return null;
-      }
-      
-      boolean firstLoad = (toLoad.getVersion() == 0);
+	   return cacheWrapper_.get(fqn, realId, true);
+   }
+
+   /**
+    * Loads any serialized data in the cache into the given session
+    * using its <code>readExternal</code> method.
+    *
+    * @return the session passed as <code>toLoad</code>, or
+    *         <code>null</code> if the cache had no data stored
+    *         under the given session id.
+    */
+   public ClusteredSipApplicationSession loadSipApplicationSession(ClusteredSipApplicationSession toLoad, Object sessionData)
+   {	   
+	   	boolean firstLoad = (toLoad.getVersion() == 0);
       
 //      if (useTreeCacheMarshalling_)
 //      {
@@ -491,7 +501,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
          }
          catch (Exception e)
          {
-            log_.error("loadSession(): id: " + realId + " exception occurred during deserialization", e);
+            log_.error("loadSession(): id: " + toLoad.getId() + " exception occurred during deserialization", e);
             return null;
          }
          finally {
@@ -506,8 +516,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
       // need to fix the version
       if (firstLoad)
       {         
-         Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
-         if (ver != null)
+    	  Fqn fqn = getSipApplicationSessionFqn(toLoad.getId());
+    	  Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
+    	  if (ver != null)
             toLoad.setVersion(ver.intValue());
       }
       

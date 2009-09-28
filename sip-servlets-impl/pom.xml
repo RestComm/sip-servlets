@@ -258,6 +258,42 @@
 			</build>
 		</profile>
 		<profile>		
+			<id>jboss-cluster</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.mobicents.ha.javax.sip</groupId>
+					<artifactId>mobicents-jain-sip-ha-core</artifactId>
+					<version>0.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.ha.javax.sip</groupId>
+					<artifactId>mobicents-jain-sip-jboss4</artifactId>
+					<version>0.1-SNAPSHOT</version>
+				</dependency>
+			</dependencies>						
+			<build>			
+				<plugins>					
+					<plugin>
+		 	        	<groupId>org.apache.maven.plugins</groupId>
+		 	        	<artifactId>maven-dependency-plugin</artifactId>
+		 	        	<executions>		 	          		
+		 	          		<execution>
+		 	            			<id>copy-to-jboss-lib</id>
+		 	            			<phase>package</phase>
+		 	            			<goals>
+										<goal>copy-dependencies</goal>
+		 	            			</goals>
+		 	            			<configuration>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss4,mobicents-jain-sip-ha-core</includeArtifactIds>
+					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
+		 	            			</configuration>
+		 	          		</execution>
+		 	        	</executions>
+		 	      	</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>		
 			<id>jboss-distro</id>			
 			<build>			
 				<plugins>
@@ -343,6 +379,42 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j</includeArtifactIds>
+					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
+		 	            			</configuration>
+		 	          		</execution>
+		 	        	</executions>
+		 	      	</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>		
+			<id>jboss-5-cluster</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.mobicents.ha.javax.sip</groupId>
+					<artifactId>mobicents-jain-sip-ha-core</artifactId>
+					<version>0.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.ha.javax.sip</groupId>
+					<artifactId>mobicents-jain-sip-jboss4</artifactId>
+					<version>0.1-SNAPSHOT</version>
+				</dependency>
+			</dependencies>						
+			<build>			
+				<plugins>				
+					<plugin>
+		 	        	<groupId>org.apache.maven.plugins</groupId>
+		 	        	<artifactId>maven-dependency-plugin</artifactId>
+		 	        	<executions>		 	          		
+		 	          		<execution>
+		 	            			<id>copy-to-jboss-lib</id>
+		 	            			<phase>package</phase>
+		 	            			<goals>
+										<goal>copy-dependencies</goal>
+		 	            			</goals>
+		 	            			<configuration>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss4,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>

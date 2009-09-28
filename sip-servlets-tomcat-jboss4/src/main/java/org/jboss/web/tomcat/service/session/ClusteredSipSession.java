@@ -16,8 +16,6 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import gov.nist.javax.sip.stack.SIPDialog;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -177,6 +175,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	protected transient boolean firstAccess;
 	
 	protected transient SipApplicationSessionKey sipAppSessionParentKey;
+	
+	protected transient String sessionCreatingDialogId = null;
 
 	/**
 	 * The string manager for this package.
@@ -519,7 +519,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			try {
 				((SipSessionBindingListener) value).valueBound(event);
 			} catch (Throwable t) {
-				sipApplicationSession.getSipContext().getLogger().error(
+				logger.error(
 						sm.getString("standardSession.bindingEvent"), t);
 			}
 		}
@@ -535,7 +535,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 						.valueUnbound(new SipSessionBindingEvent(this,
 								name));
 			} catch (Throwable t) {
-				sipApplicationSession.getSipContext().getLogger().error(
+				logger.error(
 						sm.getString("standardSession.bindingEvent"), t);
 			}
 		}
@@ -577,7 +577,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				} catch (Exception e) {
 					;
 				}
-				sipApplicationSession.getSipContext().getLogger().error(
+				logger.error(
 						sm.getString("standardSession.attributeEvent"), t);
 			}
 		}
@@ -1018,31 +1018,16 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		}
 		synchronized (this) {
 			// From SipSessionImpl
-			String fromAddress = in.readUTF();
-			String fromTag = in.readUTF();
-			String toAddress = in.readUTF();
-			String toTag = in.readUTF();
-			if("".equals(toTag)) {
-				toTag = null;
-			}
-			String callId = in.readUTF();
-			String applicationSessionId = in.readUTF();
-			String applicationName = in.readUTF();
-			key = new SipSessionKey(fromAddress,fromTag,toAddress, toTag, callId, applicationSessionId, applicationName);
+			key = (SipSessionKey) in.readObject();
 			if(logger.isDebugEnabled()) {
 				logger.debug("reading sip session from the cache. sip session key = " + key);
 			}
-			String parentAppSessionKey = in.readUTF();
-			try {
-				sipAppSessionParentKey = SessionManagerUtil.parseSipApplicationSessionKey(parentAppSessionKey);
-			} catch (ParseException e) {
-				logger.error("Couldn't parse the store parent app session key " + parentAppSessionKey, e);
-			}
+			sipAppSessionParentKey = (SipApplicationSessionKey) in.readObject();
 			if(logger.isDebugEnabled()) {
 				logger.debug("reading sip session from the cache. sip app session key = " + sipAppSessionParentKey);
 			}
 			routingRegion = (SipApplicationRoutingRegion) in.readObject();
-			stateInfo = (Serializable) in.readObject();
+//			stateInfo = (Serializable) in.readObject();
 			handlerServlet = in.readUTF();
 			if(logger.isDebugEnabled()) {
 				logger.debug("reading handlerServlet "+ handlerServlet);
@@ -1063,9 +1048,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 							+ subscriberURIStringified, pe);
 				}
 			}
-			sessionCreatingDialog = (SIPDialog) in.readObject();
+//			sessionCreatingDialog = (SIPDialog) in.readObject();
+			sessionCreatingDialogId = in.readUTF();
 			if(logger.isDebugEnabled()) {
-				logger.debug("deserialized dialog for the sip session "+ sessionCreatingDialog);
+				logger.debug("deserialized dialog Id for the sip session "+ sessionCreatingDialogId);
 			}
 			invalidateWhenReady = in.readBoolean();
 			readyToInvalidate = in.readBoolean();
@@ -1147,21 +1133,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	public void writeExternal(ObjectOutput out) throws IOException {
 		synchronized (this) {
 			// From SipSessionimpl			
-			out.writeUTF(key.getFromAddress());
-			out.writeUTF(key.getFromTag());
-			out.writeUTF(key.getToAddress());
-			if(key.getToTag() != null) {
-				out.writeUTF(key.getToTag());
-			} else {
-				out.writeUTF("");
-			}
-			out.writeUTF(key.getCallId());
-			out.writeUTF(key.getApplicationSessionId());
-			out.writeUTF(key.getApplicationName());
-			
-			out.writeUTF(sipApplicationSession.getKey().toString());
+			out.writeObject(key);
+			out.writeObject(sipApplicationSessionKey);
 			out.writeObject(routingRegion);
-			out.writeObject(stateInfo);
+//			out.writeObject(stateInfo);
 			if(logger.isDebugEnabled()) {
 				logger.debug("writing handlerServlet "+ handlerServlet);
 			}
@@ -1174,7 +1149,12 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			if(logger.isDebugEnabled()) {
 				logger.debug("serializing dialog for the sip session "+ sessionCreatingDialog);
 			}
-			out.writeObject((SIPDialog)sessionCreatingDialog);
+//			out.writeObject((SIPDialog)sessionCreatingDialog);
+			if(sessionCreatingDialog.getDialogId() != null) {
+				out.writeUTF(sessionCreatingDialog.getDialogId());
+			} else {
+				out.writeUTF("");
+			}
 			out.writeBoolean(invalidateWhenReady);
 			out.writeBoolean(readyToInvalidate);
 			
@@ -1329,7 +1309,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //				} catch (Exception e) {
 //					;
 //				}
-				sipApplicationSession.getSipContext().getLogger().error(
+				logger.error(
 						sm.getString("standardSession.attributeEvent"), t);
 			}
 		}

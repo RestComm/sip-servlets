@@ -181,7 +181,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
 				inviteAppData.getSipServletMessage();
 			final MobicentsSipSession sipSession = inviteRequest.getSipSession();			
-			sipServletRequest.setSipSession(sipSession);
+			sipServletRequest.setSipSessionKey(sipSession.getKey());
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("message associated with the inviteAppData " +

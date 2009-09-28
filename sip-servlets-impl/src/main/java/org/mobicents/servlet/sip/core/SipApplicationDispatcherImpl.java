@@ -62,6 +62,7 @@ import javax.sip.TransactionAlreadyExistsException;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
+import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
@@ -84,7 +85,10 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -226,7 +230,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} catch (ClassNotFoundException e) {
 				throw new LifecycleException("Impossible to load the Sip Application Router",e);
 			} catch (ClassCastException e) {
-				throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouter.class.getName(),e);
+				throw new LifecycleException("Sip Application Router defined does not implement " + SipApplicationRouterProvider.class.getName(),e);
 			}		
 		} else {
 			if(logger.isInfoEnabled()) {
@@ -245,7 +249,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					"and no javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property set");
 		}
 		if(logger.isInfoEnabled()) {
-			logger.info("Using the following Application Router : " + sipApplicationRouter.getClass().getName());
+			logger.info(this + " Using the following Application Router instance: " + sipApplicationRouter);
 		}
 		sipApplicationRouter.init();
 		sipApplicationRouter.applicationDeployed(new ArrayList<String>(applicationDeployed.keySet()));
@@ -505,7 +509,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		final String requestMethod = request.getMethod();
 		try {
 			if(logger.isDebugEnabled()) {
-				logger.debug("Got a request event "  + request.toString());
+				logger.debug("sipApplicationDispatcher " + this + "Got a request event "  + request.toString());
 			}			
 			if (!Request.ACK.equals(requestMethod) && requestTransaction == null ) {
 				try {
@@ -653,10 +657,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
-		if(tad != null) {
+		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
-			MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
-			tryToInvalidateSession(sipSessionImpl);
+			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+			tryToInvalidateSession(sipSessionKey);
 		} else {
 			logger.warn("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
 		}
@@ -665,27 +669,49 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * @param sipSessionImpl
 	 */
-	private void tryToInvalidateSession(MobicentsSipSession sipSessionImpl) {
+	private void tryToInvalidateSession(SipSessionKey sipSessionKey) {
 		//the key can be null if the application already invalidated the session
-		if(sipSessionImpl.getKey() != null) {
-			SipContext sipContext = findSipApplication(sipSessionImpl.getKey().getApplicationName());
+		if(sipSessionKey != null) {
+			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
 			//the context can be null if the server is being shutdown
 			if(sipContext != null) {		
 				sipContext.enterSipApp(null, null, null, true, false);
 				try {
-					if(logger.isInfoEnabled()) {
-						logger.info("session " + sipSessionImpl.getId() + " is valid ? :" + sipSessionImpl.isValid());
-						if(sipSessionImpl.isValid()) {
-							logger.info("Sip session " + sipSessionImpl.getId() + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
+					MobicentsSipApplicationSession sipApplicationSession = null;
+					if(sipSessionImpl != null) {
+						if(logger.isInfoEnabled()) {
+							logger.info("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValid());
+							if(sipSessionImpl.isValid()) {
+								logger.info("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+							}
 						}
-					}
-					
-					if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
-						sipSessionImpl.onTerminatedState();
-					}
-					MobicentsSipApplicationSession sipApplicationSession = sipSessionImpl.getSipApplicationSession();
-					if(sipApplicationSession != null && sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {
-						sipApplicationSession.tryToInvalidate();
+						sipApplicationSession = sipSessionImpl.getSipApplicationSession();
+						if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
+							sipSessionImpl.onTerminatedState();
+						}
+					} else {
+						if(logger.isInfoEnabled()) {
+							logger.info("sip session already invalidated" + sipSessionKey);
+						}
+					}										
+					if(sipApplicationSession == null) {
+						final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+								sipSessionKey.getApplicationName(), 
+								sipSessionKey.getApplicationSessionId());
+						sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+						
+						if(sipApplicationSession != null) {
+							if(logger.isInfoEnabled()) {
+								logger.info("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValid());
+								if(sipApplicationSession.isValid()) {
+									logger.info("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+								}
+							}
+							if(sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {				
+								sipApplicationSession.tryToInvalidate();
+							}							
+						}
 					}
 				} finally {
 					sipContext.exitSipApp(null, null);
@@ -712,6 +738,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		if(tad != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+			SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
 			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 			if(sipServletMessage instanceof SipServletRequestImpl) {
 				try {
@@ -772,7 +799,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						}
 					}
 				}
-				tryToInvalidateSession(sipSession);
+				tryToInvalidateSession(sipSessionKey);
 			}
 		}
 	}
@@ -795,23 +822,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		if(tad != null) {
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
-			MobicentsSipSession sipSessionImpl = sipServletMessageImpl.getSipSession();
-			if(sipSessionImpl == null) {
-//				if(logger.isInfoEnabled()) {
-					logger.warn("no sip session were returned for this transaction " + transaction + " and message " + sipServletMessageImpl);
-//				}
-			} else {
-				if(sipSessionImpl.getKey() != null) {
-					if(logger.isInfoEnabled()) {
-						logger.info("sip session " + sipSessionImpl.getId() + " returned for this transaction " + transaction);
-					}
-					tryToInvalidateSession(sipSessionImpl);
-				} else {
-					if(logger.isInfoEnabled()) {
-						logger.info("sip session already invalidate by the app for message " + sipServletMessageImpl);
-					}
+			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+			if(sipSessionKey == null) {
+				if(logger.isInfoEnabled()) {
+					logger.info("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
 				}
-				
+			} else {				
+				tryToInvalidateSession(sipSessionKey);				
 //				sipSessionImpl.removeOngoingTransaction(transaction);
 			}
 		} else {
@@ -1002,7 +1019,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					// push all of the routes on the Route header stack of the request and 
 					// send the request externally
 					for (int i = routes.length-1 ; i >= 0; i--) {
-						Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
+						RouteHeader routeHeader = (RouteHeader) SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
+						URI routeURI = routeHeader.getAddress().getURI();
+						if(routeURI.isSipURI()) {
+							((javax.sip.address.SipURI)routeURI).setLrParam();
+						}
 						request.addHeader(routeHeader);
 					}				
 				}

@@ -336,7 +336,7 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 		if(clonedRequest.getCurrentApplicationName() == null && subsequent) {
 			clonedRequest.setCurrentApplicationName(originalRequest.getSipSession().getSipApplicationSession().getApplicationName());
 		}
-		clonedRequest.setSipSession(originalRequest.getSipSession());
+		clonedRequest.setSipSessionKey(originalRequest.getSipSession().getKey());
 		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
 		try {
 			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSession()).getHandler());

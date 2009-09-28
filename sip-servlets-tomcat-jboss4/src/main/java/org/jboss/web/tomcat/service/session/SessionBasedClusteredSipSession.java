@@ -87,11 +87,11 @@ public class SessionBasedClusteredSipSession extends
 	}
 
 	public void removeMyself() {
-		proxy_.removeSipSession(sipApplicationSession.getId(), getId());
+		proxy_.removeSipSession(sipApplicationSessionKey.getId(), getId());
 	}
 
 	public void removeMyselfLocal() {
-		proxy_.removeSipSessionLocal(sipApplicationSession.getId(), getId());
+		proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getId());
 	}
 
 	// ----------------------------------------------HttpSession Public Methods

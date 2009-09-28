@@ -42,7 +42,7 @@ import org.mobicents.servlet.sip.startup.SipService;
  */
 public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession {
 	private static transient final Logger logger = Logger.getLogger(JBossCacheClusteredSipSession.class);
-
+	
 	/**
 	 * Our proxy to the cache.
 	 */
@@ -81,7 +81,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialog.getDialogId());
 			}
 		}
-		if(sessionCreatingDialog != null && sessionCreatingDialog.getDialogId() != null) {
+		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
 			Container context = manager.getContainer();
 			Container container = context.getParent().getParent();
 			if(container instanceof Engine) {
@@ -91,9 +91,8 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 					for (Connector connector : connectors) {
 						SipStack sipStack = (SipStack)
 							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-						if(sipStack != null && sipStack.getSipProviders().hasNext() && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
-							((SIPDialog)sessionCreatingDialog).setSipProvider((SipProviderImpl)sipStack.getSipProviders().next());
-							((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
+						if(sipStack != null && sipStack.getSipProviders().hasNext()) {
+							sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId); 
 							if(logger.isDebugEnabled()) {
 								logger.debug("dialog injected " + sessionCreatingDialog);
 							}

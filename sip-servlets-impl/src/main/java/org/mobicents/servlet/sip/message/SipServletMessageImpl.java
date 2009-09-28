@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,34 +88,34 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = Logger.getLogger(SipServletMessageImpl.class
+	private static Logger logger = Logger.getLogger(SipServletMessageImpl.class
 			.getCanonicalName());
 	
-	private transient static final String CONTENT_TYPE_TEXT = "text";
-//	private transient static final String HCOLON = " : ";
-	private transient static final HeaderFactory headerFactory = SipFactories.headerFactory;
+	private static final String CONTENT_TYPE_TEXT = "text";
+//	private static final String HCOLON = " : ";
+	private static final HeaderFactory headerFactory = SipFactories.headerFactory;
 	
-	protected Message message;
-	protected transient SipFactoryImpl sipFactoryImpl;
-	protected transient MobicentsSipSession session;
+	protected final Message message;
+	protected final SipFactoryImpl sipFactoryImpl;
+	protected SipSessionKey sessionKey;
+	//lazy loaded and not serialized
+	protected transient MobicentsSipSession sipSession;
 
-	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+	protected final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 	private Transaction transaction;
-	protected transient TransactionApplicationData transactionApplicationData;		
+	protected TransactionApplicationData transactionApplicationData;		
 
-	protected String defaultEncoding = "UTF8";
-
-	protected HeaderForm headerForm = HeaderForm.DEFAULT;
+	protected transient HeaderForm headerForm = HeaderForm.DEFAULT;
 	
 	// IP address of the next upstream/downstream hop from which this message
 	// was received. Applications can determine the actual IP address of the UA
 	// that originated the message from the message Via header fields.
 	// But for upstream - thats a proxy stuff, fun with ReqURI, RouteHeader
-	protected InetAddress remoteAddr = null;
+	protected transient InetAddress remoteAddr = null;
 
-	protected int remotePort = -1;
+	protected transient int remotePort = -1;
 
-	protected String transport = null;
+	protected transient String transport = null;
 
 	protected String currentApplicationName = null;
 	
@@ -124,9 +123,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 	protected boolean isMessageSent;
 	
-	protected Dialog dialog;
+	protected final Dialog dialog;
 	
-	protected String method;
+	protected transient String method;
 	
 	protected SipServletMessageImpl(Message message,
 			SipFactoryImpl sipFactoryImpl, Transaction transaction,
@@ -140,13 +139,15 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.message = message;
 		this.transaction = transaction;
-		this.session = sipSession;
+		if(sipSession != null) {
+			this.sessionKey = sipSession.getKey();
+		}
 		this.transactionApplicationData = new TransactionApplicationData(this);
 		isMessageSent = false;
 		this.dialog = dialog;
 		
 		if(sipSession != null && dialog != null) {
-			session.setSessionCreatingDialog(dialog);
+			sipSession.setSessionCreatingDialog(dialog);
 			if(dialog.getApplicationData() == null) {
 				dialog.setApplicationData(transactionApplicationData);
 			}
@@ -168,8 +169,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if (transaction != null && transaction.getApplicationData() == null) {
 			transaction.setApplicationData(transactionApplicationData);
 		}
-		method = message instanceof Request ? ((Request) message).getMethod()
-				: ((CSeqHeader) message.getHeader(CSeqHeader.NAME)).getMethod();
 	}
 
 	private void checkCommitted() {
@@ -465,33 +464,19 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession(boolean)
 	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
-		if (this.session != null
-				&& this.session.getSipApplicationSession() != null) {
-			return this.session.getSipApplicationSession();
-		} else if (create) {						
+		String applicationName = null;
+		if(sessionKey != null) {
+			applicationName = sessionKey.getApplicationName();
+		}
+		if(applicationName != null) {
+			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
-			SipApplicationSessionKey key = SessionManagerUtil.getSipApplicationSessionKey(
-					currentApplicationName, 
-					null);
-			if(this.session == null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Tryin to create a new sip application session with key = " + key);
-				}				
-				SipContext sipContext = 
-					sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(currentApplicationName);				
-				MobicentsSipApplicationSession applicationSession = 
-					((SipManager)sipContext.getManager()).getSipApplicationSession(key, create);
-				SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(key.getId(), currentApplicationName, message, false);
-				if(logger.isDebugEnabled()) {
-					logger.debug("Tryin to create a new sip session with key = " + sessionKey);
-				}
-				this.session = ((SipManager)sipContext.getManager()).getSipSession(sessionKey, create,
-						sipFactoryImpl, applicationSession);
-				this.session.setSessionCreatingTransaction(transaction);				
-			} 
-//			this.session.setSipApplicationSession(applicationSession);
-			return this.session.getSipApplicationSession();			
-		}		
+			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+					applicationName, 
+					sessionKey.getApplicationSessionId());
+			MobicentsSipApplicationSession applicationSession =  sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
+			return applicationSession;
+		}
 		return null;
 	}
 
@@ -695,8 +680,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * 
 	 * @see javax.servlet.sip.SipServletMessage#getMethod()
 	 */
-	public String getMethod() {
-
+	public final String getMethod() {
+		if(method == null) {
+			method = message instanceof Request ? ((Request) message).getMethod()
+				: ((CSeqHeader) message.getHeader(CSeqHeader.NAME)).getMethod();
+		}
 		return method;
 	}
 
@@ -860,35 +848,49 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * @see javax.servlet.sip.SipServletMessage#getSession(boolean)
 	 */
 	public SipSession getSession(boolean create) {
-		if (this.session == null && create) {
+		MobicentsSipSession session = getSipSession();
+		if (session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getApplicationSession(create);
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
-			this.session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
+			session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);
-			this.session.setSessionCreatingTransaction(transaction);
+			session.setSessionCreatingTransaction(transaction);
+			sessionKey = session.getKey();
+		} 
+		if(session != null) {
+			return session.getSession();
 		}
-		if(this.session == null) {
-			return null;
-		} else {
-			return this.session.getSession();
-		}
+		return null;
 	}
 	
 	/**
 	 * Retrieve the sip session implementation
 	 * @return the sip session implementation
 	 */
-	public MobicentsSipSession getSipSession() {
-		return session;
+	public final MobicentsSipSession getSipSession() {		
+		if(sipSession == null && sessionKey != null) {
+			final String applicationName = sessionKey.getApplicationName(); 
+			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName); 
+			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, null);	
+		} 
+		return sipSession; 
 	}
 
 	/**
 	 * @param session the session to set
 	 */
-	public void setSipSession(MobicentsSipSession session) {
-		this.session = session;
+	public void setSipSessionKey(SipSessionKey sessionKey) {
+		this.sessionKey = sessionKey;
 	}
 
+	/**
+	 * @param session the session to set
+	 */
+	public SipSessionKey getSipSessionKey() {
+		return this.sessionKey;
+	}
+
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getTo()

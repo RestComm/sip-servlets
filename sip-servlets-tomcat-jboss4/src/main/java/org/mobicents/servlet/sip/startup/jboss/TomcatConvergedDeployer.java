@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.startup.jboss;
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipSessionsUtil;
@@ -136,7 +137,9 @@ public class TomcatConvergedDeployer extends TomcatDeployer {
 					Context sipEnvCtx = (Context) iniCtx.lookup("java:/sip/");				
 					Util.unbind(sipEnvCtx, applicationName);
 				} catch (OperationNotSupportedException onse) {
-					log.warn("Could not remove the JNDI context java:/sip/" + applicationName);
+					log.warn("Could not remove the JNDI context java:/sip/" + applicationName + ", cause " + onse.getMessage());
+				} catch (NameNotFoundException nnfe) {
+					log.warn("Could not remove the JNDI context java:/sip/" + applicationName + ", cause " + nnfe.getMessage());
 				}
 				
 			}

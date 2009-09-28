@@ -19,7 +19,6 @@ package org.jboss.web.tomcat.service.session;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingSessionGranularitySessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -79,7 +78,7 @@ public class SessionBasedClusteredSipSession extends
 		Long timestamp = attrs != null || metadata != null
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		return new OutgoingData(getRealId(), getVersion(), timestamp, sipApplicationSession.getKey(), key, metadata, 
+		return new OutgoingData(getRealId(), getVersion(), timestamp, sipApplicationSessionKey, key, metadata, 
 				attrs);
 	}
 

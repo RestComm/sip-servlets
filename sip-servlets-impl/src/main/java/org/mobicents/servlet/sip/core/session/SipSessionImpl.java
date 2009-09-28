@@ -120,7 +120,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	private static transient Logger logger = Logger.getLogger(SipSessionImpl.class);
 	
-	protected transient MobicentsSipApplicationSession sipApplicationSession;			
+	protected SipApplicationSessionKey sipApplicationSessionKey;			
 	
 	protected ProxyImpl proxy;
 	
@@ -412,7 +412,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				return sipServletRequest;
 			} else {
 				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
-					this.sipApplicationSession,
+					getSipApplicationSession(),
 					method,
 					this.getLocalParty(),
 					this.getRemoteParty(),
@@ -446,7 +446,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getApplicationSession()
 	 */
 	public SipApplicationSession getApplicationSession() {
-		if(this.sipApplicationSession == null) {
+		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
+		if(sipApplicationSession == null) {
 			return null;
 		} else {
 			return sipApplicationSession.getSession();
@@ -678,6 +679,7 @@ public class SipSessionImpl implements MobicentsSipSession {
          */
         long timeNow = System.currentTimeMillis();
         int timeAlive = (int) ((timeNow - creationTime)/1000);
+        final MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
         SipManager manager = sipApplicationSession.getSipContext().getSipManager();
         synchronized (manager) {
             if (timeAlive > manager.getSipSessionMaxAliveTime()) {
@@ -691,8 +693,8 @@ public class SipSessionImpl implements MobicentsSipSession {
             manager.setSipSessionAverageAliveTime(average);
         }
 		
-		getSipApplicationSession().getSipContext().getSipManager().removeSipSession(key);		
-		getSipApplicationSession().getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+		manager.removeSipSession(key);		
+		sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		if(ongoingTransactions != null) {
 			ongoingTransactions.clear();
@@ -934,7 +936,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					" doesn't exist in the sip application " + sipContext.getApplicationName());
 		}		
 		this.handlerServlet = name;
-		sipApplicationSession.setCurrentRequestHandler(handlerServlet);
+		getSipApplicationSession().setCurrentRequestHandler(handlerServlet);
 		if(logger.isDebugEnabled()) {
 			if(name !=null) {
 				logger.debug("Session Handler for application " + getKey().getApplicationName() + " set to " + handlerServlet + " on sip session " + key);
@@ -967,12 +969,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {
-		return sipApplicationSession;
+		final String applicationName = key.getApplicationName(); 
+		final SipContext sipContext = sipFactory.getSipApplicationDispatcher().findSipApplication(applicationName); 
+		return sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
 	}
 
 	protected void setSipApplicationSession(
 			MobicentsSipApplicationSession sipApplicationSession) {
-		this.sipApplicationSession = sipApplicationSession;
+		this.sipApplicationSessionKey = sipApplicationSession.getKey();
 		if ( sipApplicationSession != null) {			
 			sipApplicationSession.addSipSession(this);			
 		}
@@ -1407,7 +1411,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public ServletContext getServletContext() {
-		return sipApplicationSession.getSipContext().getServletContext();
+		return getSipApplicationSession().getSipContext().getServletContext();
 	}
 	
 	/**

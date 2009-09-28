@@ -141,7 +141,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				stateInfo = sipSessionImpl.getStateInfo();
 				applicationRouterInfo = sipSessionImpl.getNextSipApplicationRouterInfo();
 				sipSessionImpl.setNextSipApplicationRouterInfo(null);
-				sipServletRequest.setSipSession(sipSessionImpl);
+				sipServletRequest.setSipSessionKey(sipSessionKey);
 				if(logger.isDebugEnabled()) {
 					logger.debug("state info before the request has been routed back to container : " + stateInfo);
 					logger.debug("router info before the request has been routed back to container : " + applicationRouterInfo);
@@ -366,7 +366,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//sip session association
 		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), nextApplicationName, request, false);
 		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
-		sipServletRequest.setSipSession(sipSessionImpl);
+		sipServletRequest.setSipSessionKey(sessionKey);
 
 		if(joinReplacesSipSession != null && nextApplicationName.equals(joinReplacesSipSession.getKey().getApplicationName())) {
 			final JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
@@ -482,6 +482,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							// send the request externally
 							for (int i = routes.length-1 ; i >= 0; i--) {
 								routeAddress = SipFactories.addressFactory.createAddress(routes[i]);
+								URI routeURI = routeAddress.getURI();
+								if(routeURI.isSipURI()) {
+									((javax.sip.address.SipURI)routeURI).setLrParam();
+								}
 								Header routeHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
 								// Fix for Issue 280 provided by eelcoc
 								try {
@@ -525,7 +529,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					try {
 						// Push container Route, pick up the first outbound interface
 						SipURI sipURI = sipApplicationDispatcher.getOutboundInterfaces().get(0);
-						sipURI.setParameter("modifier", "route_back");
+						sipURI.setParameter("modifier", "route_back");						
 						Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
 						// Fix for Issue 280 provided by eelcoc
 						try {

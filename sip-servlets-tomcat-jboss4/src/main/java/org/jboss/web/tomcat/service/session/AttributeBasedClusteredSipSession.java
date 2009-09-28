@@ -133,20 +133,20 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 				for (Iterator it = attrModifiedMap_.entrySet().iterator(); it
 						.hasNext();) {
 					Map.Entry entry = (Entry) it.next();
-					proxy_.putSipSessionAttribute(sipApplicationSession.getId(), getId(), (String) entry.getKey(), entry
+					proxy_.putSipSessionAttribute(sipApplicationSessionKey.getId(), getId(), (String) entry.getKey(), entry
 							.getValue());
 				}
 			} else if (modCount > 0) {
 				// It's more efficient to write a map than 2 method calls,
 				// plus it reduces the number of CacheListener notifications
-				proxy_.putSipSessionAttribute(sipApplicationSession.getId(), getId(), attrModifiedMap_);
+				proxy_.putSipSessionAttribute(sipApplicationSessionKey.getId(), getId(), attrModifiedMap_);
 			}
 
 			// Go thru the remove attr list
 			if (attrRemovedMap_.size() > 0) {
 				for (Iterator it = attrRemovedMap_.keySet().iterator(); it
 						.hasNext();) {
-					proxy_.removeSipSessionAttribute(sipApplicationSession.getId(), getId(), (String) it.next());
+					proxy_.removeSipSessionAttribute(sipApplicationSessionKey.getId(), getId(), (String) it.next());
 				}
 			}
 
@@ -161,7 +161,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 
 	public void removeMyself() {
 		// This is a shortcut to remove session and it's child attributes.
-		proxy_.removeSipSession(sipApplicationSession.getId(), getId());
+		proxy_.removeSipSession(sipApplicationSessionKey.getId(), getId());
 	}
 
 	public void removeMyselfLocal() {
@@ -170,8 +170,8 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 		// removeAttributesLocal call here in order to evict the ATTRIBUTE node.
 		// Otherwise empty nodes for the session root and child ATTRIBUTE will
 		// remain in the tree and screw up our list of session names.
-		proxy_.removeSipSessionAttributesLocal(sipApplicationSession.getId(), getId());
-		proxy_.removeSipSessionLocal(sipApplicationSession.getId(), getId());
+		proxy_.removeSipSessionAttributesLocal(sipApplicationSessionKey.getId(), getId());
+		proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getId());
 	}
 
 	// ------------------------------------------------ JBoss internal abstract
@@ -182,7 +182,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 	 * transient ones.
 	 */
 	protected void populateAttributes() {
-		Map map = proxy_.getSipSessionAttributes(sipApplicationSession.getId(), getId());
+		Map map = proxy_.getSipSessionAttributes(sipApplicationSessionKey.getId(), getId());
 
 		// Preserve any local attributes that were excluded from replication
 		Map excluded = removeExcludedAttributes(attributes_);

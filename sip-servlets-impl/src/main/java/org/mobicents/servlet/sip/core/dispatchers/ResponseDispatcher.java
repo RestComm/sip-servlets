@@ -171,7 +171,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				logger.error("Dropping the response since no active sip session has been found for it : " + response);
 				return ;
 			} else {
-				sipServletResponse.setSipSession(tmpSession);					
+				sipServletResponse.setSipSessionKey(sessionKey);					
 			}			
 			
 			if(logger.isInfoEnabled()) {

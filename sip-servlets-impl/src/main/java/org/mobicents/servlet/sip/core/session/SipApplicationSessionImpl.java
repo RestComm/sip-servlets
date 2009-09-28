@@ -243,14 +243,23 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
-		this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession.getKey());
+		SipSessionKey key = this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession.getKey());
+		if(key == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + key);
+			}
+		}
 		readyToInvalidate = false;
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
 	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
-		if(sipSessions != null) {
-			return this.sipSessions.remove(mobicentsSipSession.getKey().toString());
+		if(sipSessions != null) {			
+			SipSessionKey key = this.sipSessions.remove(mobicentsSipSession.getKey().toString());
+			if(logger.isDebugEnabled()) {
+				logger.debug("Removed sip session " + mobicentsSipSession.getKey() + " from sip app session " + key);
+			}
+			return key;
 		} 
 		return null;
 	}

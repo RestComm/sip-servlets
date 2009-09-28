@@ -36,7 +36,7 @@ public class TransactionApplicationData implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private transient ProxyBranchImpl proxyBranch;	
-	private transient SipServletMessageImpl sipServletMessage;
+	private SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
 	private transient String initialRemoteHostAddress;

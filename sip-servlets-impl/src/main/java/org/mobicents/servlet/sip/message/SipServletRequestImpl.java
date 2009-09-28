@@ -98,11 +98,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private static final long serialVersionUID = 1L;
 
-	private static transient Logger logger = Logger.getLogger(SipServletRequestImpl.class);
+	private static Logger logger = Logger.getLogger(SipServletRequestImpl.class);
 	
 	private static final String EXCEPTION_MESSAGE = "The context does not allow you to modify this request !";
 	
-	public transient static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
+	public static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
 	
 	static {
 		nonInitialSipRequestMethods.add("CANCEL");
@@ -219,7 +219,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			ClientTransaction clientTransaction = sipProvider
 					.getNewClientTransaction(cancelRequest);
 			SipServletRequest newRequest = new SipServletRequestImpl(
-					cancelRequest, sipFactoryImpl, super.session,
+					cancelRequest, sipFactoryImpl, getSipSession(),
 					clientTransaction, getTransaction().getDialog(), false);
 
 			return newRequest;
@@ -263,6 +263,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(reasonPhrase!=null) {
 				response.setReasonPhrase(reasonPhrase);
 			}
+			final MobicentsSipSession session = getSipSession();
+			final String requestMethod = getMethod();
 			//add a To tag for all responses except Trying (or trying too if it's a subsequent request)
 			if((statusCode > Response.TRYING || !isInitial()) && statusCode <= Response.SESSION_NOT_ACCEPTABLE) {
 				final ToHeader toHeader = (ToHeader) response
@@ -282,8 +284,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 				if (statusCode == Response.OK ) {
-					//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
-					if(!Request.REGISTER.equals(method) && !Request.OPTIONS.equals(method)) { 
+					//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field					
+					if(!Request.REGISTER.equals(requestMethod) && !Request.OPTIONS.equals(requestMethod)) { 
 					    // Add the contact header for the dialog.					    
 					    final ContactHeader contactHeader = JainSipUtils.createContactHeader(
 					    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
@@ -306,7 +308,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
 					validate ? (ServerTransaction) transaction : transaction, session, getDialog());
 			newSipServletResponse.setOriginalRequest(this);
-			if(!Request.PRACK.equals(method) && statusCode >= Response.OK && 
+			if(!Request.PRACK.equals(requestMethod) && statusCode >= Response.OK && 
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE) {	
 				isFinalResponseGenerated = true;
 			}
@@ -323,6 +325,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	public B2buaHelper getB2buaHelper() {
 		checkReadOnly();
+		final MobicentsSipSession session = getSipSession();
 		if (session.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
 		B2buaHelperImpl b2buaHelper = session.getB2buaHelper();
@@ -343,7 +346,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
-				this.session.setSessionCreatingDialog(dialog);
+				session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}			
 			if(JainSipUtils.dialogCreatingMethods.contains(request.getMethod())) {
@@ -397,6 +400,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public Proxy getProxy() throws TooManyHopsException {
 		checkReadOnly();
+		final MobicentsSipSession session = getSipSession();
 		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		return getProxy(true);
 	}
@@ -406,6 +410,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
 		checkReadOnly();
+		final MobicentsSipSession session = getSipSession();
 		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		
 		MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
@@ -431,10 +436,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			if(session.getProxy() == null || createNewProxy) {
 				ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
-				this.session.setProxy(proxy);
+				session.setProxy(proxy);
 			}
 		}
-		return this.session.getProxy();
+		return session.getProxy();
 	}
 
 	/**
@@ -612,6 +617,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			SipServletRequest origRequest) throws IllegalStateException {
 		checkReadOnly();
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+		final MobicentsSipSession session = getSipSession();
 		//@jean.deruelle Commenting this out, why origRequestImpl.isCommitted() is needed ?
 //			if ((directive == SipApplicationRoutingDirective.REVERSE || directive == SipApplicationRoutingDirective.CONTINUE)
 //					&& (!origRequestImpl.isInitial() || origRequestImpl.isCommitted())) {
@@ -851,11 +857,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {
 			final Request request = (Request) super.message;			
 			final String transport = JainSipUtils.findTransport(request);
+			final MobicentsSipSession session = getSipSession();
 			final ProxyImpl proxy = session.getProxy();
 			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			//Issue 112 fix by folsson
-		    if(!method.equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
+		    if(!getMethod().equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
 		    	boolean addViaHeader = false;
 		    	if(proxy == null) {
 		    		addViaHeader = true;
@@ -880,12 +887,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
-			if(Request.ACK.equals(method)) {
-				super.session.getSessionCreatingDialog().sendAck(request);
+		    final String requestMethod = getMethod();
+			if(Request.ACK.equals(requestMethod)) {
+				session.getSessionCreatingDialog().sendAck(request);
 				return;
 			}
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
-			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(method)) {
+			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
 				// Additional checks for https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29
 //				if(session.getProxy() != null &&
 //						session.getProxy().getRecordRoute()) // If the app is proxying it already does that
@@ -949,15 +957,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
 				
-				super.session.setSessionCreatingTransaction(ctx);
+				session.setSessionCreatingTransaction(ctx);
 				
 				Dialog dialog = ctx.getDialog();
 				
-				if(super.session.getProxy() != null) dialog = null;
+				if(session.getProxy() != null) dialog = null;
 				
 				if (dialog == null && this.createDialog) {					
 					dialog = sipProvider.getNewDialog(ctx);
-					super.session.setSessionCreatingDialog(dialog);
+					session.setSessionCreatingDialog(dialog);
 					if(logger.isDebugEnabled()) {
 						logger.debug("new Dialog for request " + request + ", ref = " + dialog);
 					}
@@ -1028,7 +1036,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}			
 			session.addOngoingTransaction(getTransaction());
 			// Update Session state
-			super.session.updateStateOnSubsequentRequest(this, false);			
+			session.updateStateOnSubsequentRequest(this, false);			
 			if(Request.NOTIFY.equals(getMethod())) {
 				final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 					getMessage().getHeader(SubscriptionStateHeader.NAME);		
@@ -1060,7 +1068,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(session.getProxy() != null) dialog = null;
 			// If dialog does not exist or has no state.
 			if (dialog == null || dialog.getState() == null
-					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(method))) {
+					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod))) {
 				if(logger.isInfoEnabled()) {
 					logger.info("Sending the request " + request);
 				}
@@ -1106,6 +1114,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		request.addFirst(routeHeader);		
 		// adding the application router info to avoid calling the AppRouter twice
 		// See Issue 791 : http://code.google.com/p/mobicents/issues/detail?id=791
+		final MobicentsSipSession session = getSipSession();
 		session.setNextSipApplicationRouterInfo(routerInfo);
 	}
 
@@ -1117,8 +1126,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAppCompositionRRHeader()
 			throws ParseException, SipException {
-		Request request = (Request) super.message;
-        
+		final Request request = (Request) super.message;
+		final MobicentsSipSession session = getSipSession();
+		
         javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
                         sipFactoryImpl.getSipNetworkInterfaceManager(), 
                         request);

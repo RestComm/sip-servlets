@@ -107,7 +107,7 @@ public class AttributeBasedClusteredSipSession extends ClusteredSipSession<Outgo
 		Long timestamp = modAttrs != null || removeAttrs != null
 				|| metadata != null || getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		OutgoingData outgoingData = new OutgoingData(getRealId(), getVersion(), timestamp, sipApplicationSession.getKey(), key, metadata,
+		OutgoingData outgoingData = new OutgoingData(getRealId(), getVersion(), timestamp, sipApplicationSessionKey, key, metadata,
 				modAttrs, removeAttrs);		
 		return outgoingData;
 	}

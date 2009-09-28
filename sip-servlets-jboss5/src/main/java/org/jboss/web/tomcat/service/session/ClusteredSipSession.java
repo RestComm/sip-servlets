@@ -23,7 +23,6 @@ import gov.nist.javax.sip.stack.SIPDialog;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.security.Principal;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -703,7 +702,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					} catch (Exception e) {
 						;
 					}
-					sipApplicationSession.getSipContext().getLogger().error(
+					logger.error(
 							sm.getString("standardSession.attributeEvent"), t);
 				}
 			}
@@ -788,7 +787,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	protected void getSipSessionMetadata() {
-		this.metadata.setSipApplicationSessionKey(sipApplicationSession.getKey());
+		this.metadata.setSipApplicationSessionKey(sipApplicationSessionKey);
 		this.metadata.setSipSessionKey(key);
 		this.metadata.setB2buaHelper(b2buaHelper);
 		this.metadata.setProxy(proxy);
@@ -1461,7 +1460,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 //					} catch (Exception e) {
 //						;
 //					}
-					sipApplicationSession.getSipContext().getLogger().error(
+					logger.error(
 							sm.getString("standardSession.attributeEvent"), t);
 				}
 			}

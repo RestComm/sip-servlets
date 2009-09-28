@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jboss.aop.Advised;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -96,7 +95,7 @@ public class FieldBasedClusteredSipSession extends
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
 		return new OutgoingDistributableSipSessionDataImpl(getRealId(),
-				getVersion(), timestamp, sipApplicationSession.getKey(), key, metadata);
+				getVersion(), timestamp, sipApplicationSessionKey, key, metadata);
 	}
 
 	/**

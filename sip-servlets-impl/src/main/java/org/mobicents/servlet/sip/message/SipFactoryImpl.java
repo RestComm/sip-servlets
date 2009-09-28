@@ -16,6 +16,10 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -68,12 +72,13 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
-public class SipFactoryImpl implements Serializable {	
+public class SipFactoryImpl implements Externalizable {	
 
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = Logger.getLogger(SipFactoryImpl.class
+	private static Logger logger = Logger.getLogger(SipFactoryImpl.class
 			.getCanonicalName());
 	private static final String TAG_PARAM = "tag";
 	private static final String METHOD_PARAM = "method";
@@ -105,6 +110,8 @@ public class SipFactoryImpl implements Serializable {
 	}	
 
 	private transient SipApplicationDispatcher sipApplicationDispatcher = null;
+	
+	public SipFactoryImpl() {}
 	/**
 	 * Dafault constructor
 	 * @param sipApplicationDispatcher 
@@ -694,6 +701,22 @@ public class SipFactoryImpl implements Serializable {
 		} catch (SipException e) {
 			//this should never happen
 			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);
+		}
+	}
+
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		useLoadBalancer = in.readBoolean();
+		if(useLoadBalancer) {
+			loadBalancerToUse = (BalancerDescription) in.readObject();
+		}
+		sipApplicationDispatcher = StaticServiceHolder.sipStandardService.getSipApplicationDispatcher();
+	}
+
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeBoolean(useLoadBalancer);
+		if(useLoadBalancer) {
+			out.writeObject(loadBalancerToUse);
 		}
 	}
 }
