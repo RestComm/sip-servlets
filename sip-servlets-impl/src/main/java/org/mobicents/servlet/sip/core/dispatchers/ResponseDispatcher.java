@@ -228,7 +228,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 								if(Response.TRYING == response.getStatusCode()) {
 									if(logger.isDebugEnabled()) {
 										logger.debug("the response is dropped accordingly to JSR 289 " +
-												"since this a 100");
+												"since this a 100 for a non proxy application");
 									}
 									return;
 								}		
