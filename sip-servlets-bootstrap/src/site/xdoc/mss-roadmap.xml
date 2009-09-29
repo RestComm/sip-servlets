@@ -203,10 +203,17 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=943">
 									JAIN SIP dialog is null in the stack for reINVITE after a failover crash
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=967">
+									Remove Display of Exception if Load Balancer cannot be accessed
 								</a>
 							</li>
 						</ul>
