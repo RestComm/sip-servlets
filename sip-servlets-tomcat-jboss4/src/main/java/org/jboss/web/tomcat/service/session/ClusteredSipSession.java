@@ -1150,7 +1150,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				logger.debug("serializing dialog for the sip session "+ sessionCreatingDialog);
 			}
 //			out.writeObject((SIPDialog)sessionCreatingDialog);
-			if(sessionCreatingDialog.getDialogId() != null) {
+			if(sessionCreatingDialog != null && sessionCreatingDialog.getDialogId() != null) {
 				out.writeUTF(sessionCreatingDialog.getDialogId());
 			} else {
 				out.writeUTF("");

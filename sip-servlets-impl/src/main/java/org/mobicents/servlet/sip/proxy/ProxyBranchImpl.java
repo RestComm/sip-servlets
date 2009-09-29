@@ -20,8 +20,10 @@ import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -61,11 +63,11 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  * @author root
  *
  */
-public class ProxyBranchImpl implements ProxyBranch, Serializable {
+public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = Logger.getLogger(ProxyBranchImpl.class);
-	private ProxyImpl proxy;
+	private static Logger logger = Logger.getLogger(ProxyBranchImpl.class);
+	private transient ProxyImpl proxy;
 	private transient SipServletRequestImpl originalRequest;
 	private transient SipServletRequestImpl prackOriginalRequest;
 	private transient SipServletRequestImpl outgoingRequest;
@@ -89,6 +91,9 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 	public transient ViaHeader viaHeader;
 	
 	private static transient Timer timer = new Timer();
+	
+	// empty constructor used only for Externalizable interface
+	public ProxyBranchImpl() {}
 	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
@@ -751,6 +756,37 @@ public class ProxyBranchImpl implements ProxyBranch, Serializable {
 
 	public void setWaitingForPrack(boolean waitingForPrack) {
 		this.waitingForPrack = waitingForPrack;
+	}
+
+	/**
+	 * @param proxy the proxy to set
+	 */
+	public void setProxy(ProxyImpl proxy) {
+		this.proxy = proxy;
+	}
+
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		cTimerLock = new Object();
+		recurse = in.readBoolean();
+		recordRoutingEnabled = in.readBoolean();
+		started = in.readBoolean();
+		timedOut = in.readBoolean();
+		proxyBranchTimeout = in.readInt();
+		canceled = in.readBoolean();
+		isAddToPath = in.readBoolean();
+		waitingForPrack = in.readBoolean();
+	}
+
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeBoolean(recurse);
+		out.writeBoolean(recordRoutingEnabled);
+		out.writeBoolean(started);
+		out.writeBoolean(timedOut);
+		out.writeInt(proxyBranchTimeout);
+		out.writeBoolean(canceled);
+		out.writeBoolean(isAddToPath);
+		out.writeBoolean(waitingForPrack);
 	}
 
 }

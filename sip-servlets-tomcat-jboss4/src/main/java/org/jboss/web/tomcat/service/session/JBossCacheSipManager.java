@@ -1427,7 +1427,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// session if data gravitation occurs.
 			ConvergedSessionReplicationContext.startSipCacheActivity();
 			
-			Object sessionData = proxy_.getSipSessionData(sipApplicationSessionImpl.getId(), key.toString());
+			Object sessionData = proxy_.getSipSessionData("(" + key.getApplicationSessionId() + "," + key.getApplicationName() +	")", key.toString());
 			if(sessionData != null) {
 				if (session == null && sipApplicationSessionImpl != null) {
 					// This is either the first time we've seen this session on this

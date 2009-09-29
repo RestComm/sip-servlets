@@ -18,8 +18,10 @@ package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.header.Via;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -56,13 +58,13 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  * @author root
  *
  */
-public class ProxyImpl implements Proxy, Serializable {
+public class ProxyImpl implements Proxy, Externalizable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static transient Logger logger = Logger.getLogger(ProxyImpl.class);
+	private static Logger logger = Logger.getLogger(ProxyImpl.class);
 	
-	private transient SipServletRequestImpl originalRequest;
+	private SipServletRequestImpl originalRequest;
 	private transient SipServletResponseImpl bestResponse;
 	private transient ProxyBranchImpl bestBranch;
 	private boolean recurse = true;
@@ -95,6 +97,9 @@ public class ProxyImpl implements Proxy, Serializable {
 	// Caller -> Callee or Caller <- Callee
 	private String callerFromHeader;
 
+	// empty constructor used only for Externalizable interface
+	public ProxyImpl() {}
+	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
 		this.originalRequest = request;
@@ -741,6 +746,44 @@ public class ProxyImpl implements Proxy, Serializable {
 
 	public void setCallerFromHeader(String initiatorFromHeader) {
 		this.callerFromHeader = initiatorFromHeader;
+	}
+
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		originalRequest = (SipServletRequestImpl) in.readObject();
+		recurse = in.readBoolean();
+		proxyTimeout = in.readInt();
+		seqSearchTimeout = in.readInt();
+		supervised = in.readBoolean();
+		recordRoutingEnabled = in.readBoolean();
+		parallel = in.readBoolean();
+		addToPath = in.readBoolean();
+		isNoCancel = in.readBoolean();
+		started = in.readBoolean();
+		ackReceived = in.readBoolean();
+		tryingSent = in.readBoolean();
+		finalBranchForSubsequentRequests = (ProxyBranchImpl) in.readObject();
+		finalBranchForSubsequentRequests.setProxy(this);
+		previousNode = (SipURI) in.readObject();
+		callerFromHeader = in.readUTF();
+	}
+
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(originalRequest);
+		out.writeBoolean(recurse);
+		out.writeInt(proxyTimeout);
+		out.writeInt(seqSearchTimeout);
+		out.writeBoolean(supervised);
+		out.writeBoolean(recordRoutingEnabled);
+		out.writeBoolean(parallel);
+		out.writeBoolean(addToPath);
+		out.writeBoolean(isNoCancel);
+		out.writeBoolean(started);
+		out.writeBoolean(ackReceived);
+		out.writeBoolean(tryingSent);
+		out.writeObject(finalBranchForSubsequentRequests);
+		out.writeObject(previousNode);
+		out.writeUTF(callerFromHeader);
 	}
 
 }
