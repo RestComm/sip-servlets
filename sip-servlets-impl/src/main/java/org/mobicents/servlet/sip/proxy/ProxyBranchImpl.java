@@ -719,6 +719,9 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	 * {@inheritDoc}
 	 */
 	public void setRecordRoute(boolean isRecordRoute) {
+		if(started) {
+			throw new IllegalStateException("Proxy branch alredy started!");
+		}
 		recordRoutingEnabled = isRecordRoute;
 	}
 
@@ -730,8 +733,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	}	
 	
 	private void checkSessionValidity() {
-		if(this.originalRequest.getApplicationSession().isValid() 
-		&& this.originalRequest.getSession().isValid())
+		if(this.originalRequest.getSipSession().isValid() && this.originalRequest.getSipSession().getSipApplicationSession().isValid())
 			return;
 		throw new IllegalStateException("Invalid session.");
 	}

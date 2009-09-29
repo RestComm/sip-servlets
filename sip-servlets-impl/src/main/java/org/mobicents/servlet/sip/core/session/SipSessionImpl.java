@@ -121,6 +121,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	private static transient Logger logger = Logger.getLogger(SipSessionImpl.class);
 	
 	protected SipApplicationSessionKey sipApplicationSessionKey;			
+	//lazy loaded and not serialized
+	protected transient MobicentsSipApplicationSession sipApplicationSession;
 	
 	protected ProxyImpl proxy;
 	
@@ -969,9 +971,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {
-		final String applicationName = key.getApplicationName(); 
-		final SipContext sipContext = sipFactory.getSipApplicationDispatcher().findSipApplication(applicationName); 
-		return sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+		if(sipApplicationSession == null) {
+			final String applicationName = key.getApplicationName(); 
+			final SipContext sipContext = sipFactory.getSipApplicationDispatcher().findSipApplication(applicationName); 
+			sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+		} 
+		return sipApplicationSession;
 	}
 
 	protected void setSipApplicationSession(

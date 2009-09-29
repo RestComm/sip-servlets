@@ -464,6 +464,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession(boolean)
 	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
+		MobicentsSipSession sipSession = getSipSession();
+		if(sipSession != null) {
+			MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
+			if(sipApplicationSession != null) {
+				return sipApplicationSession;
+			}
+		}
 		String applicationName = null;
 		if(sessionKey != null) {
 			applicationName = sessionKey.getApplicationName();

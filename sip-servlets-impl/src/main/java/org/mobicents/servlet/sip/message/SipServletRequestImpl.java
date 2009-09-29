@@ -858,7 +858,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			final Request request = (Request) super.message;			
 			final String transport = JainSipUtils.findTransport(request);
 			final MobicentsSipSession session = getSipSession();
-			final ProxyImpl proxy = session.getProxy();
+			ProxyImpl proxy = null;
+			if(session != null) {
+				proxy = session.getProxy();
+			}
 			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			//Issue 112 fix by folsson
