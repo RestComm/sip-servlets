@@ -74,7 +74,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 
     private boolean started = false;
     
-    private boolean displayBalancerWarining = true;
+    private boolean displayBalancerWarning = true;
     private boolean displayBalancerFound = true;
     
     @Override
@@ -365,17 +365,17 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.handlePing(info);
-				displayBalancerWarining = true;
+				displayBalancerWarning = true;
 				if(displayBalancerFound) {
 					logger.info("SIP Load Balancer Found!");
 					displayBalancerFound = false;
 				}
 			} catch (Exception e) {
-				if(displayBalancerWarining) {
+				if(displayBalancerWarning) {
 					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
 							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
-					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
-					displayBalancerWarining = false;
+//					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
+					displayBalancerWarning = false;
 				}
 				displayBalancerFound = true;
 			}
@@ -399,17 +399,17 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.switchover(fromJvmRoute, toJvmRoute);
-				displayBalancerWarining = true;
+				displayBalancerWarning = true;
 				if(displayBalancerFound) {
 					logger.info("SIP Load Balancer Found!");
 					displayBalancerFound = false;
 				}
 			} catch (Exception e) {
-				if(displayBalancerWarining) {
+				if(displayBalancerWarning) {
 					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
 							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
-					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
-					displayBalancerWarining = false;
+//					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
+					displayBalancerWarning = false;
 				}
 				displayBalancerFound = true;
 			}
@@ -429,17 +429,17 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.forceRemoval(info);
-				displayBalancerWarining = true;
+				displayBalancerWarning = true;
 				if(displayBalancerFound) {
 					logger.info("SIP Load Balancer Found!");
 					displayBalancerFound = false;
 				}
 			} catch (Exception e) {
-				if(displayBalancerWarining) {
+				if(displayBalancerWarning) {
 					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
 							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
-					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
-					displayBalancerWarining = false;
+//					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
+					displayBalancerWarning = false;
 				}
 				displayBalancerFound = true;
 			}
