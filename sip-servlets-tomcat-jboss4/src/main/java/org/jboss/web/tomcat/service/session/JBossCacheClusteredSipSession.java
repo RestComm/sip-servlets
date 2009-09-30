@@ -16,9 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.SipStackImpl;
-import gov.nist.javax.sip.stack.SIPDialog;
 
 import javax.sip.SipStack;
 
@@ -76,9 +74,9 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 		}
 		//inject the dialog into the available sip stacks
 		if(logger.isDebugEnabled()) {
-			logger.debug("dialog to inject " + sessionCreatingDialog);
-			if(sessionCreatingDialog != null) {
-				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialog.getDialogId());
+			logger.debug("dialog to inject " + sessionCreatingDialogId);
+			if(sessionCreatingDialogId != null) {
+				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialogId);
 			}
 		}
 		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
@@ -91,7 +89,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 					for (Connector connector : connectors) {
 						SipStack sipStack = (SipStack)
 							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-						if(sipStack != null && sipStack.getSipProviders().hasNext()) {
+						if(sipStack != null) {
 							sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId); 
 							if(logger.isDebugEnabled()) {
 								logger.debug("dialog injected " + sessionCreatingDialog);

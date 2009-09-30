@@ -40,7 +40,6 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -2272,75 +2271,67 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		boolean passivated = false;
 		 
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
-		ClusteredSipSession<? extends OutgoingDistributableSessionData> newTempSession = session;
 		boolean initialLoad = false;
-		if (session == null && sipApplicationSessionImpl != null && create) {
-			// This is either the first time we've seen this session on this
-			// server, or we previously expired it and have since gotten
-			// a replication message from another server
-			mustAdd = true;
-			initialLoad = true;
-			newTempSession = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
-			session = newTempSession;
-			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
-	        passivated = (osu != null && osu.passivated);
-		}				
-		if(session != null) {
-			synchronized (session) {
-				boolean doTx = false;
-				BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
-				try {
-					// We need transaction so any data gravitation replication
-					// is sent in batch.
-					// Don't do anything if there is already transaction context
-					// associated with this thread.
-					if (batchingManager.isBatchInProgress() == false)
-		            {
-		               batchingManager.startBatch();
-		               doTx = true;
-		            }
-	
-		            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
-		            if (data != null)
-		            {
-		               session.update(data);
-		            }
-		            else if(mustAdd)
-		            {
-		               // Clunky; we set the session variable to null to indicate
-		               // no data so move on
-		               session = null;
-		            }
-		            
-		            if (session != null)
-		            {
-		               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
-		                                                                    : ClusteredSessionNotificationCause.FAILOVER;
-		               session.notifyDidActivate(cause);
-		            }
-	
-	//					sessionInCache = proxy_.loadSipSession(sipApplicationSessionImpl.getId(), key.toString(), newTempSession);
-				} catch (Exception ex) {
-					try {
-						// if(doTx)
-						// Let's set it no matter what.
-						batchingManager.setBatchRollbackOnly();
-					} catch (Exception exn) {
-						log_.error("Problem rolling back session mgmt transaction",
-								exn);
-					}
-	
-					// We will need to alert Tomcat of this exception.
-					if (ex instanceof RuntimeException)
-						throw (RuntimeException) ex;
-	
-					throw new RuntimeException("Failed to load session " + key.toString(),
-							ex);
-				} finally {
-					if (doTx)
-						batchingManager.endBatch();
-				}
+		boolean doTx = false;
+		BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
+		try {
+			// We need transaction so any data gravitation replication
+			// is sent in batch.
+			// Don't do anything if there is already transaction context
+			// associated with this thread.
+			if (batchingManager.isBatchInProgress() == false)
+            {
+               batchingManager.startBatch();
+               doTx = true;
+            }
+
+            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(sipApplicationSessionImpl.getKey(), key, initialLoad);
+            if (data != null)
+            {
+            	if (session == null && sipApplicationSessionImpl != null) {
+        			// This is either the first time we've seen this session on this
+        			// server, or we previously expired it and have since gotten
+        			// a replication message from another server
+        			mustAdd = true;
+        			initialLoad = true;
+        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
+        	        passivated = (osu != null && osu.passivated);
+        		}
+            	session.update(data);
+            }
+            else if(mustAdd)
+            {
+               // Clunky; we set the session variable to null to indicate
+               // no data so move on
+               session = null;
+            }
+            
+            if (session != null)
+            {
+               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
+                                                                    : ClusteredSessionNotificationCause.FAILOVER;
+               session.notifyDidActivate(cause);
+            }
+		} catch (Exception ex) {
+			try {
+				// if(doTx)
+				// Let's set it no matter what.
+				batchingManager.setBatchRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Problem rolling back session mgmt transaction",
+						exn);
 			}
+
+			// We will need to alert Tomcat of this exception.
+			if (ex instanceof RuntimeException)
+				throw (RuntimeException) ex;
+
+			throw new RuntimeException("Failed to load session " + key.toString(),
+					ex);
+		} finally {
+			if (doTx)
+				batchingManager.endBatch();
 		}
 		if (session != null) {
 			if (mustAdd) {
@@ -2361,23 +2352,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			log_.trace("loadSession(): session " + key
 					+ " not found in distributed cache");
 		}
-//				if (sessionInCache != null) {
-//					// Need to initialize.
-//					sessionInCache.initAfterLoad(this);
-//					if (mustAdd)
-//						add(sessionInCache, false); // don't replicate
-//					long elapsed = System.currentTimeMillis() - begin;
-//					stats_.updateLoadStats(key.toString(), elapsed);
-//	
-//					if (log_.isDebugEnabled()) {
-//						log_.debug("loadSession(): id= " + key.toString() + ", session="
-//								+ newTempSession);
-//					}
-//					return sessionInCache;
-//				} else if (log_.isDebugEnabled()) {
-//					log_.debug("loadSession(): session " + key.toString()
-//							+ " not found in distributed cache");
-//				}		
 		return session;
 	}
 	
@@ -2409,16 +2383,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		boolean initialLoad = false;
 		
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
-		if (session == null) {			
-			// This is either the first time we've seen this session on this
-			// server, or we previously expired it and have since gotten
-			// a replication message from another server
-			mustAdd = true;
-			initialLoad = true;
-			session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
-			OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
-	        passivated = (osu != null && osu.passivated);
-		}
+		
 		synchronized (session) {
 //			ClusteredSipApplicationSession sessionInCache = null;
 			boolean doTx = false;
@@ -2437,7 +2402,17 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(key, initialLoad);
 				if (data != null)
 	            {
-	               session.update(data);
+					if (session == null) {			
+						// This is either the first time we've seen this session on this
+						// server, or we previously expired it and have since gotten
+						// a replication message from another server
+						mustAdd = true;
+						initialLoad = true;
+						session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
+						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
+				        passivated = (osu != null && osu.passivated);
+					}
+					session.update(data);
 	            }
 	            else if(mustAdd)
 	            {
@@ -2495,26 +2470,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	            log_.trace("loadSession(): session " + key.toString() +
 	                       " not found in distributed cache");
 	         }
-//			if (sessionInCache != null) {
-//				// Need to initialize.
-//				sessionInCache.initAfterLoad(this);
-//				if (mustAdd)
-//					add(sessionInCache, false); // don't replicate
-//				long elapsed = System.currentTimeMillis() - begin;
-//				stats_.updateLoadStats(key.toString(), elapsed);
-//
-//				if (log_.isDebugEnabled()) {
-//					log_.debug("loadSession(): id= " + key.toString() + ", session="
-//							+ sessionInCache);
-//				}
-//				return sessionInCache;
-//			} else if (log_.isDebugEnabled()) {
-//				log_.debug("loadSession(): session " + key.toString()
-//						+ " not found in distributed cache");				
-//			}
 		}
-//		ConvergedSessionReplicationContext.bindSipApplicationSession(session,
-//				snapshotManager_);
 		return session;
 	}
 	

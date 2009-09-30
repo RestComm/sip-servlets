@@ -21,8 +21,6 @@
  */
 package org.jboss.web.tomcat.service.session.distributedcache.spi;
 
-import gov.nist.javax.sip.stack.SIPDialog;
-
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -41,7 +39,7 @@ public class DistributableSipSessionMetadata extends
 	private SipApplicationRoutingRegion routingRegion;
 	private String handlerServlet;
 	private String subscriberURI;
-	private SIPDialog sipDialog;
+	private String dialogId;
 	private boolean invalidateWhenReady;
 	private boolean readyToInvalidate;
 	private ProxyImpl proxy;
@@ -117,17 +115,17 @@ public class DistributableSipSessionMetadata extends
 	}
 
 	/**
-	 * @return the sipDialog
+	 * @return the sipDialogId
 	 */
-	public SIPDialog getSipDialog() {
-		return sipDialog;
+	public String getSipDialogId() {
+		return dialogId;
 	}
 
 	/**
-	 * @param sipDialog the sipDialog to set
+	 * @param sipDialogId the sipDialogId to set
 	 */
-	public void setSipDialog(SIPDialog sipDialog) {
-		this.sipDialog = sipDialog;
+	public void setSipDialogId(String sipDialogId) {
+		this.dialogId = sipDialogId;
 	}
 
 	/**

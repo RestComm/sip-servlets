@@ -16,9 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.SipStackImpl;
-import gov.nist.javax.sip.stack.SIPDialog;
 
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -313,6 +311,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private transient boolean needsPostReplicateActivation;
 
 	protected transient SipApplicationSessionKey sipAppSessionParentKey;
+	
+	protected transient String sessionCreatingDialogId = null;
 	
 	// ------------------------------------------------------------ Constructors
 
@@ -795,7 +795,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.metadata.setInvalidateWhenReady(invalidateWhenReady);
 		this.metadata.setReadyToInvalidate(readyToInvalidate);
 		this.metadata.setRoutingRegion(routingRegion);
-		this.metadata.setSipDialog((SIPDialog)sessionCreatingDialog);
+		if(sessionCreatingDialog != null) {
+			this.metadata.setSipDialogId(sessionCreatingDialog.getDialogId());
+		} else {
+			this.metadata.setSipDialogId("");
+		}
 		if(subscriberURI != null) {
 			this.metadata.setSubscriberURI(subscriberURI.toString());
 		}
@@ -891,7 +895,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			logger.debug("reading handlerServlet "+ handlerServlet);
 		}
 		String subscriberURIStringified = md.getSubscriberURI();
-		if(subscriberURIStringified != null) {
+		if("".equals(subscriberURIStringified)) {
+			subscriberURIStringified = null;
+		} else {
 			try {
 				URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
 				if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
@@ -904,9 +910,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 						+ subscriberURIStringified, pe);
 			}
 		}
-		sessionCreatingDialog = (SIPDialog) md.getSipDialog();
+		sessionCreatingDialogId = md.getSipDialogId();
 		if(logger.isDebugEnabled()) {
-			logger.debug("deserialized dialog for the sip session "+ sessionCreatingDialog);
+			logger.debug("deserialized dialog id for the sip session "+ sessionCreatingDialogId);
 		}
 		invalidateWhenReady = md.isInvalidateWhenReady();
 		readyToInvalidate = md.isReadyToInvalidate();
@@ -927,12 +933,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 		//inject the dialog into the available sip stacks
 		if(logger.isDebugEnabled()) {
-			logger.debug("dialog to inject " + sessionCreatingDialog);
-			if(sessionCreatingDialog != null) {
-				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialog.getDialogId());
+			logger.debug("dialog to inject " + sessionCreatingDialogId);
+			if(sessionCreatingDialogId != null) {
+				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialogId);
 			}
 		}
-		if(sessionCreatingDialog != null && sessionCreatingDialog.getDialogId() != null) {
+		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
 			Container context = manager.getContainer();
 			Container container = context.getParent().getParent();
 			if(container instanceof Engine) {
@@ -942,17 +948,16 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					for (Connector connector : connectors) {
 						SipStack sipStack = (SipStack)
 							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-						if(sipStack != null && sipStack.getSipProviders().hasNext() && ((SipStackImpl)sipStack).getDialog(sessionCreatingDialog.getDialogId()) == null) {
-							((SIPDialog)sessionCreatingDialog).setSipProvider((SipProviderImpl)sipStack.getSipProviders().next());
-							((SipStackImpl)sipStack).putDialog((SIPDialog)sessionCreatingDialog);
+						if(sipStack != null) {
+							sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId);							
 							if(logger.isDebugEnabled()) {
 								logger.debug("dialog injected " + sessionCreatingDialog);
-							}
+							}							
 						}
 					}
 				}
 			}
-		}
+		}				
 	}
 
 	// ------------------------------------------------------------------ Public
