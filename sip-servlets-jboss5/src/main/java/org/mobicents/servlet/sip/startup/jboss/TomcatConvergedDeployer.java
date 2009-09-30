@@ -292,8 +292,8 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 			}
 		}
 		
-		if(log.isInfoEnabled()) {
-			log.info(unit.getName() + " is a sip servlet application ? " + isSipApplication);
+		if(log.isDebugEnabled()) {
+			log.debug(unit.getName() + " is a sip servlet application ? " + isSipApplication);
 		}
 		return isSipApplication;
 	}
