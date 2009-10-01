@@ -400,6 +400,21 @@
 					<artifactId>mobicents-jain-sip-jboss5</artifactId>
 					<version>0.1-SNAPSHOT</version>
 				</dependency>
+				<dependency>
+					<groupId>org.mobicents.cluster</groupId>
+					<artifactId>core</artifactId>
+					<version>1.0.0BETA1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.cluster</groupId>
+					<artifactId>cache</artifactId>
+					<version>1.0.0BETA1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.cluster</groupId>
+					<artifactId>timers</artifactId>
+					<version>1.0.0BETA1-SNAPSHOT</version>
+				</dependency>
 			</dependencies>						
 			<build>			
 				<plugins>				
@@ -414,7 +429,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss5,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss5,mobicents-jain-sip-ha-core,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
