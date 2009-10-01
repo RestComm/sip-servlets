@@ -154,10 +154,9 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		logger.info("Got : " + sipServletResponse.toString());
 		
 		SipSession originalSession =   
-		    helper.getLinkedSession(sipServletResponse.getSession());
-		String cSeqValue = sipServletResponse.getHeader("CSeq");
+		    helper.getLinkedSession(sipServletResponse.getSession());		
 		//if this is a response to an INVITE we ack it and forward the OK 
-		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {
+		if(originalSession!= null && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			logger.info("Sending " +  ackRequest);
 			ackRequest.send();
