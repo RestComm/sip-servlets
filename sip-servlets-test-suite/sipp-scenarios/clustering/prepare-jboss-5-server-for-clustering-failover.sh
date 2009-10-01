@@ -11,26 +11,26 @@ rm -rf $JBOSS_HOME/server/port-2
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
 # we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum)
-#cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/jboss-web-service.jar
-#cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/jboss-web-service.jar
-#cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
-#cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
-#mv $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar.bak
+cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/jboss-web-service.jar
+cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/jboss-web-service.jar
+cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
+cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
+mv $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar.bak
 # end of jars dirty copy
-#cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
-#cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
-#cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
-#cp setup/jboss-5/server-jboss-5-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
-#cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/context.xml
-#cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/context.xml
-#cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/META-INF/jboss-beans.xml
-#cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/META-INF/jboss-beans.xml
-#cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/port-1/deployers/metadata-deployer-jboss-beans.xml
-#cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/port-2/deployers/metadata-deployer-jboss-beans.xml
-#cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
-#cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
-#cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
-#cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
+cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
+cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
+cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
+cp setup/jboss-5/server-jboss-5-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
+cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/context.xml
+cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/context.xml
+cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/META-INF/jboss-beans.xml
+cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/META-INF/jboss-beans.xml
+cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/port-1/deployers/metadata-deployer-jboss-beans.xml
+cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/port-2/deployers/metadata-deployer-jboss-beans.xml
+cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
+cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
+cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
+cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 
 mvn clean install -f ../../../pom.xml -P jboss,jboss-5-cluster -Dnode=port-1
 mvn clean install -f ../../../pom.xml -P jboss,jboss-5-cluster -Dnode=port-2
