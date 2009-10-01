@@ -264,7 +264,11 @@
 		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
 		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
-						
+				
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-cluster,docs -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
@@ -288,6 +292,10 @@
 		<copy overwrite="true" file="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/jboss-web-service.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-web-service.jar" />
 		<copy overwrite="true" file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar" />
 		<move file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar.bak" />		
+
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-5-cluster,docs -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
