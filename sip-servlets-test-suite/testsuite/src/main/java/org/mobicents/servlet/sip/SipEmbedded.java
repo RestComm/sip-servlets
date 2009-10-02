@@ -144,6 +144,7 @@ public class SipEmbedded {
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		sipService.setCongestionControlCheckingInterval(30000);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
+		sipService.setUsePrettyEncoding(true);
 //		sipService.setBypassRequestExecutor(true);
 //		sipService.setBypassResponseExecutor(true);
 		// Create an engine		
@@ -205,7 +206,6 @@ public class SipEmbedded {
 		udpProtocolHandler.setPort(port);
 		udpProtocolHandler.setIpAddress(ipAddress);
 		udpProtocolHandler.setSignalingTransport(transport);
-		udpProtocolHandler.setUsePrettyEncoding(true);		
 //		udpProtocolHandler.setSipStackPropertiesFile("file:///" + loggingFilePath + "mss-sip-stack.properties");
 
 		sipService.addConnector(udpSipConnector);

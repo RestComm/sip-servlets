@@ -899,7 +899,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isInfoEnabled()) {
-				logger.info("We are now after the servlet invocation, We replicate no matter what");
+				if(request != null) {
+					logger.info("We are now after the servlet invocation for request " + request + ", We replicate no matter what " );
+				} else if (response != null) {
+					logger.info("We are now after the servlet invocation for request " + response + ", We replicate no matter what " );
+				} else {
+					logger.info("We are now after the servlet invocation, We replicate no matter what " );
+				}
 			}
 			try {
 				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext

@@ -94,4 +94,22 @@ public class ConvergedSessionInvalidationTracker {
 		}
 		return result;
 	}
+	
+	public static boolean isSipSessionInvalidated(SipSessionKey key, Manager manager) {
+		boolean result = false;
+		Map<Manager, SipSessionKey> map = invalidatedSipSessions.get();
+		if (map != null) {
+			result = key.equals(map.get(manager));
+		}
+		return result;
+	}
+	
+	public static boolean isSipApplicationSessionInvalidated(SipApplicationSessionKey key, Manager manager) {
+		boolean result = false;
+		Map<Manager, SipApplicationSessionKey> map = invalidatedSipApplicationSessions.get();
+		if (map != null) {
+			result = key.equals(map.get(manager));
+		}
+		return result;
+	}
 }

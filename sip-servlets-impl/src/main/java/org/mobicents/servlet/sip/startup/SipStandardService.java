@@ -29,6 +29,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
@@ -49,6 +50,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
 	private static transient Logger logger = Logger.getLogger(SipStandardService.class);
+	private static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
 	/**
      * The descriptive information string for this implementation.
      */
@@ -73,6 +75,15 @@ public class SipStandardService extends StandardService implements SipService {
 	protected String darConfigurationFileLocation;
 	//
 	protected boolean connectorsStartedExternally = false;
+	
+	/**
+	 * the sip stack path name. Since the sip factory is per classloader it should be set here for all underlying stacks
+	 */
+	private String sipPathName;
+	/*
+	 * use Pretty Encoding
+	 */
+	private boolean usePrettyEncoding = true;
 	
 	@Override
     public String getInfo() {
@@ -123,6 +134,16 @@ public class SipStandardService extends StandardService implements SipService {
 		} catch (ClassCastException e) {
 			throw new LifecycleException("Sip Application Dispatcher defined does not implement " + SipApplicationDispatcher.class.getName(),e);
 		}
+		if(logger.isInfoEnabled()) {
+			logger.info("Pretty encoding of headers enabled ? " + usePrettyEncoding);
+		}
+		if(sipPathName == null) {
+			sipPathName = DEFAULT_SIP_PATH_NAME;
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("Sip Stack path name : " + sipPathName);
+		}
+		SipFactories.initialize(sipPathName, usePrettyEncoding);
 		if(darConfigurationFileLocation != null) {
 			if(!darConfigurationFileLocation.startsWith("file:///")) {
 				darConfigurationFileLocation = "file:///" + System.getProperty("catalina.home").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
@@ -406,4 +427,31 @@ public class SipStandardService extends StandardService implements SipService {
 		this.bypassRequestExecutor = bypassRequestExecutor;
 	}
 
+	/**
+	 * @param usePrettyEncoding the usePrettyEncoding to set
+	 */
+	public void setUsePrettyEncoding(boolean usePrettyEncoding) {
+		this.usePrettyEncoding = usePrettyEncoding;
+	}
+
+	/**
+	 * @return the usePrettyEncoding
+	 */
+	public boolean isUsePrettyEncoding() {
+		return usePrettyEncoding;
+	}	
+	
+	/**
+	 * @param sipPathName the sipPathName to set
+	 */
+	public void setSipPathName(String sipPathName) {
+		this.sipPathName = sipPathName;
+	}
+
+	/**
+	 * @return the sipPathName
+	 */
+	public String getSipPathName() {
+		return sipPathName;
+	}	
 }

@@ -7,6 +7,8 @@
 
   <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1" />
 
+  <!--pause milliseconds="1000"/-->	
+
   <send>
     <![CDATA[
     
@@ -23,7 +25,7 @@
     ]]>
   </send>
 
-  <pause milliseconds="1000"/>
+  <!-- pause milliseconds="1000"/-->
 
   <send retrans="500">
     <![CDATA[
@@ -48,7 +50,7 @@
       a=rtpmap:0 PCMU/8000
       
     ]]>
-  </send>
+  </send>  
   
   <recv request="ACK" >
     <action>

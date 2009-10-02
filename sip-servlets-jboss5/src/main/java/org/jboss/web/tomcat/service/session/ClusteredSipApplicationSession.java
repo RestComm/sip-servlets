@@ -61,7 +61,6 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -140,12 +139,6 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * it is declared transient).
 	 */
 	private transient Method containerEventMethod = null;
-
-	/**
-	 * The facade associated with this session. NOTE: This value is not included
-	 * in the serialized version of this object.
-	 */
-	private transient MobicentsSipApplicationSessionFacade facade = null;
 
 	/**
 	 * The session identifier of this Session.
@@ -485,7 +478,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 								this.clusterStatus,
 								ClusteredSessionNotificationCause.MODIFY, name,
 								true)) {
-			event = new SipApplicationSessionBindingEvent(getSession(), name);
+			event = new SipApplicationSessionBindingEvent(this, name);
 			try {
 				((SipApplicationSessionBindingListener) value).valueBound(event);
 			} catch (Throwable t) {
@@ -751,9 +744,9 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 */
 	public synchronized void processSipApplicationSessionReplication() {
 		// Replicate the session.
-		if (log.isTraceEnabled()) {
+		if (log.isDebugEnabled()) {
 			log
-					.trace("processSipApplicationSessionReplication(): session is dirty. Will increment "
+					.debug("processSipApplicationSessionReplication(): session is dirty. Will increment "
 							+ "version from: "
 							+ getVersion()
 							+ " and replicate.");
@@ -991,7 +984,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 							.isSipApplicationSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
 						if (event == null)
-							event = new SipApplicationSessionEvent(getSession());
+							event = new SipApplicationSessionEvent(this);
 						try {
 							((SipApplicationSessionActivationListener) attribute)
 									.sessionDidActivate(event);
@@ -1063,6 +1056,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 		existing.clear();
 
+		if(logger.isDebugEnabled()) {
+			logger.debug("putting following attributes " + distributedCacheAttributes + " in the sip session " + key);
+		}
+		
 		existing.putAll(distributedCacheAttributes);
 		if (excluded != null)
 			existing.putAll(excluded);
@@ -1221,7 +1218,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 				&& notificationPolicy
 						.isSipApplicationSessionBindingListenerInvocationAllowed(
 								this.clusterStatus, cause, name, localCall)) {
-			event = new SipApplicationSessionBindingEvent(getSession(), name);
+			event = new SipApplicationSessionBindingEvent(this, name);
 			((SipApplicationSessionBindingListener) value).valueUnbound(event);
 		}
 
@@ -1289,8 +1286,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}	
 
 	private void sessionMetadataDirty() {
-		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
-			log.trace("Marking session metadata dirty " + id);
+//		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
+			log.debug("Marking session metadata dirty " + key);
 		sessionMetadataDirty = true;
 	}
 

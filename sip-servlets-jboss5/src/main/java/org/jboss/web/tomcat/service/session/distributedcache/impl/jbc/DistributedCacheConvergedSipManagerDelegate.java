@@ -428,6 +428,10 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 
 		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipApplicationSessionData.getMetadata();
 		if (dsm != null) {
+			if (log_.isDebugEnabled()) {
+				log_.debug("putSipSession(): sip session ids to serialize " + dsm.getSipSessionIds());
+				log_.debug("putSipSession(): http session ids to serialize " + dsm.getHttpSessionIds());
+			}
 			map.put(jBossCacheService.METADATA_KEY, dsm);
 		}
 
@@ -446,8 +450,8 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		SipApplicationSessionKey sipApplicationSessionKey = sipSessionData.getSipApplicationSessionKey();
 		SipSessionKey sessionKey = sipSessionData.getSipSessionKey();
 
-		if (log_.isTraceEnabled()) {
-			log_.trace("putSipSession(): putting sip session " + sessionKey.toString());
+		if (log_.isDebugEnabled()) {
+			log_.debug("putSipSession(): putting sip session " + sessionKey.toString());
 		}
 
 		Fqn<String> fqn = getSipSessionFqn(jBossCacheService.combinedPath_, sipApplicationSessionKey.toString(), sessionKey.toString());
@@ -457,14 +461,19 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 
 		DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)sipSessionData.getMetadata();
 		if (dsm != null) {
+			if (log_.isDebugEnabled()) {
+				log_.debug("putSipSession(): handler servlet name to serialize " + dsm.getHandlerServlet());
+				log_.debug("putSipSession(): dialog id to serialize " + dsm.getSipDialogId());
+				log_.debug("putSipSession(): proxy to serialize " + dsm.getProxy());
+				log_.debug("putSipSession(): b2buaHelper to serialize " + dsm.getB2buaHelper());
+			}
 			map.put(jBossCacheService.METADATA_KEY, dsm);
 		}
 
 		Long timestamp = sipSessionData.getTimestamp();
 		if (timestamp != null) {
 			map.put(jBossCacheService.TIMESTAMP_KEY, timestamp);
-		}
-
+		}		
 		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(map, sipSessionData);
 
 		jBossCacheService.cacheWrapper_.put(fqn, map);

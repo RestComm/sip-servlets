@@ -8,6 +8,9 @@
 
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
+
+mvn clean install  -f ../../../pom.xml -P jboss-5,jboss-5-cluster -Dnode=all
+
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
 # we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum)
@@ -32,8 +35,6 @@ cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/port-2/deploye
 cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-1/conf/jboss-log4j.xml
 cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/port-2/conf/jboss-log4j.xml
 
-mvn clean install -f ../../../pom.xml -P jboss,jboss-5-cluster -Dnode=port-1
-mvn clean install -f ../../../pom.xml -P jboss,jboss-5-cluster -Dnode=port-2
 
 #mkdir $JBOSS_HOME/server/port-1/conf/dars
 #mkdir $JBOSS_HOME/server/port-2/conf/dars

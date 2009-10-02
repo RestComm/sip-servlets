@@ -179,8 +179,8 @@ public final class ConvergedSessionReplicationContext
       }
       
       if(clusteredSipSession.getSipApplicationSession() instanceof org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade) {
-      clusteredSipApplicationSession = (ClusteredSipApplicationSession) 
-      	((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
+    	  clusteredSipApplicationSession = (ClusteredSipApplicationSession) 
+      		((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
       			clusteredSipSession.getSipApplicationSession()).getMobicentstSipApplicationSession();
       } else {
     	  clusteredSipApplicationSession = (ClusteredSipApplicationSession)clusteredSipSession.getSipApplicationSession();

@@ -45,7 +45,7 @@
   <send>
     <![CDATA[
     
-      ACK sip:receiver-failover@127.0.0.1:5090 SIP/2.0
+      ACK sip:receiver-failover@[local_ip]:5090 SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
@@ -63,7 +63,7 @@
   
 <send retrans="500">
  <![CDATA[
-      BYE sip:receiver-failover@127.0.0.1:5090 SIP/2.0
+      BYE sip:receiver-failover@[local_ip]:5090 SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]

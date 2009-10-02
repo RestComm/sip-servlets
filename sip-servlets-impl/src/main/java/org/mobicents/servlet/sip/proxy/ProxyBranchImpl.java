@@ -342,9 +342,9 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			clonedRequest.setCurrentApplicationName(originalRequest.getSipSession().getSipApplicationSession().getApplicationName());
 		}
 		clonedRequest.setSipSessionKey(originalRequest.getSipSession().getKey());
-		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSession(true);
+		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSipSession();
 		try {
-			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSession()).getHandler());
+			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSipSession()).getHandler());
 		} catch (ServletException e) {
 			logger.error("could not set the session handler while forwarding the request", e);
 			throw new RuntimeException(e);
@@ -508,6 +508,11 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
+				// we mark them as accessed so that HA replication can occur
+				request.getSipSession().access();
+				if(request.getSipSession().getSipApplicationSession() != null) {
+					request.getSipSession().getSipApplicationSession().access();
+				}
 				String transport = JainSipUtils.findTransport(clonedRequest);
 				SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
@@ -578,7 +583,11 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Getting new Client Tx for request " + clonedRequest);
 		}
-		
+		// we mark them as accessed so that HA replication can occur		
+		request.getSipSession().access();
+		if(request.getSipSession().getSipApplicationSession() != null) {
+			request.getSipSession().getSipApplicationSession().access();
+		}
 		try {
 			ClientTransaction ctx = sipProvider
 				.getNewClientTransaction(clonedRequest);			

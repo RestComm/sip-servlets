@@ -16,6 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 
 /**
@@ -23,7 +24,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
  * 
  */
 public class InstantConvergedSnapshotManager extends InstantSnapshotManager implements SnapshotSipManager {
-
+	protected static Logger logger = Logger.getLogger(InstantConvergedSnapshotManager.class);
 	/**
 	 * @param manager
 	 * @param path
@@ -44,6 +45,10 @@ public class InstantConvergedSnapshotManager extends InstantSnapshotManager impl
 						"Failed to replicate session "
 								+ session.getId(), e);
 			}
+		} else {
+			if(logger.isDebugEnabled()){
+				logger.debug("nothing to replicate");
+			}
 		}
 	}
 	
@@ -58,6 +63,10 @@ public class InstantConvergedSnapshotManager extends InstantSnapshotManager impl
 				getLog().warn(
 						"Failed to replicate session "
 								+ session.getId(), e);
+			}
+		} else {
+			if(logger.isDebugEnabled()){
+				logger.debug("nothing to replicate");
 			}
 		}
 	}

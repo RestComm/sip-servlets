@@ -1,14 +1,9 @@
 package org.mobicents.servlet.sip.message;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.Principal;
-import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,7 +26,6 @@ import javax.sip.Transaction;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -49,168 +43,148 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  * @author jean.deruelle@gmail.com
  *
  */
-public class MobicentsSipSessionFacade implements MobicentsSipSession, Externalizable {
+public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = Logger.getLogger(MobicentsSipSessionFacade.class);
-	private MobicentsSipSession sipSession;
+	private static Logger logger = Logger.getLogger(MobicentsSipSessionFacade.class);
+	private transient MobicentsSipSession sipSession;
+	private SipSessionKey sipSessionKey = null;
+	private SipApplicationSessionKey sipAppSessionKey = null;
 	
-	public MobicentsSipSessionFacade() { }
+//	public MobicentsSipSessionFacade() { }
 	
 	public MobicentsSipSessionFacade(MobicentsSipSession sipSession) {
 		this.sipSession = sipSession;
+		this.sipSessionKey = sipSession.getKey();
+		this.sipAppSessionKey = sipSession.getSipApplicationSession().getKey();
 	}
 
 	public SipServletRequest createRequest(String arg0) {
-		return sipSession.createRequest(arg0);
+		return getSipSession().createRequest(arg0);
 	}
 
 	public SipApplicationSession getApplicationSession() {
-		return sipSession.getApplicationSession();
+		return getSipSession().getApplicationSession();
 	}
 
 	public Object getAttribute(String arg0) {
-		return sipSession.getAttribute(arg0);
+		return getSipSession().getAttribute(arg0);
 	}
 
 	public Enumeration<String> getAttributeNames() {
-		return sipSession.getAttributeNames();
+		return getSipSession().getAttributeNames();
 	}
 
 	public String getCallId() {
-		return sipSession.getCallId();
+		return getSipSession().getCallId();
 	}
 
 	public long getCreationTime() {
-		return sipSession.getCreationTime();
+		return getSipSession().getCreationTime();
 	}
 
 	public String getId() {
-		return sipSession.getId();
+		return getSipSession().getId();
 	}
 
 	public boolean getInvalidateWhenReady() {
-		return sipSession.getInvalidateWhenReady();
+		return getSipSession().getInvalidateWhenReady();
 	}
 
 	public long getLastAccessedTime() {
-		return sipSession.getLastAccessedTime();
+		return getSipSession().getLastAccessedTime();
 	}
 
 	public Address getLocalParty() {
-		return sipSession.getLocalParty();
+		return getSipSession().getLocalParty();
 	}
 
 	public SipApplicationRoutingRegion getRegion() {
-		return sipSession.getRegion();
+		return getSipSession().getRegion();
 	}
 
 	public Address getRemoteParty() {
-		return sipSession.getRemoteParty();
+		return getSipSession().getRemoteParty();
 	}
 
 	public ServletContext getServletContext() {
-		return sipSession.getServletContext();
+		return getSipSession().getServletContext();
 	}
 
 	public State getState() {
-		return sipSession.getState();
+		return getSipSession().getState();
 	}
 
 	public URI getSubscriberURI() {
-		return sipSession.getSubscriberURI();
+		return getSipSession().getSubscriberURI();
 	}
 
 	public void invalidate() {
-		sipSession.invalidate();
+		getSipSession().invalidate();
 	}
 
 	public boolean isReadyToInvalidate() {
-		return sipSession.isReadyToInvalidate();
+		return getSipSession().isReadyToInvalidate();
 	}
 
 	public boolean isValid() {
-		return sipSession.isValid();
+		return getSipSession().isValid();
 	}
 
 	public void removeAttribute(String arg0) {
-		sipSession.removeAttribute(arg0);
+		getSipSession().removeAttribute(arg0);
 	}
 
 	public void setAttribute(String arg0, Object arg1) {
-		sipSession.setAttribute(arg0, arg1);
+		getSipSession().setAttribute(arg0, arg1);
 	}
 
 	public void setHandler(String arg0) throws ServletException {
-		sipSession.setHandler(arg0);
+		getSipSession().setHandler(arg0);
 	}
 
 	public void setInvalidateWhenReady(boolean arg0) {
-		sipSession.setInvalidateWhenReady(arg0);
+		getSipSession().setInvalidateWhenReady(arg0);
 	}
 
 	public void setOutboundInterface(InetAddress arg0) {
-		sipSession.setOutboundInterface(arg0);
+		getSipSession().setOutboundInterface(arg0);
 	}
 
 	public void setOutboundInterface(InetSocketAddress arg0) {
-		sipSession.setOutboundInterface(arg0);
+		getSipSession().setOutboundInterface(arg0);
 	}
 
-	public void readExternal(ObjectInput arg0) throws IOException,
-			ClassNotFoundException {
-		String sipSessionId = arg0.readUTF();
-		String sipAppSessionId = arg0.readUTF();
-		String sipAppName = arg0.readUTF();
-		SipContext sipContext = StaticServiceHolder.sipStandardService
-			.getSipApplicationDispatcher().findSipApplication(sipAppName);
-		SipSessionKey key = null;
-		try {
-			key = SessionManagerUtil.parseSipSessionKey(sipSessionId);
-		} catch (ParseException e) {
-			logger.error("Couldn't parse the following sip session key " + sipSessionId, e);
-			throw new RuntimeException(e);
-		}
-		SipApplicationSessionKey sipAppKey = null;
-		try {
-			sipAppKey = SessionManagerUtil.parseSipApplicationSessionKey(sipAppSessionId);
-		} catch (ParseException e) {
-			logger.error("Couldn't parse the following sip application session key " + sipAppSessionId, e);
-			throw new RuntimeException(e);
-		}
-		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(sipAppKey, false);
-		this.sipSession = ((SipManager)sipContext.getManager()).getSipSession(key, false, null, sipApplicationSession);
-		if(this.sipSession == null)
-			throw new NullPointerException(
-					"We just tried to pull a SipSession from the distributed cache and it's null, key="
-					+ key);
-		
-	}
-
-	public void writeExternal(ObjectOutput arg0) throws IOException {
-		MobicentsSipSession sipSessionImpl = (MobicentsSipSession) this.sipSession;
-		MobicentsSipApplicationSession sipAppSession = (MobicentsSipApplicationSession) 
-			sipSessionImpl.getSipApplicationSession();
-		arg0.writeUTF(sipSessionImpl.getId());
-		arg0.writeUTF(sipAppSession.getId());
-		arg0.writeUTF(sipAppSession.getApplicationName());
-	}
+//	public void readExternal(ObjectInput in) throws IOException,
+//			ClassNotFoundException {		
+//		sipSessionKey = (SipSessionKey) in.readObject();		
+//		sipAppSessionKey = (SipApplicationSessionKey) in.readObject();
+//		if(logger.isDebugEnabled()) {
+//			logger.debug("sip app session key=" + sipAppSessionKey);
+//			logger.debug("sip session key=" + sipSessionKey);
+//		}				
+//	}
+//
+//	public void writeExternal(ObjectOutput out) throws IOException {		
+//		out.writeObject(sipSessionKey);
+//		out.writeObject(sipAppSessionKey);
+//	}
 
 	public void access() {
-		sipSession.access();
+		getSipSession().access();
 	}
 
 	public void addDerivedSipSessions(MobicentsSipSession derivedSession) {
-		sipSession.addDerivedSipSessions(derivedSession);
+		getSipSession().addDerivedSipSessions(derivedSession);
 	}
 
 	public void addOngoingTransaction(Transaction transaction) {
-		sipSession.addOngoingTransaction(transaction);
+		getSipSession().addOngoingTransaction(transaction);
 	}
 
 	public void addSubscription(SipServletMessageImpl sipServletMessage)
 			throws SipException {
-		sipSession.addSubscription(sipServletMessage);
+		getSipSession().addSubscription(sipServletMessage);
 	}
 
 	public MobicentsSipSession findDerivedSipSession(String toTag) {
@@ -220,195 +194,195 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 
 	public B2buaHelperImpl getB2buaHelper() {
 		
-		return sipSession.getB2buaHelper();
+		return getSipSession().getB2buaHelper();
 	}
 
 	public Iterator<MobicentsSipSession> getDerivedSipSessions() {
 		
-		return sipSession.getDerivedSipSessions();
+		return getSipSession().getDerivedSipSessions();
 	}
 
 	public String getHandler() {
 		
-		return sipSession.getHandler();
+		return getSipSession().getHandler();
 	}
 
 	public SipSessionKey getKey() {
 		
-		return sipSession.getKey();
+		return getSipSession().getKey();
 	}
 
 	public Set<Transaction> getOngoingTransactions() {
 		
-		return sipSession.getOngoingTransactions();
+		return getSipSession().getOngoingTransactions();
 	}
 
 	public SipURI getOutboundInterface() {
 		
-		return sipSession.getOutboundInterface();
+		return getSipSession().getOutboundInterface();
 	}
 
 	public ProxyImpl getProxy() {
 		
-		return sipSession.getProxy();
+		return getSipSession().getProxy();
 	}
 
 	public SipApplicationRoutingRegion getRegionInternal() {
 		
-		return sipSession.getRegionInternal();
+		return getSipSession().getRegionInternal();
 	}
 
 	public Semaphore getSemaphore() {
 		
-		return sipSession.getSemaphore();
+		return getSipSession().getSemaphore();
 	}
 
 	public Dialog getSessionCreatingDialog() {
 		
-		return sipSession.getSessionCreatingDialog();
+		return getSipSession().getSessionCreatingDialog();
 	}
 
 	public Transaction getSessionCreatingTransaction() {
 		
-		return sipSession.getSessionCreatingTransaction();
+		return getSipSession().getSessionCreatingTransaction();
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {
 		
-		return sipSession.getSipApplicationSession();
+		return getSipSession().getSipApplicationSession();
 	}
 
 	public Map<String, Object> getSipSessionAttributeMap() {
 		
-		return sipSession.getSipSessionAttributeMap();
+		return getSipSession().getSipSessionAttributeMap();
 	}
 
 	public URI getSipSubscriberURI() {
 		
-		return sipSession.getSipSubscriberURI();
+		return getSipSession().getSipSubscriberURI();
 	}
 
 	public Serializable getStateInfo() {
 		
-		return sipSession.getStateInfo();
+		return getSipSession().getStateInfo();
 	}
 
 	public Principal getUserPrincipal() {
 		
-		return sipSession.getUserPrincipal();
+		return getSipSession().getUserPrincipal();
 	}
 
 	public void onReadyToInvalidate() {
-		sipSession.onReadyToInvalidate();
+		getSipSession().onReadyToInvalidate();
 	}
 
 	public void onTerminatedState() {
-		sipSession.onTerminatedState();
+		getSipSession().onTerminatedState();
 	}
 
 	public MobicentsSipSession removeDerivedSipSession(String toTag) {
 		
-		return sipSession.removeDerivedSipSession(toTag);
+		return getSipSession().removeDerivedSipSession(toTag);
 	}
 
 	public void removeOngoingTransaction(Transaction transaction) {
 		
-		sipSession.removeOngoingTransaction(transaction);
+		getSipSession().removeOngoingTransaction(transaction);
 	}
 
 	public void removeSubscription(SipServletMessageImpl sipServletMessage) {
-		sipSession.removeSubscription(sipServletMessage);
+		getSipSession().removeSubscription(sipServletMessage);
 	}
 
 	public void setB2buaHelper(B2buaHelperImpl helperImpl) {
-		sipSession.setB2buaHelper(helperImpl);
+		getSipSession().setB2buaHelper(helperImpl);
 	}
 
 	public void setLocalParty(Address addressImpl) {
-		sipSession.setLocalParty(addressImpl);
+		getSipSession().setLocalParty(addressImpl);
 	}
 
 	public void setParentSession(MobicentsSipSession mobicentsSipSession) {
-		sipSession.setParentSession(mobicentsSipSession);
+		getSipSession().setParentSession(mobicentsSipSession);
 	}
 
 	public void setProxy(ProxyImpl proxy) {
-		sipSession.setProxy(proxy);
+		getSipSession().setProxy(proxy);
 	}
 
 	public void setRemoteParty(Address addressImpl) {
-		sipSession.setRemoteParty(addressImpl);
+		getSipSession().setRemoteParty(addressImpl);
 	}
 
 	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
-		sipSession.setRoutingRegion(routingRegion);
+		getSipSession().setRoutingRegion(routingRegion);
 	}
 
 	public void setSessionCreatingDialog(Dialog dialog) {
-		sipSession.setSessionCreatingDialog(dialog);
+		getSipSession().setSessionCreatingDialog(dialog);
 	}
 
 	public void setSessionCreatingTransaction(Transaction transaction) {
-		sipSession.setSessionCreatingTransaction(transaction);
+		getSipSession().setSessionCreatingTransaction(transaction);
 	}
 
 	public void setSipSessionAttributeMap(
 			Map<String, Object> sipSessionAttributeMap) {
-		sipSession.setSipSessionAttributeMap(sipSessionAttributeMap);
+		getSipSession().setSipSessionAttributeMap(sipSessionAttributeMap);
 	}
 
 	public void setSipSubscriberURI(URI subscriberURI) {
-		sipSession.setSipSubscriberURI(subscriberURI);
+		getSipSession().setSipSubscriberURI(subscriberURI);
 	}
 
 	public void setState(State state) {
-		sipSession.setState(state);
+		getSipSession().setState(state);
 	}
 
 	public void setStateInfo(Serializable stateInfo) {
-		sipSession.setStateInfo(stateInfo);
+		getSipSession().setStateInfo(stateInfo);
 	}
 
 	public void setUserPrincipal(Principal principal) {
-		sipSession.setUserPrincipal(principal);
+		getSipSession().setUserPrincipal(principal);
 	}
 
 	public void updateStateOnResponse(
 			SipServletResponseImpl sipServletResponseImpl, boolean receive) {
-		sipSession.updateStateOnResponse(sipServletResponseImpl, receive);
+		getSipSession().updateStateOnResponse(sipServletResponseImpl, receive);
 	}
 
 	public void updateStateOnSubsequentRequest(
 			SipServletRequestImpl sipServletRequestImpl, boolean receive) {
-		sipSession.updateStateOnSubsequentRequest(sipServletRequestImpl, receive);
+		getSipSession().updateStateOnSubsequentRequest(sipServletRequestImpl, receive);
 	}
 
 	public MobicentsSipSessionFacade getSession() {
-		return sipSession.getSession();
+		return getSipSession().getSession();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return sipSession.equals(obj);
+		return getSipSession().equals(obj);
 	}
 
 	@Override
 	public int hashCode() {
-		return sipSession.hashCode();
+		return getSipSession().hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return sipSession.toString();
+		return getSipSession().toString();
 	}
 
 	public SipApplicationRouterInfo getNextSipApplicationRouterInfo() {
-		return sipSession.getNextSipApplicationRouterInfo();
+		return getSipSession().getNextSipApplicationRouterInfo();
 	}
 
 	public void setNextSipApplicationRouterInfo(
 			SipApplicationRouterInfo routerInfo) {
-		sipSession.setNextSipApplicationRouterInfo(routerInfo);
+		getSipSession().setNextSipApplicationRouterInfo(routerInfo);
 	}
 
 	public void setAckReceived(boolean ackReceived) {
@@ -423,5 +397,27 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Externali
 
 	public long getCseq() {
 		return 0;
+	}
+	
+	/**
+	 * @return the sipSession
+	 */
+	private MobicentsSipSession getSipSession() {
+		// lazy loading the session, useful for HA
+		if(sipSession == null){
+			if(logger.isDebugEnabled()) {
+				logger.debug("Trying to load the session from the deserialized session facade with the key " + sipSessionKey);
+			}
+			SipContext sipContext = StaticServiceHolder.sipStandardService
+				.getSipApplicationDispatcher().findSipApplication(sipAppSessionKey.getApplicationName());
+	
+			MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(sipAppSessionKey, false);
+			sipSession = ((SipManager)sipContext.getManager()).getSipSession(sipSessionKey, false, null, sipApplicationSession);
+			if(sipSession == null)
+				throw new NullPointerException(
+					"We just tried to pull a SipSession from the distributed cache and it's null, key="
+						+ sipSessionKey);
+		}
+		return sipSession;
 	}
 }

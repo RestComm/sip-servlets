@@ -139,12 +139,14 @@ public class SipCacheListener extends CacheListenerBase
       if (event.isPre())
          return;
       
+      logger.info("following node removed " + event.getFqn().toString());
+      
       boolean local = event.isOriginLocal();
       if (!fieldBased_ && local)
          return;
       
       @SuppressWarnings("unchecked")
-      Fqn<String> fqn = event.getFqn();
+      Fqn<String> fqn = event.getFqn();     
       boolean isBuddy = isBuddyFqn(fqn);
       
       if (!local 
@@ -184,6 +186,8 @@ public class SipCacheListener extends CacheListenerBase
    {      
       if (event.isPre())
          return;
+      
+      logger.info("following node modified " + event.getFqn().toString());
       
       boolean local = event.isOriginLocal();
       if (!fieldBased_ && local)

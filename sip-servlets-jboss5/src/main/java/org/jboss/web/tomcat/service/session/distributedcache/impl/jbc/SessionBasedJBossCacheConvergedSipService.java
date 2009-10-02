@@ -145,11 +145,17 @@ public class SessionBasedJBossCacheConvergedSipService extends
 	
 	public void storeSipApplicationSessionAttributes(Map<Object, Object> dataMap,
 			OutgoingSessionGranularitySessionData sessionData) {
+		if (sessionData.getSessionAttributes() != null && log_.isDebugEnabled()) {
+			log_.debug("storeSipApplicationSessionAttributes(): putting sip app session attributes " + sessionData.getSessionAttributes());
+		}
 		this.storeSessionAttributes(dataMap, sessionData);
 	}
 	
 	public void storeSipSessionAttributes(Map<Object, Object> dataMap,
 			OutgoingSessionGranularitySessionData sessionData) {
+		if (sessionData.getSessionAttributes() != null && log_.isDebugEnabled()) {
+			log_.debug("storeSipSessionAttributes(): putting sip session attributes " + sessionData.getSessionAttributes());
+		}
 		this.storeSessionAttributes(dataMap, sessionData);
 	}
 

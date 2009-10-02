@@ -74,7 +74,6 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
-import org.mobicents.servlet.sip.message.MobicentsSipSessionFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipService;
@@ -155,13 +154,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * dynamically the first time it is needed, or after a session reload (since
 	 * it is declared transient).
 	 */
-	private transient Method containerEventMethod = null;		
-
-	/**
-	 * The facade associated with this session. NOTE: This value is not included
-	 * in the serialized version of this object.
-	 */
-	private transient MobicentsSipSessionFacade facade = null;
+	private transient Method containerEventMethod = null;			
 
 	/**
 	 * The session identifier of this Session.
@@ -628,7 +621,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 								this.clusterStatus,
 								ClusteredSessionNotificationCause.MODIFY, name,
 								true)) {
-			event = new SipSessionBindingEvent(getSession(), name);
+			event = new SipSessionBindingEvent(this, name);
 			try {
 				((SipSessionBindingListener) value).valueBound(event);
 			} catch (Throwable t) {
@@ -654,7 +647,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 								true)) {
 			try {
 				((SipSessionBindingListener) unbound)
-						.valueUnbound(new SipSessionBindingEvent(getSession(),
+						.valueUnbound(new SipSessionBindingEvent(this,
 								name));
 			} catch (Throwable t) {
 				manager.getContainer().getLogger().error(
@@ -895,7 +888,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			logger.debug("reading handlerServlet "+ handlerServlet);
 		}
 		String subscriberURIStringified = md.getSubscriberURI();
-		if("".equals(subscriberURIStringified)) {
+		if(subscriberURIStringified == null || "".equals(subscriberURIStringified)) {
 			subscriberURIStringified = null;
 		} else {
 			try {
@@ -967,9 +960,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 */
 	public synchronized void processSipSessionReplication() {
 		// Replicate the session.
-		if (log.isTraceEnabled()) {
+		if (log.isDebugEnabled()) {
 			log
-					.trace("processSipSessionReplication(): session is dirty. Will increment "
+					.debug("processSipSessionReplication(): session is dirty. Will increment "
 							+ "version from: "
 							+ getVersion()
 							+ " and replicate.");
@@ -1207,7 +1200,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							.isSipSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
 						if (event == null)
-							event = new SipSessionEvent(getSession());
+							event = new SipSessionEvent(this);
 						try {
 							((SipSessionActivationListener) attribute)
 									.sessionDidActivate(event);
@@ -1279,6 +1272,10 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 		existing.clear();
 
+		if(logger.isDebugEnabled()) {
+			logger.debug("putting following attributes " + distributedCacheAttributes + " in the sip session " + key);
+		}
+		
 		existing.putAll(distributedCacheAttributes);
 		if (excluded != null)
 			existing.putAll(excluded);
@@ -1437,7 +1434,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				&& notificationPolicy
 						.isSipSessionBindingListenerInvocationAllowed(
 								this.clusterStatus, cause, name, localCall)) {
-			event = new SipSessionBindingEvent(getSession(), name);
+			event = new SipSessionBindingEvent(this, name);
 			((SipSessionBindingListener) value).valueUnbound(event);
 		}
 
@@ -1507,8 +1504,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}	
 
 	private void sessionMetadataDirty() {
-		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
-			log.trace("Marking session metadata dirty " + id);
+//		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
+			log.debug("Marking session metadata dirty " + key);
 		sessionMetadataDirty = true;
 	}
 

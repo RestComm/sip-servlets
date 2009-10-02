@@ -8,7 +8,8 @@
 
    <Service name="jboss.web"
 	        className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
-  		balancers="127.0.0.1"  
+  		balancers="127.0.0.1"
+  		sipPathName="org.mobicents.ha"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
   		darConfigurationFileLocation="conf/dars/distributable-dar.properties">

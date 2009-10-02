@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 
 /**
@@ -27,7 +28,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
  * 
  */
 public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager implements SnapshotSipManager {
-	
+	protected static Logger logger = Logger.getLogger(IntervalConvergedSnapshotManager.class);
 	// the modified sessions
 	protected Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = new LinkedHashSet<ClusteredSipSession<? extends OutgoingDistributableSessionData>>();
 	protected Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = new LinkedHashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>();
@@ -71,9 +72,12 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 			synchronized (sipSessions) {
 				sipSessions.add(session);
 			}
+			if(logger.isDebugEnabled()){
+				logger.debug("queued sip session " + session.getKey() + " for replication");
+			}
 		} catch (Exception e) {
 			log.error(
-					"Failed to queue session " + session + " for replication",
+					"Failed to queue sip session " + session + " for replication",
 					e);
 		}
 	}
@@ -87,9 +91,12 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 			synchronized (sipApplicationSessions) {
 				sipApplicationSessions.add(session);
 			}
+			if(logger.isDebugEnabled()){
+				logger.debug("queued sip app session " + session.getKey() + " for replication");
+			}
 		} catch (Exception e) {
 			log.error(
-					"Failed to queue session " + session + " for replication",
+					"Failed to queue sip app session " + session + " for replication",
 					e);
 		}
 	}

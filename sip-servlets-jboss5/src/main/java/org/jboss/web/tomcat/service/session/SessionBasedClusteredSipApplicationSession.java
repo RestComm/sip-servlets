@@ -69,10 +69,16 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 
 	@Override
 	protected OutgoingSessionGranularitySessionData getOutgoingSipApplicationSessionData() {
-		Map<String, Object> attrs = isSessionAttributeMapDirty() ? getSessionAttributeMap()
-				: null;
-		DistributableSipApplicationSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipApplicationSessionMetadata)getSessionMetadata()
-				: null;
+//		Map<String, Object> attrs = isSessionAttributeMapDirty() ? getSessionAttributeMap()
+//				: null;
+		// FIXME temp fix we always replicate the attributes to cope with proxy where attributes are lost in the cache
+		// between initial request and response, not sure why yet
+		Map<String, Object> attrs = getSessionAttributeMap();
+				
+//		DistributableSipApplicationSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipApplicationSessionMetadata)getSessionMetadata()
+//				: null;
+		DistributableSipApplicationSessionMetadata metadata = (DistributableSipApplicationSessionMetadata)getSessionMetadata();
+		
 		Long timestamp = attrs != null || metadata != null
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;

@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
@@ -35,6 +36,8 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
 public final class ConvergedSessionReplicationContext
 {
+	protected static Logger logger = Logger.getLogger(ConvergedSessionReplicationContext.class);
+	
    private static final ThreadLocal<ConvergedSessionReplicationContext> replicationContext = new ThreadLocal<ConvergedSessionReplicationContext>();
    private static final ThreadLocal<ConvergedSessionReplicationContext> sipReplicationContext = new ThreadLocal<ConvergedSessionReplicationContext>();
    
@@ -236,7 +239,7 @@ public final class ConvergedSessionReplicationContext
    
    public static void bindSipSession(ClusteredSipSession<? extends OutgoingDistributableSessionData> session, SnapshotSipManager manager)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();      
       if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addReplicatableSipSession(session, manager);
@@ -249,7 +252,7 @@ public final class ConvergedSessionReplicationContext
    
    public static void bindSipApplicationSession(ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session, SnapshotSipManager manager)
    {
-      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();      
       if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addReplicatableSipApplicationSession(session, manager);
@@ -537,6 +540,9 @@ public final class ConvergedSessionReplicationContext
 		// crossCtxSipSessions.put(session, mgr);
 		// }
 		// else
+	   if(logger.isDebugEnabled()){
+		   logger.info("Binding following sip session " + session.getKey());
+	   }
 		if (soleSipManager == null) {
 			// First one bound
 			soleSipManager = mgr;
@@ -564,6 +570,9 @@ public final class ConvergedSessionReplicationContext
 		// crossCtxSipApplicationSessions.put(session, mgr);
 		// }
 		// else
+	   if(logger.isDebugEnabled()){
+		   logger.debug("Binding following sip app session " + session.getKey());
+	   }
 		if (soleSipManager == null) {
 			// First one bound
 			soleSipManager = mgr;
@@ -602,8 +611,9 @@ public final class ConvergedSessionReplicationContext
       boolean store = manager.equals(soleSipManager);
       if (store)
       {
+    	  logger.info("Unbinding following sip session " + session.getKey());
     	  soleSipManager = null;
-         soleSipSession = null;
+    	  soleSipSession = null;
       }      
    }
    
@@ -612,8 +622,9 @@ public final class ConvergedSessionReplicationContext
       boolean store = manager.equals(soleSipManager);
       if (store)
       {
+    	  logger.info("Unbinding following sip app session " + session.getKey());
     	  soleSipManager = null;
-         soleSipApplicationSession = null;
+    	  soleSipApplicationSession = null;
       }      
    }         
 }

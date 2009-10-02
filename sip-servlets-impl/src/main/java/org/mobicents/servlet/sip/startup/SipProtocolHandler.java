@@ -75,8 +75,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
 	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";
-	private static final String IS_SIP_CONNECTOR = "isSipConnector";
-	private static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
+	private static final String IS_SIP_CONNECTOR = "isSipConnector";	
 	// the logger
 	private static transient Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
 	// *
@@ -107,11 +106,6 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * the sip stack signaling transport
 	 */
-	private String sipPathName;
-	
-	/**
-	 * the sip stack signaling transport
-	 */
 	private String signalingTransport;
 
 	/**
@@ -134,10 +128,6 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * Stun Server Port
 	 */
 	private int stunServerPort;
-	/*
-	 * use Pretty Encoding
-	 */
-	private boolean usePrettyEncoding = true;
 	
 	/*
 	 * These settings staticServerAddress, staticServerPort will override all stun settings and will 
@@ -207,14 +197,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void init() throws Exception {
-		if(logger.isInfoEnabled()) {
-			logger.info("Pretty encoding of headers enabled ? " + usePrettyEncoding);
-		}
-		if(sipPathName == null) {
-			sipPathName = DEFAULT_SIP_PATH_NAME;
-		}
-		SipFactories.initialize(sipPathName, usePrettyEncoding);
+	public void init() throws Exception {		
 		setAttribute(IS_SIP_CONNECTOR,Boolean.TRUE);
 	}
 
@@ -585,20 +568,6 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		this.useStun = useStun;
 	}	
 	
-	/**
-	 * @param usePrettyEncoding the usePrettyEncoding to set
-	 */
-	public void setUsePrettyEncoding(boolean usePrettyEncoding) {
-		this.usePrettyEncoding = usePrettyEncoding;
-	}
-
-	/**
-	 * @return the usePrettyEncoding
-	 */
-	public boolean isUsePrettyEncoding() {
-		return usePrettyEncoding;
-	}	
-
 	public InetAddress getAddress() {
 		try {
 			return InetAddress.getByName(ipAddress);
@@ -689,18 +658,4 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 
     public void postDeregister() {
     }
-
-	/**
-	 * @param sipPathName the sipPathName to set
-	 */
-	public void setSipPathName(String sipPathName) {
-		this.sipPathName = sipPathName;
-	}
-
-	/**
-	 * @return the sipPathName
-	 */
-	public String getSipPathName() {
-		return sipPathName;
-	}	
 }

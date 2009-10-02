@@ -12,7 +12,8 @@
    -->
    <Service name="jboss.web" 
       	className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
-  		balancers="127.0.0.1"  
+  		balancers="127.0.0.1" 
+  		sipPathName="org.mobicents.ha"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
   		darConfigurationFileLocation="conf/dars/distributable-dar.properties">
@@ -46,7 +47,6 @@
 
 	<!-- Define a SIP Connector -->
     <Connector port="5081" 
-    	 sipPathName="org.mobicents.ha" 
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp"
