@@ -352,7 +352,9 @@
 				<subsection name="Version 1.7 - 1st October 2010 ">					
 					<p>											
 						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=324">														
 						Allow Regexp in Application Router to select based on headers.
+						</a>
 						<br />
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=677">
