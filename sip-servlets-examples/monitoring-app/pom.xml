@@ -73,12 +73,20 @@
 			<artifactId>cmutimelex</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<!-- jslee deps -->
 		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>annotations-api</artifactId>
-			<version>6.0.14</version>
-			<scope>provided</scope>
+			<groupId>javax.slee</groupId>
+			<artifactId>jain-slee</artifactId>
+			<version>1.0</version>	
+			<scope>provided</scope>		
 		</dependency>
+		<!-- various -->
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>	
 	</dependencies>
 	<build>
 		<plugins>
@@ -97,6 +105,50 @@
 					</warSourceDirectory>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+   				<groupId>org.mobicents.tools</groupId>
+    			<version>1.0.0.BETA2</version>
+				<inherited>true</inherited>
+				<executions />
+				<configuration>
+					<excludePoms />					
+					<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
+					<eclipseProjectName>jain-sip-ha-core</eclipseProjectName>
+				</configuration>
+			</plugin>	
 		</plugins>		
 	</build>
+
+	<!-- repositories -->
+	<repositories>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>			
+			<id>JbossRepository</id>
+			<name>Jboss Repository</name>
+			<url>http://repository.jboss.org/maven2</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>jboss-snapshots</id>
+			<name>JBoss Snapshot Repository</name>
+			<url>http://snapshots.jboss.org/maven2</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
