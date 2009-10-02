@@ -77,10 +77,12 @@ public class DistributableSimpleSipServlet
 			sipServletResponse.send();
 			return;
 		}
-		request.getSession().setAttribute("INVITE", RECEIVED);
-		request.getSession().setAttribute("activationListener", new SipSessionActivationListenerAttribute());
-		request.getApplicationSession().setAttribute("INVITE", RECEIVED);
-		request.getSession().setAttribute("activationListener", new SipApplicationSessionActivationListenerAttribute());
+		if(request.isInitial()) { 
+			request.getSession().setAttribute("INVITE", RECEIVED);
+			request.getSession().setAttribute("activationListener", new SipSessionActivationListenerAttribute());
+			request.getApplicationSession().setAttribute("INVITE", RECEIVED);
+			request.getSession().setAttribute("activationListener", new SipApplicationSessionActivationListenerAttribute());
+		}
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
 		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
