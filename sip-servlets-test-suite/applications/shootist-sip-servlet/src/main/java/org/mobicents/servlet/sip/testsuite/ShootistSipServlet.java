@@ -22,6 +22,7 @@ import java.io.Serializable;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -121,6 +122,15 @@ public class ShootistSipServlet
 		}
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+		Address addr = null;
+		try {
+			addr = sipServletRequest.getAddressHeader("Contact");
+		} catch (ServletParseException e1) {
+		}
+		if(addr == null) return; // Fail the test, we need that header
+		addr.setParameter("headerparam1", "headervalue1");
+		addr.setParameter("param5", "ffff");
+		addr.getURI().setParameter("uriparam", "urivalue");
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
 		if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
 			sipApplicationSession.encodeURI(requestURI);

@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.ToHeader;
 
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -92,6 +93,25 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	public void testShootistSetContact() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue((receiver.receivedInvite.getHeader("Contact").toString().contains("uriparam=urivalue")));
+		assertFalse((receiver.receivedInvite.getHeader("Contact").toString().contains("headerparam1"))); // !!!Is this condition OK? TODO FIXME
 		assertTrue(receiver.getByeReceived());		
 	}
 	

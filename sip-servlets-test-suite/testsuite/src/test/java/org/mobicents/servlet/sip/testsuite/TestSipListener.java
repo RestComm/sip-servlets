@@ -236,6 +236,8 @@ public class TestSipListener implements SipListener {
 	private boolean sendSubsequentRequestsThroughSipProvider;
 	
 	private boolean testAckViaParam;
+	
+	public Request receivedInvite;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -868,6 +870,7 @@ public class TestSipListener implements SipListener {
 	public void processInvite(RequestEvent requestEvent,
 			ServerTransaction serverTransaction) {
 		inviteReceived = true;
+		receivedInvite = requestEvent.getRequest();
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
 		logger.info("shootme: got an Invite " + request);
