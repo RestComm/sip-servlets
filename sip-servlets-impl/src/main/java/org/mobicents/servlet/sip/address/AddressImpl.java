@@ -105,6 +105,9 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 * @throws ParseException
 	 */
 	public AddressImpl(HeaderAddress header, boolean modifiable) throws ParseException {
+		if(header instanceof Parameters) {
+			super.header = (Parameters) header;
+		}
 		this.address = header.getAddress();
 		if(header instanceof Parameters) {
 			super.parameters = getParameters((Parameters)header);
@@ -112,7 +115,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 			super.parameters = new ConcurrentHashMap<String, String>();
 		}
 		super.isModifiable = modifiable;
-
+		
 	}
 	/*
 	 * (non-Javadoc)
