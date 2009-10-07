@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.Semaphore;
 
 import javax.naming.NamingException;
 import javax.servlet.Servlet;
@@ -843,7 +844,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					sipSession = ((MobicentsSipSession)response.getSipSession());
 				}
 				if(sipSession != null) {
-					sipSession.getSemaphore().acquireUninterruptibly();
+					final Semaphore semaphore = sipSession.getSemaphore();
+					if(semaphore != null) {
+						semaphore.acquireUninterruptibly();
+					}
 				}
 				break;
 			case SipApplicationSession:
@@ -854,7 +858,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession(false));
 				}
 				if(sipApplicationSession != null) {
-					sipApplicationSession.getSemaphore().acquireUninterruptibly();
+					final Semaphore semaphore = sipApplicationSession.getSemaphore();
+					if(semaphore != null) {
+						semaphore.acquireUninterruptibly();
+					}
 				}
 				break;
 			case None:

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.Semaphore;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -1008,7 +1009,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					sipSession = ((MobicentsSipSession)response.getSipSession());
 				}
 				if(sipSession != null) {
-					sipSession.getSemaphore().acquireUninterruptibly();
+					final Semaphore semaphore = sipSession.getSemaphore();
+					if(semaphore != null) {
+						semaphore.acquireUninterruptibly();
+					}
 					if(logger.isDebugEnabled()) {
 						logger.debug("response " + response + " acquired the semaphore for sip session " + sipSession);
 					}
@@ -1022,7 +1026,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession(false));
 				}
 				if(sipApplicationSession != null) {
-					sipApplicationSession.getSemaphore().acquireUninterruptibly();
+					final Semaphore semaphore = sipApplicationSession.getSemaphore();
+					if(semaphore != null) {
+						semaphore.acquireUninterruptibly();
+					}
 					if(logger.isDebugEnabled()) {
 						logger.debug("response " + response + " acquired the semaphore for sip application session " + sipApplicationSession);
 					}
