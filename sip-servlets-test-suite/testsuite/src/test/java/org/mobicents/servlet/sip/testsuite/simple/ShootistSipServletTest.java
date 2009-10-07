@@ -111,7 +111,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue((receiver.receivedInvite.getHeader("Contact").toString().contains("uriparam=urivalue")));
-		assertFalse((receiver.receivedInvite.getHeader("Contact").toString().contains("headerparam1"))); // !!!Is this condition OK? TODO FIXME
+		assertTrue((receiver.receivedInvite.getHeader("Contact").toString().contains("headerparam1=headervalue1")));
 		assertTrue(receiver.getByeReceived());		
 	}
 	
